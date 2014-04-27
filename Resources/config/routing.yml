@@ -1,0 +1,7 @@
+ekyna_product_tax_admin:
+    resource: "routing/admin/tax.yml"
+    prefix:   /admin/catalog/taxs
+
+ekyna_product_optionGroup_admin:
+    resource: "routing/admin/optionGroup.yml"
+    prefix:   /admin/catalog/options

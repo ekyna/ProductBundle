@@ -1,0 +1,11 @@
+{% extends 'EkynaAdminBundle::base.xml.twig' %}
+
+{% block response %}
+<title>{{ 'ekyna_product.optionGroup.header.new'|trans|raw }}</title>
+<form><![CDATA[
+<form action="{{ path('ekyna_product_optionGroup_admin_new') }}" {{ form_enctype(form) }} method="post" class="form-horizontal form-with-tabs">
+    {% include "EkynaProductBundle:OptionGroup/Admin:_form.html.twig" %}
+    {{ ui_form_footer(path('ekyna_product_optionGroup_admin_list')) }}
+</form>
+]]></form>
+{% endblock %}

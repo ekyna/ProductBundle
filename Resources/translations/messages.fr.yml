@@ -1,0 +1,39 @@
+ekyna_product:
+    optionGroup:
+        label:
+            singular: Option
+            plural: Options
+        header:
+            list: Options <small>Liste des options</small>
+            show: Detail de l'option <small>%name%</small>
+            new: Créer une nouvelle option
+            edit: Modifier l'option <small>%name%</small>
+            remove: Supprimer l'option <small>%name%</small>
+        button:
+            list: Liste des options
+            show: Detail de l'option
+            new: Nouvelle option
+            edit: Modifier l'option
+        alert:
+            no_tag: Aucune option configuré
+    tax:
+        label:
+            singular: Taxe
+            plural: Taxes
+        header:
+            list: Taxes <small>Liste des taxes</small>
+            show: Detail de la taxe<small>%name%</small>
+            new: Créer une nouvelle taxe
+            edit: Modifier la taxe <small>%name%</small>
+            remove: Supprimer la taxe <small>%name%</small>
+        button:
+            list: Liste des taxes
+            show: Detail de la taxe
+            new: Nouvelle taxe
+            edit: Modifier la taxe
+        alert:
+            no_tax: Aucune tax configuré
+    type:
+        1: Physique
+        2: Virtuel
+        3: Téléchargeable
