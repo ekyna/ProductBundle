@@ -35,6 +35,12 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
+                ->arrayNode('products_map')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
+                    ->useAttributeAsKey('name')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('pools')
                     ->addDefaultsIfNotSet()
                     ->children()

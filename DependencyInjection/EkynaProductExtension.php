@@ -17,6 +17,8 @@ class EkynaProductExtension extends AbstractExtension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->configure($configs, 'ekyna_product', new Configuration(), $container);
+        list($config, $loader) = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
+
+        $container->setParameter('ekyna_product.products_map', $config['products_map']);
     }
 }

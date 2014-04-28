@@ -11,9 +11,7 @@
         inheritance-type="JOINED">
 
         <discriminator-column name="class" type="string" />
-        <discriminator-map>
-            <discriminator-mapping value="product" class="Ekyna\Bundle\DemoBundle\Entity\Product" />
-        </discriminator-map>
+        <discriminator-map />
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO" />
