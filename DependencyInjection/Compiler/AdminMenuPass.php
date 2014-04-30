@@ -19,15 +19,14 @@ class AdminMenuPass implements CompilerPassInterface
         }
 
         $pool = $container->getDefinition('ekyna_admin.menu.pool');
-
         $pool->addMethodCall('createGroupReference', array(
-            'prod', 'Catalogue', 'folder-open', null, 10
+            'catalog', 'Catalogue', 'folder-open', null, 10
         ));
         $pool->addMethodCall('createEntryReference', array(
-            'prod', 'options', 'ekyna_product_optionGroup_admin_home', 'ekyna_product.optionGroup.label.plural'
+            'catalog', 'categories', 'ekyna_product_category_admin_home', 'ekyna_product.category.label.plural'
         ));
         $pool->addMethodCall('createEntryReference', array(
-            'prod', 'taxs', 'ekyna_product_tax_admin_home', 'ekyna_product.tax.label.plural'
+            'catalog', 'taxs', 'ekyna_product_tax_admin_home', 'ekyna_product.tax.label.plural'
         ));
     }
 }

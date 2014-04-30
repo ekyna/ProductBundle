@@ -1,0 +1,23 @@
+{% extends "EkynaAdminBundle:Entity:sided.html.twig" %}
+
+{% block title %}
+<h1>{{ 'ekyna_product.category.header.remove'|trans({'%name%': category.name})|raw }}</h1>
+{% endblock %}
+
+{% block actions %}
+{{ ui_link(path('ekyna_product_category_admin_list', identifiers), 'ekyna_core.button.back_to_list', 'default', 'sm', 'list') }}
+{{ ui_link(path('ekyna_product_category_admin_new', identifiers), 'ekyna_product.category.button.new', 'primary', 'sm', 'plus') }}
+{% endblock %}
+
+{% block main %}
+<form action="{{ path('ekyna_product_category_admin_remove', identifiers|merge({'categoryId': category.id})) }}" {{ form_enctype(form) }} method="post" class="form-horizontal">
+    <div class="form-body">
+	    {{ bootstrap_set_style('horizontal') }}
+		{{ form_widget(form) }}
+    </div>
+    {{ ui_form_footer(path('ekyna_product_category_admin_show', identifiers|merge({'categoryId': category.id})), 'ekyna_core.button.remove', 'danger') }}
+</form>
+{% endblock %}
+
+{% block side %}
+{% endblock %}

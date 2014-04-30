@@ -1,0 +1,13 @@
+{% extends "EkynaAdminBundle:Entity:layout.html.twig" %}
+
+{% block title %}
+<h1>{{ 'ekyna_product.category.header.list'|trans|raw }}</h1>
+{% endblock %}
+
+{% block actions %}
+{{ ui_link(path('ekyna_product_category_admin_new', identifiers), 'ekyna_product.category.button.new', 'primary', 'sm', 'plus') }}
+{% endblock %}
+
+{% block main %}
+{{ ekyna_table_render(categories) }}
+{% endblock %}

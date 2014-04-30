@@ -33,6 +33,30 @@ abstract class AbstractProduct implements ProductInterface
      */
     protected $options;
 
+    /**
+     * @var Category
+     */
+    protected $category;
+
+    /**
+     * @var string
+     */
+    protected $slug;
+
+    /**
+     * @var \DateTime
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     */
+    protected $updatedAt;
+
+    /**
+     * @var \DateTime
+     */
+    protected $deletedAt;
 
     /**
      * Constructor.
@@ -116,7 +140,7 @@ abstract class AbstractProduct implements ProductInterface
     {
         $option->setProduct($this);
         $this->options->add($option);
-    
+
         return $this;
     }
 
@@ -143,12 +167,132 @@ abstract class AbstractProduct implements ProductInterface
      */
     public function getOptionsGroups()
     {
-        $groups = new ArrayCollection();
+        $groups = array();
         foreach ($this->options as $option) {
-            if (! $groups->contains($group = $option->getGroup())) {
-                $groups->add($group);
+            if (! in_array($group = $option->getGroup(), $groups)) {
+                $groups[] = $group;
             }
         }
         return $groups;
+    }
+
+    /**
+     * Sets the category.
+     *
+     * @param \Ekyna\Bundle\ProductBundle\Entity\Category $category
+     * 
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     */
+    public function setCategory(Category $category = null)
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * Returns the category.
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Entity\Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * Sets the slug.
+     *
+     * @param string $slug
+     * 
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Returns the slug.
+     *
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Sets the "created at" datetime.
+     *
+     * @param \DateTime $createdAt
+     * 
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     */
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Returns the "created at" datetime
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Sets the "updated at" datetime.
+     *
+     * @param \DateTime $updatedAt
+     * 
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     */
+    public function setUpdatedAt(\DateTime $updatedAt = null)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Returns the "updated at" datetime.
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Sets the "deleted at" datetime.
+     *
+     * @param \DateTime $deletedAt
+     * 
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     */
+    public function setDeletedAt(\DateTime $deletedAt = null)
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * Returns the "deleted at" datetime.
+     *
+     * @return \DateTime
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
     }
 }

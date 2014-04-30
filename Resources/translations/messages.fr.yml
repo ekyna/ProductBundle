@@ -33,6 +33,26 @@ ekyna_product:
             edit: Modifier la taxe
         alert:
             no_tax: Aucune tax configuré
+    category:
+        label:
+            singular: Catégorie
+            plural: Catégories
+        header:
+            list: Catégories <small>Liste des catégories</small>
+            show: Detail de la catégorie<small>%name%</small>
+            content: Contenu de la catégorie <small>%name%</small>
+            new: Créer une nouvelle catégorie
+            new_child: Créer une nouvelle catégorie sous <small>%name%</small>
+            edit: Modifier la catégorie <small>%name%</small>
+            content_edit: Modifier le contenu de la catégorie <small>%name%</small>
+            remove: Supprimer la catégorie <small>%name%</small>
+        button:
+            list: Liste des catégories
+            show: Detail de la catégorie
+            new: Nouvelle catégorie
+            edit: Modifier la catégorie
+        alert:
+            no_category: Aucune catégorie configuré
     type:
         1: Physique
         2: Virtuel

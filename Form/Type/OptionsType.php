@@ -4,29 +4,31 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Doctrine\ORM\EntityRepository;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\OptionsToGroupsTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * OptionsType
+ * OptionsType.
  *
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class OptionsType extends AbstractType
 {
     /**
-     * @var Doctrine\ORM\EntityRepository
+     * The options configuration.
+     * 
+     * @var array
      */
-    private $optionGroupRepository;
+    private $optionsConfiguration;
 
     /**
-     * Constructor
+     * Constructor.
      * 
-     * @param EntityRepository $optionGroupRepository
+     * @param array $optionsConfiguration
      */
-    public function __construct(EntityRepository $optionGroupRepository)
+    public function __construct(array $optionsConfiguration)
     {
-        $this->optionGroupRepository = $optionGroupRepository;
+        $this->optionsConfiguration = $optionsConfiguration;
     }
 
     /**
@@ -34,12 +36,14 @@ class OptionsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $options = $this->optionGroupRepository->findBy(array(), array('position' => 'ASC'));
-        foreach($options as $option) {
+        foreach($this->optionsConfiguration as $name => $option) {
+            if (! in_array($name, $options['options'])) {
+                continue;
+            }
             $builder
-                ->add($option->getId(), 'bootstrap_collection', array(
-                    'label'        => $option->getName(),
-                    'type'         => 'ekyna_product_option',
+                ->add($name, 'bootstrap_collection', array(
+                    'label'        => $option['label'],
+                    'type'         => $option['form_type'],
                     'allow_add'    => true,
                     'allow_delete' => true,
                     'add_button_text'    => 'Ajouter une option',
@@ -52,13 +56,29 @@ class OptionsType extends AbstractType
                         'attr' => array(
                             'widget_col' => 12
                         ),
-                        'data_class' => 'Ekyna\Bundle\ProductBundle\Entity\Option',
+                        'data_class' => $option['class'],
                     )
                 ))
             ;
         }
 
-        $builder->addModelTransformer(new OptionsToGroupsTransformer($this->optionGroupRepository));
+        $builder->addModelTransformer(new OptionsToGroupsTransformer($this->optionsConfiguration));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver
+            ->setDefaults(array(
+                'options' => null,
+            ))
+            ->setRequired(array('options'))
+            ->setAllowedTypes(array(
+            	'options' => 'array',
+            ))
+        ;
     }
 
     /**

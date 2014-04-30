@@ -7,11 +7,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * OptionType.
+ * AbstractOptionType.
  *
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class OptionType extends AbstractType
+abstract class AbstractOptionType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -78,13 +78,5 @@ class OptionType extends AbstractType
             ))
             ->setRequired(array('data_class'))
         ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-    	return 'ekyna_product_option';
     }
 }

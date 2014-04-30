@@ -1,0 +1,22 @@
+{% extends "EkynaAdminBundle:Entity:layout.html.twig" %}
+
+{% block title %}
+<h1>{{ 'ekyna_product.category.header.content_edit'|trans({'%name%': category.name})|raw }}</h1>
+{% endblock %}
+
+{% block actions %}
+{{ ui_link(path('ekyna_product_category_admin_list', identifiers), 'ekyna_core.button.back_to_list', 'default', 'sm', 'list') }}
+{{ ui_link(path('ekyna_product_category_admin_new', identifiers), 'ekyna_product.category.button.new', 'primary', 'sm', 'plus') }}
+{% endblock %}
+
+{% block main %}
+<form action="{{ path('ekyna_product_category_admin_content_edit', identifiers|merge({'categoryId': category.id})) }}" {{ form_enctype(form) }} method="post">
+    <div class="form-body">
+	    {{ form_widget(form) }}
+    </div>
+    {{ ui_form_footer(path('ekyna_product_category_admin_content', identifiers|merge({'categoryId': category.id}))) }}
+</form>
+{% endblock %}
+
+{% block side %}
+{% endblock %}

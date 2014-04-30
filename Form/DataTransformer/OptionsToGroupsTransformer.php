@@ -4,32 +4,35 @@ namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityRepository;
 
 /**
- * OptionsToGroupsTransformer
+ * OptionsToGroupsTransformer.
  *
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class OptionsToGroupsTransformer implements DataTransformerInterface
 {
     /**
-     * @var EntityRepository
+     * The options configuration.
+     * 
+     * @var array
      */
-    private $optionGroupRepository;
+    protected $optionsConfiguration;
 
     /**
-     * @param EntityRepository $optionGroupRepository
+     * Constructor.
+     * 
+     * @param array $optionsConfiguration
      */
-    public function __construct(EntityRepository $optionGroupRepository)
+    public function __construct(array $optionsConfiguration)
     {
-        $this->optionGroupRepository = $optionGroupRepository;
+        $this->optionsConfiguration = $optionsConfiguration;
     }
 
     /**
-     * Transforms a Option collection to an associativ array : OptionGroup Id => Option collection
+     * Transforms a Option collection to an associativ array : group => Option collection.
      * 
-     * @param \Doctrine\Common\Collections\ArrayCollection $sellableOptions
+     * @param \Doctrine\Common\Collections\ArrayCollection $options
      * 
      * @return array
      */
@@ -37,11 +40,10 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
     {
         $array = array();
 
-    	$optionGroups = $this->optionGroupRepository->findBy(array(), array('position' => 'ASC'));
-    	foreach($optionGroups as $optionGroup) {
-    	    foreach($options as $option) {
-    	        if($option->getGroup() == $optionGroup) {
-    	            $array[$optionGroup->getId()][] = $option;
+    	foreach ($this->optionsConfiguration as $groupName => $group) {
+    	    foreach ($options as $option) {
+    	        if ($option->getGroup() == $groupName) {
+    	            $array[$groupName][] = $option;
     	        }
     	    }
     	}
@@ -50,7 +52,7 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms an associativ array to an Option collection
+     * Transforms an associativ array to an Option collection.
      * 
      * @param array $array
      * 
@@ -60,13 +62,13 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
     {
         $collection = new ArrayCollection();
 
-        foreach($array as $groupId => $options) {
-            if(null === $optionGroup = $this->optionGroupRepository->find($groupId)) {
+        foreach($array as $groupName => $options) {
+            if (! array_key_exists($groupName, $this->optionsConfiguration)) {
                 throw new \RuntimeException('Unable to reverse transform options.');
             }
-            foreach($options as $option) {
+            foreach ($options as $option) {
                 // Set option (group)
-                $option->setGroup($optionGroup);
+                $option->setGroup($groupName);
                 $collection->add($option);
             }
         }

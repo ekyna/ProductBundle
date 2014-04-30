@@ -3,15 +3,14 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Component\Sale\Product\OptionInterface;
-use Ekyna\Component\Sale\Product\OptionGroupInterface;
 use Ekyna\Component\Sale\Product\ProductInterface;
 
 /**
- * Option.
+ * AbstractOption.
  *
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class Option implements OptionInterface
+abstract class AbstractOption implements OptionInterface
 {
     use \Ekyna\Component\Sale\PriceableTrait;
     use \Ekyna\Component\Sale\ReferenceableTrait;
@@ -28,7 +27,7 @@ class Option implements OptionInterface
     protected $product;
 
     /**
-     * @var OptionGroup
+     * @var string
      */
     protected $group;
 
@@ -78,11 +77,11 @@ class Option implements OptionInterface
     /**
      * Sets the group.
      *
-     * @param \Ekyna\Component\Sale\Product\OptionGroupInterface $group
+     * @param string $group
      * 
      * @return Option
      */
-    public function setGroup(OptionGroupInterface $group = null)
+    public function setGroup($group)
     {
         $this->group = $group;
 

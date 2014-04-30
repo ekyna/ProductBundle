@@ -3,37 +3,36 @@
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityRepository;
 
 /**
- * ProductExtension
+ * ProductExtension.
  *
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class ProductExtension extends \Twig_Extension
 {
     /**
-     * OptionGroup repository
+     * The options configuration.
      * 
-     * @var EntityRepository
+     * @var array
      */
-    protected $optionGroupRepository;
+    protected $optionsConfiguration;
 
     /**
-     * Options list template
+     * Options list template.
      *
      * @var \Twig_Template
      */
     protected $optionsListTemplate;
 
     /**
-     * Constructor
+     * Constructor.
      * 
-     * @param EntityRepository $optionGroupRepository
+     * @param array $optionsConfiguration
      */
-    public function __construct(EntityRepository $optionGroupRepository)
+    public function __construct(array $optionsConfiguration)
     {
-        $this->optionGroupRepository = $optionGroupRepository;
+        $this->optionsConfiguration = $optionsConfiguration;
     }
 
     /**
@@ -41,7 +40,7 @@ class ProductExtension extends \Twig_Extension
      */
     public function initRuntime(\Twig_Environment $environment)
     {
-        $this->optionsListTemplate = $environment->loadTemplate('EkynaProductBundle:OptionGroup:_options_list.html.twig');
+        $this->optionsListTemplate = $environment->loadTemplate('EkynaProductBundle::_options_list.html.twig');
     }
 
     /**
@@ -57,7 +56,7 @@ class ProductExtension extends \Twig_Extension
     }
 
     /**
-     * Renders a list of product options
+     * Renders a list of product options.
      * 
      * @param Collection $options
      * 
@@ -67,15 +66,15 @@ class ProductExtension extends \Twig_Extension
     {
         $groups = array();
 
-        $optionGroups = $this->optionGroupRepository->findAll();
-        foreach($optionGroups as $optionGroup) {
+        foreach($this->optionsConfiguration as $groupName => $group) {
+            $list = array();
             foreach($options as $option) {
-                if($option->getGroup() == $optionGroup) {
-                    $optionGroup->addOption($option);
+                if($option->getGroup() == $groupName) {
+                    $list[] = $option;
                 }
             }
-            if($optionGroup->hasOptions()) {
-                $groups[] = $optionGroup;
+            if(0 < count($list)) {
+                $groups[$group['label']] = $list;
             }
         }
 

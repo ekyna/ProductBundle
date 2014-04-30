@@ -14,11 +14,29 @@ use Ekyna\Component\Sale\Product\ProductTypes;
  */
 abstract class AbstractProductType extends AbstractType
 {
+    /**
+     * The product class.
+     * 
+     * @var string
+     */
     protected $dataClass;
 
-    public function __construct($class)
+    /**
+     * The products configuration.
+     *
+     * @var array
+     */
+    protected $productsConfiguration;
+
+    /**
+     * Constructor.
+     * 
+     * @param string $class
+     */
+    public function __construct($class, array $productsConfiguration)
     {
         $this->dataClass = $class;
+        $this->productsConfiguration = $productsConfiguration;
     }
 
     /**
@@ -26,6 +44,13 @@ abstract class AbstractProductType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $optionGroups = array();
+        foreach($this->productsConfiguration as $config) {
+            if($config['class'] === $options['data_class']) {
+                $optionGroups = $config['options'];
+            }
+        }
+        
         $builder
             ->add('designation', 'text', array(
                 'label' => 'ekyna_core.field.designation',
@@ -62,7 +87,18 @@ abstract class AbstractProductType extends AbstractType
                 ),
             ))
             ->add('options', 'ekyna_product_options', array(
-                'label' => 'ekyna_core.field.options',
+                'label'   => 'ekyna_core.field.options',
+                'options' => $optionGroups
+            ))
+            ->add('category', 'entity', array(
+                'label' => 'ekyna_core.field.category',
+                'class' => 'Ekyna\Bundle\ProductBundle\Entity\Category',
+                'property' => 'name',
+                'add_route' => $options['admin_mode'] ? 'ekyna_product_category_admin_new' : false,
+                'empty_value' => 'ekyna_core.field.category',
+                'attr' => array(
+                    'placeholder' => 'ekyna_core.field.category',
+                ),
             ))
         ;
     }

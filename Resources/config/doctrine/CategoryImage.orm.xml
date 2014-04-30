@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping 
+    xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                        http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\CategoryImage" table="prod_category_image">
+            
+        <one-to-one field="category" target-entity="Ekyna\Bundle\ProductBundle\Entity\Category" inversed-by="image" orphan-removal="true">
+	        <join-column name="category_id" referenced-column-name="id" on-delete="CASCADE" />
+	    </one-to-one>
+
+    </entity>
+
+</doctrine-mapping>
