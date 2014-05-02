@@ -26,7 +26,7 @@
         <field name="price" column="price" type="decimal" precision="10" scale="5" />
         <field name="weight" column="weight" type="integer" />
         <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
-            <join-column name="tax_id" referenced-column-name="id" />
+            <join-column name="tax_id" referenced-column-name="id" nullable="false" />
         </many-to-one>
         <one-to-many field="options" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractOption" mapped-by="product">
             <cascade>
