@@ -108,7 +108,7 @@ abstract class AbstractProduct implements ProductInterface
     }
 
     /**
-     * Returns wether the product has options or not.
+     * Returns whether the product has options or not.
      * 
      * @return boolean
      */
@@ -118,7 +118,7 @@ abstract class AbstractProduct implements ProductInterface
     }
 
     /**
-     * Returns wether the product has the given option or not.
+     * Returns whether the product has the given option or not.
      * 
      * @param \Ekyna\Component\Sale\Product\OptionInterface $option
      * 
