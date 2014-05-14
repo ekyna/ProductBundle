@@ -15,7 +15,7 @@
 	    {{ bootstrap_set_style('horizontal') }}
 		{{ form_widget(form) }}
     </div>
-    {{ ui_form_footer(path('ekyna_product_category_admin_show', identifiers|merge({'categoryId': category.id})), 'ekyna_core.button.remove', 'danger') }}
+    {{ ui_form_footer(form) }}
 </form>
 {% endblock %}
 

@@ -5,7 +5,7 @@
 <form><![CDATA[
 <form action="{{ path('ekyna_product_tax_admin_new') }}" {{ form_enctype(form) }} method="post" class="form-horizontal form-with-tabs">
     {% include "EkynaProductBundle:Tax/Admin:_form.html.twig" %}
-    {{ ui_form_footer(path('ekyna_product_tax_admin_list')) }}
+    {{ ui_form_footer(form) }}
 </form>
 ]]></form>
 {% endblock %}

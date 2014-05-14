@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Doctrine\Common\Collections\Collection;
+use Ekyna\Component\Sale\Product\OptionInterface;
 
 /**
  * ProductExtension.
@@ -52,6 +53,7 @@ class ProductExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('options_list', array($this, 'renderOptionsList'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('option_group_label', array($this, 'getOptionGroupLabel'), array('is_safe' => array('html'))),
         );
     }
 
@@ -81,6 +83,20 @@ class ProductExtension extends \Twig_Extension
         return $this->optionsListTemplate->render(array(
         	'options' => $groups
         ));
+    }
+
+    /**
+     * Returns the group label for the given option.
+     * 
+     * @param OptionInterface $option
+     * 
+     * @return string
+     */
+    public function getOptionGroupLabel(OptionInterface $option)
+    {
+        if (array_key_exists($option->getGroup(), $this->optionsConfiguration)) {
+            return $this->optionsConfiguration[$option->getGroup()]['label'];
+        }
     }
 
     /**

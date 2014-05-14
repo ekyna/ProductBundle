@@ -15,7 +15,7 @@
 	    {{ bootstrap_set_style('horizontal') }}
 		{{ form_widget(form) }}
     </div>
-    {{ ui_form_footer(path('ekyna_product_tax_admin_show', {'taxId': tax.id}), 'ekyna_core.button.remove', 'danger') }}
+    {{ ui_form_footer(form) }}
 </form>
 {% endblock %}
 
