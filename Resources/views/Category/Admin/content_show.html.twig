@@ -1,18 +1,18 @@
 {% extends "EkynaAdminBundle:Entity:content.html.twig" %}
 
 {% block title %}
-<h1>{{ 'ekyna_product.category.header.content'|trans({'%name%': page.name})|raw }}</h1>
+<h1>{{ 'ekyna_product.category.header.content_show'|trans({'%name%': page.name})|raw }}</h1>
 {% endblock %}
 
 {% block actions %}
-{{ ui_link(path('ekyna_product_page_admin_list'), 'ekyna_core.button.back_to_list', 'default', 'sm', 'list') }}
-{{ ui_link(path('ekyna_product_page_admin_new'), 'ekyna_product.category.button.new', 'primary', 'sm', 'plus') }}
+{{ admin_resource_btn(category, 'list') }}
+{{ admin_resource_btn(category, 'new') }}
 {% endblock %}
 
 {% block main %}
 <div class="actions">
-    {{ ui_link(path('ekyna_product_page_admin_content_edit', {'pageId': page.id}), 'ekyna_core.button.edit', 'warning', 'sm', 'pencil') }}
-    {{ ui_link(path('ekyna_product_page_admin_show', {'pageId': page.id}), 'ekyna_core.button.back_to_show', 'default', 'sm', 'eye-open') }}
+    {{ admin_resource_btn(category, 'edit', {'label': 'ekyna_core.button.content_edit', 'path': path('ekyna_product_category_admin_content_edit', identifiers|merge({'categoryId': category.id}))}) }}
+    {{ admin_resource_btn(category, 'show', {'label': 'ekyna_core.button.back_to_show'}) }}
 </div>
 <div class="show">
     {{ cms_content(page.content) }}

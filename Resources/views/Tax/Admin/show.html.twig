@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block actions %}
-{{ ui_link(path('ekyna_product_tax_admin_list'), 'ekyna_core.button.back_to_list', 'default', 'sm', 'list') }}
-{{ ui_link(path('ekyna_product_tax_admin_new'), 'ekyna_product.tax.button.new', 'primary', 'sm', 'plus') }}
+{{ admin_resource_btn(tax, 'list') }}
+{{ admin_resource_btn(tax, 'new') }}
 {% endblock %}
 
 {% block main %}
 <div class="actions">
-    {{ ui_link(path('ekyna_product_tax_admin_edit', {'taxId': tax.id}), 'ekyna_core.button.edit', 'warning', 'sm', 'pencil') }}
-    {{ ui_link(path('ekyna_product_tax_admin_remove', {'taxId': tax.id}), 'ekyna_core.button.remove', 'danger', 'sm', 'trash') }}
+    {{ admin_resource_btn(tax, 'edit') }}
+    {{ admin_resource_btn(tax, 'remove') }}
 </div>
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs">

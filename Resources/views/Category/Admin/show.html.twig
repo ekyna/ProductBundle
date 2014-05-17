@@ -6,16 +6,16 @@
 
 {% block actions %}
 {% if cms_content_enabled %}
-{{ ui_link(path('ekyna_product_category_admin_content', identifiers|merge({'categoryId': category.id})), 'ekyna_core.button.content', 'default', 'sm', 'th-large') }}
+{{ admin_resource_btn(category, 'show', {'label': 'ekyna_core.button.content_show', 'path': path('ekyna_product_category_admin_content', identifiers|merge({'categoryId': category.id})), 'icon': 'th-large'}) }}
 {% endif %}
-{{ ui_link(path('ekyna_product_category_admin_list', identifiers), 'ekyna_core.button.back_to_list', 'default', 'sm', 'list') }}
-{{ ui_link(path('ekyna_product_category_admin_new', identifiers), 'ekyna_product.category.button.new', 'primary', 'sm', 'plus') }}
+{{ admin_resource_btn(category, 'list') }}
+{{ admin_resource_btn(category, 'new') }}
 {% endblock %}
 
 {% block main %}
 <div class="actions">
-    {{ ui_link(path('ekyna_product_category_admin_edit', identifiers|merge({'categoryId': category.id})), 'ekyna_core.button.edit', 'warning', 'sm', 'pencil') }}
-    {{ ui_link(path('ekyna_product_category_admin_remove', identifiers|merge({'categoryId': category.id})), 'ekyna_core.button.remove', 'danger', 'sm', 'trash') }}
+    {{ admin_resource_btn(category, 'edit') }}
+    {{ admin_resource_btn(category, 'remove') }}
 </div>
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs">

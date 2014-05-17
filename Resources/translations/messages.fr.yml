@@ -14,6 +14,7 @@ ekyna_product:
             show: Detail de l'option
             new: Nouvelle option
             edit: Modifier l'option
+            remove: Supprimer l'option
         alert:
             no_tag: Aucune option configuré
     tax:
@@ -31,6 +32,7 @@ ekyna_product:
             show: Detail de la taxe
             new: Nouvelle taxe
             edit: Modifier la taxe
+            remove: Supprimer la taxe
         alert:
             no_tax: Aucune tax configuré
     category:
@@ -40,7 +42,7 @@ ekyna_product:
         header:
             list: Catégories <small>Liste des catégories</small>
             show: Detail de la catégorie<small>%name%</small>
-            content: Contenu de la catégorie <small>%name%</small>
+            content_show: Contenu de la catégorie <small>%name%</small>
             new: Créer une nouvelle catégorie
             new_child: Créer une nouvelle catégorie sous <small>%name%</small>
             edit: Modifier la catégorie <small>%name%</small>
@@ -51,6 +53,7 @@ ekyna_product:
             show: Detail de la catégorie
             new: Nouvelle catégorie
             edit: Modifier la catégorie
+            remove: Supprimer la catégorie
         alert:
             no_category: Aucune catégorie configuré
     type:
