@@ -40,7 +40,7 @@ class TaxType extends AbstractTableType
                 'label' => 'ekyna_core.field.rate',
                 'sortable' => true,
             ))
-            ->addColumn('actions', 'actions', array(
+            ->addColumn('actions', 'admin_actions', array(
                 'buttons' => array(
                     array(
                         'label' => 'ekyna_core.button.edit',
@@ -49,6 +49,7 @@ class TaxType extends AbstractTableType
                         'route_parameters_map' => array(
                             'taxId' => 'id'
                         ),
+                        'permission' => 'edit',
                     ),
                     array(
                         'label' => 'ekyna_core.button.remove',
@@ -57,6 +58,7 @@ class TaxType extends AbstractTableType
                         'route_parameters_map' => array(
                             'taxId' => 'id'
                         ),
+                        'permission' => 'delete',
                     ),
                 ),
             ))

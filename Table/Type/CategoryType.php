@@ -38,7 +38,7 @@ class CategoryType extends AbstractTableType
             ->addColumn('createdAt', 'datetime', array(
                 'label' => 'ekyna_core.field.add_date',
             ))
-            ->addColumn('actions', 'nested_actions', array(
+            ->addColumn('actions', 'admin_nested_actions', array(
                 'new_child_route' => 'ekyna_product_category_admin_new_child',
                 'move_up_route' => 'ekyna_product_category_admin_move_up',
                 'move_down_route' => 'ekyna_product_category_admin_move_down',
@@ -54,6 +54,7 @@ class CategoryType extends AbstractTableType
                         'route_parameters_map' => array(
                             'categoryId' => 'id'
                         ),
+                        'permission' => 'edit',
                     ),
                     array(
                         'label' => 'ekyna_core.button.remove',
@@ -63,6 +64,7 @@ class CategoryType extends AbstractTableType
                         'route_parameters_map' => array(
                             'categoryId' => 'id'
                         ),
+                        'permission' => 'delete',
                     ),
                 ),
             ))
