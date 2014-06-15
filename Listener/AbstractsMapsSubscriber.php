@@ -63,19 +63,8 @@ class AbstractsMapsSubscriber implements EventSubscriber
         $metadata = $eventArgs->getClassMetadata();
 
         if ($metadata->getName() === self::ABSTRACT_OPTION_FQCN) {
-            $namingStrategy = $eventArgs
-                ->getEntityManager()
-                ->getConfiguration()
-                ->getNamingStrategy()
-            ;
             $metadata->setDiscriminatorMap($this->optionsClassesMap);
-
         } elseif ($metadata->getName() === self::ABSTRACT_PRODUCT_FQCN) {
-            $namingStrategy = $eventArgs
-                ->getEntityManager()
-                ->getConfiguration()
-                ->getNamingStrategy()
-            ;
             $metadata->setDiscriminatorMap($this->productsClassesMap);
         }
     }

@@ -42,11 +42,9 @@ ekyna_product:
         header:
             list: Catégories <small>Liste des catégories</small>
             show: Detail de la catégorie<small>%name%</small>
-            content_show: Contenu de la catégorie <small>%name%</small>
             new: Créer une nouvelle catégorie
             new_child: Créer une nouvelle catégorie sous <small>%name%</small>
             edit: Modifier la catégorie <small>%name%</small>
-            content_edit: Modifier le contenu de la catégorie <small>%name%</small>
             remove: Supprimer la catégorie <small>%name%</small>
         button:
             list: Liste des catégories

@@ -44,20 +44,6 @@ ekyna_product_category_admin_tinymce:
         _method: GET
         categoryId:  \d+
 
-ekyna_product_category_admin_content:
-    path: /{categoryId}/content
-    defaults: { _controller: "ekyna_product.category.controller:contentShowAction" }
-    requirements:
-        _method: GET
-        categoryId:  \d+
-
-ekyna_product_category_admin_content_edit:
-    path: /{categoryId}/content/edit
-    defaults: { _controller: "ekyna_product.category.controller:contentEditAction" }
-    requirements:
-        _method: GET|POST
-        categoryId:  \d+
-
 ekyna_product_category_admin_move_up:
     path: /{categoryId}/moveup
     defaults: { _controller: "ekyna_product.category.controller:moveUpAction" }
