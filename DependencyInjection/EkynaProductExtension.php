@@ -19,6 +19,10 @@ class EkynaProductExtension extends AbstractExtension
     {
         list($config, $loader) = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
 
+        // Base abstract classes
+        $container->setParameter('ekyna_product.option.class', $config['option_class']);
+        $container->setParameter('ekyna_product.product.class', $config['product_class']);
+        
         // Options classes map (CTI)
         $container->setParameter('ekyna_product.options_classes_map', array_map(function($option) {
         	return $option['class'];

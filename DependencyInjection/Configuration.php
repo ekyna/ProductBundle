@@ -21,20 +21,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('ekyna_product');
 
-        $this->addPoolsSection($rootNode);
-
-        return $treeBuilder;
-    }
-
-    /**
-     * Adds `pools` section.
-     *
-     * @param ArrayNodeDefinition $node
-     */
-    private function addPoolsSection(ArrayNodeDefinition $node)
-    {
-        $node
+        $rootNode
             ->children()
+                ->scalarNode('option_class')->defaultValue('Ekyna\Bundle\CmsBundle\Entity\AbstractOption')->end()
+                ->scalarNode('product_class')->defaultValue('Ekyna\Bundle\CmsBundle\Entity\AbstractProduct')->end()
                 ->arrayNode('options')
                     ->isRequired()
                     ->requiresAtLeastOneElement()
@@ -61,22 +51,26 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+
+        $this->addPoolsSection($rootNode);
+
+        return $treeBuilder;
+    }
+
+    /**
+     * Adds `pools` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addPoolsSection(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('pools')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('category')
-                            ->isRequired()
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('templates')->defaultValue('EkynaProductBundle:Category/Admin')->end()
-                                ->scalarNode('parent')->end()
-                                ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Category')->end()
-                                ->scalarNode('controller')->defaultValue('Ekyna\Bundle\ProductBundle\Controller\Admin\CategoryController')->end()
-                                ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\CategoryRepository')->end()
-                                ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\CategoryType')->end()
-                                ->scalarNode('table')->defaultValue('Ekyna\Bundle\ProductBundle\Table\Type\CategoryType')->end()
-                            ->end()
-                        ->end()
                         ->arrayNode('tax')
                             ->isRequired()
                             ->addDefaultsIfNotSet()

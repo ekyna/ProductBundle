@@ -18,14 +18,28 @@ class AbstractsMapsSubscriber implements EventSubscriber
      * 
      * @var string
      */
-    const ABSTRACT_OPTION_FQCN  = 'Ekyna\Bundle\CmsBundle\Entity\AbstractOption';
+    const ROOT_OPTION_CLASS  = 'Ekyna\Bundle\CmsBundle\Entity\AbstractOption';
 
     /**
      * The abstract product full qualified class name.
      * 
      * @var string
      */
-    const ABSTRACT_PRODUCT_FQCN = 'Ekyna\Bundle\CmsBundle\Entity\AbstractProduct';
+    const ROOT_PRODUCT_CLASS = 'Ekyna\Bundle\CmsBundle\Entity\AbstractProduct';
+
+    /**
+     * The base option class.
+     * 
+     * @var string
+     */
+    protected $baseOptionClass;
+
+    /**
+     * The base product class.
+     * 
+     * @var string
+     */
+    protected $baseProductClass;
 
     /**
      * The options discriminitor classes map [name => fqcn].
@@ -44,11 +58,15 @@ class AbstractsMapsSubscriber implements EventSubscriber
     /**
      * Constructor.
      * 
-     * @param array $optionsClassesMap
-     * @param array $productsClassesMap
+     * @param string $optionClass
+     * @param string $productClass
+     * @param array  $optionsClassesMap
+     * @param array  $productsClassesMap
      */
-    public function __construct(array $optionsClassesMap, array $productsClassesMap)
+    public function __construct($baseOptionClass, $baseProductClass, array $optionsClassesMap, array $productsClassesMap)
     {
+        $this->baseOptionClass = $baseOptionClass;
+        $this->baseProductClass = $baseProductClass;
         $this->optionsClassesMap = $optionsClassesMap;
         $this->productsClassesMap = $productsClassesMap;
     }
@@ -62,9 +80,11 @@ class AbstractsMapsSubscriber implements EventSubscriber
     {
         $metadata = $eventArgs->getClassMetadata();
 
-        if ($metadata->getName() === self::ABSTRACT_OPTION_FQCN) {
+        // Option mapping
+        if ($metadata->getName() === $this->baseOptionClass) {
             $metadata->setDiscriminatorMap($this->optionsClassesMap);
-        } elseif ($metadata->getName() === self::ABSTRACT_PRODUCT_FQCN) {
+        // Product mapping
+        } elseif ($metadata->getName() === $this->baseProductClass) {
             $metadata->setDiscriminatorMap($this->productsClassesMap);
         }
     }

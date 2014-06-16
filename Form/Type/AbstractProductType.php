@@ -90,16 +90,6 @@ abstract class AbstractProductType extends AbstractType
                 'label'   => 'ekyna_core.field.options',
                 'options' => $optionGroups
             ))
-            ->add('category', 'entity', array(
-                'label' => 'ekyna_core.field.category',
-                'class' => 'Ekyna\Bundle\ProductBundle\Entity\Category',
-                'property' => 'name',
-                'add_route' => $options['admin_mode'] ? 'ekyna_product_category_admin_new' : false,
-                'empty_value' => 'ekyna_core.field.category',
-                'attr' => array(
-                    'placeholder' => 'ekyna_core.field.category',
-                ),
-            ))
         ;
     }
 

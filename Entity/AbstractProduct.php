@@ -34,11 +34,6 @@ abstract class AbstractProduct implements ProductInterface
     protected $options;
 
     /**
-     * @var Category
-     */
-    protected $category;
-
-    /**
      * @var string
      */
     protected $slug;
@@ -176,30 +171,6 @@ abstract class AbstractProduct implements ProductInterface
             }
         }
         return $groups;
-    }
-
-    /**
-     * Sets the category.
-     *
-     * @param \Ekyna\Bundle\ProductBundle\Entity\Category $category
-     * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
-     */
-    public function setCategory(Category $category = null)
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * Returns the category.
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Category
-     */
-    public function getCategory()
-    {
-        return $this->category;
     }
 
     /**

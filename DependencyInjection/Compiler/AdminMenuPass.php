@@ -26,13 +26,6 @@ class AdminMenuPass implements CompilerPassInterface
             'position' => 10,
         )));
         $pool->addMethodCall('createEntry', array('catalog', array(
-            'name'     => 'categories',
-            'route'    => 'ekyna_product_category_admin_home',
-            'label'    => 'ekyna_product.category.label.plural',
-            'resource' => 'ekyna_product_category',
-            'position' => 98,
-        )));
-        $pool->addMethodCall('createEntry', array('catalog', array(
             'name'     => 'taxes',
             'route'    => 'ekyna_product_tax_admin_home',
             'label'    => 'ekyna_product.tax.label.plural',
