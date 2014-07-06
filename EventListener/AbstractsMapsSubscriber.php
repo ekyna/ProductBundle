@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekyna\Bundle\ProductBundle\Listener;
+namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;

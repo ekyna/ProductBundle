@@ -7,10 +7,7 @@
                         http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="ekyna_product.product.repository.class">Ekyna\Bundle\ProductBundle\Entity\ProductRepository</parameter>
-        <parameter key="ekyna_product.product.search.class">Ekyna\Bundle\ProductBundle\Search\ProductSearch</parameter>
-
-        <parameter key="ekyna_product.abstracts_maps_subscriber.class">Ekyna\Bundle\ProductBundle\Listener\AbstractsMapsSubscriber</parameter>
+        <parameter key="ekyna_product.abstracts_maps_subscriber.class">Ekyna\Bundle\ProductBundle\EventListener\AbstractsMapsSubscriber</parameter>
 
         <parameter key="ekyna_product.options.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\OptionsType</parameter>
 
@@ -19,21 +16,6 @@
     </parameters>
 
     <services>
-        <!-- Product repository --> 
-        <service
-            id="ekyna_product.product.repository"
-            class="%ekyna_product.product.repository.class%"
-            factory-service="doctrine.orm.entity_manager"
-            factory-method="getRepository">
-            <argument>%ekyna_product.product.class%</argument>
-        </service>
- 
-        <!-- Product Search --> 
-        <service id="ekyna_product.product.search" class="%ekyna_product.product.search.class%">
-            <argument type="service" id="ekyna_product.product.repository" />
-            <argument>6</argument>
-        </service>
-
         <!-- Doctrine subscriber -->
         <service id="ekyna_product.abstracts_maps_subscriber" class="%ekyna_product.abstracts_maps_subscriber.class%">
             <argument>%ekyna_product.option.class%</argument>
