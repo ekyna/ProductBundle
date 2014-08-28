@@ -42,14 +42,14 @@ class AbstractsMapsSubscriber implements EventSubscriber
     protected $baseProductClass;
 
     /**
-     * The options discriminitor classes map [name => fqcn].
+     * The options discriminator classes map [name => fqcn].
      * 
      * @var array
      */
     protected $optionsClassesMap;
 
     /**
-     * The products discriminitor classes map [name => fqcn].
+     * The products discriminator classes map [name => fqcn].
      * 
      * @var array
      */
@@ -58,8 +58,8 @@ class AbstractsMapsSubscriber implements EventSubscriber
     /**
      * Constructor.
      * 
-     * @param string $optionClass
-     * @param string $productClass
+     * @param string $baseOptionClass
+     * @param string $baseProductClass
      * @param array  $optionsClassesMap
      * @param array  $productsClassesMap
      */

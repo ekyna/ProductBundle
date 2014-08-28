@@ -32,6 +32,7 @@ abstract class AbstractProductType extends AbstractType
      * Constructor.
      * 
      * @param string $class
+     * @param array $productsConfiguration
      */
     public function __construct($class, array $productsConfiguration)
     {
