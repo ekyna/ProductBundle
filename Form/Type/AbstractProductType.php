@@ -76,12 +76,11 @@ abstract class AbstractProductType extends AbstractType
                 'precision' => 5,
                 'attr' => array('input_group' => array('append' => '€')),
             ))
-            ->add('tax', 'entity', array(
+            ->add('tax', 'ekyna_resource', array(
                 'label' => 'ekyna_core.field.tax',
                 'class' => 'Ekyna\Bundle\ProductBundle\Entity\Tax',
-                'multiple' => false,
                 'property' => 'name',
-                'add_route' => $options['admin_mode'] ? 'ekyna_product_tax_admin_new' : false,
+                'allow_new' => $options['admin_mode'],
                 'empty_value' => 'ekyna_core.field.tax',
                 'attr' => array(
             	    'placeholder' => 'ekyna_core.field.tax',
