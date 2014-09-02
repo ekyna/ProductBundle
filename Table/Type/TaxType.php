@@ -2,23 +2,16 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
-use Ekyna\Component\Table\AbstractTableType;
+use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Component\Table\TableBuilderInterface;
 
 /**
- * TaxType
- *
+ * Class TaxType
+ * @package Ekyna\Bundle\ProductBundle\Table\Type
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class TaxType extends AbstractTableType
+class TaxType extends ResourceTableType
 {
-    protected $entityClass;
-
-    public function __construct($class)
-    {
-        $this->entityClass = $class;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -70,14 +63,6 @@ class TaxType extends AbstractTableType
             	'label' => 'ekyna_core.field.rate'
             ))
         ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
     }
 
     /**
