@@ -2,7 +2,6 @@
 <doctrine-mapping 
     xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
     xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                         http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
@@ -11,6 +10,15 @@
         table="prod_option"
         inheritance-type="JOINED">
 
+        <indexes>
+            <index name="group_idx" columns="grp" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="product_id,designation" name="unique_designation" />
+            <unique-constraint columns="product_id,reference" name="unique_reference" />
+        </unique-constraints>
+
         <discriminator-column name="class" type="string" />
         <discriminator-map />
 
@@ -18,23 +26,18 @@
             <generator strategy="AUTO" />
         </id>
 
-        <many-to-one field="product" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractProduct" inversed-by="options" orphan-removal="true">
-            <join-column name="product_id" referenced-column-name="id" nullable="false" />
-        </many-to-one>
         <field name="group" column="grp" type="string" length="32" />
-
         <field name="designation" column="designation" type="string" length="255" />
         <field name="reference" column="reference" type="string" length="32" />
-
         <field name="price" column="price" type="decimal" precision="10" scale="5" />
         <field name="weight" column="weight" type="integer" />
+
+        <many-to-one field="product" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractProduct" inversed-by="options">
+            <join-column name="product_id" referenced-column-name="id" nullable="false" />
+        </many-to-one>
         <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
             <join-column name="tax_id" referenced-column-name="id" nullable="false" />
         </many-to-one>
-
-		<indexes>
-		    <index name="group_idx" columns="grp" />
-		</indexes>
 
     </entity>
 

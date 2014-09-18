@@ -59,7 +59,7 @@ abstract class AbstractOption implements OptionInterface
      * 
      * @return Option
      */
-    public function setProduct(ProductInterface $product)
+    public function setProduct(ProductInterface $product = null)
     {
         $this->product = $product;
 

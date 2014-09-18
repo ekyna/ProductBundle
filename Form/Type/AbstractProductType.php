@@ -61,11 +61,7 @@ abstract class AbstractProductType extends AbstractType
             ))
             ->add('type', 'choice', array(
                 'label' => 'ekyna_core.field.type',
-                'choices' => array(
-            	    ProductTypes::PHYSICAL     => 'ekyna_product.type.' . ProductTypes::PHYSICAL,
-            	    ProductTypes::VIRTUAL      => 'ekyna_product.type.' . ProductTypes::VIRTUAL,
-            	    ProductTypes::DOWNLOADABLE => 'ekyna_product.type.' . ProductTypes::DOWNLOADABLE,
-                )
+                'choices' => ProductTypes::getChoices(),
             ))
             ->add('weight', 'integer', array(
                 'label' => 'ekyna_core.field.weight',
@@ -88,7 +84,7 @@ abstract class AbstractProductType extends AbstractType
             ))
             ->add('options', 'ekyna_product_options', array(
                 'label'   => 'ekyna_core.field.options',
-                'options' => $optionGroups
+                'options' => $optionGroups,
             ))
         ;
     }

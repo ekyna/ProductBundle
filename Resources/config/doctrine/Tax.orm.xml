@@ -11,8 +11,8 @@
             <generator strategy="AUTO" />
         </id>
 
-        <field name="name" column="name" type="string" length="64" />
-        <field name="rate" column="rate" type="decimal" precision="5" scale="3" />
+        <field name="name" column="name" type="string" length="64" unique="true" />
+        <field name="rate" column="rate" type="decimal" precision="5" scale="3" unique="true" />
 
     </entity>
 

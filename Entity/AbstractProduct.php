@@ -87,7 +87,7 @@ abstract class AbstractProduct implements ProductInterface
      * 
      * @param integer $type
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
      */
     public function setType($type)
     {
@@ -148,6 +148,7 @@ abstract class AbstractProduct implements ProductInterface
      */
     public function removeOption(OptionInterface $option)
     {
+        $option->setProduct(null);
         $this->options->removeElement($option);
     }
 
@@ -157,6 +158,21 @@ abstract class AbstractProduct implements ProductInterface
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * Sets the options.
+     *
+     * @param ArrayCollection $options
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     */
+    public function setOptions(ArrayCollection $options)
+    {
+        /** @var OptionInterface $option */
+        foreach($options as $option) {
+            $option->setProduct($this);
+        }
+        $this->options = $options;
     }
 
     /**
@@ -178,7 +194,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param string $slug
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
      */
     public function setSlug($slug)
     {
@@ -202,7 +218,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $createdAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
@@ -226,7 +242,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $updatedAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
      */
     public function setUpdatedAt(\DateTime $updatedAt = null)
     {
@@ -250,7 +266,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $deletedAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
      */
     public function setDeletedAt(\DateTime $deletedAt = null)
     {

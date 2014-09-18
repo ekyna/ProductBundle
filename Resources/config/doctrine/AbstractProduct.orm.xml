@@ -19,25 +19,14 @@
             <generator strategy="AUTO" />
         </id>
 
-        <field name="type" column="type" type="integer" />
+        <field name="type" column="type" type="string" length="16" />
         <field name="designation" column="designation" type="string" length="255" unique="true" />
         <field name="reference" column="reference" type="string" length="32" unique="true" />
-
         <field name="price" column="price" type="decimal" precision="10" scale="5" />
         <field name="weight" column="weight" type="integer" />
-        <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
-            <join-column name="tax_id" referenced-column-name="id" nullable="false" />
-        </many-to-one>
-        <one-to-many field="options" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractOption" mapped-by="product">
-            <cascade>
-                <cascade-all/>
-            </cascade>
-        </one-to-many>
-
         <field name="slug" column="slug" type="string" length="64" unique="true">
             <gedmo:slug unique="true" updatable="false" fields="designation" />
         </field>
-
         <field name="createdAt" column="created_at" type="datetime">
             <gedmo:timestampable on="create" />
         </field>
@@ -45,6 +34,17 @@
             <gedmo:timestampable on="update" />
         </field>
         <field name="deletedAt" column="deleted_at" type="datetime" nullable="true" />
+
+        <one-to-many field="options" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractOption" mapped-by="product" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+        <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
+            <join-column name="tax_id" referenced-column-name="id" nullable="false" />
+        </many-to-one>
+
         <gedmo:soft-deleteable field-name="deletedAt" />
 
     </entity>

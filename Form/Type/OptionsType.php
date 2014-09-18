@@ -50,7 +50,6 @@ class OptionsType extends AbstractType
                     'delete_button_text' => 'Supprimer',
                     'sub_widget_col'     => 9,
                     'button_col'         => 3,
-                    'by_reference' => false,
                     'options'      => array(
                         'label' => false,
                         'attr' => array(

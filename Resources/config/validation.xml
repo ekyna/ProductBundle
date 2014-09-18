@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<constraint-mapping
+        xmlns="http://symfony.com/schema/dic/constraint-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
+                        http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractProduct">
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">designation</option>
+            <option name="message">ekyna_product.product.designation_already_exists</option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">reference</option>
+            <option name="message">ekyna_product.product.reference_already_exists</option>
+        </constraint>
+        <property name="type">
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ValidProductType" />
+        </property>
+        <property name="designation">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="reference">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="price">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="weight">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="tax">
+            <constraint name="NotNull" />
+        </property>
+        <property name="options">
+            <constraint name="Valid" />
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractOption">
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">product</option>
+            <option name="fields">designation</option>
+            <option name="message">ekyna_product.option.designation_already_exists</option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">product</option>
+            <option name="fields">reference</option>
+            <option name="message">ekyna_product.option.reference_already_exists</option>
+        </constraint>
+        <property name="product">
+            <constraint name="Valid" />
+        </property>
+        <property name="group">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="designation">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="reference">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="price">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="weight">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="tax">
+            <constraint name="NotNull" />
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Tax">
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">name</option>
+            <option name="message">ekyna_product.tax.name_already_exists</option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">rate</option>
+            <option name="message">ekyna_product.tax.rate_already_exists</option>
+        </constraint>
+        <property name="name">
+            <constraint name="NotBlank" />
+        </property>
+        <property name="rate">
+            <constraint name="Range">
+                <option name="min">0</option>
+                <option name="max">1</option>
+            </constraint>
+        </property>
+    </class>
+
+</constraint-mapping>

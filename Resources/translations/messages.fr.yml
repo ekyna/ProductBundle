@@ -18,6 +18,6 @@ ekyna_product:
         alert:
             no_tax: Aucune tax configuré
     type:
-        1: Physique
-        2: Virtuel
-        3: Téléchargeable
+        physical: Physique
+        virtual: Virtuel
+        downloadable: Téléchargeable
