@@ -43,13 +43,17 @@
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractOption">
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">product</option>
-            <option name="fields">designation</option>
+            <option name="fields">
+                <value>product</value>
+                <value>designation</value>
+            </option>
             <option name="message">ekyna_product.option.designation_already_exists</option>
         </constraint>
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">product</option>
-            <option name="fields">reference</option>
+            <option name="fields">
+                <value>product</value>
+                <value>designation</value>
+            </option>
             <option name="message">ekyna_product.option.reference_already_exists</option>
         </constraint>
         <property name="product">
