@@ -1,11 +1,11 @@
 ekyna_product:
     product:
         invalid_type: Le type de produit %type% n'est pas valide.
-        designation_already_exists: Un produit portant cette désignation éxiste déjà.
+        designation_already_exists: Un produit portant cette désignation existe déjà.
         reference_already_exists: Un produit portant cette référence existe déjà.
     option:
-        designation_already_exists: Une option portant cette désignation éxiste déjà.
+        designation_already_exists: Une option portant cette désignation existe déjà.
         reference_already_exists: Une option portant cette référence existe déjà.
     tax:
-        name_already_exists: Une taxe portant ce nom éxiste déjà.
-        rate_already_exists: Une taxe avec ce taux éxiste déjà.
+        name_already_exists: Une taxe portant ce nom existe déjà.
+        rate_already_exists: Une taxe avec ce taux existe déjà.

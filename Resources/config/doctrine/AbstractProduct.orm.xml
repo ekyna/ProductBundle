@@ -37,12 +37,12 @@
 
         <one-to-many field="options" target-entity="Ekyna\Bundle\ProductBundle\Entity\AbstractOption" mapped-by="product" orphan-removal="true">
             <cascade>
-                <cascade-persist/>
-                <cascade-remove/>
+                <cascade-persist />
+                <cascade-remove />
             </cascade>
         </one-to-many>
         <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
-            <join-column name="tax_id" referenced-column-name="id" nullable="false" />
+            <join-column name="tax_id" referenced-column-name="id" nullable="false" on-delete="RESTRICT" />
         </many-to-one>
 
         <gedmo:soft-deleteable field-name="deletedAt" />

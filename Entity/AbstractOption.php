@@ -2,8 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Ekyna\Component\Sale\PriceableTrait;
 use Ekyna\Component\Sale\Product\OptionInterface;
 use Ekyna\Component\Sale\Product\ProductInterface;
+use Ekyna\Component\Sale\ReferenceableTrait;
+use Ekyna\Component\Sale\WeighableTrait;
 
 /**
  * AbstractOption.
@@ -12,9 +15,9 @@ use Ekyna\Component\Sale\Product\ProductInterface;
  */
 abstract class AbstractOption implements OptionInterface
 {
-    use \Ekyna\Component\Sale\PriceableTrait;
-    use \Ekyna\Component\Sale\ReferenceableTrait;
-    use \Ekyna\Component\Sale\WeighableTrait;
+    use PriceableTrait;
+    use ReferenceableTrait;
+    use WeighableTrait;
 
     /**
      * @var integer
@@ -33,7 +36,7 @@ abstract class AbstractOption implements OptionInterface
 
 
     /**
-     * Returns the string represenation.
+     * Returns the string representation.
      *
      * @return string
      */
@@ -57,7 +60,7 @@ abstract class AbstractOption implements OptionInterface
      *
      * @param \Ekyna\Component\Sale\Product\ProductInterface $product
      * 
-     * @return Option
+     * @return AbstractOption|$this
      */
     public function setProduct(ProductInterface $product = null)
     {
@@ -79,7 +82,7 @@ abstract class AbstractOption implements OptionInterface
      *
      * @param string $group
      * 
-     * @return Option
+     * @return AbstractOption|$this
      */
     public function setGroup($group)
     {

@@ -15,7 +15,7 @@
             <option name="message">ekyna_product.product.reference_already_exists</option>
         </constraint>
         <property name="type">
-            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ValidProductType" />
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType" />
         </property>
         <property name="designation">
             <constraint name="NotBlank" />

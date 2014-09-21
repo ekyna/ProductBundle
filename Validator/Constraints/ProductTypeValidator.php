@@ -7,11 +7,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Class ValidProductTypeValidator
+ * Class ProductTypeValidator
  * @package Ekyna\Bundle\ProductBundle\Validator\Constraints
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class ValidProductTypeValidator extends ConstraintValidator
+class ProductTypeValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
