@@ -6,7 +6,7 @@ use Ekyna\Component\Sale\PriceableTrait;
 use Ekyna\Component\Sale\Product\OptionInterface;
 use Ekyna\Component\Sale\Product\ProductInterface;
 use Ekyna\Component\Sale\ReferenceableTrait;
-use Ekyna\Component\Sale\WeighableTrait;
+use Ekyna\Component\Sale\WeightableTrait;
 
 /**
  * AbstractOption.
@@ -17,7 +17,7 @@ abstract class AbstractOption implements OptionInterface
 {
     use PriceableTrait;
     use ReferenceableTrait;
-    use WeighableTrait;
+    use WeightableTrait;
 
     /**
      * @var integer

@@ -16,7 +16,7 @@ abstract class AbstractProduct implements ProductInterface
 {
     use \Ekyna\Component\Sale\PriceableTrait;
     use \Ekyna\Component\Sale\ReferenceableTrait;
-    use \Ekyna\Component\Sale\WeighableTrait;
+    use \Ekyna\Component\Sale\WeightableTrait;
 
     /**
      * @var integer
