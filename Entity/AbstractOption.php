@@ -46,9 +46,7 @@ abstract class AbstractOption implements OptionInterface
     }
 
     /**
-     * Returns the identifier.
-     * 
-     * @return integer
+     * {@inheritdoc}
      */
     public function getId()
     {
