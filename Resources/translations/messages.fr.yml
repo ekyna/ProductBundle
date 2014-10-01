@@ -5,13 +5,13 @@ ekyna_product:
             plural: Taxes
         header:
             list: Taxes <small>Liste des taxes</small>
-            show: Detail de la taxe<small>%name%</small>
+            show: Détail de la taxe<small>%name%</small>
             new: Créer une nouvelle taxe
             edit: Modifier la taxe <small>%name%</small>
             remove: Supprimer la taxe <small>%name%</small>
         button:
             list: Liste des taxes
-            show: Detail de la taxe
+            show: Détail de la taxe
             new: Nouvelle taxe
             edit: Modifier la taxe
             remove: Supprimer la taxe
