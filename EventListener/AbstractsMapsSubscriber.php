@@ -7,8 +7,8 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 
 /**
- * AbstractsMapsSubscriber.
- *
+ * Class AbstractsMapsSubscriber
+ * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class AbstractsMapsSubscriber implements EventSubscriber
@@ -78,6 +78,8 @@ class AbstractsMapsSubscriber implements EventSubscriber
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
     {
+
+        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $metadata */
         $metadata = $eventArgs->getClassMetadata();
 
         // Option mapping
