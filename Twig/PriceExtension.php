@@ -3,8 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 /**
- * PriceExtension
- *
+ * Class PriceExtension
+ * @package Ekyna\Bundle\ProductBundle\Twig
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class PriceExtension extends \Twig_Extension
@@ -22,8 +22,8 @@ class PriceExtension extends \Twig_Extension
     /**
      * Returns a formated price
      *  
-     * @param unknown $number
-     * @param number $decimals
+     * @param float $number
+     * @param int $decimals
      * @param string $decPoint
      * @param string $thousandsSep
      * 

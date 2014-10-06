@@ -6,14 +6,14 @@ use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Sale\Product\OptionInterface;
 
 /**
- * ProductExtension.
- *
+ * Class ProductExtension
+ * @package Ekyna\Bundle\ProductBundle\Twig
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class ProductExtension extends \Twig_Extension
 {
     /**
-     * The options configuration.
+     * Options configuration.
      * 
      * @var array
      */
@@ -39,9 +39,9 @@ class ProductExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function initRuntime(\Twig_Environment $environment)
+    public function initRuntime(\Twig_Environment $twig)
     {
-        $this->optionsListTemplate = $environment->loadTemplate('EkynaProductBundle::_options_list.html.twig');
+        $this->optionsListTemplate = $twig->loadTemplate('EkynaProductBundle::_options_list.html.twig');
     }
 
     /**
@@ -70,6 +70,7 @@ class ProductExtension extends \Twig_Extension
 
         foreach($this->optionsConfiguration as $groupName => $group) {
             $list = array();
+            /** @var \Ekyna\Bundle\ProductBundle\Entity\AbstractOption $option */
             foreach($options as $option) {
                 if($option->getGroup() == $groupName) {
                     $list[] = $option;
@@ -97,6 +98,7 @@ class ProductExtension extends \Twig_Extension
         if (array_key_exists($option->getGroup(), $this->optionsConfiguration)) {
             return $this->optionsConfiguration[$option->getGroup()]['label'];
         }
+        return '';
     }
 
     /**
