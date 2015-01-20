@@ -24,7 +24,7 @@
         <field name="reference" column="reference" type="string" length="32" unique="true" />
         <field name="price" column="price" type="decimal" precision="10" scale="5" />
         <field name="weight" column="weight" type="integer" />
-        <field name="slug" column="slug" type="string" length="64" unique="true">
+        <field name="slug" column="slug" type="string" length="255" unique="true">
             <gedmo:slug unique="true" updatable="false" fields="designation" />
         </field>
         <field name="createdAt" column="created_at" type="datetime">

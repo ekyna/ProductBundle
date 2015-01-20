@@ -5,8 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Ekyna\Component\Sale\Tax as BaseTax;
 
 /**
- * Tax.
- *
+ * Class Tax
+ * @package Ekyna\Bundle\ProductBundle\Entity
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class Tax extends BaseTax
