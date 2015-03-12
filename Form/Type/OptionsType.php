@@ -41,18 +41,17 @@ class OptionsType extends AbstractType
                 continue;
             }
             $builder
-                ->add($name, 'bootstrap_collection', array(
-                    'label'        => $option['label'],
-                    'type'         => $option['form_type'],
-                    'allow_add'    => true,
-                    'allow_delete' => true,
-                    'add_button_text'    => 'Ajouter une option',
-                    'delete_button_text' => 'Supprimer',
-                    'sub_widget_col'     => 9,
-                    'button_col'         => 3,
-                    'options' => array(
+                ->add($name, 'ekyna_core_collection', array(
+                    'label'           => $option['label'],
+                    'type'            => $option['form_type'],
+                    'allow_add'       => true,
+                    'allow_delete'    => true,
+                    'add_button_text' => 'Ajouter une option',
+                    'sub_widget_col'  => 9,
+                    'button_col'      => 3,
+                    'options'         => array(
                         'label' => false,
-                        'attr' => array(
+                        'attr'  => array(
                             'widget_col' => 12
                         ),
                         'data_class' => $option['class'],
