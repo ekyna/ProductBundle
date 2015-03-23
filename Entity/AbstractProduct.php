@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Component\Sale\Product\OptionInterface;
 use Ekyna\Component\Sale\Product\ProductInterface;
 use Ekyna\Component\Sale\Product\ProductTypes;
+use Ekyna\Component\Sale;
 
 /**
  * AbstractProduct.
@@ -14,9 +15,9 @@ use Ekyna\Component\Sale\Product\ProductTypes;
  */
 abstract class AbstractProduct implements ProductInterface
 {
-    use \Ekyna\Component\Sale\PriceableTrait;
-    use \Ekyna\Component\Sale\ReferenceableTrait;
-    use \Ekyna\Component\Sale\WeightableTrait;
+    use Sale\PriceableTrait;
+    use Sale\ReferenceableTrait;
+    use Sale\WeightableTrait;
 
     /**
      * @var integer
