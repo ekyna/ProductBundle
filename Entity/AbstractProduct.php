@@ -9,8 +9,8 @@ use Ekyna\Component\Sale\Product\ProductTypes;
 use Ekyna\Component\Sale;
 
 /**
- * AbstractProduct.
- *
+ * Class AbstractProduct
+ * @package Ekyna\Bundle\ProductBundle\Entity
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 abstract class AbstractProduct implements ProductInterface
@@ -30,7 +30,7 @@ abstract class AbstractProduct implements ProductInterface
     protected $type;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      */
     protected $options;
 
@@ -88,7 +88,7 @@ abstract class AbstractProduct implements ProductInterface
      * 
      * @param integer $type
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setType($type)
     {
@@ -118,7 +118,7 @@ abstract class AbstractProduct implements ProductInterface
     /**
      * Returns whether the product has the given option or not.
      * 
-     * @param \Ekyna\Component\Sale\Product\OptionInterface $option
+     * @param OptionInterface $option
      * 
      * @return boolean
      */
@@ -130,9 +130,9 @@ abstract class AbstractProduct implements ProductInterface
     /**
      * Adds an option.
      *
-     * @param \Ekyna\Component\Sale\Product\OptionInterface $option
+     * @param OptionInterface $option
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct
+     * @return AbstractProduct
      */
     public function addOption(OptionInterface $option)
     {
@@ -145,7 +145,7 @@ abstract class AbstractProduct implements ProductInterface
     /**
      * Removes an option.
      *
-     * @param \Ekyna\Component\Sale\Product\OptionInterface $option
+     * @param OptionInterface $option
      */
     public function removeOption(OptionInterface $option)
     {
@@ -165,7 +165,7 @@ abstract class AbstractProduct implements ProductInterface
      * Sets the options.
      *
      * @param ArrayCollection $options
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setOptions(ArrayCollection $options)
     {
@@ -195,7 +195,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param string $slug
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setSlug($slug)
     {
@@ -219,7 +219,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $createdAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
@@ -243,7 +243,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $updatedAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setUpdatedAt(\DateTime $updatedAt = null)
     {
@@ -267,7 +267,7 @@ abstract class AbstractProduct implements ProductInterface
      *
      * @param \DateTime $deletedAt
      * 
-     * @return \Ekyna\Bundle\ProductBundle\Entity\AbstractProduct|$this
+     * @return AbstractProduct|$this
      */
     public function setDeletedAt(\DateTime $deletedAt = null)
     {

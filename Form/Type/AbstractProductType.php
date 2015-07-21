@@ -8,8 +8,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Ekyna\Component\Sale\Product\ProductTypes;
 
 /**
- * AbstractProductType.
- *
+ * Class AbstractProductType
+ * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 abstract class AbstractProductType extends AbstractType
@@ -74,7 +74,7 @@ abstract class AbstractProductType extends AbstractType
             ))
             ->add('tax', 'ekyna_resource', array(
                 'label' => 'ekyna_core.field.tax',
-                'class' => 'Ekyna\Bundle\ProductBundle\Entity\Tax',
+                'class' => 'Ekyna\Bundle\OrderBundle\Entity\Tax',
                 'property' => 'name',
                 'allow_new' => $options['admin_mode'],
                 'empty_value' => 'ekyna_core.field.tax',

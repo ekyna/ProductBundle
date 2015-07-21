@@ -6,6 +6,3 @@ ekyna_product:
     option:
         designation_already_exists: Une option portant cette désignation existe déjà.
         reference_already_exists: Une option portant cette référence existe déjà.
-    tax:
-        name_already_exists: Une taxe portant ce nom existe déjà.
-        rate_already_exists: Une taxe avec ce taux existe déjà.

@@ -1,22 +1,4 @@
 ekyna_product:
-    tax:
-        label:
-            singular: Taxe
-            plural: Taxes
-        header:
-            list: Taxes <small>Liste des taxes</small>
-            show: Détail de la taxe<small>%name%</small>
-            new: Créer une nouvelle taxe
-            edit: Modifier la taxe <small>%name%</small>
-            remove: Supprimer la taxe <small>%name%</small>
-        button:
-            list: Liste des taxes
-            show: Détail de la taxe
-            new: Nouvelle taxe
-            edit: Modifier la taxe
-            remove: Supprimer la taxe
-        alert:
-            no_tax: Aucune tax configuré
     type:
         physical: Physique
         virtual: Virtuel

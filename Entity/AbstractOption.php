@@ -2,22 +2,20 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Component\Sale\PriceableTrait;
+use Ekyna\Component\Sale;
 use Ekyna\Component\Sale\Product\OptionInterface;
 use Ekyna\Component\Sale\Product\ProductInterface;
-use Ekyna\Component\Sale\ReferenceableTrait;
-use Ekyna\Component\Sale\WeightableTrait;
 
 /**
- * AbstractOption.
- *
+ * Class AbstractOption
+ * @package Ekyna\Bundle\ProductBundle\Entity
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 abstract class AbstractOption implements OptionInterface
 {
-    use PriceableTrait;
-    use ReferenceableTrait;
-    use WeightableTrait;
+    use Sale\PriceableTrait,
+        Sale\ReferenceableTrait,
+        Sale\WeightableTrait;
 
     /**
      * @var integer
@@ -25,7 +23,7 @@ abstract class AbstractOption implements OptionInterface
     protected $id;
 
     /**
-     * @var \Ekyna\Component\Sale\Product\ProductInterface
+     * @var ProductInterface
      */
     protected $product;
 
@@ -54,11 +52,7 @@ abstract class AbstractOption implements OptionInterface
     }
 
     /**
-     * Sets the product.
-     *
-     * @param \Ekyna\Component\Sale\Product\ProductInterface $product
-     * 
-     * @return AbstractOption|$this
+     * {@inheritdoc}
      */
     public function setProduct(ProductInterface $product = null)
     {
@@ -76,11 +70,7 @@ abstract class AbstractOption implements OptionInterface
     }
 
     /**
-     * Sets the group.
-     *
-     * @param string $group
-     * 
-     * @return AbstractOption|$this
+     * {@inheritdoc}
      */
     public function setGroup($group)
     {

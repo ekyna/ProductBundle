@@ -7,8 +7,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
- * Configuration
- *
+ * Class Configuration
+ * @package Ekyna\Bundle\ProductBundle\DependencyInjection
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class Configuration implements ConfigurationInterface
@@ -54,39 +54,6 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addPoolsSection($rootNode);
-
         return $treeBuilder;
-    }
-
-    /**
-     * Adds `pools` section.
-     *
-     * @param ArrayNodeDefinition $node
-     */
-    private function addPoolsSection(ArrayNodeDefinition $node)
-    {
-        $node
-            ->children()
-                ->arrayNode('pools')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('tax')
-                            ->isRequired()
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('templates')->defaultValue('EkynaProductBundle:Tax/Admin')->end()
-                                ->scalarNode('parent')->end()
-                                ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Tax')->end()
-                                ->scalarNode('controller')->end()
-                                ->scalarNode('repository')->end()
-                                ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\TaxType')->end()
-                                ->scalarNode('table')->defaultValue('Ekyna\Bundle\ProductBundle\Table\Type\TaxType')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 }

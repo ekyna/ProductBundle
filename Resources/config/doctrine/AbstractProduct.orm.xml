@@ -41,7 +41,7 @@
                 <cascade-remove />
             </cascade>
         </one-to-many>
-        <many-to-one field="tax" target-entity="Ekyna\Bundle\ProductBundle\Entity\Tax">
+        <many-to-one field="tax" target-entity="Ekyna\Bundle\OrderBundle\Entity\Tax">
             <join-column name="tax_id" referenced-column-name="id" nullable="false" on-delete="RESTRICT" />
         </many-to-one>
 

@@ -83,24 +83,4 @@
         </property>
     </class>
 
-    <class name="Ekyna\Bundle\ProductBundle\Entity\Tax">
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">name</option>
-            <option name="message">ekyna_product.tax.name_already_exists</option>
-        </constraint>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">rate</option>
-            <option name="message">ekyna_product.tax.rate_already_exists</option>
-        </constraint>
-        <property name="name">
-            <constraint name="NotBlank" />
-        </property>
-        <property name="rate">
-            <constraint name="Range">
-                <option name="min">0</option>
-                <option name="max">1</option>
-            </constraint>
-        </property>
-    </class>
-
 </constraint-mapping>

@@ -8,8 +8,8 @@ use Ekyna\Bundle\ProductBundle\Form\DataTransformer\OptionsToGroupsTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * OptionsType.
- *
+ * Class OptionsType
+ * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class OptionsType extends AbstractType
@@ -41,7 +41,7 @@ class OptionsType extends AbstractType
                 continue;
             }
             $builder
-                ->add($name, 'ekyna_core_collection', array(
+                ->add($name, 'ekyna_collection', array(
                     'label'           => $option['label'],
                     'type'            => $option['form_type'],
                     'allow_add'       => true,

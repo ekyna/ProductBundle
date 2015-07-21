@@ -9,12 +9,14 @@
         <parameter key="ekyna_product.abstracts_maps_subscriber.class">Ekyna\Bundle\ProductBundle\EventListener\AbstractsMapsSubscriber</parameter>
 
         <parameter key="ekyna_product.options.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\OptionsType</parameter>
+        <parameter key="ekyna_product.add_to_order.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\AddProductType</parameter>
 
         <parameter key="ekyna_product.twig.product_extension.class">Ekyna\Bundle\ProductBundle\Twig\ProductExtension</parameter>
         <parameter key="ekyna_product.twig.price_extension.class">Ekyna\Bundle\ProductBundle\Twig\PriceExtension</parameter>
     </parameters>
 
     <services>
+
         <!-- Doctrine subscriber -->
         <service id="ekyna_product.abstracts_maps_subscriber" class="%ekyna_product.abstracts_maps_subscriber.class%">
             <argument>%ekyna_product.option.class%</argument>
@@ -29,15 +31,17 @@
             <argument>%ekyna_product.options.configuration%</argument>
             <tag name="form.type" alias="ekyna_product_options" />
         </service>
+        <service id="ekyna_order.add_to_order.form_type" class="%ekyna_product.add_to_order.form_type.class%">
+            <argument>%ekyna_product.options.configuration%</argument>
+            <tag name="form.type" alias="ekyna_product_add_to_order" />
+        </service>
 
         <!-- Twig Extensions -->
         <service id="ekyna_product.twig.product_extension" class="%ekyna_product.twig.product_extension.class%">
             <argument>%ekyna_product.options.configuration%</argument>
             <tag name="twig.extension" alias="ekyna_product" />
         </service>
-        <service id="ekyna_product.twig.price_extension" class="%ekyna_product.twig.price_extension.class%">
-            <tag name="twig.extension" alias="ekyna_price" />
-        </service>
+
     </services>
 
 </container>

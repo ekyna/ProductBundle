@@ -6,8 +6,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * OptionsToGroupsTransformer.
- *
+ * Class OptionsToGroupsTransformer
+ * @package Ekyna\Bundle\ProductBundle\Form\DataTransformer
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class OptionsToGroupsTransformer implements DataTransformerInterface
@@ -30,7 +30,7 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a Option collection to an associativ array : group => Option collection.
+     * Transforms a Option collection to an associative array : group => Option collection.
      * 
      * @param \Doctrine\Common\Collections\ArrayCollection $options
      * 
@@ -52,7 +52,7 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms an associativ array to an Option collection.
+     * Transforms an associative array to an Option collection.
      * 
      * @param array $array
      * 
@@ -66,6 +66,7 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
             if (! array_key_exists($groupName, $this->optionsConfiguration)) {
                 throw new \RuntimeException('Unable to reverse transform options.');
             }
+            /** @var \Ekyna\Component\Sale\Product\OptionInterface[] $options */
             foreach ($options as $option) {
                 // Set option (group)
                 $option->setGroup($groupName);

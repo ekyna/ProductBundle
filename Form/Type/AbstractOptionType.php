@@ -7,8 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * AbstractOptionType.
- *
+ * Class AbstractOptionType
+ * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 abstract class AbstractOptionType extends AbstractType
@@ -53,8 +53,7 @@ abstract class AbstractOptionType extends AbstractType
             ))
             ->add('tax', 'ekyna_resource', array(
                 'label' => 'ekyna_core.field.tax',
-                'class' => 'Ekyna\Bundle\ProductBundle\Entity\Tax',
-                'multiple' => false,
+                'class' => 'Ekyna\Bundle\OrderBundle\Entity\Tax',
                 'property' => 'name',
                 'empty_value' => 'ekyna_core.field.tax',
                 'allow_new' => $options['admin_mode'],

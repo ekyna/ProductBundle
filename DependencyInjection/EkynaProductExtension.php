@@ -6,8 +6,8 @@ use Ekyna\Bundle\AdminBundle\DependencyInjection\AbstractExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * EkynaProductExtension
- *
+ * Class EkynaProductExtension
+ * @package Ekyna\Bundle\ProductBundle\DependencyInjection
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
 class EkynaProductExtension extends AbstractExtension

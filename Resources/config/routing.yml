@@ -1,3 +1,0 @@
-ekyna_product_tax_admin:
-    resource: "routing/admin/tax.yml"
-    prefix:   /admin/catalog/taxes

@@ -19,7 +19,7 @@
     "require" : {
         "php" : ">=5.4",
         "symfony/framework-bundle" : "~2.3",
-        "ekyna/sale" : "0.1.*@dev"
+        "ekyna/order-bundle" : "0.3.*@dev"
     },
     "autoload" : {
         "psr-0" : {
@@ -29,7 +29,7 @@
     "target-dir" : "Ekyna/Bundle/ProductBundle",
     "extra" : {
         "branch-alias" : {
-            "dev-master" : "0.1.x-dev"
+            "dev-master" : "0.3.x-dev"
         }
     }
 }
