@@ -51,10 +51,10 @@ class ProductExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('options_list', array($this, 'renderOptionsList'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('option_group_label', array($this, 'getOptionGroupLabel'), array('is_safe' => array('html'))),
-        );
+        return [
+            new \Twig_SimpleFunction('options_list', [$this, 'renderOptionsList'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('option_group_label', [$this, 'getOptionGroupLabel'], ['is_safe' => ['html']]),
+        ];
     }
 
     /**
@@ -66,10 +66,10 @@ class ProductExtension extends \Twig_Extension
      */
     public function renderOptionsList(Collection $options)
     {
-        $groups = array();
+        $groups = [];
 
         foreach($this->optionsConfiguration as $groupName => $group) {
-            $list = array();
+            $list = [];
             /** @var \Ekyna\Bundle\ProductBundle\Entity\AbstractOption $option */
             foreach($options as $option) {
                 if($option->getGroup() == $groupName) {
@@ -81,9 +81,9 @@ class ProductExtension extends \Twig_Extension
             }
         }
 
-        return $this->optionsListTemplate->render(array(
+        return $this->optionsListTemplate->render([
         	'options' => $groups
-        ));
+        ]);
     }
 
     /**

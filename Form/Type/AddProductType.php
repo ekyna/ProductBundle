@@ -38,13 +38,13 @@ class AddProductType extends AbstractType
         // TODO ProductSelection object
 
         $builder
-            ->add('product', 'ekyna_hidden_entity', array(
+            ->add('product', 'ekyna_hidden_entity', [
                 'class' => 'EkynaProductBundle:AbstractProduct',
-            ))
-            ->add('quantity', 'integer', array('attr' => array('min' => 1)))
-            ->add('submit', 'submit', array(
+            ])
+            ->add('quantity', 'integer', ['attr' => ['min' => 1]])
+            ->add('submit', 'submit', [
         	    'label' => 'Ajouter au panier'
-            ))
+            ])
         ;
 
         $builder->addEventListener(FormEvents::POST_SET_DATA, function(FormEvent $event){
@@ -61,13 +61,13 @@ class AddProductType extends AbstractType
                         throw new \RuntimeException(sprintf('Undefined option configuration "%s".', $group));
                     }
                     //$config = $this->optionsConfiguration[$group];
-                    $form->add('option-'.$group, 'entity', array(
+                    $form->add('option-'.$group, 'entity', [
                         'label' => $this->optionsConfiguration[$group]['label'],
                         'required' => false,
                         'empty_value' => 'Choisissez une option',
-                        'attr' => array(
+                        'attr' => [
                     	    'placeholder' => 'Choisissez une option',
-                        ),
+                        ],
                         'class' => $this->optionsConfiguration[$group]['class'],
                         'query_builder' => function(EntityRepository $er) use ($product, $group) {
                             $qb = $er->createQueryBuilder('o');
@@ -78,7 +78,7 @@ class AddProductType extends AbstractType
                                 ->setParameter('group', $group)
                             ;
                         },
-                    )); 
+                    ]); 
                 }
             }
         });

@@ -5,7 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\OptionsToGroupsTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class OptionsType
@@ -41,7 +41,7 @@ class OptionsType extends AbstractType
                 continue;
             }
             $builder
-                ->add($name, 'ekyna_collection', array(
+                ->add($name, 'ekyna_collection', [
                     'label'           => $option['label'],
                     'type'            => $option['form_type'],
                     'allow_add'       => true,
@@ -49,14 +49,14 @@ class OptionsType extends AbstractType
                     'add_button_text' => 'Ajouter une option',
                     'sub_widget_col'  => 9,
                     'button_col'      => 3,
-                    'options'         => array(
+                    'options'         => [
                         'label' => false,
-                        'attr'  => array(
+                        'attr'  => [
                             'widget_col' => 12
-                        ),
+                        ],
                         'data_class' => $option['class'],
-                    )
-                ))
+                    ]
+                ])
             ;
         }
 
@@ -66,16 +66,14 @@ class OptionsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(array(
+            ->setDefaults([
                 'options' => null,
-            ))
-            ->setRequired(array('options'))
-            ->setAllowedTypes(array(
-            	'options' => 'array',
-            ))
+            ])
+            ->setRequired(['options'])
+            ->setAllowedTypes('options', 'array')
         ;
     }
 

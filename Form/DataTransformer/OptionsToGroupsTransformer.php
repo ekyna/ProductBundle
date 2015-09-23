@@ -38,7 +38,7 @@ class OptionsToGroupsTransformer implements DataTransformerInterface
      */
     public function transform($options)
     {
-        $array = array();
+        $array = [];
 
     	foreach ($this->optionsConfiguration as $groupName => $group) {
     	    foreach ($options as $option) {

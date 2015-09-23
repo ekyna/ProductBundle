@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AbstractOptionType
@@ -19,63 +19,63 @@ abstract class AbstractOptionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('designation', 'text', array(
+            ->add('designation', 'text', [
                 'label' => 'ekyna_core.field.designation',
-                'attr' => array(
+                'attr' => [
                     'label_col' => 4,
                     'widget_col' => 8
-                )
-            ))
-            ->add('reference', 'text', array(
+                ]
+            ])
+            ->add('reference', 'text', [
                 'label' => 'ekyna_core.field.reference',
-                'attr' => array(
+                'attr' => [
                     'label_col' => 4,
                     'widget_col' => 8
-                )
-            ))
-            ->add('weight', 'integer', array(
+                ]
+            ])
+            ->add('weight', 'integer', [
                 'label' => 'ekyna_core.field.weight',
-                'attr' => array(
-                    'input_group' => array('append' => 'g'),
+                'attr' => [
+                    'input_group' => ['append' => 'g'],
                     'min' => 0,
                     'label_col' => 4,
                     'widget_col' => 8
-                ),
-            ))
-            ->add('price', 'number', array(
+                ],
+            ])
+            ->add('price', 'number', [
                 'label' => 'ekyna_core.field.price',
                 'precision' => 5,
-                'attr' => array(
-                    'input_group' => array('append' => '€'),
+                'attr' => [
+                    'input_group' => ['append' => '€'],
                     'label_col' => 4,
                     'widget_col' => 8
-                ),
-            ))
-            ->add('tax', 'ekyna_resource', array(
+                ],
+            ])
+            ->add('tax', 'ekyna_resource', [
                 'label' => 'ekyna_core.field.tax',
                 'class' => 'Ekyna\Bundle\OrderBundle\Entity\Tax',
                 'property' => 'name',
                 'empty_value' => 'ekyna_core.field.tax',
                 'allow_new' => $options['admin_mode'],
-                'attr' => array(
+                'attr' => [
                     'placeholder' => 'ekyna_core.field.tax',
                     'label_col' => 4,
                     'widget_col' => 8
-                ),
-            ))
+                ],
+            ])
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(array(
+            ->setDefaults([
                 'data_class' => null,
-            ))
-            ->setRequired(array('data_class'))
+            ])
+            ->setRequired(['data_class'])
         ;
     }
 }

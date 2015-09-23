@@ -181,7 +181,7 @@ abstract class AbstractProduct implements ProductInterface
      */
     public function getOptionsGroups()
     {
-        $groups = array();
+        $groups = [];
         foreach ($this->options as $option) {
             if (! in_array($group = $option->getGroup(), $groups)) {
                 $groups[] = $group;
