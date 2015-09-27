@@ -19,7 +19,7 @@
     "require" : {
         "php" : ">=5.4",
         "symfony/framework-bundle" : "~2.7",
-        "ekyna/order-bundle" : "0.4.*@dev"
+        "ekyna/order-bundle" : "0.4.x-dev"
     },
     "autoload" : {
         "psr-4" : {
