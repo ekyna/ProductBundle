@@ -17,18 +17,13 @@
         "MIT"
     ],
     "require" : {
-        "php" : ">=5.4",
+        "php" : ">=5.4.0",
         "symfony/framework-bundle" : "~2.7",
         "ekyna/order-bundle" : "0.4.x-dev"
     },
     "autoload" : {
         "psr-4" : {
             "Ekyna\\Bundle\\ProductBundle\\" : ""
-        }
-    },
-    "extra" : {
-        "branch-alias" : {
-            "dev-master" : "0.4.x-dev"
         }
     }
 }
