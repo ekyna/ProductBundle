@@ -13,7 +13,7 @@
 	        {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6, 'col_size': 'md'}) }}
 	    </div>
 	    <div class="col-md-6 col-lg-4 add-to-cart-price">
-	        <span>{{ product.price|price }}</span>
+            <span>{{ product.price|localizedcurrency('EUR') }}</span> {# TODO user currency #}
 	    </div>
 	    <div class="col-md-6 col-lg-4 add-to-cart-submit">
 	        {{ form_widget(form.submit) }}
