@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\Product"
+            table="product_product">
+
+        <indexes>
+            <index columns="reference" name="idx_product_reference" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="reference" name="unique_product_reference" />
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="type" column="type" type="string" length="16" nullable="false"/>
+        <field name="designation" column="designation" type="string" length="255"/>
+        <field name="reference" column="reference" type="string" length="16" unique="true"/>
+        <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
+
+        <field name="stockMode" column="stock_mode" type="string" length="16"/>
+        <field name="stockState" column="stock_state" type="string" length="16"/>
+        <field name="inStock" column="in_stock" type="decimal" precision="10" scale="3"/>
+        <field name="orderedStock" column="ordered_stock" type="decimal" precision="10" scale="3"/>
+        <field name="shippedStock" column="shipped_stock" type="decimal" precision="10" scale="3"/>
+        <field name="estimatedDateOfArrival" column="estimated_date_of_arrival" type="datetime" nullable="true" />
+
+        <field name="createdAt" column="created_at" type="datetime" />
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="true" />
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="variants" mapped-by="parent" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface"
+                     field="optionGroups" mapped-by="product" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface"
+                     field="bundleSlots" mapped-by="bundle" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductImageInterface"
+                     mapped-by="product" field="images" orphan-removal="true">
+            <cascade>
+                <cascade-all />
+            </cascade>
+            <order-by>
+                <order-by-field name="position" direction="ASC" />
+            </order-by>
+        </one-to-many>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="parent" inversed-by="variants">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+            <join-column name="parent_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface" field="attributeSet">
+            <join-column name="attribute_set_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true"/>
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface" field="taxGroup">
+            <join-column name="tax_group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true"/>
+        </many-to-one>
+
+        <many-to-one field="brand" target-entity="Ekyna\Bundle\ProductBundle\Model\BrandInterface">
+            <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        </many-to-one>
+
+        <many-to-one field="category" target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface">
+            <join-column name="category_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        </many-to-one>
+
+        <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attributes">
+            <join-table name="product_product_attribute">
+                <join-columns>
+                    <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="attribute_id" referenced-column-name="id" on-delete="RESTRICT"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+    </mapped-superclass>
+
+</doctrine-mapping>

@@ -6,41 +6,223 @@
                         http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="ekyna_product.abstracts_maps_subscriber.class">Ekyna\Bundle\ProductBundle\EventListener\AbstractsMapsSubscriber</parameter>
+        <parameter key="ekyna_product.attribute_slot.class">Ekyna\Bundle\ProductBundle\Entity\AttributeSlot</parameter>
 
-        <parameter key="ekyna_product.options.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\OptionsType</parameter>
-        <parameter key="ekyna_product.add_to_order.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\AddProductType</parameter>
+        <parameter key="ekyna_product.configurable_slot.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ConfigurableSlotType</parameter>
 
-        <parameter key="ekyna_product.twig.product_extension.class">Ekyna\Bundle\ProductBundle\Twig\ProductExtension</parameter>
-        <parameter key="ekyna_product.twig.price_extension.class">Ekyna\Bundle\ProductBundle\Twig\PriceExtension</parameter>
+        <parameter key="ekyna_product.option_group.class">Ekyna\Bundle\ProductBundle\Entity\OptionGroup</parameter>
+        <parameter key="ekyna_product.option.class">Ekyna\Bundle\ProductBundle\Entity\Option</parameter>
+
+        <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
     </parameters>
 
     <services>
 
-        <!-- Doctrine subscriber -->
-        <service id="ekyna_product.abstracts_maps_subscriber" class="%ekyna_product.abstracts_maps_subscriber.class%">
-            <argument>%ekyna_product.option.class%</argument>
+        <!-- Constants helper -->
+        <service id="ekyna_product.constants_helper"
+                 class="Ekyna\Bundle\ProductBundle\Service\ConstantsHelper">
+            <argument type="service" id="translator"/>
+        </service>
+
+        <!-- Attribute form types -->
+        <service id="ekyna_product.attribute.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\AttributeType">
+            <argument>%ekyna_product.attribute.class%</argument>
+            <argument>%ekyna_product.attribute_group.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.attribute_slot.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\AttributeSlotType">
+            <argument>%ekyna_product.attribute_slot.class%</argument>
+            <argument>%ekyna_product.attribute_group.class%</argument>
+            <tag name="form.type"/>
+        </service>
+
+        <!-- Brand choice form type -->
+        <service id="ekyna_product.brand_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\BrandChoiceType">
+            <argument>%ekyna_product.brand.class%</argument>
+            <tag name="form.type"/>
+        </service>
+
+        <!-- Bundle form types -->
+        <service id="ekyna_product.bundle_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleChoiceType">
+            <argument>%ekyna_product.bundle_choice.class%</argument>
             <argument>%ekyna_product.product.class%</argument>
-            <argument>%ekyna_product.options_classes_map%</argument>
-            <argument>%ekyna_product.products_classes_map%</argument>
-            <tag name="doctrine.event_subscriber" connection="default" />
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.bundle_choice_rule.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleChoiceRuleType">
+            <argument>%ekyna_product.bundle_choice_rule.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.bundle_slot.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleSlotType">
+            <argument>%ekyna_product.bundle_slot.class%</argument>
+            <argument>%ekyna_product.bundle_choice.class%</argument>
+            <tag name="form.type"/>
         </service>
 
-        <!-- Form Types -->
-        <service id="ekyna_product.options.form_type" class="%ekyna_product.options.form_type.class%">
-            <argument>%ekyna_product.options.configuration%</argument>
-            <tag name="form.type" alias="ekyna_product_options" />
-        </service>
-        <service id="ekyna_order.add_to_order.form_type" class="%ekyna_product.add_to_order.form_type.class%">
-            <argument>%ekyna_product.options.configuration%</argument>
-            <tag name="form.type" alias="ekyna_product_add_to_order" />
+        <!-- Category choice form type -->
+        <service id="ekyna_product.category_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\CategoryChoiceType">
+            <argument>%ekyna_product.category.class%</argument>
+            <tag name="form.type"/>
         </service>
 
-        <!-- Twig Extensions -->
-        <service id="ekyna_product.twig.product_extension" class="%ekyna_product.twig.product_extension.class%">
-            <argument>%ekyna_product.options.configuration%</argument>
-            <tag name="twig.extension" alias="ekyna_product" />
+        <!-- Configurable slot form types -->
+        <service id="ekyna_product.configurable_slots.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\ConfigurableSlotsType">
+            <argument>%ekyna_product.configurable_slot.form_type.class%</argument>
+            <tag name="form.type"/>
         </service>
+        <service id="ekyna_product.configurable_slot.form_type"
+                 class="%ekyna_product.configurable_slot.form_type.class%">
+            <argument>%ekyna_product.default.no_image%</argument>
+            <call method="setCacheManager">
+                <argument type="service" id="liip_imagine.cache.manager"/>
+            </call>
+            <tag name="form.type"/>
+            <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot" />
+        </service>
+
+        <!-- Option form types -->
+        <service id="ekyna_product.option_group.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\OptionGroupType">
+            <argument>%ekyna_product.option_group.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.option.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\OptionType">
+            <argument>%ekyna_product.option.class%</argument>
+            <tag name="form.type"/>
+        </service>
+
+        <!-- Product form types -->
+        <service id="ekyna_product.product.form_type"
+                 class="%ekyna_product.product.form_type.class%">
+            <argument type="service" id="ekyna_product.product.form_type.event_subscriber"/>
+            <argument>%ekyna_product.product.class%</argument>
+            <argument>%ekyna_product.product_image.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.product.form_type.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber">
+            <argument>%ekyna_product.product.class%</argument>
+            <argument>%ekyna_product.attribute_set.class%</argument>
+        </service>
+
+        <!-- Product type column column type -->
+        <service id="ekyna_product.product_type.column_type"
+                 class="Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType">
+            <argument type="service" id="ekyna_product.constants_helper"/>
+            <tag name="table.column_type" alias="ekyna_product_product_type"/>
+        </service>
+
+        <!-- Twig extension -->
+        <service id="ekyna_product.twig.product_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
+            <argument type="service" id="ekyna_product.constants_helper"/>
+            <tag name="twig.extension"/>
+        </service>
+
+
+        <!-- Product form builder -->
+        <service id="ekyna_product.product.form_builder"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder">
+            <argument>%ekyna_product.product.class%</argument>
+        </service>
+
+        <!-- Product item builder -->
+        <service id="ekyna_product.product.item_builder"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder">
+            <argument type="service" id="ekyna_commerce.sale_factory"/>
+        </service>
+
+        <!-- Product subject provider -->
+        <service id="ekyna_product.product.subject_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product_stock_unit.repository"/>
+            <argument type="service" id="ekyna_product.product.item_builder"/>
+            <argument type="service" id="ekyna_product.product.form_builder"/>
+            <tag name="ekyna_commerce.subject_provider"/>
+        </service>
+
+        <!-- Variant generator -->
+        <service id="ekyna_product.product.variant_generator"
+                 class="Ekyna\Bundle\ProductBundle\Service\Generator\VariantGenerator">
+            <argument>%ekyna_product.product.class%</argument>
+        </service>
+
+        <!-- Simple product event handler -->
+        <service id="ekyna_product.product.event_subscriber.simple_handler"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\SimpleHandler"
+                 public="false">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_resource.event_dispatcher"/>
+            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <tag name="ekyna_product.product_event_handler"/>
+        </service>
+        <!-- Variant product event handler -->
+        <service id="ekyna_product.product.event_subscriber.variant_handler"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariantHandler"
+                 public="false">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="ekyna_product.product_event_handler"/>
+        </service>
+        <!-- Variable product event handler -->
+        <service id="ekyna_product.product.event_subscriber.variable_handler"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariableHandler"
+                 public="false">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="ekyna_product.product_event_handler"/>
+        </service>
+        <!-- Bundle product event handler -->
+        <service id="ekyna_product.product.event_subscriber.bundle_handler"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\BundleHandler"
+                 public="false">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <tag name="ekyna_product.product_event_handler"/>
+        </service>
+        <!-- Configurable product event handler -->
+        <service id="ekyna_product.product.event_subscriber.configurable_handler"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\ConfigurableHandler"
+                 public="false">
+            <tag name="ekyna_product.product_event_handler"/>
+        </service>
+
+        <!-- Product event handlers registry -->
+        <service id="ekyna_product.product.event_subscriber.handler_registry"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
+
+        <!-- Product event listener -->
+        <service id="ekyna_product.product.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductEventSubscriber">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_product.product.event_subscriber.handler_registry"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
+        <!-- Product stock unit event listener -->
+        <!-- TODO abstract service -->
+        <service id="ekyna_product.product_stock_unit.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitEventSubscriber">
+            <call method="setPersistenceHelper">
+                <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            </call>
+            <call method="setDispatcher">
+                <argument type="service" id="ekyna_resource.event_dispatcher"/>
+            </call>
+            <call method="setStateResolver">
+                <argument type="service" id="ekyna_commerce.stock_unit.state_resolver"/>
+            </call>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
 
     </services>
 

@@ -1,0 +1,30 @@
+ekyna_product_attribute_admin_new:
+    path: /new
+    defaults: { _controller: "ekyna_product.attribute.controller:newAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeGroupId: \d+
+
+ekyna_product_attribute_admin_show:
+    path: /{attributeId}/show
+    defaults: { _controller: "ekyna_product.attribute.controller:showAction" }
+    methods: [GET]
+    requirements:
+        attributeGroupId: \d+
+        attributeId: \d+
+
+ekyna_product_attribute_admin_edit:
+    path: /{attributeId}/edit
+    defaults: { _controller: "ekyna_product.attribute.controller:editAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeGroupId: \d+
+        attributeId: \d+
+
+ekyna_product_attribute_admin_remove:
+    path: /{attributeId}/remove
+    defaults: { _controller: "ekyna_product.attribute.controller:removeAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeGroupId: \d+
+        attributeId: \d+

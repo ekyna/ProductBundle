@@ -2,8 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
-use Doctrine\Common\Collections\Collection;
-use Ekyna\Component\Sale\Product\OptionInterface;
+use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
+
 
 /**
  * Class ProductExtension
@@ -13,92 +14,75 @@ use Ekyna\Component\Sale\Product\OptionInterface;
 class ProductExtension extends \Twig_Extension
 {
     /**
-     * Options configuration.
-     * 
-     * @var array
+     * @var ConstantsHelper
      */
-    protected $optionsConfiguration;
+    private $constantHelper;
 
-    /**
-     * Options list template.
-     *
-     * @var \Twig_Template
-     */
-    protected $optionsListTemplate;
 
     /**
      * Constructor.
-     * 
-     * @param array $optionsConfiguration
-     */
-    public function __construct(array $optionsConfiguration)
-    {
-        $this->optionsConfiguration = $optionsConfiguration;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(\Twig_Environment $twig)
-    {
-        $this->optionsListTemplate = $twig->loadTemplate('EkynaProductBundle::_options_list.html.twig');
-    }
-
-    /**
-     * Returns a list of functions to add to the existing list.
      *
-     * @return array An array of functions
+     * @param ConstantsHelper $constantHelper
      */
-    public function getFunctions()
+    public function __construct(ConstantsHelper $constantHelper)
+    {
+        $this->constantHelper = $constantHelper;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFilters()
     {
         return [
-            new \Twig_SimpleFunction('options_list', [$this, 'renderOptionsList'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFunction('option_group_label', [$this, 'getOptionGroupLabel'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter(
+                'product_type_label',
+                [$this->constantHelper, 'renderProductTypeLabel'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
+                'product_type_badge',
+                [$this->constantHelper, 'renderProductTypeBadge'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
     /**
-     * Renders a list of product options.
-     * 
-     * @param Collection $options
-     * 
-     * @return string
+     * @inheritdoc
      */
-    public function renderOptionsList(Collection $options)
+    public function getFunctions()
     {
-        $groups = [];
-
-        foreach($this->optionsConfiguration as $groupName => $group) {
-            $list = [];
-            /** @var \Ekyna\Bundle\ProductBundle\Entity\AbstractOption $option */
-            foreach($options as $option) {
-                if($option->getGroup() == $groupName) {
-                    $list[] = $option;
-                }
-            }
-            if(0 < count($list)) {
-                $groups[$group['label']] = $list;
-            }
-        }
-
-        return $this->optionsListTemplate->render([
-        	'options' => $groups
-        ]);
+        return [
+            new \Twig_SimpleFunction(
+                'get_product_types',
+                [Model\ProductTypes::class, 'getConstants']
+            ),
+        ];
     }
 
     /**
-     * Returns the group label for the given option.
-     * 
-     * @param OptionInterface $option
-     * 
-     * @return string
+     * @inheritdoc
      */
-    public function getOptionGroupLabel(OptionInterface $option)
+    public function getTests()
     {
-        if (array_key_exists($option->getGroup(), $this->optionsConfiguration)) {
-            return $this->optionsConfiguration[$option->getGroup()]['label'];
-        }
-        return '';
+        return array(
+            new \Twig_SimpleTest('simple_product', function(Model\ProductInterface $product) {
+                return $product->getType() === Model\ProductTypes::TYPE_SIMPLE;
+            }),
+            new \Twig_SimpleTest('variable_product', function(Model\ProductInterface $product) {
+                return $product->getType() === Model\ProductTypes::TYPE_VARIABLE;
+            }),
+            new \Twig_SimpleTest('variant_product', function(Model\ProductInterface $product) {
+                return $product->getType() === Model\ProductTypes::TYPE_VARIANT;
+            }),
+            new \Twig_SimpleTest('bundle_product', function(Model\ProductInterface $product) {
+                return $product->getType() === Model\ProductTypes::TYPE_BUNDLE;
+            }),
+            new \Twig_SimpleTest('configurable_product', function(Model\ProductInterface $product) {
+                return $product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE;
+            }),
+        );
     }
 
     /**
@@ -106,6 +90,6 @@ class ProductExtension extends \Twig_Extension
      */
     public function getName()
     {
-    	return 'ekyna_product';
+        return 'ekyna_product';
     }
 }

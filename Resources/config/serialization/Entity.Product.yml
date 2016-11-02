@@ -1,0 +1,21 @@
+Ekyna\Bundle\ProductBundle\Entity\Product:
+    attributes:
+        id:
+            groups: [Default, Search]
+        designation:
+            groups: [Default, Search]
+#        translations:
+#            groups: [Default, Search]
+        title:
+            groups: [Default, Search]
+        description:
+            groups: [Default, Search]
+
+#Ekyna\Bundle\ProductBundle\Entity\ProductTranslation:
+#    attributes:
+#        locale:
+#            groups: [Default, Search]
+#        title:
+#            groups: [Default, Search]
+#        description:
+#            groups: [Default, Search]

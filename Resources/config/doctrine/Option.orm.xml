@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\Option"
+            table="product_option">
+
+        <indexes>
+            <index columns="reference" name="idx_option_reference" />
+            <index columns="position" name="idx_option_position" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="reference" name="unique_option_reference" />
+            <unique-constraint columns="group_id,position" name="unique_option_position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="designation" column="designation" type="string" length="255" nullable="false" unique="false"/>
+        <field name="reference" column="reference" type="string" length="16" nullable="false" unique="true"/>
+        <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface"
+                     field="group" inversed-by="options">
+            <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface" field="taxGroup">
+            <join-column name="tax_group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false"/>
+        </many-to-one>
+
+    </mapped-superclass>
+
+</doctrine-mapping>

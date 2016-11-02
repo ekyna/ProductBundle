@@ -1,0 +1,11 @@
+# Liip Imagine
+liip_imagine:
+    filter_sets:
+        configurable_slot:
+            quality: 70
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [539, 404], mode: outbound }
+            post_processors:
+                jpegoptim: {}

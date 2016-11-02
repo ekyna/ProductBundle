@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup"
+            table="product_option_group">
+
+        <indexes>
+            <index columns="name" name="idx_option_group_name" />
+            <index columns="position" name="idx_option_group_position" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="name" name="unique_name" />
+            <unique-constraint columns="product_id,position" name="unique_option_group_position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="name" column="name" type="string" length="64" nullable="false" unique="true"/>
+        <field name="required" column="required" type="boolean" nullable="false"/>
+        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\OptionInterface"
+                     field="options" mapped-by="group" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+            <order-by>
+                <order-by-field name="position" direction="ASC"/>
+            </order-by>
+        </one-to-many>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="product" inversed-by="optionGroups">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+        </many-to-one>
+
+    </mapped-superclass>
+
+</doctrine-mapping>

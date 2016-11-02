@@ -8,6 +8,3 @@ TODO
 
 ## Configuration
 TODO
-
-## TODO
-- Dynamic definition of products CTI through configuration.

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\BundleChoice"
+            table="product_bundle_choice">
+
+        <indexes>
+            <index columns="position" name="idx_bundle_choice_position" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="slot_id,product_id,position" name="unique_bundle_choice_position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="userOption" column="user_option" type="boolean" nullable="false"/>
+        <field name="minQuantity" column="min_quantity" type="integer" nullable="false"/>
+        <field name="maxQuantity" column="max_quantity" type="integer" nullable="true"/>
+        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleInterface"
+                     field="rules" mapped-by="choice" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+            <order-by>
+                <order-by-field name="position" direction="ASC"/>
+            </order-by>
+        </one-to-many>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface"
+                     field="slot" inversed-by="choices">
+            <join-column name="slot_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
+            <join-column name="product_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        </many-to-one>
+        <!--<many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\OptionValueInterface" field="optionValue">
+            <join-column name="option_value_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
+        </many-to-one>-->
+
+    </mapped-superclass>
+
+</doctrine-mapping>

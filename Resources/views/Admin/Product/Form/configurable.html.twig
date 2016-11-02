@@ -1,0 +1,18 @@
+{% extends 'EkynaProductBundle:Admin/Product/Form:base.html.twig' %}
+
+
+{% block pricing_tab %}
+    {{- 'ekyna_product.product.field.composition'|trans -}}
+{% endblock pricing_tab %}
+
+
+{% block general_content %}
+    {{ parent() }}
+    {{ form_row(form.images) }}
+{% endblock general_content %}
+
+
+{% block pricing_content %}
+    {{ form_row(form.bundleSlots) }}
+{% endblock pricing_content %}
+

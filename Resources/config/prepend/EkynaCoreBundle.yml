@@ -1,0 +1,5 @@
+ekyna_core:
+    ui:
+        stylesheets:
+            forms:
+                - "bundles/ekynaproduct/css/form.css"

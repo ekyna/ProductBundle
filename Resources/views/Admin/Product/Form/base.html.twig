@@ -1,0 +1,63 @@
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a href="#product-general" data-toggle="tab">
+            {{ 'ekyna_core.field.general'|trans }}
+        </a>
+    </li>
+    <li>
+        <a href="#product-pricing" data-toggle="tab">
+            {% block pricing_tab %}{{ 'ekyna_product.product.field.pricing'|trans }}{% endblock pricing_tab %}
+        </a>
+    </li>
+    <li>
+        <a href="#product-seo" data-toggle="tab">
+            {{ 'ekyna_core.field.seo'|trans }}
+        </a>
+    </li>
+</ul>
+<div class="panel-body form-body">
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ form_errors(form) }}
+    <div class="tab-content">
+        <div class="tab-pane active" id="product-general">
+            {% block general_content %}
+                {% if form.translations is defined %}
+                    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+                {% endif %}
+                {{ form_row(form.designation) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.brand, {'label_col': 4, 'widget_col': 8}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.category, {'label_col': 4, 'widget_col': 8}) }}
+                    </div>
+                </div>
+                {{ form_row(form.reference) }}
+            {% endblock general_content %}
+        </div>
+        <div class="tab-pane" id="product-pricing">
+            {% block pricing_content %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if form.netPrice is defined %}
+                            {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if form.taxGroup is defined %}
+                            {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endblock pricing_content %}
+        </div>
+        <div class="tab-pane" id="product-seo">
+            {% block seo_content %}
+                {{ form_row(form.seo) }}
+            {% endblock seo_content %}
+        </div>
+    </div>
+    {{ form_rest(form) }}
+</div>

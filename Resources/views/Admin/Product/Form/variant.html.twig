@@ -1,0 +1,18 @@
+{% extends 'EkynaProductBundle:Admin/Product/Form:base.html.twig' %}
+
+
+{% block general_content %}
+    {{ parent() }}
+    {{ form_row(form.variable) }}
+    {{ form_row(form.attributes) }}
+    {{ form_row(form.images) }}
+{% endblock general_content %}
+
+
+{% block pricing_content %}
+    {{ parent() }}
+    {{ form_row(form.optionGroups) }}
+{% endblock pricing_content %}
+
+
+{#{% block seo_content %}{% endblock seo_content %}#}

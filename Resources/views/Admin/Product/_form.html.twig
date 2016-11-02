@@ -1,0 +1,13 @@
+{% if product is simple_product %}
+    {% include 'EkynaProductBundle:Admin/Product/Form:simple.html.twig' %}
+{% elseif product is variable_product %}
+    {% include 'EkynaProductBundle:Admin/Product/Form:variable.html.twig' %}
+{% elseif product is variant_product %}
+    {% include 'EkynaProductBundle:Admin/Product/Form:variant.html.twig' %}
+{% elseif product is bundle_product %}
+    {% include 'EkynaProductBundle:Admin/Product/Form:bundle.html.twig' %}
+{% elseif product is configurable_product %}
+    {% include 'EkynaProductBundle:Admin/Product/Form:configurable.html.twig' %}
+{% else %}
+    <p>Unexpected product type.</p>
+{% endif %}

@@ -5,81 +5,489 @@
         xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
                         http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-    <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractProduct">
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Attribute">
+        <property name="group">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <!-- Unique name per group -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">designation</option>
-            <option name="message">ekyna_product.product.designation_already_exists</option>
+            <option name="fields">
+                <value>group</value>
+                <value>name</value>
+            </option>
         </constraint>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroup">
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <!-- Unique name -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">reference</option>
-            <option name="message">ekyna_product.product.reference_already_exists</option>
+            <option name="fields">name</option>
         </constraint>
-        <property name="type">
-            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType" />
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeSet">
+        <property name="name">
+            <constraint name="NotBlank"/>
         </property>
-        <property name="designation">
-            <constraint name="NotBlank" />
-        </property>
-        <property name="reference">
-            <constraint name="NotBlank" />
-        </property>
-        <property name="price">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
+        <!-- Unique name -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">name</option>
+        </constraint>
+        <property name="slots">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="min">1</option>
             </constraint>
-        </property>
-        <property name="weight">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
-            </constraint>
-        </property>
-        <property name="tax">
-            <constraint name="NotNull" />
-        </property>
-        <property name="options">
-            <constraint name="Valid" />
         </property>
     </class>
 
-    <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractOption">
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>product</value>
-                <value>designation</value>
-            </option>
-            <option name="message">ekyna_product.option.designation_already_exists</option>
-        </constraint>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>product</value>
-                <value>designation</value>
-            </option>
-            <option name="message">ekyna_product.option.reference_already_exists</option>
-        </constraint>
-        <property name="product">
-            <constraint name="Valid" />
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeSlot">
+        <property name="set">
+            <constraint name="NotNull"/>
         </property>
         <property name="group">
-            <constraint name="NotBlank" />
+            <constraint name="NotNull"/>
         </property>
-        <property name="designation">
+        <!-- Unique group per set -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>set</value>
+                <value>group</value>
+            </option>
+        </constraint>
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BundleChoice">
+        <property name="slot">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="product">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="minQuantity">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="maxQuantity">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+                <option name="groups">
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="rules">
+            <constraint name="Valid"/>
+        </property>
+        <!-- TODO options -->
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleChoice"/>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BundleChoiceRule">
+        <property name="choice">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="type">
             <constraint name="NotBlank" />
+            <constraint name="Callback">
+                <value>Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleTypes</value>
+                <value>isValidType</value>
+            </constraint>
+        </property>
+        <!-- TODO expression validation
+        <property name="expression">
+            <constraint name="Valid"/>
+        </property>-->
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlot">
+        <property name="bundle">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="description">
+            <constraint name="Null">
+                <option name="groups">
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="choices">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleSlot"/>
+
+        <!-- TODO translations -->
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
+        <property name="group">
+            <constraint name="NotNull"/>
         </property>
         <property name="reference">
             <constraint name="NotBlank" />
+            <constraint name="Length">
+                <option name="max">16</option>
+            </constraint>
         </property>
-        <property name="price">
+        <!-- Unique reference -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">reference</option>
+        </constraint>
+        <property name="designation">
+            <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="min">3</option>
+                <option name="max">255</option>
+            </constraint>
+        </property>
+        <!-- Unique designation per group -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>group</value>
+                <value>designation</value>
+            </option>
+        </constraint>
+        <property name="netPrice">
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
             </constraint>
         </property>
+        <property name="taxGroup">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup">
+        <property name="product">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <!-- Unique name per product -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>product</value>
+                <value>name</value>
+            </option>
+        </constraint>
+        <property name="options">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+            <constraint name="Valid"/>
+        </property>
+        <property name="position">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Product">
+
+        <!--
+        !!! Don't forget to always use both 'Default' AND '[product.type]' validations groups !!!
+        -->
+
+        <!-- Type -->
+        <property name="type">
+            <constraint name="NotBlank" />
+            <constraint name="Callback">
+                <value>Ekyna\Bundle\ProductBundle\Model\ProductTypes</value>
+                <value>isValidType</value>
+            </constraint>
+        </property>
+
+        <!-- Reference -->
+        <property name="reference">
+            <constraint name="NotBlank" />
+            <constraint name="Length">
+                <option name="max">16</option>
+            </constraint>
+        </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">reference</option>
+        </constraint>
+
+        <!-- Designation -->
+        <property name="designation">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Length">
+                <option name="min">3</option>
+                <option name="max">255</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">designation</option>
+            <option name="groups">
+                <value>simple</value>
+                <value>variable</value>
+                <value>bundle</value>
+                <value>configurable</value>
+            </option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>parent</value>
+                <value>designation</value>
+            </option>
+            <option name="groups">variant</option>
+        </constraint>
+
+        <!-- Net price -->
+        <property name="netPrice">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Weight -->
         <property name="weight">
-            <constraint name="GreaterThanOrEqual">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThan">
                 <option name="value">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
             </constraint>
         </property>
-        <property name="tax">
-            <constraint name="NotNull" />
+
+        <!-- Tax group -->
+        <property name="taxGroup">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Parent -->
+        <property name="parent">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Variants -->
+        <property name="variants">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <!--<constraint name="Count">
+                <option name="min">0</option>
+                <option name="groups">
+                    <value>variable</value>
+                </option>
+            </constraint>-->
+        </property>
+
+        <!-- Attribute set -->
+        <property name="attributeSet">
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>variable</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- (Variant) Attributes -->
+        <property name="attributes">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Count">
+                <option name="min">1</option>
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Option groups -->
+        <property name="optionGroups">
+            <constraint name="Valid"/>
+        </property>
+
+        <!-- Bundle slots -->
+        <property name="bundleSlots">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>variant</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Count">
+                <option name="min">1</option>
+                <option name="groups">
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="Valid"/>
+        </property>
+
+        <!-- Variant (attributes) validation -->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
+            <option name="groups">variant</option>
+        </constraint>
+
+        <!-- TODO translations (none for variants) -->
+
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductStockUnit">
+        <property name="product">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
         </property>
     </class>
 

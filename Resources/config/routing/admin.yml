@@ -1,0 +1,19 @@
+ekyna_product_attribute_group_admin:
+    resource: "admin/attribute_group.yml"
+    prefix:   /attribute-groups
+
+ekyna_product_attribute_set_admin:
+    resource: "admin/attribute_set.yml"
+    prefix:   /attribute-sets
+
+ekyna_product_product_admin:
+    resource: "admin/product.yml"
+    prefix:   /products
+
+ekyna_product_category_admin:
+    resource: "admin/category.yml"
+    prefix:   /categories
+
+ekyna_product_brand_admin:
+    resource: "admin/brand.yml"
+    prefix:   /brands

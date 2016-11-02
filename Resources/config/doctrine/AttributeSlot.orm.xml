@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\AttributeSlot"
+            table="product_attribute_slot">
+
+        <indexes>
+            <index columns="position" name="idx_attribute_slot_position" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="set_id,position" name="unique_attribute_slot_position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="multiple" column="multiple" type="boolean" />
+        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface"
+                     field="set" inversed-by="slots">
+            <join-column name="set_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface" field="group">
+            <join-column name="group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        </many-to-one>
+
+    </mapped-superclass>
+
+</doctrine-mapping>

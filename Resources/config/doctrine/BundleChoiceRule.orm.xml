@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\BundleChoiceRule"
+            table="product_bundle_choice_rule">
+
+        <indexes>
+            <index columns="position" name="idx_bundle_choice_rule_position" />
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="choice_id,position" name="unique_bundle_choice_rule_position"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="type" column="type" type="string" length="16" nullable="false"/>
+        <field name="expression" column="expression" type="string" length="255" nullable="false"/>
+        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface"
+                     field="choice" inversed-by="rules">
+            <join-column name="choice_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        </many-to-one>
+
+    </mapped-superclass>
+
+</doctrine-mapping>
