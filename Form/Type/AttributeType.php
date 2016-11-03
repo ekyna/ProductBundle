@@ -6,6 +6,8 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * Class AttributeType
@@ -39,13 +41,23 @@ class AttributeType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('group', ResourceType::class, [
-                'label'     => 'ekyna_product.attribute_group.label.singular',
-                'class'     => $this->attributeGroupClass,
-                'allow_new' => true,
-            ])
             ->add('name', TextType::class, [
                 'label' => 'ekyna_core.field.name',
             ]);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeInterface $attribute */
+            $attribute = $event->getData();
+            $form = $event->getForm();
+
+            $disabled = (null !== $attribute && $attribute->getId());
+
+            $form->add('group', ResourceType::class, [
+                'label'     => 'ekyna_product.attribute_group.label.singular',
+                'class'     => $this->attributeGroupClass,
+                'allow_new' => !$disabled,
+                'disabled'  => $disabled,
+            ]);
+        });
     }
 }

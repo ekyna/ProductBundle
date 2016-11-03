@@ -1,9 +1,14 @@
 {% extends "EkynaAdminBundle:Entity/Default:show.html.twig" %}
 
-{% block actions %}{% endblock %}#}
+{% block actions %}{% endblock %}
 
 {% block main %}
 <div class="actions">
+    {{ admin_resource_btn(attribute.group, 'show', {
+        'label': 'ekyna_core.button.back',
+        'icon': 'arrow-left',
+        'theme': 'default',
+    }) }}
     {{ admin_resource_btn(attribute, 'edit') }}
     {{ admin_resource_btn(attribute, 'remove') }}
 </div>
@@ -16,11 +21,11 @@
     <div class="show-body">
         <div class="tab-content">
             <div class="tab-pane active" id="general">
-                {{ show_row(attribute.attributeGroup, 'entity', 'ekyna_product.attribute_group.label.singular', {
+                {{ show_row(attribute.group, 'entity', 'ekyna_product.attribute_group.label.singular', {
                     'route': 'ekyna_product_attribute_group_admin_show',
                     'route_params_map': {'attributeGroupId': 'id'}
                 }) }}
-                {{ show_row(attribute.name, 'text', 'ekyna_core.field.email') }}
+                {{ show_row(attribute.name, 'text', 'ekyna_core.field.name') }}
             </div>
         </div>
     </div>
