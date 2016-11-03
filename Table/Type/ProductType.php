@@ -55,9 +55,9 @@ class ProductType extends ResourceTableType
                 'sortable' => !$variantMode,
             ])
             ->addColumn('taxGroup', 'anchor', [
-                'label'                => 'ekyna_product.tax_group.label.singular',
+                'label'                => 'ekyna_commerce.tax_group.label.singular',
                 'sortable'             => !$variantMode,
-                'route_name'           => 'ekyna_product_tax_group_admin_show',
+                'route_name'           => 'ekyna_commerce_tax_group_admin_show',
                 'route_parameters_map' => [
                     'taxGroupId' => 'taxGroup.id',
                 ],

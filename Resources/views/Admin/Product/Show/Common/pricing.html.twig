@@ -1,11 +1,3 @@
-{% if product is variant_product %}
-    {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
-        'route': 'ekyna_product_product_admin_show',
-        'route_params_map': {'productId': 'id'},
-    }) }}
-{% endif %}
-{{ show_row(product.designation, 'text', 'ekyna_core.field.designation') }}
-{{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
 <div class="row">
     <div class="col-md-6">
         {# TODO use IntlNumberFormatter #}

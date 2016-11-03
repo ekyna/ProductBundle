@@ -56,7 +56,11 @@ class ProductExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction(
                 'get_product_types',
-                [Model\ProductTypes::class, 'getConstants']
+                [Model\ProductTypes::class, 'getTypes']
+            ),
+            new \Twig_SimpleFunction(
+                'get_product_create_types',
+                [Model\ProductTypes::class, 'getCreateTypes']
             ),
         ];
     }

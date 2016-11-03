@@ -6,7 +6,9 @@
     </li>
     <li>
         <a href="#product-pricing" data-toggle="tab">
-            {% block pricing_tab %}{{ 'ekyna_product.product.field.pricing'|trans }}{% endblock pricing_tab %}
+            {% block pricing_tab %}
+                {{- 'ekyna_product.product.field.pricing'|trans -}}
+            {% endblock pricing_tab %}
         </a>
     </li>
     <li>
@@ -22,9 +24,6 @@
     <div class="tab-content">
         <div class="tab-pane active" id="product-general">
             {% block general_content %}
-                {% if form.translations is defined %}
-                    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-                {% endif %}
                 {{ form_row(form.designation) }}
                 <div class="row">
                     <div class="col-md-6">

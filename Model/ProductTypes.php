@@ -52,6 +52,21 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Returns the "create button" types.
+     *
+     * @return array
+     */
+    static public function getCreateTypes()
+    {
+        return [
+            static::TYPE_SIMPLE,
+            static::TYPE_VARIABLE,
+            static::TYPE_BUNDLE,
+            static::TYPE_CONFIGURABLE,
+        ];
+    }
+
+    /**
      * Returns the 'child' types.
      *
      * @return array

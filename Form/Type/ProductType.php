@@ -51,9 +51,11 @@ class ProductType extends ResourceFormType
     {
         $builder
             ->add('brand', BrandChoiceType::class, [
+                'allow_new' => true,
                 'required' => true,
             ])
             ->add('category', CategoryChoiceType::class, [
+                'allow_new' => true,
                 'required' => true,
             ])
             ->add('images', MediaCollectionType::class, [

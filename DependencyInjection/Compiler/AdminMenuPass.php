@@ -40,7 +40,7 @@ class AdminMenuPass implements CompilerPassInterface
         ]]);
 
         // Categories
-        $pool->addMethodCall('createEntry', ['store', [
+        $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'categories',
             'route'    => 'ekyna_product_category_admin_home',
             'label'    => 'ekyna_product.category.label.plural',
@@ -49,7 +49,7 @@ class AdminMenuPass implements CompilerPassInterface
         ]]);
 
         // Brands
-        $pool->addMethodCall('createEntry', ['store', [
+        $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'brands',
             'route'    => 'ekyna_product_brand_admin_home',
             'label'    => 'ekyna_product.brand.label.plural',

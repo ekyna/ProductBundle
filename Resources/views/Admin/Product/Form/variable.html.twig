@@ -3,6 +3,7 @@
 
 {% block general_content %}
     {{ parent() }}
+    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
     {{ form_row(form.attributeSet) }}
     {{ form_row(form.images) }}
 {% endblock general_content %}
@@ -10,5 +11,3 @@
 
 {#{% block pricing_content %}{% endblock pricing_content %}#}
 
-
-{#{% block seo_content %}{% endblock seo_content %}#}

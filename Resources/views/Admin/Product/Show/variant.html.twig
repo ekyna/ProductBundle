@@ -1,0 +1,17 @@
+{% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
+
+{% block general_content %}
+    {{ parent() }}
+    {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
+        'route': 'ekyna_product_product_admin_show',
+        'route_params_map': {'productId': 'id'},
+    }) }}
+    {# TODO attributes #}
+    {{ show_row(product.medias, 'medias', 'ekyna_core.field.images') }}
+{% endblock general_content %}
+
+
+{% block pricing_content %}
+    {{ parent() }}
+    {# TODO optionGroups #}
+{% endblock pricing_content %}

@@ -1,0 +1,30 @@
+{% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
+
+{% block general_content %}
+    {{ parent() }}
+    {{ show_translations_row(product.translations, {
+        'fields': {
+            'title': {'label': 'ekyna_core.field.title'},
+            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+        }
+    }) }}
+    {# TODO attributeSet #}
+    {{ show_row(product.medias, 'medias', 'ekyna_core.field.images') }}
+{% endblock general_content %}
+
+
+{% block children_content %}
+    <div class="sub-header">
+        <h2>{{ 'ekyna_product.variant.header.list'|trans|raw }}</h2>
+    </div>
+    <div class="actions">
+        {{ admin_resource_btn('ekyna_product.product', 'new', {
+            'label': 'ekyna_product.variant.button.new',
+            'path': path('ekyna_product_product_admin_new', {
+                'parent': product.id,
+                'type': 'variant'
+            })
+        }) }}
+    </div>
+    {{ ekyna_table_render(variants) }}
+{% endblock children_content %}

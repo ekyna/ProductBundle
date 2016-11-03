@@ -1,0 +1,20 @@
+{{ show_row(product.designation, 'text', 'ekyna_core.field.designation') }}
+<div class="row">
+    <div class="col-md-6">
+        {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
+            'route': 'ekyna_product_brand_admin_show',
+            'route_params_map': {'brandId': 'id'},
+            'label_nb_col': 4,
+            'widget_nb_col': 8
+        }) }}
+    </div>
+    <div class="col-md-6">
+        {{ show_row(product.category, 'entity', 'ekyna_product.category.label.singular', {
+            'route': 'ekyna_product_category_admin_show',
+            'route_params_map': {'categoryId': 'id'},
+            'label_nb_col': 4,
+            'widget_nb_col': 8
+        }) }}
+    </div>
+</div>
+{{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
