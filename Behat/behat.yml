@@ -1,0 +1,5 @@
+default:
+    suites:
+        product_admin_features:
+            paths:    [ "%paths.base%/features/admin" ]
+            contexts: [ Ekyna\Behat\DatabaseContext ]
