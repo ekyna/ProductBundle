@@ -2,4 +2,6 @@ default:
     suites:
         product_admin_features:
             paths:    [ "%paths.base%/features/admin" ]
-            contexts: [ Ekyna\Behat\DatabaseContext ]
+            contexts:
+                - Ekyna\Behat\BaseContext
+                - Ekyna\Behat\ResetContext
