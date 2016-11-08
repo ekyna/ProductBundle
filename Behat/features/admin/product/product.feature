@@ -7,9 +7,5 @@ Feature: Adding new products
         Given I am logged in as an administrator
 
     Scenario: I can see the list of products
-        When I go to ekyna_product_product_admin_list route
+        When I go to "ekyna_product_product_admin_list" route
         Then I should see "Liste des produits"
-
-#    Scenario: I can't see hello world
-#        When I go to "/contact"
-#        Then I should not see "Accueil" in the "title" element
