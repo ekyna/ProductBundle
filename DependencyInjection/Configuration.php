@@ -106,7 +106,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('brand')
-                            ->isRequired()
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
@@ -154,7 +153,6 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('category')
-                            ->isRequired()
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
