@@ -2,6 +2,7 @@
 
 {% block general_content %}
     {{ parent() }}
+    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
     {{ show_translations_row(product.translations, {
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},

@@ -35,6 +35,15 @@ class OptionType extends ResourceFormType
                     'placeholder' => 'ekyna_core.field.reference',
                 ],
             ])
+            ->add('weight', Type\NumberType::class, [
+                'label'  => 'ekyna_core.field.weight',
+                'sizing' => 'sm',
+                'scale'  => 3,
+                'attr'   => [
+                    'placeholder' => 'ekyna_core.field.weight',
+                    'input_group' => ['append' => 'kg'],
+                ],
+            ])
             ->add('netPrice', Type\NumberType::class, [
                 'label'  => 'ekyna_product.product.field.net_price',
                 'sizing' => 'sm',
@@ -47,6 +56,9 @@ class OptionType extends ResourceFormType
             // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
                 'sizing' => 'sm',
+                'attr' => [
+                    'class' => 'no-select2',
+                ]
             ])
             ->add('position', Type\HiddenType::class,[
                 'attr' => [

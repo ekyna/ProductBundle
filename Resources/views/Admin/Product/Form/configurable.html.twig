@@ -8,6 +8,7 @@
 
 {% block general_content %}
     {{ parent() }}
+    {{ form_row(form.reference) }}
     {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
     {{ form_row(form.images) }}
 {% endblock general_content %}

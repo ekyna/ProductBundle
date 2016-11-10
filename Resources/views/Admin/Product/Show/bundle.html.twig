@@ -1,11 +1,14 @@
 {% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
 
+{% import "EkynaProductBundle:Admin/Product/Show/Common:macros.html.twig" as macros %}
+
 {% block pricing_tab %}
     {{- 'ekyna_product.product.field.composition'|trans -}}
 {% endblock pricing_tab %}
 
 {% block general_content %}
     {{ parent() }}
+    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
     {{ show_translations_row(product.translations, {
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},
@@ -18,5 +21,6 @@
 
 {% block pricing_content %}
     {{ parent() }}
-    {# TODO bundleSlots #}
+    {#{{ macros.show_option_groups(product) }}#}
+    {{ macros.show_bundle_composition(product) }}
 {% endblock pricing_content %}

@@ -45,6 +45,23 @@ class ProductExtension extends \Twig_Extension
                 [$this->constantHelper, 'renderProductTypeBadge'],
                 ['is_safe' => ['html']]
             ),
+            new \Twig_SimpleFilter(
+                'product_reference_type_label',
+                [$this->constantHelper, 'renderProductReferenceTypeLabel'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
+                'product_attributes',
+                [$this, 'transformProductAttributes']
+            ),
+            new \Twig_SimpleFilter(
+                'product_bundle_total_price',
+                [$this, 'calculateBundleTotalPrice']
+            ),
+            new \Twig_SimpleFilter(
+                'product_configurable_total_price',
+                [$this, 'calculateConfigurableTotalPrice']
+            ),
         ];
     }
 
@@ -88,6 +105,99 @@ class ProductExtension extends \Twig_Extension
             }),
         );
     }
+
+    /**
+     * Transforms the product attributes to an array of attribute slots.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    public function transformProductAttributes(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertVariant($product);
+
+        $attributes = [];
+        $slots = $product->getParent()->getAttributeSet()->getSlots();
+
+        foreach ($slots as $slot) {
+            $group = $slot->getGroup();
+
+            $groupAttributes = [];
+            foreach ($product->getAttributes() as $attribute) {
+                if ($group === $attribute->getGroup()) {
+                    $groupAttributes[] = $attribute;
+                }
+            }
+
+            $attributes[] = [
+                'group'      => $group,
+                'attributes' => $groupAttributes
+            ];
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Calculates the product (bundle) total price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     *
+     * @todo Move to a dedicated service
+     * @todo The product (bundle) min price should be processed and persisted during update (flush)
+     */
+    public function calculateBundleTotalPrice(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertBundle($product);
+
+        $total = 0;
+
+        foreach ($product->getBundleSlots() as $slot) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
+
+            $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
+        }
+
+        return $total;
+    }
+
+    /**
+     * Calculates the product (configurable) total.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     *
+     * @todo Move to a dedicated service
+     * @todo The product (configurable) min price should be processed and persisted during update (flush)
+     */
+    public function calculateConfigurableTotalPrice(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertConfigurable($product);
+
+        $total = 0;
+
+        foreach ($product->getBundleSlots() as $slot) {
+            $lowerChoice = $lowerPrice = null;
+
+            // TODO Check compatibility
+            foreach ($slot->getChoices() as $choice) {
+                $price = $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
+                if (null === $lowerPrice || $price < $lowerPrice) {
+                    $lowerChoice = $choice;
+                }
+            }
+
+            $total += $lowerChoice->getProduct()->getNetPrice() * $lowerChoice->getMinQuantity();
+        }
+
+        return $total;
+    }
+
 
     /**
      * {inheritdoc}

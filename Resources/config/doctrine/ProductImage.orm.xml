@@ -17,7 +17,8 @@
             <gedmo:sortable-position />
         </field>
 
-        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" inversed-by="images" field="product">
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     inversed-by="images" field="product">
             <join-column name="product_id" referenced-column-name="id" nullable="true" on-delete="CASCADE" />
             <gedmo:sortable-group />
         </many-to-one>

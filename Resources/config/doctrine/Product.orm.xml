@@ -34,6 +34,7 @@
         <field name="shippedStock" column="shipped_stock" type="decimal" precision="10" scale="3"/>
         <field name="estimatedDateOfArrival" column="estimated_date_of_arrival" type="datetime" nullable="true" />
 
+        <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
         <field name="createdAt" column="created_at" type="datetime" />
         <field name="updatedAt" column="updated_at" type="datetime" nullable="true" />
 
@@ -69,6 +70,13 @@
             <order-by>
                 <order-by-field name="position" direction="ASC" />
             </order-by>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface"
+                     mapped-by="product" field="references" orphan-removal="true">
+            <cascade>
+                <cascade-all />
+            </cascade>
         </one-to-many>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"

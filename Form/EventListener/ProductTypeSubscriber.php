@@ -4,11 +4,13 @@ namespace Ekyna\Bundle\ProductBundle\Form\EventListener;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\BundleSlotsType;
 use Ekyna\Bundle\ProductBundle\Form\Type\OptionGroupType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAttributesType;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductReferenceType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductTranslationType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -30,7 +32,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      * @var string
      */
     private $productClass;
-
 
     /**
      * @var string
@@ -64,6 +65,11 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         if (!ProductTypes::isValid($type)) {
             throw new \RuntimeException('Product type not set or invalid.');
         }
+
+        $form->add('seo', SeoType::class, [
+            'label' => false,
+            'required' => $type != Types::TYPE_VARIANT,
+        ]);
 
         switch ($type) {
             case Types::TYPE_SIMPLE:
@@ -107,17 +113,28 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->add('reference', Type\TextType::class, [
                 'label' => 'ekyna_core.field.reference',
             ])
+            ->add('weight', Type\NumberType::class, [
+                'label'  => 'ekyna_core.field.weight',
+                'scale'  => 3,
+                'attr'   => [
+                    'placeholder' => 'ekyna_core.field.weight',
+                    'input_group' => ['append' => 'kg'],
+                ],
+            ])
             ->add('netPrice', Type\NumberType::class, [
                 'label'  => 'ekyna_product.product.field.net_price',
                 'scale'  => 5,
-                'sizing' => 'sm',
                 'attr'   => [
                     'input_group' => ['append' => '€'],
                 ],
             ])
-            // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
                 'allow_new' => true,
+            ])
+            ->add('references', CollectionType::class, [
+                'label'      => 'ekyna_product.product_reference.label.plural',
+                'entry_type' => ProductReferenceType::class,
+                'required'   => false,
             ]);
 
         $this->addOptionGroupsForm($form);
@@ -143,21 +160,27 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'label'    => 'ekyna_core.field.designation',
                 'required' => false,
                 'attr'     => [
-                    'help_text' => 'Leave blank to auto generate based on selected attributes.',
+                    'help_text' => 'ekyna_product.variant.help.leave_blank_to_auto_generate',
                 ],
             ])
             ->add('reference', Type\TextType::class, [
                 'label' => 'ekyna_core.field.reference',
             ])
+            ->add('weight', Type\NumberType::class, [
+                'label'  => 'ekyna_core.field.weight',
+                'scale'  => 3,
+                'attr'   => [
+                    'placeholder' => 'ekyna_core.field.weight',
+                    'input_group' => ['append' => 'kg'],
+                ],
+            ])
             ->add('netPrice', Type\NumberType::class, [
                 'label'  => 'ekyna_product.product.field.net_price',
                 'scale'  => 5,
-                'sizing' => 'sm',
                 'attr'   => [
                     'input_group' => ['append' => '€'],
                 ],
             ])
-            // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
                 'required' => false,
                 'disabled' => true,
@@ -165,6 +188,11 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->add('attributes', ProductAttributesType::class, [
                 'label'         => 'ekyna_product.attribute.label.plural',
                 'attribute_set' => $product->getParent()->getAttributeSet(),
+            ])
+            ->add('references', CollectionType::class, [
+                'label'      => 'ekyna_product.product_reference.label.plural',
+                'entry_type' => ProductReferenceType::class,
+                'required'   => false,
             ]);
 
         $this->addOptionGroupsForm($form);
@@ -194,7 +222,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'label'    => 'ekyna_product.product.field.net_price', // TODO
                 'disabled' => true,
                 'scale'    => 5,
-                'sizing'   => 'sm',
                 'attr'     => [
                     'input_group' => ['append' => '€'],
                 ],
@@ -287,14 +314,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $form->add('bundleSlots', BundleSlotsType::class, [
             'configurable' => $configurable,
         ]);
-        /*$form->add('bundleSlots', CollectionType::class, [
-            'label'           => 'ekyna_product.bundle_slot.label.plural',
-            'sub_widget_col'  => 11,
-            'button_col'      => 1,
-            'allow_sort'      => true,
-            'entry_type'      => OptionGroupType::class,
-            'add_button_text' => 'ekyna_product.option_group.button.add',
-        ]);*/
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber;
@@ -33,8 +32,8 @@ class ProductType extends ResourceFormType
      * Constructor.
      *
      * @param ProductTypeSubscriber $subscriber
-     * @param string $productClass
-     * @param string $imageClass
+     * @param string                $productClass
+     * @param string                $imageClass
      */
     public function __construct(ProductTypeSubscriber $subscriber, $productClass, $imageClass)
     {
@@ -52,19 +51,17 @@ class ProductType extends ResourceFormType
         $builder
             ->add('brand', BrandChoiceType::class, [
                 'allow_new' => true,
-                'required' => true,
+                'required'  => true,
             ])
             ->add('category', CategoryChoiceType::class, [
                 'allow_new' => true,
-                'required' => true,
+                'required'  => true,
             ])
             ->add('images', MediaCollectionType::class, [
-                'label' => 'ekyna_core.field.images',
+                'label'       => 'ekyna_core.field.images',
                 'media_class' => $this->imageClass,
-                'types' => [MediaTypes::IMAGE],
-            ])
-            ->add('seo', SeoType::class, [
-                'label' => false
+                'types'       => [MediaTypes::IMAGE],
+                'required'    => false,
             ]);
 
         $builder->addEventSubscriber($this->subscriber);

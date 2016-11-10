@@ -34,7 +34,7 @@ class ProductAttributesTransformer implements DataTransformerInterface
     /**
      * @inheritDoc
      *
-     * Transforms a collection of attributes to an array of slots.
+     * Transforms a collection of attributes to an array of slots [slot_id => [attributes]].
      */
     public function transform($attributes)
     {
@@ -74,7 +74,7 @@ class ProductAttributesTransformer implements DataTransformerInterface
     /**
      * @inheritDoc
      *
-     * Transforms an array of slots to a collection of attributes.
+     * Transforms an array of slots [slot_id => [attributes]] to a collection of attributes.
      */
     public function reverseTransform($slots)
     {
@@ -84,7 +84,6 @@ class ProductAttributesTransformer implements DataTransformerInterface
 
         $attributes = new ArrayCollection();
 
-        /** @var Model\ProductAttributesSlot $slot */
         foreach ($slots as $slotId => $slotAttributes) {
             if (is_array($slotAttributes)) {
                 foreach ($slotAttributes as $attribute) {

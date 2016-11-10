@@ -3,6 +3,15 @@
 
 {% block general_content %}
     {{ parent() }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.weight, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+    </div>
+    {{ form_row(form.references) }}
     {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
     {{ form_row(form.images) }}
 {% endblock general_content %}

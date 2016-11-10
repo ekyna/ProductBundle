@@ -35,6 +35,11 @@ class Option implements Model\OptionInterface
     /**
      * @var float
      */
+    protected $weight;
+
+    /**
+     * @var float
+     */
     protected $netPrice;
 
     /**
@@ -123,6 +128,24 @@ class Option implements Model\OptionInterface
     /**
      * @inheritdoc
      */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = (float)$weight;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getNetPrice()
     {
         return $this->netPrice;
@@ -133,7 +156,7 @@ class Option implements Model\OptionInterface
      */
     public function setNetPrice($netPrice)
     {
-        $this->netPrice = $netPrice;
+        $this->netPrice = (float)$netPrice;
 
         return $this;
     }

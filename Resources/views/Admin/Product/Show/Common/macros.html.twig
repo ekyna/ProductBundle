@@ -1,0 +1,220 @@
+{% macro show_references(product) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_product.product_reference.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-block">
+                {% if product.references is not empty %}
+                    <dl class="dl-horizontal">
+                        {% for reference in product.references %}
+                            <dt>{{ reference|product_reference_type_label }}</dt>
+                            <dd>{{ reference.number }}</dd>
+                        {% endfor %}
+                    </dl>
+                {% else %}
+                    <em>{{ 'ekyna_core.value.none'|trans }}</em>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_references %}
+
+{% macro show_attributes(product) %}
+{% spaceless %}
+    {% if product is variant_product %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_product.attribute.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-block">
+                {% set attributes = product|product_attributes %}
+                <dl class="dl-horizontal">
+                {% for data in attributes -%}
+                    <dt>{{ attribute(data, 'group').name }}</dt>
+                    <dd>
+                    {% for attribute in attribute(data, 'attributes') -%}
+                        {{ attribute.name }}
+                        {% if not loop.last %}, {% endif -%}
+                    {% endfor -%}
+                    </dd>
+                {%- endfor %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endspaceless %}
+{% endmacro show_attributes %}
+
+{% macro show_option_groups(product) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_product.option_group.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-sm">
+                {% for group in product.optionGroups %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ show_row(group.name, 'text', 'ekyna_core.field.name', {
+                            'label_nb_col': 4,
+                            'widget_nb_col': 8
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
+                            'label_nb_col': 4,
+                            'widget_nb_col': 8
+                        }) }}
+                    </div>
+                </div>
+                <div class="row show-row">
+                    <div class="col-md-2 show-label">
+                        {{ 'ekyna_product.option.label.plural'|trans }}
+                    </div>
+                    <div class="col-md-10">
+                        <div class="show-widget">
+                            <table class="table table-stripped table-condensed">
+                                <tr>
+                                    <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+                                    <th>{{ 'ekyna_core.field.reference'|trans }}</th>
+                                    <th>{{ 'ekyna_core.field.weight'|trans }}</th>
+                                    <th>{{ 'ekyna_core.field.price'|trans }}</th>
+                                    <th>{{ 'ekyna_core.field.group'|trans }}</th>
+                                </tr>
+                                {% for option in group.options %}
+                                <tr>
+                                    <td>{{ option.designation }}</td>
+                                    <td>{{ option.reference }}</td>
+                                    <td>{{ option.weight|localizednumber }} kg</td>
+                                    <td>{{ option.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                                    <td>{{ option.taxGroup }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_option_groups %}
+
+{% macro show_bundle_composition(product) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_product.bundle_slot.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-sm">
+            {% if product is bundle_product %}
+                <table class="table table-stripped table-condensed">
+                    <tr>
+                        <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
+                        <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                    </tr>
+                    {% for slot in product.bundleSlots %}
+                    <tr>
+                        <td>
+                            {% set choice = (slot.choices|first) %}
+                            <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
+                                {{ choice.product }}
+                            </a>
+                        </td>
+                        <td class="text-right">{{ choice.minQuantity }}</td>
+                        <td class="text-right">{{ choice.product.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                        </td>
+                        <td class="text-right">
+                            {{ product|product_bundle_total_price|localizedcurrency('EUR') }}
+                        </td>
+                    </tr>
+                </table>
+            {% else %}
+                <p>
+                    <em>Wrong product type</em>
+                </p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_bundle_composition %}
+
+{% macro show_configurable_composition(product) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_product.bundle_slot.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-sm show-product-configurable">
+            {% if product is configurable_product %}
+
+                {% for slot in product.bundleSlots %}
+                    <div class="slot">
+                    {{ show_translations_row(slot.translations, {
+                        'fields': {
+                            'title': {'label': 'ekyna_core.field.title'},
+                            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+                        }
+                    }) }}
+
+                    <table class="table table-stripped table-condensed">
+                        <tr>
+                            <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                            <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
+                            <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
+                            <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                        </tr>
+                        {% for choice in slot.choices %}
+                            <tr>
+                                <td>
+                                    <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
+                                        {{ choice.product }}
+                                    </a>
+                                </td>
+                                <td class="text-right">{{ choice.minQuantity }}</td>
+                                <td class="text-right">{{ choice.maxQuantity }}</td>
+                                <td class="text-right">{{ choice.product.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="choice-rules">
+                                    <em>[TODO] Choice rules</em> {# TODO rules #}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                    </div>
+                {% endfor %}
+
+                <p class="total">
+                    <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                    <span>{{ product|product_configurable_total_price|localizedcurrency('EUR') }}</span>
+                </p>
+
+            {% else %}
+                <p>
+                    <em>Wrong product type</em>
+                </p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_configurable_composition %}

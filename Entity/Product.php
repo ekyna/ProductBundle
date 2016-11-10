@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model\TimestampableTrait;
 
 /**
  * Class Product
@@ -21,6 +22,7 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
+        TimestampableTrait,
         StockSubjectTrait;
 
     /**
@@ -84,6 +86,11 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     protected $images;
 
     /**
+     * @var ArrayCollection|Model\ProductReferenceInterface[]
+     */
+    protected $references;
+
+    /**
      * @var string
      */
     protected $designation;
@@ -102,6 +109,11 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
      * @var float
      */
     protected $weight;
+
+    /**
+     * @var \DateTime
+     */
+    protected $releasedAt;
 
     /**
      * @var \DateTime
@@ -126,6 +138,7 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
         $this->optionGroups = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
         $this->images = new ArrayCollection();
+        $this->references = new ArrayCollection();
         $this->seo = new Seo();
 
         $this->initializeStock();
@@ -574,6 +587,48 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function hasReference(Model\ProductReferenceInterface $reference)
+    {
+        return $this->references->contains($reference);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addReference(Model\ProductReferenceInterface $reference)
+    {
+        if (!$this->hasReference($reference)) {
+            $reference->setProduct($this);
+            $this->references->add($reference);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeReference(Model\ProductReferenceInterface $reference)
+    {
+        if ($this->hasReference($reference)) {
+            $reference->setProduct(null);
+            $this->references->removeElement($reference);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReferences()
+    {
+        return $this->references;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTitle()
     {
         if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
@@ -690,35 +745,17 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getCreatedAt()
+    public function getReleasedAt()
     {
-        return $this->createdAt;
+        return $this->releasedAt;
     }
 
     /**
      * @inheritdoc
      */
-    public function setCreatedAt(\DateTime $createdAt)
+    public function setReleasedAt(\DateTime $releasedAt = null)
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
-    {
-        $this->updatedAt = $updatedAt;
+        $this->releasedAt = $releasedAt;
 
         return $this;
     }

@@ -134,7 +134,7 @@ ekyna_product:
             singular: Option
             plural: Options
         button:
-            add: Ajouter une options
+            add: Ajouter une option
 
     option_group:
         label:
@@ -167,11 +167,21 @@ ekyna_product:
             configurable: Pack personnalisable
         field:
             parent: Parent
-            net_price: Prix Net
+            net_price: Prix HT
+            total_net_price: Prix total HT
             pricing: Tarifs
             composition: Composition
         alert:
             no_item: Aucun produit configuré
+
+    product_reference:
+        label:
+            singular: Réf. externe
+            plural: Réf. externes
+        type:
+            ean8: Code EAN 8
+            ean13: Code EAN 13
+            manufacturer: Référence fabricant
 
     variant:
         label:
@@ -181,3 +191,5 @@ ekyna_product:
             list: Variantes <small>Liste des variantes</small>
         button:
             new: Nouvelle variante
+        help:
+            leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.

@@ -61,6 +61,22 @@ interface OptionInterface extends ResourceInterface
     public function setReference($reference);
 
     /**
+     * Returns the weight.
+     *
+     * @return float
+     */
+    public function getWeight();
+
+    /**
+     * Sets the weight.
+     *
+     * @param float $weight
+     *
+     * @return $this|OptionInterface
+     */
+    public function setWeight($weight);
+
+    /**
      * Returns the net price.
      *
      * @return float

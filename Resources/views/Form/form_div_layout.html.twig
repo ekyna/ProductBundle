@@ -132,9 +132,20 @@
 {% block ekyna_product_option_widget %}
 {% spaceless %}
     {{ form_errors(form) }}
-    {{ form_widget(form.designation) }}
-    {{ form_widget(form.reference) }}
-    <div class="row">
+    <div class="row form-group">
+        <div class="col-md-12">
+            {{ form_widget(form.designation) }}
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-md-6">
+            {{ form_widget(form.reference) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_widget(form.weight) }}
+        </div>
+    </div>
+    <div class="row form-group">
         <div class="col-md-6">
             {{ form_widget(form.netPrice) }}
         </div>
@@ -159,14 +170,24 @@
             {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
         </div>
     </div>
-
-    {% set previous_style = bootstrap_get_style() %}
-    {{ bootstrap_set_style('') }}
-    {{ form_row(form.options) }}
-    {{ bootstrap_set_style(previous_style) }}
-
     {{ form_widget(form.position) }}
     {{ form_rest(form) }}
 {% endspaceless %}
 {% endblock ekyna_product_option_group_widget %}
+
+
+{% block ekyna_product_reference_widget %}
+{% spaceless %}
+    {{ form_errors(form) }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_widget(form.type) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_widget(form.number) }}
+        </div>
+    </div>
+    {{ form_rest(form) }}
+{% endspaceless %}
+{% endblock ekyna_product_reference_widget %}
 

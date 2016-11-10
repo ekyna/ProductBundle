@@ -31,4 +31,20 @@ class ConstantsHelper extends AbstractConstantsHelper
 
         return $this->renderLabel();
     }
+
+    /**
+     * Renders the product reference type label.
+     *
+     * @param Model\ProductReferenceInterface|string $typeOrReference
+     *
+     * @return string
+     */
+    public function renderProductReferenceTypeLabel($typeOrReference)
+    {
+        if ($typeOrReference instanceof Model\ProductReferenceInterface) {
+            $typeOrReference = $typeOrReference->getType();
+        }
+
+        return $this->renderLabel(Model\ProductReferenceTypes::getLabel($typeOrReference));
+    }
 }

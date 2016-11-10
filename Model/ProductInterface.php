@@ -18,6 +18,7 @@ interface ProductInterface extends
     Cms\SeoSubjectInterface,
     ResourceModel\ResourceInterface,
     ResourceModel\TranslatableInterface,
+    ResourceModel\TimestampableInterface ,
     PricingModel\TaxableInterface,
     StockSubjectInterface
 {
@@ -310,6 +311,40 @@ interface ProductInterface extends
     public function getImages();
 
     /**
+     * Returns whether or not the product has the reference.
+     *
+     * @param ProductReferenceInterface $reference
+     *
+     * @return bool
+     */
+    public function hasReference(ProductReferenceInterface $reference);
+
+    /**
+     * Adds the product reference.
+     *
+     * @param ProductReferenceInterface $reference
+     *
+     * @return $this|ProductInterface
+     */
+    public function addReference(ProductReferenceInterface $reference);
+
+    /**
+     * Removes the product reference.
+     *
+     * @param ProductReferenceInterface $reference
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeReference(ProductReferenceInterface $reference);
+
+    /**
+     * Returns the references.
+     *
+     * @return ArrayCollection|ProductReferenceInterface[]
+     */
+    public function getReferences();
+
+    /**
      * Returns the title.
      *
      * @return string
@@ -406,36 +441,20 @@ interface ProductInterface extends
     public function setWeight($weight);
 
     /**
-     * Returns the "created at" datetime.
+     * Returns the releasedAt.
      *
      * @return \DateTime
      */
-    public function getCreatedAt();
+    public function getReleasedAt();
 
     /**
-     * Sets the "created at" datetime.
+     * Sets the releasedAt.
      *
-     * @param \DateTime $createdAt
+     * @param \DateTime $releasedAt
      *
      * @return $this|ProductInterface
      */
-    public function setCreatedAt(\DateTime $createdAt);
-
-    /**
-     * Returns the "updated at" datetime.
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt();
-
-    /**
-     * Sets the "updated at" datetime.
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return $this|ProductInterface
-     */
-    public function setUpdatedAt(\DateTime $updatedAt = null);
+    public function setReleasedAt(\DateTime $releasedAt = null);
 
     /**
      * Returns the variant uniqueness signature.
