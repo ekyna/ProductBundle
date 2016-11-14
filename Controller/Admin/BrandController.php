@@ -2,15 +2,15 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
+use Ekyna\Bundle\AdminBundle\Controller\Resource\SortableTrait;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
-use Ekyna\Bundle\AdminBundle\Controller\Resource\NestedTrait;
 
 /**
- * Class CategoryController
+ * Class BrandController
  * @package Ekyna\Bundle\ProductBundle\Controller\Admin
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class CategoryController extends ResourceController
+class BrandController extends ResourceController
 {
-    use NestedTrait;
+    use SortableTrait;
 }

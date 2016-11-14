@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -24,7 +25,10 @@
         <field name="userOption" column="user_option" type="boolean" nullable="false"/>
         <field name="minQuantity" column="min_quantity" type="integer" nullable="false"/>
         <field name="maxQuantity" column="max_quantity" type="integer" nullable="true"/>
-        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <field name="position" type="integer" column="position">
+            <gedmo:sortable-position />
+        </field>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleInterface"
                      field="rules" mapped-by="choice" orphan-removal="true">
@@ -40,6 +44,7 @@
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface"
                      field="slot" inversed-by="choices">
             <join-column name="slot_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+            <gedmo:sortable-group />
         </many-to-one>
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
             <join-column name="product_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />

@@ -15,6 +15,7 @@ interface BrandInterface
     extends Cms\ContentSubjectInterface,
             Cms\SeoSubjectInterface,
             Media\MediaSubjectInterface,
+            ResourceModel\SortableInterface,
             ResourceModel\TimestampableInterface,
             ResourceModel\ResourceInterface
 {

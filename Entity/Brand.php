@@ -13,11 +13,12 @@ use Ekyna\Bundle\MediaBundle\Model as Media;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Brand implements BrandInterface
+class Brand extends ResourceModel\AbstractTranslatable implements BrandInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         Media\MediaSubjectTrait,
+        ResourceModel\SortableTrait,
         ResourceModel\TimestampableTrait;
 
     /**
@@ -36,6 +37,8 @@ class Brand implements BrandInterface
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->seo = new Seo();
     }
 
@@ -71,5 +74,13 @@ class Brand implements BrandInterface
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTranslationClass()
+    {
+        return BrandTranslation::class;
     }
 }

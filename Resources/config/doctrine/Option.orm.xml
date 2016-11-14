@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -27,11 +28,15 @@
         <field name="reference" column="reference" type="string" length="16" nullable="false" unique="true"/>
         <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
-        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <field name="position" type="integer" column="position">
+            <gedmo:sortable-position />
+        </field>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface"
                      field="group" inversed-by="options">
             <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+            <gedmo:sortable-group />
         </many-to-one>
 
         <many-to-one target-entity="Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface" field="taxGroup">

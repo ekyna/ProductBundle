@@ -27,6 +27,12 @@
         <div class="tab-content">
             <div class="tab-pane active" id="brand-general">
                 {{ show_row(brand.name, null, 'ekyna_core.field.name') }}
+                {{ show_translations_row(brand.translations, {
+                    'fields': {
+                        'title': {'label': 'ekyna_core.field.title'},
+                        'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+                    }
+                }) }}
                 {{ show_row(brand.media, 'media', 'ekyna_core.field.image') }}
             </div>
             <div class="tab-pane" id="brand-seo">

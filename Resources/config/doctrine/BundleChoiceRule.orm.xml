@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -23,11 +24,15 @@
 
         <field name="type" column="type" type="string" length="16" nullable="false"/>
         <field name="expression" column="expression" type="string" length="255" nullable="false"/>
-        <field name="position" column="position" type="integer" nullable="false"/>
+
+        <field name="position" type="integer" column="position">
+            <gedmo:sortable-position />
+        </field>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface"
                      field="choice" inversed-by="rules">
             <join-column name="choice_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+            <gedmo:sortable-group />
         </many-to-one>
 
     </mapped-superclass>

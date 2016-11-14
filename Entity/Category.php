@@ -15,7 +15,7 @@ use Ekyna\Component\Resource\Model as ResourceModel;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Category implements CategoryInterface
+class Category extends ResourceModel\AbstractTranslatable implements CategoryInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
@@ -49,6 +49,8 @@ class Category implements CategoryInterface
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->children = new ArrayCollection();
         $this->seo = new Seo();
     }
@@ -147,5 +149,13 @@ class Category implements CategoryInterface
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTranslationClass()
+    {
+        return CategoryTranslation::class;
     }
 }

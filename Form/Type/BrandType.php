@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
@@ -25,6 +26,11 @@ class BrandType extends ResourceFormType
             ->add('name', TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'required' => true,
+            ])
+            ->add('translations', TranslationsFormsType::class, [
+                'form_type'      => BrandTranslationType::class,
+                'label'          => false,
+                'error_bubbling' => false,
             ])
             ->add('media', MediaChoiceType::class, [
                 'label' => 'ekyna_core.field.image',

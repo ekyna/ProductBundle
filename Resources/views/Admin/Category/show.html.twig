@@ -27,7 +27,16 @@
         <div class="tab-content">
             <div class="tab-pane active" id="category-general">
                 {{ show_row(category.name, 'text', 'ekyna_core.field.name') }}
-                {# TODO parent #}
+                {{ show_row(category.parent, 'entity', 'ekyna_core.field.parent', {
+                    'route': 'ekyna_product_category_admin_show',
+                    'route_params_map': {'categoryId': 'id'}
+                }) }}
+                {{ show_translations_row(category.translations, {
+                    'fields': {
+                        'title': {'label': 'ekyna_core.field.title'},
+                        'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+                    }
+                }) }}
                 {{ show_row(category.media, 'media', 'ekyna_core.field.image') }}
             </div>
             <div class="tab-pane" id="category-seo">

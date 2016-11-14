@@ -30,6 +30,26 @@ class BrandType extends ResourceTableType
             ->addColumn('actions', 'admin_actions', [
                 'buttons' => [
                     [
+                        'label'                => 'ekyna_core.button.move_up',
+                        'icon'                 => 'arrow-up',
+                        'class'                => 'primary',
+                        'route_name'           => 'ekyna_product_brand_admin_move_up',
+                        'route_parameters_map' => [
+                            'brandId' => 'id',
+                        ],
+                        'permission'           => 'edit',
+                    ],
+                    [
+                        'label'                => 'ekyna_core.button.move_down',
+                        'icon'                 => 'arrow-down',
+                        'class'                => 'primary',
+                        'route_name'           => 'ekyna_product_brand_admin_move_down',
+                        'route_parameters_map' => [
+                            'brandId' => 'id',
+                        ],
+                        'permission'           => 'edit',
+                    ],
+                    [
                         'label' => 'ekyna_core.button.edit',
                         'class' => 'warning',
                         'route_name' => 'ekyna_product_brand_admin_edit',
