@@ -6,7 +6,9 @@
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                         http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="Ekyna\Bundle\ProductBundle\Entity\Brand" table="product_brand">
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\Brand"
+            table="product_brand">
 
         <id name="id" type="integer" column="id">
           <generator strategy="AUTO"/>
@@ -25,6 +27,6 @@
             <gedmo:timestampable on="update"/>
         </field>
 
-    </entity>
+    </mapped-superclass>
 
 </doctrine-mapping>
