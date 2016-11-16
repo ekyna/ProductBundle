@@ -43,7 +43,7 @@ class CategoryType extends ResourceFormType
                 'required'      => false,
             ])
             ->add('translations', TranslationsFormsType::class, [
-                'form_type'      => BrandTranslationType::class,
+                'form_type'      => CategoryTranslationType::class,
                 'label'          => false,
                 'error_bubbling' => false,
             ])

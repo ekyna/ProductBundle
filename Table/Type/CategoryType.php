@@ -19,7 +19,6 @@ class CategoryType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'number')
             ->addColumn('name', 'nested_anchor', [
                 'label' => 'ekyna_core.field.name',
                 'route_name' => 'ekyna_product_category_admin_show',
@@ -59,10 +58,6 @@ class CategoryType extends ResourceTableType
                         'permission' => 'delete',
                     ],
                 ],
-            ])
-            ->addFilter('id', 'number')
-            ->addFilter('name', 'text', [
-                'label' => 'ekyna_core.field.name'
             ])
         ;
     }

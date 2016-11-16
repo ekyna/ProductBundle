@@ -168,8 +168,12 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->variableNode('templates')->defaultValue([
                                     '_form.html'     => 'EkynaProductBundle:Admin/Category:_form.html',
-                                    'show.html'      => 'EkynaProductBundle:Admin/Category:show.html',
+                                    'list.html'      => 'EkynaProductBundle:Admin/Category:list.html',
+                                    'new.html'       => 'EkynaProductBundle:Admin/Category:new.html',
                                     'new_child.html' => 'EkynaProductBundle:Admin/Category:new_child.html',
+                                    'show.html'      => 'EkynaProductBundle:Admin/Category:show.html',
+                                    'edit.html'      => 'EkynaProductBundle:Admin/Category:edit.html',
+                                    'remove.html'    => 'EkynaProductBundle:Admin/Category:remove.html',
                                 ])->end()
                                 ->scalarNode('parent')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Category')->end()

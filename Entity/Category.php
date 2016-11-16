@@ -7,15 +7,17 @@ use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\CoreBundle\Model\TreeTrait;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
-use Ekyna\Bundle\ProductBundle\Model\CategoryInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model as ResourceModel;
 
 /**
  * Class Category
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\CategoryTranslationInterface translate($locale = null, $create = false)
  */
-class Category extends ResourceModel\AbstractTranslatable implements CategoryInterface
+class Category extends ResourceModel\AbstractTranslatable implements Model\CategoryInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
@@ -94,7 +96,7 @@ class Category extends ResourceModel\AbstractTranslatable implements CategoryInt
     /**
      * @inheritdoc
      */
-    public function hasChild(CategoryInterface $child)
+    public function hasChild(Model\CategoryInterface $child)
     {
         return $this->children->contains($child);
     }
@@ -102,7 +104,7 @@ class Category extends ResourceModel\AbstractTranslatable implements CategoryInt
     /**
      * @inheritdoc
      */
-    public function addChild(CategoryInterface $child)
+    public function addChild(Model\CategoryInterface $child)
     {
         if (!$this->hasChild($child)) {
             $child->setParent($this);
@@ -115,7 +117,7 @@ class Category extends ResourceModel\AbstractTranslatable implements CategoryInt
     /**
      * @inheritdoc
      */
-    public function removeChild(CategoryInterface $child)
+    public function removeChild(Model\CategoryInterface $child)
     {
         if ($this->hasChild($child)) {
             $child->setParent(null);
@@ -136,7 +138,7 @@ class Category extends ResourceModel\AbstractTranslatable implements CategoryInt
     /**
      * @inheritdoc
      */
-    public function setParent(CategoryInterface $parent = null)
+    public function setParent(Model\CategoryInterface $parent = null)
     {
         $this->parent = $parent;
 
