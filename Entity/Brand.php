@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\BrandTranslationInterface;
 use Ekyna\Component\Resource\Model as ResourceModel;
 use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
@@ -12,6 +13,8 @@ use Ekyna\Bundle\MediaBundle\Model as Media;
  * Class Brand
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
+ *
+ * @method BrandTranslationInterface translate($locale = null, $create = false)
  */
 class Brand extends ResourceModel\AbstractTranslatable implements BrandInterface
 {
@@ -74,7 +77,45 @@ class Brand extends ResourceModel\AbstractTranslatable implements BrandInterface
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    /*public function setTitle($title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }*/
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription()
+    {
+        return $this->translate()->getDescription();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    /*public function setDescription($description)
+    {
+        $this->translate()->setDescription($description);
+
+        return $this;
+    }*/
 
     /**
      * @inheritdoc

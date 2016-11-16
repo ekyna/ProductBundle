@@ -33,4 +33,36 @@ interface BrandInterface
      * @return $this|BrandInterface
      */
     public function setName($name);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
+
+    /**
+     * Sets the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|BrandInterface
+     */
+    //public function setTitle($title);
+
+    /**
+     * Returns the (translated) description.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
+     * Sets the (translated) description.
+     *
+     * @param string $description
+     *
+     * @return $this|BrandInterface
+     */
+    //public function setDescription($description);
 }

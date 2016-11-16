@@ -345,14 +345,14 @@ interface ProductInterface extends
     public function getReferences();
 
     /**
-     * Returns the title.
+     * Returns the (translated) title.
      *
      * @return string
      */
     public function getTitle();
 
     /**
-     * Sets the title.
+     * Sets the (translated) title.
      *
      * @param string $title
      *
@@ -361,14 +361,14 @@ interface ProductInterface extends
     //public function setTitle($title);
 
     /**
-     * Returns the description.
+     * Returns the (translated) description.
      *
      * @return string
      */
     public function getDescription();
 
     /**
-     * Sets the description.
+     * Sets the (translated) description.
      *
      * @param string $description
      *

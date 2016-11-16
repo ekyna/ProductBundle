@@ -115,7 +115,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('parent')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Brand')->end()
                                 ->scalarNode('controller')->end()
-                                ->scalarNode('repository')->end()
+                                ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\BrandRepository')->end()
                                 ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\BrandType')->end()
                                 ->scalarNode('table')->defaultValue('Ekyna\Bundle\ProductBundle\Table\Type\BrandType')->end()
                             ->end()

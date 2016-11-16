@@ -2,8 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\Util\ResourceRepositoryTrait;
+use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
+use Ekyna\Component\Resource\Doctrine\ORM\Util\TranslatableResourceRepositoryTrait;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
 /**
@@ -11,9 +11,9 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class CategoryRepository extends NestedTreeRepository implements ResourceRepositoryInterface
+class CategoryRepository extends NestedTreeRepository implements TranslatableResourceRepositoryInterface
 {
-    use ResourceRepositoryTrait;
+    use TranslatableResourceRepositoryTrait;
 
     /*public function findBySlug($categorySlug)
     {
