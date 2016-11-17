@@ -4,13 +4,16 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractTranslatable;
 
 /**
  * Class OptionGroup
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\OptionGroupTranslationInterface translate($locale = null, $create = false)
  */
-class OptionGroup implements Model\OptionGroupInterface
+class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInterface
 {
     /**
      * @var integer
@@ -48,6 +51,8 @@ class OptionGroup implements Model\OptionGroupInterface
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->options = new ArrayCollection();
     }
 
@@ -113,6 +118,14 @@ class OptionGroup implements Model\OptionGroupInterface
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
     }
 
     /**
@@ -199,5 +212,13 @@ class OptionGroup implements Model\OptionGroupInterface
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getTranslationClass()
+    {
+        return OptionGroupTranslation::class;
     }
 }

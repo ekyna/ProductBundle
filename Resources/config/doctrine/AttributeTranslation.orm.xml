@@ -5,15 +5,14 @@
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
-    <entity name="Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation"
-            table="product_bundle_slot_translation">
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation"
+            table="product_attribute_translation">
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO" />
         </id>
 
         <field name="title" column="title" type="string" length="255" />
-        <field name="description" column="description" type="text" nullable="true" />
 
     </entity>
 

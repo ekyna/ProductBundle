@@ -15,6 +15,11 @@
             <div class="tab-content">
                 <div class="tab-pane active" id="general">
                     {{ show_row(attributeGroup.name, 'text', 'ekyna_core.field.email') }}
+                    {{ show_translations_row(attributeGroup.translations, {
+                        'fields': {
+                            'title': {'label': 'ekyna_core.field.title'},
+                        }
+                    }) }}
                 </div>
             </div>
         </div>

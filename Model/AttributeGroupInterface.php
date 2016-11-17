@@ -9,6 +9,8 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  * Interface AttributeGroupInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method AttributeGroupTranslationInterface translate($locale = null, $create = false)
  */
 interface AttributeGroupInterface extends ResourceInterface
 {
@@ -27,6 +29,13 @@ interface AttributeGroupInterface extends ResourceInterface
      * @return $this|AttributeGroupInterface
      */
     public function setName($name);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
 
     /**
      * Returns the attributes.

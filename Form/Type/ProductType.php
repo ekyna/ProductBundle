@@ -49,6 +49,7 @@ class ProductType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            // TODO not if variant ????
             ->add('brand', BrandChoiceType::class, [
                 'allow_new' => true,
                 'required'  => true,

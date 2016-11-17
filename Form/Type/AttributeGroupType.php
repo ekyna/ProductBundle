@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,6 +22,11 @@ class AttributeGroupType extends ResourceFormType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'ekyna_core.field.name',
+            ])
+            ->add('translations', TranslationsFormsType::class, [
+                'form_type'      => AttributeGroupTranslationType::class,
+                'label'          => false,
+                'error_bubbling' => false,
             ]);
     }
 }

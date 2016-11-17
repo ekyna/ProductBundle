@@ -2,19 +2,18 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\TinymceType;
-use Ekyna\Bundle\ProductBundle\Entity\BrandTranslation;
+use Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class BrandTranslationType
+ * Class OptionGroupTranslationType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BrandTranslationType extends AbstractType
+class OptionGroupTranslationType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -24,10 +23,6 @@ class BrandTranslationType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'label' => 'ekyna_core.field.title',
-            ])
-            ->add('description', TinymceType::class, [
-                'label' => 'ekyna_core.field.content',
-                'theme' => 'front',
             ]);
     }
 
@@ -37,7 +32,7 @@ class BrandTranslationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => BrandTranslation::class,
+            'data_class' => OptionGroupTranslation::class,
         ]);
     }
 }

@@ -4,17 +4,19 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model as ResourceModel;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Bundle\MediaBundle\Model as Media;
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
 
 /**
  * Interface BrandInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method BrandTranslationInterface translate($locale = null, $create = false)
  */
 interface BrandInterface
     extends Cms\ContentSubjectInterface,
             Cms\SeoSubjectInterface,
-            Media\MediaSubjectInterface,
+            MediaSubjectInterface,
             ResourceModel\SortableInterface,
             ResourceModel\TimestampableInterface,
             ResourceModel\ResourceInterface
@@ -42,27 +44,9 @@ interface BrandInterface
     public function getTitle();
 
     /**
-     * Sets the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|BrandInterface
-     */
-    //public function setTitle($title);
-
-    /**
      * Returns the (translated) description.
      *
      * @return string
      */
     public function getDescription();
-
-    /**
-     * Sets the (translated) description.
-     *
-     * @param string $description
-     *
-     * @return $this|BrandInterface
-     */
-    //public function setDescription($description);
 }

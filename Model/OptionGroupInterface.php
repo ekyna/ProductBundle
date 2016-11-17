@@ -9,6 +9,8 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  * Interface OptionGroupInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method OptionGroupTranslationInterface translate($locale = null, $create = false)
  */
 interface OptionGroupInterface extends ResourceInterface
 {
@@ -39,6 +41,13 @@ interface OptionGroupInterface extends ResourceInterface
      * @param string $name
      */
     public function setName($name);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
 
     /**
      * Returns the required.

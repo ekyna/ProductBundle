@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -23,6 +24,11 @@ class OptionGroupType extends ResourceFormType
             ->add('name', Type\TextType::class, [
                 'label'  => 'ekyna_core.field.name',
                 'sizing' => 'sm',
+            ])
+            ->add('translations', TranslationsFormsType::class, [
+                'form_type'      => OptionGroupTranslationType::class,
+                'label'          => false,
+                'error_bubbling' => false,
             ])
             ->add('required', Type\CheckboxType::class, [
                 'label'    => 'ekyna_core.field.required',

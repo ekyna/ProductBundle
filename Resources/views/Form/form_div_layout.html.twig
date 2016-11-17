@@ -137,6 +137,7 @@
             {{ form_widget(form.designation) }}
         </div>
     </div>
+    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
     <div class="row form-group">
         <div class="col-md-6">
             {{ form_widget(form.reference) }}
@@ -170,6 +171,7 @@
             {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
         </div>
     </div>
+    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
     {{ form_widget(form.position) }}
     {{ form_rest(form) }}
 {% endspaceless %}

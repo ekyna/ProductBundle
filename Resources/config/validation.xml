@@ -5,6 +5,8 @@
         xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
                         http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
+    <!-- TODO translations ! -->
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Attribute">
         <property name="group">
             <constraint name="NotNull"/>
@@ -190,24 +192,6 @@
                 <option name="max">16</option>
             </constraint>
         </property>
-        <!-- Unique reference -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">reference</option>
-        </constraint>
-        <property name="designation">
-            <constraint name="NotBlank"/>
-            <constraint name="Length">
-                <option name="min">3</option>
-                <option name="max">255</option>
-            </constraint>
-        </property>
-        <!-- Unique designation per group -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>group</value>
-                <value>designation</value>
-            </option>
-        </constraint>
         <property name="netPrice">
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
@@ -221,6 +205,25 @@
                 <option name="value">0</option>
             </constraint>
         </property>
+        <!-- Unique reference -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">reference</option>
+        </constraint>
+        <property name="designation">
+            <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="min">3</option>
+                <option name="max">255</option>
+            </constraint>
+        </property>
+        <!-- Unique designation per group -->
+        <!-- TODO bug because option group may not have an identifier ...
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>group</value>
+                <value>designation</value>
+            </option>
+        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup">
@@ -236,13 +239,6 @@
         <property name="name">
             <constraint name="NotBlank"/>
         </property>
-        <!-- Unique name per product -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>product</value>
-                <value>name</value>
-            </option>
-        </constraint>
         <property name="options">
             <constraint name="Count">
                 <option name="min">1</option>
@@ -254,6 +250,14 @@
                 <option name="value">0</option>
             </constraint>
         </property>
+        <!-- Unique name per product -->
+        <!-- TODO bug because product may not have an identifier ...
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>product</value>
+                <value>name</value>
+            </option>
+        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Product">
@@ -278,9 +282,6 @@
                 <option name="max">16</option>
             </constraint>
         </property>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">reference</option>
-        </constraint>
 
         <!-- Designation -->
         <property name="designation">
@@ -303,22 +304,6 @@
                 </option>
             </constraint>
         </property>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">designation</option>
-            <option name="groups">
-                <value>simple</value>
-                <value>variable</value>
-                <value>bundle</value>
-                <value>configurable</value>
-            </option>
-        </constraint>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>parent</value>
-                <value>designation</value>
-            </option>
-            <option name="groups">variant</option>
-        </constraint>
 
         <!-- Net price -->
         <property name="netPrice">
@@ -475,11 +460,36 @@
             <option name="groups">variant</option>
         </constraint>
 
+        <!-- TODO brand (null for variants) -->
+        <!-- TODO category (null for variants) -->
+
+        <!-- TODO seo (allow null for variants) -->
         <!-- TODO translations (none for variants) -->
 
+        <!-- Unique constraints -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">reference</option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">designation</option>
+            <option name="groups">
+                <value>simple</value>
+                <value>variable</value>
+                <value>bundle</value>
+                <value>configurable</value>
+            </option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>parent</value>
+                <value>designation</value>
+            </option>
+            <option name="groups">variant</option>
+        </constraint>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductImage">
+        <!-- TODO media type (image) -->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">
@@ -500,8 +510,8 @@
                 <value>number</value>
             </option>
             <option name="groups">
-                <value>Default</value>
-                <value>ProductReference</value>
+                <!--<value>Default</value>-->
+                <!--<value>ProductReference</value>-->
                 <value>simple</value>
                 <value>variant</value>
             </option>
@@ -513,8 +523,8 @@
                 <value>product</value>
             </option>
             <option name="groups">
-                <value>Default</value>
-                <value>ProductReference</value>
+                <!--<value>Default</value>-->
+                <!--<value>ProductReference</value>-->
                 <value>simple</value>
                 <value>variant</value>
             </option>

@@ -16,7 +16,7 @@
         </indexes>
 
         <unique-constraints>
-            <unique-constraint columns="reference" name="unique_option_reference" />
+            <unique-constraint columns="group_id,reference" name="unique_option_reference" />
             <unique-constraint columns="group_id,position" name="unique_option_position"/>
         </unique-constraints>
 

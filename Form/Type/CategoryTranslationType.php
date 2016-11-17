@@ -22,15 +22,13 @@ class CategoryTranslationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', TextType::class, array(
-                'label'        => 'ekyna_core.field.title',
-//                'admin_helper' => 'CMS_PAGE_TITLE',
-            ))
-            ->add('description', TinymceType::class, array(
-                'label'        => 'ekyna_core.field.content',
-//                'admin_helper' => 'CMS_PAGE_CONTENT',
-                'theme'        => 'front'
-            ));
+            ->add('title', TextType::class, [
+                'label' => 'ekyna_core.field.title',
+            ])
+            ->add('description', TinymceType::class, [
+                'label' => 'ekyna_core.field.content',
+                'theme' => 'front',
+            ]);
     }
 
     /**
@@ -38,8 +36,8 @@ class CategoryTranslationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => CategoryTranslation::class,
-        ));
+        ]);
     }
 }

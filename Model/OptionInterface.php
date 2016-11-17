@@ -9,6 +9,8 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  * Interface OptionInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method OptionTranslationInterface translate($locale = null, $create = false)
  */
 interface OptionInterface extends ResourceInterface
 {
@@ -59,6 +61,13 @@ interface OptionInterface extends ResourceInterface
      * @return $this|OptionInterface
      */
     public function setReference($reference);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
 
     /**
      * Returns the weight.

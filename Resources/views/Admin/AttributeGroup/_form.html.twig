@@ -1,6 +1,6 @@
 <ul class="nav nav-tabs">
     <li class="active">
-        <a href="#attribute-general" data-toggle="tab">{{ 'ekyna_core.field.general'|trans }}</a>
+        <a href="#attribute-group-general" data-toggle="tab">{{ 'ekyna_core.field.general'|trans }}</a>
     </li>
 </ul>
 <div class="panel-body form-body">
@@ -8,11 +8,9 @@
     {{ bootstrap_set_col_size('md') }}
     {{ form_errors(form) }}
     <div class="tab-content">
-        <div class="tab-pane active" id="attribute-general">
-            {{ form_row(form.group) }}
+        <div class="tab-pane active" id="attribute-group-general">
             {{ form_row(form.name) }}
             {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-            {{ form_row(form.media) }}
         </div>
     </div>
     {{ form_rest(form) }}

@@ -5,7 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Ekyna\Component\Resource\Model as ResourceModel;
 use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Bundle\MediaBundle\Model as Media;
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -19,7 +19,7 @@ class Brand extends ResourceModel\AbstractTranslatable implements Model\BrandInt
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
-        Media\MediaSubjectTrait,
+        MediaSubjectTrait,
         ResourceModel\SortableTrait,
         ResourceModel\TimestampableTrait;
 
@@ -91,30 +91,10 @@ class Brand extends ResourceModel\AbstractTranslatable implements Model\BrandInt
     /**
      * @inheritdoc
      */
-    /*public function setTitle($title)
-    {
-        $this->translate()->setTitle($title);
-
-        return $this;
-    }*/
-
-    /**
-     * @inheritdoc
-     */
     public function getDescription()
     {
         return $this->translate()->getDescription();
     }
-
-    /**
-     * @inheritdoc
-     */
-    /*public function setDescription($description)
-    {
-        $this->translate()->setDescription($description);
-
-        return $this;
-    }*/
 
     /**
      * @inheritdoc

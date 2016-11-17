@@ -12,6 +12,8 @@ use Ekyna\Bundle\CmsBundle\Model as Cms;
  * Interface CategoryInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method CategoryTranslationInterface translate($locale = null, $create = false)
  */
 interface CategoryInterface extends
     Cms\ContentSubjectInterface,

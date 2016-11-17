@@ -4,13 +4,16 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractTranslatable;
 
 /**
  * Class Option
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
  */
-class Option implements Model\OptionInterface
+class Option extends AbstractTranslatable implements Model\OptionInterface
 {
     /**
      * @var integer
@@ -128,6 +131,14 @@ class Option implements Model\OptionInterface
     /**
      * @inheritdoc
      */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getWeight()
     {
         return $this->weight;
@@ -195,5 +206,13 @@ class Option implements Model\OptionInterface
         $this->position = $position;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getTranslationClass()
+    {
+        return OptionTranslation::class;
     }
 }

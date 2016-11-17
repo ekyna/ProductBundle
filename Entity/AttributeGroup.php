@@ -4,13 +4,16 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractTranslatable;
 
 /**
  * Class AttributeGroup
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\AttributeGroupTranslationInterface translate($locale = null, $create = false)
  */
-class AttributeGroup implements Model\AttributeGroupInterface
+class AttributeGroup extends AbstractTranslatable implements Model\AttributeGroupInterface
 {
     /**
      * @var int
@@ -33,6 +36,8 @@ class AttributeGroup implements Model\AttributeGroupInterface
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->attributes = new ArrayCollection();
     }
 
@@ -68,6 +73,14 @@ class AttributeGroup implements Model\AttributeGroupInterface
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
     }
 
     /**
@@ -122,5 +135,13 @@ class AttributeGroup implements Model\AttributeGroupInterface
         $this->attributes = $attributes;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTranslationClass()
+    {
+        return AttributeGroupTranslation::class;
     }
 }

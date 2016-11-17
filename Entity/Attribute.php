@@ -2,15 +2,21 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractTranslatable;
 
 /**
  * Class Attribute
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\AttributeTranslationInterface translate($locale = null, $create = false)
  */
-class Attribute implements Model\AttributeInterface
+class Attribute extends AbstractTranslatable implements Model\AttributeInterface
 {
+    use MediaSubjectTrait;
+
     /**
      * @var integer
      */
@@ -78,5 +84,21 @@ class Attribute implements Model\AttributeInterface
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTranslationClass()
+    {
+        return AttributeTranslation::class;
     }
 }

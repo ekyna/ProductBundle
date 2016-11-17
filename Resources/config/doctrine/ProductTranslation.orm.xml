@@ -13,7 +13,7 @@
         </id>
 
         <field name="title" column="title" type="string" length="255" />
-        <field name="description" column="description" type="text" />
+        <field name="description" column="description" type="text" nullable="true" />
 
     </entity>
 

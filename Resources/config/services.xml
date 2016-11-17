@@ -25,6 +25,8 @@
             <argument type="service" id="translator"/>
         </service>
 
+        <!-- TODO Remove resources form types definitions (see configuration), by using resource choice form types -->
+
         <!-- Attribute form types -->
         <service id="ekyna_product.attribute.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\AttributeType">
@@ -89,7 +91,7 @@
         </service>
 
         <!-- Option form types -->
-        <service id="ekyna_product.option_group.form_type"
+        <!--<service id="ekyna_product.option_group.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\OptionGroupType">
             <argument>%ekyna_product.option_group.class%</argument>
             <tag name="form.type"/>
@@ -98,7 +100,7 @@
                  class="Ekyna\Bundle\ProductBundle\Form\Type\OptionType">
             <argument>%ekyna_product.option.class%</argument>
             <tag name="form.type"/>
-        </service>
+        </service>-->
 
         <!-- Product form types -->
         <service id="ekyna_product.product.form_type"

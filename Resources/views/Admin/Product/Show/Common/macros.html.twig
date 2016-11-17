@@ -73,6 +73,11 @@
                         }) }}
                     </div>
                 </div>
+                {{ show_translations_row(group.translations, {
+                    'fields': {
+                        'title': {'label': 'ekyna_core.field.title'},
+                    }
+                }) }}
                 <div class="row show-row">
                     <div class="col-md-2 show-label">
                         {{ 'ekyna_product.option.label.plural'|trans }}
@@ -95,6 +100,7 @@
                                     <td>{{ option.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
                                     <td>{{ option.taxGroup }}</td>
                                 </tr>
+                                {# TODO translations ? #}
                                 {% endfor %}
                             </table>
                         </div>

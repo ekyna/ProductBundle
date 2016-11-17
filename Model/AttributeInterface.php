@@ -2,14 +2,17 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
  * Interface AttributeInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method AttributeTranslationInterface translate($locale = null, $create = false)
  */
-interface AttributeInterface extends ResourceInterface
+interface AttributeInterface extends MediaSubjectInterface, ResourceInterface
 {
     /**
      * Returns the group.
@@ -42,4 +45,11 @@ interface AttributeInterface extends ResourceInterface
      * @return $this|AttributeInterface
      */
     public function setName($name);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
 }

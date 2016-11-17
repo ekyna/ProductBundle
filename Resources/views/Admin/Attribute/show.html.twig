@@ -26,6 +26,12 @@
                     'route_params_map': {'attributeGroupId': 'id'}
                 }) }}
                 {{ show_row(attribute.name, 'text', 'ekyna_core.field.name') }}
+                {{ show_translations_row(attribute.translations, {
+                    'fields': {
+                        'title': {'label': 'ekyna_core.field.title'},
+                    }
+                }) }}
+                {{ show_row(attribute.media, 'media', 'ekyna_core.field.image') }}
             </div>
         </div>
     </div>

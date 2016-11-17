@@ -2,8 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
+use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -43,6 +46,15 @@ class AttributeType extends ResourceFormType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'ekyna_core.field.name',
+            ])
+            ->add('translations', TranslationsFormsType::class, [
+                'form_type'      => AttributeTranslationType::class,
+                'label'          => false,
+                'error_bubbling' => false,
+            ])
+            ->add('media', MediaChoiceType::class, [
+                'label' => 'ekyna_core.field.image',
+                'types' => [MediaTypes::IMAGE],
             ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {

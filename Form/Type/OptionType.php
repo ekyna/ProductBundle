@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -34,6 +35,11 @@ class OptionType extends ResourceFormType
                 'attr'   => [
                     'placeholder' => 'ekyna_core.field.reference',
                 ],
+            ])
+            ->add('translations', TranslationsFormsType::class, [
+                'form_type'      => OptionTranslationType::class,
+                'label'          => false,
+                'error_bubbling' => false,
             ])
             ->add('weight', Type\NumberType::class, [
                 'label'  => 'ekyna_core.field.weight',
