@@ -27,11 +27,11 @@ class ProductTypes extends AbstractConstants
         $prefix = 'ekyna_product.product.type.';
 
         return [
-            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE],
-            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE],
-            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT],
-            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE],
-            static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE],
+            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE,       'default'],
+            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'primary'],
+            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT,      'success'],
+            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE,       'warning'],
+            static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'danger'],
         ];
     }
 
@@ -75,7 +75,7 @@ class ProductTypes extends AbstractConstants
     {
         return [
             ProductTypes::TYPE_SIMPLE,
-            ProductTypes::TYPE_VARIANT
+            ProductTypes::TYPE_VARIANT,
         ];
     }
 
@@ -89,26 +89,29 @@ class ProductTypes extends AbstractConstants
         return [
             ProductTypes::TYPE_VARIABLE,
             ProductTypes::TYPE_BUNDLE,
-            ProductTypes::TYPE_CONFIGURABLE
+            ProductTypes::TYPE_CONFIGURABLE,
         ];
     }
 
     /**
-     * Returns whether the given type is valid or not.
+     * Returns the theme for the given state.
      *
-     * @param string $type
+     * @param string $state
      *
-     * @return bool
+     * @return string
      */
-    static public function isValidType($type)
+    static public function getTheme($state)
     {
-        return in_array($type, static::getTypes(), true);
+        static::isValid($state, true);
+
+        return static::getConfig()[$state][1];
     }
 
     /**
      * Asserts that the product has the 'simple' type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static public function assertSimple(ProductInterface $product)
@@ -120,6 +123,7 @@ class ProductTypes extends AbstractConstants
      * Asserts that the product has the 'variable' type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static public function assertVariable(ProductInterface $product)
@@ -131,6 +135,7 @@ class ProductTypes extends AbstractConstants
      * Asserts that the product has the 'variant' type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static public function assertVariant(ProductInterface $product)
@@ -142,6 +147,7 @@ class ProductTypes extends AbstractConstants
      * Asserts that the product has the 'bundle' type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static public function assertBundle(ProductInterface $product)
@@ -153,6 +159,7 @@ class ProductTypes extends AbstractConstants
      * Asserts that the product has the 'configurable' type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static public function assertConfigurable(ProductInterface $product)
@@ -188,6 +195,7 @@ class ProductTypes extends AbstractConstants
      * Asserts that the product has the given type.
      *
      * @param ProductInterface $product
+     *
      * @throws InvalidArgumentException
      */
     static private function assertType(ProductInterface $product, $type)

@@ -42,7 +42,7 @@ class EkynaProductBundle extends AbstractBundle
             Model\OptionInterface::class           => 'ekyna_product.option.class',
             Model\OptionGroupInterface::class      => 'ekyna_product.option_group.class',
             Model\ProductInterface::class          => 'ekyna_product.product.class',
-            Model\ProductImageInterface::class     => 'ekyna_product.product_image.class',
+            Model\ProductMediaInterface::class     => 'ekyna_product.product_media.class',
             Model\ProductReferenceInterface::class => 'ekyna_product.product_reference.class',
             Model\ProductStockUnitInterface::class => 'ekyna_product.product_stock_unit.class',
         ];

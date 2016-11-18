@@ -15,6 +15,7 @@ Feature: Edit attributes
     Scenario: Edit the attribute
         When I go to "ekyna_product_attribute_admin_edit" route with "attributeGroupId:1,attributeId:1"
         And I fill in "attribute[name]" with "Noir"
+        And I fill in "attribute[translations][fr][title]" with "Noir"
         And I press "attribute_actions_save"
         Then I should see "La ressource a été sauvegardée avec succès"
         And I should see "Noir"

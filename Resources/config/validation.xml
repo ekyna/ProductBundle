@@ -5,14 +5,22 @@
         xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
                         http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
-    <!-- TODO translations ! -->
-
     <class name="Ekyna\Bundle\ProductBundle\Entity\Attribute">
         <property name="group">
             <constraint name="NotNull"/>
         </property>
         <property name="name">
             <constraint name="NotBlank"/>
+        </property>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="media">
+            <constraint name="Ekyna\Bundle\MediaBundle\Validator\Constraints\MediaTypes">
+                <option name="types">image</option>
+            </constraint>
         </property>
         <!-- Unique name per group -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -23,9 +31,20 @@
         </constraint>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroup">
         <property name="name">
             <constraint name="NotBlank"/>
+        </property>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
         </property>
         <!-- Unique name -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -33,20 +52,26 @@
         </constraint>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroupTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeSet">
         <property name="name">
             <constraint name="NotBlank"/>
         </property>
-        <!-- Unique name -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">name</option>
-        </constraint>
         <property name="slots">
             <constraint name="Valid"/>
             <constraint name="Count">
                 <option name="min">1</option>
             </constraint>
         </property>
+        <!-- Unique name -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">name</option>
+        </constraint>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeSlot">
@@ -63,10 +88,37 @@
                 <value>group</value>
             </option>
         </constraint>
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Brand">
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
             </constraint>
+        </property>
+        <property name="media">
+            <constraint name="Ekyna\Bundle\MediaBundle\Validator\Constraints\MediaTypes">
+                <option name="types">image</option>
+            </constraint>
+        </property>
+        <property name="seo">
+            <constraint name="NotNull"/>
+            <constraint name="Valid"/>
+        </property>
+        <!-- Unique name -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>name</value>
+            </option>
+        </constraint>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BrandTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
         </property>
     </class>
 
@@ -114,11 +166,6 @@
             <constraint name="Valid"/>
         </property>
         <!-- TODO options -->
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
-            </constraint>
-        </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleChoice"/>
     </class>
 
@@ -127,7 +174,7 @@
             <constraint name="NotNull"/>
         </property>
         <property name="type">
-            <constraint name="NotBlank" />
+            <constraint name="NotBlank"/>
             <constraint name="Callback">
                 <value>Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleTypes</value>
                 <value>isValidType</value>
@@ -137,11 +184,6 @@
         <property name="expression">
             <constraint name="Valid"/>
         </property>-->
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
-            </constraint>
-        </property>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlot">
@@ -155,7 +197,7 @@
             </constraint>
         </property>
         <property name="description">
-            <constraint name="Null">
+            <constraint name="IsNull">
                 <option name="groups">
                     <value>bundle</value>
                 </option>
@@ -172,9 +214,9 @@
                 <option name="min">1</option>
             </constraint>
         </property>
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
             </constraint>
         </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleSlot"/>
@@ -182,12 +224,53 @@
         <!-- TODO translations -->
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="description">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Category">
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="media">
+            <constraint name="Ekyna\Bundle\MediaBundle\Validator\Constraints\MediaTypes">
+                <option name="types">image</option>
+            </constraint>
+        </property>
+        <property name="seo">
+            <constraint name="NotNull"/>
+            <constraint name="Valid"/>
+        </property>
+        <!-- Unique name -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>name</value>
+            </option>
+        </constraint>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\CategoryTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
         <property name="group">
             <constraint name="NotNull"/>
         </property>
         <property name="reference">
-            <constraint name="NotBlank" />
+            <constraint name="NotBlank"/>
             <constraint name="Length">
                 <option name="max">16</option>
             </constraint>
@@ -200,9 +283,9 @@
         <property name="taxGroup">
             <constraint name="NotNull"/>
         </property>
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
             </constraint>
         </property>
         <!-- Unique reference -->
@@ -226,6 +309,12 @@
         </constraint>-->
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\OptionTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup">
         <property name="product">
             <constraint name="NotNull"/>
@@ -245,9 +334,9 @@
             </constraint>
             <constraint name="Valid"/>
         </property>
-        <property name="position">
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">0</option>
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
             </constraint>
         </property>
         <!-- Unique name per product -->
@@ -260,6 +349,12 @@
         </constraint>-->
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Product">
 
         <!--
@@ -268,16 +363,16 @@
 
         <!-- Type -->
         <property name="type">
-            <constraint name="NotBlank" />
+            <constraint name="NotBlank"/>
             <constraint name="Callback">
                 <value>Ekyna\Bundle\ProductBundle\Model\ProductTypes</value>
-                <value>isValidType</value>
+                <value>isValid</value>
             </constraint>
         </property>
 
         <!-- Reference -->
         <property name="reference">
-            <constraint name="NotBlank" />
+            <constraint name="NotBlank"/>
             <constraint name="Length">
                 <option name="max">16</option>
             </constraint>
@@ -386,12 +481,6 @@
                     <value>configurable</value>
                 </option>
             </constraint>
-            <!--<constraint name="Count">
-                <option name="min">0</option>
-                <option name="groups">
-                    <value>variable</value>
-                </option>
-            </constraint>-->
         </property>
 
         <!-- Attribute set -->
@@ -455,16 +544,86 @@
             <constraint name="Valid"/>
         </property>
 
+        <!-- Brand (null for variants) -->
+        <property name="brand">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Category (null for variants) -->
+        <property name="category">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Seo (null for variants) -->
+        <property name="seo">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+            <constraint name="Valid"/>
+        </property>
+
+        <!-- Translations (none for variants) -->
+        <property name="translations">
+            <constraint name="Count">
+                <option name="min">1</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Medias -->
+        <property name="medias">
+            <constraint name="Valid"/>
+        </property>
+
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
         </constraint>
-
-        <!-- TODO brand (null for variants) -->
-        <!-- TODO category (null for variants) -->
-
-        <!-- TODO seo (allow null for variants) -->
-        <!-- TODO translations (none for variants) -->
 
         <!-- Unique constraints -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -488,8 +647,26 @@
         </constraint>
     </class>
 
-    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductImage">
-        <!-- TODO media type (image) -->
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductMedia">
+        <property name="media">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\MediaBundle\Validator\Constraints\MediaTypes">
+                <option name="types">
+                    <value>image</value>
+                    <value>video</value>
+                    <value>file</value>
+                </option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="description">
+            <constraint name="NotBlank"/>
+        </property>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">
@@ -510,8 +687,7 @@
                 <value>number</value>
             </option>
             <option name="groups">
-                <!--<value>Default</value>-->
-                <!--<value>ProductReference</value>-->
+                <value>Default</value>
                 <value>simple</value>
                 <value>variant</value>
             </option>
@@ -523,8 +699,7 @@
                 <value>product</value>
             </option>
             <option name="groups">
-                <!--<value>Default</value>-->
-                <!--<value>ProductReference</value>-->
+                <value>Default</value>
                 <value>simple</value>
                 <value>variant</value>
             </option>

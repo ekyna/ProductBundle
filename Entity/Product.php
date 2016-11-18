@@ -3,8 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
+use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
@@ -81,9 +81,9 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     protected $category;
 
     /**
-     * @var ArrayCollection|Model\ProductImageInterface[]
+     * @var ArrayCollection|Model\ProductMediaInterface[]
      */
-    protected $images;
+    protected $medias;
 
     /**
      * @var ArrayCollection|Model\ProductReferenceInterface[]
@@ -137,9 +137,8 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
         $this->attributes = new ArrayCollection();
         $this->optionGroups = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
-        $this->images = new ArrayCollection();
+        $this->medias = new ArrayCollection();
         $this->references = new ArrayCollection();
-        $this->seo = new Seo();
 
         $this->initializeStock();
     }
@@ -176,7 +175,7 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
 
             $this->seo = clone $this->seo;
 
-            // TODO images ?
+            // TODO medias ?
         }
     }
 
@@ -543,19 +542,19 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function hasImage(Model\ProductImageInterface $image)
+    public function hasMedia(Model\ProductMediaInterface $media)
     {
-        return $this->images->contains($image);
+        return $this->medias->contains($media);
     }
 
     /**
      * @inheritdoc
      */
-    public function addImage(Model\ProductImageInterface $image)
+    public function addMedia(Model\ProductMediaInterface $media)
     {
-        if (!$this->hasImage($image)) {
-            $image->setProduct($this);
-            $this->images->add($image);
+        if (!$this->hasMedia($media)) {
+            $media->setProduct($this);
+            $this->medias->add($media);
             // TODO ??? $this->setUpdatedAt(new \DateTime());
         }
 
@@ -565,11 +564,11 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function removeImage(Model\ProductImageInterface $image)
+    public function removeMedia(Model\ProductMediaInterface $media)
     {
-        if ($this->hasImage($image)) {
-            $image->setProduct(null);
-            $this->images->removeElement($image);
+        if ($this->hasMedia($media)) {
+            $media->setProduct(null);
+            $this->medias->removeElement($media);
             // TODO ??? $this->setUpdatedAt(new \DateTime());
         }
 
@@ -579,9 +578,19 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getImages()
+    public function getMedias(array $types = [])
     {
-        return $this->images;
+        if (!empty($types)) {
+            foreach ($types as $type) {
+                MediaTypes::isValid($type, true);
+            }
+
+            return $this->medias->filter(function(Model\ProductMediaInterface $media) use ($types) {
+                return in_array($media->getMedia()->getType(), $types);
+            });
+        }
+
+        return $this->medias;
     }
 
     /**

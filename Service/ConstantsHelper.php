@@ -33,6 +33,33 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
+     * Renders the product type badge.
+     *
+     * @param Model\ProductInterface|string $typeOrProduct
+     * @param bool                          $long
+     *
+     * @return string
+     */
+    public function renderProductTypeBadge($typeOrProduct, $long = true)
+    {
+        if ($typeOrProduct instanceof Model\ProductInterface) {
+            $typeOrProduct = $typeOrProduct->getType();
+        }
+
+        $theme = 'default';
+        if (Model\ProductTypes::isValid($typeOrProduct)) {
+            $theme = Model\ProductTypes::getTheme($typeOrProduct);
+        }
+
+        $label = $this->renderProductTypeLabel($typeOrProduct);
+        if (!$long) {
+            $label = strtoupper($label[0]);
+        }
+
+        return $this->renderBadge($label, $theme);
+    }
+
+    /**
      * Renders the product reference type label.
      *
      * @param Model\ProductReferenceInterface|string $typeOrReference

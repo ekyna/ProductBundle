@@ -3,15 +3,15 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\MediaBundle\Model\GalleryMediaTrait;
-use Ekyna\Bundle\ProductBundle\Model\ProductImageInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 
 /**
- * Class ProductImage
+ * Class ProductMedia
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author Étienne Dauvergne <contact@ekyna.com>
  */
-class ProductImage implements ProductImageInterface
+class ProductMedia implements ProductMediaInterface
 {
     use GalleryMediaTrait;
 

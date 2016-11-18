@@ -4,18 +4,20 @@
             {{ 'ekyna_core.field.general'|trans }}
         </a>
     </li>
+    {% block pricing_tab %}
     <li>
         <a href="#product-pricing" data-toggle="tab">
-            {% block pricing_tab %}
-                {{- 'ekyna_product.product.field.pricing'|trans -}}
-            {% endblock pricing_tab %}
+            {{- 'ekyna_product.product.field.pricing'|trans -}}
         </a>
     </li>
+    {% endblock pricing_tab %}
+    {% block seo_tab %}
     <li>
         <a href="#product-seo" data-toggle="tab">
             {{ 'ekyna_core.field.seo'|trans }}
         </a>
     </li>
+    {% endblock seo_tab %}
 </ul>
 <div class="panel-body form-body">
     {{ bootstrap_set_style('horizontal') }}
@@ -25,16 +27,10 @@
         <div class="tab-pane active" id="product-general">
             {% block general_content %}
                 {{ form_row(form.designation) }}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.brand, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.category, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                </div>
             {% endblock general_content %}
         </div>
+
+        {% block pricing_pane %}
         <div class="tab-pane" id="product-pricing">
             {% block pricing_content %}
                 <div class="row">
@@ -51,11 +47,15 @@
                 </div>
             {% endblock pricing_content %}
         </div>
+        {% endblock pricing_pane %}
+
+        {% block seo_pane %}
         <div class="tab-pane" id="product-seo">
             {% block seo_content %}
                 {{ form_row(form.seo) }}
             {% endblock seo_content %}
         </div>
+        {% endblock seo_pane %}
     </div>
     {{ form_rest(form) }}
 </div>

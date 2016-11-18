@@ -28,7 +28,7 @@ class ProductController extends ResourceController
         $request = $context->getRequest();
 
         $type = $request->attributes->get('type');
-        if (!ProductTypes::isValidType($type)) {
+        if (!ProductTypes::isValid($type)) {
             throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
         }
 

@@ -24,15 +24,16 @@
 
         <field name="type" column="type" type="string" length="16" nullable="false"/>
         <field name="designation" column="designation" type="string" length="255"/>
-        <field name="reference" column="reference" type="string" length="16" unique="true"/>
+        <field name="reference" column="reference" type="string" length="16" unique="true" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
         <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
 
-        <field name="stockMode" column="stock_mode" type="string" length="16"/>
-        <field name="stockState" column="stock_state" type="string" length="16"/>
-        <field name="inStock" column="in_stock" type="decimal" precision="10" scale="3"/>
-        <field name="orderedStock" column="ordered_stock" type="decimal" precision="10" scale="3"/>
-        <field name="shippedStock" column="shipped_stock" type="decimal" precision="10" scale="3"/>
+        <!-- Auto mapping through loadmetadata event -->
+        <field name="stockMode" column="stock_mode" type="string" length="16" nullable="true"/>
+        <field name="stockState" column="stock_state" type="string" length="16" nullable="true"/>
+        <field name="inStock" column="in_stock" type="decimal" precision="10" scale="3" nullable="true"/>
+        <field name="orderedStock" column="ordered_stock" type="decimal" precision="10" scale="3" nullable="true"/>
+        <field name="shippedStock" column="shipped_stock" type="decimal" precision="10" scale="3" nullable="true"/>
         <field name="estimatedDateOfArrival" column="estimated_date_of_arrival" type="datetime" nullable="true" />
 
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
@@ -68,8 +69,8 @@
             </cascade>
         </one-to-many>
 
-        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductImageInterface"
-                     mapped-by="product" field="images" orphan-removal="true">
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface"
+                     mapped-by="product" field="medias" orphan-removal="true">
             <cascade>
                 <cascade-all />
             </cascade>
@@ -103,11 +104,11 @@
         </many-to-one>
 
         <many-to-one field="brand" target-entity="Ekyna\Bundle\ProductBundle\Model\BrandInterface">
-            <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+            <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
         </many-to-one>
 
         <many-to-one field="category" target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface">
-            <join-column name="category_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+            <join-column name="category_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
         </many-to-one>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attributes">

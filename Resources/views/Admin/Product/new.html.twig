@@ -1,5 +1,9 @@
 {% extends "EkynaAdminBundle:Entity/Default:new.html.twig" %}
 
+{% block title %}
+    {{ parent() }} {{ product|product_type_badge }}
+{% endblock title %}
+
 {% block actions %}
     {{ admin_resource_btn(resource_id, 'list') }}
 {% endblock actions %}

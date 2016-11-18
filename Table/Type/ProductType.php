@@ -23,17 +23,15 @@ class ProductType extends ResourceTableType
     {
         $variantMode = null !== $options['variable'];
 
-        $builder
-            ->addColumn('id', 'number', [
-                'sortable' => !$variantMode,
-            ]);
+        $builder->addColumn('id', 'number', [
+            'sortable' => !$variantMode,
+        ]);
 
         if (!$variantMode) {
-            $builder
-                ->addColumn('type', 'ekyna_product_product_type', [
-                    'label'    => 'ekyna_core.field.type',
-                    'sortable' => true,
-                ]);
+            $builder->addColumn('type', 'ekyna_product_product_type', [
+                'label'    => 'ekyna_core.field.type',
+                'sortable' => true,
+            ]);
         }
 
         $builder
@@ -53,45 +51,56 @@ class ProductType extends ResourceTableType
                 'label'    => 'ekyna_product.product.field.net_price',
                 'currency' => 'EUR', // TODO
                 'sortable' => !$variantMode,
-            ])
-            ->addColumn('taxGroup', 'anchor', [
+            ]);
+
+        if (!$variantMode) {
+            $builder->addColumn('taxGroup', 'anchor', [
                 'label'                => 'ekyna_commerce.tax_group.label.singular',
                 'sortable'             => !$variantMode,
                 'route_name'           => 'ekyna_commerce_tax_group_admin_show',
                 'route_parameters_map' => [
                     'taxGroupId' => 'taxGroup.id',
                 ],
-            ])
-            ->addColumn('actions', 'admin_actions', [
-                'buttons' => [
-                    [
-                        'label'                => 'ekyna_core.button.edit',
-                        'class'                => 'warning',
-                        'route_name'           => 'ekyna_product_product_admin_edit',
-                        'route_parameters_map' => [
-                            'productId' => 'id',
-                        ],
-                        'permission'           => 'edit',
-                    ],
-                    [
-                        'label'                => 'ekyna_core.button.remove',
-                        'class'                => 'danger',
-                        'route_name'           => 'ekyna_product_product_admin_remove',
-                        'route_parameters_map' => [
-                            'productId' => 'id',
-                        ],
-                        'permission'           => 'delete',
-                    ],
-                ],
             ]);
+        }
+
+        $builder->addColumn('actions', 'admin_actions', [
+            'buttons' => [
+                [
+                    'label'                => 'ekyna_core.button.edit',
+                    'class'                => 'warning',
+                    'route_name'           => 'ekyna_product_product_admin_edit',
+                    'route_parameters_map' => [
+                        'productId' => 'id',
+                    ],
+                    'permission'           => 'edit',
+                ],
+                [
+                    'label'                => 'ekyna_core.button.remove',
+                    'class'                => 'danger',
+                    'route_name'           => 'ekyna_product_product_admin_remove',
+                    'route_parameters_map' => [
+                        'productId' => 'id',
+                    ],
+                    'permission'           => 'delete',
+                ],
+            ],
+        ]);
 
         if (null === $options['variable']) {
             $builder
+                ->addFilter('type', 'choice', [
+                    'label'   => 'ekyna_core.field.type',
+                    'choices' => ProductTypes::getChoices([ProductTypes::TYPE_VARIANT]),
+                ])
                 ->addFilter('designation', 'text', [
                     'label' => 'ekyna_core.field.designation',
                 ])
+                ->addFilter('reference', 'text', [
+                    'label' => 'ekyna_core.field.reference',
+                ])
                 ->addFilter('netPrice', 'number', [
-                    'label' => 'ekyna_core.field.net_price',
+                    'label' => 'ekyna_product.product.field.net_price',
                 ]);
         }
     }

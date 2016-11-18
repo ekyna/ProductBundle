@@ -1,3 +1,119 @@
+{% macro show_designation(product) %}
+{% spaceless %}
+    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation') }}
+{% endspaceless %}
+{% endmacro show_designation %}
+
+
+{% macro show_brand_and_category(product) %}
+{% spaceless %}
+    <div class="row">
+        <div class="col-md-6">
+            {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
+                'route': 'ekyna_product_brand_admin_show',
+                'route_params_map': {'brandId': 'id'},
+                'label_nb_col': 4,
+                'widget_nb_col': 8
+            }) }}
+        </div>
+        <div class="col-md-6">
+            {{ show_row(product.category, 'entity', 'ekyna_product.category.label.singular', {
+                'route': 'ekyna_product_category_admin_show',
+                'route_params_map': {'categoryId': 'id'},
+                'label_nb_col': 4,
+                'widget_nb_col': 8
+            }) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_brand_and_category %}
+
+
+{% macro show_reference_and_weight(product) %}
+{% spaceless %}
+    <div class="row">
+        <div class="col-md-6">
+            {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {
+                'label_nb_col': 4,
+                'widget_nb_col': 8
+            }) }}
+        </div>
+        <div class="col-md-6">
+            {# TODO use IntlNumberFormatter #}
+            {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
+                'label_nb_col': 4,
+                'widget_nb_col': 8,
+                'append': ' kg'
+            }) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_reference_and_weight %}
+
+
+{% macro show_translations(product) %}
+{% spaceless %}
+    {{ show_translations_row(product.translations, {
+        'fields': {
+            'title': {'label': 'ekyna_core.field.title'},
+            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+        }
+    }) }}
+{% endspaceless %}
+{% endmacro show_translations %}
+
+
+{% macro show_attribute_set(product) %}
+{% spaceless %}
+    {{ show_row(product.attributeSet, 'entity', 'ekyna_product.attribute_set.label.singular', {
+        'route': 'ekyna_product_attribute_set_admin_show',
+        'route_params_map': {'attributeSetId': 'id'}
+    }) }}
+{% endspaceless %}
+{% endmacro show_attribute_set %}
+
+
+{% macro show_variable(product) %}
+{% spaceless %}
+    {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
+        'route': 'ekyna_product_product_admin_show',
+        'route_params_map': {'productId': 'id'},
+    }) }}
+{% endspaceless %}
+{% endmacro show_variable %}
+
+
+{% macro show_medias(product) %}
+{% spaceless %}
+    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias') }}
+{% endspaceless %}
+{% endmacro show_medias %}
+
+
+{% macro show_net_price_and_tax_group(product) %}
+{% spaceless %}
+    <div class="row">
+        <div class="col-md-6">
+            {# TODO use IntlNumberFormatter #}
+            {{ show_row(product.netPrice, 'number', 'ekyna_product.product.field.net_price', {
+                'label_nb_col': 4,
+                'widget_nb_col': 8,
+                'append': ' €'
+            }) }}
+        </div>
+        <div class="col-md-6">
+            {{ show_row(product.taxGroup, 'entity', 'ekyna_commerce.tax_group.label.singular', {
+                'route': 'ekyna_commerce_tax_group_admin_show',
+                'route_params_map': {'taxGroupId': 'id'},
+                'label_nb_col': 4,
+                'widget_nb_col': 8
+            }) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_net_price_and_tax_group %}
+
+
 {% macro show_references(product) %}
 {% spaceless %}
     <div class="row show-row">
@@ -21,6 +137,7 @@
     </div>
 {% endspaceless %}
 {% endmacro show_references %}
+
 
 {% macro show_attributes(product) %}
 {% spaceless %}
@@ -49,6 +166,7 @@
     {% endif %}
 {% endspaceless %}
 {% endmacro show_attributes %}
+
 
 {% macro show_option_groups(product) %}
 {% spaceless %}
@@ -114,6 +232,7 @@
 {% endspaceless %}
 {% endmacro show_option_groups %}
 
+
 {% macro show_bundle_composition(product) %}
 {% spaceless %}
     <div class="row show-row">
@@ -160,6 +279,7 @@
     </div>
 {% endspaceless %}
 {% endmacro show_bundle_composition %}
+
 
 {% macro show_configurable_composition(product) %}
 {% spaceless %}
@@ -224,3 +344,10 @@
     </div>
 {% endspaceless %}
 {% endmacro show_configurable_composition %}
+
+
+{% macro show_seo(product) %}
+{% spaceless %}
+    {{ show_row(product.seo, 'seo') }}
+{% endspaceless %}
+{% endmacro show_seo %}

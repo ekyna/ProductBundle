@@ -55,7 +55,9 @@ class AttributeContext implements Context, KernelAwareContext
             $attribute = $repository->createNew();
             $attribute
                 ->setName($hash['name'])
-                ->setGroup($group);
+                ->setGroup($group)
+                ->translate()
+                    ->setTitle($hash['name']);
 
             $attributes[] = $attribute;
         }

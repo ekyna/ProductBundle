@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Component\Resource\Model as ResourceModel;
-use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
@@ -33,16 +32,6 @@ class Brand extends ResourceModel\AbstractTranslatable implements Model\BrandInt
      */
     protected $name;
 
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->seo = new Seo();
-    }
 
     /**
      * Returns the string representation

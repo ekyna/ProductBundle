@@ -48,7 +48,10 @@ class AttributeGroupContext implements Context, KernelAwareContext
         foreach ($table->getHash() as $hash) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface $group */
             $group = $repository->createNew();
-            $group->setName($hash['name']);
+            $group
+                ->setName($hash['name'])
+                ->translate()
+                    ->setTitle($hash['name']);
 
             $groups[] = $group;
         }

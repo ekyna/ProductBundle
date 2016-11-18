@@ -14,6 +14,7 @@
         <parameter key="ekyna_product.option.class">Ekyna\Bundle\ProductBundle\Entity\Option</parameter>
 
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
+        <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
         <parameter key="ekyna_product.product.form_type.event_subscriber.class">Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber</parameter>
     </parameters>
 
@@ -90,30 +91,22 @@
             <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot" />
         </service>
 
-        <!-- Option form types -->
-        <!--<service id="ekyna_product.option_group.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\OptionGroupType">
-            <argument>%ekyna_product.option_group.class%</argument>
-            <tag name="form.type"/>
-        </service>
-        <service id="ekyna_product.option.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\OptionType">
-            <argument>%ekyna_product.option.class%</argument>
-            <tag name="form.type"/>
-        </service>-->
-
         <!-- Product form types -->
+        <service id="ekyna_product.product.form_type.builder"
+                 class="%ekyna_product.product.form_type.builder.class%">
+            <argument>%ekyna_product.product.class%</argument>
+            <argument>%ekyna_product.product_media.class%</argument>
+            <argument>%ekyna_product.attribute_set.class%</argument>
+        </service>
+        <service id="ekyna_product.product.form_type.event_subscriber"
+                 class="%ekyna_product.product.form_type.event_subscriber.class%">
+            <argument type="service" id="ekyna_product.product.form_type.builder"/>
+        </service>
         <service id="ekyna_product.product.form_type"
                  class="%ekyna_product.product.form_type.class%">
             <argument type="service" id="ekyna_product.product.form_type.event_subscriber"/>
             <argument>%ekyna_product.product.class%</argument>
-            <argument>%ekyna_product.product_image.class%</argument>
             <tag name="form.type"/>
-        </service>
-        <service id="ekyna_product.product.form_type.event_subscriber"
-                 class="%ekyna_product.product.form_type.event_subscriber.class%">
-            <argument>%ekyna_product.product.class%</argument>
-            <argument>%ekyna_product.attribute_set.class%</argument>
         </service>
 
         <!-- Product type column column type -->

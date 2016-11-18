@@ -36,20 +36,19 @@ class ProductType extends Constraint
                     'types' => $options,
                 ];
             }
-            foreach ($options['types'] as $type) {
-                if (!ProductTypes::isValidType($type)) {
-                    throw new InvalidOptionsException("Type '$type' is invalid.", ['types']);
-                }
-            }
         }
 
         parent::__construct($options);
 
-        if (null === $this->types) {
+        if (empty($this->types)) {
             throw new MissingOptionsException(
                 sprintf('Option "types" must be given for constraint %s', __CLASS__),
                 ['types']
             );
+        }
+
+        foreach ($options['types'] as $type) {
+            ProductTypes::isValid($type, true);
         }
     }
 

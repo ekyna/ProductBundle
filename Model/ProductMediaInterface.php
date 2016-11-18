@@ -6,25 +6,25 @@ use Ekyna\Bundle\MediaBundle\Model\GalleryMediaInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
- * Interface ProductImageInterface
+ * Interface ProductMediaInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface ProductImageInterface extends GalleryMediaInterface, ResourceInterface
+interface ProductMediaInterface extends GalleryMediaInterface, ResourceInterface
 {
     /**
      * Sets the product.
      *
      * @param ProductInterface $product
      *
-     * @return ProductImageInterface
+     * @return ProductMediaInterface
      */
     public function setProduct(ProductInterface $product = null);
 
     /**
      * Returns the product.
      *
-     * @return ProductImageInterface
+     * @return ProductMediaInterface
      */
     public function getProduct();
 }

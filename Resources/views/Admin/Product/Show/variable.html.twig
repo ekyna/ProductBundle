@@ -2,15 +2,11 @@
 
 {% block general_content %}
     {{ parent() }}
-    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
-    {{ show_translations_row(product.translations, {
-        'fields': {
-            'title': {'label': 'ekyna_core.field.title'},
-            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
-        }
-    }) }}
-    {# TODO attributeSet #}
-    {{ show_row(product.images, 'medias', 'ekyna_core.field.images') }}
+    {{ macros.show_brand_and_category(product) }}
+    {{ macros.show_reference_and_weight(product) }}
+    {{ macros.show_translations(product) }}
+    {{ macros.show_attribute_set(product) }}
+    {{ macros.show_medias(product) }}
 {% endblock general_content %}
 
 

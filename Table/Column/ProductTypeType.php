@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Column;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Component\Table\Extension\Core\Type\Column\TextType;
 use Ekyna\Component\Table\Table;
@@ -39,8 +40,17 @@ class ProductTypeType extends TextType
 
         $cell->setVars([
             'type'  => 'text',
-            'value' => $this->constantHelper->renderProductTypeLabel($cell->vars['value']),
+            'value' => $this->constantHelper->renderProductTypeBadge($cell->vars['value'], false),
         ]);
+
+        /*$value = $cell->vars['value'];
+        $cell->setVars([
+            'type'       => 'boolean',
+            'class'      => 'label-' . ProductTypes::getTheme($value),
+            'label'      => $this->constantHelper->renderProductTypeLabel($value),
+            'route'      => null,
+            'parameters' => [],
+        ]);*/
     }
 
     /**

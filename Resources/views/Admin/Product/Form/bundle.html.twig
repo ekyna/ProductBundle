@@ -1,19 +1,41 @@
 {% extends 'EkynaProductBundle:Admin/Product/Form:base.html.twig' %}
 
+
 {% block pricing_tab %}
-    {{- 'ekyna_product.product.field.composition'|trans -}}
+    <li>
+        <a href="#product-pricing" data-toggle="tab">
+            {{- 'ekyna_product.product.field.composition'|trans -}}
+        </a>
+    </li>
 {% endblock pricing_tab %}
 
 
 {% block general_content %}
     {{ parent() }}
-    {{ form_row(form.reference) }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.brand, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.category, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.weight, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+    </div>
     {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-    {{ form_row(form.images) }}
+    {{ form_row(form.medias) }}
 {% endblock general_content %}
 
 
 {% block pricing_content %}
+    {{ parent() }}
+    {#{{ form_row(form.optionGroups) }}#}
     {{ form_row(form.bundleSlots) }}
 {% endblock pricing_content %}
 

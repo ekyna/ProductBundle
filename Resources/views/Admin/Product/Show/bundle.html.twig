@@ -1,21 +1,24 @@
 {% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
 
-{% import "EkynaProductBundle:Admin/Product/Show/Common:macros.html.twig" as macros %}
+
+{% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
+
 
 {% block pricing_tab %}
-    {{- 'ekyna_product.product.field.composition'|trans -}}
+    <li>
+        <a href="#product-pricing" data-toggle="tab">
+            {{- 'ekyna_product.product.field.composition'|trans -}}
+        </a>
+    </li>
 {% endblock pricing_tab %}
+
 
 {% block general_content %}
     {{ parent() }}
-    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference') }}
-    {{ show_translations_row(product.translations, {
-        'fields': {
-            'title': {'label': 'ekyna_core.field.title'},
-            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
-        }
-    }) }}
-    {{ show_row(product.images, 'medias', 'ekyna_core.field.images') }}
+    {{ macros.show_brand_and_category(product) }}
+    {{ macros.show_reference_and_weight(product) }}
+    {{ macros.show_translations(product) }}
+    {{ macros.show_medias(product) }}
 {% endblock general_content %}
 
 

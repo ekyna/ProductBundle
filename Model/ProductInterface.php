@@ -277,38 +277,40 @@ interface ProductInterface extends
     public function setCategory(CategoryInterface $category);
 
     /**
-     * Returns whether or not the product has the image.
+     * Returns whether or not the product has the media.
      *
-     * @param ProductImageInterface $image
+     * @param ProductMediaInterface $media
      *
      * @return bool
      */
-    public function hasImage(ProductImageInterface $image);
+    public function hasMedia(ProductMediaInterface $media);
 
     /**
-     * Adds the product image.
+     * Adds the product media.
      *
-     * @param ProductImageInterface $image
+     * @param ProductMediaInterface $media
      *
      * @return $this|ProductInterface
      */
-    public function addImage(ProductImageInterface $image);
+    public function addMedia(ProductMediaInterface $media);
 
     /**
-     * Removes the product image.
+     * Removes the product media.
      *
-     * @param ProductImageInterface $image
+     * @param ProductMediaInterface $media
      *
      * @return $this|ProductInterface
      */
-    public function removeImage(ProductImageInterface $image);
+    public function removeMedia(ProductMediaInterface $media);
 
     /**
-     * Returns the images.
+     * Returns the medias, optionally filtered by (media) types.
      *
-     * @return ArrayCollection|ProductImageInterface[]
+     * @param array $types
+     *
+     * @return ArrayCollection|ProductMediaInterface[]
      */
-    public function getImages();
+    public function getMedias(array $types = []);
 
     /**
      * Returns whether or not the product has the reference.

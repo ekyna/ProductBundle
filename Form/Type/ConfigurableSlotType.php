@@ -2,7 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
+use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\ProductToBundleSlotChoiceTransformer;
+use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
@@ -90,10 +92,10 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
             'price'        => $product->getNetPrice(), // TODO
         ];
 
-        $product = $choice->getProduct();
-        if (0 < $product->getImages()->count()) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductImageInterface $image */
-            $image = $product->getImages()->first();
+        $images = $choice->getProduct()->getMedias([MediaTypes::IMAGE]);
+        if (0 < $images->count()) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface $image */
+            $image = $images->first();
             $attributes['image'] = $this
                 ->cacheManager
                 ->getBrowserPath($image->getMedia()->getPath(), 'configurable_slot');

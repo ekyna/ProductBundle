@@ -6,6 +6,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class ProductTypeValidator
@@ -15,24 +16,22 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class ProductTypeValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function validate($typeOrProduct, Constraint $constraint)
     {
         if (!$constraint instanceof ProductType) {
-            throw new InvalidArgumentException("Expected instance of ProductType (validation constraint)");
+            throw new UnexpectedTypeException($constraint, ProductType::class);
         }
 
-        if ($typeOrProduct instanceof ProductInterface) {
-            $typeOrProduct = $typeOrProduct->getType();
-        }
+        $type = $typeOrProduct instanceof ProductInterface ? $typeOrProduct->getType() : $typeOrProduct;
 
         /* @var string $type */
         /* @var ProductType $constraint */
 
         /* TODO insert expected types (translated) in error message */
 
-        if (!in_array($typeOrProduct, $constraint->types)) {
+        if (!in_array($type, $constraint->types)) {
             $this->context
                 ->buildViolation($constraint->invalidProductType)
                 ->addViolation();

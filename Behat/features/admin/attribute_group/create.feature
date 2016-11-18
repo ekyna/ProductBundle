@@ -9,6 +9,7 @@ Feature: Create attribute groups
     Scenario: Create an attribute group
         When I go to "ekyna_product_attribute_group_admin_new" route
         And I fill in "attribute_group[name]" with "Couleur"
+        And I fill in "attribute_group[translations][fr][title]" with "Couleur"
         And I press "attribute_group_actions_save"
         Then I should see "La ressource a été sauvegardée avec succès"
         And I should see "Couleur"

@@ -4,6 +4,7 @@
 
 {% block title %}
     <h1>{{ 'ekyna_product.product.header.show'|trans({'%name%': product})|raw }}</h1>
+    {{ product|product_type_badge }}
 {% endblock title %}
 
 {% block actions %}

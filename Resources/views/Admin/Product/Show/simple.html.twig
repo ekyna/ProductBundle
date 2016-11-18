@@ -1,34 +1,18 @@
 {% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
 
-{% import "EkynaProductBundle:Admin/Product/Show/Common:macros.html.twig" as macros %}
+
+{% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
+
 
 {% block general_content %}
     {{ parent() }}
-    <div class="row">
-        <div class="col-md-6">
-            {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {
-                'label_nb_col': 4,
-                'widget_nb_col': 8
-            }) }}
-        </div>
-        <div class="col-md-6">
-            {# TODO use IntlNumberFormatter #}
-            {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
-                'label_nb_col': 4,
-                'widget_nb_col': 8,
-                'append': ' kg'
-            }) }}
-        </div>
-    </div>
+    {{ macros.show_brand_and_category(product) }}
+    {{ macros.show_reference_and_weight(product) }}
     {{ macros.show_references(product) }}
-    {{ show_translations_row(product.translations, {
-        'fields': {
-            'title': {'label': 'ekyna_core.field.title'},
-            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
-        }
-    }) }}
-    {{ show_row(product.images, 'medias', 'ekyna_core.field.images') }}
+    {{ macros.show_translations(product) }}
+    {{ macros.show_medias(product) }}
 {% endblock general_content %}
+
 
 {% block pricing_content %}
     {{ parent() }}

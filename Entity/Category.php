@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Bundle\CmsBundle\Entity\Seo;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\CoreBundle\Model\TreeTrait;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
@@ -52,7 +51,6 @@ class Category extends ResourceModel\AbstractTranslatable implements Model\Categ
         parent::__construct();
 
         $this->children = new ArrayCollection();
-        $this->seo = new Seo();
     }
 
     /**
