@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AttributeGroupType
@@ -18,18 +19,29 @@ class AttributeGroupType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'number', [
-                'sortable' => true,
-            ])
-            ->addColumn('name', 'anchor', array(
+            ->addColumn('name', 'anchor', [
                 'label'                => 'ekyna_core.field.name',
-                'property_path'        => null,
-                'sortable'             => true,
                 'route_name'           => 'ekyna_product_attribute_group_admin_show',
                 'route_parameters_map' => ['attributeGroupId' => 'id'],
-            ))
+            ])
             ->addColumn('actions', 'admin_actions', [
                 'buttons' => [
+                    [
+                        'label'                => 'ekyna_core.button.move_up',
+                        'icon'                 => 'arrow-up',
+                        'class'                => 'primary',
+                        'route_name'           => 'ekyna_product_attribute_group_admin_move_up',
+                        'route_parameters_map' => ['attributeGroupId' => 'id'],
+                        'permission'           => 'edit',
+                    ],
+                    [
+                        'label'                => 'ekyna_core.button.move_down',
+                        'icon'                 => 'arrow-down',
+                        'class'                => 'primary',
+                        'route_name'           => 'ekyna_product_attribute_group_admin_move_down',
+                        'route_parameters_map' => ['attributeGroupId' => 'id'],
+                        'permission'           => 'edit',
+                    ],
                     [
                         'label'                => 'ekyna_core.button.edit',
                         'class'                => 'warning',
@@ -46,10 +58,22 @@ class AttributeGroupType extends ResourceTableType
                     ],
                 ],
             ])
-            ->addFilter('id', 'number')
             ->addFilter('name', 'text', [
                 'label' => 'ekyna_core.field.name',
             ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults([
+            'default_sort' => 'position asc',
+            'max_per_page' => 100,
+        ]);
     }
 
     /**

@@ -4,11 +4,12 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class BrandType
  * @package Ekyna\Bundle\ProductBundle\Table\Type
- * @author Étienne Dauvergne <contact@ekyna.com>
+ * @author  Étienne Dauvergne <contact@ekyna.com>
  */
 class BrandType extends ResourceTableType
 {
@@ -18,13 +19,11 @@ class BrandType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'number')
             ->addColumn('name', 'anchor', [
-                'label' => 'ekyna_core.field.name',
-                'sortable' => true,
-                'route_name' => 'ekyna_product_brand_admin_show',
+                'label'                => 'ekyna_core.field.name',
+                'route_name'           => 'ekyna_product_brand_admin_show',
                 'route_parameters_map' => [
-                    'brandId' => 'id'
+                    'brandId' => 'id',
                 ],
             ])
             ->addColumn('actions', 'admin_actions', [
@@ -34,9 +33,7 @@ class BrandType extends ResourceTableType
                         'icon'                 => 'arrow-up',
                         'class'                => 'primary',
                         'route_name'           => 'ekyna_product_brand_admin_move_up',
-                        'route_parameters_map' => [
-                            'brandId' => 'id',
-                        ],
+                        'route_parameters_map' => ['brandId' => 'id'],
                         'permission'           => 'edit',
                     ],
                     [
@@ -44,36 +41,41 @@ class BrandType extends ResourceTableType
                         'icon'                 => 'arrow-down',
                         'class'                => 'primary',
                         'route_name'           => 'ekyna_product_brand_admin_move_down',
-                        'route_parameters_map' => [
-                            'brandId' => 'id',
-                        ],
+                        'route_parameters_map' => ['brandId' => 'id'],
                         'permission'           => 'edit',
                     ],
                     [
-                        'label' => 'ekyna_core.button.edit',
-                        'class' => 'warning',
-                        'route_name' => 'ekyna_product_brand_admin_edit',
-                        'route_parameters_map' => [
-                            'brandId' => 'id'
-                        ],
-                        'permission' => 'edit',
+                        'label'                => 'ekyna_core.button.edit',
+                        'class'                => 'warning',
+                        'route_name'           => 'ekyna_product_brand_admin_edit',
+                        'route_parameters_map' => ['brandId' => 'id'],
+                        'permission'           => 'edit',
                     ],
                     [
-                        'label' => 'ekyna_core.button.remove',
-                        'class' => 'danger',
-                        'route_name' => 'ekyna_product_brand_admin_remove',
-                        'route_parameters_map' => [
-                            'brandId' => 'id'
-                        ],
-                        'permission' => 'delete',
+                        'label'                => 'ekyna_core.button.remove',
+                        'class'                => 'danger',
+                        'route_name'           => 'ekyna_product_brand_admin_remove',
+                        'route_parameters_map' => ['brandId' => 'id'],
+                        'permission'           => 'delete',
                     ],
                 ],
             ])
-            ->addFilter('id', 'number')
             ->addFilter('name', 'text', [
-                'label' => 'ekyna_core.field.name'
-            ])
-        ;
+                'label' => 'ekyna_core.field.name',
+            ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefaults([
+            'default_sort' => 'position asc',
+            'max_per_page' => 100,
+        ]);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
-use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface AttributeInterface
@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  *
  * @method AttributeTranslationInterface translate($locale = null, $create = false)
  */
-interface AttributeInterface extends MediaSubjectInterface, ResourceInterface
+interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface, RM\ResourceInterface
 {
     /**
      * Returns the group.

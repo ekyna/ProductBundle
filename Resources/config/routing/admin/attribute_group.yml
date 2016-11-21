@@ -27,6 +27,20 @@ ekyna_product_attribute_group_admin_edit:
     requirements:
         attributeGroupId: \d+
 
+ekyna_product_attribute_group_admin_move_up:
+    path: /{attributeGroupId}/moveup
+    defaults: { _controller: "ekyna_product.attribute_group.controller:moveUpAction" }
+    methods: [GET]
+    requirements:
+        attributeGroupId: \d+
+
+ekyna_product_attribute_group_admin_move_down:
+    path: /{attributeGroupId}/movedown
+    defaults: { _controller: "ekyna_product.attribute_group.controller:moveDownAction" }
+    methods: [GET]
+    requirements:
+        attributeGroupId: \d+
+
 ekyna_product_attribute_group_admin_remove:
     path: /{attributeGroupId}/remove
     defaults: { _controller: "ekyna_product.attribute_group.controller:removeAction" }

@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -22,6 +23,10 @@
         </id>
 
         <field name="name" column="name" type="string" length="32" nullable="false" unique="true"/>
+
+        <field name="position" type="integer" column="position">
+            <gedmo:sortable-position/>
+        </field>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface"
                      field="attributes" mapped-by="group" orphan-removal="true">

@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -24,9 +25,14 @@
         <field name="name" column="name" type="string" length="32" nullable="false" unique="true"/>
         <field name="color" column="color" type="string" length="16" nullable="true" />
 
+        <field name="position" type="integer" column="position">
+            <gedmo:sortable-position/>
+        </field>
+
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface"
                      field="group" inversed-by="attributes">
             <join-column name="group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false"/>
+            <gedmo:sortable-group/>
         </many-to-one>
 
     </mapped-superclass>

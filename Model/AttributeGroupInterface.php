@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface AttributeGroupInterface
@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  *
  * @method AttributeGroupTranslationInterface translate($locale = null, $create = false)
  */
-interface AttributeGroupInterface extends ResourceInterface
+interface AttributeGroupInterface extends RM\SortableInterface, RM\ResourceInterface
 {
     /**
      * Returns the name.

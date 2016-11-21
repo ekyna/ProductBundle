@@ -21,6 +21,22 @@ ekyna_product_attribute_admin_edit:
         attributeGroupId: \d+
         attributeId: \d+
 
+ekyna_product_attribute_admin_move_up:
+    path: /{attributeId}/moveup
+    defaults: { _controller: "ekyna_product.attribute.controller:moveUpAction" }
+    methods: [GET]
+    requirements:
+        attributeGroupId: \d+
+        attributeId: \d+
+
+ekyna_product_attribute_admin_move_down:
+    path: /{attributeId}/movedown
+    defaults: { _controller: "ekyna_product.attribute.controller:moveDownAction" }
+    methods: [GET]
+    requirements:
+        attributeGroupId: \d+
+        attributeId: \d+
+
 ekyna_product_attribute_admin_remove:
     path: /{attributeId}/remove
     defaults: { _controller: "ekyna_product.attribute.controller:removeAction" }

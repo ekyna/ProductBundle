@@ -32,8 +32,7 @@
             'path': path('ekyna_product_attribute_admin_new', {'attributeGroupId': attributeGroup.id})
         }) }}
     </div>
-    {#{{ ekyna_table_render(attributes) }}#}
-
+    {# TODO {{ ekyna_table_render(attributes) }}#}
 
     <div class="ekyna-table">
         <div class="table-responsive">
@@ -51,6 +50,14 @@
                         <a href="{{ admin_resource_path(attribute) }}">{{ attribute.name }}</a>
                     </td>
                     <td class="actions">
+                        <a href="{{ admin_resource_path(attribute, 'move_up') }}"
+                           class="btn btn-xs btn-primary">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                        </a>
+                        <a href="{{ admin_resource_path(attribute, 'move_down') }}"
+                           class="btn btn-xs btn-primary">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
+                        </a>
                         <a href="{{ admin_resource_path(attribute, 'edit') }}"
                            class="btn btn-xs btn-warning">
                             {{ 'ekyna_core.button.edit'|trans }}
@@ -66,7 +73,5 @@
             </table>
         </div>
     </div>
-
-
 
 {% endblock %}

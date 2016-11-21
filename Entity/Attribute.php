@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class Attribute
@@ -13,9 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  *
  * @method Model\AttributeTranslationInterface translate($locale = null, $create = false)
  */
-class Attribute extends AbstractTranslatable implements Model\AttributeInterface
+class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterface
 {
-    use MediaSubjectTrait;
+    use MediaSubjectTrait,
+        RM\SortableTrait;
 
     /**
      * @var integer

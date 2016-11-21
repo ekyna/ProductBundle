@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model AS RM;
 
 /**
  * Class AttributeGroup
@@ -13,8 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  *
  * @method Model\AttributeGroupTranslationInterface translate($locale = null, $create = false)
  */
-class AttributeGroup extends AbstractTranslatable implements Model\AttributeGroupInterface
+class AttributeGroup extends RM\AbstractTranslatable implements Model\AttributeGroupInterface
 {
+    use RM\SortableTrait;
+
     /**
      * @var int
      */
