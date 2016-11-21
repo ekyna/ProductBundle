@@ -32,6 +32,11 @@ class Attribute extends AbstractTranslatable implements Model\AttributeInterface
      */
     protected $name;
 
+    /**
+     * @var string
+     */
+    protected $color;
+
 
     /**
      * @inheritdoc
@@ -82,6 +87,24 @@ class Attribute extends AbstractTranslatable implements Model\AttributeInterface
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setColor($color)
+    {
+        $this->color = $color;
 
         return $this;
     }

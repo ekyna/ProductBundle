@@ -47,6 +47,22 @@ interface AttributeInterface extends MediaSubjectInterface, ResourceInterface
     public function setName($name);
 
     /**
+     * Returns the color.
+     *
+     * @return string
+     */
+    public function getColor();
+
+    /**
+     * Sets the color.
+     *
+     * @param string $color
+     *
+     * @return $this|AttributeInterface
+     */
+    public function setColor($color);
+
+    /**
      * Returns the (translated) title.
      *
      * @return string

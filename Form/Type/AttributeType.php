@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\CoreBundle\Form\Type\ColorPickerType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -53,8 +54,13 @@ class AttributeType extends ResourceFormType
                 'error_bubbling' => false,
             ])
             ->add('media', MediaChoiceType::class, [
-                'label' => 'ekyna_core.field.image',
-                'types' => [MediaTypes::IMAGE],
+                'label'    => 'ekyna_core.field.image',
+                'types'    => [MediaTypes::IMAGE],
+                'required' => false,
+            ])
+            ->add('color', ColorPickerType::class, [
+                'label'    => 'ekyna_core.field.color',
+                'required' => false,
             ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {

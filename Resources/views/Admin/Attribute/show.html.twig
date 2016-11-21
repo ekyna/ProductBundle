@@ -31,7 +31,14 @@
                         'title': {'label': 'ekyna_core.field.title'},
                     }
                 }) }}
-                {{ show_row(attribute.media, 'media', 'ekyna_core.field.image') }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ show_row(attribute.media, 'media', 'ekyna_core.field.image', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ show_row(attribute.color, 'color', 'ekyna_core.field.color', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
