@@ -30,11 +30,12 @@ class ProductAttributesType extends AbstractType
             $group = $slot->getGroup();
 
             $builder->add('slot_' . $slot->getId(), ChoiceType::class, [
-                'label' => $group->getName(),
-                'choices' => $group->getAttributes()->toArray(),
+                'label'        => $group->getName(),
+                'choices'      => $group->getAttributes()->toArray(),
                 'choice_label' => 'name',
                 'choice_value' => 'id',
-                'multiple' => $slot->isMultiple(),
+                'multiple'     => $slot->isMultiple(),
+                'required'     => $slot->isRequired(),
             ]);
         }
     }

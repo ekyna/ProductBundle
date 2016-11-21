@@ -13,6 +13,8 @@ use Ekyna\Component\Resource\Model as ResourceModel;
  * Class Category
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\CategoryTranslationInterface translate($locale = null, $create = false)
  */
 class Category extends ResourceModel\AbstractTranslatable implements Model\CategoryInterface
 {

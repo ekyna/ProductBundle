@@ -5,11 +5,14 @@
 {% spaceless %}
     {{ form_errors(form) }}
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             {{ form_widget(form.group) }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             {{ form_row(form.multiple) }}
+        </div>
+        <div class="col-md-3">
+            {{ form_row(form.required) }}
         </div>
     </div>
     {{ form_rest(form) }}

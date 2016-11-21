@@ -51,6 +51,10 @@ class AttributeSlotType extends ResourceFormType
                 'label'    => 'ekyna_product.attribute_set.field.multiple',
                 'required' => false,
             ])
+            ->add('required', Type\CheckboxType::class, [
+                'label'    => 'ekyna_core.field.required',
+                'required' => false,
+            ])
             ->add('position', Type\HiddenType::class, [
                 'attr' => [
                     'data-collection-role' => 'position',

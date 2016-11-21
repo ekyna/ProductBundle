@@ -15,11 +15,61 @@
         <div class="tab-content">
             <div class="tab-pane active" id="general">
                 {{ show_row(attributeSet.name, 'text', 'ekyna_core.field.email') }}
-                {{ show_row(attributeSet.slots, 'entity', 'ekyna_product.attribute_group.label.plural', {
-                    'field': 'group.name',
-                    'route': 'ekyna_product_attribute_group_admin_show',
-                    'route_params_map': {'attributeGroupId': 'id'},
-                }) }}
+                <div class="row show-row">
+                    <div class="col-md-2 show-label">
+                        {{ 'ekyna_product.attribute_group.label.plural'|trans }}
+                    </div>
+                    <div class="col-md-10">
+                        <div class="show-widget">
+                            <div class="ekyna-table">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>{{ 'ekyna_core.field.group'|trans }}</th>
+                                            <th>{{ 'ekyna_product.attribute_set.field.multiple'|trans }}</th>
+                                            <th>{{ 'ekyna_core.field.required'|trans }}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for slot in attributeSet.slots %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ admin_resource_path(slot.group) }}" class="show-entity">
+                                                        {{ slot.group.name }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    {% if slot.multiple %}
+                                                        <span class="label label-success">
+                                                            {{ 'ekyna_core.value.yes'|trans }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="label label-default">
+                                                            {{ 'ekyna_core.value.no'|trans }}
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if slot.required %}
+                                                        <span class="label label-success">
+                                                            {{ 'ekyna_core.value.yes'|trans }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="label label-default">
+                                                            {{ 'ekyna_core.value.no'|trans }}
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

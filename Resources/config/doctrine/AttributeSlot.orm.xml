@@ -23,6 +23,7 @@
         </id>
 
         <field name="multiple" column="multiple" type="boolean" />
+        <field name="required" column="required" type="boolean" />
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />
         </field>

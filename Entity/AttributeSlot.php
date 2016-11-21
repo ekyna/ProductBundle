@@ -32,6 +32,11 @@ class AttributeSlot implements Model\AttributeSlotInterface
     protected $multiple = false;
 
     /**
+     * @var bool
+     */
+    protected $required = true;
+
+    /**
      * @var integer
      */
     protected $position;
@@ -96,6 +101,24 @@ class AttributeSlot implements Model\AttributeSlotInterface
     public function setMultiple($multiple)
     {
         $this->multiple = (bool)$multiple;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRequired()
+    {
+        return $this->required;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setRequired($required)
+    {
+        $this->required = (bool)$required;
 
         return $this;
     }

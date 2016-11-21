@@ -60,6 +60,22 @@ interface AttributeSlotInterface extends ResourceInterface
     public function setMultiple($multiple);
 
     /**
+     * Returns the required.
+     *
+     * @return boolean
+     */
+    public function isRequired();
+
+    /**
+     * Sets the required.
+     *
+     * @param boolean $required
+     *
+     * @return $this|AttributeSlotInterface
+     */
+    public function setRequired($required);
+
+    /**
      * Returns the position.
      *
      * @return int
