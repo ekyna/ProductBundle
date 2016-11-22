@@ -414,13 +414,15 @@
                     <value>variant</value>
                 </option>
             </constraint>
+            <!--
+            Set by persistence events handlers
             <constraint name="IsNull">
                 <option name="groups">
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
-            </constraint>
+            </constraint>-->
             <constraint name="GreaterThan">
                 <option name="value">0</option>
                 <option name="groups">
@@ -438,13 +440,15 @@
                     <value>variant</value>
                 </option>
             </constraint>
+            <!--
+            Set by persistence events handlers
             <constraint name="IsNull">
                 <option name="groups">
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
-            </constraint>
+            </constraint>-->
             <constraint name="GreaterThan">
                 <option name="value">0</option>
                 <option name="groups">
@@ -464,7 +468,10 @@
             </constraint>
             <constraint name="IsNull">
                 <option name="groups">
+                    <!--
+                    Set by persistence events handlers
                     <value>variant</value>
+                    -->
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
@@ -529,12 +536,15 @@
                     <value>configurable</value>
                 </option>
             </constraint>
+            <!--
+            Attribute slots can be optional
             <constraint name="Count">
                 <option name="min">1</option>
                 <option name="groups">
                     <value>variant</value>
                 </option>
             </constraint>
+            -->
         </property>
 
         <!-- Option groups -->

@@ -261,10 +261,10 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     public function addVariant(Model\ProductInterface $variant)
     {
         if (!$this->hasVariant($variant)) {
+            $this->variants->add($variant);
             if ($variant->getParent() !== $this) {
                 $variant->setParent($this);
             }
-            $this->variants->add($variant);
         }
 
         return $this;
@@ -276,8 +276,8 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     public function removeVariant(Model\ProductInterface $variant)
     {
         if ($this->hasVariant($variant)) {
-            $variant->setParent(null);
             $this->variants->removeElement($variant);
+            $variant->setParent(null);
         }
 
         return $this;
