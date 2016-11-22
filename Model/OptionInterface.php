@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method OptionTranslationInterface translate($locale = null, $create = false)
  */
-interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface, RM\ResourceInterface
+interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
 {
     /**
      * Returns the group.
