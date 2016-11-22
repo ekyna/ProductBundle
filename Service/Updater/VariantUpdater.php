@@ -42,7 +42,7 @@ class VariantUpdater
                     }
                 }
             }
-            if (!$found) {
+            if ($slot->isRequired() && !$found) {
                 throw new InvalidProductException("No attribute found for attribute group '$group'.'");
             }
         }

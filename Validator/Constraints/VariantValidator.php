@@ -82,8 +82,8 @@ class VariantValidator extends ConstraintValidator
              */
             list($slot, $count) = $data;
 
-            // Asserts that each slot has at least one assigned attribute
-            if ($count == 0) {
+            // Asserts that each required slot has at least one assigned attribute
+            if ($slot->isRequired() && $count == 0) {
                 $this->context
                     ->buildViolation($constraint->slotAttributeIsMandatory)
                     ->setParameter('%group_name%', $slot->getGroup()->getName())
