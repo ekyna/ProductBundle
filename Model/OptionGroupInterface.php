@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface OptionGroupInterface
@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  *
  * @method OptionGroupTranslationInterface translate($locale = null, $create = false)
  */
-interface OptionGroupInterface extends ResourceInterface
+interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInterface, RM\ResourceInterface
 {
     /**
      * Returns the product.
@@ -25,6 +25,8 @@ interface OptionGroupInterface extends ResourceInterface
      * Sets the product.
      *
      * @param ProductInterface $product
+     *
+     * @return $this|OptionGroupInterface
      */
     public function setProduct(ProductInterface $product = null);
 
@@ -39,6 +41,8 @@ interface OptionGroupInterface extends ResourceInterface
      * Sets the name.
      *
      * @param string $name
+     *
+     * @return $this|OptionGroupInterface
      */
     public function setName($name);
 
@@ -108,18 +112,4 @@ interface OptionGroupInterface extends ResourceInterface
      * @internal
      */
     public function setOptions(ArrayCollection $options);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     */
-    public function setPosition($position);
 }

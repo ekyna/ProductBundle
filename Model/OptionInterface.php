@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
-use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface OptionInterface
@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  *
  * @method OptionTranslationInterface translate($locale = null, $create = false)
  */
-interface OptionInterface extends ResourceInterface
+interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface, RM\ResourceInterface
 {
     /**
      * Returns the group.

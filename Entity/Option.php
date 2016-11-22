@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class Option
@@ -13,8 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  *
  * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
  */
-class Option extends AbstractTranslatable implements Model\OptionInterface
+class Option extends RM\AbstractTranslatable implements Model\OptionInterface
 {
+    use RM\SortableTrait;
+
     /**
      * @var integer
      */
@@ -49,11 +51,6 @@ class Option extends AbstractTranslatable implements Model\OptionInterface
      * @var TaxGroupInterface
      */
     protected $taxGroup;
-
-    /**
-     * @var integer
-     */
-    protected $position;
 
 
     /**
@@ -186,24 +183,6 @@ class Option extends AbstractTranslatable implements Model\OptionInterface
     public function setTaxGroup(TaxGroupInterface $group)
     {
         $this->taxGroup = $group;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
 
         return $this;
     }

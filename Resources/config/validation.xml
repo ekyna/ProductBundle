@@ -648,6 +648,11 @@
             <constraint name="Valid"/>
         </property>
 
+        <!-- Medias -->
+        <property name="references">
+            <constraint name="Valid"/>
+        </property>
+
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
@@ -702,7 +707,7 @@
         <property name="type">
             <constraint name="Callback">
                 <value>Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes</value>
-                <value>isValidType</value>
+                <value>isValid</value>
             </constraint>
         </property>
         <property name="number">
@@ -722,6 +727,7 @@
             </option>
         </constraint>
         <!-- Unique type by product constraint -->
+        <!-- TODO bug because product may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
                 <value>type</value>
@@ -732,7 +738,7 @@
                 <value>simple</value>
                 <value>variant</value>
             </option>
-        </constraint>
+        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductStockUnit">

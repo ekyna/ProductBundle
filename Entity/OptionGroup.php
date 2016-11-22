@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class OptionGroup
@@ -13,8 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  *
  * @method Model\OptionGroupTranslationInterface translate($locale = null, $create = false)
  */
-class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInterface
+class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupInterface
 {
+    use RM\SortableTrait;
+
     /**
      * @var integer
      */
@@ -40,11 +42,6 @@ class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInter
      */
     protected $options;
 
-    /**
-     * @var integer
-     */
-    protected $position;
-
 
     /**
      * Constructor.
@@ -54,6 +51,7 @@ class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInter
         parent::__construct();
 
         $this->options = new ArrayCollection();
+        $this->required = false;
     }
 
     /**
@@ -102,6 +100,8 @@ class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInter
     public function setProduct(Model\ProductInterface $product = null)
     {
         $this->product = $product;
+
+        return $this;
     }
 
     /**
@@ -118,6 +118,8 @@ class OptionGroup extends AbstractTranslatable implements Model\OptionGroupInter
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
