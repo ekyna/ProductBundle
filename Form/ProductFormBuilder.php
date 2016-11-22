@@ -75,6 +75,26 @@ class ProductFormBuilder
     }
 
     /**
+     * Returns the form.
+     *
+     * @return FormInterface
+     */
+    protected function getForm()
+    {
+        return $this->form;
+    }
+
+    /**
+     * Returns the product.
+     *
+     * @return ProductInterface
+     */
+    protected function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
      * Adds the attribute set field.
      *
      * @param array $options

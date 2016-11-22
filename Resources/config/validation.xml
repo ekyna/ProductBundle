@@ -372,7 +372,19 @@
 
         <!-- Reference -->
         <property name="reference">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
             <constraint name="Length">
                 <option name="max">16</option>
             </constraint>
@@ -391,17 +403,17 @@
             <constraint name="Length">
                 <option name="min">3</option>
                 <option name="max">255</option>
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variable</value>
-                    <value>bundle</value>
-                    <value>configurable</value>
-                </option>
             </constraint>
         </property>
 
         <!-- Net price -->
         <property name="netPrice">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
             <constraint name="IsNull">
                 <option name="groups">
                     <value>variable</value>
@@ -420,6 +432,12 @@
 
         <!-- Weight -->
         <property name="weight">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
             <constraint name="IsNull">
                 <option name="groups">
                     <value>variable</value>
@@ -438,34 +456,34 @@
 
         <!-- Tax group -->
         <property name="taxGroup">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                </option>
+            </constraint>
             <constraint name="IsNull">
                 <option name="groups">
                     <value>variant</value>
                     <value>bundle</value>
                     <value>configurable</value>
-                </option>
-            </constraint>
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variable</value>
                 </option>
             </constraint>
         </property>
 
         <!-- Parent -->
         <property name="parent">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>variant</value>
+                </option>
+            </constraint>
             <constraint name="IsNull">
                 <option name="groups">
                     <value>simple</value>
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
-                </option>
-            </constraint>
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>variant</value>
                 </option>
             </constraint>
         </property>
@@ -485,17 +503,17 @@
 
         <!-- Attribute set -->
         <property name="attributeSet">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>variable</value>
+                </option>
+            </constraint>
             <constraint name="IsNull">
                 <option name="groups">
                     <value>simple</value>
                     <value>variant</value>
                     <value>bundle</value>
                     <value>configurable</value>
-                </option>
-            </constraint>
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>variable</value>
                 </option>
             </constraint>
         </property>
@@ -638,13 +656,14 @@
                 <value>configurable</value>
             </option>
         </constraint>
+        <!-- TODO bug because parent may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
                 <value>parent</value>
                 <value>designation</value>
             </option>
             <option name="groups">variant</option>
-        </constraint>
+        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductMedia">
