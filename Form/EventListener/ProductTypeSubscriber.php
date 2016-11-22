@@ -32,6 +32,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Returns the product form builder.
+     *
+     * @return ProductFormBuilder|string
+     */
+    protected function getBuilder()
+    {
+        return $this->builder;
+    }
+
+    /**
      * Form pre set data event handler.
      *
      * @param FormEvent $event
