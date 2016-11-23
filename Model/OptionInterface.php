@@ -116,20 +116,4 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
      * @return $this|OptionInterface
      */
     public function setTaxGroup(TaxGroupInterface $group);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return $this|OptionInterface
-     */
-    public function setPosition($position);
 }

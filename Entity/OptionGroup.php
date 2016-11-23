@@ -201,22 +201,6 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
-    }
-
-    /**
      * @inheritDoc
      */
     protected function getTranslationClass()
