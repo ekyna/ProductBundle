@@ -97,7 +97,9 @@ class VariantUpdater
 
                 if ($title != $vTrans->getAttributesTitle()) {
                     $vTrans->setAttributesTitle($title);
-                    $this->persistenceHelper->persistAndRecompute($vTrans);
+
+                    $this->persistTranslation($vTrans);
+
                     $changed = true;
                 }
             }
@@ -131,6 +133,28 @@ class VariantUpdater
         }
 
         return $changed;
+    }
+
+    /**
+     * Persists and recomputes the translation.
+     *
+     * @param $translation
+     */
+    protected function persistTranslation($translation)
+    {
+        $manager = $this->persistenceHelper->getManager();
+        $uow = $manager->getUnitOfWork();
+
+        if (!($uow->isScheduledForInsert($translation) || $uow->isScheduledForUpdate($translation))) {
+            $manager->persist($translation);
+        }
+
+        $metadata = $manager->getClassMetadata(get_class($translation));
+        if ($uow->getEntityChangeSet($translation)) {
+            $uow->recomputeSingleEntityChangeSet($metadata, $translation);
+        } else {
+            $uow->computeChangeSet($metadata, $translation);
+        }
     }
 
     /**

@@ -1,5 +1,9 @@
 {% extends "EkynaProductBundle:Admin/Product/Show:base.html.twig" %}
 
+
+{% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
+
+
 {% block general_content %}
     {{ parent() }}
     {{ macros.show_brand_and_category(product) }}
