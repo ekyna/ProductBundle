@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\TranslatableInterface;
 
 /**
@@ -11,7 +10,7 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface BundleSlotInterface extends ResourceInterface, TranslatableInterface
+interface BundleSlotInterface extends TranslatableInterface
 {
     const ITEM_DATA_KEY = 'bundle_slot_id';
 

@@ -15,6 +15,8 @@ class Variant extends Constraint
     public $slotHasTooManyAttributes = 'ekyna_product.product.slot_has_too_many_attributes';
     public $unexpectedAttribute      = 'ekyna_product.product.unexpected_attribute';
     public $variantIsNotUnique       = 'ekyna_product.product.variant_is_not_unique';
+    public $designationNeeded        = 'ekyna_product.product.designation_needed';
+    public $translationTitleNeeded   = 'ekyna_product.product.translation_title_needed';
 
     /**
      * {@inheritdoc}

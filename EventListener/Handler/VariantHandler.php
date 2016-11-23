@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
@@ -37,12 +38,15 @@ class VariantHandler extends AbstractHandler
      * Constructor.
      *
      * @param PersistenceHelperInterface $persistenceHelper
+     * @param LocaleProviderInterface    $localeProvider
      */
-    public function __construct(PersistenceHelperInterface $persistenceHelper)
-    {
+    public function __construct(
+        PersistenceHelperInterface $persistenceHelper,
+        LocaleProviderInterface $localeProvider
+    ) {
         $this->persistenceHelper = $persistenceHelper;
 
-        $this->variantUpdater = new VariantUpdater();
+        $this->variantUpdater = new VariantUpdater($persistenceHelper, $localeProvider);
         $this->variableUpdater = new VariableUpdater();
     }
 
@@ -55,8 +59,8 @@ class VariantHandler extends AbstractHandler
 
         $changed = false;
 
-        // Generate variant designation if needed
-        if (0 === strlen($variant->getDesignation()) && $this->variantUpdater->updateDesignation($variant)) {
+        // Generate attributes designation and title if needed
+        if ($this->variantUpdater->updateAttributesDesignationAndTitle($variant)) {
             $changed = true;
         }
 
@@ -81,8 +85,8 @@ class VariantHandler extends AbstractHandler
 
         $changed = false;
 
-        // Generate variant designation if needed
-        if (0 === strlen($variant->getDesignation()) && $this->variantUpdater->updateDesignation($variant)) {
+        // Generate attributes designation and title if needed
+        if ($this->variantUpdater->updateAttributesDesignationAndTitle($variant)) {
             $changed = true;
         }
 

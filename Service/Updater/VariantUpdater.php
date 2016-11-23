@@ -2,9 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
+use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidProductException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
+use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
  * Class ProductUpdater
@@ -14,14 +16,39 @@ use Ekyna\Component\Commerce\Exception\RuntimeException;
 class VariantUpdater
 {
     /**
-     * Updates the variant designation regarding to his attributes.
+     * @var PersistenceHelperInterface
+     */
+    private $persistenceHelper;
+
+    /**
+     * @var LocaleProviderInterface
+     */
+    private $localeProvider;
+
+
+    /**
+     * Constructor.
+     *
+     * @param PersistenceHelperInterface $persistenceHelper
+     * @param LocaleProviderInterface    $localeProvider
+     */
+    public function __construct(
+        PersistenceHelperInterface $persistenceHelper,
+        LocaleProviderInterface $localeProvider
+    ) {
+        $this->persistenceHelper = $persistenceHelper;
+        $this->localeProvider = $localeProvider;
+    }
+
+    /**
+     * Updates the attributes designation and title if needed.
      *
      * @param Model\ProductInterface $variant The variant product
      *
-     * @return bool Whether the variable has been changed or not.
+     * @return bool Whether the variant has been changed or not.
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
-    public function updateDesignation(Model\ProductInterface $variant)
+    public function updateAttributesDesignationAndTitle(Model\ProductInterface $variant)
     {
         $this->assertVariantWithParent($variant);
 
@@ -29,13 +56,61 @@ class VariantUpdater
             throw new RuntimeException("Variant's parent attribute set must be defined.");
         }
 
-        $attributeNames = [];
+        $changed = false;
+
+        // Attributes title for each locales
+        foreach ($this->localeProvider->getAvailableLocales() as $locale) {
+            $titles = [];
+            foreach ($attributeSet->getSlots() as $slot) {
+                $group = $slot->getGroup();
+                $found = false;
+                foreach ($variant->getAttributes() as $attribute) {
+                    if ($attribute->getGroup() === $group) {
+                        // Don't create attribute translation here
+                        if (null !== $aTrans = $attribute->getTranslations()->get($locale)) {
+                            if (0 < strlen($title = $aTrans->getTitle())) {
+                                $titles[] = $title;
+                                $found = true;
+                            }
+                        }
+                        if (!$slot->isMultiple()) {
+                            continue 2;
+                        }
+                    }
+                }
+                if ($slot->isRequired() && !$found) {
+                    throw new InvalidProductException("No attribute found for attribute group '$group'.'");
+                }
+            }
+
+            $title = trim(implode(' ', $titles));
+            // TODO truncate if length is greater than 255 ?
+
+            // If title is not blank or locale is the default one or a translation exists for this locale.
+            if (
+                0 < strlen($title) ||
+                $locale == $this->localeProvider->getFallbackLocale() ||
+                null !== $variant->getTranslations()->get($locale)
+            ) {
+                // Create variant translation
+                $vTrans = $variant->translate($locale, true);
+
+                if ($title != $vTrans->getAttributesTitle()) {
+                    $vTrans->setAttributesTitle($title);
+                    $this->persistenceHelper->persistAndRecompute($vTrans);
+                    $changed = true;
+                }
+            }
+        }
+
+        // Attributes designation
+        $names = [];
         foreach ($attributeSet->getSlots() as $slot) {
             $group = $slot->getGroup();
             $found = false;
             foreach ($variant->getAttributes() as $attribute) {
                 if ($attribute->getGroup() === $group) {
-                    $attributeNames[] = $attribute->getName();
+                    $names[] = $attribute->getName();
                     $found = true;
                     if (!$slot->isMultiple()) {
                         continue 2;
@@ -47,14 +122,15 @@ class VariantUpdater
             }
         }
 
-        $designation = implode(' ', $attributeNames);
-        if ($designation != $variant->getDesignation()) {
-            $variant->setDesignation($designation);
+        $designation = trim(implode(' ', $names));
+        // TODO truncate if length is greater than 255 ?
+        if ($designation != $variant->getAttributesDesignation()) {
+            $variant->setAttributesDesignation($designation);
 
-            return true;
+            $changed = true;
         }
 
-        return false;
+        return $changed;
     }
 
     /**
@@ -62,7 +138,7 @@ class VariantUpdater
      *
      * @param Model\ProductInterface $variant
      *
-     * @return bool Whether the variable has been changed or not.
+     * @return bool Whether the variant has been changed or not.
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
     public function updateTaxGroup(Model\ProductInterface $variant)

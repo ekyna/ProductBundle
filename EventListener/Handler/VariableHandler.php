@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
@@ -36,12 +37,15 @@ class VariableHandler extends AbstractHandler
      * Constructor.
      *
      * @param PersistenceHelperInterface $persistenceHelper
+     * @param LocaleProviderInterface    $localeProvider
      */
-    public function __construct(PersistenceHelperInterface $persistenceHelper)
-    {
+    public function __construct(
+        PersistenceHelperInterface $persistenceHelper,
+        LocaleProviderInterface $localeProvider
+    ) {
         $this->persistenceHelper = $persistenceHelper;
 
-        $this->variantUpdater = new VariantUpdater();
+        $this->variantUpdater = new VariantUpdater($persistenceHelper, $localeProvider);
         $this->variableUpdater = new VariableUpdater();
     }
 

@@ -167,6 +167,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariantHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_core.locale_provider.request"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variable product event handler -->
@@ -174,6 +175,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariableHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_core.locale_provider.request"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
@@ -219,6 +221,12 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Variant constraint validator -->
+        <service id="ekyna_product.validator.variant_validator"
+                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
+            <argument type="service" id="ekyna_core.locale_provider.request"/>
+            <tag name="validator.constraint_validator" />
+        </service>
 
     </services>
 

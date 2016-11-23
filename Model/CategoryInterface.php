@@ -5,7 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CoreBundle\Model\TreeInterface;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
-use Ekyna\Component\Resource\Model as ResourceModel;
+use Ekyna\Component\Resource\Model as RM;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 
 /**
@@ -20,8 +20,8 @@ interface CategoryInterface extends
     Cms\SeoSubjectInterface,
     MediaSubjectInterface,
     TreeInterface,
-    ResourceModel\TimestampableInterface,
-    ResourceModel\ResourceInterface
+    RM\TimestampableInterface,
+    RM\TranslatableInterface
 {
     /**
      * Sets the name.

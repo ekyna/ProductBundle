@@ -98,6 +98,11 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @var string
      */
+    protected $attributesDesignation;
+
+    /**
+     * @var string
+     */
     protected $reference;
 
     /**
@@ -186,10 +191,15 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
      */
     public function __toString()
     {
+        $designation = $this->getDesignation();
+
+        // Variant : parent designation + variant designation
         if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            $designation = sprintf('%s %s', $this->parent->getDesignation(), $this->getDesignation());
-        } else {
-            $designation = $this->getDesignation();
+            if (0 == strlen($designation)) {
+                // Fallback to auto-generated designation
+                $designation = $this->getAttributesDesignation();
+            }
+            $designation = sprintf('%s %s', $this->parent->getDesignation(), $designation);
         }
 
         return sprintf('%s %s', $this->brand, $designation);
@@ -640,8 +650,13 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
      */
     public function getTitle()
     {
+        // Variant : parent title + variant title
         if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            return sprintf('%s %s', $this->parent->getTitle(), $this->getDesignation());
+            if (0 == strlen($title = $this->translate()->getTitle())) {
+                // Fallback to auto-generated title
+                $title = $this->getAttributesTitle();
+            }
+            return sprintf('%s %s', $this->parent->getTitle(), $title);
         }
 
         return $this->translate()->getTitle();
@@ -660,8 +675,27 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getAttributesTitle()
+    {
+        return $this->translate()->getAttributesTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    /*public function setAttributesTitle($title)
+    {
+        $this->translate()->setAttributesTitle($title);
+
+        return $this;
+    }*/
+
+    /**
+     * @inheritdoc
+     */
     public function getDescription()
     {
+        // Variant : fallback to parent description
         if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
             return $this->parent->getDescription();
         }
@@ -693,6 +727,24 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     public function setDesignation($designation)
     {
         $this->designation = $designation;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributesDesignation()
+    {
+        return $this->attributesDesignation;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesDesignation($attributesDesignation)
+    {
+        $this->attributesDesignation = $attributesDesignation;
 
         return $this;
     }

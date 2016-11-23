@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method AttributeTranslationInterface translate($locale = null, $create = false)
  */
-interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface, RM\ResourceInterface
+interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface, RM\TranslatableInterface
 {
     /**
      * Returns the group.

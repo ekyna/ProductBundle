@@ -12,3 +12,5 @@ ekyna_product:
         slot_has_too_many_attributes: Le groupe "%group_name%" ne peut avoir plus d'un attribut sélectionné.
         unexpected_attribute: L'attribut "%attribute_name%" ne correspond à aucun groupe du modèle d'attributs.
         variant_is_not_unique: Une autre variante existe déjà avec cette configuration d'attributs.
+        designation_needed: La désignation ne peut être générée automatiquement sans attributs, veuillez la saisir.
+        translation_title_needed: Le titre ne peut être généré automatiquement sans attributs, veuillez le saisir.

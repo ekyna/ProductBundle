@@ -38,6 +38,7 @@ class ProductType extends ResourceTableType
             ->addColumn('designation', 'anchor', [
                 'label'                => 'ekyna_core.field.designation',
                 'sortable'             => !$variantMode,
+                'property_path'        => null,
                 'route_name'           => 'ekyna_product_product_admin_show',
                 'route_parameters_map' => [
                     'productId' => 'id',

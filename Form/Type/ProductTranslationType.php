@@ -21,16 +21,23 @@ class ProductTranslationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $titleOptions = [
+            'label' => 'ekyna_core.field.title',
+        ];
+        if ($options['variant_mode']) {
+            $titleOptions['required'] = false;
+            $titleOptions['attr'] = [
+                'help_text' => 'ekyna_product.variant.help.leave_blank_to_auto_generate',
+            ];
+        }
+
         $builder
-            ->add('title', TextType::class, array(
-                'label'        => 'ekyna_core.field.title',
-//                'admin_helper' => 'CMS_PAGE_TITLE',
-            ))
-            ->add('description', TinymceType::class, array(
-                'label'        => 'ekyna_core.field.content',
-//                'admin_helper' => 'CMS_PAGE_CONTENT',
-                'theme'        => 'front'
-            ));
+            ->add('title', TextType::class, $titleOptions)
+            ->add('description', TinymceType::class, [
+                'label'    => 'ekyna_core.field.content',
+                'theme'    => 'front',
+                'required' => false,
+            ]);
     }
 
     /**
@@ -38,8 +45,11 @@ class ProductTranslationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => ProductTranslation::class,
-        ));
+        $resolver
+            ->setDefaults([
+                'data_class'   => ProductTranslation::class,
+                'variant_mode' => false,
+            ])
+            ->setAllowedTypes('variant_mode', 'bool');
     }
 }

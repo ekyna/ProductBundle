@@ -280,6 +280,11 @@
                 <option name="value">0</option>
             </constraint>
         </property>
+        <property name="weight">
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
         <property name="taxGroup">
             <constraint name="NotNull"/>
         </property>
@@ -408,22 +413,7 @@
 
         <!-- Net price -->
         <property name="netPrice">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
-            <!--
-            Set by persistence events handlers
-            <constraint name="IsNull">
-                <option name="groups">
-                    <value>variable</value>
-                    <value>bundle</value>
-                    <value>configurable</value>
-                </option>
-            </constraint>-->
-            <constraint name="GreaterThan">
+            <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">
                     <value>simple</value>
@@ -434,22 +424,7 @@
 
         <!-- Weight -->
         <property name="weight">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
-            <!--
-            Set by persistence events handlers
-            <constraint name="IsNull">
-                <option name="groups">
-                    <value>variable</value>
-                    <value>bundle</value>
-                    <value>configurable</value>
-                </option>
-            </constraint>-->
-            <constraint name="GreaterThan">
+            <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">
                     <value>simple</value>
@@ -696,10 +671,18 @@
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductTranslation">
         <property name="title">
-            <constraint name="NotBlank"/>
-        </property>
-        <property name="description">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Length">
+                <option name="min">3</option>
+                <option name="max">255</option>
+            </constraint>
         </property>
     </class>
 

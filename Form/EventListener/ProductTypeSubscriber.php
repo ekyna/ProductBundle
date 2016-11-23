@@ -118,14 +118,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTranslationsField()
             ->addAttributeSetField()
             ->addMediasField()
-
             // Pricing
             ->addNetPriceField([
                 'required' => false,
                 'disabled' => true,
             ])
             ->addTaxGroupField()
-
             // Seo
             ->addSeoField();
     }
@@ -145,17 +143,22 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addReferenceField()
             ->addWeightField()
+            ->addTranslationsField([
+                'required'     => false,
+                'form_options' => [
+                    'variant_mode' => true,
+                ],
+            ])
             ->addReferencesField()
             ->addVariableField()
             ->addAttributesField()
             ->addMediasField()
-
             // Pricing
             ->addNetPriceField()
             ->addTaxGroupField([
                 'allow_new' => false,
-                'required' => false,
-                'disabled' => true,
+                'required'  => false,
+                'disabled'  => true,
             ])
             ->addOptionGroupsField();
     }
@@ -177,7 +180,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addTranslationsField()
             ->addMediasField()
-
             // Pricing
             ->addNetPriceField([
                 'required' => false,
@@ -185,11 +187,10 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addTaxGroupField([
                 'allow_new' => false,
-                'required' => false,
-                'disabled' => true,
+                'required'  => false,
+                'disabled'  => true,
             ])
             ->addBundleSlotsField()
-
             // Seo
             ->addSeoField();
     }
@@ -211,7 +212,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addTranslationsField()
             ->addMediasField()
-
             // Pricing
             ->addNetPriceField([
                 'required' => false,
@@ -219,13 +219,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addTaxGroupField([
                 'allow_new' => false,
-                'required' => false,
-                'disabled' => true,
+                'required'  => false,
+                'disabled'  => true,
             ])
             ->addBundleSlotsField([
                 'configurable' => true,
             ])
-
             // Seo
             ->addSeoField();
     }

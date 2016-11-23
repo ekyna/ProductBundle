@@ -4,22 +4,23 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Component\Commerce\Pricing\Model as PricingModel;
+use Ekyna\Component\Commerce\Pricing\Model as Pricing;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
-use Ekyna\Component\Resource\Model as ResourceModel;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface ProductInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method ProductTranslationInterface translate($locale = null, $create = false)
  */
 interface ProductInterface extends
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
-    ResourceModel\ResourceInterface,
-    ResourceModel\TranslatableInterface,
-    ResourceModel\TimestampableInterface ,
-    PricingModel\TaxableInterface,
+    RM\TranslatableInterface,
+    RM\TimestampableInterface ,
+    Pricing\TaxableInterface,
     StockSubjectInterface
 {
     /**
@@ -393,6 +394,22 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setDesignation($designation);
+
+    /**
+     * Returns the attributes (auto-generated) designation.
+     *
+     * @return string
+     */
+    public function getAttributesDesignation();
+
+    /**
+     * Sets the attributes (auto-generated) designation.
+     *
+     * @param string $attributesDesignation
+     *
+     * @return $this|ProductInterface
+     */
+    public function setAttributesDesignation($attributesDesignation);
 
     /**
      * Returns the reference.

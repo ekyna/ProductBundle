@@ -19,7 +19,7 @@ interface BrandInterface
             MediaSubjectInterface,
             ResourceModel\SortableInterface,
             ResourceModel\TimestampableInterface,
-            ResourceModel\ResourceInterface
+            ResourceModel\TranslatableInterface
 {
     /**
      * Returns the name.

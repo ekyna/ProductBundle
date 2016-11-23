@@ -2,14 +2,14 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Ekyna\Component\Resource\Model\TranslationInterface;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Interface ProductTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface ProductTranslationInterface extends TranslationInterface
+interface ProductTranslationInterface extends RM\TranslationInterface
 {
     /**
      * Returns the title.
@@ -26,6 +26,22 @@ interface ProductTranslationInterface extends TranslationInterface
      * @return $this|ProductTranslationInterface
      */
     public function setTitle($title);
+
+    /**
+     * Returns the attributes (auto-generated) title.
+     *
+     * @return string
+     */
+    public function getAttributesTitle();
+
+    /**
+     * Sets the attributes (auto-generated) title.
+     *
+     * @param string $attributesTitle
+     *
+     * @return $this|ProductTranslationInterface
+     */
+    public function setAttributesTitle($attributesTitle);
 
     /**
      * Returns the description.

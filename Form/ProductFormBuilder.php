@@ -127,9 +127,12 @@ class ProductFormBuilder
     {
         ProductTypes::assertVariant($this->product);
 
+        $attributeSet = $this->product->getParent()->getAttributeSet();
+
         $options = array_replace([
             'label'         => 'ekyna_product.attribute.label.plural',
-            'attribute_set' => $this->product->getParent()->getAttributeSet(),
+            'attribute_set' => $attributeSet,
+            'required'      => $attributeSet->hasRequiredSlot(),
         ], $options);
 
         $this->form->add('attributes', PR\ProductAttributesType::class, $options);
@@ -327,7 +330,7 @@ class ProductFormBuilder
     public function addSeoField(array $options = [])
     {
         $options = array_replace([
-            'label' => false,
+            'label'    => false,
             'required' => $this->product->getType() != ProductTypes::TYPE_VARIANT,
         ], $options);
 

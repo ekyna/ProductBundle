@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
+use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Validator\Constraint;
@@ -15,6 +16,22 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class VariantValidator extends ConstraintValidator
 {
+    /**
+     * @var LocaleProviderInterface
+     */
+    private $localeProvider;
+
+
+    /**
+     * Constructor.
+     *
+     * @param LocaleProviderInterface $localeProvider
+     */
+    public function __construct(LocaleProviderInterface $localeProvider)
+    {
+        $this->localeProvider = $localeProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,6 +75,7 @@ class VariantValidator extends ConstraintValidator
         $validGroups = [];
         $slotsCounts = [];
         $totalCount = 0;
+        $hasRequiredSlot = false;
 
         // Gather attributes count per slot, and total attributes count.
         foreach ($attributeSet->getSlots() as $slot) {
@@ -70,9 +88,43 @@ class VariantValidator extends ConstraintValidator
                 }
             }
 
+            if ($slot->isRequired()) {
+                $hasRequiredSlot = true;
+            }
+
             $validGroups[] = $group;
             $slotsCounts[] = [$slot, $count];
             $totalCount += $count;
+        }
+
+        // If no attributes (and no required slots), attributesDesignation and attributesTitle (translations)
+        // can't be auto-generated, so we need the user to provide them
+        if (!$hasRequiredSlot && 0 == $attributes->count()) {
+            // Designation
+            if (0 == strlen($variant->getDesignation())) {
+                $this->context
+                    ->buildViolation($constraint->designationNeeded)
+                    ->atPath('designation')
+                    ->addViolation();
+            }
+
+            // Translations title
+            foreach ($this->localeProvider->getAvailableLocales() as $locale) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface $translation */
+                if (null !== $translation = $variant->getTranslations()->get($locale)) {
+                    if (0 == strlen($translation->getTitle())) {
+                        $this->context
+                            ->buildViolation($constraint->translationTitleNeeded)
+                            ->atPath('translations['. $locale . '].title')
+                            ->addViolation();
+                    }
+                } elseif ($locale == $this->localeProvider->getFallbackLocale()) {
+                    $this->context
+                        ->buildViolation($constraint->translationTitleNeeded)
+                        ->atPath('translations['. $locale . '].title')
+                        ->addViolation();
+                }
+            }
         }
 
         foreach ($slotsCounts as $data) {

@@ -125,4 +125,18 @@ class AttributeSet implements Model\AttributeSetInterface
 
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasRequiredSlot()
+    {
+        foreach ($this->slots as $slot) {
+            if ($slot->isRequired()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
