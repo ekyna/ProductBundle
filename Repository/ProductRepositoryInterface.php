@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
 
 /**
@@ -17,16 +17,35 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      *
      * @param int $id
      *
-     * @return ProductInterface|null
+     * @return Model\ProductInterface|null
      */
     public function findOneById($id);
 
     /**
      * Finds the parents products of the given bundled product.
      *
-     * @param ProductInterface $bundled
+     * @param Model\ProductInterface $bundled
      *
-     * @return array|ProductInterface[]
+     * @return array|Model\ProductInterface[]
      */
-    public function findParentsByBundled(ProductInterface $bundled);
+    public function findParentsByBundled(Model\ProductInterface $bundled);
+
+    /**
+     * Finds products by category, optionally including children categories.
+     *
+     * @param Model\CategoryInterface $category
+     * @param bool              $recursive
+     *
+     * @return array|Model\ProductInterface[]
+     */
+    public function findByCategory(Model\CategoryInterface $category, $recursive = false);
+
+    /**
+     * Finds products by brand.
+     *
+     * @param Model\BrandInterface $brand
+     *
+     * @return array|Model\ProductInterface[]
+     */
+    public function findByBrand(Model\BrandInterface $brand);
 }

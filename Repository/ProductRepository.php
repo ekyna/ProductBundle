@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
 /**
@@ -23,7 +23,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
-    public function findParentsByBundled(ProductInterface $bundled)
+    public function findParentsByBundled(Model\ProductInterface $bundled)
     {
         $qb = $this->getQueryBuilder();
 
@@ -33,6 +33,61 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->eq('choice.product', ':bundled'))
             ->setParameter('bundled', $bundled)
             ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findByCategory(Model\CategoryInterface $category, $recursive = false)
+    {
+        $qb = $this->getCollectionQueryBuilder();
+
+        $query = $qb
+            ->andWhere($qb->expr()->in('o.category', ':categories'))
+            ->andWhere($qb->expr()->in('o.type', ':types'))
+            ->getQuery();
+
+        $categories = [$category];
+        if ($recursive) {
+            $categories = array_merge($categories, $category->getChildren()->toArray());
+        };
+
+        return $query
+            ->setParameters([
+                'categories' => $categories,
+                'types' => [
+                    Model\ProductTypes::TYPE_SIMPLE,
+                    Model\ProductTypes::TYPE_VARIABLE,
+                    Model\ProductTypes::TYPE_BUNDLE,
+                    Model\ProductTypes::TYPE_CONFIGURABLE,
+                ]
+            ])
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findByBrand(Model\BrandInterface $brand)
+    {
+        $qb = $this->getCollectionQueryBuilder();
+
+        $query = $qb
+            ->andWhere($qb->expr()->eq('o.brand', ':brand'))
+            ->andWhere($qb->expr()->in('o.type', ':types'))
+            ->getQuery();
+
+        return $query
+            ->setParameters([
+                'brand' => $brand,
+                'types' => [
+                    Model\ProductTypes::TYPE_SIMPLE,
+                    Model\ProductTypes::TYPE_VARIABLE,
+                    Model\ProductTypes::TYPE_BUNDLE,
+                    Model\ProductTypes::TYPE_CONFIGURABLE,
+                ]
+            ])
             ->getResult();
     }
 }
