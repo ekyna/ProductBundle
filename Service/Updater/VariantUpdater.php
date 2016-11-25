@@ -70,9 +70,11 @@ class VariantUpdater
                         if (null !== $aTrans = $attribute->getTranslations()->get($locale)) {
                             if (0 < strlen($title = $aTrans->getTitle())) {
                                 $titles[] = $title;
-                                $found = true;
                             }
+                        } else {
+                            // TODO missing trans ?
                         }
+                        $found = true;
                         if (!$slot->isMultiple()) {
                             continue 2;
                         }

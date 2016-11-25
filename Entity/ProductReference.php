@@ -90,7 +90,7 @@ class ProductReference implements ProductReferenceInterface
      */
     public function setNumber($number)
     {
-        $this->number = $number;
+        $this->number = (string)$number;
 
         return $this;
     }
