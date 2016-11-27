@@ -6,8 +6,8 @@ fos_elastica:
                     serializer:
                         groups: [Search]
                     mappings:
-                        reference: { type: string }
-                        references: { type: string }
+                        reference: {type: string, search_analyzer: search, index_analyzer: index}
+                        references: {type: string, search_analyzer: search, index_analyzer: index}
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string
@@ -39,9 +39,6 @@ fos_elastica:
                 ekyna_product_brand:
                     serializer:
                         groups: [Search]
-                    mappings:
-                        reference: { type: string }
-                        references: { type: string }
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string
@@ -73,9 +70,6 @@ fos_elastica:
                 ekyna_product_category:
                     serializer:
                         groups: [Search]
-                    mappings:
-                        reference: { type: string }
-                        references: { type: string }
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string

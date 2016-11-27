@@ -30,9 +30,10 @@ class ProductRepository extends Repository implements SearchRepositoryInterface
             $query
                 ->setQuery($expression)
                 ->setFields([
+                    'reference^5',
                     'references^5',
-                    'title^3',
                     'designation^3',
+                    'translations.*.title^3',
                     'brand.name',
                     'category.name',
                 ]);
