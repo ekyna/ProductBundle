@@ -36,24 +36,32 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
 
         if (in_array('Default', $groups)) {
 
-            $data['brand'] = $product->getBrand()->getId();
+            // Brand
+            if (null !== $brand = $product->getBrand()) {
+                $data['brand'] = $brand->getId();
+            }
 
+            // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
                 return $c->getId();
             }, $product->getCategories()->toArray());
 
+            // References
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
                 return $this->normalizeObject($r, $format, $context);
             }, $product->getReferences()->toArray());
 
         } elseif (in_array('Search', $groups)) {
 
-            $brand = $product->getBrand();
-            $data['brand'] = [
-                'id'   => $brand->getId(),
-                'name' => $brand->getName(),
-            ];
+            // Brand
+            if (null !== $brand = $product->getBrand()) {
+                $data['brand'] = [
+                    'id'   => $brand->getId(),
+                    'name' => $brand->getName(),
+                ];
+            }
 
+            // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
                 return [
                     'id'   => $c->getId(),
@@ -61,6 +69,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
                 ];
             }, $product->getCategories()->toArray());
 
+            // References
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
                 return $r->getNumber();
             }, $product->getReferences()->toArray());
