@@ -178,20 +178,22 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the category field.
+     * Adds the categories field.
      *
      * @param array $options
      *
      * @return ProductFormBuilder
      */
-    public function addCategoryField(array $options = [])
+    public function addCategoriesField(array $options = [])
     {
         $options = array_replace([
+            'label'     => 'ekyna_product.category.label.plural',
+            'multiple'  => true,
             'allow_new' => true,
             'required'  => true,
         ], $options);
 
-        $this->form->add('category', PR\CategoryChoiceType::class, $options);
+        $this->form->add('categories', PR\CategoryChoiceType::class, $options);
 
         return $this;
     }
@@ -370,6 +372,10 @@ class ProductFormBuilder
             'form_type'      => PR\ProductTranslationType::class,
             'label'          => false,
             'error_bubbling' => false,
+            'attr'           => [
+                'label_col'  => 0,
+                'widget_col' => 12,
+            ],
         ], $options);
 
         $this->form->add('translations', TranslationsFormsType::class, $options);

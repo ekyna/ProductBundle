@@ -564,9 +564,10 @@
             </constraint>
         </property>
 
-        <!-- Category (null for variants) -->
-        <property name="category">
-            <constraint name="NotNull">
+        <!-- Categories (none for variants) -->
+        <property name="categories">
+            <constraint name="Count">
+                <option name="min">1</option>
                 <option name="groups">
                     <value>simple</value>
                     <value>variable</value>
@@ -574,7 +575,8 @@
                     <value>configurable</value>
                 </option>
             </constraint>
-            <constraint name="IsNull">
+            <constraint name="Count">
+                <option name="max">0</option>
                 <option name="groups">
                     <value>variant</value>
                 </option>

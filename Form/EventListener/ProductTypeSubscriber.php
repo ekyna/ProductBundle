@@ -85,7 +85,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->builder
             ->addDesignationField()
             ->addBrandField()
-            ->addCategoryField()
+            ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField()
             ->addReferencesField()
@@ -106,11 +106,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
-            ->addCategoryField()
-            ->addReferenceField([
-                'required' => false,
-                'disabled' => true,
-            ])
+            ->addCategoriesField()
+            ->addReferenceField()
             ->addWeightField([
                 'required' => false,
                 'disabled' => true,
@@ -172,7 +169,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
-            ->addCategoryField()
+            ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
                 'required' => false,
@@ -204,7 +201,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
-            ->addCategoryField()
+            ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
                 'required' => false,

@@ -104,9 +104,16 @@
             <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
         </many-to-one>
 
-        <many-to-one field="category" target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface">
-            <join-column name="category_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
-        </many-to-one>
+        <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface" field="categories">
+            <join-table name="product_product_category">
+                <join-columns>
+                    <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="category_id" referenced-column-name="id" on-delete="RESTRICT"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attributes">
             <join-table name="product_product_attribute">

@@ -4,9 +4,7 @@
 
 {% block general_content %}
     {{ parent() }}
-    {{ macros.show_reference_and_weight(product) }}
     {{ macros.show_translations(product) }}
-    {{ macros.show_references(product) }}
     {{ macros.show_variable(product) }}
     {{ macros.show_attributes(product) }}
     {{ macros.show_medias(product) }}
@@ -15,6 +13,7 @@
 
 {% block pricing_content %}
     {{ parent() }}
+    {{ macros.show_references(product) }}
     {{ macros.show_option_groups(product) }}
 {% endblock pricing_content %}
 

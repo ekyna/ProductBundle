@@ -76,9 +76,9 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     protected $brand;
 
     /**
-     * @var Model\CategoryInterface
+     * @var ArrayCollection|Model\CategoryInterface[]
      */
-    protected $category;
+    protected $categories;
 
     /**
      * @var ArrayCollection|Model\ProductMediaInterface[]
@@ -138,6 +138,7 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     {
         parent::__construct();
 
+        $this->categories = new ArrayCollection();
         $this->variants = new ArrayCollection();
         $this->attributes = new ArrayCollection();
         $this->optionGroups = new ArrayCollection();
@@ -534,17 +535,49 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getCategory()
+    public function getCategories()
     {
-        return $this->category;
+        return $this->categories;
     }
 
     /**
      * @inheritdoc
      */
-    public function setCategory(Model\CategoryInterface $category)
+    public function hasCategory(Model\CategoryInterface $category)
     {
-        $this->category = $category;
+        return $this->categories->contains($category);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addCategory(Model\CategoryInterface $category)
+    {
+        if (!$this->hasCategory($category)) {
+            $this->categories->add($category);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeCategory(Model\CategoryInterface $category)
+    {
+        if ($this->hasCategory($category)) {
+            $this->categories->removeElement($category);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCategories(ArrayCollection $categories)
+    {
+        $this->categories = $categories;
 
         return $this;
     }

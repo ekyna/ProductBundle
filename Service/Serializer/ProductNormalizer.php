@@ -38,7 +38,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
 
             $data['brand'] = $product->getBrand()->getId();
 
-            $data['category'] = $product->getCategory()->getId();
+            $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
+                return $c->getId();
+            }, $product->getCategories()->toArray());
 
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
                 return $this->normalizeObject($r, $format, $context);
@@ -48,15 +50,16 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
 
             $brand = $product->getBrand();
             $data['brand'] = [
-                'id' => $brand->getId(),
+                'id'   => $brand->getId(),
                 'name' => $brand->getName(),
             ];
 
-            $category = $product->getCategory();
-            $data['category'] = [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-            ];
+            $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
+                return [
+                    'id'   => $c->getId(),
+                    'name' => $c->getName(),
+                ];
+            }, $product->getCategories()->toArray());
 
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
                 return $r->getNumber();

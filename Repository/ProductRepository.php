@@ -44,7 +44,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $qb = $this->getCollectionQueryBuilder();
 
         $query = $qb
-            ->andWhere($qb->expr()->in('o.category', ':categories'))
+            ->andWhere($qb->expr()->isMemberOf(':categories', 'o.categories'))
             ->andWhere($qb->expr()->in('o.type', ':types'))
             ->getQuery();
 

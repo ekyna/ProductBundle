@@ -34,6 +34,7 @@
                 <div class="tab-pane" id="product-pricing">
                 {% block pricing_content %}
                     {{ macros.show_net_price_and_tax_group(product) }}
+                    {{ macros.show_reference_and_weight(product) }}
                 {% endblock pricing_content %}
                 </div>
             {% endblock pricing_pane %}

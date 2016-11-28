@@ -262,20 +262,47 @@ interface ProductInterface extends
     public function setBrand(BrandInterface $brand);
 
     /**
-     * Returns the category.
+     * Returns the categories.
      *
-     * @return CategoryInterface
+     * @return ArrayCollection|CategoryInterface[]
      */
-    public function getCategory();
+    public function getCategories();
 
     /**
-     * Sets the category.
+     * Returns whether the product has the given category.
+     *
+     * @param CategoryInterface $category
+     *
+     * @return bool
+     */
+    public function hasCategory(CategoryInterface $category);
+
+    /**
+     * Adds the category.
      *
      * @param CategoryInterface $category
      *
      * @return $this|ProductInterface
      */
-    public function setCategory(CategoryInterface $category);
+    public function addCategory(CategoryInterface $category);
+
+    /**
+     * Removes the category.
+     *
+     * @param CategoryInterface $category
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeCategory(CategoryInterface $category);
+
+    /**
+     * Sets the categories.
+     *
+     * @param ArrayCollection|CategoryInterface[] $categories
+     *
+     * @return $this|ProductInterface
+     */
+    public function setCategories(ArrayCollection $categories);
 
     /**
      * Returns whether or not the product has the media.

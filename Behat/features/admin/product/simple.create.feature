@@ -18,7 +18,7 @@ Feature: Create simple products
 
         And I fill in "product[designation]" with "iPhone 6"
         And I select "Apple" from "product[brand]"
-        And I select "Smartphones" from "product[category]"
+        And I select "Smartphones" from "product[categories][]"
         And I fill in "product[reference]" with "APPL-IPHO-6"
         And I fill in "product[weight]" with "0.3"
 

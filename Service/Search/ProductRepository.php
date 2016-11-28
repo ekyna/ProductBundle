@@ -35,7 +35,7 @@ class ProductRepository extends Repository implements SearchRepositoryInterface
                     'designation^3',
                     'translations.*.title^3',
                     'brand.name',
-                    'category.name',
+                    'categories.name',
                 ]);
         }
 

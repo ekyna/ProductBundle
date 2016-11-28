@@ -15,8 +15,8 @@
 
 {% block general_content %}
     {{ parent() }}
-    {{ macros.show_brand_and_category(product) }}
-    {{ macros.show_reference_and_weight(product) }}
+    {{ macros.show_brand(product) }}
+    {{ macros.show_categories(product) }}
     {{ macros.show_translations(product) }}
     {{ macros.show_medias(product) }}
 {% endblock general_content %}
@@ -25,5 +25,6 @@
 {% block pricing_content %}
     {{ parent() }}
     {#{{ macros.show_option_groups(product) }}#}
+    <hr>
     {{ macros.show_bundle_composition(product) }}
 {% endblock pricing_content %}
