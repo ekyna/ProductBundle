@@ -40,6 +40,20 @@ interface CategoryInterface extends
     public function getName();
 
     /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
+
+    /**
+     * Returns the (translated) description.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
      * Returns whether or not the category has the given child.
      *
      * @param CategoryInterface $child

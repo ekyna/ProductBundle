@@ -27,6 +27,14 @@ ekyna_product_brand_admin_edit:
     requirements:
         brandId: \d+
 
+ekyna_product_brand_admin_tinymce:
+    path: /{brandId}/tinymce
+    defaults: { _controller: "ekyna_product.brand.controller:tinymceAction", field: description }
+    methods: [GET]
+    requirements:
+        field: "[a-zA-Z0-9]+"
+        brandId: \d+
+
 ekyna_product_brand_admin_move_up:
     path: /{brandId}/moveup
     defaults: { _controller: "ekyna_product.brand.controller:moveUpAction" }

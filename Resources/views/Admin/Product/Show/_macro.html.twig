@@ -52,7 +52,12 @@
     {{ show_translations_row(product.translations, {
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},
-            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+            'description': {
+                'label': 'ekyna_core.field.description',
+                'type': 'tinymce',
+                'content': path('ekyna_product_product_admin_tinymce', {'productId': product.id}),
+                'options': {'height': 150}
+            }
         }
     }) }}
 {% endspaceless %}
@@ -286,9 +291,8 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-configurable">
             {% if product is configurable_product %}
-
                 {% for slot in product.bundleSlots %}
-                    <div class="slot">
+                <div class="slot">
                     {{ show_translations_row(slot.translations, {
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
@@ -322,7 +326,7 @@
                         {% endfor %}
                     </table>
 
-                    </div>
+                </div>
                 {% endfor %}
 
                 <p class="total">

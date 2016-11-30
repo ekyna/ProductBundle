@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
-use Ekyna\Bundle\AdminBundle\Controller\Resource\NestedTrait;
+use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 
 /**
  * Class CategoryController
@@ -12,5 +12,6 @@ use Ekyna\Bundle\AdminBundle\Controller\Resource\NestedTrait;
  */
 class CategoryController extends ResourceController
 {
-    use NestedTrait;
+    use RC\NestedTrait,
+        RC\TinymceTrait;
 }

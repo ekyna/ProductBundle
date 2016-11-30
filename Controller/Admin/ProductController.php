@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
-//use Ekyna\Bundle\AdminBundle\Controller\Resource\ToggleableTrait;
+use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -15,6 +15,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
  */
 class ProductController extends ResourceController
 {
+    use RC\TinymceTrait;
     //use ToggleableTrait;
 
     /**

@@ -16,6 +16,10 @@
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
         <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
         <parameter key="ekyna_product.product.form_type.event_subscriber.class">Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber</parameter>
+
+        <parameter key="ekyna_product.product.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository</parameter>
+        <parameter key="ekyna_product.brand.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository</parameter>
+        <parameter key="ekyna_product.category.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\CategoryRepository</parameter>
     </parameters>
 
     <services>
@@ -227,6 +231,26 @@
             <argument type="service" id="ekyna_core.locale_provider.request"/>
             <tag name="validator.constraint_validator" />
         </service>
+
+        <!-- Search -->
+        <!-- TODO <service id="ekyna_product.category.search_repository"
+                 class="%ekyna_product.category.search_repository.class%">
+            <factory service="fos_elastica.manager" method="getRepository"/>
+            <argument>%ekyna_product.category.class%</argument>
+            <tag name="ekyna_cms.wide_search.provider"/>
+        </service>
+        <service id="ekyna_product.brand.search_repository"
+                 class="%ekyna_product.brand.search_repository.class%">
+            <factory service="fos_elastica.manager" method="getRepository"/>
+            <argument>%ekyna_product.brand.class%</argument>
+            <tag name="ekyna_cms.wide_search.provider"/>
+        </service>
+        <service id="ekyna_product.product.search_repository"
+                 class="%ekyna_product.product.search_repository.class%">
+            <factory service="fos_elastica.manager" method="getRepository"/>
+            <argument>%ekyna_product.product.class%</argument>
+            <tag name="ekyna_cms.wide_search.provider"/>
+        </service>-->
 
         <!-- Serialization -->
         <service id="ekyna_product.serializer.product_normalizer"

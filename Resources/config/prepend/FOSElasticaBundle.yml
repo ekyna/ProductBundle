@@ -35,7 +35,7 @@ fos_elastica:
                             batch_size: 25
                         listener: ~
                         finder: ~
-                        repository: Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository
+                        repository: "%ekyna_product.product.search_repository.class%"
                 ekyna_product_brand:
                     serializer:
                         groups: [Search]
@@ -66,7 +66,7 @@ fos_elastica:
                             batch_size: 25
                         listener: ~
                         finder: ~
-#                        repository: Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository
+                        repository: "%ekyna_product.brand.search_repository.class%"
                 ekyna_product_category:
                     serializer:
                         groups: [Search]
@@ -97,5 +97,5 @@ fos_elastica:
                             batch_size: 25
                         listener: ~
                         finder: ~
-#                        repository: Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository
+                        repository: "%ekyna_product.category.search_repository.class%"
 

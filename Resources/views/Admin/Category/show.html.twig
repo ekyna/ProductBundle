@@ -34,7 +34,12 @@
                 {{ show_translations_row(category.translations, {
                     'fields': {
                         'title': {'label': 'ekyna_core.field.title'},
-                        'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+                        'description': {
+                            'label': 'ekyna_core.field.description',
+                            'type': 'tinymce',
+                            'content': path('ekyna_product_category_admin_tinymce', {'categoryId': category.id}),
+                            'options': {'height': 100}
+                        }
                     }
                 }) }}
                 {{ show_row(category.media, 'media', 'ekyna_core.field.image') }}

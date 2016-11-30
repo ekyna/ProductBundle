@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
-use Ekyna\Bundle\AdminBundle\Controller\Resource\SortableTrait;
+use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 
 /**
@@ -12,5 +12,6 @@ use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
  */
 class BrandController extends ResourceController
 {
-    use SortableTrait;
+    use RC\SortableTrait,
+        RC\TinymceTrait;
 }

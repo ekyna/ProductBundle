@@ -94,6 +94,22 @@ class Category extends ResourceModel\AbstractTranslatable implements Model\Categ
     /**
      * @inheritdoc
      */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription()
+    {
+        return $this->translate()->getDescription();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function hasChild(Model\CategoryInterface $child)
     {
         return $this->children->contains($child);

@@ -41,6 +41,11 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
                 $data['brand'] = $brand->getId();
             }
 
+            // Seo
+            if (null !== $seo = $product->getSeo()) {
+                $data['seo'] = $seo->getId();
+            }
+
             // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
                 return $c->getId();
@@ -59,6 +64,11 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
                     'id'   => $brand->getId(),
                     'name' => $brand->getName(),
                 ];
+            }
+
+            // Seo
+            if (null !== $seo = $product->getSeo()) {
+                $data['seo'] = $this->normalizeObject($seo, $format, $context);
             }
 
             // Categories

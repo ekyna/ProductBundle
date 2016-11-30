@@ -20,9 +20,21 @@ class CategoryNormalizer extends AbstractTranslatableNormalizer
         $data = parent::normalize($category, $format, $context);
 
         /** @var Model\CategoryInterface $category */
-        //$groups = isset($context['groups']) ? (array)$context['groups'] : [];
+        $groups = isset($context['groups']) ? (array)$context['groups'] : [];
 
         $data['name'] = $category->getName();
+
+        if (in_array('Default', $groups)) {
+            // Seo
+            if (null !== $seo = $category->getSeo()) {
+                $data['seo'] = $seo->getId();
+            }
+        } elseif (in_array('Search', $groups)) {
+            // Seo
+            if (null !== $seo = $category->getSeo()) {
+                $data['seo'] = $this->normalizeObject($seo, $format, $context);
+            }
+        }
 
         return $data;
     }

@@ -7,11 +7,11 @@ use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderAwareTrait;
 use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
 
 /**
- * Class ProductRepository
+ * Class BrandRepository
  * @package Ekyna\Bundle\CommerceBundle\Search
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class ProductRepository extends ResourceRepository implements LocaleProviderAwareInterface
+class BrandRepository extends ResourceRepository implements LocaleProviderAwareInterface
 {
     use LocaleProviderAwareTrait;
 
@@ -23,13 +23,9 @@ class ProductRepository extends ResourceRepository implements LocaleProviderAwar
         $locale = $this->localeProvider->getCurrentLocale();
 
         return [
-            'reference^5',
-            'references^5',
-            'designation^3',
+            'name^5',
             'translations.'.$locale.'.title^3',
             'seo.translations.'.$locale.'.title^3',
-            'brand.name',
-            'categories.name',
             'translations.'.$locale.'.description',
             'seo.translations.'.$locale.'.description',
         ];
