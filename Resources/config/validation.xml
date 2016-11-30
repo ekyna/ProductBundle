@@ -381,10 +381,6 @@
                 <option name="groups">
                     <value>simple</value>
                     <value>variant</value>
-                </option>
-            </constraint>
-            <constraint name="IsNull">
-                <option name="groups">
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
