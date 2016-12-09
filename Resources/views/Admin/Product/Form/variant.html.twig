@@ -3,7 +3,7 @@
 
 {% block general_content %}
     {{ parent() }}
-    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+    {{ form_row(form.translations) }}
     {{ form_row(form.variable) }}
     {{ form_row(form.attributes) }}
     {{ form_row(form.medias) }}

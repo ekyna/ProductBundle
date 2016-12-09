@@ -18,16 +18,17 @@ class AttributeSetType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'number', [
+            ->addColumn('id', 'id', [
                 'sortable' => true,
             ])
-            ->addColumn('name', 'anchor', array(
+            ->addColumn('name', 'anchor', [
                 'label'                => 'ekyna_core.field.name',
                 'property_path'        => null,
                 'sortable'             => true,
                 'route_name'           => 'ekyna_product_attribute_set_admin_show',
                 'route_parameters_map' => ['attributeSetId' => 'id'],
-            ))
+                'position'             => 10,
+            ])
             ->addColumn('actions', 'admin_actions', [
                 'buttons' => [
                     [
@@ -48,7 +49,8 @@ class AttributeSetType extends ResourceTableType
             ])
             ->addFilter('id', 'number')
             ->addFilter('name', 'text', [
-                'label' => 'ekyna_core.field.name',
+                'label'    => 'ekyna_core.field.name',
+                'position' => 10,
             ]);
     }
 

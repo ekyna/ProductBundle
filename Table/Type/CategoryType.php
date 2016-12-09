@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class CategoryType
  * @package Ekyna\Bundle\ProductBundle\Table\Type
- * @author Étienne Dauvergne <contact@ekyna.com>
+ * @author  Étienne Dauvergne <contact@ekyna.com>
  */
 class CategoryType extends ResourceTableType
 {
@@ -19,47 +19,49 @@ class CategoryType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
+            ->addColumn('id', 'id')
             ->addColumn('name', 'nested_anchor', [
-                'label' => 'ekyna_core.field.name',
-                'route_name' => 'ekyna_product_category_admin_show',
+                'label'                => 'ekyna_core.field.name',
+                'route_name'           => 'ekyna_product_category_admin_show',
                 'route_parameters_map' => [
-                    'categoryId' => 'id'
+                    'categoryId' => 'id',
                 ],
+                'position' => 10,
             ])
             ->addColumn('createdAt', 'datetime', [
                 'label' => 'ekyna_core.field.created_at',
+                'position' => 20,
             ])
             ->addColumn('actions', 'admin_nested_actions', [
-                'new_child_route' => 'ekyna_product_category_admin_new_child',
-                'move_up_route' => 'ekyna_product_category_admin_move_up',
-                'move_down_route' => 'ekyna_product_category_admin_move_down',
+                'new_child_route'       => 'ekyna_product_category_admin_new_child',
+                'move_up_route'         => 'ekyna_product_category_admin_move_up',
+                'move_down_route'       => 'ekyna_product_category_admin_move_down',
                 'routes_parameters_map' => [
-                    'categoryId' => 'id'
+                    'categoryId' => 'id',
                 ],
-                'buttons' => [
+                'buttons'               => [
                     [
-                        'label' => 'ekyna_core.button.edit',
-                        'icon' => 'pencil',
-                        'class' => 'warning',
-                        'route_name' => 'ekyna_product_category_admin_edit',
+                        'label'                => 'ekyna_core.button.edit',
+                        'icon'                 => 'pencil',
+                        'class'                => 'warning',
+                        'route_name'           => 'ekyna_product_category_admin_edit',
                         'route_parameters_map' => [
-                            'categoryId' => 'id'
+                            'categoryId' => 'id',
                         ],
-                        'permission' => 'edit',
+                        'permission'           => 'edit',
                     ],
                     [
-                        'label' => 'ekyna_core.button.remove',
-                        'icon' => 'trash',
-                        'class' => 'danger',
-                        'route_name' => 'ekyna_product_category_admin_remove',
+                        'label'                => 'ekyna_core.button.remove',
+                        'icon'                 => 'trash',
+                        'class'                => 'danger',
+                        'route_name'           => 'ekyna_product_category_admin_remove',
                         'route_parameters_map' => [
-                            'categoryId' => 'id'
+                            'categoryId' => 'id',
                         ],
-                        'permission' => 'delete',
+                        'permission'           => 'delete',
                     ],
                 ],
-            ])
-        ;
+            ]);
     }
 
     /**

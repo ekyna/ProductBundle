@@ -120,6 +120,16 @@
             <tag name="table.column_type" alias="ekyna_product_product_type"/>
         </service>
 
+        <!-- Product table type -->
+        <service id="ekyna_product.product.table_type"
+                 class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType">
+            <argument>%ekyna_product.product.class%</argument>
+            <argument>%ekyna_product.brand.class%</argument>
+            <argument>%ekyna_product.category.class%</argument>
+            <argument>%ekyna_commerce.tax_group.class%</argument>
+            <tag name="table.type" alias="ekyna_product_product"/>
+        </service>
+
         <!-- Twig extension -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">

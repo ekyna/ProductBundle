@@ -19,10 +19,12 @@ class AttributeType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
+            ->addColumn('id', 'id')
             ->addColumn('name', 'anchor', [
                 'label'                => 'ekyna_core.field.name',
                 'route_name'           => 'ekyna_product_attribute_admin_show',
                 'route_parameters_map' => ['attributeGroupId' => 'group.id', 'attributeId' => 'id'],
+                'position'             => 10,
             ])
             ->addColumn('actions', 'admin_actions', [
                 'buttons' => [
@@ -59,7 +61,8 @@ class AttributeType extends ResourceTableType
                 ],
             ])
             ->addFilter('name', 'text', [
-                'label' => 'ekyna_core.field.name',
+                'label'    => 'ekyna_core.field.name',
+                'position' => 10,
             ]);
     }
 
