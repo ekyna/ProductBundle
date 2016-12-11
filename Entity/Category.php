@@ -7,7 +7,7 @@ use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\CoreBundle\Model\TreeTrait;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model as ResourceModel;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class Category
@@ -16,13 +16,14 @@ use Ekyna\Component\Resource\Model as ResourceModel;
  *
  * @method Model\CategoryTranslationInterface translate($locale = null, $create = false)
  */
-class Category extends ResourceModel\AbstractTranslatable implements Model\CategoryInterface
+class Category extends RM\AbstractTranslatable implements Model\CategoryInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         MediaSubjectTrait,
         TreeTrait,
-        ResourceModel\TimestampableTrait;
+        RM\TimestampableTrait,
+        RM\TaggedEntityTrait;
 
     /**
      * @var integer
@@ -173,5 +174,13 @@ class Category extends ResourceModel\AbstractTranslatable implements Model\Categ
     protected function getTranslationClass()
     {
         return CategoryTranslation::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getEntityTagPrefix()
+    {
+        return 'ekyna_product.category';
     }
 }

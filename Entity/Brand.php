@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Component\Resource\Model as ResourceModel;
+use Ekyna\Component\Resource\Model as RM;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
@@ -14,13 +14,14 @@ use Ekyna\Bundle\ProductBundle\Model;
  *
  * @method Model\BrandTranslationInterface translate($locale = null, $create = false)
  */
-class Brand extends ResourceModel\AbstractTranslatable implements Model\BrandInterface
+class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         MediaSubjectTrait,
-        ResourceModel\SortableTrait,
-        ResourceModel\TimestampableTrait;
+        RM\SortableTrait,
+        RM\TimestampableTrait,
+        RM\TaggedEntityTrait;
 
     /**
      * @var int
@@ -91,5 +92,13 @@ class Brand extends ResourceModel\AbstractTranslatable implements Model\BrandInt
     protected function getTranslationClass()
     {
         return BrandTranslation::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getEntityTagPrefix()
+    {
+        return 'ekyna_product.brand';
     }
 }

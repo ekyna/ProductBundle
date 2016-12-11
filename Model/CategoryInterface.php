@@ -21,7 +21,8 @@ interface CategoryInterface extends
     MediaSubjectInterface,
     TreeInterface,
     RM\TimestampableInterface,
-    RM\TranslatableInterface
+    RM\TranslatableInterface,
+    RM\TaggedEntityInterface
 {
     /**
      * Sets the name.

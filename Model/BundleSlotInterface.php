@@ -9,6 +9,8 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  * Interface BundleSlotInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method BundleSlotTranslationInterface translate($locale = null, $create = false)
  */
 interface BundleSlotInterface extends TranslatableInterface
 {

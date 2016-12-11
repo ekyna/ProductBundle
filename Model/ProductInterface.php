@@ -19,7 +19,8 @@ interface ProductInterface extends
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
     RM\TranslatableInterface,
-    RM\TimestampableInterface ,
+    RM\TimestampableInterface,
+    RM\TaggedEntityInterface,
     Pricing\TaxableInterface,
     StockSubjectInterface
 {

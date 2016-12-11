@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Ekyna\Component\Resource\Model as ResourceModel;
+use Ekyna\Component\Resource\Model as RM;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
 
@@ -17,9 +17,10 @@ interface BrandInterface
     extends Cms\ContentSubjectInterface,
             Cms\SeoSubjectInterface,
             MediaSubjectInterface,
-            ResourceModel\SortableInterface,
-            ResourceModel\TimestampableInterface,
-            ResourceModel\TranslatableInterface
+            RM\SortableInterface,
+            RM\TimestampableInterface,
+            RM\TranslatableInterface,
+            RM\TaggedEntityInterface
 {
     /**
      * Returns the name.

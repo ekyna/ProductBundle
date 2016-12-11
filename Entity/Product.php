@@ -8,8 +8,7 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
-use Ekyna\Component\Resource\Model\AbstractTranslatable;
-use Ekyna\Component\Resource\Model\TimestampableTrait;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class Product
@@ -18,11 +17,12 @@ use Ekyna\Component\Resource\Model\TimestampableTrait;
  *
  * @method Model\ProductTranslationInterface translate($locale = null, $create = false)
  */
-class Product extends AbstractTranslatable implements Model\ProductInterface
+class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
     use Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
-        TimestampableTrait,
+        RM\TimestampableTrait,
+        RM\TaggedEntityTrait,
         StockSubjectTrait;
 
     /**
@@ -928,5 +928,13 @@ class Product extends AbstractTranslatable implements Model\ProductInterface
     protected function getTranslationClass()
     {
         return ProductTranslation::class;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getEntityTagPrefix()
+    {
+        return 'ekyna_product.product';
     }
 }
