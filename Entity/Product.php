@@ -698,30 +698,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    /*public function setTitle($title)
-    {
-        $this->translate()->setTitle($title);
-
-        return $this;
-    }*/
-
-    /**
-     * @inheritdoc
-     */
     public function getAttributesTitle()
     {
         return $this->translate()->getAttributesTitle();
     }
-
-    /**
-     * @inheritdoc
-     */
-    /*public function setAttributesTitle($title)
-    {
-        $this->translate()->setAttributesTitle($title);
-
-        return $this;
-    }*/
 
     /**
      * @inheritdoc
@@ -739,12 +719,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    /*public function setDescription($description)
+    public function getSlug()
     {
-        $this->translate()->setDescription($description);
-
-        return $this;
-    }*/
+        return $this->translate()->getSlug();
+    }
 
     /**
      * @inheritdoc

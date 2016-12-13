@@ -32,6 +32,11 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
      */
     protected $description;
 
+    /**
+     * @var string
+     */
+    protected $slug;
+
 
     /**
      * @inheritdoc
@@ -91,6 +96,24 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
 
         return $this;
     }

@@ -89,6 +89,14 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     /**
      * @inheritdoc
      */
+    public function getSlug()
+    {
+        return $this->translate()->getSlug();
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function getTranslationClass()
     {
         return BrandTranslation::class;

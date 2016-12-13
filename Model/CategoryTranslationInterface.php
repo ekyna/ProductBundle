@@ -42,4 +42,20 @@ interface CategoryTranslationInterface extends TranslationInterface
      * @return $this|CategoryTranslationInterface
      */
     public function setDescription($description);
+
+    /**
+     * Returns the slug (auto-generated).
+     *
+     * @return string
+     */
+    public function getSlug();
+
+    /**
+     * Sets the slug (auto-generated).
+     *
+     * @param string $slug
+     *
+     * @return $this|CategoryTranslationInterface
+     */
+    public function setSlug($slug);
 }

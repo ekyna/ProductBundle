@@ -27,6 +27,11 @@ class CategoryTranslation extends AbstractTranslation implements CategoryTransla
      */
     protected $description;
 
+    /**
+     * @var string
+     */
+    protected $slug;
+
 
     /**
      * @inheritdoc
@@ -68,6 +73,24 @@ class CategoryTranslation extends AbstractTranslation implements CategoryTransla
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
 
         return $this;
     }

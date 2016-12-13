@@ -111,6 +111,14 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     /**
      * @inheritdoc
      */
+    public function getSlug()
+    {
+        return $this->translate()->getSlug();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function hasChild(Model\CategoryInterface $child)
     {
         return $this->children->contains($child);

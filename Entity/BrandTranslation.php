@@ -27,6 +27,11 @@ class BrandTranslation extends AbstractTranslation implements BrandTranslationIn
      */
     protected $description;
 
+    /**
+     * @var string
+     */
+    protected $slug;
+
 
     /**
      * @inheritdoc
@@ -68,6 +73,24 @@ class BrandTranslation extends AbstractTranslation implements BrandTranslationIn
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
 
         return $this;
     }

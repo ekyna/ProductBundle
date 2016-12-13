@@ -93,6 +93,9 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\Brand">
         <property name="name">
             <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
         </property>
         <property name="translations">
             <constraint name="Count">
@@ -119,6 +122,9 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\BrandTranslation">
         <property name="title">
             <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
         </property>
     </class>
 
@@ -236,6 +242,9 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\Category">
         <property name="name">
             <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
         </property>
         <property name="translations">
             <constraint name="Count">
@@ -262,6 +271,9 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\CategoryTranslation">
         <property name="title">
             <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
         </property>
     </class>
 
@@ -403,7 +415,7 @@
             </constraint>
             <constraint name="Length">
                 <option name="min">3</option>
-                <option name="max">255</option>
+                <option name="max">128</option>
             </constraint>
         </property>
 
@@ -687,7 +699,7 @@
             </constraint>
             <constraint name="Length">
                 <option name="min">3</option>
-                <option name="max">255</option>
+                <option name="max">128</option>
             </constraint>
         </property>
     </class>
@@ -701,7 +713,7 @@
         </property>
         <property name="number">
             <constraint name="NotBlank"/>
-            <!-- TODO validate by regarding to the type -->
+            <!-- TODO validate regarding to the type -->
         </property>
 
         <!-- Unique number constraint -->

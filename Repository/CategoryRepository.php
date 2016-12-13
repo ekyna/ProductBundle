@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Ekyna\Bundle\ProductBundle\Entity\Category;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\TranslatableResourceRepositoryTrait;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
@@ -37,4 +38,36 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
 
         return $category;
     }*/
+
+    /**
+     * Finds the category by slug.
+     *
+     * @param string $slug
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\CategoryInterface|null
+     */
+    public function findOneBySlug($slug)
+    {
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true, 3600, Category::getEntityTagPrefix() . '[slug=' . $slug . ']')
+            ->setParameters([
+                'slug' => $slug
+            ])
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getAlias()
+    {
+        return 'c';
+    }
 }

@@ -58,4 +58,20 @@ interface ProductTranslationInterface extends RM\TranslationInterface
      * @return $this|ProductTranslationInterface
      */
     public function setDescription($description);
+
+    /**
+     * Returns the slug (auto-generated).
+     *
+     * @return string
+     */
+    public function getSlug();
+
+    /**
+     * Sets the slug (auto-generated).
+     *
+     * @param string $slug
+     *
+     * @return $this|ProductTranslationInterface
+     */
+    public function setSlug($slug);
 }

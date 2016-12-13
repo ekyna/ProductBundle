@@ -55,6 +55,13 @@ interface CategoryInterface extends
     public function getDescription();
 
     /**
+     * Returns the (translated) slug.
+     *
+     * @return string
+     */
+    public function getSlug();
+
+    /**
      * Returns whether or not the category has the given child.
      *
      * @param CategoryInterface $child

@@ -42,4 +42,20 @@ interface BrandTranslationInterface extends TranslationInterface
      * @return $this|BrandTranslationInterface
      */
     public function setDescription($description);
+
+    /**
+     * Returns the slug (auto-generated).
+     *
+     * @return string
+     */
+    public function getSlug();
+
+    /**
+     * Sets the slug (auto-generated).
+     *
+     * @param string $slug
+     *
+     * @return $this|BrandTranslationInterface
+     */
+    public function setSlug($slug);
 }

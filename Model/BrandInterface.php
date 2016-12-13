@@ -50,4 +50,11 @@ interface BrandInterface
      * @return string
      */
     public function getDescription();
+
+    /**
+     * Returns the (translated) slug.
+     *
+     * @return string
+     */
+    public function getSlug();
 }

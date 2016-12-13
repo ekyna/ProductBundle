@@ -2,13 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
-use Ekyna\Bundle\ProductBundle\Form\Type\ConfigurableSlotsType;
-use Ekyna\Bundle\CoreBundle\Form\Type\EntitySearchType;
+use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceSearchType;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type as Sf;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -55,21 +54,34 @@ class FormBuilder
      */
     public function buildItemForm(FormInterface $form, SaleItemInterface $item)
     {
-        $form->add('quantity', Type\IntegerType::class, [
+        /** @var ProductInterface $product */
+        $product = $item->getSubject();
+
+        // Variant : fallback to parent (Variable)
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            $product = $product->getParent();
+        }
+
+        // Variable : add variant choice form
+        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
+            $form->add('variant', Pr\VariantChoiceType::class, [
+                'variable' => $product,
+            ]);
+
+            // Configurable : add configuration form
+        } elseif ($product->getType() === ProductTypes::TYPE_CONFIGURABLE) {
+            $form->add('configuration', Pr\ConfigurableSlotsType::class, [
+                'bundle_slots' => $product->getBundleSlots()->toArray(),
+                'item'         => $item,
+            ]);
+        }
+
+        // Quantity
+        $form->add('quantity', Sf\IntegerType::class, [
             'label' => 'ekyna_core.field.quantity',
             'attr'  => [
                 'min' => 1,
             ],
         ]);
-
-        /** @var ProductInterface $product */
-        $product = $item->getSubject();
-
-        if ($product->getType() === ProductTypes::TYPE_CONFIGURABLE) {
-            $form->add('configuration', ConfigurableSlotsType::class, [
-                'bundle_slots' => $product->getBundleSlots()->toArray(),
-                'item'         => $item,
-            ]);
-        }
     }
 }

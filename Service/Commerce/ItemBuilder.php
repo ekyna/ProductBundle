@@ -50,6 +50,9 @@ class ItemBuilder
             case ProductTypes::TYPE_VARIANT:
                 $this->buildSimpleItem($item, $product, $data);
                 break;
+            case ProductTypes::TYPE_VARIABLE:
+                $this->buildVariableItem($item, $product, $data);
+                break;
             case ProductTypes::TYPE_BUNDLE:
                 $this->buildBundleItem($item, $product, $data);
                 break;
@@ -77,11 +80,40 @@ class ItemBuilder
         $this->setItemProduct($item, $product, $extraData);
 
         $item
-            ->setDesignation($product->getDesignation())
+            ->setDesignation((string) $product)
             ->setReference($product->getReference())
             ->setNetPrice($product->getNetPrice())
             ->setWeight($product->getWeight())
             ->setTaxGroup($product->getTaxGroup());
+    }
+
+    /**
+     * Builds the sale item form the variable product.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $product
+     * @param array             $extraData
+     */
+    protected function buildVariableItem(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    {
+        ProductTypes::assertVariable($product);
+
+        $variant = null;
+
+        if (0 < ($variantId = intval($item->getSubjectData('variant')))) {
+            foreach ($product->getVariants() as $v) {
+                if ($variantId == $v->getId()) {
+                    $variant = $v;
+                    break;
+                }
+            }
+        }
+
+        if (null === $variant) {
+            throw new RuntimeException("Failed to resolve variable's selected variant.");
+        }
+
+        $this->buildSimpleItem($item, $variant, $extraData);
     }
 
     /**

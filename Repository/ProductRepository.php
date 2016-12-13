@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
@@ -18,6 +19,29 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     public function findOneById($id)
     {
         return $this->find($id);
+    }
+
+    /**
+     * Finds the product by slug.
+     *
+     * @param string $slug
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface|null
+     */
+    public function findOneBySlug($slug)
+    {
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true, 3600, Product::getEntityTagPrefix() . '[slug=' . $slug . ']')
+            ->setParameters([
+                'slug' => $slug
+            ])
+            ->getOneOrNullResult();
     }
 
     /**

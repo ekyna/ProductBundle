@@ -383,13 +383,11 @@ interface ProductInterface extends
     public function getTitle();
 
     /**
-     * Sets the (translated) title.
+     * Returns the (translated) attributes title.
      *
-     * @param string $title
-     *
-     * @return $this|ProductInterface
+     * @return string
      */
-    //public function setTitle($title);
+    public function getAttributesTitle();
 
     /**
      * Returns the (translated) description.
@@ -399,13 +397,11 @@ interface ProductInterface extends
     public function getDescription();
 
     /**
-     * Sets the (translated) description.
+     * Returns the (translated) slug.
      *
-     * @param string $description
-     *
-     * @return $this|ProductInterface
+     * @return string
      */
-    //public function setDescription($description);
+    public function getSlug();
 
     /**
      * Returns the designation.
