@@ -11,5 +11,11 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
  */
 class AttributeGroupRepository extends TranslatableResourceRepository
 {
-
+    /**
+     * @inheritdoc
+     */
+    protected function getAlias()
+    {
+        return 'ag';
+    }
 }

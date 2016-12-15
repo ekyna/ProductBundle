@@ -11,5 +11,4 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
  */
 class OptionRepository extends TranslatableResourceRepository
 {
-
 }

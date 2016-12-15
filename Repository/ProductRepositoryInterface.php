@@ -22,13 +22,22 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findOneById($id);
 
     /**
-     * Finds the parents products of the given bundled product.
+     * Finds the product by slug.
      *
-     * @param Model\ProductInterface $bundled
+     * @param string $slug
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findOneBySlug($slug);
+
+    /**
+     * Finds products by brand.
+     *
+     * @param Model\BrandInterface $brand
      *
      * @return array|Model\ProductInterface[]
      */
-    public function findParentsByBundled(Model\ProductInterface $bundled);
+    public function findByBrand(Model\BrandInterface $brand);
 
     /**
      * Finds products by category, optionally including children categories.
@@ -41,11 +50,39 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findByCategory(Model\CategoryInterface $category, $recursive = false);
 
     /**
-     * Finds products by brand.
+     * Finds the parents products of the given bundled product.
      *
-     * @param Model\BrandInterface $brand
+     * @param Model\ProductInterface $bundled
      *
      * @return array|Model\ProductInterface[]
      */
-    public function findByBrand(Model\BrandInterface $brand);
+    public function findParentsByBundled(Model\ProductInterface $bundled);
+
+    /**
+     * Loads the product's medias.
+     *
+     * @param Model\ProductInterface $product
+     */
+    public function loadMedias(Model\ProductInterface $product);
+
+    /**
+     * Loads the variable's variants.
+     *
+     * @param Model\ProductInterface $variable
+     */
+    public function loadVariants(Model\ProductInterface $variable);
+
+    /**
+     * Loads the bundles slots into the bundle product.
+     *
+     * @param Model\ProductInterface $bundle
+     */
+    public function loadBundleSlots(Model\ProductInterface $bundle);
+
+    /**
+     * Loads the bundles slots into the configurable product.
+     *
+     * @param Model\ProductInterface $configurable
+     */
+    public function loadConfigurableSlots(Model\ProductInterface $configurable);
 }

@@ -137,11 +137,17 @@
             <tag name="twig.extension"/>
         </service>
 
+        <!-- Product repository -->
+        <!--<service id="ekyna_product.product.repository"
+                 class="Ekyna\Bundle\ProductBundle\Repository\ProductRepository">
+            <factory service="doctrine.orm.default_entity_manager" method="getRepository"/>
+            <argument>%ekyna_product.product.class%</argument>
+        </service>-->
 
         <!-- Product form builder -->
         <service id="ekyna_product.product.form_builder"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder">
-            <argument>%ekyna_product.product.class%</argument>
+            <argument type="service" id="ekyna_product.product.repository"/>
         </service>
 
         <!-- Product item builder -->

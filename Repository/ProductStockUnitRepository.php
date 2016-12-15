@@ -27,8 +27,8 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->in('o.product', ':product'))
-            ->andWhere($qb->expr()->in('o.state', ':state'))
+            ->andWhere($qb->expr()->in('psu.product', ':product'))
+            ->andWhere($qb->expr()->in('psu.state', ':state'))
             ->setParameter('product', $subject)
             ->setParameter('state', [StockUnitStates::STATE_OPENED, StockUnitStates::STATE_PENDING])
             ->getQuery()
@@ -47,8 +47,8 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->in('o.product', ':product'))
-            ->andWhere($qb->expr()->in('o.state', ':states'))
+            ->andWhere($qb->expr()->in('psu.product', ':product'))
+            ->andWhere($qb->expr()->in('psu.state', ':states'))
             ->setParameter('product', $subject)
             ->setParameter('state', StockUnitStates::STATE_NEW)
             ->getQuery()
@@ -67,9 +67,18 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->eq('o.supplierOrderItem', ':item'))
+            ->andWhere($qb->expr()->eq('psu.supplierOrderItem', ':item'))
             ->setParameter('item', $item)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getAlias()
+    {
+        return 'psu';
     }
 }

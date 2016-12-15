@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Entity\Category;
+use Doctrine\ORM\Query\Expr;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\TranslatableResourceRepositoryTrait;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
@@ -10,34 +10,12 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 /**
  * Class CategoryRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
- * @author Étienne Dauvergne <contact@ekyna.com>
+ * @author  Étienne Dauvergne <contact@ekyna.com>
  */
 class CategoryRepository extends NestedTreeRepository implements TranslatableResourceRepositoryInterface
 {
     use TranslatableResourceRepositoryTrait;
 
-    /*public function findBySlug($categorySlug)
-    {
-        $category = null;
-
-        $slugs = explode('/', trim($categorySlug, '/'));
-        if (count($slugs) > 0) {
-            $slugs = array_reverse($slugs);
-            if (null !== $category = $this->findOneBy(['slug' => array_shift($slugs)])) {
-                $parent = $category;
-                while(count($slugs) > 0) {
-                    if($parent->getSlug() !== array_shift($slugs)) {
-                        $category = null;
-                    }
-                    if(null === $parent = $parent->getParent()) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $category;
-    }*/
 
     /**
      * Finds the category by slug.
@@ -48,19 +26,48 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
      */
     public function findOneBySlug($slug)
     {
+        $alias = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         return $qb
-
+            ->leftJoin($alias.'.seo', 's')
+            ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
+            ->addSelect('s', 's_t')
             ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->andWhere($this->getLocaleCondition())
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            ->useResultCache(true, 3600, Category::getEntityTagPrefix() . '[slug=' . $slug . ']')
+            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
-                'slug' => $slug
+                'slug' => $slug,
             ])
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds the categories for the navbar menu.
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\CategoryInterface[]
+     */
+    public function findForMenu()
+    {
+        $alias = $this->getAlias();
+        $qb = $this->createQueryBuilder();
+
+        return $qb
+            ->leftJoin($alias . '.translations', 'c_t', Expr\Join::WITH, $this->getLocaleCondition('c_t'))
+            ->addSelect('c_t')
+            ->andWhere($qb->expr()->eq($alias . '.level', ':level'))
+            ->addOrderBy($alias . '.left', 'ASC')
+            ->addOrderBy($alias . '.id', 'ASC')
+            ->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true, 3600, $this->getCachePrefix())
+            ->setParameters([
+                'level' => 0,
+            ])
+            ->getResult();
     }
 
     /**

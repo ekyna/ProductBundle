@@ -260,14 +260,19 @@ class ItemBuilder
      */
     protected function setItemProduct(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
     {
-        if ((null === $subject = $item->getSubject()) || $product != $subject) {
+        $subject = $item->getSubject();
+        if (!$subject || !$subject instanceof ProductInterface || $product->getId() != $subject->getId()) {
             $item->setSubject($product);
         }
 
-        $data = array_replace((array)$item->getSubjectData(), $extraData, [
-            SubjectProviderInterface::DATA_KEY => ProductProvider::NAME,
-            'id'                               => $product->getId(),
-        ]);
+        $data = array_replace(
+            (array)$item->getSubjectData(), // TODO remove ? (if subject class changed)
+            $extraData,
+            [
+                SubjectProviderInterface::DATA_KEY => ProductProvider::NAME,
+                'id'                               => $product->getId(),
+            ]
+        );
 
         $item->setSubjectData($data);
 

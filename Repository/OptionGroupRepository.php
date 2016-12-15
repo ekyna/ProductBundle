@@ -11,5 +11,11 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
  */
 class OptionGroupRepository extends TranslatableResourceRepository
 {
-
+    /**
+     * @inheritDoc
+     */
+    protected function getAlias()
+    {
+        return 'og';
+    }
 }
