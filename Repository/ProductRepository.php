@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Model;
@@ -47,21 +48,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
-        if (null !== $product) {
-            // Medias
-            $this->loadMedias($product);
-
-            if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                // Variants
-                $this->loadVariants($product);
-            } elseif ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                // Bundle slots
-                $this->loadBundleSlots($product);
-            } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
-                // Configurable slots
-                $this->loadConfigurableSlots($product);
-            }
-        }
+        $this->loadAssociations($product);
 
         return $product;
     }
@@ -267,16 +254,44 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * Loads the product associations.
+     *
+     * @param Model\ProductInterface|null $product
+     */
+    protected function loadAssociations(Model\ProductInterface $product = null)
+    {
+
+        if (null !== $product) {
+            // Medias
+            $this->loadMedias($product);
+
+            if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                // Variants
+                $this->loadVariants($product);
+            } elseif ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                // Bundle slots
+                $this->loadBundleSlots($product);
+            } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+                // Configurable slots
+                $this->loadConfigurableSlots($product);
+            }
+        }
+    }
+
+    /**
      * Adds the join parts for brand to the query builder.
      *
      * @param QueryBuilder $qb
+     * @param string       $alias
      *
      * @return ProductRepository
      */
-    protected function joinBrand(QueryBuilder $qb)
+    protected function joinBrand(QueryBuilder $qb, $alias = null)
     {
+        $alias = $alias ?: $this->getAlias();
+
         $qb
-            ->join('p.brand', 'b')
+            ->join($alias . '.brand', 'b')
             ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
             ->addSelect('b', 'b_t');
 
@@ -287,25 +302,34 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * Adds the join parts for seo to the query builder.
      *
      * @param QueryBuilder $qb
+     * @param string       $alias
      *
      * @return ProductRepository
      */
-    protected function joinSeo(QueryBuilder $qb)
+    protected function joinSeo(QueryBuilder $qb, $alias = null)
     {
+        $alias = $alias ?: $this->getAlias();
+
         $qb
-            // Seo
-            ->leftJoin('p.seo', 's')
+            ->leftJoin($alias . '.seo', 's')
             ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
             ->addSelect('s', 's_t');
 
         return $this;
     }
 
-    protected function isInitializedCollection($collection)
+    /**
+     * Returns whether the collection has been initialized or not.
+     *
+     * @param Collection $collection
+     *
+     * @return bool
+     */
+    protected function isInitializedCollection(Collection $collection = null)
     {
         return (null !== $collection)
-        && method_exists($collection, 'isInitialized')
-        && $collection->{'isInitialized'}();
+            && method_exists($collection, 'isInitialized')
+            && $collection->{'isInitialized'}();
     }
 
     /**

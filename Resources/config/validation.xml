@@ -574,7 +574,7 @@
 
         <!-- Categories (none for variants) -->
         <property name="categories">
-            <constraint name="Count">
+            <!--<constraint name="Count">
                 <option name="min">1</option>
                 <option name="groups">
                     <value>simple</value>
@@ -582,7 +582,7 @@
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
-            </constraint>
+            </constraint>-->
             <constraint name="Count">
                 <option name="max">0</option>
                 <option name="groups">

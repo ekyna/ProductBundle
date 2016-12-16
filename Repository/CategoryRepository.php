@@ -26,21 +26,22 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
      */
     public function findOneBySlug($slug)
     {
-        $alias = $this->getAlias();
+        $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->leftJoin($alias.'.seo', 's')
+            ->leftJoin($as.'.seo', 's')
             ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
             ->addSelect('s', 's_t')
             ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
-            ->andWhere($this->getLocaleCondition())
+            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
             // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'slug' => $slug,
+                'locale' => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
     }
@@ -52,18 +53,16 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
      */
     public function findForMenu()
     {
-        $alias = $this->getAlias();
-        $qb = $this->createQueryBuilder();
+        $as = $this->getAlias();
+        $qb = $this->getCollectionQueryBuilder();
 
         return $qb
-            ->leftJoin($alias . '.translations', 'c_t', Expr\Join::WITH, $this->getLocaleCondition('c_t'))
-            ->addSelect('c_t')
-            ->andWhere($qb->expr()->eq($alias . '.level', ':level'))
-            ->addOrderBy($alias . '.left', 'ASC')
-            ->addOrderBy($alias . '.id', 'ASC')
+            ->andWhere($qb->expr()->eq($as . '.level', ':level'))
+            ->addOrderBy($as . '.left', 'ASC')
+            ->addOrderBy($as . '.id', 'ASC')
             ->getQuery()
             ->useQueryCache(true)
-            ->useResultCache(true, 3600, $this->getCachePrefix())
+            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '.menu')
             ->setParameters([
                 'level' => 0,
             ])
