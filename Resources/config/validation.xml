@@ -372,6 +372,56 @@
         </property>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Pricing">
+        <property name="groups">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="countries">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="brands">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="rules">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\PricingRule">
+        <property name="pricing">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="minQuantity">
+            <constraint name="NotBlank"/>
+            <constraint name="Range">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <property name="percent">
+            <constraint name="NotBlank"/>
+            <constraint name="Range">
+                <option name="min">0</option>
+                <option name="max">100</option>
+            </constraint>
+        </property>
+        <!-- TODO bug because pricing may not have an identifier ...
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>pricing</value>
+                <value>minQuantity</value>
+            </option>
+        </constraint>-->
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Product">
 
         <!--
@@ -635,6 +685,19 @@
 
         <!-- References -->
         <property name="references">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Prices -->
+        <property name="prices">
             <constraint name="Valid"/>
             <constraint name="Count">
                 <option name="max">0</option>

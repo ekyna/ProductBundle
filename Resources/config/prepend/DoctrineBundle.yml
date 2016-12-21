@@ -1,0 +1,6 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                hydrators:
+                    PricingGridHydrator: Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PricingGridHydrator

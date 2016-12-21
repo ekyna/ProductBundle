@@ -57,7 +57,7 @@ interface ProductInterface extends
     public function getVariants();
 
     /**
-     * Returns whether the parent has the variant or not.
+     * Returns whether the parent has the given variant or not.
      *
      * @param ProductInterface $variant
      *
@@ -123,7 +123,7 @@ interface ProductInterface extends
     public function getAttributes();
 
     /**
-     * Returns whether the product has the attribute or not.
+     * Returns whether the product has the given attribute or not.
      *
      * @param AttributeInterface $attribute
      *
@@ -166,7 +166,7 @@ interface ProductInterface extends
     public function getOptionGroups();
 
     /**
-     * Returns whether the product has the option group or not.
+     * Returns whether the product has the given option group or not.
      *
      * @param OptionGroupInterface $group
      *
@@ -193,7 +193,7 @@ interface ProductInterface extends
     public function removeOptionGroup(OptionGroupInterface $group);
 
     /**
-     * Sets the option  groups.
+     * Sets the option groups.
      *
      * @param ArrayCollection|OptionGroupInterface[] $options
      *
@@ -210,7 +210,7 @@ interface ProductInterface extends
     public function getBundleSlots();
 
     /**
-     * Returns whether the product has the bundle slot or not.
+     * Returns whether the product has the given bundle slot or not.
      *
      * @param BundleSlotInterface $slot
      *
@@ -270,7 +270,7 @@ interface ProductInterface extends
     public function getCategories();
 
     /**
-     * Returns whether the product has the given category.
+     * Returns whether the product has the given given category.
      *
      * @param CategoryInterface $category
      *
@@ -306,7 +306,7 @@ interface ProductInterface extends
     public function setCategories(ArrayCollection $categories);
 
     /**
-     * Returns whether or not the product has the media.
+     * Returns whether or not the product has the given media.
      *
      * @param ProductMediaInterface $media
      *
@@ -342,7 +342,7 @@ interface ProductInterface extends
     public function getMedias(array $types = []);
 
     /**
-     * Returns whether or not the product has the reference.
+     * Returns whether or not the product has the given reference.
      *
      * @param ProductReferenceInterface $reference
      *

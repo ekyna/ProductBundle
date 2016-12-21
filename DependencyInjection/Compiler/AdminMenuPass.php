@@ -23,6 +23,26 @@ class AdminMenuPass implements CompilerPassInterface
 
         $pool = $container->getDefinition('ekyna_admin.menu.pool');
 
+        // SALES
+
+        $pool->addMethodCall('createGroup', [[
+            'name'     => 'sales',
+            'label'    => 'ekyna_commerce.sale.label.plural',
+            'icon'     => 'file',
+            'position' => 10,
+        ]]);
+
+        // Pricings
+        $pool->addMethodCall('createEntry', ['sales', [
+            'name'     => 'pricings',
+            'route'    => 'ekyna_product_pricing_admin_home',
+            'label'    => 'ekyna_product.pricing.label.plural',
+            'resource' => 'ekyna_product_pricing',
+            'position' => 99,
+        ]]);
+
+        // CATALOG
+
         $pool->addMethodCall('createGroup', [[
             'name'     => 'catalog',
             'label'    => 'ekyna_product.catalog',

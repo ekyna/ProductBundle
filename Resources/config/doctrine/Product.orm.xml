@@ -71,7 +71,7 @@
         </one-to-many>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface"
-                     mapped-by="product" field="medias" orphan-removal="true">
+                     field="medias" mapped-by="product" orphan-removal="true">
             <cascade>
                 <cascade-all />
             </cascade>
@@ -81,7 +81,7 @@
         </one-to-many>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface"
-                     mapped-by="product" field="references" orphan-removal="true">
+                     field="references" mapped-by="product" orphan-removal="true">
             <cascade>
                 <cascade-all />
             </cascade>

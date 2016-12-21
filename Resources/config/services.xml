@@ -13,6 +13,8 @@
         <parameter key="ekyna_product.option_group.class">Ekyna\Bundle\ProductBundle\Entity\OptionGroup</parameter>
         <parameter key="ekyna_product.option.class">Ekyna\Bundle\ProductBundle\Entity\Option</parameter>
 
+        <parameter key="ekyna_product.pricing.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\PricingType</parameter>
+
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
         <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
         <parameter key="ekyna_product.product.form_type.event_subscriber.class">Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber</parameter>
@@ -95,6 +97,16 @@
             <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot" />
         </service>
 
+        <!-- Pricing form types -->
+        <service id="ekyna_product.pricing.form_type"
+                 class="%ekyna_product.pricing.form_type.class%">
+            <argument>%ekyna_product.pricing.class%</argument>
+            <argument>%ekyna_commerce.customer_group.class%</argument>
+            <argument>%ekyna_commerce.country.class%</argument>
+            <argument>%ekyna_product.brand.class%</argument>
+            <tag name="form.type"/>
+        </service>
+
         <!-- Product form types -->
         <service id="ekyna_product.product.form_type.builder"
                  class="%ekyna_product.product.form_type.builder.class%">
@@ -130,6 +142,15 @@
             <tag name="table.type" alias="ekyna_product_product"/>
         </service>
 
+        <!-- Pricing resolver -->
+        <service id="ekyna_product.pricing.resolver"
+                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver"
+                 lazy="true">
+            <argument id="ekyna_product.pricing.repository" type="service"/>
+            <argument id="ekyna_commerce.customer_group.repository" type="service"/>
+            <argument id="ekyna_commerce.country.repository" type="service"/>
+        </service>
+
         <!-- Twig extension -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
@@ -137,32 +158,12 @@
             <tag name="twig.extension"/>
         </service>
 
-        <!-- Product repository -->
-        <!--<service id="ekyna_product.product.repository"
-                 class="Ekyna\Bundle\ProductBundle\Repository\ProductRepository">
-            <factory service="doctrine.orm.default_entity_manager" method="getRepository"/>
-            <argument>%ekyna_product.product.class%</argument>
-        </service>-->
-
-        <!-- Product form builder -->
-        <service id="ekyna_product.product.form_builder"
-                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder">
-            <argument type="service" id="ekyna_product.product.repository"/>
-        </service>
-
-        <!-- Product item builder -->
-        <service id="ekyna_product.product.item_builder"
-                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder">
-            <argument type="service" id="ekyna_commerce.sale_factory"/>
-        </service>
-
         <!-- Product subject provider -->
         <service id="ekyna_product.product.subject_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.product_stock_unit.repository"/>
-            <argument type="service" id="ekyna_product.product.item_builder"/>
-            <argument type="service" id="ekyna_product.product.form_builder"/>
+            <argument type="service" id="ekyna_product.pricing.resolver"/>
             <tag name="ekyna_commerce.subject_provider"/>
         </service>
 

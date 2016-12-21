@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
-use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceSearchType;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -19,19 +18,19 @@ use Symfony\Component\Form\FormInterface;
 class FormBuilder
 {
     /**
-     * @var ProductRepositoryInterface
+     * @var ProductProvider
      */
-    private $productRepository;
+    private $provider;
 
 
     /**
      * Constructor.
      *
-     * @param ProductRepositoryInterface $repository
+     * @param ProductProvider $provider
      */
-    public function __construct(ProductRepositoryInterface $repository)
+    public function __construct(ProductProvider $provider)
     {
-        $this->productRepository = $repository;
+        $this->provider = $provider;
     }
 
     /**
@@ -42,7 +41,7 @@ class FormBuilder
     public function buildChoiceForm(FormInterface $form)
     {
         $form->add('subject', ResourceSearchType::class, [
-            'class'    => $this->productRepository->getClassName(),
+            'class'    => $this->provider->getProductRepository()->getClassName(),
             'required' => false,
         ]);
     }
@@ -63,12 +62,14 @@ class FormBuilder
             $product = $product->getParent();
         }
 
+        $repository = $this->provider->getProductRepository();
+
         // TODO load options ?
-        // $this->productRepository->loadOptions($product);
+        // $repository->loadOptions($product);
 
         // Variable : add variant choice form
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
-            $this->productRepository->loadVariants($product);
+            $repository->loadVariants($product);
 
             $form->add('variant', Pr\VariantChoiceType::class, [
                 'variable' => $product,
@@ -76,11 +77,11 @@ class FormBuilder
 
             // Configurable : add configuration form
         } elseif ($product->getType() === ProductTypes::TYPE_CONFIGURABLE) {
-            $this->productRepository->loadConfigurableSlots($product);
+            $repository->loadConfigurableSlots($product);
 
             foreach ($product->getBundleSlots() as $slot) {
                 foreach ($slot->getChoices() as $choice) {
-                    $this->productRepository->loadMedias($choice->getProduct());
+                    $repository->loadMedias($choice->getProduct());
                 }
             }
 

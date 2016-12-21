@@ -143,6 +143,45 @@ ekyna_product:
         button:
             add: Ajouter un groupe d'options
 
+    price:
+        label:
+            singular: Tarif
+            plural: Tarifs
+        alert:
+            no_item: Aucun tarif configuré
+
+    pricing:
+        label:
+            singular: Tarification
+            plural: Tarifications
+        header:
+            list: Tarifications <small>Liste des tarifications</small>
+            show: Détail de la tarification <small>%name%</small>
+            new: Créer une nouvelle tarification
+            edit: Modifier la tarification <small>%name%</small>
+            remove: Supprimer la tarification <small>%name%</small>
+        button:
+            list: Liste des tarifications
+            show: Détail de la tarification
+            new: Nouvelle tarification
+            edit: Modifier la tarification
+            remove: Supprimer la tarification
+        field:
+            countries: Pays de facturation
+            rules: Règles
+        alert:
+            no_item: Aucune tarification configuré
+
+    pricing_rule:
+        label:
+            singular: Règles de tarification
+            plural: Règle de tarification
+        field:
+            min_quantity: Qte. Min.
+            percent: Pourcentage
+        alert:
+            no_item: Aucune régle configuré
+
     product:
         label:
             singular: Produit
@@ -174,6 +213,11 @@ ekyna_product:
         alert:
             no_item: Aucun produit configuré
 
+    product_media:
+        label:
+            singular: Média
+            plural: Médias
+
     product_reference:
         label:
             singular: Réf. externe
@@ -182,6 +226,11 @@ ekyna_product:
             ean8: Code EAN 8
             ean13: Code EAN 13
             manufacturer: Référence fabricant
+
+    product_stock_unit:
+        label:
+            singular: Unitée de stock
+            plural: Unitées de stock
 
     variant:
         label:

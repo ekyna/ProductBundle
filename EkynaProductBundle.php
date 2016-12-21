@@ -41,6 +41,8 @@ class EkynaProductBundle extends AbstractBundle
             Model\CategoryInterface::class         => 'ekyna_product.category.class',
             Model\OptionInterface::class           => 'ekyna_product.option.class',
             Model\OptionGroupInterface::class      => 'ekyna_product.option_group.class',
+            Model\PricingInterface::class          => 'ekyna_product.pricing.class',
+            Model\PricingRuleInterface::class      => 'ekyna_product.pricing_rule.class',
             Model\ProductInterface::class          => 'ekyna_product.product.class',
             Model\ProductMediaInterface::class     => 'ekyna_product.product_media.class',
             Model\ProductReferenceInterface::class => 'ekyna_product.product_reference.class',

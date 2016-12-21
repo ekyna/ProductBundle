@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Component\Commerce\Common\Factory\SaleFactoryInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
@@ -21,19 +20,19 @@ class ItemBuilder
     const DATA_KEY_REMOVE_MISS_MATCH = 'remove_miss_match';
 
     /**
-     * @var SaleFactoryInterface
+     * @var ProductProvider
      */
-    private $saleFactory;
+    private $provider;
 
 
     /**
      * Constructor.
      *
-     * @param SaleFactoryInterface       $saleFactory
+     * @param ProductProvider $provider
      */
-    public function __construct(SaleFactoryInterface $saleFactory)
+    public function __construct(ProductProvider $provider)
     {
-        $this->saleFactory = $saleFactory;
+        $this->provider = $provider;
     }
 
     /**

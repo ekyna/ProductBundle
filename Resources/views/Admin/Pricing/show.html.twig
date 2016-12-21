@@ -1,0 +1,79 @@
+{% extends "EkynaAdminBundle:Entity:sided.html.twig" %}
+
+{% block title %}
+<h1>{{ 'ekyna_product.pricing.header.show'|trans({'%name%': pricing})|raw }}</h1>
+{% endblock %}
+
+{% block actions %}
+    {{ admin_resource_btn(pricing, 'list') }}
+    {{ admin_resource_btn(pricing, 'new') }}
+{% endblock %}
+
+{% block main %}
+<div class="actions">
+    {{ admin_resource_btn(pricing, 'edit') }}
+    {{ admin_resource_btn(pricing, 'remove') }}
+</div>
+<div class="show show-with-tabs">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#pricing-general" data-toggle="tab">{{ 'ekyna_core.field.general'|trans }}</a>
+        </li>
+    </ul>
+    <div class="show-body">
+        <div class="tab-content">
+            <div class="tab-pane active" id="pricing-general">
+                {{ show_row(pricing.name, 'text', 'ekyna_core.field.name') }}
+                {{ show_row(pricing.groups, 'entity', 'ekyna_commerce.customer_group.label.plural', {
+                    'route': 'ekyna_commerce_customer_group_admin_show',
+                    'route_params_map': {'customerGroupId': 'id'}
+                }) }}
+                {{ show_row(pricing.countries, 'entity', 'ekyna_product.pricing.field.countries', {
+                    'route': 'ekyna_commerce_country_admin_show',
+                    'route_params_map': {'countryId': 'id'}
+                }) }}
+                {{ show_row(pricing.brands, 'entity', 'ekyna_product.brand.label.plural', {
+                    'route': 'ekyna_product_brand_admin_show',
+                    'route_params_map': {'brandId': 'id'}
+                }) }}
+
+                <div class="row show-row">
+                    <div class="col-md-2 show-label">
+                        {{ 'ekyna_product.pricing.field.rules'|trans }}
+                    </div>
+                    <div class="col-md-10">
+                        <div class="show-widget">
+                            <table class="table table-condensed table-striped">
+                                <thead>
+                                <tr>
+                                    <th>{{ 'ekyna_product.pricing_rule.field.min_quantity'|trans }}</th>
+                                    <th>{{ 'ekyna_product.pricing_rule.field.percent'|trans }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for rule in pricing.rules %}
+                                    <tr>
+                                        <td class="text-right">
+                                            {{ rule.minQuantity }}
+                                        </td>
+                                        <td class="text-right">
+                                            {{ rule.percent }}&nbsp;%
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="2">
+                                            {{ 'ekyna_product.pricing_rule.alert.no_item'|trans }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

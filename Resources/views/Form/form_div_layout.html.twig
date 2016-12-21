@@ -181,6 +181,22 @@
 {% endblock ekyna_product_option_group_widget %}
 
 
+{% block ekyna_product_pricing_rule_widget %}
+{% spaceless %}
+    {{ form_errors(form) }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.percent, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+    </div>
+    {{ form_rest(form) }}
+{% endspaceless %}
+{% endblock ekyna_product_pricing_rule_widget %}
+
+
 {% block ekyna_product_reference_widget %}
 {% spaceless %}
     {{ form_errors(form) }}

@@ -17,3 +17,7 @@ ekyna_product_category_admin:
 ekyna_product_brand_admin:
     resource: admin/brand.yml
     prefix:   /brands
+
+ekyna_product_pricing_admin:
+    resource: admin/pricing.yml
+    prefix:   /pricings

@@ -2,6 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
@@ -35,6 +37,11 @@ class ProductProvider implements SubjectProviderInterface
     private $stockUnitRepository;
 
     /**
+     * @var PriceResolver
+     */
+    private $priceResolver;
+
+    /**
      * @var ItemBuilder
      */
     private $itemBuilder;
@@ -50,19 +57,16 @@ class ProductProvider implements SubjectProviderInterface
      *
      * @param ProductRepositoryInterface   $productRepository
      * @param StockUnitRepositoryInterface $stockUnitRepository
-     * @param ItemBuilder                  $itemBuilder
-     * @param FormBuilder                  $formBuilder
+     * @param PriceResolver                $priceResolver
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
         StockUnitRepositoryInterface $stockUnitRepository,
-        ItemBuilder $itemBuilder,
-        FormBuilder $formBuilder
+        PriceResolver $priceResolver
     ) {
         $this->productRepository = $productRepository;
         $this->stockUnitRepository = $stockUnitRepository;
-        $this->itemBuilder = $itemBuilder;
-        $this->formBuilder = $formBuilder;
+        $this->priceResolver = $priceResolver;
     }
 
     /**
@@ -78,7 +82,7 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function buildChoiceForm(FormInterface $form)
     {
-        $this->formBuilder->buildChoiceForm($form);
+        $this->getFormBuilder()->buildChoiceForm($form);
     }
 
     /**
@@ -175,7 +179,7 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function buildItemForm(FormInterface $form, SaleItemInterface $item)
     {
-        $this->formBuilder->buildItemForm($form, $item);
+        $this->getFormBuilder()->buildItemForm($form, $item);
     }
 
     /**
@@ -185,7 +189,27 @@ class ProductProvider implements SubjectProviderInterface
     {
         $product = $this->getItemProduct($item);
 
-        $this->itemBuilder->buildItem($item, $product);
+        $this->getItemBuilder()->buildItem($item, $product);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function resolveDiscounts(SaleItemInterface $item)
+    {
+        $product = $this->resolve($item);
+        $sale = $item->getSale();
+        $country = $sale->getInvoiceAddress() ? $sale->getInvoiceAddress()->getCountry() : null;
+
+        $data = $this
+            ->priceResolver
+            ->resolve($product, $item->getQuantity(), $sale->getCustomerGroup(), $country);
+
+        if (null !== $data) {
+            return [$data];
+        }
+
+        return [];
     }
 
     /**
@@ -237,6 +261,16 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
+     * Returns the productRepository.
+     *
+     * @return ProductRepositoryInterface
+     */
+    public function getProductRepository()
+    {
+        return $this->productRepository;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getStockUnitRepository()
@@ -253,20 +287,6 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
-     * Asserts that the subject relative is supported.
-     *
-     * @param SubjectRelativeInterface $relative
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function assertSupportsRelative(SubjectRelativeInterface $relative)
-    {
-        if (!$this->supportsRelative($relative)) {
-            throw new InvalidArgumentException('Unsupported subject relative.');
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     public function getName()
@@ -280,6 +300,48 @@ class ProductProvider implements SubjectProviderInterface
     public function getLabel()
     {
         return 'ekyna_product.product.label.singular';
+    }
+
+    /**
+     * Returns the itemBuilder.
+     *
+     * @return ItemBuilder
+     */
+    protected function getItemBuilder()
+    {
+        if (null !== $this->itemBuilder) {
+            return $this->itemBuilder;
+        }
+
+        return $this->itemBuilder = new ItemBuilder($this);
+    }
+
+    /**
+     * Returns the formBuilder.
+     *
+     * @return FormBuilder
+     */
+    protected function getFormBuilder()
+    {
+        if (null !== $this->formBuilder) {
+            return $this->formBuilder;
+        }
+
+        return $this->formBuilder = new FormBuilder($this);
+    }
+
+    /**
+     * Asserts that the subject relative is supported.
+     *
+     * @param SubjectRelativeInterface $relative
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function assertSupportsRelative(SubjectRelativeInterface $relative)
+    {
+        if (!$this->supportsRelative($relative)) {
+            throw new InvalidArgumentException('Unsupported subject relative.');
+        }
     }
 
     /**
