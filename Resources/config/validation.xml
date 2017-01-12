@@ -696,19 +696,6 @@
             </constraint>
         </property>
 
-        <!-- Prices -->
-        <property name="prices">
-            <constraint name="Valid"/>
-            <constraint name="Count">
-                <option name="max">0</option>
-                <option name="groups">
-                    <value>variable</value>
-                    <value>bundle</value>
-                    <value>configurable</value>
-                </option>
-            </constraint>
-        </property>
-
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
