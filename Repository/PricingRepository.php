@@ -40,7 +40,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->addOrderBy('r.minQuantity', 'DESC')
             ->getQuery()
             ->useQueryCache(true)
-            ->useResultCache(true, $this->getCachePrefix())
+            // TODO ->useResultCache(true, $this->getCachePrefix())
             ->getResult(PricingGridHydrator::NAME);
 
         return $result;
