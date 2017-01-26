@@ -9,7 +9,7 @@ use Ekyna\Component\Commerce\Exception\CommerceExceptionInterface;
  * @package Ekyna\Bundle\ProductBundle\Exception
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class InvalidProductException extends \Exception implements CommerceExceptionInterface
+class InvalidProductException extends \Exception implements CommerceExceptionInterface // TODO ProductExceptionInterface ?
 {
 
 }

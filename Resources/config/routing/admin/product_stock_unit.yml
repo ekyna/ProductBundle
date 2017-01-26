@@ -1,0 +1,30 @@
+ekyna_product_product_stock_unit_admin_new:
+    path: /new
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:newAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+
+#ekyna_product_product_stock_unit_admin_show:
+#    path: /{productStockUnitId}/show
+#    defaults: { _controller: "ekyna_product.product_stock_unit.controller:showAction" }
+#    methods: [GET]
+#    requirements:
+#        productId: \d+
+#        productStockUnitId: \d+
+
+ekyna_product_product_stock_unit_admin_edit:
+    path: /{productStockUnitId}/edit
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:editAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+        productStockUnitId: \d+
+
+ekyna_product_product_stock_unit_admin_remove:
+    path: /{productStockUnitId}/remove
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:removeAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+        productStockUnitId: \d+

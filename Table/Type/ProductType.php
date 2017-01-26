@@ -4,6 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -74,43 +76,57 @@ class ProductType extends ResourceTableType
                 ],
                 'position'             => 10,
             ])
+            ->addColumn('visible', 'boolean', [
+                'label'                => 'ekyna_product.product.field.visible',
+                'sortable'             => !$variantMode,
+                'route_name'           => 'ekyna_product_product_admin_toggle',
+                'route_parameters'     => ['field' => 'visible'],
+                'route_parameters_map' => ['productId' => 'id'],
+                'position'             => 20,
+            ])
             ->addColumn('reference', 'text', [
                 'label'    => 'ekyna_core.field.reference',
                 'sortable' => !$variantMode,
-                'position' => 20,
+                'position' => 30,
             ])
             ->addColumn('netPrice', 'price', [
                 'label'    => 'ekyna_product.product.field.net_price',
                 'currency' => 'EUR', // TODO
                 'sortable' => !$variantMode,
-                'position' => 30,
+                'position' => 40,
+            ])
+            ->addColumn('stockMode', 'ekyna_commerce_stock_subject_mode', [
+                'position' => 50,
+            ])
+            ->addColumn('stockState', 'ekyna_commerce_stock_subject_state', [
+                'position' => 60,
             ]);
 
-        if (!$variantMode) {
+        /*if (!$variantMode) {
             $builder
-                /* TODO ->addColumn('categories', 'anchor', [
+                ->addColumn('categories', 'anchor', [
                     'label'                => 'ekyna_product.category.label.plural',
                     'property_path'        => 'categories[]',
                     'sortable'             => true,
                     'route_name'           => 'ekyna_product_category_admin_show',
                     'route_parameters_map' => ['categoryId' => 'categories.id'],
-                    'position'             => 40,
-                ])*/
+                    'position'             => 70,
+                ])
                 ->addColumn('brand', 'anchor', [
                     'label'                => 'ekyna_product.brand.label.singular',
                     'sortable'             => true,
                     'route_name'           => 'ekyna_product_brand_admin_show',
                     'route_parameters_map' => ['brandId' => 'brand.id'],
-                    'position'             => 50,
-                ])
-                ->addColumn('taxGroup', 'anchor', [
+                    'position'             => 80,
+                ])->addColumn('taxGroup', 'anchor', [
                     'label'                => 'ekyna_commerce.tax_group.label.singular',
                     'sortable'             => true,
                     'route_name'           => 'ekyna_commerce_tax_group_admin_show',
                     'route_parameters_map' => ['taxGroupId' => 'taxGroup.id'],
-                    'position'             => 60,
-                ]);
-        }
+                    'position'             => 90,
+                ])
+            ;
+        }*/
 
         $builder->addColumn('actions', 'admin_actions', [
             'buttons' => [
@@ -142,31 +158,45 @@ class ProductType extends ResourceTableType
                     'label'    => 'ekyna_core.field.designation',
                     'position' => 20,
                 ])
+                ->addFilter('visible', 'boolean', [
+                    'label'    => 'ekyna_product.product.field.visible',
+                    'position' => 30,
+                ])
                 ->addFilter('reference', 'text', [
                     'label'    => 'ekyna_core.field.reference',
-                    'position' => 30,
+                    'position' => 40,
                 ])
                 ->addFilter('netPrice', 'number', [
                     'label'    => 'ekyna_product.product.field.net_price',
-                    'position' => 40,
+                    'position' => 50,
+                ])
+                ->addFilter('stockMode', 'choice', [
+                    'label'    => 'ekyna_commerce.stock_subject.field.mode',
+                    'choices'  => StockSubjectModes::getChoices(),
+                    'position' => 60,
+                ])
+                ->addFilter('stockState', 'choice', [
+                    'label'    => 'ekyna_commerce.stock_subject.field.state',
+                    'choices'  => StockSubjectStates::getChoices(),
+                    'position' => 70,
                 ])
                 ->addFilter('category', 'entity', [
                     'label'    => 'ekyna_product.category.label.singular',
                     'class'    => $this->categoryClass,
                     'property' => 'name',
-                    'position' => 50,
+                    'position' => 80,
                 ])
                 ->addFilter('brand', 'entity', [
                     'label'    => 'ekyna_product.brand.label.singular',
                     'class'    => $this->brandClass,
                     'property' => 'name',
-                    'position' => 60,
+                    'position' => 90,
                 ])
                 ->addFilter('taxGroup', 'entity', [
                     'label'    => 'ekyna_commerce.tax_group.label.singular',
                     'class'    => $this->taxGroupClass,
                     'property' => 'name',
-                    'position' => 70,
+                    'position' => 100,
                 ]);
         }
     }

@@ -15,7 +15,14 @@
 
 {% block general_content %}
     {{ parent() }}
-    {{ macros.show_brand(product) }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ macros.show_brand(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ macros.show_visible(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+        </div>
+    </div>
     {{ macros.show_categories(product) }}
     {{ macros.show_translations(product) }}
     {{ macros.show_medias(product) }}
@@ -28,3 +35,8 @@
     <hr>
     {{ macros.show_configurable_composition(product) }}
 {% endblock pricing_content %}
+
+
+{% block stock_content %}
+    {{ parent() }}
+{% endblock stock_content %}

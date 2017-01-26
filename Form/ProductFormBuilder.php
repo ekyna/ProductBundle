@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\AdjustmentsType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
@@ -12,6 +13,8 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormInterface;
 
@@ -92,6 +95,31 @@ class ProductFormBuilder
     protected function getProduct()
     {
         return $this->product;
+    }
+
+    /**
+     * Adds the adjustments field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addAdjustmentsField(array $options = [])
+    {
+        $options = array_replace([
+            'label'                 => 'ekyna_commerce.adjustment.label.plural',
+            'prototype_name'        => '__product_adjustment__',
+            'entry_type'            => PR\ProductAdjustmentType::class,
+            'add_button_text'       => 'ekyna_commerce.sale.form.add_item_adjustment',
+            'delete_button_confirm' => 'ekyna_commerce.sale.form.remove_item_adjustment',
+            'attr'                  => ['label_col' => 2, 'widget_col' => 10],
+            'modes'                 => [AdjustmentModes::MODE_FLAT],
+            'types'                 => [AdjustmentTypes::TYPE_INCLUDED],
+        ], $options);
+
+        $this->form->add('adjustments', AdjustmentsType::class, $options);
+
+        return $this;
     }
 
     /**
@@ -217,6 +245,25 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the geocode field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addGeocodeField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.geocode',
+            'required' => false,
+        ], $options);
+
+        $this->form->add('geocode', SF\TextType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the medias field.
      *
      * @param array $options
@@ -247,11 +294,12 @@ class ProductFormBuilder
     public function addNetPriceField(array $options = [])
     {
         $options = array_replace([
-            'label' => 'ekyna_product.product.field.net_price',
-            'scale' => 5,
-            'attr'  => [
+            'label'    => 'ekyna_product.product.field.net_price',
+            'scale'    => 5,
+            'attr'     => [
                 'input_group' => ['append' => '€'],
             ],
+            'required' => false,
         ], $options);
 
         $this->form->add('netPrice', SF\NumberType::class, $options);
@@ -408,6 +456,28 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the visible field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addVisibleField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.visible',
+            'required' => false,
+            'attr'     => [
+                'align_with_widget' => true,
+            ],
+        ], $options);
+
+        $this->form->add('visible', SF\CheckboxType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the weight field.
      *
      * @param array $options
@@ -417,12 +487,13 @@ class ProductFormBuilder
     public function addWeightField(array $options = [])
     {
         $options = array_replace([
-            'label' => 'ekyna_core.field.weight',
-            'scale' => 3,
-            'attr'  => [
+            'label'    => 'ekyna_core.field.weight',
+            'scale'    => 3,
+            'attr'     => [
                 'placeholder' => 'ekyna_core.field.weight',
                 'input_group' => ['append' => 'kg'],
             ],
+            'required' => false,
         ], $options);
 
         $this->form->add('weight', SF\NumberType::class, $options);

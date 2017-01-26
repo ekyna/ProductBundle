@@ -724,6 +724,23 @@
         </constraint>-->
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAdjustment">
+        <property name="type">
+            <constraint name="Choice">
+                <option name="choices">
+                    <value>included</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="mode">
+            <constraint name="Choice">
+                <option name="choices">
+                    <value>flat</value>
+                </option>
+            </constraint>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductMedia">
         <property name="media">
             <constraint name="NotNull"/>

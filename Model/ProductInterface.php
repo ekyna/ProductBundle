@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
+use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
@@ -21,6 +22,7 @@ interface ProductInterface extends
     RM\TranslatableInterface,
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,
+    AdjustableInterface,
     Pricing\TaxableInterface,
     StockSubjectInterface
 {
@@ -436,6 +438,22 @@ interface ProductInterface extends
     public function setAttributesDesignation($attributesDesignation);
 
     /**
+     * Returns the visible.
+     *
+     * @return bool
+     */
+    public function isVisible();
+
+    /**
+     * Sets the visible.
+     *
+     * @param bool $visible
+     *
+     * @return $this|ProductInterface
+     */
+    public function setVisible($visible);
+
+    /**
      * Returns the reference.
      *
      * @return string
@@ -450,6 +468,22 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setReference($reference);
+
+    /**
+     * Returns the geocode.
+     *
+     * @return string
+     */
+    public function getGeocode();
+
+    /**
+     * Sets the geocode.
+     *
+     * @param string $code
+     *
+     * @return $this|ProductInterface
+     */
+    public function setGeocode($code);
 
     /**
      * Returns the net price.

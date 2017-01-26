@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Commerce\Stock\Model\StockModes;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 
 /**
  * Class BundleUpdater
@@ -23,7 +23,7 @@ class BundleUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        if ($bundle->getStockMode() != StockModes::MODE_ENABLED) {
+        if ($bundle->getStockMode() != StockSubjectModes::MODE_ENABLED) {
             return false;
         }
 

@@ -85,14 +85,17 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->builder
             ->addDesignationField()
             ->addBrandField()
+            ->addVisibleField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField()
+            ->addGeocodeField()
             ->addReferencesField()
             ->addTranslationsField()
             ->addMediasField()
             ->addNetPriceField()
             ->addTaxGroupField()
+            ->addAdjustmentsField()
             ->addOptionGroupsField()
             ->addSeoField();
     }
@@ -106,10 +109,13 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
+            ->addVisibleField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
-                'required' => false,
+                'disabled' => true,
+            ])
+            ->addGeocodeField([
                 'disabled' => true,
             ])
             ->addTranslationsField()
@@ -117,7 +123,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addMediasField()
             // Pricing
             ->addNetPriceField([
-                'required' => false,
                 'disabled' => true,
             ])
             ->addTaxGroupField()
@@ -138,8 +143,10 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                     'help_text' => 'ekyna_product.variant.help.leave_blank_to_auto_generate',
                 ],
             ])
+            ->addVisibleField()
             ->addReferenceField()
             ->addWeightField()
+            ->addGeocodeField()
             ->addTranslationsField([
                 'required'     => false,
                 'form_options' => [
@@ -157,6 +164,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'required'  => false,
                 'disabled'  => true,
             ])
+            ->addAdjustmentsField()
             ->addOptionGroupsField();
     }
 
@@ -169,17 +177,19 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
+            ->addVisibleField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
-                'required' => false,
+                'disabled' => true,
+            ])
+            ->addGeocodeField([
                 'disabled' => true,
             ])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
             ->addNetPriceField([
-                'required' => false,
                 'disabled' => true,
             ])
             ->addTaxGroupField([
@@ -201,17 +211,19 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // General
             ->addDesignationField()
             ->addBrandField()
+            ->addVisibleField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
-                'required' => false,
+                'disabled' => true,
+            ])
+            ->addGeocodeField([
                 'disabled' => true,
             ])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
             ->addNetPriceField([
-                'required' => false,
                 'disabled' => true,
             ])
             ->addTaxGroupField([

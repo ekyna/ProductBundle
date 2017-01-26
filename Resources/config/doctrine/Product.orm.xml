@@ -25,7 +25,9 @@
         <field name="type" column="type" type="string" length="16" nullable="false"/>
         <field name="designation" column="designation" type="string" length="128" nullable="true"/>
         <field name="attributesDesignation" column="attr_designation" type="string" length="128" nullable="true"/>
+        <field name="visible" column="visible" type="boolean" nullable="false"/>
         <field name="reference" column="reference" type="string" length="16" unique="true" nullable="true"/>
+        <field name="geocode" column="geocode" type="string" length="16" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
         <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
 
@@ -85,6 +87,16 @@
             <cascade>
                 <cascade-all />
             </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductAdjustmentInterface"
+                     field="adjustments" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+            <order-by>
+                <order-by-field name="position" direction="ASC"/>
+            </order-by>
         </one-to-many>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"

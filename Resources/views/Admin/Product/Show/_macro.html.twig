@@ -1,53 +1,62 @@
-{% macro show_designation(product) %}
+{% macro show_designation(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation') }}
+    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation', options) }}
 {% endspaceless %}
 {% endmacro show_designation %}
 
 
-{% macro show_brand(product) %}
+{% macro show_visible(product, options = {}) %}
+    {% spaceless %}
+        {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', options) }}
+    {% endspaceless %}
+{% endmacro show_visible %}
+
+
+{% macro show_brand(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
         'route': 'ekyna_product_brand_admin_show',
         'route_params_map': {'brandId': 'id'}
-    }) }}
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_brand %}
 
 
-{% macro show_categories(product) %}
+{% macro show_categories(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.categories, 'entity', 'ekyna_product.category.label.plural', {
         'route': 'ekyna_product_category_admin_show',
         'route_params_map': {'categoryId': 'id'}
-    }) }}
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_categories %}
 
 
-{% macro show_reference_and_weight(product) %}
+{% macro show_geocode(product, options = {}) %}
 {% spaceless %}
-    <div class="row">
-        <div class="col-md-6">
-            {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {
-                'label_nb_col': 4,
-                'widget_nb_col': 8
-            }) }}
-        </div>
-        <div class="col-md-6">
-            {# TODO use IntlNumberFormatter #}
-            {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
-                'label_nb_col': 4,
-                'widget_nb_col': 8,
-                'append': ' kg'
-            }) }}
-        </div>
-    </div>
+    {{ show_row(product.geocode, 'text', 'ekyna_product.product.field.geocode', options) }}
 {% endspaceless %}
-{% endmacro show_reference_and_weight %}
+{% endmacro show_geocode %}
 
 
-{% macro show_translations(product) %}
+{% macro show_reference(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', options) }}
+{% endspaceless %}
+{% endmacro show_reference %}
+
+
+{% macro show_weight(product, options = {}) %}
+{% spaceless %}
+    {# TODO use IntlNumberFormatter #}
+    {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
+        'append': ' kg'
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_weight %}
+
+
+{% macro show_translations(product, options = {}) %}
 {% spaceless %}
     {{ show_translations_row(product.translations, {
         'fields': {
@@ -59,63 +68,59 @@
                 'options': {'height': 150}
             }
         }
-    }) }}
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_translations %}
 
 
-{% macro show_attribute_set(product) %}
+{% macro show_attribute_set(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.attributeSet, 'entity', 'ekyna_product.attribute_set.label.singular', {
         'route': 'ekyna_product_attribute_set_admin_show',
         'route_params_map': {'attributeSetId': 'id'}
-    }) }}
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_attribute_set %}
 
 
-{% macro show_variable(product) %}
+{% macro show_variable(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
         'route': 'ekyna_product_product_admin_show',
         'route_params_map': {'productId': 'id'},
-    }) }}
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_variable %}
 
 
-{% macro show_medias(product) %}
+{% macro show_medias(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias') }}
+    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias', options) }}
 {% endspaceless %}
 {% endmacro show_medias %}
 
 
-{% macro show_net_price_and_tax_group(product) %}
+{% macro show_net_price(product, options = {}) %}
 {% spaceless %}
-    <div class="row">
-        <div class="col-md-6">
-            {# TODO use IntlNumberFormatter #}
-            {{ show_row(product.netPrice, 'number', 'ekyna_product.product.field.net_price', {
-                'label_nb_col': 4,
-                'widget_nb_col': 8,
-                'append': ' €'
-            }) }}
-        </div>
-        <div class="col-md-6">
-            {{ show_row(product.taxGroup, 'entity', 'ekyna_commerce.tax_group.label.singular', {
-                'route': 'ekyna_commerce_tax_group_admin_show',
-                'route_params_map': {'taxGroupId': 'id'},
-                'label_nb_col': 4,
-                'widget_nb_col': 8
-            }) }}
-        </div>
-    </div>
+    {# TODO use IntlNumberFormatter #}
+    {{ show_row(product.netPrice, 'number', 'ekyna_product.product.field.net_price', {
+        'append': ' €'
+    }|merge(options)) }}
 {% endspaceless %}
-{% endmacro show_net_price_and_tax_group %}
+{% endmacro show_net_price %}
 
 
-{% macro show_references(product) %}
+{% macro show_tax_group(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.taxGroup, 'entity', 'ekyna_commerce.tax_group.label.singular', {
+        'route': 'ekyna_commerce_tax_group_admin_show',
+        'route_params_map': {'taxGroupId': 'id'},
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_tax_group %}
+
+
+{% macro show_references(product, options = {}) %}
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
@@ -140,7 +145,7 @@
 {% endmacro show_references %}
 
 
-{% macro show_attributes(product) %}
+{% macro show_attributes(product, options = {}) %}
 {% spaceless %}
     {% if product is variant_product %}
     <div class="row show-row">
@@ -169,7 +174,45 @@
 {% endmacro show_attributes %}
 
 
-{% macro show_option_groups(product) %}
+{% macro show_adjustments(product, options = {}) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'ekyna_commerce.adjustment.label.plural'|trans }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget show-widget-block">
+                <table class="table table-stripped table-condensed">
+                    <tr>
+                        <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.type'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.mode'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.amount'|trans }}</th>
+                    </tr>
+                    {% for adjustment in product.adjustments -%}
+                        <tr>
+                            <td>{{ adjustment.designation }}</td>
+                            <td>{{ adjustment.type|adjustment_type_label }}</td>
+                            <td>{{ adjustment.mode|adjustment_mode_label }}</td>
+                            <td>{{ adjustment.amount|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                        </tr>
+                        {# TODO translations ? #}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">
+                                {{ 'ekyna_core.value.none'|trans }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_adjustments %}
+
+
+{% macro show_option_groups(product, options = {}) %}
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
@@ -234,7 +277,7 @@
 {% endmacro show_option_groups %}
 
 
-{% macro show_bundle_composition(product) %}
+{% macro show_bundle_composition(product, options = {}) %}
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
@@ -244,6 +287,14 @@
             <div class="show-widget show-widget-sm">
             {% if product is bundle_product %}
                 <table class="table table-stripped table-condensed">
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                        </td>
+                        <td class="text-right">
+                            {{ product|product_bundle_total_price|localizedcurrency('EUR') }}
+                        </td>
+                    </tr>
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
                         <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
@@ -261,14 +312,6 @@
                         <td class="text-right">{{ choice.product.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
                     </tr>
                     {% endfor %}
-                    <tr>
-                        <td colspan="2" class="text-right">
-                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
-                        </td>
-                        <td class="text-right">
-                            {{ product|product_bundle_total_price|localizedcurrency('EUR') }}
-                        </td>
-                    </tr>
                 </table>
             {% else %}
                 <p>
@@ -282,7 +325,7 @@
 {% endmacro show_bundle_composition %}
 
 
-{% macro show_configurable_composition(product) %}
+{% macro show_configurable_composition(product, options = {}) %}
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
@@ -291,6 +334,11 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-configurable">
             {% if product is configurable_product %}
+                <p class="total">
+                    <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                    <span>{{ product|product_configurable_total_price|localizedcurrency('EUR') }}</span>
+                </p>
+
                 {% for slot in product.bundleSlots %}
                 <div class="slot">
                     {{ show_translations_row(slot.translations, {
@@ -329,11 +377,6 @@
                 </div>
                 {% endfor %}
 
-                <p class="total">
-                    <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
-                    <span>{{ product|product_configurable_total_price|localizedcurrency('EUR') }}</span>
-                </p>
-
             {% else %}
                 <p>
                     <em>Wrong product type</em>
@@ -346,8 +389,24 @@
 {% endmacro show_configurable_composition %}
 
 
-{% macro show_seo(product) %}
+{% macro show_seo(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.seo, 'seo') }}
+    {{ show_row(product.seo, 'seo', null, options) }}
 {% endspaceless %}
 {% endmacro show_seo %}
+
+
+{% macro show_stock_units(product, table_view, options = {}) %}
+{% spaceless %}
+    <div class="actions">
+        {{ admin_resource_btn('ekyna_product.product_stock_unit', 'new', {
+            'label': 'ekyna_product.product_stock_unit.button.new',
+            'size': 'xs',
+            'path': path('ekyna_product_product_stock_unit_admin_new', {
+                'productId': product.id,
+            })
+        }) }}
+    </div>
+    {{ ekyna_table_render(table_view) }}
+{% endspaceless %}
+{% endmacro show_stock_units %}

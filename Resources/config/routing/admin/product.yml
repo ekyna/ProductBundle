@@ -37,13 +37,13 @@ ekyna_product_product_admin_tinymce:
         field: "[a-zA-Z0-9]+"
         productId: \d+
 
-#ekyna_product_product_admin_toggle:
-#    path: /{productId}/toggle/{field}
-#    defaults: { _controller: "ekyna_product.product.controller:toggleAction", field: enabled }
-#    methods: [GET]
-#    requirements:
-#        productId: \d+
-#        field: \w+
+ekyna_product_product_admin_toggle:
+    path: /{productId}/toggle/{field}
+    defaults: { _controller: "ekyna_product.product.controller:toggleAction", field: visible }
+    methods: [GET]
+    requirements:
+        productId: \d+
+        field: \w+
 
 ekyna_product_product_admin_remove:
     path: /{productId}/remove
@@ -65,3 +65,7 @@ ekyna_product_product_admin_find:
     methods: [GET]
     options:
         expose: true
+
+ekyna_product_product_stock_unit_admin:
+    resource: product_stock_unit.yml
+    prefix: /{productId}/stock-units

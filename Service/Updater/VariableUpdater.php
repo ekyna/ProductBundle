@@ -62,15 +62,15 @@ class VariableUpdater
     {
         Model\ProductTypes::assertVariable($variable);
 
-        if (!$variable->getStockMode() === Stock\StockModes::MODE_ENABLED) {
+        if (!$variable->getStockMode() === Stock\StockSubjectModes::MODE_ENABLED) {
             return false;
         }
 
-        $state = Stock\StockStates::STATE_OUT_OF_STOCK;
+        $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
         $variants = $variable->getVariants()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-            if (Stock\StockStates::isBetterState($variant->getStockState(), $state)) {
+            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $state)) {
                 $state = $variant->getStockState();
             }
         }

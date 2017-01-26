@@ -209,7 +209,10 @@ ekyna_product:
             net_price: Prix HT
             total_net_price: Prix total HT
             pricing: Tarifs
+            stock: Stocks
             composition: Composition
+            geocode: Geocode
+            visible: Visible
         alert:
             no_item: Aucun produit configuré
 
@@ -231,6 +234,14 @@ ekyna_product:
         label:
             singular: Unitée de stock
             plural: Unitées de stock
+        header:
+            list: Liste des unitées de stock
+            show: Détail de l'unité
+            new: Créer une nouvelle unité
+            edit: Modifier l'unité
+            remove: Supprimer l'unité
+        button:
+            new: Créer une nouvelle unité
 
     variant:
         label:

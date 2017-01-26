@@ -5,7 +5,9 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model as RM;
@@ -19,7 +21,8 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
-    use Cms\ContentSubjectTrait,
+    use Common\AdjustableTrait,
+        Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         RM\TimestampableTrait,
         RM\TaggedEntityTrait,
@@ -101,9 +104,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $attributesDesignation;
 
     /**
+     * @var bool
+     */
+    protected $visible;
+
+    /**
      * @var string
      */
     protected $reference;
+
+    /**
+     * @var string
+     */
+    protected $geocode;
 
     /**
      * @var float
@@ -119,16 +132,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      * @var \DateTime
      */
     protected $releasedAt;
-
-    /**
-     * @var \DateTime
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     */
-    protected $updatedAt;
 
 
     /**
@@ -146,6 +149,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->medias = new ArrayCollection();
         $this->references = new ArrayCollection();
 
+        $this->visible = true;
+
+        $this->initializeAdjustments();
         $this->initializeStock();
     }
 
@@ -182,6 +188,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $this->seo = clone $this->seo;
 
             // TODO medias ?
+            // TODO adjustment ?
         }
     }
 
@@ -761,6 +768,30 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
+     * Returns the visible.
+     *
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * Sets the visible.
+     *
+     * @param bool $visible
+     *
+     * @return Product
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = (bool)$visible;
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getReference()
@@ -774,6 +805,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setReference($reference)
     {
         $this->reference = $reference;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGeocode()
+    {
+        return $this->geocode;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setGeocode($code)
+    {
+        $this->geocode = $code;
 
         return $this;
     }
@@ -828,6 +877,52 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setReleasedAt(\DateTime $releasedAt = null)
     {
         $this->releasedAt = $releasedAt;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasAdjustment(Common\AdjustmentInterface $adjustment)
+    {
+        if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
+            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+        }
+
+        return $this->adjustments->contains($adjustment);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addAdjustment(Common\AdjustmentInterface $adjustment)
+    {
+        if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
+            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+        }
+
+        if (!$this->hasAdjustment($adjustment)) {
+            $this->adjustments->add($adjustment);
+            $adjustment->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeAdjustment(Common\AdjustmentInterface $adjustment)
+    {
+        if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
+            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+        }
+
+        if ($this->hasAdjustment($adjustment)) {
+            $this->adjustments->removeElement($adjustment);
+            //$adjustment->setProduct(null);
+        }
 
         return $this;
     }
