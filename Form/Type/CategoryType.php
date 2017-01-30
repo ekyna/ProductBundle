@@ -50,7 +50,7 @@ class CategoryType extends ResourceFormType
             ->add('media', MediaChoiceType::class, [
                 'label'    => 'ekyna_core.field.image',
                 'required' => false,
-                'types'    => MediaTypes::IMAGE,
+                'types'    => [MediaTypes::IMAGE, MediaTypes::SVG],
             ])
             ->add('seo', SeoType::class, [
                 'label' => false,

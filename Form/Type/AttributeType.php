@@ -55,7 +55,7 @@ class AttributeType extends ResourceFormType
             ])
             ->add('media', MediaChoiceType::class, [
                 'label'    => 'ekyna_core.field.image',
-                'types'    => [MediaTypes::IMAGE],
+                'types'    => [MediaTypes::IMAGE, MediaTypes::SVG],
                 'required' => false,
             ])
             ->add('color', ColorPickerType::class, [

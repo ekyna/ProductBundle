@@ -275,7 +275,13 @@ class ProductFormBuilder
         $options = array_replace([
             'label'       => 'ekyna_core.field.medias',
             'media_class' => $this->mediaClass,
-            'types'       => [MediaTypes::IMAGE, MediaTypes::VIDEO, MediaTypes::FILE],
+            'types'       => [
+                MediaTypes::IMAGE,
+                MediaTypes::SVG,
+                MediaTypes::FLASH,
+                MediaTypes::VIDEO,
+                MediaTypes::FILE
+            ],
             'required'    => false,
         ], $options);
 

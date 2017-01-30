@@ -34,7 +34,7 @@ class BrandType extends ResourceFormType
             ])
             ->add('media', MediaChoiceType::class, [
                 'label' => 'ekyna_core.field.image',
-                'types' => [MediaTypes::IMAGE],
+                'types' => [MediaTypes::IMAGE, MediaTypes::SVG],
             ])
             ->add('seo', SeoType::class, [
                 'label' => false,
