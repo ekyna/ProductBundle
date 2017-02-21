@@ -23,14 +23,14 @@ class OptionType extends ResourceFormType
         $builder
             ->add('designation', Type\TextType::class, [
                 'label'    => 'ekyna_core.field.designation',
-                'sizing' => 'sm',
+                'sizing'   => 'sm',
                 'required' => false,
-                'attr'   => [
+                'attr'     => [
                     'placeholder' => 'ekyna_core.field.designation',
                 ],
             ])
             ->add('reference', Type\TextType::class, [
-                'label' => 'ekyna_core.field.reference',
+                'label'  => 'ekyna_core.field.reference',
                 'sizing' => 'sm',
                 'attr'   => [
                     'placeholder' => 'ekyna_core.field.reference',
@@ -61,12 +61,10 @@ class OptionType extends ResourceFormType
             ])
             // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
-                'sizing' => 'sm',
-                'attr' => [
-                    'class' => 'no-select2',
-                ]
+                'sizing'  => 'sm',
+                'select2' => false,
             ])
-            ->add('position', Type\HiddenType::class,[
+            ->add('position', Type\HiddenType::class, [
                 'attr' => [
                     'data-collection-role' => 'position',
                 ],

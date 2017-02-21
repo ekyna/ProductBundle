@@ -234,7 +234,7 @@ class SimpleHandler extends AbstractHandler
      */
     private function handleChildStockUpdate(ProductInterface $child)
     {
-        ProductTypes::assetChildType($child);
+        ProductTypes::assertChildType($child);
 
         if ($child->getType() === ProductTypes::TYPE_VARIANT) {
             if (!$variable = $child->getParent()) {
@@ -256,7 +256,7 @@ class SimpleHandler extends AbstractHandler
      */
     private function scheduleChildStockChangeEvent(ProductInterface $parent)
     {
-        ProductTypes::assetParentType($parent);
+        ProductTypes::assertParentType($parent);
 
         $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_STOCK_CHANGE, $parent);
     }

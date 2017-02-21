@@ -23,6 +23,24 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     /**
      * @inheritdoc
      */
+    public function setProduct(Model\ProductInterface $product)
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setSubject(StockSubjectInterface $subject)
     {
         if (!$subject instanceof Model\ProductInterface) {
@@ -38,23 +56,5 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     public function getSubject()
     {
         return $this->getProduct();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getProduct()
-    {
-        return $this->product;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setProduct(Model\ProductInterface $product)
-    {
-        $this->product = $product;
-
-        return $this;
     }
 }

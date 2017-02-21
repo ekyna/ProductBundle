@@ -24,6 +24,7 @@ class VariantChoiceType extends AbstractType
             ->setDefaults([
                 'label'         => 'ekyna_product.variant.label.singular',
                 'property_path' => 'subjectData[variant]',
+                'select2'       => false,
                 'choices'       => function (Options $options, $value) {
                     if (empty($value)) {
                         $variable = $options['variable'];
@@ -36,9 +37,6 @@ class VariantChoiceType extends AbstractType
 
                     return $value;
                 },
-                'attr'          => [
-                    'class' => 'no-select2',
-                ],
             ])
             ->setRequired(['variable'])
             ->setAllowedTypes('variable', 'Ekyna\Bundle\ProductBundle\Model\ProductInterface')

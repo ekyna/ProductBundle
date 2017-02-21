@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
-use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
+use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidProductException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
@@ -185,6 +185,7 @@ class VariantUpdater
      * Asserts that the variant has a parent.
      *
      * @param Model\ProductInterface $variant
+     *
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
     protected function assertVariantWithParent(Model\ProductInterface $variant)

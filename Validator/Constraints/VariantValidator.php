@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
-use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderInterface;
+use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Validator\Constraint;

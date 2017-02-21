@@ -16,7 +16,7 @@ Feature: Remove attributes
         When I go to "ekyna_product_attribute_admin_remove" route with "attributeGroupId:1,attributeId:1"
         And I check "form[confirm]"
         And I press "form[actions][remove]"
-        Then I should see "La ressource a été supprimée avec succès."
+        Then I should see the resource removed confirmation message
         And I should not see "Blanc"
 
     # TODO Scenario: Remove an attribute used by a product

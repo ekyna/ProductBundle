@@ -15,5 +15,5 @@ Feature: Create attributes
         And I fill in "attribute[translations][fr][title]" with "Blanc"
         And I select "Couleur" from "attribute[group]"
         And I press "attribute_actions_save"
-        Then I should see "La ressource a été sauvegardée avec succès"
+        Then I should see the resource saved confirmation message
         And I should see "Blanc"

@@ -26,9 +26,7 @@ class ProductReferenceType extends ResourceFormType
                 'choices'     => ProductReferenceTypes::getChoices(),
                 'sizing'      => 'sm',
                 'placeholder' => 'ekyna_core.field.type',
-                'attr' => [
-                    'class' => 'no-select2',
-                ],
+                'select2'     => false,
             ])
             ->add('number', TextType::class, [
                 'label'  => 'ekyna_core.field.number',

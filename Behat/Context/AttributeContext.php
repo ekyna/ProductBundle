@@ -48,7 +48,7 @@ class AttributeContext implements Context, KernelAwareContext
         $attributes = [];
         foreach ($table->getHash() as $hash) {
             if (null === $group = $groupRepository->findOneBy(['name' => $hash['group']])) {
-                throw new \InvalidArgumentException("Failed to find an attribute group named '{$hash['group']}'.");
+                throw new \InvalidArgumentException("Failed to find the attribute group named '{$hash['group']}'.");
             }
 
             /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeInterface $attribute */

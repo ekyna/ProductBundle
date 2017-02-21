@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Subject\Repository\SubjectRepositoryInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
 
 /**
@@ -10,7 +11,7 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterfac
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface ProductRepositoryInterface extends TranslatableResourceRepositoryInterface
+interface ProductRepositoryInterface extends TranslatableResourceRepositoryInterface, SubjectRepositoryInterface
 {
     /**
      * Finds the product by id.

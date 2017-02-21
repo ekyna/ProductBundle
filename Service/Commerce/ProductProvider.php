@@ -3,19 +3,16 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
-use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
-use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
-use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
-use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
+use Ekyna\Component\Commerce\Subject\Builder\FormBuilderInterface;
+use Ekyna\Component\Commerce\Subject\Builder\ItemBuilderInterface;
+use Ekyna\Component\Commerce\Subject\Entity\SubjectIdentity;
 use Ekyna\Component\Commerce\Subject\Model\SubjectRelativeInterface;
 use Ekyna\Component\Commerce\Subject\Provider\SubjectProviderInterface;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * Class ProductProvider
@@ -70,176 +67,73 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function needChoice(SaleItemInterface $item)
+    public function assign(SubjectRelativeInterface $relative, $subject)
     {
-        return true;
+        /** @noinspection PhpInternalEntityUsedInspection */
+        return $this->transform($subject, $relative->getSubjectIdentity());
     }
 
     /**
-     * @inheritdoc
-     */
-    public function buildChoiceForm(FormInterface $form)
-    {
-        $this->getFormBuilder()->buildChoiceForm($form);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function handleChoiceSubmit(SaleItemInterface $item)
-    {
-        $product = $this->getItemProduct($item);
-
-        $data = [
-            SubjectProviderInterface::DATA_KEY => $this->getName(),
-            'id'                               => $product->getId(),
-        ];
-
-        $item->setSubjectData(array_replace((array)$item->getSubjectData(), $data));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function prepareItem(SaleItemInterface $item)
-    {
-        if (null === $product = $item->getSubject()) {
-            $product = $this->resolve($item);
-            $item->setSubject($product); // TODO May be done by resolve()
-        }
-
-        if (!$product instanceof ProductInterface) {
-            throw new InvalidArgumentException('Unexpected subject.');
-        }
-
-        // TODO move to item builder (can't actually because of the resolve() usage)
-        // If bundle/configurable product
-        if (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
-            $itemClass = get_class($item);
-
-            // For each bundle/configurable slots
-            foreach ($product->getBundleSlots() as $bundleSlot) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
-                $defaultChoice = $bundleSlot->getChoices()->first();
-                $choiceProducts = [];
-
-                // Valid and default slot product(s)
-                foreach ($bundleSlot->getChoices() as $choice) {
-                    $choiceProducts[] = $choice->getProduct();
-                }
-
-                // Find slot matching item
-                if ($item->hasChildren()) {
-                    foreach ($item->getChildren() as $child) {
-                        // Check bundle slot id
-                        $childBundleSlotId = intval($child->getSubjectData(BundleSlotInterface::ITEM_DATA_KEY));
-                        if ($childBundleSlotId != $bundleSlot->getId()) {
-                            continue;
-                        }
-
-                        // Get/resolve item subject
-                        if (null === $childProduct = $child->getSubject()) {
-                            $childProduct = $this->resolve($child);
-                        }
-
-                        // Invalid choice : set default
-                        if (!in_array($childProduct, $choiceProducts)) {
-                            $child
-                                ->setSubject($defaultChoice->getProduct())
-                                ->setQuantity($defaultChoice->getMinQuantity());
-                        }
-
-                        $child->setPosition($bundleSlot->getPosition());
-
-                        // Next bundle slot
-                        continue 2;
-                    }
-                }
-
-                // Item not found : create it
-                /** @var SaleItemInterface $bundleSlotItem */
-                $bundleSlotItem = new $itemClass;
-                $bundleSlotItem
-                    ->setSubject($defaultChoice->getProduct())
-                    ->setSubjectData(BundleSlotInterface::ITEM_DATA_KEY, $bundleSlot->getId())
-                    ->setQuantity($defaultChoice->getMinQuantity())
-                    ->setPosition($bundleSlot->getPosition());
-
-                $item->addChild($bundleSlotItem);
-            }
-
-            // TODO Sort items by position ?
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function buildItemForm(FormInterface $form, SaleItemInterface $item)
-    {
-        $this->getFormBuilder()->buildItemForm($form, $item);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function handleItemSubmit(SaleItemInterface $item)
-    {
-        $product = $this->getItemProduct($item);
-
-        $this->getItemBuilder()->buildItem($item, $product);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function resolveDiscounts(SaleItemInterface $item)
-    {
-        $product = $this->resolve($item);
-        $sale = $item->getSale();
-        $country = $sale->getInvoiceAddress() ? $sale->getInvoiceAddress()->getCountry() : null;
-
-        $data = $this
-            ->priceResolver
-            ->resolve($product, $item->getQuantity(), $sale->getCustomerGroup(), $country);
-
-        if (null !== $data) {
-            return [$data];
-        }
-
-        return [];
-    }
-
-    /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function resolve(SubjectRelativeInterface $relative)
     {
-        $this->assertSupportsRelative($relative);
+        /** @noinspection PhpInternalEntityUsedInspection */
+        return $this->reverseTransform($relative->getSubjectIdentity());
+    }
 
-        $data = $relative->getSubjectData();
-        if (!array_key_exists('id', $data)) {
-            throw new InvalidArgumentException("Unexpected item subject data.");
+    /**
+     * @inheritdoc
+     */
+    public function transform($subject, SubjectIdentity $identity)
+    {
+        $this->assertSupportsSubject($subject);
+
+        /** @noinspection PhpInternalEntityUsedInspection */
+        if ($subject === $identity->getSubject()) {
+            return $this;
         }
-        $dataId = intval($data['id']);
 
-        if (
-            (null !== $product = $relative->getSubject())
-            && ($product instanceof ProductInterface)
-            && ($product->getId() !== $dataId)
-        ) {
+        /** @var ProductInterface $subject */
+
+        /** @noinspection PhpInternalEntityUsedInspection */
+        $identity
+            ->setProvider(static::NAME)
+            ->setIdentifier($subject->getId())
+            ->setSubject($subject);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function reverseTransform(SubjectIdentity $identity)
+    {
+        $this->assertSupportsIdentity($identity);
+
+        /** @noinspection PhpInternalEntityUsedInspection */
+        $productId = intval($identity->getIdentifier());
+
+        /** @noinspection PhpInternalEntityUsedInspection */
+        if (null !== $product = $identity->getSubject()) {
+            if ((!$product instanceof ProductInterface) || ($product->getId() != $productId)) {
+                // TODO Clear identity data ?
+                throw new InvalidArgumentException("Failed to resolve item subject.");
+            }
+
             return $product;
         }
 
-        if ((0 < $dataId) && (null !== $product = $this->productRepository->findOneById($data['id']))) {
-            $relative->setSubject($product);
-        } else {
-            // TODO $item->setSubject(null);
-            // TODO return null;
+        if (null === $product = $this->productRepository->findOneById($productId)) {
+            // TODO Clear identity data ?
             throw new InvalidArgumentException("Failed to resolve item subject.");
         }
+
+        /** @noinspection PhpInternalEntityUsedInspection */
+        $identity->setSubject($product);
 
         return $product;
     }
@@ -257,13 +151,40 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function supportsRelative(SubjectRelativeInterface $relative)
     {
-        return $relative->getSubjectData(SubjectProviderInterface::DATA_KEY) === self::NAME;
+        /** @noinspection PhpInternalEntityUsedInspection */
+        return $relative->getSubjectIdentity()->getProvider() === self::NAME;
     }
 
     /**
-     * Returns the productRepository.
+     * Returns the item builder.
      *
-     * @return ProductRepositoryInterface
+     * @return ItemBuilderInterface
+     */
+    public function getItemBuilder()
+    {
+        if (null !== $this->itemBuilder) {
+            return $this->itemBuilder;
+        }
+
+        return $this->itemBuilder = new ItemBuilder($this, $this->priceResolver);
+    }
+
+    /**
+     * Returns the form builder.
+     *
+     * @return FormBuilderInterface
+     */
+    public function getFormBuilder()
+    {
+        if (null !== $this->formBuilder) {
+            return $this->formBuilder;
+        }
+
+        return $this->formBuilder = new FormBuilder($this);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getProductRepository()
     {
@@ -303,31 +224,17 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
-     * Returns the itemBuilder.
+     * Asserts that the subject relative is supported.
      *
-     * @return ItemBuilder
-     */
-    protected function getItemBuilder()
-    {
-        if (null !== $this->itemBuilder) {
-            return $this->itemBuilder;
-        }
-
-        return $this->itemBuilder = new ItemBuilder($this);
-    }
-
-    /**
-     * Returns the formBuilder.
+     * @param mixed $subject
      *
-     * @return FormBuilder
+     * @throws InvalidArgumentException
      */
-    protected function getFormBuilder()
+    protected function assertSupportsSubject($subject)
     {
-        if (null !== $this->formBuilder) {
-            return $this->formBuilder;
+        if (!$this->supportsSubject($subject)) {
+            throw new InvalidArgumentException('Unsupported subject.');
         }
-
-        return $this->formBuilder = new FormBuilder($this);
     }
 
     /**
@@ -345,24 +252,17 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
-     * Asserts that the item subject is set.
+     * Asserts that the subject identity is supported.
      *
-     * @param SaleItemInterface $item
+     * @param SubjectIdentity $identity
      *
-     * @return ProductInterface
-     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
-    private function getItemProduct(SaleItemInterface $item)
+    protected function assertSupportsIdentity(SubjectIdentity $identity)
     {
         /** @noinspection PhpInternalEntityUsedInspection */
-        if (null === $subject = $item->getSubject()) {
-            throw new RuntimeException('Item subject must be set.');
+        if ($identity->getProvider() != static::NAME) {
+            throw new InvalidArgumentException('Unsupported subject identity.');
         }
-
-        if (!$subject instanceof ProductInterface) {
-            throw new InvalidArgumentException("Expected instance of " . ProductInterface::class);
-        }
-
-        return $subject;
     }
 }

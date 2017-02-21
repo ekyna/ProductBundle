@@ -134,7 +134,7 @@
 
         <!-- Product table type -->
         <service id="ekyna_product.product.table_type"
-                 class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType">
+                 class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType"><!-- TODO use parameter defined by config builder -->
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.brand.class%</argument>
             <argument>%ekyna_product.category.class%</argument>
@@ -188,7 +188,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariantHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_core.locale_provider.request"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variable product event handler -->
@@ -196,7 +196,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariableHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_core.locale_provider.request"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
@@ -227,25 +227,16 @@
         </service>
 
         <!-- Product stock unit event listener -->
-        <!-- TODO abstract service -->
         <service id="ekyna_product.product_stock_unit.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitEventSubscriber">
-            <call method="setPersistenceHelper">
-                <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            </call>
-            <call method="setDispatcher">
-                <argument type="service" id="ekyna_resource.event_dispatcher"/>
-            </call>
-            <call method="setStateResolver">
-                <argument type="service" id="ekyna_commerce.stock_unit.state_resolver"/>
-            </call>
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitEventSubscriber"
+                 parent="ekyna_commerce.stock_unit.abstract_listener">
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Variant constraint validator -->
         <service id="ekyna_product.validator.variant_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
-            <argument type="service" id="ekyna_core.locale_provider.request"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="validator.constraint_validator" />
         </service>
 

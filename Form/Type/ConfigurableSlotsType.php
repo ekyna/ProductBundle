@@ -44,7 +44,7 @@ class ConfigurableSlotsType extends AbstractType
 
         foreach ($bundleSlots as $bundleSlot) {
             foreach ($item->getChildren() as $key => $child) {
-                $bundleSlotId = intval($child->getSubjectData(BundleSlotInterface::ITEM_DATA_KEY));
+                $bundleSlotId = intval($child->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
                 if ($bundleSlotId == $bundleSlot->getId()) {
                     // TODO (PRE_SET_DATA) $form->add()
                     $builder->add('slot_' . $bundleSlot->getId(), $this->slotTypeClass, [

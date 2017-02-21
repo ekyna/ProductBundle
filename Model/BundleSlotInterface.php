@@ -14,7 +14,7 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  */
 interface BundleSlotInterface extends TranslatableInterface
 {
-    const ITEM_DATA_KEY = 'bundle_slot_id';
+    const BUNDLE_SLOT_ID = 'bundle_slot_id';
 
     /**
      * Returns the bundle.

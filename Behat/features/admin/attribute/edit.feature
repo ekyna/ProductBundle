@@ -17,5 +17,5 @@ Feature: Edit attributes
         And I fill in "attribute[name]" with "Noir"
         And I fill in "attribute[translations][fr][title]" with "Noir"
         And I press "attribute_actions_save"
-        Then I should see "La ressource a été sauvegardée avec succès"
+        Then I should see the resource saved confirmation message
         And I should see "Noir"

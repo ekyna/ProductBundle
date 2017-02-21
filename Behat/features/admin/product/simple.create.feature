@@ -36,5 +36,5 @@ Feature: Create simple products
 
 
         And I press "product_actions_save"
-        Then I should see "La ressource a été sauvegardée avec succès"
+        Then I should see the resource saved confirmation message
         And I should see "iPhone 6"

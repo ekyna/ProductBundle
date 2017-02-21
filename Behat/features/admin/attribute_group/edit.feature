@@ -14,5 +14,5 @@ Feature: Edit attribute groups
         And I fill in "attribute_group[name]" with "Taille"
         And I fill in "attribute_group[translations][fr][title]" with "Taille"
         And I press "attribute_group_actions_save"
-        Then I should see "La ressource a été sauvegardée avec succès"
+        Then I should see the resource saved confirmation message
         And I should see "Taille"

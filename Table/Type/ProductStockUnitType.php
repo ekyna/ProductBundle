@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Table\Type\AbstractStockUnitType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -64,8 +65,9 @@ class ProductStockUnitType extends AbstractStockUnitType
 
                 return function (QueryBuilder $qb, $alias) use ($product) {
                     $qb
-                        // TODO ->andWhere($alias . '.state IN :states')
-                        ->andWhere($alias . '.product = :product')
+                        ->andWhere($qb->expr()->notIn($alias . '.state',  ':not_state'))
+                        ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+                        ->setParameter('not_state', StockUnitStates::STATE_CLOSED)
                         ->setParameter('product', $product);
                 };
             })

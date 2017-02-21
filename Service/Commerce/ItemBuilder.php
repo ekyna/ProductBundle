@@ -2,37 +2,124 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Commerce\Subject\Provider\SubjectProviderInterface;
+use Ekyna\Component\Commerce\Subject\Builder\ItemBuilderInterface;
 
 /**
  * Class ItemBuilder
  * @package Ekyna\Bundle\ProductBundle\Service\Commerce
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ItemBuilder
+class ItemBuilder implements ItemBuilderInterface
 {
-    const DATA_KEY_REMOVE_MISS_MATCH = 'remove_miss_match';
+    const REMOVE_MISS_MATCH = 'remove_miss_match';
+    const VARIANT_ID        = 'variant_id';
 
     /**
      * @var ProductProvider
      */
     private $provider;
 
+    /**
+     * @var PriceResolver
+     */
+    private $priceResolver;
+
 
     /**
      * Constructor.
      *
      * @param ProductProvider $provider
+     * @param PriceResolver   $priceResolver
      */
-    public function __construct(ProductProvider $provider)
+    public function __construct(ProductProvider $provider, PriceResolver $priceResolver)
     {
         $this->provider = $provider;
+        $this->priceResolver = $priceResolver;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initializeItem(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        if (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
+            $itemClass = get_class($item);
+
+            // For each bundle/configurable slots
+            foreach ($product->getBundleSlots() as $bundleSlot) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
+                $defaultChoice = $bundleSlot->getChoices()->first();
+                $choiceProducts = [];
+
+                // Valid and default slot product(s)
+                foreach ($bundleSlot->getChoices() as $choice) {
+                    $choiceProducts[] = $choice->getProduct();
+                }
+
+                // Find slot matching item
+                if ($item->hasChildren()) {
+                    foreach ($item->getChildren() as $child) {
+                        // Check bundle slot id
+                        $childBundleSlotId = intval($child->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
+                        if ($childBundleSlotId != $bundleSlot->getId()) {
+                            continue;
+                        }
+
+                        // Get/resolve item subject
+                        $childProduct = $this->provider->resolve($child);
+
+                        // If invalid choice
+                        if (!in_array($childProduct, $choiceProducts)) {
+                            // Assign the default product
+                            $this->provider->assign($child, $defaultChoice->getProduct());
+                            // Set quantity
+                            $child
+                                ->setQuantity($defaultChoice->getMinQuantity())/*->setSubjectData(BundleSlotInterface::ITEM_DATA_KEY, $bundleSlot->getId())*/
+                            ;
+                        }
+
+                        $child->setPosition($bundleSlot->getPosition());
+
+                        // Next bundle slot
+                        continue 2;
+                    }
+                }
+
+                // Item not found : create it
+                /** @var SaleItemInterface $bundleSlotItem */
+                $bundleSlotItem = new $itemClass; // TODO use Factory
+
+                $this->provider->assign($bundleSlotItem, $defaultChoice->getProduct());
+
+                $bundleSlotItem
+                    ->setSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID, $bundleSlot->getId())
+                    ->setQuantity($defaultChoice->getMinQuantity())
+                    ->setPosition($bundleSlot->getPosition());
+
+                $item->addChild($bundleSlotItem);
+            }
+
+            // TODO Sort items by position ?
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildItem(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        $this->buildItemFromProduct($item, $product);
     }
 
     /**
@@ -42,7 +129,7 @@ class ItemBuilder
      * @param ProductInterface  $product
      * @param array             $data
      */
-    public function buildItem(SaleItemInterface $item, ProductInterface $product, array $data = [])
+    protected function buildItemFromProduct(SaleItemInterface $item, ProductInterface $product, array $data = [])
     {
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -64,22 +151,42 @@ class ItemBuilder
     }
 
     /**
+     * @inheritdoc
+     */
+    public function buildAdjustmentsData(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        $sale = $item->getSale();
+        $country = $sale->getInvoiceAddress() ? $sale->getInvoiceAddress()->getCountry() : null;
+
+        $data = $this
+            ->priceResolver
+            ->resolve($product, $item->getQuantity(), $sale->getCustomerGroup(), $country);
+
+        if (null !== $data) {
+            return [$data];
+        }
+
+        return [];
+    }
+
+    /**
      * Builds the sale item form the simple product.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $extraData
+     * @param array             $data
      */
-    protected function buildSimpleItem(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    protected function buildSimpleItem(SaleItemInterface $item, ProductInterface $product, array $data = [])
     {
-        if (!in_array($product->getType(), [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT])) {
-            throw new InvalidArgumentException("Unexpected product type.");
-        }
+        ProductTypes::assertChildType($product);
 
-        $this->setItemProduct($item, $product, $extraData);
+        $this->provider->assign($item, $product);
 
         $item
-            ->setDesignation((string) $product)
+            ->setSubjectData($data)
+            ->setDesignation((string)$product)
             ->setReference($product->getReference())
             ->setNetPrice($product->getNetPrice())
             ->setWeight($product->getWeight())
@@ -91,15 +198,15 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $extraData
+     * @param array             $data
      */
-    protected function buildVariableItem(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    protected function buildVariableItem(SaleItemInterface $item, ProductInterface $product, array $data = [])
     {
         ProductTypes::assertVariable($product);
 
         $variant = null;
 
-        if (0 < ($variantId = intval($item->getSubjectData('variant')))) {
+        if (0 < ($variantId = intval($item->getSubjectData(static::VARIANT_ID)))) { // TODO key
             foreach ($product->getVariants() as $v) {
                 if ($variantId == $v->getId()) {
                     $variant = $v;
@@ -112,7 +219,7 @@ class ItemBuilder
             throw new RuntimeException("Failed to resolve variable's selected variant.");
         }
 
-        $this->buildSimpleItem($item, $variant, $extraData);
+        $this->buildSimpleItem($item, $variant, $data);
     }
 
     /**
@@ -120,20 +227,20 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $extraData
+     * @param array             $data
      */
-    protected function buildBundleItem(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    protected function buildBundleItem(SaleItemInterface $item, ProductInterface $product, array $data = [])
     {
         ProductTypes::assertBundle($product);
 
-        $this->setItemProduct($item, $product, $extraData);
-
         // Remove miss match option
-        $removeMissMatch = (bool)$item->getSubjectData(self::DATA_KEY_REMOVE_MISS_MATCH);
+        $removeMissMatch = $this->doRemoveMissMatch($data);
+
+        $this->provider->assign($item, $product);
 
         // Bundle root item
         $item
-            ->unsetSubjectData(self::DATA_KEY_REMOVE_MISS_MATCH)
+            ->setSubjectData($data)
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference());
 
@@ -147,17 +254,17 @@ class ItemBuilder
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getSubjectData(BundleSlotInterface::ITEM_DATA_KEY));
+                $bundleSlotId = intval($childItem->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
 
                 /** @var ProductInterface $childItemProduct */
-                $childItemProduct = $item->getSubject();
+                $childItemProduct = $this->provider->resolve($childItem);
 
                 // Build the item form the bundle choice's product
-                $this->buildItem($childItem, $childItemProduct, [
-                    self::DATA_KEY_REMOVE_MISS_MATCH => $removeMissMatch,
+                $this->buildItemFromProduct($childItem, $childItemProduct, [
+                    static::REMOVE_MISS_MATCH => $removeMissMatch,
                 ]);
 
                 // Item is immutable
@@ -175,7 +282,7 @@ class ItemBuilder
         // Removes miss match items
         if ($removeMissMatch) {
             foreach ($item->getChildren() as $childItem) {
-                $childProduct = $childItem->getSubject();
+                $childProduct = $this->provider->resolve($childItem);
                 if (null === $childProduct || !in_array($childProduct, $bundleProducts)) {
                     $item->removeChild($childItem);
                 }
@@ -188,20 +295,20 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $extraData
+     * @param array             $data
      */
-    protected function buildConfigurableItem(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    protected function buildConfigurableItem(SaleItemInterface $item, ProductInterface $product, array $data = [])
     {
         ProductTypes::assertConfigurable($product);
 
-        $this->setItemProduct($item, $product, $extraData);
-
         // Remove miss match option
-        $removeMissMatch = (bool)$item->getSubjectData(self::DATA_KEY_REMOVE_MISS_MATCH);
+        $removeMissMatch = $this->doRemoveMissMatch($data);
+
+        $this->provider->assign($item, $product);
 
         // Configurable root item
         $item
-            ->unsetSubjectData(self::DATA_KEY_REMOVE_MISS_MATCH)
+            ->setSubjectData($data)
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference())
             ->setConfigurable(true);
@@ -211,17 +318,17 @@ class ItemBuilder
         foreach ($product->getBundleSlots() as $bundleSlot) {
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getSubjectData(BundleSlotInterface::ITEM_DATA_KEY));
+                $bundleSlotId = intval($childItem->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
 
                 /** @var ProductInterface $childItemProduct */
-                $childItemProduct = $childItem->getSubject();
+                $childItemProduct = $this->provider->resolve($childItem);
 
                 // Sets the bundle product
-                $this->buildItem($childItem, $childItemProduct, [
-                    self::DATA_KEY_REMOVE_MISS_MATCH => $removeMissMatch,
+                $this->buildItemFromProduct($childItem, $childItemProduct, [
+                    static::REMOVE_MISS_MATCH => $removeMissMatch,
                 ]);
 
                 // Item is immutable
@@ -239,7 +346,8 @@ class ItemBuilder
         // Removes miss match items
         if ($removeMissMatch) {
             foreach ($item->getChildren() as $childItem) {
-                $childProduct = $childItem->getSubject();
+                /** @var ProductInterface $childProduct */
+                $childProduct = $this->provider->resolve($childItem);
 
                 if (null === $childProduct || !in_array($childProduct, $bundleProducts)) {
                     $item->removeChild($childItem);
@@ -249,32 +357,18 @@ class ItemBuilder
     }
 
     /**
-     * Sets the item product (subject) and configures the item subject data.
+     * Returns whether miss matches should be removed.
      *
-     * @param SaleItemInterface $item
-     * @param ProductInterface  $product
-     * @param array             $extraData
+     * @param array $data
      *
-     * @return array The resulting item subject data.
+     * @return bool
      */
-    protected function setItemProduct(SaleItemInterface $item, ProductInterface $product, array $extraData = [])
+    private function doRemoveMissMatch(&$data)
     {
-        $subject = $item->getSubject();
-        if (!$subject || !$subject instanceof ProductInterface || $product->getId() != $subject->getId()) {
-            $item->setSubject($product);
-        }
+        $removeMissMatch = isset($data[static::REMOVE_MISS_MATCH]) && (bool)$data[static::REMOVE_MISS_MATCH];
 
-        $data = array_replace(
-            (array)$item->getSubjectData(), // TODO remove ? (if subject class changed)
-            $extraData,
-            [
-                SubjectProviderInterface::DATA_KEY => ProductProvider::NAME,
-                'id'                               => $product->getId(),
-            ]
-        );
+        unset($data[static::REMOVE_MISS_MATCH]);
 
-        $item->setSubjectData($data);
-
-        return $data;
+        return $removeMissMatch;
     }
 }

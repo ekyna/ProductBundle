@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle;
 
-use Ekyna\Bundle\CoreBundle\AbstractBundle;
+use Ekyna\Bundle\ResourceBundle\AbstractBundle;
 use Ekyna\Bundle\ProductBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

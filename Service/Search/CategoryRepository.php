@@ -2,8 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Search;
 
-use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderAwareInterface;
-use Ekyna\Bundle\CoreBundle\Locale\LocaleProviderAwareTrait;
+use Ekyna\Component\Resource\Locale;
 use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
 
 /**
@@ -11,9 +10,9 @@ use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
  * @package Ekyna\Bundle\CommerceBundle\Search
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class CategoryRepository extends ResourceRepository implements LocaleProviderAwareInterface
+class CategoryRepository extends ResourceRepository implements Locale\LocaleProviderAwareInterface
 {
-    use LocaleProviderAwareTrait;
+    use Locale\LocaleProviderAwareTrait;
 
     /**
      * @inheritdoc

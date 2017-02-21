@@ -172,7 +172,7 @@ class ProductTypes extends AbstractConstants
      *
      * @param ProductInterface $product
      */
-    static public function assetChildType(ProductInterface $product)
+    static public function assertChildType(ProductInterface $product)
     {
         if (!in_array($product->getType(), static::getChildTypes(), true)) {
             throw new InvalidArgumentException("Expected product of 'child' type.");
@@ -184,7 +184,7 @@ class ProductTypes extends AbstractConstants
      *
      * @param ProductInterface $product
      */
-    static public function assetParentType(ProductInterface $product)
+    static public function assertParentType(ProductInterface $product)
     {
         if (!in_array($product->getType(), static::getParentTypes(), true)) {
             throw new InvalidArgumentException("Expected product of 'parent' type.");
