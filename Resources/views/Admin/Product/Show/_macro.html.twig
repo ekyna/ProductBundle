@@ -1,13 +1,17 @@
 {% macro show_designation(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation', options) }}
+    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation', {
+        'id': 'product_designation'
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_designation %}
 
 
 {% macro show_visible(product, options = {}) %}
     {% spaceless %}
-        {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', options) }}
+        {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', {
+            'id': 'product_visible'
+        }|merge(options)) }}
     {% endspaceless %}
 {% endmacro show_visible %}
 
@@ -16,7 +20,8 @@
 {% spaceless %}
     {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
         'route': 'ekyna_product_brand_admin_show',
-        'route_params_map': {'brandId': 'id'}
+        'route_params_map': {'brandId': 'id'},
+        'id': 'product_brand'
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_brand %}
@@ -26,7 +31,8 @@
 {% spaceless %}
     {{ show_row(product.categories, 'entity', 'ekyna_product.category.label.plural', {
         'route': 'ekyna_product_category_admin_show',
-        'route_params_map': {'categoryId': 'id'}
+        'route_params_map': {'categoryId': 'id'},
+        'id': 'product_categories'
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_categories %}
@@ -34,14 +40,18 @@
 
 {% macro show_geocode(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.geocode, 'text', 'ekyna_product.product.field.geocode', options) }}
+    {{ show_row(product.geocode, 'text', 'ekyna_product.product.field.geocode', {
+        'id': 'product_geocode'
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_geocode %}
 
 
 {% macro show_reference(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', options) }}
+    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {
+        'id': 'product_reference'
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_reference %}
 
@@ -50,6 +60,7 @@
 {% spaceless %}
     {# TODO use IntlNumberFormatter #}
     {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
+        'id': 'product_weight',
         'append': ' kg'
     }|merge(options)) }}
 {% endspaceless %}
@@ -59,6 +70,7 @@
 {% macro show_translations(product, options = {}) %}
 {% spaceless %}
     {{ show_translations_row(product.translations, {
+        'id': 'product_translations',
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},
             'description': {
@@ -76,6 +88,7 @@
 {% macro show_attribute_set(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.attributeSet, 'entity', 'ekyna_product.attribute_set.label.singular', {
+        'id': 'product_attributeSet',
         'route': 'ekyna_product_attribute_set_admin_show',
         'route_params_map': {'attributeSetId': 'id'}
     }|merge(options)) }}
@@ -86,6 +99,7 @@
 {% macro show_variable(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
+        'id': 'product_parent',
         'route': 'ekyna_product_product_admin_show',
         'route_params_map': {'productId': 'id'},
     }|merge(options)) }}
@@ -95,7 +109,9 @@
 
 {% macro show_medias(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias', options) }}
+    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias', {
+        'id': 'product_medias'
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_medias %}
 
@@ -104,6 +120,7 @@
 {% spaceless %}
     {# TODO use IntlNumberFormatter #}
     {{ show_row(product.netPrice, 'number', 'ekyna_product.product.field.net_price', {
+        'id': 'product_netPrice',
         'append': ' €'
     }|merge(options)) }}
 {% endspaceless %}
@@ -113,6 +130,7 @@
 {% macro show_tax_group(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.taxGroup, 'entity', 'ekyna_commerce.tax_group.label.singular', {
+        'id': 'product_taxGroup',
         'route': 'ekyna_commerce_tax_group_admin_show',
         'route_params_map': {'taxGroupId': 'id'},
     }|merge(options)) }}
@@ -127,7 +145,7 @@
             {{ 'ekyna_product.product_reference.label.plural'|trans }}
         </div>
         <div class="col-md-10">
-            <div class="show-widget show-widget-block">
+            <div class="show-widget show-widget-block" id="product_references">
                 {% if product.references is not empty %}
                     <dl class="dl-horizontal">
                         {% for reference in product.references %}
@@ -153,7 +171,7 @@
             {{ 'ekyna_product.attribute.label.plural'|trans }}
         </div>
         <div class="col-md-10">
-            <div class="show-widget show-widget-block">
+            <div class="show-widget show-widget-block" id="product_attributes">
                 {% set attributes = product|product_attributes %}
                 <dl class="dl-horizontal">
                 {% for data in attributes -%}
@@ -181,7 +199,7 @@
             {{ 'ekyna_commerce.adjustment.label.plural'|trans }}
         </div>
         <div class="col-md-10">
-            <div class="show-widget show-widget-block">
+            <div class="show-widget show-widget-block" id="product_adjustments">
                 <table class="table table-stripped table-condensed">
                     <tr>
                         <th>{{ 'ekyna_core.field.designation'|trans }}</th>
@@ -221,21 +239,25 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm">
                 {% for group in product.optionGroups %}
+                {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
                 <div class="row">
                     <div class="col-md-6">
                         {{ show_row(group.name, 'text', 'ekyna_core.field.name', {
+                            'id': groupId ~ 'name',
                             'label_nb_col': 4,
                             'widget_nb_col': 8
                         }) }}
                     </div>
                     <div class="col-md-6">
                         {{ show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
+                            'id': groupId ~ 'required',
                             'label_nb_col': 4,
                             'widget_nb_col': 8
                         }) }}
                     </div>
                 </div>
                 {{ show_translations_row(group.translations, {
+                    'id': groupId ~ 'translations',
                     'fields': {
                         'title': {'label': 'ekyna_core.field.title'},
                     }
@@ -255,12 +277,23 @@
                                     <th>{{ 'ekyna_core.field.group'|trans }}</th>
                                 </tr>
                                 {% for option in group.options %}
+                                {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
                                 <tr>
-                                    <td>{{ option.designation }}</td>
-                                    <td>{{ option.reference }}</td>
-                                    <td>{{ option.weight|localizednumber }} kg</td>
-                                    <td>{{ option.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
-                                    <td>{{ option.taxGroup }}</td>
+                                    <td id="{{ optionId ~ 'designation' }}">
+                                        {{ option.designation }}
+                                    </td>
+                                    <td id="{{ optionId ~ 'reference' }}">
+                                        {{ option.reference }}
+                                    </td>
+                                    <td id="{{ optionId ~ 'weight' }}">
+                                        {{ option.weight|localizednumber }} kg
+                                    </td>
+                                    <td id="{{ optionId ~ 'netPrice' }}">
+                                        {{ option.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                                    </td>
+                                    <td id="{{ optionId ~ 'taxGroup' }}">
+                                        {{ option.taxGroup }}
+                                    </td>
                                 </tr>
                                 {# TODO translations ? #}
                                 {% endfor %}
@@ -301,15 +334,20 @@
                         <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                     </tr>
                     {% for slot in product.bundleSlots %}
+                    {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
                     <tr>
-                        <td>
+                        <td id="{{ slotId ~ 'choice_0_product' }}">
                             {% set choice = (slot.choices|first) %}
                             <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
                                 {{ choice.product }}
                             </a>
                         </td>
-                        <td class="text-right">{{ choice.minQuantity }}</td>
-                        <td class="text-right">{{ choice.product.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                        <td id="{{ slotId ~ 'minQuantity' }}" class="text-right">
+                            {{ choice.minQuantity }}
+                        </td>
+                        <td id="{{ slotId ~ 'choice_0_product_netPrice' }}" class="text-right">
+                            {{ choice.product.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -338,10 +376,11 @@
                     <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
                     <span>{{ product|product_configurable_total_price|localizedcurrency('EUR') }}</span>
                 </p>
-
                 {% for slot in product.bundleSlots %}
+                {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
                 <div class="slot">
                     {{ show_translations_row(slot.translations, {
+                        'id': slotId ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
                             'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
@@ -356,27 +395,33 @@
                             <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                         </tr>
                         {% for choice in slot.choices %}
-                            <tr>
-                                <td>
-                                    <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
-                                        {{ choice.product }}
-                                    </a>
-                                </td>
-                                <td class="text-right">{{ choice.minQuantity }}</td>
-                                <td class="text-right">{{ choice.maxQuantity }}</td>
-                                <td class="text-right">{{ choice.product.netPrice|localizedcurrency('EUR') }}</td>{# TODO currency #}
-                            </tr>
-                            <tr>
-                                <td colspan="4" class="choice-rules">
-                                    <em>[TODO] Choice rules</em> {# TODO rules #}
-                                </td>
-                            </tr>
+                        {% set choiceId = slotId ~ '_choice_' ~loop.index0 ~ '_' %}
+                        <tr>
+                            <td id="{{ choiceId ~ 'product' }}">
+                                <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
+                                    {{ choice.product }}
+                                </a>
+                            </td>
+                            <td id="{{ choiceId ~ 'minQuantity' }}" class="text-right">
+                                {{ choice.minQuantity }}
+                            </td>
+                            <td id="{{ choiceId ~ 'maxQuantity' }}" class="text-right">
+                                {{ choice.maxQuantity }}
+                            </td>
+                            <td id="{{ choiceId ~ 'product_netPrice' }}" class="text-right">
+                                {{ choice.product.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="choice-rules">
+                                <em>[TODO] Choice rules</em> {# TODO rules #}
+                            </td>
+                        </tr>
                         {% endfor %}
                     </table>
 
                 </div>
                 {% endfor %}
-
             {% else %}
                 <p>
                     <em>Wrong product type</em>
@@ -391,12 +436,14 @@
 
 {% macro show_seo(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.seo, 'seo', null, options) }}
+    {{ show_row(product.seo, 'seo', null, {
+        'id': 'product_seo'
+    }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_seo %}
 
 
-{% macro show_stock_units(product, table_view, options = {}) %}
+{% macro show_stock_units(product) %}
 {% spaceless %}
     <div class="actions">
         {{ admin_resource_btn('ekyna_product.product_stock_unit', 'new', {
@@ -407,6 +454,8 @@
             })
         }) }}
     </div>
-    {{ ekyna_table_render(table_view) }}
+    {{ render_stock_unit_list(product, {
+        'id': 'product_stockUnit'
+    }) }}
 {% endspaceless %}
 {% endmacro show_stock_units %}

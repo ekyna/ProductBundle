@@ -24,11 +24,12 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             return [];
         }
 
+        $alias = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->in('psu.product', ':product'))
-            ->andWhere($qb->expr()->in('psu.state', ':state'))
+            ->andWhere($qb->expr()->in($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->in($alias . '.state', ':state'))
             ->setParameter('product', $subject)
             ->setParameter('state', [StockUnitStates::STATE_OPENED, StockUnitStates::STATE_PENDING])
             ->getQuery()
@@ -44,11 +45,12 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             return [];
         }
 
+        $alias = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->in('psu.product', ':product'))
-            ->andWhere($qb->expr()->in('psu.state', ':states'))
+            ->andWhere($qb->expr()->in($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->in($alias . '.state', ':states'))
             ->setParameter('product', $subject)
             ->setParameter('state', StockUnitStates::STATE_NEW)
             ->getQuery()
@@ -58,21 +60,23 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     /**
      * @inheritDoc
      */
-    public function findOneBySupplierOrderItem(SupplierOrderItemInterface $item)
+    public function findNotClosedSubject(StockSubjectInterface $subject)
     {
-        if (!$item->getId()) {
-            return null;
+        if (!$subject->getId()) {
+            return [];
         }
 
+        $alias = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->andWhere($qb->expr()->eq('psu.supplierOrderItem', ':item'))
-            ->setParameter('item', $item)
+            ->andWhere($qb->expr()->in($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->notIn($alias . '.state', ':state'))
+            ->setParameter('product', $subject)
+            ->setParameter('state', StockUnitStates::STATE_CLOSED)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getResult();
     }
-
 
     /**
      * @inheritDoc

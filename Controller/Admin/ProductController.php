@@ -74,7 +74,7 @@ class ProductController extends ResourceController
                 ])
                 ->getTable($context->getRequest())
                 ->createView();
-        } elseif (in_array($product->getType(), [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT], true)) {
+        } /*elseif (in_array($product->getType(), [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT], true)) {
             $data['stock_units'] = $this->getTableFactory()
                 ->createBuilder('ekyna_product_product_stock_unit', [
                     'name'    => 'ekyna_product.product_stock_unit',
@@ -82,7 +82,7 @@ class ProductController extends ResourceController
                 ])
                 ->getTable($context->getRequest())
                 ->createView();
-        }
+        }*/
 
         return null;
     }

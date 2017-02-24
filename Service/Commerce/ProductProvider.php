@@ -3,11 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
-use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
-use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
-use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
+use Ekyna\Component\Commerce\Exception\SubjectException;
 use Ekyna\Component\Commerce\Subject\Builder\FormBuilderInterface;
 use Ekyna\Component\Commerce\Subject\Builder\ItemBuilderInterface;
 use Ekyna\Component\Commerce\Subject\Entity\SubjectIdentity;
@@ -29,14 +26,14 @@ class ProductProvider implements SubjectProviderInterface
     private $productRepository;
 
     /**
-     * @var StockUnitRepositoryInterface
-     */
-    private $stockUnitRepository;
-
-    /**
      * @var PriceResolver
      */
     private $priceResolver;
+
+    /**
+     * @var string
+     */
+    private $productClass;
 
     /**
      * @var ItemBuilder
@@ -53,17 +50,17 @@ class ProductProvider implements SubjectProviderInterface
      * Constructor.
      *
      * @param ProductRepositoryInterface   $productRepository
-     * @param StockUnitRepositoryInterface $stockUnitRepository
      * @param PriceResolver                $priceResolver
+     * @param string                       $productClass
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
-        StockUnitRepositoryInterface $stockUnitRepository,
-        PriceResolver $priceResolver
+        PriceResolver $priceResolver,
+        $productClass
     ) {
         $this->productRepository = $productRepository;
-        $this->stockUnitRepository = $stockUnitRepository;
         $this->priceResolver = $priceResolver;
+        $this->productClass = $productClass;
     }
 
     /**
@@ -96,7 +93,7 @@ class ProductProvider implements SubjectProviderInterface
             return $this;
         }
 
-        /** @var ProductInterface $subject */
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $subject */
 
         /** @noinspection PhpInternalEntityUsedInspection */
         $identity
@@ -119,9 +116,9 @@ class ProductProvider implements SubjectProviderInterface
 
         /** @noinspection PhpInternalEntityUsedInspection */
         if (null !== $product = $identity->getSubject()) {
-            if ((!$product instanceof ProductInterface) || ($product->getId() != $productId)) {
+            if ((!$product instanceof $this->productClass) || ($product->getId() != $productId)) {
                 // TODO Clear identity data ?
-                throw new InvalidArgumentException("Failed to resolve item subject.");
+                throw new SubjectException("Failed to resolve item subject.");
             }
 
             return $product;
@@ -129,7 +126,7 @@ class ProductProvider implements SubjectProviderInterface
 
         if (null === $product = $this->productRepository->findOneById($productId)) {
             // TODO Clear identity data ?
-            throw new InvalidArgumentException("Failed to resolve item subject.");
+            throw new SubjectException("Failed to resolve item subject.");
         }
 
         /** @noinspection PhpInternalEntityUsedInspection */
@@ -143,7 +140,7 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function supportsSubject($subject)
     {
-        return $subject instanceof ProductInterface;
+        return $subject instanceof $this->productClass;
     }
 
     /**
@@ -194,17 +191,9 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * @inheritdoc
      */
-    public function getStockUnitRepository()
+    public function getSubjectClass()
     {
-        return $this->stockUnitRepository;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStockUnitChangeEventName()
-    {
-        return ProductEvents::STOCK_UNIT_CHANGE;
+        return $this->productClass;
     }
 
     /**
@@ -228,12 +217,12 @@ class ProductProvider implements SubjectProviderInterface
      *
      * @param mixed $subject
      *
-     * @throws InvalidArgumentException
+     * @throws SubjectException
      */
     protected function assertSupportsSubject($subject)
     {
         if (!$this->supportsSubject($subject)) {
-            throw new InvalidArgumentException('Unsupported subject.');
+            throw new SubjectException('Unsupported subject.');
         }
     }
 
@@ -242,12 +231,12 @@ class ProductProvider implements SubjectProviderInterface
      *
      * @param SubjectRelativeInterface $relative
      *
-     * @throws InvalidArgumentException
+     * @throws SubjectException
      */
     protected function assertSupportsRelative(SubjectRelativeInterface $relative)
     {
         if (!$this->supportsRelative($relative)) {
-            throw new InvalidArgumentException('Unsupported subject relative.');
+            throw new SubjectException('Unsupported subject relative.');
         }
     }
 
@@ -256,13 +245,13 @@ class ProductProvider implements SubjectProviderInterface
      *
      * @param SubjectIdentity $identity
      *
-     * @throws InvalidArgumentException
+     * @throws SubjectException
      */
     protected function assertSupportsIdentity(SubjectIdentity $identity)
     {
         /** @noinspection PhpInternalEntityUsedInspection */
         if ($identity->getProvider() != static::NAME) {
-            throw new InvalidArgumentException('Unsupported subject identity.');
+            throw new SubjectException('Unsupported subject identity.');
         }
     }
 }

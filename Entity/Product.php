@@ -990,17 +990,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getStockUnitClass()
+    protected function getTranslationClass()
     {
-        return ProductStockUnit::class;
+        return ProductTranslation::class;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    public static function getStockUnitClass()
     {
-        return ProductTranslation::class;
+        return ProductStockUnit::class;
     }
 
     /**

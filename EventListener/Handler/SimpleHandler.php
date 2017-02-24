@@ -7,8 +7,6 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
-use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
-use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -104,7 +102,7 @@ class SimpleHandler extends AbstractHandler
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
         if (null !== $stockUnit = $event->getData('stock_unit')) {
-            $changed = $this->updateStockByStockUnitChange($product, $stockUnit);
+            $changed = $this->stockUpdater->updateFromStockUnitChange($product, $stockUnit);
         } else {
             $changed = $this->updateStock($product);
         }
@@ -124,7 +122,7 @@ class SimpleHandler extends AbstractHandler
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
         if (null !== $stockUnit = $event->getData('stock_unit')) {
-            $changed = $this->updateStockByStockUnitRemoval($product, $stockUnit);
+            $changed = $this->stockUpdater->updateFromStockUnitRemoval($product, $stockUnit);
         } else {
             $changed = $this->updateStock($product);
         }
@@ -153,78 +151,6 @@ class SimpleHandler extends AbstractHandler
 
         // Estimated date of arrival update
         return $this->stockUpdater->updateEstimatedDateOfArrival($product) || $changed;
-    }
-
-    /**
-     * Updates stock data regarding to the stock unit changes.
-     *
-     * @param ProductInterface   $product
-     * @param StockUnitInterface $stockUnit
-     *
-     * @return bool
-     */
-    private function updateStockByStockUnitChange(ProductInterface $product, StockUnitInterface $stockUnit)
-    {
-        $cs = $this->persistenceHelper->getChangeSet($stockUnit);
-
-        $changed = false;
-
-        if (isset($cs['deliveredQuantity']) || isset($cs['shippedQuantity'])) {
-            // Resolve delivered and shipped quantity changes
-            $deliveredDelta = $deltaShipped = 0;
-            if (isset($cs['deliveredQuantity'])) {
-                $deliveredDelta = ((float)$cs['deliveredQuantity'][1]) - ((float)$cs['deliveredQuantity'][0]);
-            }
-            if (isset($cs['shippedQuantity'])) {
-                $deltaShipped = ((float)$cs['shippedQuantity'][1]) - ((float)$cs['shippedQuantity'][0]);
-            }
-
-            // TODO really need tests T_T
-            $changed = $this->stockUpdater->updateInStock($product, $deliveredDelta - $deltaShipped);
-        }
-
-        if (isset($cs['orderedQuantity'])) {
-            // Resolve ordered quantity change
-            $delta = ((float)$cs['orderedQuantity'][1]) - ((float)$cs['orderedQuantity'][0]);
-
-            $changed = $this->stockUpdater->updateOrderedStock($product, $delta) || $changed;
-        }
-
-        if ($changed || isset($cs['estimatedDateOfArrival'])) {
-            $date = $stockUnit->getState() !== StockUnitStates::STATE_CLOSED
-                ? $stockUnit->getEstimatedDateOfArrival()
-                : null;
-
-            $changed = $this->stockUpdater->updateEstimatedDateOfArrival($product, $date) || $changed;
-        }
-
-        return $changed;
-    }
-
-    /**
-     * Updates stock data regarding to the stock unit changes.
-     *
-     * @param ProductInterface   $product
-     * @param StockUnitInterface $stockUnit
-     *
-     * @return bool
-     */
-    private function updateStockByStockUnitRemoval(ProductInterface $product, StockUnitInterface $stockUnit)
-    {
-        $changed = false;
-
-        // We don't care about delivered and shipped stocks because the
-        // stock unit removal is prevented if those stocks are not null.
-
-        // Update ordered quantity
-        if (0 < $stockUnit->getOrderedQuantity()) {
-            $changed = $this->stockUpdater->updateOrderedStock($product, -$stockUnit->getOrderedQuantity());
-        }
-
-        // Update the estimated date of arrival
-        $changed = $this->stockUpdater->updateEstimatedDateOfArrival($product) || $changed;
-
-        return $changed;
     }
 
     /**

@@ -7,7 +7,7 @@ use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
 
 /**
  * Class CategoryRepository
- * @package Ekyna\Bundle\CommerceBundle\Search
+ * @package Ekyna\Bundle\ProductBundle\Service\Search
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
 class CategoryRepository extends ResourceRepository implements Locale\LocaleProviderAwareInterface

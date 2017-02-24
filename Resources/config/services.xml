@@ -162,8 +162,8 @@
         <service id="ekyna_product.product.subject_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_product.product_stock_unit.repository"/>
             <argument type="service" id="ekyna_product.pricing.resolver"/>
+            <argument>%ekyna_product.product.class%</argument>
             <tag name="ekyna_commerce.subject_provider"/>
         </service>
 
@@ -241,7 +241,8 @@
         </service>
 
         <!-- Search -->
-        <!-- TODO <service id="ekyna_product.category.search_repository"
+        <!-- TODO Handle wide_search tag in \Ekyna\Bundle\ResourceBundle\Elastica\RepositoryManager
+        <service id="ekyna_product.category.search_repository"
                  class="%ekyna_product.category.search_repository.class%">
             <factory service="fos_elastica.manager" method="getRepository"/>
             <argument>%ekyna_product.category.class%</argument>

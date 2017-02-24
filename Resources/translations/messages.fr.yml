@@ -234,14 +234,6 @@ ekyna_product:
         label:
             singular: Unitée de stock
             plural: Unitées de stock
-        header:
-            list: Liste des unitées de stock
-            show: Détail de l'unité
-            new: Créer une nouvelle unité
-            edit: Modifier l'unité
-            remove: Supprimer l'unité
-        button:
-            new: Créer une nouvelle unité
 
     variant:
         label:

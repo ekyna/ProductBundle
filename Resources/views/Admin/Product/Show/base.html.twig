@@ -1,30 +1,30 @@
 {% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
-{% import "EkynaCommerceBundle:Admin/Stock:_subject_macros.html.twig" as subject_macros %}
+{% import "EkynaCommerceBundle:Admin/Stock:_subject_macros.html.twig" as stock_macros %}
 
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="#product-general" data-toggle="tab">
+            <a href="#product-general" id="toggle-product-general" data-toggle="tab">
                 {{ 'ekyna_core.field.general'|trans }}
             </a>
         </li>
         {% block pricing_tab %}
         <li>
-            <a href="#product-pricing" data-toggle="tab">
+            <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
                 {{- 'ekyna_product.product.field.pricing'|trans -}}
             </a>
         </li>
         {% endblock pricing_tab %}
         {% block stock_tab %}
         <li>
-            <a href="#product-stock" data-toggle="tab">
+            <a href="#product-stock" id="toggle-product-stock" data-toggle="tab">
                 {{- 'ekyna_product.product.field.stock'|trans -}}
             </a>
         </li>
         {% endblock stock_tab %}
         {% block seo_tab %}
         <li>
-            <a href="#product-seo" data-toggle="tab">
+            <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
                 {{ 'ekyna_core.field.seo'|trans }}
             </a>
         </li>
@@ -65,30 +65,7 @@
                 <div class="tab-pane" id="product-stock">
                 {% block stock_content %}
                     {{ macros.show_geocode(product) }}
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ subject_macros.show_stock_mode(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ subject_macros.show_stock_state(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ subject_macros.show_in_stock(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ subject_macros.show_ordered_stock(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ subject_macros.show_shipped_stock(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ subject_macros.show_eta(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
-                        </div>
-                    </div>
+                    {{ stock_macros.show_stock_view(product, 'product') }}
                 {% endblock stock_content %}
                 </div>
             {% endblock stock_pane %}

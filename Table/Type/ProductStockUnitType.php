@@ -14,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Class ProductStockUnitType
  * @package Ekyna\Bundle\ProductBundle\Table\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ * @deprecated Use the StockRenderer
  */
 class ProductStockUnitType extends AbstractStockUnitType
 {
@@ -65,7 +66,7 @@ class ProductStockUnitType extends AbstractStockUnitType
 
                 return function (QueryBuilder $qb, $alias) use ($product) {
                     $qb
-                        ->andWhere($qb->expr()->notIn($alias . '.state',  ':not_state'))
+                        ->andWhere($qb->expr()->notIn($alias . '.state', ':not_state'))
                         ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
                         ->setParameter('not_state', StockUnitStates::STATE_CLOSED)
                         ->setParameter('product', $product);
