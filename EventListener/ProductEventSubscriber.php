@@ -102,7 +102,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
         $product = $this->getProductFromEvent($event);
 
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_CHANGE)) {
-            $this->persistenceHelper->persistAndRecompute($product);
+            $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
 
@@ -116,7 +116,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
         $product = $this->getProductFromEvent($event);
 
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_REMOVAL)) {
-            $this->persistenceHelper->persistAndRecompute($product);
+            $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
 
@@ -130,7 +130,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
         $product = $this->getProductFromEvent($event);
 
         if ($this->executeHandlers($event, HandlerInterface::CHILD_STOCK_CHANGE)) {
-            $this->persistenceHelper->persistAndRecompute($product);
+            $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
 
