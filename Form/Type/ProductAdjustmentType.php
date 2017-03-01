@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\CommerceBundle\Form\Type\AdjustmentType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Common\AdjustmentType;
 
 /**
  * Class ProductAdjustmentType
