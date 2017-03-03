@@ -4,11 +4,9 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
-use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceSearchType;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Commerce\Subject\Builder\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
 use Symfony\Component\Form\FormInterface;
 
@@ -17,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
  * @package Ekyna\Bundle\ProductBundle\Service\Commerce
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class FormBuilder implements FormBuilderInterface
+class FormBuilder
 {
     /**
      * @var ProductProvider
@@ -36,36 +34,14 @@ class FormBuilder implements FormBuilderInterface
     }
 
     /**
-     * Build the product choice form.
-     *
-     * @param FormInterface $form
-     *
-     * @deprecated Use SubjectChoiceType
-     */
-    public function buildChoiceForm(FormInterface $form)
-    {
-        //throw new \Exception('This method must be removed.');
-
-        $form->add('subject', ResourceSearchType::class, [
-            'label'    => false,
-            'class'    => $this->provider->getSubjectClass(),
-            'required' => false,
-        ]);
-    }
-
-    /**
      * Build the product item form.
      *
      * @param FormInterface     $form
      * @param SaleItemInterface $item
      */
-    public function buildItemForm($form, SaleItemInterface $item)
+    public function buildItemForm(FormInterface $form, SaleItemInterface $item)
     {
-        if (!$form instanceof FormInterface) {
-            throw new InvalidArgumentException('Expected form as instance of ' . FormInterface::class);
-        }
-
-        /** @var ProductInterface $product */
+        /** @var ProductInterface $product @todo assert */
         $product = $this->provider->resolve($item);
 
         // Variant : fallback to parent (Variable)

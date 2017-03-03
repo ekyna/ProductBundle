@@ -5,7 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
-use Ekyna\Component\Commerce\Pricing\Model as Pricing;
+use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -23,7 +23,7 @@ interface ProductInterface extends
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,
     AdjustableInterface,
-    Pricing\TaxableInterface,
+    TaxableInterface,
     StockSubjectInterface
 {
     /**

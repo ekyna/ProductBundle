@@ -2,21 +2,19 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Commerce\Subject\Builder\ItemBuilderInterface;
 
 /**
  * Class ItemBuilder
  * @package Ekyna\Bundle\ProductBundle\Service\Commerce
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ItemBuilder implements ItemBuilderInterface
+class ItemBuilder
 {
     const REMOVE_MISS_MATCH = 'remove_miss_match';
     const VARIANT_ID        = 'variant_id';
@@ -26,22 +24,15 @@ class ItemBuilder implements ItemBuilderInterface
      */
     private $provider;
 
-    /**
-     * @var PriceResolver
-     */
-    private $priceResolver;
-
 
     /**
      * Constructor.
      *
      * @param ProductProvider $provider
-     * @param PriceResolver   $priceResolver
      */
-    public function __construct(ProductProvider $provider, PriceResolver $priceResolver)
+    public function __construct(ProductProvider $provider)
     {
         $this->provider = $provider;
-        $this->priceResolver = $priceResolver;
     }
 
     /**
@@ -49,6 +40,7 @@ class ItemBuilder implements ItemBuilderInterface
      */
     public function initializeItem(SaleItemInterface $item)
     {
+        // TODO assert ProductInterface
         $product = $this->provider->resolve($item);
 
         if (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
@@ -75,6 +67,7 @@ class ItemBuilder implements ItemBuilderInterface
                         }
 
                         // Get/resolve item subject
+                        // TODO assert ProductInterface
                         $childProduct = $this->provider->resolve($child);
 
                         // If invalid choice
@@ -117,6 +110,7 @@ class ItemBuilder implements ItemBuilderInterface
      */
     public function buildItem(SaleItemInterface $item)
     {
+        // TODO assert ProductInterface
         $product = $this->provider->resolve($item);
 
         $this->buildItemFromProduct($item, $product);
@@ -148,27 +142,6 @@ class ItemBuilder implements ItemBuilderInterface
             default:
                 throw new InvalidArgumentException('Unexpected product type');
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function buildAdjustmentsData(SaleItemInterface $item)
-    {
-        $product = $this->provider->resolve($item);
-
-        $sale = $item->getSale();
-        $country = $sale->getInvoiceAddress() ? $sale->getInvoiceAddress()->getCountry() : null;
-
-        $data = $this
-            ->priceResolver
-            ->resolve($product, $item->getQuantity(), $sale->getCustomerGroup(), $country);
-
-        if (null !== $data) {
-            return [$data];
-        }
-
-        return [];
     }
 
     /**

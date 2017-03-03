@@ -8,7 +8,7 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model as Common;
-use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
+use Ekyna\Component\Commerce\Pricing\Model as Pricing;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -26,6 +26,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         Cms\SeoSubjectTrait,
         RM\TimestampableTrait,
         RM\TaggedEntityTrait,
+        Pricing\TaxableTrait,
         StockSubjectTrait;
 
     /**
@@ -67,11 +68,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      * @var ArrayCollection|Model\BundleSlotInterface[]
      */
     protected $bundleSlots;
-
-    /**
-     * @var TaxGroupInterface
-     */
-    protected $taxGroup;
 
     /**
      * @var Model\BrandInterface
@@ -499,24 +495,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         foreach ($bundleSlots as $slot) {
             $this->addBundleSlot($slot);
         }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTaxGroup()
-    {
-        return $this->taxGroup;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setTaxGroup(TaxGroupInterface $group = null)
-    {
-        $this->taxGroup = $group;
 
         return $this;
     }

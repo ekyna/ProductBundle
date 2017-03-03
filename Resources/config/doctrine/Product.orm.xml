@@ -107,10 +107,6 @@
             <join-column name="attribute_set_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true"/>
         </many-to-one>
 
-        <many-to-one target-entity="Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface" field="taxGroup">
-            <join-column name="tax_group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true"/>
-        </many-to-one>
-
         <many-to-one field="brand" target-entity="Ekyna\Bundle\ProductBundle\Model\BrandInterface">
             <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
         </many-to-one>

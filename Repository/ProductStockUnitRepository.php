@@ -16,7 +16,7 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 class ProductStockUnitRepository extends ResourceRepository implements StockUnitRepositoryInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function findAvailableOrPendingBySubject(StockSubjectInterface $subject)
     {
@@ -37,7 +37,15 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     */
+    public function findUnassignedBySubject(StockSubjectInterface $subject)
+    {
+        throw new \Exception('Not yet implemented');
+    }
+
+    /**
+     * @inheritdoc
      */
     public function findNewBySubject(StockSubjectInterface $subject)
     {
@@ -58,7 +66,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function findNotClosedSubject(StockSubjectInterface $subject)
     {
@@ -79,7 +87,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getAlias()
     {
