@@ -208,18 +208,6 @@
                 </option>
             </constraint>
         </property>
-        <property name="description">
-            <constraint name="IsNull">
-                <option name="groups">
-                    <value>bundle</value>
-                </option>
-            </constraint>
-            <constraint name="NotBlank">
-                <option name="groups">
-                    <value>configurable</value>
-                </option>
-            </constraint>
-        </property>
         <property name="choices">
             <constraint name="Valid"/>
             <constraint name="Count">
@@ -229,6 +217,9 @@
         <property name="translations">
             <constraint name="Count">
                 <option name="min">1</option>
+                <option name="groups">
+                    <value>configurable</value>
+                </option>
             </constraint>
         </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleSlot"/>

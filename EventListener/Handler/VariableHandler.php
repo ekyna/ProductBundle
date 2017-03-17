@@ -2,53 +2,18 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
-use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
  * Class VariableHandler
  * @package Ekyna\Bundle\ProductBundle\EventListener\Handler
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariableHandler extends AbstractHandler
+class VariableHandler extends AbstractVariantHandler
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    private $persistenceHelper;
-
-    /**
-     * @var VariantUpdater
-     */
-    private $variantUpdater;
-
-    /**
-     * @var VariableUpdater
-     */
-    private $variableUpdater;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param LocaleProviderInterface    $localeProvider
-     */
-    public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider
-    ) {
-        $this->persistenceHelper = $persistenceHelper;
-
-        $this->variantUpdater = new VariantUpdater($persistenceHelper, $localeProvider);
-        $this->variableUpdater = new VariableUpdater();
-    }
-
     /**
      * @inheritdoc
      */
@@ -56,7 +21,9 @@ class VariableHandler extends AbstractHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->variableUpdater->updateMinPrice($variable);
+
+        return $this->ensureDisabledStockMode($variable)
+            || $this->getVariableUpdater()->updateMinPrice($variable);
     }
 
     /**
@@ -68,13 +35,13 @@ class VariableHandler extends AbstractHandler
 
         if ($this->persistenceHelper->isChanged($variable, 'taxGroup')) {
             foreach ($variable->getVariants() as $variant) {
-                if ($this->variantUpdater->updateTaxGroup($variant)) {
+                if ($this->getVariantUpdater()->updateTaxGroup($variant)) {
                     $this->persistenceHelper->persistAndRecompute($variant, true);
                 }
             }
         }
 
-        return false;
+        return $this->ensureDisabledStockMode($variable);
     }
 
     /**
@@ -84,7 +51,7 @@ class VariableHandler extends AbstractHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->variableUpdater->updateStockState($variable);
+        return $this->getVariableUpdater()->updateStockState($variable);
     }
 
     /**

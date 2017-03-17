@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -149,6 +150,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         $this->initializeAdjustments();
         $this->initializeStock();
+
+        $this->stockMode = StockSubjectModes::MODE_ENABLED;
     }
 
     /**
@@ -946,11 +949,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      *
      * @return float
      */
-    public function getOrderedStock()
+    public function getVirtualStock()
     {
         // TODO if bundled or variable, resolve stock
 
-        return $this->orderedStock;
+        return $this->virtualStock;
     }
 
     /**

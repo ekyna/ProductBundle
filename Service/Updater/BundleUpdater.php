@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
 /**
  * Class BundleUpdater
@@ -23,19 +24,27 @@ class BundleUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        if ($bundle->getStockMode() != StockSubjectModes::MODE_ENABLED) {
-            return false;
-        }
-
-        $eda = null; $inStock = $orderedStock = 0;
+        $justInTime = true;
+        $inStock = $virtualStock = 0;
+        $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
         if (0 < $bundleSlots->count()) {
             foreach ($bundleSlots as $slot) {
+
+                // TODO For configurable, look for availability over all choices
+
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
                 $product = $choice->getProduct();
+
+                if ($product->getStockMode() != StockSubjectModes::MODE_JUST_IN_TIME) {
+                    $justInTime = false;
+                    if ($product->getStockMode() == StockSubjectModes::MODE_DISABLED) {
+                        continue;
+                    }
+                }
 
                 if ($slotInStock = $product->getInStock() / $choice->getMinQuantity()) {
                     if (0 == $inStock || $slotInStock < $inStock) {
@@ -43,14 +52,13 @@ class BundleUpdater
                     }
                 }
 
-                if ($slotOrderedStock = $product->getOrderedStock() / $choice->getMinQuantity()) {
-                    if (0 == $orderedStock || $slotOrderedStock < $orderedStock) {
-                        $orderedStock = $slotOrderedStock;
-
-                        if (null !== $slotEda = $product->getEstimatedDateOfArrival()) {
-                            if (null === $eda || $slotEda > $eda) {
-                                $eda = $slotEda;
-                            }
+                if ($slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity()) {
+                    if (0 == $virtualStock || $slotVirtualStock < $virtualStock) {
+                        $virtualStock = $slotVirtualStock;
+                    }
+                    if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
+                        if (null === $eda || $slotEda > $eda) {
+                            $eda = $slotEda;
                         }
                     }
                 }
@@ -59,12 +67,23 @@ class BundleUpdater
 
         $changed = false;
 
+        $state = StockSubjectStates::STATE_OUT_OF_STOCK;
+        if ($justInTime || 0 < $inStock) {
+            $state = StockSubjectStates::STATE_IN_STOCK;
+        } elseif (0 < $virtualStock) {
+            $state = StockSubjectStates::STATE_PRE_ORDER;
+        }
+
+        if ($state != $bundle->getStockState()) {
+            $bundle->setStockState($state);
+            $changed = true;
+        }
         if ($inStock != $bundle->getInStock()) {
             $bundle->setInStock($inStock);
             $changed = true;
         }
-        if ($orderedStock != $bundle->getOrderedStock()) {
-            $bundle->setOrderedStock($orderedStock);
+        if ($virtualStock != $bundle->getVirtualStock()) {
+            $bundle->setVirtualStock($virtualStock);
             $changed = true;
         }
         if ($eda != $bundle->getEstimatedDateOfArrival()) {

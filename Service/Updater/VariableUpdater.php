@@ -62,25 +62,51 @@ class VariableUpdater
     {
         Model\ProductTypes::assertVariable($variable);
 
-        if (!$variable->getStockMode() === Stock\StockSubjectModes::MODE_ENABLED) {
-            return false;
-        }
-
         $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
+        $inStock = $virtualStock = null;
         $variants = $variable->getVariants()->getIterator();
+
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
+
+            if ($variant->getStockMode() == Stock\StockSubjectModes::MODE_DISABLED) {
+                continue;
+            } elseif ($variant->getStockMode() == Stock\StockSubjectModes::MODE_JUST_IN_TIME) {
+                $state = Stock\StockSubjectStates::STATE_IN_STOCK;
+                $inStock = $virtualStock = 0;
+                break;
+            }
+
             if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $state)) {
                 $state = $variant->getStockState();
             }
+
+            if (null === $inStock || $inStock > $variant->getInStock()) {
+                $inStock = $variant->getInStock();
+            }
+
+            if (null === $virtualStock || $virtualStock > $variant->getVirtualStock()) {
+                $virtualStock = $variant->getVirtualStock();
+            }
+        }
+
+        $changed = false;
+
+        if ($variable->getInStock() !== $inStock) {
+            $variable->setInStock($inStock);
+            $changed = true;
+        }
+
+        if ($variable->getVirtualStock() !== $virtualStock) {
+            $variable->setVirtualStock($virtualStock);
+            $changed = true;
         }
 
         if ($variable->getStockState() !== $state) {
             $variable->setStockState($state);
-
-            return true;
+            $changed = true;
         }
 
-        return false;
+        return $changed;
     }
 }

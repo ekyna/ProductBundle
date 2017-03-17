@@ -2,54 +2,18 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
-use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
  * Class VariantHandler
  * @package Ekyna\Bundle\ProductBundle\EventListener\Handler
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariantHandler extends AbstractHandler
+class VariantHandler extends AbstractVariantHandler
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    private $persistenceHelper;
-
-    /**
-     * @var VariantUpdater
-     */
-    private $variantUpdater;
-
-    /**
-     * @var VariableUpdater
-     */
-    private $variableUpdater;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param LocaleProviderInterface    $localeProvider
-     */
-    public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider
-    ) {
-        $this->persistenceHelper = $persistenceHelper;
-
-        $this->variantUpdater = new VariantUpdater($persistenceHelper, $localeProvider);
-        $this->variableUpdater = new VariableUpdater();
-    }
-
     /**
      * @inheritDoc
      */
@@ -60,12 +24,12 @@ class VariantHandler extends AbstractHandler
         $changed = false;
 
         // Generate attributes designation and title if needed
-        if ($this->variantUpdater->updateAttributesDesignationAndTitle($variant)) {
+        if ($this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant)) {
             $changed = true;
         }
 
         // Set tax group regarding to parent/variable if needed
-        if ($this->variantUpdater->updateTaxGroup($variant)) {
+        if ($this->getVariantUpdater()->updateTaxGroup($variant)) {
             $changed = true;
         }
 
@@ -86,13 +50,13 @@ class VariantHandler extends AbstractHandler
         $changed = false;
 
         // Generate attributes designation and title if needed
-        if ($this->variantUpdater->updateAttributesDesignationAndTitle($variant)) {
+        if ($this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant)) {
             $changed = true;
         }
 
         // Update parent/variable minimum price if variant price has changed
         if ($this->persistenceHelper->isChanged($variant, 'netPrice')) {
-            if ($this->variableUpdater->updateMinPrice($variable)) {
+            if ($this->getVariableUpdater()->updateMinPrice($variable)) {
                 $this->persistenceHelper->persistAndRecompute($variable, true);
             }
         }

@@ -19,15 +19,15 @@ class BundleHandler extends AbstractHandler
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    //private $persistenceHelper;
 
     /**
      * @var StockSubjectUpdaterInterface
      */
-    private $stockUpdater;
+    //private $stockUpdater;
 
     /**
-     * @var \Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater
+     * @var BundleUpdater
      */
     private $bundleUpdater;
 
@@ -38,7 +38,7 @@ class BundleHandler extends AbstractHandler
      * @param PersistenceHelperInterface       $persistenceHelper
      * @param StockSubjectUpdaterInterface     $stockUpdater
      */
-    public function __construct(
+    /*public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         StockSubjectUpdaterInterface $stockUpdater
     ) {
@@ -46,7 +46,7 @@ class BundleHandler extends AbstractHandler
         $this->stockUpdater = $stockUpdater;
 
         $this->bundleUpdater = new BundleUpdater();
-    }
+    }*/
 
     /**
      * @inheritdoc
@@ -55,7 +55,9 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        return $this->stockUpdater->update($bundle);
+        //$this->stockUpdater->update($bundle);
+
+        return $this->ensureDisabledStockMode($bundle);
     }
 
     /**
@@ -65,11 +67,11 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        if ($this->persistenceHelper->isChanged($bundle, ['inStock', 'orderedStock', 'estimatedDateOfArrival'])) {
+        /*if ($this->persistenceHelper->isChanged($bundle, ['inStock', 'virtualStock', 'estimatedDateOfArrival'])) {
             return $this->stockUpdater->updateStockState($bundle);
-        }
+        }*/
 
-        return false;
+        return $this->ensureDisabledStockMode($bundle);
     }
 
     /**
@@ -79,7 +81,7 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        return $this->bundleUpdater->updateStock($bundle);
+        return $this->getBundleUpdater()->updateStock($bundle);
     }
 
     /**
@@ -88,5 +90,19 @@ class BundleHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return $product->getType() === ProductTypes::TYPE_BUNDLE;
+    }
+
+    /**
+     * Returns the bundle updater.
+     *
+     * @return BundleUpdater
+     */
+    protected function getBundleUpdater()
+    {
+        if (null !== $this->bundleUpdater) {
+            return $this->bundleUpdater;
+        }
+
+        return $this->bundleUpdater = new BundleUpdater();
     }
 }

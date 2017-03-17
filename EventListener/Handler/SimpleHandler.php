@@ -83,7 +83,7 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if ($this->persistenceHelper->isChanged($product, ['inStock', 'orderedStock', 'estimatedDateOfArrival'])) {
+        if ($this->persistenceHelper->isChanged($product, ['inStock', 'virtualStock', 'estimatedDateOfArrival'])) {
             if ($this->stockUpdater->updateStockState($product)) {
                 $this->handleChildStockUpdate($product);
 
@@ -135,6 +135,14 @@ class SimpleHandler extends AbstractHandler
     }
 
     /**
+     * @inheritdoc
+     */
+    public function supports(ProductInterface $product)
+    {
+        return in_array($product->getType(), ProductTypes::getChildTypes());
+    }
+
+    /**
      * Updates the stock data.
      *
      * @param ProductInterface $product
@@ -146,11 +154,17 @@ class SimpleHandler extends AbstractHandler
         // In stock update
         $changed = $this->stockUpdater->updateInStock($product);
 
-        // Ordered stock update
-        $changed = $this->stockUpdater->updateOrderedStock($product) || $changed;
+        // Virtual stock update
+        $changed |= $this->stockUpdater->updateVirtualStock($product);
 
         // Estimated date of arrival update
-        return $this->stockUpdater->updateEstimatedDateOfArrival($product) || $changed;
+        $changed |= $this->stockUpdater->updateEstimatedDateOfArrival($product);
+
+        return $changed;
+
+        // TODO Check that stock state update is ALWAYS done by the handUpdate method.
+        // Stock state
+        //return $this->stockUpdater->updateStockState($product) || $changed;
     }
 
     /**
@@ -185,13 +199,5 @@ class SimpleHandler extends AbstractHandler
         ProductTypes::assertParentType($parent);
 
         $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_STOCK_CHANGE, $parent);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function supports(ProductInterface $product)
-    {
-        return in_array($product->getType(), ProductTypes::getChildTypes());
     }
 }
