@@ -29,6 +29,16 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     /**
      * @inheritdoc
      */
+    public function findPendingBySubject(StockSubjectInterface $subject)
+    {
+        return $this->findBySubjectAndStates($subject, [
+            StockUnitStates::STATE_PENDING
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function findPendingOrReadyBySubject(StockSubjectInterface $subject)
     {
         return $this->findBySubjectAndStates($subject, [
@@ -77,7 +87,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         if (1 == count($states)) {
             $qb
                 ->andWhere($qb->expr()->eq($alias . '.state', ':state'))
-                ->setParameter('state', current($states));
+                ->setParameter('state', reset($states));
         } else {
             $qb
                 ->andWhere($qb->expr()->in($alias . '.state', ':states'))

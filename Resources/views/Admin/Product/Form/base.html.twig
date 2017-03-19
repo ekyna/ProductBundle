@@ -1,19 +1,19 @@
 <ul class="nav nav-tabs">
     <li class="active">
-        <a href="#product-general" data-toggle="tab">
+        <a href="#product-general" id="toggle-product-general" data-toggle="tab">
             {{ 'ekyna_core.field.general'|trans }}
         </a>
     </li>
     {% block pricing_tab %}
     <li>
-        <a href="#product-pricing" data-toggle="tab">
+        <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
             {{- 'ekyna_product.product.field.pricing'|trans -}}
         </a>
     </li>
     {% endblock pricing_tab %}
     {% block seo_tab %}
     <li>
-        <a href="#product-seo" data-toggle="tab">
+        <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
             {{ 'ekyna_core.field.seo'|trans }}
         </a>
     </li>

@@ -18,7 +18,7 @@ class ConfigurableHandler extends AbstractHandler
      */
     public function handleInsert(ResourceEventInterface $event)
     {
-        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
+        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
         return $this->ensureDisabledStockMode($bundle);
     }
@@ -28,7 +28,7 @@ class ConfigurableHandler extends AbstractHandler
      */
     public function handleUpdate(ResourceEventInterface $event)
     {
-        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
+        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
         return $this->ensureDisabledStockMode($bundle);
     }
@@ -39,6 +39,7 @@ class ConfigurableHandler extends AbstractHandler
     public function handleChildStockChange(ResourceEventInterface $event)
     {
         //throw new \Exception('Not yet implemented');
+        // TODO
     }
 
     /**

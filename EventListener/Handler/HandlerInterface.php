@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
 /**
@@ -48,20 +49,20 @@ interface HandlerInterface
     /**
      * Handles the stock unit change event.
      *
-     * @param ResourceEventInterface $event
+     * @param SubjectStockUnitEvent $event
      *
      * @return bool Whether or not the product has been changed.
      */
-    public function handleStockUnitChange(ResourceEventInterface $event);
+    public function handleStockUnitChange(SubjectStockUnitEvent $event);
 
     /**
      * Handles the stock unit remove event.
      *
-     * @param ResourceEventInterface $event
+     * @param SubjectStockUnitEvent $event
      *
      * @return bool Whether or not the product has been changed.
      */
-    public function handleStockUnitRemoval(ResourceEventInterface $event);
+    public function handleStockUnitRemoval(SubjectStockUnitEvent $event);
 
     /**
      * Handles the child stock change event.

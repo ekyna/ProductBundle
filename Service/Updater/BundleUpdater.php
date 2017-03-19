@@ -39,6 +39,7 @@ class BundleUpdater
                 $choice = $slot->getChoices()->first();
                 $product = $choice->getProduct();
 
+                // State
                 if ($product->getStockMode() != StockSubjectModes::MODE_JUST_IN_TIME) {
                     $justInTime = false;
                     if ($product->getStockMode() == StockSubjectModes::MODE_DISABLED) {
@@ -46,20 +47,20 @@ class BundleUpdater
                     }
                 }
 
-                if ($slotInStock = $product->getInStock() / $choice->getMinQuantity()) {
-                    if (0 == $inStock || $slotInStock < $inStock) {
-                        $inStock = $slotInStock;
-                    }
+                // In stock
+                $slotInStock = $product->getInStock() / $choice->getMinQuantity();
+                if (0 == $inStock || $slotInStock < $inStock) {
+                    $inStock = $slotInStock;
                 }
 
-                if ($slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity()) {
-                    if (0 == $virtualStock || $slotVirtualStock < $virtualStock) {
-                        $virtualStock = $slotVirtualStock;
-                    }
-                    if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
-                        if (null === $eda || $slotEda > $eda) {
-                            $eda = $slotEda;
-                        }
+                // Virtual stock
+                $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
+                if (0 == $virtualStock || $slotVirtualStock < $virtualStock) {
+                    $virtualStock = $slotVirtualStock;
+                }
+                if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
+                    if (null === $eda || $slotEda > $eda) {
+                        $eda = $slotEda;
                     }
                 }
             }

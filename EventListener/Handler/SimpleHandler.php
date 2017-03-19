@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
+use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -97,11 +98,11 @@ class SimpleHandler extends AbstractHandler
     /**
      * @inheritdoc
      */
-    public function handleStockUnitChange(ResourceEventInterface $event)
+    public function handleStockUnitChange(SubjectStockUnitEvent $event)
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if (null !== $stockUnit = $event->getData('stock_unit')) {
+        if (null !== $stockUnit = $event->getStockUnit()) {
             $changed = $this->stockUpdater->updateFromStockUnitChange($product, $stockUnit);
         } else {
             $changed = $this->updateStock($product);
@@ -117,11 +118,11 @@ class SimpleHandler extends AbstractHandler
     /**
      * @inheritdoc
      */
-    public function handleStockUnitRemoval(ResourceEventInterface $event)
+    public function handleStockUnitRemoval(SubjectStockUnitEvent $event)
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if (null !== $stockUnit = $event->getData('stock_unit')) {
+        if (null !== $stockUnit = $event->getStockUnit()) {
             $changed = $this->stockUpdater->updateFromStockUnitRemoval($product, $stockUnit);
         } else {
             $changed = $this->updateStock($product);

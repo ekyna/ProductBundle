@@ -1,3 +1,4 @@
+@product @attribute-group
 Feature: Create attribute groups
     In order to manage attributes for product variants
     As an administrator

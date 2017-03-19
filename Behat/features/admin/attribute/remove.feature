@@ -1,3 +1,4 @@
+@product @attribute
 Feature: Remove attributes
     In order to manage attributes for product variants
     As an administrator

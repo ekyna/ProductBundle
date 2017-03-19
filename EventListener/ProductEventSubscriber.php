@@ -6,6 +6,7 @@ use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
+use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -95,9 +96,9 @@ class ProductEventSubscriber implements EventSubscriberInterface
     /**
      * Stock unit change event handler.
      *
-     * @param ResourceEventInterface $event
+     * @param SubjectStockUnitEvent $event
      */
-    public function onStockUnitChange(ResourceEventInterface $event)
+    public function onStockUnitChange(SubjectStockUnitEvent $event)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -109,9 +110,9 @@ class ProductEventSubscriber implements EventSubscriberInterface
     /**
      * Stock unit delete event handler.
      *
-     * @param ResourceEventInterface $event
+     * @param SubjectStockUnitEvent $event
      */
-    public function onStockUnitRemoval(ResourceEventInterface $event)
+    public function onStockUnitRemoval(SubjectStockUnitEvent $event)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -151,7 +152,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
 
         $handlers = $this->handlerRegistry->getHandlers($product);
         foreach ($handlers as $handler) {
-            $changed = call_user_func([$handler, $method], $event) || $changed;
+            $changed |= call_user_func([$handler, $method], $event);
         }
 
         return $changed;

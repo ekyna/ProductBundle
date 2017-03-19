@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
+use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
@@ -41,7 +42,7 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleStockUnitChange(ResourceEventInterface $event)
+    public function handleStockUnitChange(SubjectStockUnitEvent $event)
     {
         return false;
     }
@@ -49,7 +50,7 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleStockUnitRemoval(ResourceEventInterface $event)
+    public function handleStockUnitRemoval(SubjectStockUnitEvent $event)
     {
         return false;
     }
