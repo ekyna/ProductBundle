@@ -6,7 +6,7 @@ use Ekyna\Bundle\CommerceBundle\Service\AbstractViewType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Cart\Model as Cart;
 use Ekyna\Component\Commerce\Common\Model as Common;
-use Ekyna\Component\Commerce\Common\View\AbstractView;
+use Ekyna\Component\Commerce\Common\View;
 
 /**
  * Class SaleViewType
@@ -18,7 +18,7 @@ class SaleViewType extends AbstractViewType
     /**
      * @inheritDoc
      */
-    public function buildItemView(Common\SaleItemInterface $item, AbstractView $view, array $options)
+    public function buildItemView(Common\SaleItemInterface $item, View\LineView $view, array $options)
     {
         if (!$options['editable']) {
             return;

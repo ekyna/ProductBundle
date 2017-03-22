@@ -56,7 +56,6 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function assign(SubjectRelativeInterface $relative, $subject)
     {
-        /** @noinspection PhpInternalEntityUsedInspection */
         return $this->transform($subject, $relative->getSubjectIdentity());
     }
 
@@ -65,7 +64,6 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function resolve(SubjectRelativeInterface $relative)
     {
-        /** @noinspection PhpInternalEntityUsedInspection */
         return $this->reverseTransform($relative->getSubjectIdentity());
     }
 
@@ -76,14 +74,11 @@ class ProductProvider implements SubjectProviderInterface
     {
         $this->assertSupportsSubject($subject);
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         if ($subject === $identity->getSubject()) {
             return $this;
         }
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $subject */
-
-        /** @noinspection PhpInternalEntityUsedInspection */
         $identity
             ->setProvider(static::NAME)
             ->setIdentifier($subject->getId())
@@ -99,10 +94,8 @@ class ProductProvider implements SubjectProviderInterface
     {
         $this->assertSupportsIdentity($identity);
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         $productId = intval($identity->getIdentifier());
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         if (null !== $product = $identity->getSubject()) {
             if ((!$product instanceof $this->productClass) || ($product->getId() != $productId)) {
                 // TODO Clear identity data ?
@@ -117,7 +110,6 @@ class ProductProvider implements SubjectProviderInterface
             throw new SubjectException("Failed to resolve item subject.");
         }
 
-        /** @noinspection PhpInternalEntityUsedInspection */
         $identity->setSubject($product);
 
         return $product;
@@ -136,7 +128,6 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function supportsRelative(SubjectRelativeInterface $relative)
     {
-        /** @noinspection PhpInternalEntityUsedInspection */
         return $relative->getSubjectIdentity()->getProvider() === self::NAME;
     }
 
@@ -209,7 +200,6 @@ class ProductProvider implements SubjectProviderInterface
      */
     protected function assertSupportsIdentity(SubjectIdentity $identity)
     {
-        /** @noinspection PhpInternalEntityUsedInspection */
         if ($identity->getProvider() != static::NAME) {
             throw new SubjectException('Unsupported subject identity.');
         }
