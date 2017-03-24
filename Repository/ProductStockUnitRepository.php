@@ -60,6 +60,34 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     }
 
     /**
+     * @inheritdoc
+     */
+    public function findAssignableBySubject(StockSubjectInterface $subject)
+    {
+        if (!$subject instanceof ProductInterface) {
+            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
+        }
+
+        if (!$subject->getId()) {
+            return [];
+        }
+
+        $alias = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+            ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not yet linked to a supplier order
+                $qb->expr()->lt($alias . '.reservedQuantity', $alias . '.orderedQuantity'),   // Reserved lower than ordered
+                $qb->expr()->eq('SIZE(' . $alias . '.stockAssignments)', 0) // No assignments TODO remove ?
+            ))
+            ->setParameter('product', $subject)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Finds stock units by subject and states.
      *
      * @param StockSubjectInterface $subject
@@ -96,34 +124,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
-            ->setParameter('product', $subject)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findAssignableBySubject(StockSubjectInterface $subject)
-    {
-        if (!$subject instanceof ProductInterface) {
-            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
-        }
-
-        if (!$subject->getId()) {
-            return [];
-        }
-
-        $alias = $this->getAlias();
-        $qb = $this->getQueryBuilder();
-
-        return $qb
-            ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
-            ->andWhere($qb->expr()->orX(
-                $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not yet linked to a supplier order
-                $qb->expr()->lt($alias . '.reservedQuantity', $alias . '.orderedQuantity'),   // Reserved lower than ordered
-                $qb->expr()->eq('SIZE(' . $alias . '.stockAssignments)', 0) // No assignments TODO remove ?
-            ))
             ->setParameter('product', $subject)
             ->getQuery()
             ->getResult();
