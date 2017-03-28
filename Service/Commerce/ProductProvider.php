@@ -98,7 +98,6 @@ class ProductProvider implements SubjectProviderInterface
 
         if (null !== $product = $identity->getSubject()) {
             if ((!$product instanceof $this->productClass) || ($product->getId() != $productId)) {
-                // TODO Clear identity data ?
                 throw new SubjectException("Failed to resolve item subject.");
             }
 
@@ -106,7 +105,6 @@ class ProductProvider implements SubjectProviderInterface
         }
 
         if (null === $product = $this->productRepository->findOneById($productId)) {
-            // TODO Clear identity data ?
             throw new SubjectException("Failed to resolve item subject.");
         }
 

@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\ProductToBundleSlotChoiceTransformer;
-use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
@@ -12,6 +12,8 @@ use Liip\ImagineBundle\Imagine\Cache as Imagine;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,11 +23,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @todo CommerceBundle DI
+ * @todo    CommerceBundle DI pass
  */
 class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerAwareInterface
 {
     use Imagine\CacheManagerAwareTrait;
+
+    /**
+     * @var ProductProvider
+     */
+    private $productProvider;
 
     /**
      * @var string
@@ -36,10 +43,12 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
     /**
      * Constructor.
      *
-     * @param string $noImagePath
+     * @param ProductProvider $productProvider
+     * @param string          $noImagePath
      */
-    public function __construct($noImagePath)
+    public function __construct(ProductProvider $productProvider, $noImagePath)
     {
+        $this->productProvider = $productProvider;
         $this->noImagePath = $noImagePath;
     }
 
@@ -51,18 +60,22 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
         /** @var BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
 
+        // TODO subject property does no longer exist on sale item.
+        // -> mapped = false
+        // -> 'post_submit' event to re assign (need higher priority than sale item 'build' event)
         $subjectField = $builder
             ->create('subject', Type\ChoiceType::class, [
-                'label'        => $bundleSlot->getDescription(),
-                'choices'      => $bundleSlot->getChoices(),
-                'choice_value' => 'id',
-                'choice_label' => 'product.designation',
-                'choice_attr'  => function (BundleChoiceInterface $choice) {
+                'property_path' => 'subjectIdentity.subject',
+                'label'         => $bundleSlot->getDescription(),
+                'choices'       => $bundleSlot->getChoices(),
+                'choice_value'  => 'id',
+                'choice_label'  => 'product.designation',
+                'choice_attr'   => function (BundleChoiceInterface $choice) {
                     return [
                         'data-config' => json_encode($this->buildChoiceAttributes($choice)),
                     ];
                 },
-                'expanded'     => true,
+                'expanded'      => true,
             ])
             ->addModelTransformer(new ProductToBundleSlotChoiceTransformer($bundleSlot));
 
@@ -73,7 +86,18 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
                 'attr'  => [
                     'min' => 1,
                 ],
-            ]);
+            ])
+            ->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
+                /** @var SaleItemInterface $item */
+                $item  = $event->getData();
+
+                $product = $item->getSubjectIdentity()->getSubject();
+                $item->getSubjectIdentity()->clear();
+
+                $this->productProvider->assign($item, $product);
+
+                $event->setData($item);
+            }, 2048);
     }
 
     /**

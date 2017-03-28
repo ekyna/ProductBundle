@@ -89,6 +89,7 @@
         </service>
         <service id="ekyna_product.configurable_slot.form_type"
                  class="%ekyna_product.configurable_slot.form_type.class%">
+            <argument type="service" id="ekyna_product.product.subject_provider"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <call method="setCacheManager">
                 <argument type="service" id="liip_imagine.cache.manager"/>

@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Doctrine\Common\Collections\Criteria;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
@@ -40,13 +41,13 @@ class ItemBuilder
      */
     public function initializeItem(SaleItemInterface $item)
     {
-        // TODO assert ProductInterface
         $product = $this->provider->resolve($item);
 
         if (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
             $itemClass = get_class($item);
 
             // For each bundle/configurable slots
+            $bundleSlotIds = [];
             foreach ($product->getBundleSlots() as $bundleSlot) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
                 $defaultChoice = $bundleSlot->getChoices()->first();
@@ -61,23 +62,29 @@ class ItemBuilder
                 if ($item->hasChildren()) {
                     foreach ($item->getChildren() as $child) {
                         // Check bundle slot id
-                        $childBundleSlotId = intval($child->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
-                        if ($childBundleSlotId != $bundleSlot->getId()) {
+                        $bundleSlotId = intval($child->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
+                        if ($bundleSlotId != $bundleSlot->getId()) {
                             continue;
                         }
 
+                        // Remove bundle slot duplicates
+                        if (in_array($bundleSlotId, $bundleSlotIds)) {
+                            $item->removeChild($child);
+                            continue;
+                        }
+                        $bundleSlotIds[] = $bundleSlotId;
+
                         // Get/resolve item subject
-                        // TODO assert ProductInterface
                         $childProduct = $this->provider->resolve($child);
 
                         // If invalid choice
                         if (!in_array($childProduct, $choiceProducts)) {
                             // Assign the default product
+                            $child->getSubjectIdentity()->clear();
                             $this->provider->assign($child, $defaultChoice->getProduct());
+
                             // Set quantity
-                            $child
-                                ->setQuantity($defaultChoice->getMinQuantity())/*->setSubjectData(BundleSlotInterface::ITEM_DATA_KEY, $bundleSlot->getId())*/
-                            ;
+                            $child->setQuantity($defaultChoice->getMinQuantity());
                         }
 
                         $child->setPosition($bundleSlot->getPosition());
@@ -89,7 +96,7 @@ class ItemBuilder
 
                 // Item not found : create it
                 /** @var SaleItemInterface $bundleSlotItem */
-                $bundleSlotItem = new $itemClass; // TODO use Factory
+                $bundleSlotItem = new $itemClass; // TODO use the SaleFactory ?
 
                 $this->provider->assign($bundleSlotItem, $defaultChoice->getProduct());
 
@@ -108,12 +115,12 @@ class ItemBuilder
     /**
      * @inheritdoc
      */
-    public function buildItem(SaleItemInterface $item)
+    public function buildItem(SaleItemInterface $item, array $data = [])
     {
         // TODO assert ProductInterface
         $product = $this->provider->resolve($item);
 
-        $this->buildItemFromProduct($item, $product);
+        $this->buildItemFromProduct($item, $product, $data);
     }
 
     /**
@@ -155,6 +162,8 @@ class ItemBuilder
     {
         ProductTypes::assertChildType($product);
 
+        $this->doRemoveMissMatch($data);
+
         $this->provider->assign($item, $product);
 
         $item
@@ -177,9 +186,11 @@ class ItemBuilder
     {
         ProductTypes::assertVariable($product);
 
+        $this->doRemoveMissMatch($data);
+
         $variant = null;
 
-        if (0 < ($variantId = intval($item->getSubjectData(static::VARIANT_ID)))) { // TODO key
+        if (0 < ($variantId = intval($item->getSubjectData(static::VARIANT_ID)))) {
             foreach ($product->getVariants() as $v) {
                 if ($variantId == $v->getId()) {
                     $variant = $v;
@@ -192,7 +203,9 @@ class ItemBuilder
             throw new RuntimeException("Failed to resolve variable's selected variant.");
         }
 
-        $this->buildSimpleItem($item, $variant, $data);
+        $this->buildSimpleItem($item, $variant, array_merge($data, [
+            static::VARIANT_ID => $variantId,
+        ]));
     }
 
     /**
@@ -219,6 +232,7 @@ class ItemBuilder
 
         // Every slot must match a single item
         $bundleProducts = [];
+        $bundleSlotIds = [];
         foreach ($product->getBundleSlots() as $bundleSlot) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = $bundleSlot->getChoices()->first();
@@ -232,12 +246,19 @@ class ItemBuilder
                     continue;
                 }
 
+                // Remove bundle slot duplicates
+                if (in_array($bundleSlotId, $bundleSlotIds)) {
+                    $item->removeChild($childItem);
+                    continue;
+                }
+                $bundleSlotIds[] = $bundleSlotId;
+
                 /** @var ProductInterface $childItemProduct */
                 $childItemProduct = $this->provider->resolve($childItem);
 
                 // Build the item form the bundle choice's product
                 $this->buildItemFromProduct($childItem, $childItemProduct, [
-                    static::REMOVE_MISS_MATCH => $removeMissMatch,
+                    BundleSlotInterface::BUNDLE_SLOT_ID => $bundleSlotId,
                 ]);
 
                 // Item is immutable
@@ -249,8 +270,6 @@ class ItemBuilder
             // Not found : call prepareItem() first.
             throw new RuntimeException("Bundle slot matching item not found.");
         }
-
-        // TODO Cleanup : remove bundle slots duplicates
 
         // Removes miss match items
         if ($removeMissMatch) {
@@ -287,7 +306,7 @@ class ItemBuilder
             ->setConfigurable(true);
 
         // Every slot must match a single item
-        $bundleProducts = [];
+        $bundleSlotIds = [];
         foreach ($product->getBundleSlots() as $bundleSlot) {
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
@@ -296,12 +315,19 @@ class ItemBuilder
                     continue;
                 }
 
+                // Remove bundle slot duplicates
+                if (in_array($bundleSlotId, $bundleSlotIds)) {
+                    $item->removeChild($childItem);
+                    continue;
+                }
+                $bundleSlotIds[] = $bundleSlotId;
+
                 /** @var ProductInterface $childItemProduct */
                 $childItemProduct = $this->provider->resolve($childItem);
 
                 // Sets the bundle product
                 $this->buildItemFromProduct($childItem, $childItemProduct, [
-                    static::REMOVE_MISS_MATCH => $removeMissMatch,
+                    BundleSlotInterface::BUNDLE_SLOT_ID => $bundleSlotId,
                 ]);
 
                 // Item is immutable
@@ -314,15 +340,34 @@ class ItemBuilder
             throw new RuntimeException("Bundle slot matching item not found.");
         }
 
-        // TODO Cleanup : remove bundle slots duplicates ?
-
         // Removes miss match items
         if ($removeMissMatch) {
             foreach ($item->getChildren() as $childItem) {
                 /** @var ProductInterface $childProduct */
                 $childProduct = $this->provider->resolve($childItem);
+                if (null === $childProduct) {
+                    $item->removeChild($childItem);
+                    continue;
+                }
 
-                if (null === $childProduct || !in_array($childProduct, $bundleProducts)) {
+                // Find matching slot
+                $bundleSlotId = intval($childItem->getSubjectData(BundleSlotInterface::BUNDLE_SLOT_ID));
+                $bundleSlots = $product->getBundleSlots()->matching(
+                    Criteria::create()->where(Criteria::expr()->eq('id', $bundleSlotId))
+                );
+                if (1 != $bundleSlots->count()) {
+                    $item->removeChild($childItem);
+                    continue;
+                }
+
+                $slotProductsIds = [];
+                $bundleSlot = $bundleSlots->first();
+                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
+                foreach ($bundleSlot->getChoices() as $bundleChoice) {
+                    $slotProductsIds[] = $bundleChoice->getProduct()->getId();
+                }
+
+                if (!in_array($childProduct->getId(), $slotProductsIds)) {
                     $item->removeChild($childItem);
                 }
             }

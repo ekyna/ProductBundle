@@ -41,7 +41,7 @@ class FormBuilder
      */
     public function buildItemForm(FormInterface $form, SaleItemInterface $item)
     {
-        /** @var ProductInterface $product @todo assert */
+        /** @var ProductInterface $product */
         $product = $this->provider->resolve($item);
 
         // Variant : fallback to parent (Variable)

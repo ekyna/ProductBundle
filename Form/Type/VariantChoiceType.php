@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -23,7 +24,7 @@ class VariantChoiceType extends AbstractType
         $resolver
             ->setDefaults([
                 'label'         => 'ekyna_product.variant.label.singular',
-                'property_path' => 'subjectData[variant]',
+                'property_path' => 'subjectData[' . ItemBuilder::VARIANT_ID . ']',
                 'select2'       => false,
                 'choices'       => function (Options $options, $value) {
                     if (empty($value)) {
