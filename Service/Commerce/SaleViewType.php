@@ -20,7 +20,7 @@ class SaleViewType extends AbstractViewType
      */
     public function buildItemView(Common\SaleItemInterface $item, View\LineView $view, array $options)
     {
-        if (!$options['editable']) {
+        if (!$options['editable'] || !$options['private']) {
             return;
         }
 

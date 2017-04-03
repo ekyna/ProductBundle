@@ -236,13 +236,13 @@ class ItemBuilder
             ->setReference($product->getReference());
 
         // Every slot must match a single item
-        $bundleProducts = [];
+        $bundleProductIds = [];
         $bundleSlotIds = [];
         foreach ($product->getBundleSlots() as $bundleSlot) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = $bundleSlot->getChoices()->first();
             $bundleProduct = $bundleChoice->getProduct();
-            $bundleProducts[] = $bundleProduct;
+            $bundleProductIds[] = $bundleProduct->getId();
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
@@ -280,7 +280,7 @@ class ItemBuilder
         if ($removeMissMatch) {
             foreach ($item->getChildren() as $childItem) {
                 $childProduct = $this->provider->resolve($childItem);
-                if (null === $childProduct || !in_array($childProduct, $bundleProducts)) {
+                if (null === $childProduct || !in_array($childProduct->getId(), $bundleProductIds)) {
                     $item->removeChild($childItem);
                 }
             }
