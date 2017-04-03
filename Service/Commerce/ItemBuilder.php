@@ -43,7 +43,12 @@ class ItemBuilder
     {
         $product = $this->provider->resolve($item);
 
-        if (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
+        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
+            /** @var ProductInterface $variant */
+            $variant = $product->getVariants()->first();
+            $item->setSubjectData(static::VARIANT_ID, $variant->getId());
+
+        } elseif (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
             $itemClass = get_class($item);
 
             // For each bundle/configurable slots
