@@ -76,7 +76,7 @@ class BundleChoiceType extends ResourceFormType
                     'sizing' => 'sm',
                 ])
                 ->add('maxQuantity', Type\NumberType::class, [
-                    'label'  => 'ekyna_product.bundle_choice.field.min_quantity',
+                    'label'  => 'ekyna_product.bundle_choice.field.max_quantity',
                     'sizing' => 'sm',
                 ])
                 ->add('position', Type\HiddenType::class, [

@@ -593,13 +593,13 @@
                     <value>simple</value>
                     <value>variable</value>
                     <value>variant</value>
-                    <value>configurable</value>
                 </option>
             </constraint>
             <constraint name="Count">
                 <option name="min">1</option>
                 <option name="groups">
                     <value>bundle</value>
+                    <value>configurable</value>
                 </option>
             </constraint>
             <constraint name="Valid"/>
@@ -659,7 +659,7 @@
             <constraint name="Valid"/>
         </property>
 
-        <!-- Translations (none for variants) -->
+        <!-- Translations -->
         <property name="translations">
             <constraint name="Count">
                 <option name="min">1</option>
@@ -670,12 +670,12 @@
                     <value>configurable</value>
                 </option>
             </constraint>
-            <constraint name="Count">
+            <!--<constraint name="Count">
                 <option name="max">0</option>
                 <option name="groups">
                     <value>variant</value>
                 </option>
-            </constraint>
+            </constraint>-->
         </property>
 
         <!-- Medias -->

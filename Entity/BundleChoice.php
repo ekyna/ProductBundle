@@ -64,6 +64,8 @@ class BundleChoice implements Model\BundleChoiceInterface
      */
     public function __construct()
     {
+        $this->userOption = false;
+        $this->minQuantity = 1;
         $this->rules = new ArrayCollection();
     }
 
