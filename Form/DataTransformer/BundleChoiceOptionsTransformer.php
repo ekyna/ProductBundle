@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
@@ -11,17 +13,8 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class BundleChoiceOptionsTransformer implements DataTransformerInterface
 {
-    /**
-     * @var array
-     */
-    private $choices;
+    private array $choices;
 
-
-    /**
-     * Constructor.
-     *
-     * @param array $choices
-     */
     public function __construct(array $choices)
     {
         $this->choices = $choices;

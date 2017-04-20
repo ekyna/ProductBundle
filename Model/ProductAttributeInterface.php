@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -12,92 +14,31 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 interface ProductAttributeInterface extends ResourceInterface
 {
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
+
+    public function setProduct(?ProductInterface $product): ProductAttributeInterface;
+
+    public function getAttributeSlot(): ?AttributeSlotInterface;
+
+    public function setAttributeSlot(?AttributeSlotInterface $slot): ProductAttributeInterface;
 
     /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|ProductAttributeInterface
+     * @return Collection<AttributeChoiceInterface>
      */
-    public function setProduct(ProductInterface $product = null);
+    public function getChoices(): Collection;
+
+    public function hasChoice(AttributeChoiceInterface $choice): bool;
+
+    public function addChoice(AttributeChoiceInterface $choice): ProductAttributeInterface;
+
+    public function removeChoice(AttributeChoiceInterface $choice): ProductAttributeInterface;
+
+    public function getValue(): string;
+
+    public function setValue(?string $value): ProductAttributeInterface;
 
     /**
-     * Returns the attribute slot.
-     *
-     * @return AttributeSlotInterface
+     * Returns whether the product attribute has no value and no choices.
      */
-    public function getAttributeSlot();
-
-    /**
-     * Sets the attribute slot.
-     *
-     * @param AttributeSlotInterface $attribute
-     *
-     * @return $this|ProductAttributeInterface
-     */
-    public function setAttributeSlot(AttributeSlotInterface $attribute);
-
-    /**
-     * Returns the choices.
-     *
-     * @return ArrayCollection|AttributeChoiceInterface[]
-     */
-    public function getChoices();
-
-    /**
-     * Returns whether this product attribute has the given attribute choice.
-     *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return bool
-     */
-    public function hasChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Adds the given attribute choice.
-     *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return $this|ProductAttributeInterface
-     */
-    public function addChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Removes the given attribute choice.
-     *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return $this|ProductAttributeInterface
-     */
-    public function removeChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Returns the value.
-     *
-     * @return mixed
-     */
-    public function getValue();
-
-    /**
-     * Sets the value.
-     *
-     * @param mixed $value
-     *
-     * @return $this|ProductAttributeInterface
-     */
-    public function setValue($value);
-
-    /**
-     * Returns whether or not the product attribute has no value and no choices.
-     *
-     * @return bool
-     */
-    public function isEmpty();
+    public function isEmpty(): bool;
 }

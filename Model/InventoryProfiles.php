@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
@@ -11,19 +13,15 @@ use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
  */
 class InventoryProfiles extends AbstractConstants
 {
-    const NONE         = 'none';
-    const TREATMENT    = 'treatment';
-    const RESUPPLY     = 'resupply';
-    const OUT_OF_STOCK = 'out_of_stock';
-    const ORDERED      = 'ordered';
+    public const NONE         = 'none';
+    public const TREATMENT    = 'treatment';
+    public const RESUPPLY     = 'resupply';
+    public const OUT_OF_STOCK = 'out_of_stock';
+    public const ORDERED      = 'ordered';
 
-
-    /**
-     * @inheritdoc
-     */
     public static function getConfig(): array
     {
-        $prefix = 'ekyna_product.inventory.profile.';
+        $prefix = 'inventory.profile.';
 
         return [
             static::NONE         => [$prefix . static::NONE],
@@ -34,9 +32,11 @@ class InventoryProfiles extends AbstractConstants
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
+    public static function getTranslationDomain(): ?string
+    {
+        return 'EkynaProduct';
+    }
+
     public static function getTheme(string $constant): ?string
     {
         return null;

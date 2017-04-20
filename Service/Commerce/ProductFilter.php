@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
-use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
@@ -14,63 +16,26 @@ use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
  */
 class ProductFilter implements ProductFilterInterface
 {
-    /**
-     * @var array
-     */
-    private $productCache;
+    private array            $productCache;
+    private array            $variantCache;
+    private array            $slotCache;
+    private array            $choiceCache;
+    private array            $groupCache;
+    private array            $optionCache;
+    private ContextInterface $context;
 
-    /**
-     * @var array
-     */
-    private $variantCache;
-
-    /**
-     * @var array
-     */
-    private $slotCache;
-
-    /**
-     * @var array
-     */
-    private $choiceCache;
-
-    /**
-     * @var array
-     */
-    private $groupCache;
-
-    /**
-     * @var array
-     */
-    private $optionCache;
-
-    /**
-     * @var ContextInterface
-     */
-    private $context;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->clearCache();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setContext(ContextInterface $context)
+    public function setContext(ContextInterface $context): void
     {
         $this->context = $context;
 
         $this->clearCache();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function isProductAvailable(Model\ProductInterface $product, array $exclude = []): bool
     {
         if ($this->hasProductAvailability($product)) {
@@ -119,9 +84,6 @@ class ProductFilter implements ProductFilterInterface
         return $this->setProductAvailability($product, $available);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getVariants(Model\ProductInterface $product): array
     {
         Model\ProductTypes::assertVariable($product);
@@ -147,9 +109,6 @@ class ProductFilter implements ProductFilterInterface
         return $this->variantCache[$product->getId()] = $variants;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getBundleSlots(Model\ProductInterface $product): array
     {
         Model\ProductTypes::assertBundled($product);
@@ -168,9 +127,6 @@ class ProductFilter implements ProductFilterInterface
         return $this->slotCache[$product->getId()] = $slots;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getSlotChoices(Model\BundleSlotInterface $slot): array
     {
         if (isset($this->choiceCache[$slot->getId()])) {
@@ -194,9 +150,6 @@ class ProductFilter implements ProductFilterInterface
         return $this->choiceCache[$slot->getId()] = $choices;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getOptionGroups(Model\ProductInterface $product, array $exclude = []): array
     {
         $key = implode('-', $exclude);
@@ -223,9 +176,6 @@ class ProductFilter implements ProductFilterInterface
         return $this->groupCache[$product->getId()][$key] = $groups;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getGroupOptions(Model\OptionGroupInterface $group): array
     {
         if (isset($this->optionCache[$group->getId()])) {
@@ -248,10 +198,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Returns whether the given bundle slot choice is available.
-     *
-     * @param Model\BundleChoiceInterface $choice
-     *
-     * @return bool
      */
     protected function isChoiceAvailable(Model\BundleChoiceInterface $choice): bool
     {
@@ -266,10 +212,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Returns whether the option is available.
-     *
-     * @param Model\OptionInterface $option
-     *
-     * @return bool
      */
     protected function isOptionAvailable(Model\OptionInterface $option): bool
     {
@@ -286,10 +228,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Returns whether the product has reserved availability.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function hasReservedAvailability(Model\ProductInterface $product): bool
     {
@@ -310,10 +248,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Returns whether the product availability is cached.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function hasProductAvailability(Model\ProductInterface $product): bool
     {
@@ -322,10 +256,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Returns the cached product availability.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function getProductAvailability(Model\ProductInterface $product): bool
     {
@@ -359,9 +289,6 @@ class ProductFilter implements ProductFilterInterface
 
     /**
      * Sort the choices by availability.
-     *
-     * @param array         $choices
-     * @param callable|null $getter
      */
     protected function sortChoices(array &$choices, callable $getter = null): void
     {
@@ -375,19 +302,14 @@ class ProductFilter implements ProductFilterInterface
                 return 0;
             }
 
-            if (!$a instanceof Model\ProductInterface || !$b instanceof Model\ProductInterface) {
-                throw new RuntimeException("Expected instance of " . Model\ProductInterface::class);
+            if (!$a instanceof Model\ProductInterface) {
+                throw new UnexpectedTypeException($a, Model\ProductInterface::class);
+            }
+            if (!$b instanceof Model\ProductInterface) {
+                throw new UnexpectedTypeException($b, Model\ProductInterface::class);
             }
 
-            if ($a->getAvailableStock() && !$b->getAvailableStock()) {
-                return -1;
-            }
-
-            if (!$a->getAvailableStock() && $b->getAvailableStock()) {
-                return 1;
-            }
-
-            return 0;
+            return $a->getAvailableStock()->compareTo($b->getAvailableStock());
         });
     }
 }

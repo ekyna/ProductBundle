@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use DateTimeInterface;
+use Decimal\Decimal;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaInterface;
-use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
@@ -34,932 +37,401 @@ interface ProductInterface extends
     TaxableInterface,
     StockSubjectInterface
 {
-    /**
-     * Returns the parent.
-     *
-     * @return ProductInterface
-     */
-    public function getParent();
+    public function getType(): ?string;
 
-    /**
-     * Sets the parent.
-     *
-     * @param ProductInterface $parent
-     *
-     * @return $this|ProductInterface
-     */
-    public function setParent(ProductInterface $parent = null);
+    public function setType(string $type): ProductInterface;
 
-    /**
-     * Returns the variants.
-     *
-     * @return Collection|ProductInterface[]
-     */
-    public function getVariants();
+    public function getMinPrice(): Decimal;
 
-    /**
-     * Returns whether the parent has the given variant or not.
-     *
-     * @param ProductInterface $variant
-     *
-     * @return bool
-     */
-    public function hasVariant(ProductInterface $variant);
-
-    /**
-     * Adds the variant.
-     *
-     * @param ProductInterface $variant
-     *
-     * @return $this|ProductInterface
-     */
-    public function addVariant(ProductInterface $variant);
-
-    /**
-     * Removes the variant.
-     *
-     * @param ProductInterface $variant
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeVariant(ProductInterface $variant);
-
-    /**
-     * Returns the attribute set.
-     *
-     * @return AttributeSetInterface
-     */
-    public function getAttributeSet();
-
-    /**
-     * Sets the attribute set.
-     *
-     * @param AttributeSetInterface $attributeSet
-     *
-     * @return $this|ProductInterface
-     */
-    public function setAttributeSet(AttributeSetInterface $attributeSet = null);
-
-    /**
-     * Returns the attributes.
-     *
-     * @return Collection|ProductAttributeInterface[]
-     */
-    public function getAttributes();
-
-    /**
-     * Returns whether the product has the given attribute or not.
-     *
-     * @param ProductAttributeInterface $attribute
-     *
-     * @return bool
-     */
-    public function hasAttribute(ProductAttributeInterface $attribute);
-
-    /**
-     * Adds the attribute.
-     *
-     * @param ProductAttributeInterface $attribute
-     *
-     * @return $this|ProductInterface
-     */
-    public function addAttribute(ProductAttributeInterface $attribute);
-
-    /**
-     * Removes the attribute.
-     *
-     * @param ProductAttributeInterface $attribute
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeAttribute(ProductAttributeInterface $attribute);
-
-    /**
-     * Sets the attributes.
-     *
-     * @param Collection|ProductAttributeInterface[] $attributes
-     *
-     * @return $this|ProductInterface
-     */
-    //public function setAttributes(Collection $attributes);
-
-    /**
-     * Returns the option groups.
-     *
-     * @return Collection|OptionGroupInterface[]
-     */
-    public function getOptionGroups();
-
-    /**
-     * Returns whether the product has given option groups or not.
-     *
-     * @return bool
-     */
-    public function hasOptionGroups();
-
-    /**
-     * Returns whether the product has the given option group or not.
-     *
-     * @param OptionGroupInterface $group
-     *
-     * @return bool
-     */
-    public function hasOptionGroup(OptionGroupInterface $group);
-
-    /**
-     * Adds the option group.
-     *
-     * @param OptionGroupInterface $group
-     *
-     * @return $this|ProductInterface
-     */
-    public function addOptionGroup(OptionGroupInterface $group);
-
-    /**
-     * Removes the option group.
-     *
-     * @param OptionGroupInterface $group
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeOptionGroup(OptionGroupInterface $group);
-
-    /**
-     * Sets the option groups.
-     *
-     * @param Collection|OptionGroupInterface[] $options
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setOptionGroups(Collection $options);
-
-    /**
-     * Returns whether the product has at least one required option group.
-     *
-     * @param array $exclude The excluded option group ids.
-     *
-     * @return bool
-     */
-    public function hasRequiredOptionGroup(array $exclude = []): bool;
-
-    /**
-     * Returns the resolved option groups.
-     *
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
-     * @param bool       $bundle  Whether to return bundle slots option groups.
-     *
-     * @return OptionGroupInterface[]
-     */
-    public function resolveOptionGroups($exclude = [], bool $bundle = false): array;
-
-    /**
-     * Returns the bundle slots.
-     *
-     * @return Collection|BundleSlotInterface[]
-     */
-    public function getBundleSlots();
-
-    /**
-     * Returns whether the product has the given bundle slot or not.
-     *
-     * @param BundleSlotInterface $slot
-     *
-     * @return bool
-     */
-    public function hasBundleSlot(BundleSlotInterface $slot);
-
-    /**
-     * Adds the bundle slot.
-     *
-     * @param BundleSlotInterface $slot
-     *
-     * @return $this|ProductInterface
-     */
-    public function addBundleSlot(BundleSlotInterface $slot);
-
-    /**
-     * Removes the bundle slot.
-     *
-     * @param BundleSlotInterface $slot
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeBundleSlot(BundleSlotInterface $slot);
-
-    /**
-     * Sets the bundle slots.
-     *
-     * @param Collection|BundleSlotInterface[] $slots
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setBundleSlots(Collection $slots);
-
-    /**
-     * Returns the components.
-     *
-     * @return Collection|ComponentInterface[]
-     */
-    public function getComponents();
-
-    /**
-     * Returns whether this product has components.
-     *
-     * @return bool
-     */
-    public function hasComponents();
-
-    /**
-     * Returns whether the product has the given component or not.
-     *
-     * @param ComponentInterface $component
-     *
-     * @return bool
-     */
-    public function hasComponent(ComponentInterface $component);
-
-    /**
-     * Adds the component.
-     *
-     * @param ComponentInterface $component
-     *
-     * @return $this|ProductInterface
-     */
-    public function addComponent(ComponentInterface $component);
-
-    /**
-     * Removes the component.
-     *
-     * @param ComponentInterface $component
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeComponent(ComponentInterface $component);
-
-    /**
-     * Sets the components.
-     *
-     * @param Collection|ComponentInterface[] $components
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setComponents(Collection $components);
-
-    /**
-     * Returns the cross sellings.
-     *
-     * @return Collection|CrossSellingInterface[]
-     */
-    public function getCrossSellings();
-
-    /**
-     * Returns whether this product has cross sellings.
-     *
-     * @return bool
-     */
-    public function hasCrossSellings();
-
-    /**
-     * Returns whether the product has the given cross selling or not.
-     *
-     * @param CrossSellingInterface $crossSelling
-     *
-     * @return bool
-     */
-    public function hasCrossSelling(CrossSellingInterface $crossSelling);
-
-    /**
-     * Adds the cross selling.
-     *
-     * @param CrossSellingInterface $crossSelling
-     *
-     * @return $this|ProductInterface
-     */
-    public function addCrossSelling(CrossSellingInterface $crossSelling);
-
-    /**
-     * Removes the cross selling.
-     *
-     * @param CrossSellingInterface $crossSelling
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeCrossSelling(CrossSellingInterface $crossSelling);
-
-    /**
-     * Sets the cross sellings.
-     *
-     * @param Collection|CrossSellingInterface[] $crossSellings
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setCrossSellings(Collection $crossSellings);
-
-    /**
-     * Returns the special offers.
-     *
-     * @return Collection|SpecialOfferInterface[]
-     */
-    public function getSpecialOffers();
-
-    /**
-     * Returns whether the product has the given special offer or not.
-     *
-     * @param SpecialOfferInterface $offer
-     *
-     * @return bool
-     */
-    public function hasSpecialOffer(SpecialOfferInterface $offer);
-
-    /**
-     * Adds the special offer.
-     *
-     * @param SpecialOfferInterface $offer
-     *
-     * @return $this|ProductInterface
-     */
-    public function addSpecialOffer(SpecialOfferInterface $offer);
-
-    /**
-     * Removes the special offer.
-     *
-     * @param SpecialOfferInterface $offer
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeSpecialOffer(SpecialOfferInterface $offer);
-
-    /**
-     * Sets the special offers.
-     *
-     * @param Collection|SpecialOfferInterface[] $offers
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setSpecialOffers(Collection $offers);
-
-    /**
-     * Returns the pricings.
-     *
-     * @return Collection|PricingInterface[]
-     */
-    public function getPricings();
-
-    /**
-     * Returns whether the product has the given pricing or not.
-     *
-     * @param PricingInterface $pricing
-     *
-     * @return bool
-     */
-    public function hasPricing(PricingInterface $pricing);
-
-    /**
-     * Adds the pricing.
-     *
-     * @param PricingInterface $pricing
-     *
-     * @return $this|ProductInterface
-     */
-    public function addPricing(PricingInterface $pricing);
-
-    /**
-     * Removes the pricing.
-     *
-     * @param PricingInterface $pricing
-     *
-     * @return $this|ProductInterface
-     */
-    public function removePricing(PricingInterface $pricing);
-
-    /**
-     * Sets the pricings.
-     *
-     * @param Collection|PricingInterface[] $pricings
-     *
-     * @return $this|ProductInterface
-     * @internal
-     */
-    public function setPricings(Collection $pricings);
-
-    /**
-     * Returns the brand.
-     *
-     * @return BrandInterface
-     */
-    public function getBrand();
-
-    /**
-     * Sets the brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return $this|ProductInterface
-     */
-    public function setBrand(BrandInterface $brand);
-
-    /**
-     * Returns the categories.
-     *
-     * @return Collection|CategoryInterface[]
-     */
-    public function getCategories();
-
-    /**
-     * Returns whether the product has the given given category.
-     *
-     * @param CategoryInterface $category
-     *
-     * @return bool
-     */
-    public function hasCategory(CategoryInterface $category);
-
-    /**
-     * Adds the category.
-     *
-     * @param CategoryInterface $category
-     *
-     * @return $this|ProductInterface
-     */
-    public function addCategory(CategoryInterface $category);
-
-    /**
-     * Removes the category.
-     *
-     * @param CategoryInterface $category
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeCategory(CategoryInterface $category);
-
-    /**
-     * Sets the categories.
-     *
-     * @param Collection|CategoryInterface[] $categories
-     *
-     * @return $this|ProductInterface
-     */
-    public function setCategories(Collection $categories);
-
-    /**
-     * Returns the customer groups.
-     *
-     * @return Collection|CustomerGroupInterface[]
-     */
-    public function getCustomerGroups();
-
-    /**
-     * Returns whether the product has the given given customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return bool
-     */
-    public function hasCustomerGroup(CustomerGroupInterface $group);
-
-    /**
-     * Adds the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|ProductInterface
-     */
-    public function addCustomerGroup(CustomerGroupInterface $group);
-
-    /**
-     * Removes the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeCustomerGroup(CustomerGroupInterface $group);
-
-    /**
-     * Sets the customer groups.
-     *
-     * @param Collection|CustomerGroupInterface[] $groups
-     *
-     * @return $this|ProductInterface
-     */
-    public function setCustomerGroups(Collection $groups);
-
-    /**
-     * Returns whether or not the product has the given media.
-     *
-     * @param ProductMediaInterface $media
-     *
-     * @return bool
-     */
-    public function hasMedia(ProductMediaInterface $media);
-
-    /**
-     * Returns the medias, optionally filtered by (media) types.
-     *
-     * @param array $types
-     *
-     * @return Collection|ProductMediaInterface[]
-     */
-    public function getMedias(array $types = []);
-
-    /**
-     * Adds the product media.
-     *
-     * @param ProductMediaInterface $media
-     *
-     * @return $this|ProductInterface
-     */
-    public function addMedia(ProductMediaInterface $media);
-
-    /**
-     * Removes the product media.
-     *
-     * @param ProductMediaInterface $media
-     *
-     * @return $this|ProductInterface
-     */
-    public function removeMedia(ProductMediaInterface $media);
+    public function setMinPrice(Decimal $minPrice): ProductInterface;
 
     /**
      * Returns whether the medias are not contractual.
-     *
-     * @return bool
      */
     public function isNotContractual(): bool;
 
     /**
      * Sets whether the medias are not contractual.
-     *
-     * @param bool $notContractual
-     *
-     * @return $this|ProductInterface
      */
     public function setNotContractual(bool $notContractual): ProductInterface;
 
     /**
-     * Returns whether or not the product has the given reference.
-     *
-     * @param ProductReferenceInterface $reference
-     *
-     * @return bool
+     * Returns whether offers update is needed.
      */
-    public function hasReference(ProductReferenceInterface $reference);
+    public function isPendingOffers(): bool;
 
     /**
-     * Adds the product reference.
-     *
-     * @param ProductReferenceInterface $reference
-     *
-     * @return $this|ProductInterface
+     * Sets whether offers update is needed.
      */
-    public function addReference(ProductReferenceInterface $reference);
+    public function setPendingOffers(bool $pending): ProductInterface;
 
     /**
-     * Removes the product reference.
-     *
-     * @param ProductReferenceInterface $reference
-     *
-     * @return $this|ProductInterface
+     * Returns whether prices update is needed.
      */
-    public function removeReference(ProductReferenceInterface $reference);
+    public function isPendingPrices(): bool;
 
     /**
-     * Returns the references.
-     *
-     * @return Collection|ProductReferenceInterface[]
+     * Sets whether prices update is needed.
      */
-    public function getReferences();
+    public function setPendingPrices(bool $pending): ProductInterface;
+
+    public function getReleasedAt(): ?DateTimeInterface;
+
+    public function setReleasedAt(?DateTimeInterface $date): ProductInterface;
 
     /**
-     * Returns the reference for the given type.
-     *
-     * @param string $type
-     *
-     * @return null|string
+     * Returns the best seller mode.
      */
-    public function getReferenceByType($type);
+    public function getBestSeller(): string;
 
     /**
-     * Returns the type.
-     *
-     * @return string
+     * Sets the best seller mode.
      */
-    public function getType();
+    public function setBestSeller(string $mode): ProductInterface;
 
     /**
-     * Sets the type.
-     *
-     * @param string $type
-     *
-     * @return $this|ProductInterface
+     * Returns the cross-selling mode.
      */
-    public function setType(string $type);
+    public function getCrossSelling(): string;
 
     /**
-     * Returns the (translated) title.
-     *
-     * @return string
+     * Sets the cross-selling mode.
      */
-    public function getTitle();
+    public function setCrossSelling(string $mode): ProductInterface;
+
+    public function getStatUpdatedAt(): ?DateTimeInterface;
+
+    public function setStatUpdatedAt(?DateTimeInterface $date): ProductInterface;
+
+    /**
+     * Returns whether to include brand in full designation and title.
+     */
+    public function isBrandNaming(): bool;
+
+    /**
+     * Sets whether to include brand in full designation and title.
+     */
+    public function setBrandNaming(bool $naming): ProductInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|ProductInterface
      */
-    public function setTitle(string $title);
+    public function getTitle(): ?string;
 
     /**
-     * Returns the (translated) sub title.
-     *
-     * @return string
+     * Returns the (translated) title.
      */
-    public function getSubTitle();
+    public function setTitle(?string $title): ProductInterface;
 
     /**
-     * Returns the (translated) subTitle.
-     *
-     * @param string $subTitle
-     *
-     * @return $this|ProductInterface
+     * Returns the (translated) sub-title.
      */
-    public function setSubTitle(string $subTitle);
+    public function getSubTitle(): ?string;
+
+    /**
+     * Returns the (translated) sub-title.
+     */
+    public function setSubTitle(?string $subTitle): ProductInterface;
 
     /**
      * Returns the (translated) attributes title.
-     *
-     * @return string
      */
-    public function getAttributesTitle();
+    public function getAttributesTitle(): ?string;
 
     /**
-     * Returns the (translated) attributesTitle.
-     *
-     * @param string $attributesTitle
-     *
-     * @return $this|ProductInterface
+     * Returns the (translated) attributes title.
      */
-    public function setAttributesTitle(string $attributesTitle);
+    public function setAttributesTitle(?string $attributesTitle): ProductInterface;
 
     /**
      * Returns the (translated) full title.
      *
      * @param bool $withBrand Whether to prepend the brand name
-     *
-     * @return string
      */
-    public function getFullTitle($withBrand = false);
+    public function getFullTitle(bool $withBrand = false): ?string;
 
     /**
      * Returns the (translated) description.
-     *
-     * @return string
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 
     /**
      * Returns the (translated) description.
-     *
-     * @param string $description
-     *
-     * @return $this|ProductInterface
      */
-    public function setDescription(string $description);
+    public function setDescription(?string $description): ProductInterface;
 
     /**
      * Returns the (translated) slug.
-     *
-     * @return string
      */
-    public function getSlug();
+    public function getSlug(): ?string;
 
     /**
      * Returns the (translated) slug.
-     *
-     * @param string $slug
-     *
-     * @return $this|ProductInterface
      */
-    public function setSlug(string $slug);
+    public function setSlug(?string $slug): ProductInterface;
 
     /**
      * Returns the attributes (auto-generated) designation.
-     *
-     * @return string
      */
-    public function getAttributesDesignation();
+    public function getAttributesDesignation(): ?string;
 
     /**
      * Sets the attributes (auto-generated) designation.
-     *
-     * @param string $attributesDesignation
-     *
-     * @return $this|ProductInterface
      */
-    public function setAttributesDesignation($attributesDesignation);
-
-    /**
-     * Returns whether to include brand in full designation an title.
-     *
-     * @return bool
-     */
-    public function isBrandNaming(): bool;
-
-    /**
-     * Sets whether to include brand in full designation an title.
-     *
-     * @param bool $naming
-     *
-     * @return $this|ProductInterface
-     */
-    public function setBrandNaming(bool $naming): ProductInterface;
+    public function setAttributesDesignation(?string $attributesDesignation): ProductInterface;
 
     /**
      * Returns the full designation.
      *
      * @param bool $withBrand Whether to prepend the brand name
-     *
-     * @return string
      */
-    public function getFullDesignation($withBrand = false);
+    public function getFullDesignation(bool $withBrand = false): ?string;
+
+    public function getBrand(): ?BrandInterface;
+
+    public function setBrand(BrandInterface $brand): ProductInterface;
+
+    public function getParent(): ?ProductInterface;
+
+    public function setParent(?ProductInterface $parent): ProductInterface;
 
     /**
-     * Returns the minimum price.
-     *
-     * @return float
+     * @return array<ProductInterface>|Collection<ProductInterface>
      */
-    public function getMinPrice();
+    public function getVariants(): Collection;
+
+    public function hasVariant(ProductInterface $variant): bool;
+
+    public function addVariant(ProductInterface $variant): ProductInterface;
+
+    public function removeVariant(ProductInterface $variant): ProductInterface;
+
+    public function getAttributeSet(): ?AttributeSetInterface;
+
+    public function setAttributeSet(?AttributeSetInterface $attributeSet): ProductInterface;
 
     /**
-     * Sets the minimum price.
-     *
-     * @param float $minPrice
-     *
-     * @return $this|ProductInterface
+     * @return array<ProductAttributeInterface>|Collection<ProductAttributeInterface>
      */
-    public function setMinPrice($minPrice);
+    public function getAttributes(): Collection;
+
+    public function hasAttribute(ProductAttributeInterface $attribute): bool;
+
+    public function addAttribute(ProductAttributeInterface $attribute): ProductInterface;
+
+    public function removeAttribute(ProductAttributeInterface $attribute): ProductInterface;
 
     /**
-     * Returns whether offers update is needed.
-     *
-     * @return bool
+     * @return array<OptionGroupInterface>|Collection<OptionGroupInterface>
      */
-    public function isPendingOffers();
+    public function getOptionGroups(): Collection;
+
+    public function hasOptionGroups(): bool;
+
+    public function hasOptionGroup(OptionGroupInterface $group): bool;
+
+    public function addOptionGroup(OptionGroupInterface $group): ProductInterface;
+
+    public function removeOptionGroup(OptionGroupInterface $group): ProductInterface;
 
     /**
-     * Sets whether offers update is needed.
+     * @param Collection<OptionGroupInterface> $groups
      *
-     * @param bool $pending
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function setPendingOffers($pending);
+    public function setOptionGroups(Collection $groups): ProductInterface;
 
     /**
-     * Returns whether prices update is needed.
-     *
-     * @return bool
+     * @param array<int> $exclude
      */
-    public function isPendingPrices();
+    public function hasRequiredOptionGroup(array $exclude = []): bool;
 
     /**
-     * Sets whether prices update is needed.
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $bundle  Whether to return bundle slots option groups.
      *
-     * @param bool $pending
-     *
-     * @return $this|ProductInterface
+     * @return array<OptionGroupInterface>
      */
-    public function setPendingPrices($pending);
+    public function resolveOptionGroups($exclude = [], bool $bundle = false): array;
 
     /**
-     * Returns the "released at" date.
-     *
-     * @return \DateTime
+     * @return array<BundleSlotInterface>|Collection<BundleSlotInterface>
      */
-    public function getReleasedAt();
+    public function getBundleSlots(): Collection;
+
+    public function hasBundleSlot(BundleSlotInterface $slot): bool;
+
+    public function addBundleSlot(BundleSlotInterface $slot): ProductInterface;
+
+    public function removeBundleSlot(BundleSlotInterface $slot): ProductInterface;
 
     /**
-     * Sets the "released at" date.
+     * @param Collection<BundleSlotInterface> $slots
      *
-     * @param \DateTime $date
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function setReleasedAt(\DateTime $date = null);
+    public function setBundleSlots(Collection $slots): ProductInterface;
 
     /**
-     * Returns the best seller mode.
-     *
-     * @return int
+     * @return array<ComponentInterface>|Collection<ComponentInterface>
      */
-    public function getBestSeller();
+    public function getComponents(): Collection;
+
+    public function hasComponents():bool;
+
+    public function hasComponent(ComponentInterface $component): bool;
+
+    public function addComponent(ComponentInterface $component): ProductInterface;
+
+    public function removeComponent(ComponentInterface $component): ProductInterface;
 
     /**
-     * Sets the best seller mode.
+     * @param Collection<ComponentInterface> $components
      *
-     * @param int $value
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function setBestSeller(int $value);
+    public function setComponents(Collection $components): ProductInterface;
 
     /**
-     * Returns the cross selling mode.
-     *
-     * @return int
+     * @return array<CrossSellingInterface>|Collection<CrossSellingInterface>
      */
-    public function getCrossSelling();
+    public function getCrossSellings(): Collection;
+
+    public function hasCrossSellings(): bool;
+
+    public function hasCrossSelling(CrossSellingInterface $crossSelling): bool;
+
+    public function addCrossSelling(CrossSellingInterface $crossSelling): ProductInterface;
+
+    public function removeCrossSelling(CrossSellingInterface $crossSelling): ProductInterface;
 
     /**
-     * Sets the cross selling mode.
+     * @param Collection<CrossSellingInterface> $crossSellings
      *
-     * @param int $value
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function setCrossSelling(int $value);
+    public function setCrossSellings(Collection $crossSellings): ProductInterface;
 
     /**
-     * Returns the "stat updated at" datetime.
-     *
-     * @return \DateTime
+     * @return array<SpecialOfferInterface>|Collection<SpecialOfferInterface>
      */
-    public function getStatUpdatedAt();
+    public function getSpecialOffers(): Collection;
+
+    public function hasSpecialOffer(SpecialOfferInterface $offer): bool;
+
+    public function addSpecialOffer(SpecialOfferInterface $offer): ProductInterface;
+
+    public function removeSpecialOffer(SpecialOfferInterface $offer): ProductInterface;
 
     /**
-     * Sets the "stat updated at" datetime.
+     * @param Collection<SpecialOfferInterface> $offers
      *
-     * @param \DateTime $date
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function setStatUpdatedAt(\DateTime $date = null);
+    public function setSpecialOffers(Collection $offers): ProductInterface;
 
     /**
-     * Returns whether this product has the given mention.
-     *
-     * @param ProductMention $mention
-     *
-     * @return bool
+     * @return array<PricingInterface>|Collection<PricingInterface>
      */
-    public function hasMention(ProductMention $mention): bool;
+    public function getPricings(): Collection;
+
+    public function hasPricing(PricingInterface $pricing): bool;
+
+    public function addPricing(PricingInterface $pricing): ProductInterface;
+
+    public function removePricing(PricingInterface $pricing): ProductInterface;
 
     /**
-     * Adds the mention.
+     * @param Collection<PricingInterface> $pricings
      *
-     * @param ProductMention $mention
-     *
-     * @return $this|ProductInterface
+     * @internal
      */
-    public function addMention(ProductMention $mention): ProductInterface;
+    public function setPricings(Collection $pricings): ProductInterface;
 
     /**
-     * Removes the mention.
-     *
-     * @param ProductMention $mention
-     *
-     * @return $this|ProductInterface
+     * @return array<CategoryInterface>|Collection<CategoryInterface>
      */
-    public function removeMention(ProductMention $mention): ProductInterface;
+    public function getCategories(): Collection;
+
+    public function hasCategory(CategoryInterface $category): bool;
+
+    public function addCategory(CategoryInterface $category): ProductInterface;
+
+    public function removeCategory(CategoryInterface $category): ProductInterface;
+
+    /**
+     * @param Collection<CategoryInterface> $categories
+     */
+    public function setCategories(Collection $categories): ProductInterface;
+
+    /**
+     * @return array<CustomerGroupInterface>|Collection<CustomerGroupInterface>
+     */
+    public function getCustomerGroups(): Collection;
+
+    public function hasCustomerGroup(CustomerGroupInterface $group): bool;
+
+    public function addCustomerGroup(CustomerGroupInterface $group): ProductInterface;
+
+    public function removeCustomerGroup(CustomerGroupInterface $group): ProductInterface;
+
+    /**
+     * @param Collection<CustomerGroupInterface> $groups
+     */
+    public function setCustomerGroups(Collection $groups): ProductInterface;
+
+    public function hasMedia(ProductMediaInterface $media): bool;
+
+    /**
+     * @param array<string> $types To filter media by type(s)
+     *
+     * @return array<ProductMediaInterface>|Collection<ProductMediaInterface>
+     */
+    public function getMedias(array $types = []): Collection;
+
+    public function addMedia(ProductMediaInterface $media): ProductInterface;
+
+    public function removeMedia(ProductMediaInterface $media): ProductInterface;
+
+    public function hasReference(ProductReferenceInterface $reference): bool;
+
+    public function addReference(ProductReferenceInterface $reference): ProductInterface;
+
+    public function removeReference(ProductReferenceInterface $reference): ProductInterface;
+
+    /**
+     * @return array<ProductReferenceInterface>|Collection<ProductReferenceInterface>
+     */
+    public function getReferences(): Collection;
+
+    /**
+     * Returns the reference for the given type.
+     */
+    public function getReferenceByType(string $type): ?string;
+
+    public function hasMention(ProductMentionInterface $mention): bool;
+
+    public function addMention(ProductMentionInterface $mention): ProductInterface;
+
+    public function removeMention(ProductMentionInterface $mention): ProductInterface;
 
     /**
      * Returns the product's main image.
-     *
-     * @return MediaInterface|null
      */
     public function getImage(): ?MediaInterface;
 
     /**
-     * Returns the product images.
-     *
-     * @param bool $withChildren
-     * @param int  $limit
-     *
-     * @return Collection|MediaInterface[]
+     * @return array<MediaInterface>|Collection<MediaInterface>
      */
-    public function getImages(bool $withChildren = true, int $limit = 5);
+    public function getImages(bool $withChildren = true, int $limit = 5): Collection;
 
     /**
-     * Returns the product files.
-     *
-     * @param bool $withChildren
-     * @param int  $limit
-     *
-     * @return Collection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     * @return array<MediaInterface>|Collection<MediaInterface>
      */
-    public function getFiles(bool $withChildren = false, int $limit = 5);
+    public function getFiles(bool $withChildren = false, int $limit = 5): Collection;
 
     /**
      * Returns the variant uniqueness signature.
-     *
-     * @return string
      */
-    public function getUniquenessSignature();
+    public function getUniquenessSignature(): string;
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class ProductTypeValidator extends ConstraintValidator
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function validate($typeOrProduct, Constraint $constraint)
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
@@ -15,171 +17,52 @@ use Ekyna\Component\Resource\Model\TrackAssociationInterface;
  */
 interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterface
 {
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
+
+    public function setName(?string $name): PricingInterface;
+
+    public function getProduct(): ?ProductInterface;
+
+    public function setProduct(?ProductInterface $product): PricingInterface;
 
     /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|PricingInterface
+     * @return Collection<CustomerGroupInterface>
      */
-    public function setName($name);
+    public function getGroups(): Collection;
+
+    public function hasGroup(CustomerGroupInterface $group): bool;
+
+    public function addGroup(CustomerGroupInterface $group): PricingInterface;
+
+    public function removeGroup(CustomerGroupInterface $group): PricingInterface;
 
     /**
-     * Returns the product.
-     *
-     * @return ProductInterface
+     * @return Collection<CountryInterface>
      */
-    public function getProduct();
+    public function getCountries(): Collection;
+
+    public function hasCountry(CountryInterface $country): bool;
+
+    public function addCountry(CountryInterface $country): PricingInterface;
+
+    public function removeCountry(CountryInterface $country): PricingInterface;
 
     /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|PricingInterface
+     * @return Collection<BrandInterface>
      */
-    public function setProduct(ProductInterface $product = null);
+    public function getBrands(): Collection;
 
-    /**
-     * Returns the customer groups.
-     *
-     * @return Collection|CustomerGroupInterface[]
-     */
-    public function getGroups();
+    public function hasBrand(BrandInterface $brand): bool;
 
-    /**
-     * Returns whether the pricing has the given customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return boolean
-     */
-    public function hasGroup(CustomerGroupInterface $group);
+    public function addBrand(BrandInterface $brand): PricingInterface;
 
-    /**
-     * Adds the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|PricingInterface
-     */
-    public function addGroup(CustomerGroupInterface $group);
+    public function removeBrand(BrandInterface $brand): PricingInterface;
 
-    /**
-     * Removes the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|PricingInterface
-     */
-    public function removeGroup(CustomerGroupInterface $group);
+    public function getRules(): Collection;
 
-    /**
-     * Returns the countries.
-     *
-     * @return Collection|CountryInterface[]
-     */
-    public function getCountries();
+    public function hasRule(PricingRuleInterface $rule): bool;
 
-    /**
-     * Returns whether the pricing has the given country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return boolean
-     */
-    public function hasCountry(CountryInterface $country);
+    public function addRule(PricingRuleInterface $rule): PricingInterface;
 
-    /**
-     * Adds the country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return $this|PricingInterface
-     */
-    public function addCountry(CountryInterface $country);
-
-    /**
-     * Removes the country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return $this|PricingInterface
-     */
-    public function removeCountry(CountryInterface $country);
-
-    /**
-     * Returns the brands.
-     *
-     * @return Collection|BrandInterface[]
-     */
-    public function getBrands();
-
-    /**
-     * Returns whether the pricing has the given brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return boolean
-     */
-    public function hasBrand(BrandInterface $brand);
-
-    /**
-     * Adds the brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return $this|PricingInterface
-     */
-    public function addBrand(BrandInterface $brand);
-
-    /**
-     * Removes the brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return $this|PricingInterface
-     */
-    public function removeBrand(BrandInterface $brand);
-
-    /**
-     * Returns the rules.
-     *
-     * @return Collection|PricingRuleInterface[]
-     */
-    public function getRules();
-
-    /**
-     * Returns whether the pricing has the given rule.
-     *
-     * @param PricingRuleInterface $rule
-     *
-     * @return boolean
-     */
-    public function hasRule(PricingRuleInterface $rule);
-
-    /**
-     * Adds the rule.
-     *
-     * @param PricingRuleInterface $rule
-     *
-     * @return $this|PricingInterface
-     */
-    public function addRule(PricingRuleInterface $rule);
-
-    /**
-     * Removes the rule.
-     *
-     * @param PricingRuleInterface $rule
-     *
-     * @return $this|PricingInterface
-     */
-    public function removeRule(PricingRuleInterface $rule);
+    public function removeRule(PricingRuleInterface $rule): PricingInterface;
 }

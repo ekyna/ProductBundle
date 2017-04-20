@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class SelectConfigType
@@ -13,13 +17,10 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SelectConfigType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('multiple', CheckboxType::class, [
-            'label' => 'ekyna_product.attribute.config.multiple',
+            'label' => t('attribute.config.multiple', [], 'EkynaProduct'),
             'required' => false,
         ]);
     }

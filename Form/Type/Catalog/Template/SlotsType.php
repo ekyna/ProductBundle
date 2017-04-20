@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
-use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
+use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -16,10 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SlotsType extends AbstractType
 {
-    /**
-     * @inheritdoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         for ($i = 0; $i < $options['slot_count']; $i++) {
             $this->addSlot($builder, $i);
@@ -42,18 +41,12 @@ class SlotsType extends AbstractType
         $builder->add($slot);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         FormUtil::addClass($view, 'catalog-page-slots');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -63,10 +56,7 @@ class SlotsType extends AbstractType
             ->setAllowedTypes('slot_count', 'int');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): ?string
     {
         return 'ekyna_product_catalog_slots';
     }

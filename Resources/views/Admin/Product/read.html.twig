@@ -1,0 +1,80 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+
+{% block flashes %}
+    {{ parent() }}
+    {% for message in product|product_messages %}
+        <div class="alert alert-{{ message[1] }} alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message[0]|raw }}
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block title %}
+    {{ admin_resource_pin(resource) }}
+    <h1>{{ 'product.header.show'|trans({'%name%': product}, 'EkynaProduct')|raw }}</h1>
+{% endblock title %}
+
+{% block actions %}
+    {%- if product is variant_product -%}
+        {{ ui_button('product.field.parent', {
+            'trans_domain': 'EkynaProduct',
+            'type': 'link',
+            'icon': 'arrow-up',
+            'path': admin_resource_path(product.parent)
+        }) }}
+    {%- endif -%}
+    {{- admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') -}}
+    {{ macros.export_products_button() }}
+    {{- macros.new_product_button() -}}
+{% endblock actions %}
+
+{% block main %}
+    <div class="main-header">
+        <div class="infos">
+            {{- product|product_type_badge }}
+            {{ product|cms_tags({'text': false}) -}}
+        </div>
+        <div class="actions">
+            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\LabelAction', {
+                'parameters': {'id': [product.id]}
+            }, {'target': '_blank'}) }}
+            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\ExportOrdersAction') }}
+            {{ macros.convert_product_button(product) }}
+            {%- if product is simple_product -%}
+                {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\DuplicateAction') }}
+            {%- endif -%}
+            {{ admin_resource_btn(product, 'public') }}
+            {{ admin_resource_btn(product, 'editor') }}
+            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {'short': true}) }}
+            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {'short': true}) }}
+        </div>
+    </div>
+    {% if product is simple_product %}
+        {% include '@EkynaProduct/Admin/Product/Show/simple.html.twig' %}
+    {% elseif product is variable_product %}
+        {% include '@EkynaProduct/Admin/Product/Show/variable.html.twig' %}
+    {% elseif product is variant_product %}
+        {% include '@EkynaProduct/Admin/Product/Show/variant.html.twig' %}
+    {% elseif product is bundle_product %}
+        {% include '@EkynaProduct/Admin/Product/Show/bundle.html.twig' %}
+    {% elseif product is configurable_product %}
+        {% include '@EkynaProduct/Admin/Product/Show/configurable.html.twig' %}
+    {% else %}
+        <div class="panel-body form-body">
+            <p>Unexpected product type.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/product.css')) }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">require(['ekyna-product/admin/product']);</script>
+{% endblock javascripts %}

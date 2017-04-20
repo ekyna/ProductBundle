@@ -2,7 +2,6 @@
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductTranslationRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Validator\Constraint;

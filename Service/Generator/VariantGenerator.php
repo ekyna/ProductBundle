@@ -29,7 +29,7 @@ class VariantGenerator implements VariantGeneratorInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function generateVariants(Model\ProductInterface $variable)
     {

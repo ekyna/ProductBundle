@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use DatePeriod;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
@@ -11,6 +14,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function array_replace;
+
 /**
  * Class StatCountRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
@@ -18,27 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class StatCountRepository extends AbstractStatRepository
 {
-    /**
-     * @var Query
-     */
-    private $findOneQuery;
+    private ?Query $findOneQuery = null;
+    private ?Query $findByProductAndPeriodQuery = null;
+    private ?Query $findByProductAndPeriodAndGroupQuery = null;
 
-    /**
-     * @var Query
-     */
-    private $findByProductAndPeriodQuery;
-
-    /**
-     * @var Query
-     */
-    private $findByProductAndPeriodAndGroupQuery;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, StatCount::class);
@@ -46,13 +34,6 @@ class StatCountRepository extends AbstractStatRepository
 
     /**
      * Finds one stat count.
-     *
-     * @param Product $product
-     * @param string  $source
-     * @param Group   $group
-     * @param string  $date
-     *
-     * @return StatCount|null
      */
     public function findOne(Product $product, string $source, Group $group, string $date): ?StatCount
     {
@@ -70,17 +51,12 @@ class StatCountRepository extends AbstractStatRepository
     /**
      * Finds count stats by product and period (and optionally customer group).
      *
-     * @param Product     $product
-     * @param string      $source
-     * @param \DatePeriod $period
-     * @param Group       $group
-     *
-     * @return int[]
+     * @return array<int>
      */
     public function findByProductAndPeriodAndGroup(
         Product $product,
         string $source,
-        \DatePeriod $period,
+        DatePeriod $period,
         Group $group = null
     ): array {
         $parameters = [
@@ -107,9 +83,6 @@ class StatCountRepository extends AbstractStatRepository
         return $return;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getFindProductsDefaultParameters(): array
     {
         return array_replace(parent::getFindProductsDefaultParameters(), [
@@ -119,8 +92,6 @@ class StatCountRepository extends AbstractStatRepository
 
     /**
      * Creates the "find products" query builder.
-     *
-     * @return QueryBuilder
      */
     protected function createFindProductsQueryBuilder(): QueryBuilder
     {
@@ -135,9 +106,6 @@ class StatCountRepository extends AbstractStatRepository
 
     /**
      * Configures the "find products" query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
      */
     protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
     {
@@ -146,9 +114,6 @@ class StatCountRepository extends AbstractStatRepository
             ->setParameter('mode', HighlightModes::MODE_AUTO);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
     {
         $resolver
@@ -156,9 +121,6 @@ class StatCountRepository extends AbstractStatRepository
             ->setAllowedValues('source', StatCount::getSources());
     }
 
-    /**
-     * @return Query
-     */
     private function getFindByProductAndPeriodQuery(): Query
     {
         if ($this->findByProductAndPeriodQuery) {
@@ -180,9 +142,6 @@ class StatCountRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindByProductAndPeriodAndGroupQuery(): Query
     {
         if ($this->findByProductAndPeriodAndGroupQuery) {
@@ -205,9 +164,6 @@ class StatCountRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindOneQuery(): Query
     {
         if ($this->findOneQuery) {

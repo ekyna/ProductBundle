@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config\BooleanConfigType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type\BooleanAttributeType;
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class BooleanType
@@ -15,48 +20,24 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class BooleanType extends AbstractType
 {
-    const TRUE  = 'true';
-    const FALSE = 'false';
+    public const TRUE  = 'true';
+    public const FALSE = 'false';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
+    /** @var string[] */
+    private array  $locales;
+    private string $defaultLocale;
 
-    /**
-     * @var string[]
-     */
-    private $locales;
+    private ?array $configDefaults = null;
 
-    /**
-     * @var string
-     */
-    private $defaultLocale;
-
-    /**
-     * @var array
-     */
-    private $configDefaults;
-
-
-    /**
-     * Constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param array               $locales
-     * @param string              $defaultLocale
-     */
-    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale)
+    public function __construct(TranslatorInterface $translator, array $locales, string $defaultLocale)
     {
         $this->translator = $translator;
         $this->locales = $locales;
         $this->defaultLocale = $defaultLocale;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function render(ProductAttributeInterface $productAttribute, $locale = null)
+    public function render(ProductAttributeInterface $productAttribute, string $locale = null): ?string
     {
         $config = $productAttribute->getAttributeSlot()->getAttribute()->getConfig();
         $value = (bool)$productAttribute->getValue();
@@ -77,10 +58,7 @@ class BooleanType extends AbstractType
         return $this->getConfigDefaults()[$key][$this->defaultLocale];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigDefaults()
+    public function getConfigDefaults(): array
     {
         if (null !== $this->configDefaults) {
             return $this->configDefaults;
@@ -89,32 +67,29 @@ class BooleanType extends AbstractType
         $this->configDefaults = [];
 
         $labels = [
-            static::TRUE  => 'ekyna_core.value.yes',
-            static::FALSE => 'ekyna_core.value.no',
+            static::TRUE  => 'value.yes',
+            static::FALSE => 'value.no',
         ];
 
         foreach ($labels as $value => $label) {
             $this->configDefaults[$value] = [];
             foreach ($this->locales as $locale) {
-                $this->configDefaults[$value][$locale] = $this->translator->trans($label, [], null, $locale);
+                $this->configDefaults[$value][$locale] = $this->translator->trans($label, [], 'EkynaUi', $locale);
             }
         }
 
         return $this->configDefaults;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigShowFields(AttributeInterface $attribute)
+    public function getConfigShowFields(AttributeInterface $attribute): array
     {
         $config = $attribute->getConfig();
 
         $layout = [];
 
         $values = [
-            static::TRUE  => 'ekyna_core.value.yes',
-            static::FALSE => 'ekyna_core.value.no',
+            static::TRUE  => t('value.yes', [], 'EkynaUi'),
+            static::FALSE => t('value.no', [], 'EkynaUi'),
         ];
 
         foreach ($values as $value => $label) {
@@ -130,8 +105,8 @@ class BooleanType extends AbstractType
 
             if (!empty($labels)) {
                 $layout[] = [
-                    'value' => $labels,
-                    'type' => 'map',
+                    'value'   => $labels,
+                    'type'    => 'map',
                     'options' => [
                         'label' => $label,
                     ],
@@ -142,27 +117,23 @@ class BooleanType extends AbstractType
         return $layout;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigType()
+    public function getConfigType(): ?string
     {
         return BooleanConfigType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFormType()
+    public function getFormType(): ?string
     {
         return BooleanAttributeType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getLabel()
+    public function getLabel(): TranslatableInterface
     {
-        return 'ekyna_product.attribute.type.boolean';
+        return t('attribute.type.boolean', [], 'EkynaProduct');
+    }
+
+    public static function getName(): string
+    {
+        return 'boolean';
     }
 }

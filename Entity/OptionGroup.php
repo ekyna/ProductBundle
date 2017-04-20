@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -13,58 +16,27 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method Model\OptionGroupTranslationInterface translate($locale = null, $create = false)
  *
- * @TODO Rename to 'Option'
+ * @TODO    Rename to 'Option'
  */
 class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupInterface
 {
     use RM\SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                    $id        = null;
+    protected ?Model\ProductInterface $product   = null;
+    protected ?string                 $name      = null;
+    protected bool                    $required  = false;
+    protected bool                    $fullTitle = false;
+    /** @var Collection<Model\OptionInterface> */
+    protected Collection $options;
 
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $product;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var bool
-     */
-    protected $required;
-
-    /**
-     * @var bool
-     */
-    protected $fullTitle;
-
-    /**
-     * @var ArrayCollection|Model\OptionInterface[]
-     */
-    protected $options;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct();
 
         $this->options = new ArrayCollection();
-        $this->required = false;
-        $this->fullTitle = false;
     }
 
-    /**
-     * Clones the option group.
-     */
     public function __clone()
     {
         parent::__clone();
@@ -79,143 +51,98 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
         }
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New option group';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setProduct(Model\ProductInterface $product = null)
+    public function setProduct(?Model\ProductInterface $product): Model\OptionGroupInterface
     {
-        if ($this->product !== $product) {
-            if ($previous = $this->product) {
-                $this->product = null;
-                $previous->removeOptionGroup($this);
-            }
+        if ($this->product === $product) {
+            return $this;
+        }
 
-            if ($this->product = $product) {
-                $this->product->addOptionGroup($this);
-            }
+        if ($previous = $this->product) {
+            $this->product = null;
+            $previous->removeOptionGroup($this);
+        }
+
+        if ($this->product = $product) {
+            $this->product->addOptionGroup($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function setName(?string $name): Model\OptionGroupInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): Model\OptionGroupInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setRequired($required)
+    public function setRequired(bool $required): Model\OptionGroupInterface
     {
-        $this->required = (bool)$required;
+        $this->required = $required;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isFullTitle()
+    public function isFullTitle(): bool
     {
         return $this->fullTitle;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setFullTitle(bool $full)
+    public function setFullTitle(bool $full): Model\OptionGroupInterface
     {
         $this->fullTitle = $full;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getOptions()
+    public function getOptions(): Collection
     {
         return $this->options;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasOption(Model\OptionInterface $option)
+    public function hasOption(Model\OptionInterface $option): bool
     {
         return $this->options->contains($option);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addOption(Model\OptionInterface $option)
+    public function addOption(Model\OptionInterface $option): Model\OptionGroupInterface
     {
         if (!$this->hasOption($option)) {
             $this->options->add($option);
@@ -225,10 +152,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeOption(Model\OptionInterface $option)
+    public function removeOption(Model\OptionInterface $option): Model\OptionGroupInterface
     {
         if ($this->hasOption($option)) {
             $this->options->removeElement($option);
@@ -238,19 +162,13 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setOptions(ArrayCollection $options)
+    public function setOptions(Collection $options): Model\OptionGroupInterface
     {
         $this->options = $options;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function getTranslationClass(): string
     {
         return OptionGroupTranslation::class;

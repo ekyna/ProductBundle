@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
@@ -11,6 +13,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -20,33 +23,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductAttributesType extends AbstractType
 {
-    /**
-     * @var AttributeTypeRegistryInterface
-     */
-    private $typeRegistry;
+    private AttributeTypeRegistryInterface $typeRegistry;
+    private string $productAttributeClass;
 
-    /**
-     * @var string
-     */
-    private $productAttributeClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param AttributeTypeRegistryInterface $typeRegistry
-     * @param string                         $productAttributeClass
-     */
-    public function __construct(AttributeTypeRegistryInterface $typeRegistry, $productAttributeClass)
+    public function __construct(AttributeTypeRegistryInterface $typeRegistry, string $productAttributeClass)
     {
         $this->typeRegistry = $typeRegistry;
         $this->productAttributeClass = $productAttributeClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(
             new ProductAttributesTransformer($this->productAttributeClass, $options['attribute_set'])
@@ -72,10 +58,7 @@ class ProductAttributesType extends AbstractType
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr'] = array_merge($view->vars['attr'], [
             'class'          => 'product-attributes',
@@ -84,15 +67,12 @@ class ProductAttributesType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'attribute_set' => 'null',
-                'required'      => function (OptionsResolver $options, $value) {
+                'attribute_set' => null,
+                'required'      => function (Options $options) {
                     /** @var Model\AttributeSetInterface $set */
                     $attributeSet = $options['attribute_set'];
 
@@ -102,10 +82,7 @@ class ProductAttributesType extends AbstractType
             ->setAllowedTypes('attribute_set', [Model\AttributeSetInterface::class, 'null']);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_product_attributes';
     }

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -11,94 +14,65 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class PricingRule implements Model\PricingRuleInterface
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                    $id      = null;
+    protected ?Model\PricingInterface $pricing = null;
+    protected Decimal                 $minQuantity;
+    protected Decimal                 $percent;
 
-    /**
-     * @var Model\PricingInterface
-     */
-    protected $pricing;
+    public function __construct()
+    {
+        $this->minQuantity = new Decimal(0);
+        $this->percent = new Decimal(0);
+    }
 
-    /**
-     * @var int
-     */
-    protected $minQuantity;
-
-    /**
-     * @var float
-     */
-    protected $percent;
-
-
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getPricing()
+    public function getPricing(): ?Model\PricingInterface
     {
         return $this->pricing;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setPricing(Model\PricingInterface $pricing = null)
+    public function setPricing(?Model\PricingInterface $pricing): Model\PricingRuleInterface
     {
-        if ($this->pricing !== $pricing) {
-            if ($previous = $this->pricing) {
-                $this->pricing = null;
-                $previous->removeRule($this);
-            }
+        if ($this->pricing === $pricing) {
+            return $this;
+        }
 
-            if ($this->pricing = $pricing) {
-                $this->pricing->addRule($this);
-            }
+        if ($previous = $this->pricing) {
+            $this->pricing = null;
+            $previous->removeRule($this);
+        }
+
+        if ($this->pricing = $pricing) {
+            $this->pricing->addRule($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getMinQuantity()
+    public function getMinQuantity(): Decimal
     {
         return $this->minQuantity;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setMinQuantity($quantity)
+    public function setMinQuantity(Decimal $quantity): Model\PricingRuleInterface
     {
-        $this->minQuantity = (int)$quantity;
+        $this->minQuantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getPercent()
+    public function getPercent(): Decimal
     {
         return $this->percent;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setPercent($percent)
+    public function setPercent(Decimal $percent): Model\PricingRuleInterface
     {
-        $this->percent = (float)$percent;
+        $this->percent = $percent;
 
         return $this;
     }

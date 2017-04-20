@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Controller\Account;
 
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Component\Resource\Search\Request as SearchRequest;
 use Ekyna\Component\Resource\Search\Search;
-use Elastica\Client as ElasticaClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,54 +20,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class ProductController
 {
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $authorization;
+    private AuthorizationCheckerInterface $authorization;
+    private Search                        $search;
 
-    /**
-     * @var Search
-     */
-    private $search;
-
-    /**
-     * @var ElasticaClient
-     */
-    private $client;
-
-    /**
-     * @var string
-     */
-    private $productClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param AuthorizationCheckerInterface $authorization
-     * @param Search                        $search
-     * @param ElasticaClient                $client
-     * @param string                        $productClass
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorization,
-        Search $search,
-        ElasticaClient $client,
-        string $productClass
+        Search                        $search
     ) {
         $this->authorization = $authorization;
         $this->search = $search;
-        $this->client = $client;
-        $this->productClass = $productClass;
     }
 
-    /**
-     * Account product search.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
     public function search(Request $request): Response
     {
         if (!$this->authorization->isGranted('IS_AUTHENTICATED_REMEMBERED')) {

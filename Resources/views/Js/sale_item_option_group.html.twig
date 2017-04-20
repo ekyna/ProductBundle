@@ -4,7 +4,8 @@
         <div class="input-group">
             <select name="{{ parent }}[option_group_{{ id }}][choice]" class="sale-item-option form-control{# input-sm#}"{% if required %} required="required"{% endif %}>
                 {% if not required %}<option selected="selected" value>{{ placeholder }}</option>{% endif %}
-                {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode|escape }}'>{{ option.label }}</option>{% endfor %}
+                {# 1060 = JSON_HEX_APOS | JSON_NUMERIC_CHECK | JSON_PRESERVE_ZERO_FRACTION #}
+                {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode(1060)|escape }}'>{{ option.label }}</option>{% endfor %}
             </select>
             <span class="input-group-addon sale-item-info">&nbsp;</span>
         </div>

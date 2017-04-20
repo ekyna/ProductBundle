@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\ArrayToProductEntriesTransformer;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductSelectionType
@@ -16,37 +20,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductSelectionType extends AbstractType
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $repository;
+    private ProductRepositoryInterface $repository;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     */
     public function __construct(ProductRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(new ArrayToProductEntriesTransformer($this->repository));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label'          => 'ekyna_product.product.label.plural',
+            'label'          => t('product.label.plural', [], 'EkynaProduct'),
             'allow_add'      => true,
             'allow_sort'     => true,
             'allow_delete'   => true,
@@ -56,10 +45,7 @@ class ProductSelectionType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

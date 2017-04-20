@@ -19,7 +19,7 @@ class Variant extends Constraint
     public $translationTitleNeeded   = 'ekyna_product.product.translation_title_needed';
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getTargets()
     {

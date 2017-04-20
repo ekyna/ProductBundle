@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\CommerceBundle\Form\SubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAdjustmentType;
+use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductTypeSubscriber
@@ -20,39 +27,15 @@ use Symfony\Component\Form\FormEvents;
  */
 class ProductTypeSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ProductFormBuilder
-     */
-    private $productBuilder;
+    private ProductFormBuilder          $productBuilder;
+    private SubjectFormBuilder          $subjectBuilder;
+    private StockSubjectFormBuilder     $stockBuilder;
+    private ResourceRepositoryInterface $attributeSetRepository;
 
-    /**
-     * @var SubjectFormBuilder
-     */
-    private $subjectBuilder;
-
-    /**
-     * @var StockSubjectFormBuilder
-     */
-    private $stockBuilder;
-
-    /**
-     * @var ResourceRepositoryInterface
-     */
-    private $attributeSetRepository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductFormBuilder          $productBuilder
-     * @param SubjectFormBuilder          $subjectBuilder
-     * @param StockSubjectFormBuilder     $stockBuilder
-     * @param ResourceRepositoryInterface $attributeSetRepository
-     */
     public function __construct(
-        ProductFormBuilder $productBuilder,
-        SubjectFormBuilder $subjectBuilder,
-        StockSubjectFormBuilder $stockBuilder,
+        ProductFormBuilder          $productBuilder,
+        SubjectFormBuilder          $subjectBuilder,
+        StockSubjectFormBuilder     $stockBuilder,
         ResourceRepositoryInterface $attributeSetRepository
     ) {
         $this->productBuilder = $productBuilder;
@@ -63,10 +46,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
     /**
      * Form pre set data event handler.
-     *
-     * @param FormEvent $event
      */
-    public function onPreSetData(FormEvent $event)
+    public function onPreSetData(FormEvent $event): void
     {
         /** @var ProductInterface $product */
         $product = $event->getData();
@@ -77,7 +58,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $type = $product->getType();
         if (!ProductTypes::isValid($type)) {
-            throw new \RuntimeException('Product type not set or invalid.');
+            throw new RuntimeException('Product type not set or invalid.');
         }
 
         switch ($type) {
@@ -97,16 +78,14 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 $this->buildConfigurableProductForm();
                 break;
             default:
-                throw new \InvalidArgumentException('Unexpected product type.');
+                throw new InvalidArgumentException('Unexpected product type.');
         }
     }
 
     /**
      * Form pre submit event handler.
-     *
-     * @param FormEvent $event
      */
-    public function onPreSubmit(FormEvent $event)
+    public function onPreSubmit(FormEvent $event): void
     {
         $product = $this->productBuilder->getProduct();
 
@@ -125,7 +104,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $attributeSet = null;
         if (0 < $id = intval($data['attributeSet'])) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface $attributeSet */
+            /** @var AttributeSetInterface $attributeSet */
             $attributeSet = $this->attributeSetRepository->find($id);
         }
 
@@ -137,7 +116,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     /**
      * Builds the simple product form.
      */
-    protected function buildSimpleProductForm()
+    protected function buildSimpleProductForm(): void
     {
         $product = $this->getProductBuilder()->getProduct();
 
@@ -198,7 +177,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     /**
      * Builds the variable product form.
      */
-    protected function buildVariableProductForm()
+    protected function buildVariableProductForm(): void
     {
         $this->productBuilder
             // General
@@ -249,7 +228,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     /**
      * Builds the variant product form.
      */
-    protected function buildVariantProductForm()
+    protected function buildVariantProductForm(): void
     {
         $product = $this->getProductBuilder()->getProduct();
 
@@ -279,7 +258,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField([
                 'required' => false,
                 'attr'     => [
-                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                    'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
                 ],
             ])
             ->addCustomerGroupsField()
@@ -316,7 +295,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     /**
      * Builds the bundle product form.
      */
-    protected function buildBundleProductForm()
+    protected function buildBundleProductForm(): void
     {
         $this->productBuilder
             // General
@@ -369,7 +348,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     /**
      * Builds the configurable product form.
      */
-    protected function buildConfigurableProductForm()
+    protected function buildConfigurableProductForm(): void
     {
         $this->productBuilder
             // General
@@ -415,30 +394,17 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageDepthField(['disabled' => true]);
     }
 
-    /**
-     * Returns the product form builder.
-     *
-     * @return ProductFormBuilder
-     */
-    protected function getProductBuilder()
+    protected function getProductBuilder(): ProductFormBuilder
     {
         return $this->productBuilder;
     }
 
-    /**
-     * Returns the stock form builder.
-     *
-     * @return StockSubjectFormBuilder
-     */
-    protected function getStockBuilder()
+    protected function getStockBuilder(): StockSubjectFormBuilder
     {
         return $this->stockBuilder;
     }
 
-    /**
-     * @inheritDoc
-     */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => ['onPreSetData', 0],

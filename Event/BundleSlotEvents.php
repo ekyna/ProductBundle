@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,10 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class BundleSlotEvents
 {
-    const INSERT = 'ekyna_product.bundle_slot.insert';
-    const UPDATE = 'ekyna_product.bundle_slot.update';
-    const DELETE = 'ekyna_product.bundle_slot.delete';
-
+    public const INSERT = 'ekyna_product.bundle_slot.insert';
+    public const UPDATE = 'ekyna_product.bundle_slot.update';
+    public const DELETE = 'ekyna_product.bundle_slot.delete';
 
     /**
      * Disabled constructor.

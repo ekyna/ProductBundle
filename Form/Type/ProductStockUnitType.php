@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Stock\AbstractStockUnitType;

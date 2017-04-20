@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -14,127 +16,56 @@ use Ekyna\Component\Resource\Model as RM;
  */
 interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInterface
 {
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function setProduct(ProductInterface $product = null);
+    public function setProduct(?ProductInterface $product): OptionGroupInterface;
 
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
 
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function setName($name);
+    public function setName(?string $name): OptionGroupInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Returns the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|OptionGroupInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(?string $title): OptionGroupInterface;
 
-    /**
-     * Returns the required.
-     *
-     * @return boolean
-     */
-    public function isRequired();
+    public function isRequired(): bool;
 
-    /**
-     * Sets the required.
-     *
-     * @param boolean $required
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function setRequired($required);
+    public function setRequired(bool $required): OptionGroupInterface;
 
     /**
      * Returns whether to display variant's full titles.
-     *
-     * @return bool
      */
-    public function isFullTitle();
+    public function isFullTitle(): bool;
 
     /**
      * Sets the whether to display variant's full titles.
-     *
-     * @param bool $full
-     *
-     * @return $this|OptionGroupInterface
      */
-    public function setFullTitle(bool $full);
+    public function setFullTitle(bool $full): OptionGroupInterface;
 
     /**
-     * Returns the options.
-     *
-     * @return ArrayCollection|OptionInterface[]
+     * @return Collection<OptionInterface>
      */
-    public function getOptions();
+    public function getOptions(): Collection;
 
     /**
      * Returns whether the group has the option or not.
-     *
-     * @param OptionInterface $option
-     *
-     * @return bool
      */
-    public function hasOption(OptionInterface $option);
+    public function hasOption(OptionInterface $option): bool;
+
+    public function addOption(OptionInterface $option): OptionGroupInterface;
+
+    public function removeOption(OptionInterface $option): OptionGroupInterface;
 
     /**
-     * Adds the option.
+     * @param Collection<OptionInterface> $options
      *
-     * @param OptionInterface $option
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function addOption(OptionInterface $option);
-
-    /**
-     * Removes the option.
-     *
-     * @param OptionInterface $option
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function removeOption(OptionInterface $option);
-
-    /**
-     * Sets the options.
-     *
-     * @param ArrayCollection|OptionInterface[] $options
-     *
-     * @return $this|OptionGroupInterface
      * @internal
      */
-    public function setOptions(ArrayCollection $options);
+    public function setOptions(Collection $options): OptionGroupInterface;
 }

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PriceScalarHydrator;
+use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator;
+use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
 /**
  * Class PriceRepository
@@ -17,46 +20,21 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class PriceRepository extends ResourceRepository implements PriceRepositoryInterface
 {
-    /**
-     * @var array
-     */
-    private $cachedCountryCodes;
+    private array  $cachedCountryCodes;
+    private int    $cacheTtl                        = 3600;
+    private ?Query $findOneByProductAndContextQuery = null;
 
-    /**
-     * @var int
-     */
-    private $cacheTtl = 3600;
-
-    /**
-     * @var Query
-     */
-    private $findOneByProductAndContextQuery;
-
-
-    /**
-     * Sets the cached country codes.
-     *
-     * @param array $codes
-     */
-    public function setCachedCountryCodes(array $codes)
+    public function setCachedCountryCodes(array $codes): void
     {
         $this->cachedCountryCodes = $codes;
     }
 
-    /**
-     * Sets the cache lifetime.
-     *
-     * @param int $cacheTtl
-     */
-    public function setCacheTtl(int $cacheTtl)
+    public function setCacheTtl(int $cacheTtl): void
     {
         $this->cacheTtl = $cacheTtl;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findByProduct(ProductInterface $product, $asArray = false)
+    public function findByProduct(ProductInterface $product, bool $asArray = false): array
     {
         $qb = $this->createQueryBuilder('p');
         $qb
@@ -74,14 +52,11 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
             : $this->objectResult($qb, $parameters);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findOneByProductAndContext(
         ProductInterface $product,
         ContextInterface $context,
-        $useCache = true
-    ) {
+        bool             $useCache = true
+    ): ?array {
         $group = $context->getCustomerGroup();
         $country = $context->getInvoiceCountry();
 
@@ -95,19 +70,17 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
 
         return $query
             ->setParameters([
-                'product'  => $product,
-                'group'    => $group,
-                'country'  => $country,
+                'product' => $product,
+                'group'   => $group,
+                'country' => $country,
             ])
-            ->getOneOrNullResult(PriceScalarHydrator::NAME);
+            ->getOneOrNullResult(OfferScalarHydrator::NAME);
     }
 
     /**
      * Returns the "find by product and context" query.
-     *
-     * @return \Doctrine\ORM\Query
      */
-    private function getOneFindByProductAndContextQuery()
+    private function getOneFindByProductAndContextQuery(): Query
     {
         if (null !== $this->findOneByProductAndContextQuery) {
             return $this->findOneByProductAndContextQuery;
@@ -139,13 +112,8 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
 
     /**
      * Returns the query builder result as array.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     *
-     * @return array
      */
-    private function arrayResult(QueryBuilder $qb, array $parameters)
+    private function arrayResult(QueryBuilder $qb, array $parameters): array
     {
         return $qb
             ->select([
@@ -161,18 +129,15 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
             ])
             ->getQuery()
             ->setParameters($parameters)
-            ->getResult(PriceScalarHydrator::NAME);
+            ->getResult(OfferScalarHydrator::NAME);
     }
 
     /**
      * Returns the query builder result as objects.
      *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Price[]
+     * @return array<Price>
      */
-    private function objectResult(QueryBuilder $qb, array $parameters)
+    private function objectResult(QueryBuilder $qb, array $parameters): array
     {
         return $qb
             ->getQuery()

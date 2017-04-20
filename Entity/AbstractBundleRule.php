@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\BundleRuleInterface;
@@ -11,47 +13,27 @@ use Ekyna\Bundle\ProductBundle\Model\BundleRuleInterface;
  */
 abstract class AbstractBundleRule implements BundleRuleInterface
 {
-    /**
-     * @var string
-     */
-    protected $type;
+    protected ?string $type       = null;
+    protected ?array  $conditions = null;
 
-    /**
-     * @var array
-     */
-    protected $conditions;
-
-
-    /**
-     * @inheritDoc
-     */
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setType(string $type): BundleRuleInterface
+    public function setType(?string $type): BundleRuleInterface
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getConditions(): ?array
     {
         return $this->conditions;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setConditions(array $conditions): BundleRuleInterface
+    public function setConditions(?array $conditions): BundleRuleInterface
     {
         $this->conditions = $conditions;
 

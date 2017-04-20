@@ -33,7 +33,7 @@ class VariantValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate($variant, Constraint $constraint)
     {
@@ -79,7 +79,7 @@ class VariantValidator extends ConstraintValidator
         // can't be auto-generated, so we need the user to provide them
         if (!$attributeSet->hasRequiredSlot() && 0 == $variant->getAttributes()->count()) {
             // Designation
-            if (0 == strlen($variant->getDesignation())) {
+            if (empty($variant->getDesignation())) {
                 $this->context
                     ->buildViolation($constraint->designationNeeded)
                     ->atPath('designation')
@@ -90,7 +90,7 @@ class VariantValidator extends ConstraintValidator
             foreach ($this->localeProvider->getAvailableLocales() as $locale) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface $translation */
                 if (null !== $translation = $variant->getTranslations()->get($locale)) {
-                    if (0 == strlen($translation->getTitle())) {
+                    if (empty($translation->getTitle())) {
                         $this->context
                             ->buildViolation($constraint->translationTitleNeeded)
                             ->atPath('translations['. $locale . '].title')

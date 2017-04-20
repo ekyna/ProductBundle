@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\ProductBundle\Event\OptionEvents;
@@ -18,30 +20,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class OptionListener implements EventSubscriberInterface
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface $persistenceHelper;
 
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     */
     public function __construct(PersistenceHelperInterface $persistenceHelper)
     {
         $this->persistenceHelper = $persistenceHelper;
     }
 
-    /**
-     * Insert event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return OptionInterface
-     */
-    public function onInsert(ResourceEventInterface $event)
+    public function onInsert(ResourceEventInterface $event): OptionInterface
     {
         $option = $this->getOptionFromEvent($event);
 
@@ -52,14 +38,7 @@ class OptionListener implements EventSubscriberInterface
         return $option;
     }
 
-    /**
-     * Update event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return OptionInterface
-     */
-    public function onUpdate(ResourceEventInterface $event)
+    public function onUpdate(ResourceEventInterface $event): OptionInterface
     {
         $option = $this->getOptionFromEvent($event);
 
@@ -72,14 +51,7 @@ class OptionListener implements EventSubscriberInterface
         return $option;
     }
 
-    /**
-     * Delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return OptionInterface
-     */
-    public function onDelete(ResourceEventInterface $event)
+    public function onDelete(ResourceEventInterface $event): OptionInterface
     {
         $option = $this->getOptionFromEvent($event);
 
@@ -98,14 +70,12 @@ class OptionListener implements EventSubscriberInterface
 
     /**
      * Clears the data fields of a product is bound to the option.
-     *
-     * @param OptionInterface $option
      */
-    protected function handleDataFields(OptionInterface $option)
+    protected function handleDataFields(OptionInterface $option): void
     {
         $changed = false;
 
-        if (null !== $product = $option->getProduct()) {
+        if (null !== $option->getProduct()) {
             if (null !== $option->getDesignation()) {
                 $option->setDesignation(null);
                 $changed = true;
@@ -143,20 +113,17 @@ class OptionListener implements EventSubscriberInterface
      *
      * @param ProductInterface $product
      */
-    protected function scheduleChildPriceChangeEvent(ProductInterface $product)
+    protected function scheduleChildPriceChangeEvent(ProductInterface $product): void
     {
-        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $product);
+        $this->persistenceHelper->scheduleEvent($product, ProductEvents::CHILD_PRICE_CHANGE);
     }
 
     /**
      * Returns the option from the event.
      *
-     * @param ResourceEventInterface $event
-     *
-     * @return OptionInterface
      * @throws InvalidArgumentException
      */
-    protected function getOptionFromEvent(ResourceEventInterface $event)
+    protected function getOptionFromEvent(ResourceEventInterface $event): OptionInterface
     {
         $resource = $event->getResource();
 
@@ -167,10 +134,7 @@ class OptionListener implements EventSubscriberInterface
         return $resource;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             OptionEvents::INSERT => ['onInsert', 0],

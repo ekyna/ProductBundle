@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 
 /**
  * Interface PricingRepositoryInterface
@@ -15,19 +17,11 @@ interface PricingRepositoryInterface extends ResourceRepositoryInterface
 {
     /**
      * Finds the pricing rules by product.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
      */
-    public function findRulesByProduct(Model\ProductInterface $product);
+    public function findRulesByProduct(Model\ProductInterface $product): array;
 
     /**
-     * Finds applicable pricings for the given context.
-     *
-     * @param ContextInterface $context
-     *
-     * @return Model\PricingInterface[]
+     * Finds applicable pricing for the given context.
      */
-    public function findByContext(ContextInterface $context);
+    public function findByContext(ContextInterface $context): array;
 }

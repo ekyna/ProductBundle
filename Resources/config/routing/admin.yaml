@@ -1,0 +1,11 @@
+admin_ekyna_product_product_bookmark:
+    resource: admin/product_bookmark.yaml
+    prefix: /product-bookmark
+
+admin_ekyna_product_inventory:
+    resource: admin/inventory.yaml
+    prefix:   /inventory
+
+admin_ekyna_product_highlight:
+    resource: admin/highlight.yaml
+    prefix:   /highlight

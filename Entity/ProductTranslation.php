@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -15,35 +17,12 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  */
 class ProductTranslation extends AbstractTranslation implements ProductTranslationInterface
 {
-    /**
-     * @var string
-     */
-    protected $title;
+    protected ?string $title           = null;
+    protected ?string $subTitle        = null;
+    protected ?string $attributesTitle = null;
+    protected ?string $description     = null;
+    protected ?string $slug            = null;
 
-    /**
-     * @var string
-     */
-    protected $subTitle;
-
-    /**
-     * @var string
-     */
-    protected $attributesTitle;
-
-    /**
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * @var string
-     */
-    protected $slug;
-
-
-    /**
-     * @inheritDoc
-     */
     public function __clone()
     {
         parent::__clone();
@@ -53,100 +32,67 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
         $this->attributesTitle = null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): ProductTranslationInterface
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSubTitle()
+    public function getSubTitle(): ?string
     {
         return $this->subTitle;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSubTitle($subTitle)
+    public function setSubTitle(?string $subTitle): ProductTranslationInterface
     {
         $this->subTitle = $subTitle;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttributesTitle()
+    public function getAttributesTitle(): ?string
     {
         return $this->attributesTitle;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setAttributesTitle($attributesTitle)
+    public function setAttributesTitle(?string $attributesTitle): ProductTranslationInterface
     {
         $this->attributesTitle = $attributesTitle;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): ProductTranslationInterface
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSlug($slug)
+    public function setSlug(?string $slug): ProductTranslationInterface
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function clear()
+    public function clear(): ProductTranslationInterface
     {
         $this->title = null;
         $this->attributesTitle = null;

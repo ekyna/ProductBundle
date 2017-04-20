@@ -1,8 +1,8 @@
 {% apply spaceless %}
 <hr>
-<h3>{{ 'ekyna_product.price.label.plural'|trans }}</h3>
+<h3>{{ 'price.label.plural'|trans({}, 'EkynaProduct') }}</h3>
 <div class="show-product-offers">
-{% for list in prices_list %}
+{% for list in product|product_price_list %}
     {% if loop.index0 % 3 == 0 %}
     <div class="row">
     {% endif %}
@@ -17,16 +17,16 @@
                     {% for price in list.prices %}
                     <tr>
                         <td>
-                            <strong>{{ price.percent|localizednumber }}&nbsp;%</strong>
+                            <strong>{{ price.percent|format_number }}&nbsp;%</strong>
                             ({%- for percent in price.detailedPercents -%}
-                                {{ percent|localizednumber }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
+                                {{ percent|format_number }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
                             {%- endfor -%})
                         </td>
                         <td>
                             {% if price.originalPrice > price.sellPrice %}
-                                <del>{{ price.originalPrice|localizedcurrency(commerce_default_currency) }}</del>&nbsp;
+                                <del>{{ price.originalPrice|format_currency(commerce_default_currency) }}</del>&nbsp;
                             {% endif %}
-                            <strong class="text-primary">{{ price.sellPrice|localizedcurrency(commerce_default_currency) }}</strong>
+                            <strong class="text-primary">{{ price.sellPrice|format_currency(commerce_default_currency) }}</strong>
                         </td>
                     </tr>
                     {% endfor %}
@@ -37,7 +37,7 @@
     </div>
     {% endif %}
 {% else %}
-    <p><em>{{ 'ekyna_product.product.alert.no_price'|trans }}</em></p>
+    <p><em>{{ 'product.alert.no_price'|trans({}, 'EkynaProduct') }}</em></p>
 {% endfor %}
 </div>
 {% endapply %}

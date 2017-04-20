@@ -8,7 +8,7 @@ define(['jquery', 'jquery-ui/widget', 'select2', 'ekyna-commerce/form/price'], f
             this.$productWrapper = this.element.find('> .option-product');
             this.$dataWrapper = this.element.find('> .option-data');
 
-            this.$product = this.$productWrapper.find('select.entity-search');
+            this.$product = this.$productWrapper.find('select.resource-search');
             this.$cascade = this.$productWrapper.find('input.product-cascade');
             this.$taxGroup = this.$dataWrapper.find('.tax-group-choice');
 

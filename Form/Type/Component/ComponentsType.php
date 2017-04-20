@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Component;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ComponentsType
@@ -13,28 +17,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ComponentsType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'           => 'ekyna_product.component.label.plural',
+                'label'           => t('component.label.plural', [], 'EkynaProduct'),
                 'prototype_name'  => '__component__',
                 'sub_widget_col'  => 11,
                 'button_col'      => 1,
                 'allow_sort'      => false,
-                'add_button_text' => 'ekyna_product.component.button.add',
+                'add_button_text' => t('component.button.add', [], 'EkynaProduct'),
                 'entry_type'      => ComponentType::class,
                 'required'        => false,
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

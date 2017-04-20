@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\OptionsGroupsListener;
@@ -16,34 +18,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionGroupsType extends Form\AbstractType
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     */
     public function __construct(ItemBuilder $itemBuilder)
     {
         $this->itemBuilder = $itemBuilder;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(Form\FormBuilderInterface $builder, array $options)
+    public function buildForm(Form\FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new OptionsGroupsListener($this->itemBuilder, $options['exclude_options']));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr']['name'] = $view->vars['full_name'];
 
@@ -52,10 +39,7 @@ class OptionGroupsType extends Form\AbstractType
         $view->children = array_reverse($view->children, true);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -71,10 +55,7 @@ class OptionGroupsType extends Form\AbstractType
             ->setAllowedTypes('exclude_options', 'array');
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'sale_item_option_groups';
     }

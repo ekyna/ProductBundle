@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
@@ -14,117 +16,72 @@ class AttributeSlot implements Model\AttributeSlotInterface
 {
     use SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                         $id        = null;
+    protected ?Model\AttributeSetInterface $set       = null;
+    protected ?Model\AttributeInterface    $attribute = null;
+    protected bool                         $required  = false;
+    protected bool                         $naming    = false;
 
-    /**
-     * @var Model\AttributeSetInterface
-     */
-    protected $set;
-
-    /**
-     * @var Model\AttributeInterface
-     */
-    protected $attribute;
-
-    /**
-     * @var bool
-     */
-    protected $required = false;
-
-    /**
-     * @var bool
-     */
-    protected $naming = false;
-
-
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSet()
+    public function getSet(): ?Model\AttributeSetInterface
     {
         return $this->set;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSet(Model\AttributeSetInterface $set = null)
+    public function setSet(Model\AttributeSetInterface $set = null): Model\AttributeSlotInterface
     {
-        if ($this->set !== $set) {
-            if ($previous = $this->set) {
-                $this->set = null;
-                $previous->removeSlot($this);
-            }
+        if ($this->set === $set) {
+            return $this;
+        }
 
-            if ($this->set = $set) {
-                $this->set->addSlot($this);
-            }
+        if ($previous = $this->set) {
+            $this->set = null;
+            $previous->removeSlot($this);
+        }
+
+        if ($this->set = $set) {
+            $this->set->addSlot($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttribute()
+    public function getAttribute(): ?Model\AttributeInterface
     {
         return $this->attribute;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setAttribute(Model\AttributeInterface $attribute)
+    public function setAttribute(?Model\AttributeInterface $attribute): Model\AttributeSlotInterface
     {
         $this->attribute = $attribute;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setRequired($required)
+    public function setRequired(bool $required): Model\AttributeSlotInterface
     {
-        $this->required = (bool)$required;
+        $this->required = $required;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isNaming()
+    public function isNaming(): bool
     {
         return $this->naming;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setNaming($naming)
+    public function setNaming(bool $naming): Model\AttributeSlotInterface
     {
-        $this->naming = (bool)$naming;
+        $this->naming = $naming;
 
         return $this;
     }

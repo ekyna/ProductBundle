@@ -1,24 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Doctrine\ORM\QueryBuilder;
-use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\AdminBundle\Action;
 use Ekyna\Bundle\CmsBundle\Table\Column\TagsType;
+use Ekyna\Bundle\CommerceBundle\Action\Admin\Subject;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectModeType;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
 use Ekyna\Bundle\ProductBundle\Table\Column\ReferenceType;
 use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
+use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
+use Ekyna\Bundle\ResourceBundle\Table\Type\AbstractResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
-use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
-use Ekyna\Component\Table\Exception\InvalidArgumentException;
+use Ekyna\Component\Table\Exception\UnexpectedTypeException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
@@ -28,46 +33,28 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use function json_encode;
+use function Symfony\Component\Translation\t;
+
 /**
  * Class ProductType
  * @package Ekyna\Bundle\ProductBundle\Table\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductType extends ResourceTableType
+class ProductType extends AbstractResourceType
 {
-    /**
-     * @var SubjectHelperInterface
-     */
-    protected $subjectHelper;
+    protected ResourceHelper        $resourceHelper;
+    protected UrlGeneratorInterface $urlGenerator;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGenerator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param SubjectHelperInterface $subjectHelper
-     * @param UrlGeneratorInterface  $urlGenerator
-     * @param string                 $productClass
-     */
     public function __construct(
-        SubjectHelperInterface $subjectHelper,
-        UrlGeneratorInterface $urlGenerator,
-        string $productClass
+        ResourceHelper        $resourceHelper,
+        UrlGeneratorInterface $urlGenerator
     ) {
-        parent::__construct($productClass);
-
-        $this->subjectHelper = $subjectHelper;
+        $this->resourceHelper = $resourceHelper;
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildTable(TableBuilderInterface $builder, array $options)
+    public function buildTable(TableBuilderInterface $builder, array $options): void
     {
         $variantMode = $options['variant_mode'];
 
@@ -78,7 +65,7 @@ class ProductType extends ResourceTableType
                 ->setProfileable(true)
                 ->addDefaultSort('id', ColumnSort::DESC)
                 ->addColumn('type', ProductTypeType::class, [
-                    'label'    => 'ekyna_core.field.type',
+                    'label'    => t('field.type', [], 'EkynaUi'),
                     'position' => 10,
                 ]);
         } else {
@@ -89,32 +76,26 @@ class ProductType extends ResourceTableType
 
         $builder
             ->addColumn('designation', BType\Column\AnchorType::class, [
-                'label'                => 'ekyna_core.field.designation',
-                'property_path'        => 'fullDesignation',
-                'sortable'             => false,
-                'route_name'           => 'ekyna_product_product_admin_show',
-                'route_parameters_map' => [
-                    'productId' => 'id',
-                ],
-                'position'             => 20,
+                'label'         => t('field.designation', [], 'EkynaUi'),
+                'property_path' => 'fullDesignation',
+                'sortable'      => false,
+                'position'      => 20,
             ])
             ->addColumn('visible', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_core.field.visible',
-                'route_name'           => 'ekyna_product_product_admin_toggle',
-                'route_parameters'     => ['field' => 'visible'],
-                'route_parameters_map' => ['productId' => 'id'],
-                'position'             => 30,
+                'label'    => t('field.visible', [], 'EkynaUi'),
+                'property' => 'visible',
+                'position' => 30,
             ])
             ->addColumn('reference', ReferenceType::class, [
-                'label'    => 'ekyna_core.field.reference',
+                'label'    => t('field.reference', [], 'EkynaUi'),
                 'position' => 40,
             ])
             ->addColumn('netPrice', BType\Column\PriceType::class, [
-                'label'    => 'ekyna_commerce.field.net_price',
+                'label'    => t('field.net_price', [], 'EkynaCommerce'),
                 'position' => 50,
             ])
             ->addColumn('weight', CType\Column\NumberType::class, [
-                'label'     => 'ekyna_core.field.weight',
+                'label'     => t('field.weight', [], 'EkynaUi'),
                 'precision' => 3,
                 'append'    => 'Kg',
                 'position'  => 60,
@@ -128,7 +109,7 @@ class ProductType extends ResourceTableType
                 'position' => 80,
             ])
             /*->addColumn('quoteOnly', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_commerce.stock_subject.field.quote_only',
+                'label'                => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
                 'route_name'           => 'ekyna_product_product_admin_toggle',
                 'route_parameters'     => ['field' => 'quoteOnly'],
                 'route_parameters_map' => ['productId' => 'id'],
@@ -136,7 +117,7 @@ class ProductType extends ResourceTableType
                 'visible'              => false,
             ])
             ->addColumn('endOfLife', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_commerce.stock_subject.field.end_of_life',
+                'label'                => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
                 'route_name'           => 'ekyna_product_product_admin_toggle',
                 'route_parameters'     => ['field' => 'endOfLife'],
                 'route_parameters_map' => ['productId' => 'id'],
@@ -150,159 +131,116 @@ class ProductType extends ResourceTableType
         if (!$variantMode) {
             $builder
                 ->addColumn('categories', DType\Column\EntityType::class, [
-                    'label'                => 'ekyna_product.category.label.plural',
-                    'entity_label'         => 'name',
-                    'route_name'           => 'ekyna_product_category_admin_show',
-                    'route_parameters_map' => ['categoryId' => 'id'],
-                    'position'             => 200,
+                    'label'        => t('category.label.plural', [], 'EkynaProduct'),
+                    'entity_label' => 'name',
+                    'position'     => 200,
                     //'visible'              => false,
                 ])
                 ->addColumn('brand', DType\Column\EntityType::class, [
-                    'label'                => 'ekyna_product.brand.label.singular',
-                    'entity_label'         => 'name',
-                    'route_name'           => 'ekyna_product_brand_admin_show',
-                    'route_parameters_map' => ['brandId' => 'id'],
-                    'position'             => 210,
+                    'label'        => t('brand.label.singular', [], 'EkynaProduct'),
+                    'entity_label' => 'name',
+                    'position'     => 210,
                     //'visible'              => false,
                 ])
                 ->addColumn('taxGroup', DType\Column\EntityType::class, [
-                    'label'                => 'ekyna_commerce.tax_group.label.singular',
-                    'entity_label'         => 'name',
-                    'route_name'           => 'ekyna_commerce_tax_group_admin_show',
-                    'route_parameters_map' => ['taxGroupId' => 'id'],
-                    'position'             => 220,
+                    'label'        => t('tax_group.label.singular', [], 'EkynaCommerce'),
+                    'entity_label' => 'name',
+                    'position'     => 220,
                     //'visible'              => false,
                 ]);
         }
 
+        $actions = $buttons = [];
         if ($variantMode) {
-            $buttons = [
-                [
-                    'label'                => 'ekyna_core.button.move_up',
-                    'icon'                 => 'arrow-up',
-                    'class'                => 'primary',
-                    'route_name'           => 'ekyna_product_product_admin_move_up',
-                    'route_parameters_map' => ['productId' => 'id'],
-                    'permission'           => 'edit',
-                ],
-                [
-                    'label'                => 'ekyna_core.button.move_down',
-                    'icon'                 => 'arrow-down',
-                    'class'                => 'primary',
-                    'route_name'           => 'ekyna_product_product_admin_move_down',
-                    'route_parameters_map' => ['productId' => 'id'],
-                    'permission'           => 'edit',
-                ],
-            ];
+            $actions[] = Product\MoveUpAction::class;
+            $actions[] = Product\MoveDownAction::class;
         } else {
-            $buttons = [
-                function (RowInterface $row) {
-                    $product = $row->getData();
+            $buttons[] = function (RowInterface $row) {
+                $product = $row->getData(null);
 
-                    if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
-                        return [
-                            'label'  => 'ekyna_admin.resource.button.show_front',
-                            'class'  => 'default',
-                            'icon'   => 'eye-open',
-                            'target' => '_blank',
-                            'path'   => $path,
-                        ];
-                    }
+                if (null !== $path = $this->resourceHelper->generatePublicUrl($product)) {
+                    return [
+                        'label'  => 'ekyna_admin.resource.button.show_front',
+                        'class'  => 'default',
+                        'icon'   => 'eye-open',
+                        'target' => '_blank',
+                        'path'   => $path,
+                    ];
+                }
 
-                    return null;
-                },
-                function (RowInterface $row) {
-                    $product = $row->getData();
+                return null;
+            };
+            $buttons[] = function (RowInterface $row) {
+                $product = $row->getData(null);
 
-                    if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
-                        return [
-                            'label'  => 'ekyna_admin.resource.button.show_editor',
-                            'class'  => 'default',
-                            'icon'   => 'edit',
-                            'target' => '_blank',
-                            'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
-                                'path' => $path,
-                            ]),
-                        ];
-                    }
+                if (null !== $path = $this->resourceHelper->generatePublicUrl($product)) {
+                    return [
+                        'label'  => 'ekyna_admin.resource.button.show_editor',
+                        'class'  => 'default',
+                        'icon'   => 'edit',
+                        'target' => '_blank',
+                        'path'   => $this->urlGenerator->generate('admin_ekyna_cms_editor_index', [
+                            'path' => $path,
+                        ]),
+                    ];
+                }
 
-                    return null;
-                },
-            ];
+                return null;
+            };
         }
-        $buttons[] = [
-            'label'                => 'ekyna_product.product.button.label',
-            'icon'                 => 'barcode',
-            'class'                => 'primary',
-            'route_name'           => 'ekyna_product_product_admin_label',
-            'route_parameters'     => ['format' => 'large'],
-            'route_parameters_map' => ['id' => 'id'],
-            'permission'           => 'edit',
-        ];
-        $buttons[] = [
-            'label'                => 'ekyna_core.button.edit',
-            'icon'                 => 'pencil',
-            'class'                => 'warning',
-            'route_name'           => 'ekyna_product_product_admin_edit',
-            'route_parameters_map' => ['productId' => 'id'],
-            'permission'           => 'edit',
-        ];
-        $buttons[] = [
-            'label'                => 'ekyna_core.button.remove',
-            'icon'                 => 'trash',
-            'class'                => 'danger',
-            'route_name'           => 'ekyna_product_product_admin_remove',
-            'route_parameters_map' => ['productId' => 'id'],
-            'permission'           => 'delete',
-        ];
+        $actions[] = Subject\LabelAction::class;
+        $actions[] = Action\UpdateAction::class;
+        $actions[] = Action\DeleteAction::class;
 
         $builder->addColumn('actions', BType\Column\ActionsType::class, [
-            'buttons' => $buttons,
+            'resource' => $this->dataClass,
+            'actions'  => $actions,
+            'buttons'  => $buttons,
         ]);
 
         if (!$variantMode) {
             $builder
                 ->addFilter('type', CType\Filter\ChoiceType::class, [
-                    'label'    => 'ekyna_core.field.type',
+                    'label'    => t('field.type', [], 'EkynaUi'),
                     'choices'  => ProductTypes::getChoices([ProductTypes::TYPE_VARIANT]),
                     'position' => 10,
                 ])
                 ->addFilter('designation', CType\Filter\TextType::class, [
-                    'label'    => 'ekyna_core.field.designation',
+                    'label'    => t('field.designation', [], 'EkynaUi'),
                     'position' => 20,
                 ])
                 ->addFilter('visible', CType\Filter\BooleanType::class, [
-                    'label'    => 'ekyna_core.field.visible',
+                    'label'    => t('field.visible', [], 'EkynaUi'),
                     'position' => 30,
                 ])
                 ->addFilter('reference', ProductReferenceType::class, [
-                    'label'    => 'ekyna_core.field.reference',
+                    'label'    => t('field.reference', [], 'EkynaUi'),
                     'position' => 40,
                 ])
                 ->addFilter('netPrice', CType\Filter\NumberType::class, [
-                    'label'    => 'ekyna_commerce.field.net_price',
+                    'label'    => t('field.net_price', [], 'EkynaCommerce'),
                     'position' => 50,
                 ])
                 ->addFilter('weight', CType\Filter\NumberType::class, [
-                    'label'    => 'ekyna_core.field.weight',
+                    'label'    => t('field.weight', [], 'EkynaUi'),
                     'position' => 60,
                 ])
                 ->addFilter('stockMode', CType\Filter\ChoiceType::class, [
-                    'label'    => 'ekyna_commerce.stock_subject.field.mode',
+                    'label'    => t('stock_subject.field.mode', [], 'EkynaCommerce'),
                     'choices'  => StockSubjectModes::getChoices(),
                     'position' => 70,
                 ])
                 ->addFilter('stockState', CType\Filter\ChoiceType::class, [
-                    'label'    => 'ekyna_commerce.stock_subject.field.state',
+                    'label'    => t('stock_subject.field.state', [], 'EkynaCommerce'),
                     'choices'  => StockSubjectStates::getChoices(),
                     'position' => 80,
                 ])
                 ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
-                    'label'    => 'ekyna_commerce.stock_subject.field.quote_only',
+                    'label'    => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
                     'position' => 90,
                 ])
                 ->addFilter('endOfLife', CType\Filter\BooleanType::class, [
-                    'label'    => 'ekyna_commerce.stock_subject.field.end_of_life',
+                    'label'    => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
                     'position' => 100,
                 ])
                 ->addFilter('categories', ResourceType::class, [
@@ -328,21 +266,14 @@ class ProductType extends ResourceTableType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildRowView(View\RowView $view, RowInterface $row, array $options)
+    public function buildRowView(View\RowView $view, RowInterface $row, array $options): void
     {
-        $view->vars['attr']['data-summary'] = json_encode([
-            'route'      => 'ekyna_product_product_admin_summary',
-            'parameters' => ['productId' => $row->getData('id')],
-        ]);
+        $view->vars['attr']['data-summary'] = $this
+            ->resourceHelper
+            ->generateResourcePath($row->getData(null), Action\SummaryAction::class);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -355,10 +286,10 @@ class ProductType extends ResourceTableType
                 }
 
                 if (!$value instanceof EntitySource) {
-                    throw new InvalidArgumentException("Expected instance of " . EntitySource::class);
+                    throw new UnexpectedTypeException($value, EntitySource::class);
                 }
 
-                $value->setQueryBuilderInitializer(function (QueryBuilder $qb, $alias) {
+                $value->setQueryBuilderInitializer(function (QueryBuilder $qb, string $alias): void {
                     $qb
                         ->andWhere($alias . '.type != :type')
                         ->setParameter('type', ProductTypes::TYPE_VARIANT);

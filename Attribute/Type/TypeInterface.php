@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Interface TypeInterface
@@ -12,66 +15,44 @@ use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
  */
 interface TypeInterface
 {
-    /**
-     * Renders the product attribute.
-     *
-     * @param ProductAttributeInterface $productAttribute
-     * @param string                    $locale
-     *
-     * @return string
-     */
-    public function render(ProductAttributeInterface $productAttribute, $locale = null);
+    public const TYPE_TAG = 'ekyna_product.attribute_type';
 
     /**
-     * Returns whether or not this type works with attribute choices.
-     *
-     * @return bool
+     * Renders the product attribute.
      */
-    public function hasChoices();
+    public function render(ProductAttributeInterface $productAttribute, string $locale = null): ?string;
+
+    /**
+     * Returns whether this type works with attribute choices.
+     */
+    public function hasChoices(): bool;
 
     /**
      * Returns the validation constraints.
-     *
-     * @param ProductAttributeInterface $productAttribute
-     *
-     * @return array
      */
-    public function getConstraints(ProductAttributeInterface $productAttribute);
+    public function getConstraints(ProductAttributeInterface $productAttribute): array;
 
     /**
      * Returns the config show fields.
-     *
-     * @param AttributeInterface $attribute
-     *
-     * @return array
      */
-    public function getConfigShowFields(AttributeInterface $attribute);
+    public function getConfigShowFields(AttributeInterface $attribute): array;
 
     /**
      * Returns configuration defaults.
-     *
-     * @return array
      */
-    public function getConfigDefaults();
+    public function getConfigDefaults(): array;
 
     /**
      * Returns the configuration form type class.
-     *
-     * @return string
      */
-    public function getConfigType();
+    public function getConfigType(): ?string;
 
     /**
      * Returns the product attribute form type class.
-     *
-     * @return string
      */
-    public function getFormType();
+    public function getFormType(): ?string;
 
-    /**
-     * Returns the label.
-     *
-     * @return string
-     */
-    public function getLabel();
+    public function getLabel(): TranslatableInterface;
+
+    public static function getName(): string;
 }

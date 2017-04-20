@@ -2,14 +2,14 @@
 
 {% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
 
-{% block page_title %}{{ 'ekyna_product.product.label.plural'|trans|raw }} - {{ parent() }}{% endblock page_title %}
+{% block page_title %}{{ 'product.label.plural'|trans({}, 'EkynaProduct')|raw }}{% endblock page_title %}
 
 {% block title %}
-    <h1>{{ 'ekyna_product.product.header.export'|trans|raw }}</h1>
+    <h1>{{ 'product.header.export'|trans({}, 'EkynaProduct')|raw }}</h1>
 {% endblock title %}
 
 {% block actions %}
-    {{ admin_resource_btn(resource_id, 'list') }}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
     {{ macros.new_product_button() }}
 {% endblock actions %}
 

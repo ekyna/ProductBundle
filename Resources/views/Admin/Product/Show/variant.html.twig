@@ -2,13 +2,12 @@
 
 
 {% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
-{% import '@EkynaCms/Admin/show_macros.html.twig' as _cms %}
 
 
 {% block general_content %}
     {{ parent() }}
     {{- show_row(product.attributesDesignation, 'text', {
-        'label': 'ekyna_product.product.field.attributes_designation',
+        'label': t('product.field.attributes_designation', [], 'EkynaProduct'),
         'id': 'product_attributesDesignation'
     }) -}}
     {{ _product.show_variable(product) }}
@@ -21,7 +20,9 @@
         </div>
     </div>
     {{ _product.show_attributes(product) }}
-    {{ _cms.show_tags(product) }}
+    {{ show_row(product, 'tags', {
+        'id': 'product_tags'
+    }) }}
 {% endblock general_content %}
 
 

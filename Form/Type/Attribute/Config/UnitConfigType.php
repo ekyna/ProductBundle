@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config;
 
 use Ekyna\Bundle\CommerceBundle\Model\Units;
 use Ekyna\Bundle\ProductBundle\Validator\Constraints\UnitAttributeConfig;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class UnitConfigType
@@ -16,29 +21,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UnitConfigType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('unit', Type\ChoiceType::class, [
-                'label'         => 'ekyna_commerce.unit.label',
-                'choices'       => Units::getChoices(),
+            ->add('unit', ConstantChoiceType::class, [
+                'label' => t('unit.label', [], 'EkynaCommerce'),
+                'class' => Units::class,
             ])
             ->add('suffix', Type\TextType::class, [
-                'label'         => 'ekyna_product.attribute.config.suffix',
-                'required'      => false,
-                'attr'          => [
-                    'help_text' => 'ekyna_product.attribute.help.suffix',
+                'label'    => t('attribute.config.suffix', [], 'EkynaProduct'),
+                'required' => false,
+                'attr'     => [
+                    'help_text' => t('attribute.help.suffix', [], 'EkynaProduct'),
                 ],
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

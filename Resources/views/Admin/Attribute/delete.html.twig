@@ -1,0 +1,8 @@
+{% extends '@EkynaAdmin/Entity/Crud/delete.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Attribute/_macro.html.twig' as macros %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+    {{ macros.new_attribute_button() }}
+{% endblock actions %}

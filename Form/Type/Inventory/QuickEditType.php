@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\CommerceBundle\Form\SubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
+use RuntimeException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -20,45 +23,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class QuickEditType extends AbstractType
 {
-    /**
-     * @var SubjectFormBuilder
-     */
-    private $subjectBuilder;
+    private SubjectFormBuilder      $subjectBuilder;
+    private StockSubjectFormBuilder $stockBuilder;
+    private TaxResolverInterface    $taxResolver;
 
-    /**
-     * @var StockSubjectFormBuilder
-     */
-    private $stockBuilder;
-
-    /**
-     * @var TaxResolverInterface
-     */
-    private $taxResolver;
-
-
-    /**
-     * Constructor.
-     *
-     * @param SubjectFormBuilder $subjectBuilder
-     * @param StockSubjectFormBuilder $stockBuilder
-     * @param TaxResolverInterface $taxResolver
-     */
     public function __construct(
-        SubjectFormBuilder $subjectBuilder,
+        SubjectFormBuilder      $subjectBuilder,
         StockSubjectFormBuilder $stockBuilder,
-        TaxResolverInterface $taxResolver
+        TaxResolverInterface    $taxResolver
     ) {
         $this->subjectBuilder = $subjectBuilder;
         $this->stockBuilder = $stockBuilder;
         $this->taxResolver = $taxResolver;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var ProductInterface $product */
             $product = $event->getData();
             $form = $event->getForm();
@@ -97,10 +78,7 @@ class QuickEditType extends AbstractType
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'        => ProductInterface::class,
@@ -108,8 +86,8 @@ class QuickEditType extends AbstractType
                 /** @var ProductInterface $product */
                 $product = $form->getData();
 
-                if (!strlen($type = $product->getType())) {
-                    throw new \RuntimeException('Product type is not set.');
+                if (!strlen($product->getType())) {
+                    throw new RuntimeException('Product type is not set.');
                 }
 
                 return ['Default', $product->getType()];

@@ -20,7 +20,7 @@
                 {%- if itemForm.vars.choice_description is empty -%}
                     &nbsp;
                 {%- else -%}
-                    {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
+                    {{- itemForm.vars.choice_description|truncate_html(170)|raw -}}
                 {%- endif -%}
             </div>
 
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col-xs-6">
                         <div class="form-group sale-item-pricing">
-                            <label class="control-label col-sm-4">{{ 'ekyna_product.sale_item_configure.total_price'|trans }}</label>
+                            <label class="control-label col-sm-4">{{ 'sale_item_configure.total_price'|trans({}, 'EkynaProduct') }}</label>
                             <div class="col-sm-8">
                                 <span class="form-control" id="{{ itemForm.vars.id }}_pricing"></span>
                             </div>
@@ -108,7 +108,7 @@
             {{- form_widget(child, {'attr': {'data-index': child.vars.index}}) -}}
             {%- endif -%}
             <h4 class="slot-title">{{ form.vars.slot_title }}</h4>
-            <div class="slot-description">{{ form.vars.slot_description|raw }}</div>
+            <div class="slot-description">{{ form.vars.slot_description|truncate_html(200)|raw }}</div>
         </div>
         <div class="slot-choices{% if 1 == form.choice.children|length %} single-choice{% endif %}">
             {%- if 1 < form.choice.children|length -%}
@@ -202,11 +202,11 @@
             {% set bundle_products = form.vars.subject|bundle_visible_products -%}
             {% if bundle_products is not empty -%}
             <div class="sale-item-bundle">
-                <p>{{ 'ekyna_product.sale_item_configure.bundle'|trans }}</p>
+                <p>{{ 'sale_item_configure.bundle'|trans({}, 'EkynaProduct') }}</p>
                 <table class="table table-condensed">
                     {% for bundle_product in bundle_products -%}
                     <tr>
-                        <td class="quantity">{{- bundle_product.quantity|localizednumber -}}x</td>
+                        <td class="quantity">{{- bundle_product.quantity|format_number -}}x</td>
                         <td class="reference" data-clipboard-copy="{{ bundle_product.product.reference }}">
                             {{- bundle_product.product.reference -}}
                         </td>
@@ -247,7 +247,7 @@
                 <div class="form-group sale-item-pricing inline">
                     <div class="col-sm-12">
                         <span class="form-control">
-                            {{ 'ekyna_product.sale_item_configure.total_price'|trans }}&nbsp;<span id="{{ form.vars.id }}_pricing"></span>
+                            {{ 'sale_item_configure.total_price'|trans({}, 'EkynaProduct') }}&nbsp;<span id="{{ form.vars.id }}_pricing"></span>
                         </span>
                     </div>
                 </div>
@@ -257,7 +257,7 @@
             </div>
             <div class="col-sm-6">
                 <div class="form-group sale-item-pricing">
-                    <label class="control-label col-sm-4">{{ 'ekyna_product.sale_item_configure.total_price'|trans }}</label>
+                    <label class="control-label col-sm-4">{{ 'sale_item_configure.total_price'|trans({}, 'EkynaProduct') }}</label>
                     <div class="col-sm-8">
                         <span class="form-control" id="{{ form.vars.id }}_pricing"></span>
                     </div>
@@ -287,7 +287,7 @@
         {%- if form.vars.submit_button -%}
         <p class="text-center">
             <button type="submit" id="{{ form.vars.id }}_submit" class="btn btn-primary">
-                <i class="fa fa-shopping-cart"></i> {{ 'ekyna_commerce.cart.button.add'|trans }}
+                <i class="fa fa-shopping-cart"></i> {{ 'cart.button.add'|trans({}, 'EkynaCommerce') }}
             </button>
         </p>
         {%- endif %}

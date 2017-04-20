@@ -1,26 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class AttributeSlotType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Attribute
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeSlotType extends ResourceFormType
+class AttributeSlotType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('attribute', ResourceType::class, [
+            ->add('attribute', ResourceChoiceType::class, [
                 'label'    => false,
                 'resource' => 'ekyna_product.attribute',
                 'attr'     => [
@@ -28,14 +29,14 @@ class AttributeSlotType extends ResourceFormType
                 ],
             ])
             ->add('required', Type\CheckboxType::class, [
-                'label'    => 'ekyna_core.field.required',
+                'label'    => t('field.required', [], 'EkynaUi'),
                 'required' => false,
             ])
             ->add('naming', Type\CheckboxType::class, [
-                'label'    => 'ekyna_product.attribute_slot.field.naming',
+                'label'    => t('attribute_slot.field.naming', [], 'EkynaProduct'),
                 'required' => false,
                 'attr'     => [
-                    'help_text' => 'ekyna_product.attribute_slot.help.naming',
+                    'help_text' => t('attribute_slot.help.naming', [], 'EkynaProduct'),
                 ],
             ])
             ->add('position', Type\HiddenType::class, [
@@ -45,10 +46,7 @@ class AttributeSlotType extends ResourceFormType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_attribute_slot';
     }

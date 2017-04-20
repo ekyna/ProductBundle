@@ -1,0 +1,6 @@
+ekyna_product_account:
+    resource: "front/account.yaml"
+    prefix:
+        en: /my-account
+        fr: /mon-compte
+        es: /mi-cuenta

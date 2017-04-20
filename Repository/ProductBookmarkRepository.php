@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Ekyna\Bundle\AdminBundle\Model\UserInterface;
 use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -12,44 +15,21 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductBookmarkRepository extends EntityRepository
+class ProductBookmarkRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ProductBookmark::class);
+    }
+
     /**
-     * Finds the book mark by user and product.
-     *
-     * @param UserInterface    $user
-     * @param ProductInterface $product
-     *
-     * @return ProductBookmark|null
+     * Finds the bookmark by user and product.
      */
     public function findBookmark(UserInterface $user, ProductInterface $product): ?ProductBookmark
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->findOneBy([
             'user' => $user,
             'product' => $product,
         ]);
-    }
-
-    /**
-     * Returns the user's bookmarked products identifiers.
-     *
-     * @param UserInterface $user
-     *
-     * @return array
-     *
-     * @TODO Remove as not used
-     */
-    public function getBookmarkedIds(UserInterface $user): array
-    {
-        $qb = $this->createQueryBuilder('b');
-
-        $result = $qb
-            ->select('IDENTITY(b.product)')
-            ->where($qb->expr()->eq('b.user', $user))
-            ->getQuery()
-            ->getScalarResult();
-
-        return array_column($result, 'id');
     }
 }

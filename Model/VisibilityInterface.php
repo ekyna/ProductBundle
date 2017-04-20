@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -9,35 +11,17 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 interface VisibilityInterface
 {
-    /**
-     * Returns whether this element is visible.
-     *
-     * @return bool
-     */
-    public function isVisible();
+    public function isVisible(): bool;
 
     /**
-     * Sets whether this element is visible.
-     *
-     * @param bool $visible
-     *
      * @return $this|VisibilityInterface
      */
-    public function setVisible(bool $visible);
+    public function setVisible(bool $visible): VisibilityInterface;
+
+    public function getVisibility(): int;
 
     /**
-     * Returns the visibility.
-     *
-     * @return int
-     */
-    public function getVisibility();
-
-    /**
-     * Sets the visibility.
-     *
-     * @param int $value
-     *
      * @return $this|VisibilityInterface
      */
-    public function setVisibility(int $value);
+    public function setVisibility(int $value): VisibilityInterface;
 }

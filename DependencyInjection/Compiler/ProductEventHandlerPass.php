@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection\Compiler;
 
-use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry;
+use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -15,19 +16,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ProductEventHandlerPass implements CompilerPassInterface
 {
-    public const TAG = 'ekyna_product.product_event_handler';
-
-    /**
-     * @inheritDoc
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->has(HandlerRegistry::class)) {
-            throw new ServiceNotFoundException('Product event handlers registry is not available.');
-        }
-
-        $definition = $container->getDefinition(HandlerRegistry::class);
-        foreach ($container->findTaggedServiceIds(self::TAG) as $serviceId => $attributes) {
+        $definition = $container->getDefinition('ekyna_product.registry.event_handler');
+        foreach ($container->findTaggedServiceIds(HandlerInterface::DI_TAG) as $serviceId => $attributes) {
             $definition->addMethodCall('addHandler', [new Reference($serviceId)]);
         }
     }

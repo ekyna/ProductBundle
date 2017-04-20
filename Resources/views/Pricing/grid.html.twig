@@ -3,9 +3,9 @@
     {#<caption>{{ pricing.designation }}</caption>#}
     <thead>
         <tr>
-            <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
-            <th class="text-right">{{ 'ekyna_product.pricing_rule.field.discount'|trans }}</th>
-            <th class="text-right">{{ 'ekyna_product.pricing_rule.field.unit_price'|trans }}</th>
+            <th>{{ 'field.quantity'|trans({}, 'EkynaUi') }}</th>
+            <th class="text-right">{{ 'pricing_rule.field.discount'|trans({}, 'EkynaProduct') }}</th>
+            <th class="text-right">{{ 'pricing_rule.field.unit_price'|trans({}, 'EkynaProduct') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -13,17 +13,17 @@
         <tr>
             <td>
             {% if offer.max is null -%}
-                {{ 'ekyna_product.pricing_rule.field.from'|trans({
-                    '%min%': offer.min|localizednumber
-                }) }}
+                {{ 'pricing_rule.field.from'|trans({
+                    '%min%': offer.min|format_number
+                }, 'EkynaProduct') }}
             {%- else -%}
-                {{ 'ekyna_product.pricing_rule.field.range'|trans({
-                    '%min%': offer.min|localizednumber, '%max%': offer.max|localizednumber
-                }) }}
+                {{ 'pricing_rule.field.range'|trans({
+                    '%min%': offer.min|format_number, '%max%': offer.max|format_number
+                }, 'EkynaProduct') }}
             {%- endif %}
             </td>
-            <td class="text-right">{{ offer.percent|localizednumber }}%</td>
-            <td class="text-right">{{ offer.price|localizedcurrency(pricing.currency) }}</td>
+            <td class="text-right">{{ offer.percent|format_number }}%</td>
+            <td class="text-right">{{ offer.net_price|format_currency(pricing.currency) }}</td>
         </tr>
     {%- endfor %}
     </tbody>

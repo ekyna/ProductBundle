@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,21 +11,18 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class PriceEvents
 {
-    const INSERT      = 'ekyna_product.price.insert';
-    const UPDATE      = 'ekyna_product.price.update';
-    const DELETE      = 'ekyna_product.price.delete';
+    public const INSERT      = 'ekyna_product.price.insert';
+    public const UPDATE      = 'ekyna_product.price.update';
+    public const DELETE      = 'ekyna_product.price.delete';
 
-    const INITIALIZE  = 'ekyna_product.price.initialize';
+    public const PRE_CREATE  = 'ekyna_product.price.pre_create';
+    public const POST_CREATE = 'ekyna_product.price.post_create';
 
-    const PRE_CREATE  = 'ekyna_product.price.pre_create';
-    const POST_CREATE = 'ekyna_product.price.post_create';
+    public const PRE_UPDATE  = 'ekyna_product.price.pre_update';
+    public const POST_UPDATE = 'ekyna_product.price.post_update';
 
-    const PRE_UPDATE  = 'ekyna_product.price.pre_update';
-    const POST_UPDATE = 'ekyna_product.price.post_update';
-
-    const PRE_DELETE  = 'ekyna_product.price.pre_delete';
-    const POST_DELETE = 'ekyna_product.price.post_delete';
-
+    public const PRE_DELETE  = 'ekyna_product.price.pre_delete';
+    public const POST_DELETE = 'ekyna_product.price.post_delete';
 
     /**
      * Disabled constructor.

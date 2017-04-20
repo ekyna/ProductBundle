@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -12,86 +15,48 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class AttributeSet implements Model\AttributeSetInterface
 {
-    /**
-     * @var integer
-     */
-    protected $id;
+    protected ?int       $id   = null;
+    protected ?string    $name = null;
+    protected Collection $slots;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var ArrayCollection|Model\AttributeSlotInterface[]
-     */
-    protected $slots;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->slots = new ArrayCollection();
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New attribute set';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function setName(?string $name): Model\AttributeSetInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSlots()
+    public function getSlots(): Collection
     {
         return $this->slots;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasSlot(Model\AttributeSlotInterface $slot)
+    public function hasSlot(Model\AttributeSlotInterface $slot): bool
     {
         return $this->slots->contains($slot);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addSlot(Model\AttributeSlotInterface $slot)
+    public function addSlot(Model\AttributeSlotInterface $slot): Model\AttributeSetInterface
     {
         if (!$this->hasSlot($slot)) {
             $this->slots->add($slot);
@@ -101,10 +66,7 @@ class AttributeSet implements Model\AttributeSetInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeSlot(Model\AttributeSlotInterface $slot)
+    public function removeSlot(Model\AttributeSlotInterface $slot): Model\AttributeSetInterface
     {
         if ($this->hasSlot($slot)) {
             $this->slots->removeElement($slot);
@@ -114,20 +76,14 @@ class AttributeSet implements Model\AttributeSetInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSlots(ArrayCollection $slots)
+    public function setSlots(Collection $slots): Model\AttributeSetInterface
     {
         $this->slots = $slots;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasRequiredSlot()
+    public function hasRequiredSlot(): bool
     {
         foreach ($this->slots as $slot) {
             if ($slot->isRequired()) {
@@ -138,10 +94,7 @@ class AttributeSet implements Model\AttributeSetInterface
         return false;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasNamingSlot()
+    public function hasNamingSlot(): bool
     {
         foreach ($this->slots as $slot) {
             if ($slot->isNaming()) {

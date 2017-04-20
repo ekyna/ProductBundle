@@ -1,0 +1,42 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Attribute/_macro.html.twig' as macros %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+    {{ macros.new_attribute_button() }}
+{% endblock actions %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {{ show_row(attribute.name, 'text', {
+            'label': t('field.name', [], 'EkynaUi')
+        }) }}
+        {{ show_row(attribute.translations, 'translations', {
+            'fields': {
+                'title': {'label': t('field.title', [], 'EkynaUi')},
+            }
+        }) }}
+        {{ show_row(attribute|product_attribute_type_label, 'text', {
+            'label': t('field.type', [], 'EkynaUi')
+        }) }}
+        {{ show_row(attribute, 'product_attribute_config', {
+            'label': t('field.config', [], 'EkynaUi')
+        }) }}
+    </div>
+{%- endblock main_contents %}
+
+{% block post_main -%}
+    {% set type = attribute|attribute_type %}
+    {% if type.hasChoices -%}
+    <div class="sub-header">
+        <h2>{{ 'attribute_choice.header.list'|trans({}, 'EkynaProduct')|raw }}</h2>
+    </div>
+    <div class="actions">
+        {{ admin_resource_btn('ekyna_product.attribute_choice', 'admin_create') }}
+    </div>
+    {{ ekyna_table_render(admin_resource_table('ekyna_product.attribute_choice', {
+        'source': attribute.choices.toArray()
+    })) }}
+    {%- endif %}
+{%- endblock post_main %}

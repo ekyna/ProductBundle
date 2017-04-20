@@ -1,10 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use DateTime;
+use Decimal\Decimal;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
+
+use function round;
 
 /**
  * Class SpecialOfferRepository
@@ -13,38 +20,37 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class SpecialOfferRepository extends ResourceRepository implements SpecialOfferRepositoryInterface
 {
-    /**
-     * @var \Doctrine\ORM\Query
-     */
-    private $byProductQuery;
+    private ?Query $byProductQuery = null;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function findRulesByProduct(ProductInterface $product)
+    public function findRulesByProduct(ProductInterface $product): array
     {
-        return $this
+        $rules = $this
             ->getByProductQuery()
             ->setParameters([
                 'product' => $product,
                 'brand'   => $product->getBrand(),
-                'now'     => new \DateTime(),
+                'now'     => new DateTime(),
                 'enabled' => true,
             ])
-            ->setParameter('now', new \DateTime(), Types::DATE_MUTABLE)
+            ->setParameter('now', new DateTime(), Types::DATE_MUTABLE)
             ->getScalarResult();
+
+        return array_map(function ($rule) {
+            return [
+                'special_offer_id' => (int)$rule['special_offer_id'],
+                'group_id'         => $rule['group_id'] ? (int)$rule['group_id'] : null,
+                'country_id'       => $rule['country_id'] ? (int)$rule['country_id'] : null,
+                'min_qty'          => new Decimal($rule['min_qty']),
+                'percent'          => new Decimal($rule['percent']),
+                'stack'            => (bool)$rule['stack'],
+            ];
+        }, $rules);
     }
 
-    /**
-     * Returns special offers starting today or ending yesterday.
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface[]
-     */
-    public function findStartingTodayOrEndingYesterday()
+    public function findStartingTodayOrEndingYesterday(): array
     {
-        $today     = new \DateTime();
-        $yesterday = new \DateTime('-1 day');
+        $today = new DateTime();
+        $yesterday = new DateTime('-1 day');
 
         $qb = $this->createQueryBuilder('s');
 
@@ -63,10 +69,8 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
 
     /**
      * Returns the "find by brand" query.
-     *
-     * @return \Doctrine\ORM\Query
      */
-    private function getByProductQuery()
+    private function getByProductQuery(): Query
     {
         if (null !== $this->byProductQuery) {
             return $this->byProductQuery;
@@ -78,13 +82,11 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
         return $this->byProductQuery = $qb
             ->select([
                 's.id as special_offer_id',
-                // TODO (?) 's.designation as designation',
                 'g.id as group_id',
                 'c.id as country_id',
                 's.minQuantity as min_qty',
                 's.percent as percent',
                 's.stack as stack',
-                's.endsAt as ends_at'
             ])
             ->leftJoin('s.groups', 'g')
             ->leftJoin('s.countries', 'c')
@@ -107,10 +109,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
             ->useQueryCache(true);
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 's';
     }

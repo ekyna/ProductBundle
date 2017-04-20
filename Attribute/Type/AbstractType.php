@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
@@ -12,10 +14,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
  */
 abstract class AbstractType implements TypeInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function render(ProductAttributeInterface $productAttribute, $locale = null)
+    public function render(ProductAttributeInterface $productAttribute, string $locale = null): ?string
     {
         if (!empty($value = $productAttribute->getValue())) {
             return (string) $value;
@@ -24,42 +23,27 @@ abstract class AbstractType implements TypeInterface
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasChoices()
+    public function hasChoices(): bool
     {
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConstraints(ProductAttributeInterface $productAttribute)
+    public function getConstraints(ProductAttributeInterface $productAttribute): array
     {
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigShowFields(AttributeInterface $attribute)
+    public function getConfigShowFields(AttributeInterface $attribute): array
     {
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigDefaults()
+    public function getConfigDefaults(): array
     {
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigType()
+    public function getConfigType(): ?string
     {
         return null;
     }

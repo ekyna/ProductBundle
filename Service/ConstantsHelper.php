@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ResourceBundle\Helper\AbstractConstantsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ConstantsHelper
@@ -14,15 +16,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ConstantsHelper extends AbstractConstantsHelper
 {
-    /**
-     * @var AttributeTypeRegistryInterface
-     */
-    private $attributeTypeRegistry;
+    private AttributeTypeRegistryInterface $attributeTypeRegistry;
 
-
-    /**
-     * @inheritDoc
-     */
     public function __construct(TranslatorInterface $translator, AttributeTypeRegistryInterface $attributeTypeRegistry)
     {
         parent::__construct($translator);
@@ -34,10 +29,8 @@ class ConstantsHelper extends AbstractConstantsHelper
      * Renders the bundle rule type label.
      *
      * @param Model\BundleRuleInterface|string $typeOrRule
-     *
-     * @return string
      */
-    public function renderBundleRuleTypeLabel($typeOrRule)
+    public function renderBundleRuleTypeLabel($typeOrRule): string
     {
         if ($typeOrRule instanceof Model\BundleRuleInterface) {
             $typeOrRule = $typeOrRule->getType();
@@ -47,17 +40,15 @@ class ConstantsHelper extends AbstractConstantsHelper
             return $this->renderLabel(Model\BundleRuleTypes::getLabel($typeOrRule));
         }
 
-        return $this->renderLabel();
+        return $this->renderLabel(null);
     }
 
     /**
      * Renders the product type label.
      *
      * @param Model\ProductInterface|string $typeOrProduct
-     *
-     * @return string
      */
-    public function renderProductTypeLabel($typeOrProduct)
+    public function renderProductTypeLabel($typeOrProduct): string
     {
         if ($typeOrProduct instanceof Model\ProductInterface) {
             $typeOrProduct = $typeOrProduct->getType();
@@ -67,18 +58,15 @@ class ConstantsHelper extends AbstractConstantsHelper
             return $this->renderLabel(Model\ProductTypes::getLabel($typeOrProduct));
         }
 
-        return $this->renderLabel();
+        return $this->renderLabel(null);
     }
 
     /**
      * Renders the product type badge.
      *
      * @param Model\ProductInterface|string $typeOrProduct
-     * @param bool                          $long
-     *
-     * @return string
      */
-    public function renderProductTypeBadge($typeOrProduct, $long = true)
+    public function renderProductTypeBadge($typeOrProduct, bool $long = true): string
     {
         if ($typeOrProduct instanceof Model\ProductInterface) {
             $typeOrProduct = $typeOrProduct->getType();
@@ -101,10 +89,8 @@ class ConstantsHelper extends AbstractConstantsHelper
      * Renders the product reference type label.
      *
      * @param Model\ProductReferenceInterface|string $typeOrReference
-     *
-     * @return string
      */
-    public function renderProductReferenceTypeLabel($typeOrReference)
+    public function renderProductReferenceTypeLabel($typeOrReference): string
     {
         if ($typeOrReference instanceof Model\ProductReferenceInterface) {
             $typeOrReference = $typeOrReference->getType();
@@ -117,10 +103,8 @@ class ConstantsHelper extends AbstractConstantsHelper
      * Renders the attribute type label.
      *
      * @param string|Model\AttributeInterface $typeOrAttribute
-     *
-     * @return string
      */
-    public function renderAttributeTypeLabel($typeOrAttribute)
+    public function renderAttributeTypeLabel($typeOrAttribute): string
     {
         if ($typeOrAttribute instanceof Model\AttributeInterface) {
             $typeOrAttribute = $typeOrAttribute->getType();
@@ -128,17 +112,15 @@ class ConstantsHelper extends AbstractConstantsHelper
 
         $type = $this->attributeTypeRegistry->getType($typeOrAttribute);
 
-        return $this->renderLabel($type->getLabel());
+        return $type->getLabel()->trans($this->translator);
     }
 
     /**
-     * Renders the product best seller label.
+     * Renders the product best-seller label.
      *
      * @param Model\ProductInterface|string $modeOrProduct
-     *
-     * @return string
      */
-    public function renderProductBestSellerLabel($modeOrProduct)
+    public function renderProductBestSellerLabel($modeOrProduct): string
     {
         if ($modeOrProduct instanceof Model\ProductInterface) {
             $modeOrProduct = $modeOrProduct->getBestSeller();
@@ -148,13 +130,11 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
-     * Renders the product best seller badge.
+     * Renders the product best-seller badge.
      *
      * @param Model\ProductInterface|string $modeOrProduct
-     *
-     * @return string
      */
-    public function renderProductBestSellerBadge($modeOrProduct)
+    public function renderProductBestSellerBadge($modeOrProduct): string
     {
         if ($modeOrProduct instanceof Model\ProductInterface) {
             $modeOrProduct = $modeOrProduct->getBestSeller();
@@ -164,13 +144,11 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
-     * Renders the product cross selling label.
+     * Renders the product cross-selling label.
      *
      * @param Model\ProductInterface|string $modeOrProduct
-     *
-     * @return string
      */
-    public function renderProductCrossSellingLabel($modeOrProduct)
+    public function renderProductCrossSellingLabel($modeOrProduct): string
     {
         if ($modeOrProduct instanceof Model\ProductInterface) {
             $modeOrProduct = $modeOrProduct->getCrossSelling();
@@ -180,13 +158,11 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
-     * Renders the product cross selling badge.
+     * Renders the product cross-selling badge.
      *
      * @param Model\ProductInterface|string $modeOrProduct
-     *
-     * @return string
      */
-    public function renderProductCrossSellingBadge($modeOrProduct)
+    public function renderProductCrossSellingBadge($modeOrProduct): string
     {
         if ($modeOrProduct instanceof Model\ProductInterface) {
             $modeOrProduct = $modeOrProduct->getCrossSelling();
@@ -197,32 +173,24 @@ class ConstantsHelper extends AbstractConstantsHelper
 
     /**
      * Renders the highlight mode label.
-     *
-     * @param string $mode
-     *
-     * @return string
      */
-    protected function renderHighlightModeLabel($mode)
+    protected function renderHighlightModeLabel(string $mode): string
     {
         if (Model\HighlightModes::isValid($mode)) {
             return $this->renderLabel(Model\HighlightModes::getLabel($mode));
         }
 
-        return $this->renderLabel();
+        return $this->renderLabel(null);
     }
 
     /**
      * Renders the highlight mode badge.
-     *
-     * @param string $mode
-     *
-     * @return string
      */
-    protected function renderHighlightModeBadge($mode)
+    protected function renderHighlightModeBadge(string $mode): string
     {
         $theme = 'default';
-        if (Model\ProductTypes::isValid($mode)) {
-            $theme = Model\ProductTypes::getTheme($mode);
+        if (Model\HighlightModes::isValid($mode)) {
+            $theme = Model\HighlightModes::getTheme($mode);
         }
 
         $label = $this->renderHighlightModeLabel($mode);

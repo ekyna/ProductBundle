@@ -77,7 +77,7 @@ define(
         page++;
 
         productsXhr = $.ajax({
-            url: Router.generate('ekyna_product_inventory_admin_products', {page: page}),
+            url: Router.generate('admin_ekyna_product_inventory_products', {page: page}),
             method: 'GET',
             dataType: 'json',
             data: getContext()
@@ -240,7 +240,7 @@ define(
         page = 0;
 
         productsXhr = $.ajax({
-            url: Router.generate('ekyna_product_inventory_admin_products', {page: page}),
+            url: Router.generate('admin_ekyna_product_inventory_products', {page: page}),
             method: 'GET',
             dataType: 'json',
             data: {
@@ -262,8 +262,8 @@ define(
         var $icon = $(e.currentTarget).closest('a'),
             value = $icon.hasClass('fa-bookmark-o'),
             route = value
-                ? 'ekyna_product_product_bookmark_admin_add'
-                : 'ekyna_product_product_bookmark_admin_remove';
+                ? 'admin_ekyna_product_product_bookmark_add'
+                : 'admin_ekyna_product_product_bookmark_remove';
 
         return request(e, route, true, value ? 'POST' : 'DELETE', function() {
             if (value) {
@@ -278,7 +278,7 @@ define(
      * Line's quick edit buttons click handler
      */
     $body.on('click', 'a.quick-edit', function (e) {
-        return requestModal(e, 'ekyna_product_inventory_admin_quick_edit', true);
+        return requestModal(e, 'admin_ekyna_product_inventory_quick_edit', true);
     });
 
     /**
@@ -291,7 +291,7 @@ define(
             return false;
         }
 
-        var url = Router.generate('ekyna_product_product_admin_label', {
+        var url = Router.generate('admin_ekyna_product_product_label', {
             'format': 'large',
             'id': [productId]
         });
@@ -324,28 +324,28 @@ define(
      * Line's quick edit buttons click handler
      */
     $body.on('click', 'a.quick-edit', function (e) {
-        return requestModal(e, 'ekyna_product_inventory_admin_quick_edit', true);
+        return requestModal(e, 'admin_ekyna_product_inventory_quick_edit', true);
     });
 
     /**
      * Line's stock unit buttons click handler
      */
     $body.on('click', 'a.stock-units', function (e) {
-        return requestModal(e, 'ekyna_product_inventory_admin_stock_units', true);
+        return requestModal(e, 'admin_ekyna_product_inventory_stock_units', true);
     });
 
     /**
      * Line's stock unit buttons click handler
      */
     $body.on('click', 'a.treatment', function (e) {
-        return requestModal(e, 'ekyna_product_inventory_admin_customer_orders', true);
+        return requestModal(e, 'admin_ekyna_product_inventory_customer_orders', true);
     });
 
     /**
      * Line's resupply buttons click handler
      */
     $body.on('click', 'a.resupply', function (e) {
-        return requestModal(e, 'ekyna_product_inventory_admin_resupply', true);
+        return requestModal(e, 'admin_ekyna_product_inventory_resupply', true);
     });
 
     $('button[name="batch_submit"]').on('click', function(e) {
@@ -360,7 +360,7 @@ define(
             return false;
         }
 
-        return requestModal(e, 'ekyna_product_inventory_admin_batch_edit', {id: ids});
+        return requestModal(e, 'admin_ekyna_product_inventory_batch_edit', {id: ids});
     });
 
     /**

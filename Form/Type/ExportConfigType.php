@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\ContextType;
@@ -10,6 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function array_flip;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ExportConfigType
@@ -18,46 +24,53 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ExportConfigType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
     {
+        $this->translator = $translator;
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $columns = [];
+        foreach (ExportConfig::getColumnsLabels() as $value => $label) {
+            $columns[$label->trans($this->translator)] = $value;
+        }
+
         $builder
             ->add('format', Type\ChoiceType::class, [
-                'label'   => 'ekyna_core.field.format',
-                'choices' => ExportConfig::getFormatChoices(),
+                'label'                     => t('field.format', [], 'EkynaUi'),
+                'choices'                   => array_flip(ExportConfig::getFormatLabels()),
+                'choice_translation_domain' => false,
             ])
             ->add('columns', Type\ChoiceType::class, [
-                'label'    => 'ekyna_core.field.columns',
-                'choices'  => ExportConfig::getColumnsChoices(),
-                'multiple' => true,
-                'expanded' => true,
+                'label'                     => t('field.columns', [], 'EkynaUi'),
+                'choices'                   => $columns,
+                'choice_translation_domain' => false,
+                'multiple'                  => true,
+                'expanded'                  => true,
             ])
             ->add('brands', BrandChoiceType::class, [
                 'multiple' => true,
                 'required' => false,
             ])
             ->add('visible', Type\CheckboxType::class, [
-                'label'    => 'ekyna_core.field.visible',
+                'label'    => t('field.visible', [], 'EkynaUi'),
                 'required' => false,
                 'attr'     => [
                     'align_with_widget' => true,
                 ],
             ])
             ->add('context', ContextType::class, [
-                'label'      => false,
+                'label' => false,
             ])
             ->add('validUntil', DateTimeType::class, [
-                'label'  => 'ekyna_product.export.column.valid_until',
-                'format' => 'dd/MM/yyyy',
+                'label' => t('export.column.valid_until', [], 'EkynaProduct'),
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', ExportConfig::class);
     }

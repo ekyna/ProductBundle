@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ApiBundle\Action\SearchAction;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
@@ -11,6 +14,8 @@ use Ekyna\Component\Commerce\Subject\Model\SubjectReferenceInterface as Referenc
 use Ekyna\Component\Commerce\Subject\Provider\SubjectProviderInterface;
 use Ekyna\Component\Commerce\Subject\Repository\SubjectRepositoryInterface;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class ProductProvider
  * @package Ekyna\Bundle\ProductBundle\Service\Commerce
@@ -18,50 +23,27 @@ use Ekyna\Component\Commerce\Subject\Repository\SubjectRepositoryInterface;
  */
 class ProductProvider implements SubjectProviderInterface
 {
-    const NAME = 'product';
+    public const NAME = 'product';
 
-    /**
-     * @var ProductRepositoryInterface
-     */
-    protected $productRepository;
+    protected ProductRepositoryInterface $productRepository;
+    private string                       $productClass;
 
-    /**
-     * @var string
-     */
-    private $productClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $productRepository
-     * @param string                     $productClass
-     */
     public function __construct(ProductRepositoryInterface $productRepository, string $productClass)
     {
         $this->productRepository = $productRepository;
         $this->productClass = $productClass;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function assign(Reference $reference, Subject $subject): SubjectProviderInterface
     {
         return $this->transform($subject, $reference->getSubjectIdentity());
     }
 
-    /**
-     * @inheritDoc
-     */
     public function resolve(Reference $reference): Subject
     {
         return $this->reverseTransform($reference->getSubjectIdentity());
     }
 
-    /**
-     * @inheritdoc
-     */
     public function transform(Subject $subject, Identity $identity): SubjectProviderInterface
     {
         $this->assertSupportsSubject($subject);
@@ -78,25 +60,22 @@ class ProductProvider implements SubjectProviderInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function reverseTransform(Identity $identity): Subject
     {
         $this->assertSupportsIdentity($identity);
 
-        $productId = intval($identity->getIdentifier());
+        $productId = $identity->getIdentifier();
 
         if (null !== $product = $identity->getSubject()) {
             if ((!$product instanceof $this->productClass) || ($product->getId() != $productId)) {
-                throw new SubjectException("Failed to resolve item subject.");
+                throw new SubjectException('Failed to resolve item subject.');
             }
 
             return $product;
         }
 
         if (null === $product = $this->productRepository->find($productId)) {
-            throw new SubjectException("Failed to resolve item subject.");
+            throw new SubjectException('Failed to resolve item subject.');
         }
 
         $identity->setSubject($product);
@@ -104,42 +83,27 @@ class ProductProvider implements SubjectProviderInterface
         return $product;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function supportsSubject(Subject $subject): bool
     {
         return $subject instanceof $this->productClass;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function supportsReference(Reference $reference): bool
     {
         return $reference->getSubjectIdentity()->getProvider() === self::NAME;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getRepository(): SubjectRepositoryInterface
     {
         return $this->productRepository;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getSubjectClass(): string
     {
         return $this->productClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getSearchRouteAndParameters(string $context): array
+    public function getSearchActionAndParameters(string $context): array
     {
         if ($context === self::CONTEXT_ACCOUNT) {
             return [
@@ -149,7 +113,7 @@ class ProductProvider implements SubjectProviderInterface
         }
 
         $result = [
-            'route'      => 'ekyna_product_product_admin_search',
+            'action'     => SearchAction::class,
             'parameters' => [],
         ];
 
@@ -183,26 +147,21 @@ class ProductProvider implements SubjectProviderInterface
         return $result;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getLabel(): string
+    public function getLabel()
     {
-        return 'ekyna_product.product.label.singular';
+        return t('product.label.singular', [], 'EkynaProduct');
     }
 
     /**
      * Asserts that the subject reference is supported.
-     *
-     * @param Subject $subject
      *
      * @throws SubjectException
      */
@@ -216,13 +175,11 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * Asserts that the subject identity is supported.
      *
-     * @param Identity $identity
-     *
      * @throws SubjectException
      */
     protected function assertSupportsIdentity(Identity $identity): void
     {
-        if ($identity->getProvider() != self::NAME) {
+        if ($identity->getProvider() !== self::NAME) {
             throw new SubjectException('Unsupported subject identity.');
         }
     }

@@ -1,147 +1,99 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\ComponentInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 
+/**
+ * Class Component
+ * @package Ekyna\Bundle\ProductBundle\Entity
+ * @author  Étienne Dauvergne <contact@ekyna.com>
+ */
 class Component implements ComponentInterface
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int              $id       = null;
+    private ?ProductInterface $parent   = null;
+    private ?ProductInterface $child    = null;
+    private Decimal           $quantity;
+    private ?Decimal          $netPrice = null;
 
-    /**
-     * @var ProductInterface
-     */
-    private $parent;
-
-    /**
-     * @var ProductInterface
-     */
-    private $child;
-
-    /**
-     * @var float
-     */
-    private $quantity;
-
-    /**
-     * @var float
-     */
-    private $netPrice;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->quantity = 1;
+        $this->quantity = new Decimal(1);
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return null !== $this->child ? (string)$this->child : 'New component';
     }
 
-    /**
-     * Clones the component.
-     */
     public function __clone()
     {
         $this->id = null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getParent(): ?ProductInterface
     {
         return $this->parent;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setParent(ProductInterface $parent = null): ComponentInterface
+    public function setParent(?ProductInterface $parent): ComponentInterface
     {
-        if ($this->parent !== $parent) {
-            if ($previous = $this->parent) {
-                $this->parent = null;
-                $previous->removeComponent($this);
-            }
+        if ($this->parent === $parent) {
+            return $this;
+        }
 
-            if ($this->parent = $parent) {
-                $this->parent->addComponent($this);
-            }
+        if ($previous = $this->parent) {
+            $this->parent = null;
+            $previous->removeComponent($this);
+        }
+
+        if ($this->parent = $parent) {
+            $this->parent->addComponent($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getChild(): ?ProductInterface
     {
         return $this->child;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setChild(ProductInterface $child): ComponentInterface
+    public function setChild(?ProductInterface $child): ComponentInterface
     {
         $this->child = $child;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getQuantity(): ?float
+    public function getQuantity(): Decimal
     {
         return $this->quantity;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setQuantity(float $quantity = null): ComponentInterface
+    public function setQuantity(?Decimal $quantity): ComponentInterface
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getNetPrice(): ?float
+    public function getNetPrice(): ?Decimal
     {
         return $this->netPrice;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setNetPrice(float $price = null): ComponentInterface
+    public function setNetPrice(?Decimal $price): ComponentInterface
     {
         $this->netPrice = $price;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
@@ -7,26 +9,17 @@ use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use RuntimeException;
-use Twig\Extension\RuntimeExtensionInterface;
 
 /**
  * Class ProductConverter
  * @package Ekyna\Bundle\ProductBundle\Service\Converter
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductConverter implements RuntimeExtensionInterface
+class ProductConverter
 {
-    /**
-     * @var ConverterInterface[]
-     */
+    /** @var array<ConverterInterface> */
     private $converters = [];
 
-
-    /**
-     * Registers the converter.
-     *
-     * @param ConverterInterface $converter
-     */
     public function registerConverter(ConverterInterface $converter): void
     {
         $class = get_class($converter);
@@ -40,30 +33,20 @@ class ProductConverter implements RuntimeExtensionInterface
 
     /**
      * Converts the given product to the given type.
-     *
-     * @param ProductInterface $source
-     * @param string           $targetType
-     *
-     * @return ConvertEvent
      */
     public function convert(ProductInterface $source, string $targetType): ConvertEvent
     {
         $sourceType = $source->getType();
 
         if ($sourceType === $targetType) {
-            throw new RuntimeException("Unexpected conversion type: source and target are the same.");
+            throw new RuntimeException('Unexpected conversion type: source and target are the same.');
         }
 
         return $this->getConverter($sourceType, $targetType)->convert($source);
     }
 
     /**
-     * Returns whether or not the conversion is supported.
-     *
-     * @param ProductInterface $product
-     * @param string           $type
-     *
-     * @return bool
+     * Returns whether the conversion is supported.
      */
     public function can(ProductInterface $product, string $type): bool
     {
@@ -71,7 +54,7 @@ class ProductConverter implements RuntimeExtensionInterface
             $this->getConverter($product->getType(), $type);
 
             return true;
-        } catch (ConvertException $e) {
+        } catch (ConvertException $exception) {
         }
 
         return false;
@@ -79,10 +62,6 @@ class ProductConverter implements RuntimeExtensionInterface
 
     /**
      * Returns the supported conversion types.
-     *
-     * @param string $sourceType
-     *
-     * @return array
      */
     public function getTargetTypes(string $sourceType): array
     {
@@ -108,11 +87,6 @@ class ProductConverter implements RuntimeExtensionInterface
 
     /**
      * Returns the converter for the given types.
-     *
-     * @param string $sourceType
-     * @param string $targetType
-     *
-     * @return ConverterInterface
      */
     private function getConverter(string $sourceType, string $targetType): ConverterInterface
     {

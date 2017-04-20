@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Extension;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemConfigureType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
@@ -17,38 +21,15 @@ use Symfony\Component\Form\FormView;
  */
 class SaleItemConfigureTypeExtension extends AbstractTypeExtension
 {
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
+    private FormBuilder           $formBuilder;
+    private FormRendererInterface $formRenderer;
+    private string                $theme;
+    private bool                  $displayOffers = false;
 
-    /**
-     * @var FormRendererInterface
-     */
-    private $formRenderer;
-
-    /**
-     * @var string
-     */
-    private $theme;
-
-    /**
-     * @var bool
-     */
-    private $displayOffers = false;
-
-
-    /**
-     * Constructor.
-     *
-     * @param FormBuilder           $formBuilder
-     * @param FormRendererInterface $formRenderer
-     * @param string                $theme
-     */
     public function __construct(
-        FormBuilder $formBuilder,
+        FormBuilder           $formBuilder,
         FormRendererInterface $formRenderer,
-        $theme = '@EkynaProduct/Form/sale_item_configure.html.twig'
+        string                $theme = '@EkynaProduct/Form/sale_item_configure.html.twig'
     ) {
         $this->formBuilder = $formBuilder;
         $this->formRenderer = $formRenderer;
@@ -57,20 +38,15 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
 
     /**
      * Sets whether to display offers.
-     *
-     * @param bool $display
      */
-    public function setDisplayOffers(bool $display)
+    public function setDisplayOffers(bool $display): void
     {
         $this->displayOffers = $display;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+        /** @var SaleItemInterface $item */
         if (null === $item = $form->getData()) {
             return;
         }
@@ -98,12 +74,8 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
 
     /**
      * Returns whether offers should be displayed if any.
-     *
-     * @param FormView $view
-     *
-     * @return bool
      */
-    private function doDisplayOffers(FormView $view)
+    private function doDisplayOffers(FormView $view): bool
     {
         if (!$this->displayOffers) {
             return false;
@@ -121,7 +93,7 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
             }
 
             if ($name === 'variant') {
-                /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
+                /** @var ChoiceView $choice */
                 foreach ($child->vars['choices'] as $choice) {
                     if (1 < count($choice->attr['data-config']['pricing']['offers'])) {
                         return true;
@@ -133,7 +105,7 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
                 /** @var FormView $optionGroup */
                 foreach ($child->children as $optionGroup) {
                     foreach ($optionGroup->children as $option) {
-                        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
+                        /** @var ChoiceView $choice */
                         foreach ($option->vars['choices'] as $choice) {
                             if (1 < count($choice->attr['data-config']['pricing']['offers'])) {
                                 return true;
@@ -147,11 +119,8 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getExtendedType()
+    public static function getExtendedTypes(): array
     {
-        return SaleItemConfigureType::class;
+        return [SaleItemConfigureType::class];
     }
 }

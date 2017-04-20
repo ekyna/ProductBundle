@@ -22,8 +22,8 @@
         </id>
 
         <field name="name" column="name" type="string" length="255" nullable="true"/>
-        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
-        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="3" nullable="false"/>
+        <field name="percent" column="percent" type="php_decimal" precision="4" scale="2" nullable="false"/>
+        <field name="minQuantity" column="min_quantity" type="php_decimal" precision="7" scale="3" nullable="false"/>
         <field name="startsAt" column="starts_at" type="date" nullable="true"/>
         <field name="endsAt" column="ends_at" type="date" nullable="true"/>
         <field name="stack" column="stack" type="boolean" nullable="false"/>

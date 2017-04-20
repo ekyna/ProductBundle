@@ -143,8 +143,8 @@
         <table class="table table-condensed table-alt-head" style="margin-bottom:0">
             <thead>
             <tr>
-                <th>{{ 'ekyna_product.bundle_slot.label.singular'|trans }}</th>
-                <th>{{ 'ekyna_product.bundle_choice.label.singular'|trans }}</th>
+                <th>{{ 'bundle_slot.label.singular'|trans({}, 'EkynaProduct') }}</th>
+                <th>{{ 'bundle_choice.label.singular'|trans({}, 'EkynaProduct') }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -440,13 +440,13 @@
         <thead>
         <tr>
             <th>&nbsp;</th>
-            <th>{{ 'ekyna_commerce.supplier.label.singular'|trans }}</th>
-            <th>{{ 'ekyna_core.field.designation'|trans }}</th>
-            <th>{{ 'ekyna_core.field.reference'|trans }}</th>
-            <th>{{ 'ekyna_commerce.field.buy_net_price'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_product.field.available'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_product.field.ordered'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_product.field.eda'|trans }}</th>
+            <th>{{ 'supplier.label.singular'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'field.designation'|trans({}, 'EkynaUi') }}</th>
+            <th>{{ 'field.reference'|trans({}, 'EkynaUi') }}</th>
+            <th>{{ 'field.buy_net_price'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'supplier_product.field.available'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'supplier_product.field.ordered'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'supplier_product.field.eda'|trans({}, 'EkynaCommerce') }}</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -476,12 +476,12 @@
             </a>
         </td>
         <td>{{ supplierProduct.reference }}</td>
-        <td>{{ supplierProduct.netPrice|localizedcurrency(supplierProduct.supplier.currency.code) }}</td>
-        <td>{{ supplierProduct.availableStock|localizednumber() }}</td>
-        <td>{{ supplierProduct.orderedStock|localizednumber() }}</td>
+        <td>{{ supplierProduct.netPrice|format_currency(supplierProduct.supplier.currency.code) }}</td>
+        <td>{{ supplierProduct.availableStock|format_number() }}</td>
+        <td>{{ supplierProduct.orderedStock|format_number() }}</td>
         <td>
             {%- if supplierProduct.estimatedDateOfArrival is not same as(null) -%}
-                {{- supplierProduct.estimatedDateOfArrival|localizeddate('short', 'none') -}}
+                {{- supplierProduct.estimatedDateOfArrival|format_datetime('short', 'none') -}}
             {%- endif -%}
         </td>
     </tr>
@@ -500,11 +500,10 @@
         <thead>
         <tr>
             <th>&nbsp;</th>
-            <th>{{ 'ekyna_core.field.number'|trans }}</th>
-            <th>{{ 'ekyna_core.field.state'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_order.field.shipping_cost'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_order.field.payment_total'|trans }}</th>
-            <th>{{ 'ekyna_commerce.supplier_product.field.eda'|trans }}</th>
+            <th>{{ 'field.number'|trans({}, 'EkynaUi') }}</th>
+            <th>{{ 'supplier_order.field.shipping_cost'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'supplier_order.field.payment_total'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'supplier_product.field.eda'|trans({}, 'EkynaCommerce') }}</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -526,12 +525,11 @@
                 {{- supplierOrder.number -}}
             </a>
         </td>
-        <td>{{ supplierOrder|supplier_order_state_badge }}</td>
-        <td>{{ supplierOrder.shippingCost|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
-        <td>{{ supplierOrder.paymentTotal|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
+        <td>{{ supplierOrder.shippingCost|format_currency(supplierOrder.supplier.currency.code) }}</td>
+        <td>{{ supplierOrder.paymentTotal|format_currency(supplierOrder.supplier.currency.code) }}</td>
         <td>
             {%- if supplierOrder.estimatedDateOfArrival is not same as(null) -%}
-                {{- supplierOrder.estimatedDateOfArrival|localizeddate('short', 'none') -}}
+                {{- supplierOrder.estimatedDateOfArrival|format_datetime('short', 'none') -}}
             {%- endif -%}
         </td>
         <td>
@@ -540,13 +538,13 @@
             </a>
         </td>
         {%- else -%}
-        <td colspan="5">{{ 'ekyna_commerce.supplier_order.button.new'|trans }}</td>
+        <td colspan="5">{{ 'supplier_order.button.new'|trans({}, 'EkynaCommerce') }}</td>
         {%- endif -%}
     </tr>
     {%- if supplierOrder is not same as(null) -%}
     <tr id="supplier_order_{{ supplierOrder.id }}_details" class="supplier-order-details" style="display:none;">
         <td>&nbsp;</td>
-        <td colspan="6">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
+        <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
     </tr>
     {%- endif -%}
 {%- endblock ekyna_product_inventory_resupply_order_widget -%}

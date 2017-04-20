@@ -6,8 +6,8 @@
 
 {% block pricing_tab %}
     <li>
-        <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
-            {{- 'ekyna_product.product.field.composition'|trans -}}
+        <a href="#{{ resource_name }}-pricing" id="toggle-product-pricing" data-toggle="tab">
+            {{- 'product.field.composition'|trans({}, 'EkynaProduct') -}}
         </a>
     </li>
 {% endblock pricing_tab %}

@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Brand;
 
 use Doctrine\ORM\EntityRepository;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -15,32 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BrandChoiceType extends AbstractType
 {
-    /**
-     * @var string
-     */
-    private $brandClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $brandClass
-     */
-    public function __construct($brandClass)
-    {
-        $this->brandClass = $brandClass;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label'         => function (Options $options) {
-                return 'ekyna_product.brand.label.' . ($options['multiple'] ? 'plural' : 'singular');
-            },
-            'class'         => $this->brandClass,
+            'resource'      => 'ekyna_product.brand',
             'query_builder' => function (EntityRepository $er) {
                 $qb = $er->createQueryBuilder('b');
 
@@ -49,11 +28,8 @@ class BrandChoiceType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
-        return ResourceType::class;
+        return ResourceChoiceType::class;
     }
 }

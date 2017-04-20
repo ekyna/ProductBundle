@@ -6,17 +6,16 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="Ekyna\Bundle\ProductBundle\Entity\Offer"
-            repository-class="Ekyna\Bundle\ProductBundle\Repository\OfferRepository"
             table="product_offer">
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="3" nullable="false"/>
-        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
-        <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="false"/>
-        <field name="details" column="details" type="json_array" nullable="false"/>
+        <field name="minQuantity" column="min_quantity" type="php_decimal" precision="7" scale="3" nullable="false"/>
+        <field name="percent" column="percent" type="php_decimal" precision="4" scale="2" nullable="false"/>
+        <field name="netPrice" column="net_price" type="php_decimal" precision="10" scale="5" nullable="false"/>
+        <field name="details" column="details" type="json" nullable="false"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
             <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />

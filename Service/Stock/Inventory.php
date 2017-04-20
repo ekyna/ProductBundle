@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Ekyna\Bundle\AdminBundle\Action\ReadAction;
 use Ekyna\Bundle\AdminBundle\Model\UserInterface;
-use Ekyna\Bundle\AdminBundle\Service\Security\UserProviderInterface;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates as BStockStates;
 use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
@@ -12,20 +16,23 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType;
 use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Component\Commerce\Common\Util\FormatterAwareTrait;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\User\Service\UserProviderInterface;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class Inventory
@@ -55,125 +62,64 @@ class Inventory
     AND _table_.product = p.id
 ) AS _alias_";
 
-    private const BOOKMARK_SUB_DQL = "(
+    private const BOOKMARK_SUB_DQL = '(
     SELECT 1
     FROM _class_ bm
     WHERE bm.user = _user_id_
     AND bm.product = p.id
-) AS bookmark";
+) AS bookmark';
 
     private const SESSION_KEY = 'inventory_context';
 
-    /**
-     * @var ProductRepository
-     */
-    private $productRepository;
+    private EntityManagerInterface $entityManager;
+    private ResourceHelper         $resourceHelper;
+    private UrlGeneratorInterface  $urlGenerator;
+    private TranslatorInterface    $translator;
+    private FormFactoryInterface   $formFactory;
+    private RequestStack           $requestStack;
+    private UserProviderInterface  $userProvider;
 
-    /**
-     * @var ResourceRepository
-     */
-    private $supplierProductRepository;
+    private string $productClass;
+    private string $supplierProductClass;
+    private string $supplierOrderItemClass;
+    private string $stockUnitClass;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
+    private ?array            $config  = null;
+    private ?InventoryContext $context = null;
+    private ?FormInterface    $form    = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FormFactory
-     */
-    private $formFactory;
-
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var UserProviderInterface
-     */
-    private $userProvider;
-
-    /**
-     * @var string
-     */
-    private $supplierOrderItemClass;
-
-    /**
-     * @var string
-     */
-    private $stockUnitClass;
-
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @var InventoryContext
-     */
-    private $context;
-
-    /**
-     * @var FormInterface
-     */
-    private $form;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepository     $productRepository
-     * @param ResourceRepository    $supplierProductRepository
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param TranslatorInterface   $translator
-     * @param FormFactory           $formFactory
-     * @param SessionInterface      $session
-     * @param FormatterFactory      $formatterFactory
-     * @param UserProviderInterface $userProvider
-     * @param string                $supplierOrderItemClass
-     * @param string                $stockUnitClass
-     */
     public function __construct(
-        ProductRepository $productRepository,
-        ResourceRepository $supplierProductRepository,
-        UrlGeneratorInterface $urlGenerator,
-        TranslatorInterface $translator,
-        FormFactory $formFactory,
-        SessionInterface $session,
-        FormatterFactory $formatterFactory,
-        UserProviderInterface $userProvider,
-        $supplierOrderItemClass,
-        $stockUnitClass
+        EntityManagerInterface $entityManager,
+        ResourceHelper         $resourceHelper,
+        UrlGeneratorInterface  $urlGenerator,
+        TranslatorInterface    $translator,
+        FormFactory            $formFactory,
+        RequestStack           $requestStack,
+        FormatterFactory       $formatterFactory,
+        UserProviderInterface  $userProvider,
+        string                 $productClass,
+        string                 $supplierProductClass,
+        string                 $supplierOrderItemClass,
+        string                 $stockUnitClass
     ) {
-        $this->productRepository = $productRepository;
-        $this->supplierProductRepository = $supplierProductRepository;
+        $this->entityManager = $entityManager;
+        $this->resourceHelper = $resourceHelper;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
         $this->formFactory = $formFactory;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->formatterFactory = $formatterFactory;
         $this->userProvider = $userProvider;
 
+        $this->productClass = $productClass;
+        $this->supplierProductClass = $supplierProductClass;
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
 
         $this->loadConfig();
     }
 
-    /**
-     * Returns the form.
-     *
-     * @param array $options
-     *
-     * @return FormInterface
-     */
-    public function getForm(array $options = [])
+    public function getForm(array $options = []): ?FormInterface
     {
         if ($this->form) {
             return $this->form;
@@ -188,12 +134,7 @@ class Inventory
             );
     }
 
-    /**
-     * Returns the context.
-     *
-     * @return InventoryContext
-     */
-    public function getContext()
+    public function getContext(): ?InventoryContext
     {
         if ($this->context) {
             return $this->context;
@@ -201,19 +142,20 @@ class Inventory
 
         $this->context = new InventoryContext();
 
-        if ($this->session->has(static::SESSION_KEY)) {
-            $this->context->fromArray(json_decode($this->session->get(static::SESSION_KEY)));
+        if (($session = $this->getSession()) && $session->has(static::SESSION_KEY)) {
+            $this->context->fromArray(json_decode($session->get(static::SESSION_KEY)));
         }
 
         return $this->context;
     }
 
-    /**
-     * Saves the context.
-     */
-    public function saveContext()
+    public function saveContext(): void
     {
-        $this->session->set(static::SESSION_KEY, json_encode($this->getContext()->toArray()));
+        if (!$session = $this->getSession()) {
+            return;
+        }
+
+        $session->set(static::SESSION_KEY, json_encode($this->getContext()->toArray()));
     }
 
     /**
@@ -290,10 +232,12 @@ class Inventory
     {
         $formatter = $this->getFormatter();
 
+        $route = $this->resourceHelper->getRoute('ekyna_product.product', ReadAction::class);
+
         foreach ($products as &$product) {
             // Designation (for variant)
             if ($product['type'] === ProductTypes::TYPE_VARIANT) {
-                if (0 == strlen($product['designation'])) {
+                if (empty($product['designation'])) {
                     $product['designation'] = sprintf(
                         '%s %s',
                         $product['parent_designation'],
@@ -303,7 +247,7 @@ class Inventory
             }
 
             // Url
-            $product['url'] = $this->urlGenerator->generate('ekyna_product_product_admin_show', [
+            $product['url'] = $this->urlGenerator->generate($route, [
                 'productId' => $product['id'],
             ]);
 
@@ -332,9 +276,8 @@ class Inventory
             $product['virtual_stock'] = $formatter->number((float)$product['virtual_stock']);
 
             // Eda
-            /** @var \DateTime $eda */
             if (null !== $eda = $product['eda']) {
-                $product['eda'] = (new \DateTime($eda))->format('d/m/Y'); // TODO localized format
+                $product['eda'] = (new DateTime($eda))->format('d/m/Y'); // TODO localized format
             }
 
             // Stock themes
@@ -367,15 +310,11 @@ class Inventory
         return $products;
     }
 
-    /**
-     * Returns the products query builder.
-     *
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    private function getProductsQueryBuilder()
+    private function getProductsQueryBuilder(): QueryBuilder
     {
-        $pQb = $this->productRepository->createQueryBuilder('p');
+        $pQb = $this->entityManager->createQueryBuilder();
         $pQb
+            ->from($this->productClass, 'p')
             ->select([
                 'p.id',
                 'p.type',
@@ -420,6 +359,7 @@ class Inventory
             ]);
 
         if ($this->userProvider->hasUser()) {
+            /** @noinspection PhpParamsInspection */
             $pQb->addSelect($this->buildBookmarkSubQuery($this->userProvider->getUser()));
         }
 
@@ -460,7 +400,7 @@ class Inventory
         }
 
         // Designation filter
-        if (0 < strlen($designation = $context->getDesignation())) {
+        if (!empty($designation = $context->getDesignation())) {
             $qb
                 ->andWhere($expr->orX(
                     $expr->andX($expr->isNull('p.parent'), $expr->like('p.designation', ':designation')),
@@ -470,14 +410,14 @@ class Inventory
         }
 
         // Reference filter
-        if (0 < strlen($reference = $context->getReference())) {
+        if (!empty($reference = $context->getReference())) {
             $qb
                 ->andWhere($expr->like('p.reference', ':reference'))
                 ->setParameter('reference', '%' . $reference . '%');
         }
 
         // Geocode filter
-        if (0 < strlen($geocode = $context->getGeocode())) {
+        if (!empty($geocode = $context->getGeocode())) {
             $qb
                 ->andWhere($expr->like('p.geocode', ':geocode'))
                 ->setParameter('geocode', '%' . $geocode . '%');
@@ -505,14 +445,14 @@ class Inventory
         }
 
         // Mode filter
-        if (0 < strlen($mode = $context->getMode())) {
+        if (!empty($mode = $context->getMode())) {
             $qb
                 ->andWhere($expr->eq('p.stockMode', ':mode'))
                 ->setParameter('mode', $mode);
         }
 
         // State filter
-        if (0 < strlen($state = $context->getState())) {
+        if (!empty($state = $context->getState())) {
             $qb
                 ->andWhere($expr->eq('p.stockState', ':state'))
                 ->setParameter('state', $state);
@@ -555,8 +495,8 @@ class Inventory
 
         // Sorting
         $by = $context->getSortBy();
-        $dir = strtoupper($context->getSortDir());
-        if (0 < strlen($by) && in_array($dir, ['ASC', 'DESC'])) {
+        $dir = strtoupper((string)$context->getSortDir());
+        if (!empty($by) && in_array($dir, ['ASC', 'DESC'])) {
             if ($by === 'brand') {
                 $by = 'b.name';
             } else {
@@ -627,8 +567,9 @@ class Inventory
      */
     private function buildSupplierSubQuery(): string
     {
-        $sQb = $this->supplierProductRepository->createQueryBuilder('sp');
+        $sQb = $this->entityManager->createQueryBuilder();
         $sQb
+            ->from($this->supplierProductClass, 'sp')
             ->select('sp.subjectIdentity.identifier')
             ->andWhere($sQb->expr()->eq('sp.subjectIdentity.identifier', 'p.id'))
             ->andWhere($sQb->expr()->eq('sp.supplier', ':supplier'));
@@ -636,9 +577,6 @@ class Inventory
         return $sQb->getDQL();
     }
 
-    /**
-     * Loads the config.
-     */
     private function loadConfig(): void
     {
         if ($this->config) {
@@ -650,11 +588,11 @@ class Inventory
             'stock_states' => [],
             'bool'         => [
                 true  => [
-                    'label' => $this->translator->trans('ekyna_core.value.yes'),
+                    'label' => $this->translator->trans('value.yes', [], 'EkynaUi'),
                     'theme' => 'success',
                 ],
                 false => [
-                    'label' => $this->translator->trans('ekyna_core.value.no'),
+                    'label' => $this->translator->trans('value.no', [], 'EkynaUi'),
                     'theme' => 'danger',
                 ],
             ],
@@ -662,18 +600,27 @@ class Inventory
 
         foreach (BStockModes::getConfig() as $mode => $c) {
             $config['stock_modes'][$mode] = [
-                'label' => $this->translator->trans($c[0]),
+                'label' => $this->translator->trans($c[0], [], 'EkynaCommerce'),
                 'theme' => $c[1],
             ];
         }
 
         foreach (BStockStates::getConfig() as $state => $c) {
             $config['stock_states'][$state] = [
-                'label' => $this->translator->trans($c[0]),
+                'label' => $this->translator->trans($c[0], [], 'EkynaCommerce'),
                 'theme' => $c[1],
             ];
         }
 
         $this->config = $config;
+    }
+
+    private function getSession(): ?SessionInterface
+    {
+        try {
+            return $this->requestStack->getSession();
+        } catch (SessionNotFoundException $exception) {
+            return null;
+        }
     }
 }

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
+use InvalidArgumentException;
 
 /**
  * Class HighlightModes
@@ -11,44 +14,37 @@ use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
  */
 final class HighlightModes extends AbstractConstants
 {
-    const TYPE_BEST_SELLER   = 'bestSeller';
-    const TYPE_CROSS_SELLING = 'crossSelling';
+    public const TYPE_BEST_SELLER   = 'bestSeller';
+    public const TYPE_CROSS_SELLING = 'crossSelling';
 
-    const MODE_AUTO   = 0;
-    const MODE_ALWAYS = 1;
-    const MODE_NEVER  = 2;
+    public const MODE_ALWAYS = 'always';
+    public const MODE_AUTO   = 'auto';
+    public const MODE_NEVER  = 'never';
 
-
-    /**
-     * @inheritdoc
-     */
     public static function getConfig(): array
     {
-        $prefix = 'ekyna_product.highlight.mode';
+        $prefix = 'highlight.mode';
 
         return [
-            self::MODE_AUTO   => [$prefix . '.auto',   'default'],
-            self::MODE_ALWAYS => [$prefix . '.always', 'success'],
-            self::MODE_NEVER  => [$prefix . '.never',  'danger'],
+            self::MODE_ALWAYS => [$prefix . '.' . self::MODE_ALWAYS, 'success'],
+            self::MODE_AUTO   => [$prefix . '.' . self::MODE_AUTO,   'default'],
+            self::MODE_NEVER  => [$prefix . '.' . self::MODE_NEVER,  'danger'],
         ];
     }
 
-    /**
-     * Returns whether the given type is valid.
-     *
-     * @param string $type
-     * @param bool   $throwException
-     *
-     * @return bool
-     */
-    public static function isValidType(string $type, bool $throwException = true)
+    public static function getTranslationDomain(): ?string
+    {
+        return 'EkynaProduct';
+    }
+
+    public static function isValidType(string $type, bool $throwException = true): bool
     {
         if (in_array($type, [self::TYPE_BEST_SELLER, self::TYPE_CROSS_SELLING], true)) {
             return true;
         }
 
         if ($throwException) {
-            throw new \InvalidArgumentException(sprintf('Unknown highlight type "%s"', $type));
+            throw new InvalidArgumentException(sprintf('Unknown highlight type "%s"', $type));
         }
 
         return false;

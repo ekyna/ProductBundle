@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeInterface;
+use Decimal\Decimal;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityInterface;
@@ -15,227 +19,86 @@ use Ekyna\Component\Resource\Model\TrackAssociationInterface;
  */
 interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationInterface
 {
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
 
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     */
-    public function setName($name);
+    public function setName(?string $name): SpecialOfferInterface;
 
-    /**
-     * Returns the percent.
-     *
-     * @return int
-     */
-    public function getPercent();
+    public function getPercent(): Decimal;
 
-    /**
-     * Sets the percent.
-     *
-     * @param int $percent
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function setPercent($percent);
+    public function setPercent(Decimal $percent): SpecialOfferInterface;
 
-    /**
-     * Returns the minimum quantity.
-     *
-     * @return int
-     */
-    public function getMinQuantity();
+    public function getMinQuantity(): Decimal;
 
-    /**
-     * Sets the minimum quantity.
-     *
-     * @param int $quantity
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function setMinQuantity($quantity);
+    public function setMinQuantity(Decimal $quantity): SpecialOfferInterface;
 
     /**
      * Returns the "starts at" date (including).
-     *
-     * @return \DateTime
      */
-    public function getStartsAt();
+    public function getStartsAt(): ?DateTimeInterface;
 
     /**
      * Sets the "starts at" date (including).
-     *
-     * @param \DateTime $date
-     *
-     * @return $this|SpecialOfferInterface
      */
-    public function setStartsAt(\DateTime $date = null);
+    public function setStartsAt(?DateTimeInterface $date): SpecialOfferInterface;
 
     /**
      * Returns the "ends at" date (including).
-     *
-     * @return \DateTime
      */
-    public function getEndsAt();
+    public function getEndsAt(): ?DateTimeInterface;
 
     /**
      * Sets the "ends at" date (including).
-     *
-     * @param \DateTime $date
-     *
-     * @return $this|SpecialOfferInterface
      */
-    public function setEndsAt(\DateTime $date = null);
+    public function setEndsAt(?DateTimeInterface $date): SpecialOfferInterface;
 
     /**
      * Returns whether this special offer stacks over pricing rules.
-     *
-     * @return bool
      */
-    public function isStack();
+    public function isStack(): bool;
 
     /**
      * Sets whether this special offer stacks over pricing rules.
-     *
-     * @param bool $stack
-     *
-     * @return $this|SpecialOfferInterface
      */
-    public function setStack(bool $stack);
+    public function setStack(bool $stack): SpecialOfferInterface;
+
+    public function isEnabled(): bool;
+
+    public function setEnabled(bool $enabled): SpecialOfferInterface;
+
+    public function getProduct(): ?ProductInterface;
+
+    public function setProduct(?ProductInterface $product): SpecialOfferInterface;
+
+    public function getProducts(): Collection;
+
+    public function addProduct(ProductInterface $product): SpecialOfferInterface;
+
+    public function removeProduct(ProductInterface $product): SpecialOfferInterface;
 
     /**
-     * Returns the enabled.
-     *
-     * @return bool
+     * @return Collection<BrandInterface>
      */
-    public function isEnabled();
+    public function getBrands(): Collection;
+
+    public function addBrand(BrandInterface $brand): SpecialOfferInterface;
+
+    public function removeBrand(BrandInterface $brand): SpecialOfferInterface;
 
     /**
-     * Sets the enabled.
-     *
-     * @param bool $enabled
-     *
-     * @return $this|SpecialOfferInterface
+     * @return Collection<CustomerGroupInterface>
      */
-    public function setEnabled(bool $enabled);
+    public function getGroups(): Collection;
+
+    public function addGroup(CustomerGroupInterface $group): SpecialOfferInterface;
+
+    public function removeGroup(CustomerGroupInterface $group): SpecialOfferInterface;
 
     /**
-     * Returns the product.
-     *
-     * @return ProductInterface
+     * @return Collection<CountryInterface>
      */
-    public function getProduct();
+    public function getCountries(): Collection;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     */
-    public function setProduct(ProductInterface $product = null);
+    public function addCountry(CountryInterface $country): SpecialOfferInterface;
 
-    /**
-     * Returns the products.
-     *
-     * @return ArrayCollection|ProductInterface[]
-     */
-    public function getProducts();
-
-    /**
-     * Adds the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function addProduct(ProductInterface $product);
-
-    /**
-     * Removes the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function removeProduct(ProductInterface $product);
-
-    /**
-     * Returns the brands.
-     *
-     * @return ArrayCollection|BrandInterface[]
-     */
-    public function getBrands();
-
-    /**
-     * Adds the brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function addBrand(BrandInterface $brand);
-
-    /**
-     * Removes the brand.
-     *
-     * @param BrandInterface $brand
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function removeBrand(BrandInterface $brand);
-
-    /**
-     * Returns the customerGroups.
-     *
-     * @return ArrayCollection|CustomerGroupInterface[]
-     */
-    public function getGroups();
-
-    /**
-     * Adds the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function addGroup(CustomerGroupInterface $group);
-
-    /**
-     * Removes the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function removeGroup(CustomerGroupInterface $group);
-
-    /**
-     * Returns the customerCountries.
-     *
-     * @return ArrayCollection|CountryInterface[]
-     */
-    public function getCountries();
-
-    /**
-     * Adds the customer country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function addCountry(CountryInterface $country);
-
-    /**
-     * Removes the customer country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return $this|SpecialOfferInterface
-     */
-    public function removeCountry(CountryInterface $country);
+    public function removeCountry(CountryInterface $country): SpecialOfferInterface;
 }

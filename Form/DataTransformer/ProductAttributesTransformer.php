@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,6 +10,8 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+use function is_object;
+
 /**
  * Class ProductAttributesTransformer
  * @package Ekyna\Bundle\ProductBundle\Form\DataTransformer
@@ -15,24 +19,10 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class ProductAttributesTransformer implements DataTransformerInterface
 {
-    /**
-     * @var string
-     */
-    private $productAttributeClass;
+    private string $productAttributeClass;
+    private ?Model\AttributeSetInterface $attributeSet;
 
-    /**
-     * @var Model\AttributeSetInterface
-     */
-    private $attributeSet;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string                      $productAttributeClass
-     * @param Model\AttributeSetInterface $attributeSet
-     */
-    public function __construct($productAttributeClass, Model\AttributeSetInterface $attributeSet = null)
+    public function __construct(string $productAttributeClass, ?Model\AttributeSetInterface $attributeSet)
     {
         $this->productAttributeClass = $productAttributeClass;
         $this->attributeSet = $attributeSet;
@@ -44,11 +34,11 @@ class ProductAttributesTransformer implements DataTransformerInterface
      * Transforms the product attributes collection to an array
      * by creating missing entries and indexing the array by slot id.
      */
-    public function transform($collection)
+    public function transform($value)
     {
-        /** @var Model\ProductAttributeInterface[] $collection */
-        if ($collection instanceof Collection) {
-            $array = $collection->toArray();
+        /** @var Collection<Model\ProductAttributeInterface> $value */
+        if ($value instanceof Collection) {
+            $array = $value->toArray();
         } else {
             $array = [];
         }
@@ -61,23 +51,23 @@ class ProductAttributesTransformer implements DataTransformerInterface
     /**
      * @inheritDoc
      */
-    public function reverseTransform($array)
+    public function reverseTransform($value)
     {
-        if (!is_array($array)) {
+        if (!is_array($value)) {
             throw new TransformationFailedException('Expected array');
         }
 
-        $array = $this->createMissingAttributes($array);
+        $value = $this->createMissingAttributes($value);
 
         // Remove empty / non required product attributes.
         /** @var Model\ProductAttributeInterface $productAttribute */
-        foreach ($array as $key => $productAttribute) {
+        foreach ($value as $key => $productAttribute) {
             if (!$productAttribute->getAttributeSlot()->isRequired() && $productAttribute->isEmpty()) {
-                unset($array[$key]);
+                unset($value[$key]);
             }
         }
 
-        return new ArrayCollection(array_values($array));
+        return new ArrayCollection(array_values($value));
     }
 
     /**
@@ -107,7 +97,7 @@ class ProductAttributesTransformer implements DataTransformerInterface
 
             // Create if not found
             /** @var Model\ProductAttributeInterface $productAttribute */
-            $productAttribute = new $this->productAttributeClass;
+            $productAttribute = new $this->productAttributeClass(); // TODO Product attribute factory ?
             $productAttribute->setAttributeSlot($slot);
 
             $return[] = $productAttribute;

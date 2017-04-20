@@ -1,21 +1,21 @@
 {% apply spaceless %}
-<ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
+<ul class="nav nav-tabs" data-tab-key="{{ context.config.id }}">
     <li class="active">
         <a href="#product-general" id="toggle-product-general" data-toggle="tab">
-            {{ 'ekyna_core.field.general'|trans }}
+            {{ 'field.general'|trans({}, 'EkynaUi') }}
         </a>
     </li>
     {% block content_tab %}
         <li>
             <a href="#product-content" id="toggle-product-content" data-toggle="tab">
-                {{- 'ekyna_core.field.content'|trans -}}
+                {{- 'field.content'|trans({}, 'EkynaUi') -}}
             </a>
         </li>
     {% endblock content_tab %}
     {% block pricing_tab %}
     <li>
         <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
-            {{- 'ekyna_product.product.field.pricing'|trans -}}
+            {{- 'product.field.pricing'|trans({}, 'EkynaProduct') -}}
         </a>
     </li>
     {% endblock pricing_tab %}
@@ -23,7 +23,7 @@
     {% block offers_tab %}
     <li>
         <a href="#product-offers" id="toggle-product-offers" data-toggle="tab">
-            {{- 'ekyna_product.offer.label.plural'|trans -}}
+            {{- 'offer.label.plural'|trans({}, 'EkynaProduct') -}}
         </a>
     </li>
     {% endblock offers_tab %}
@@ -31,14 +31,14 @@
     {% block stock_tab %}
     <li>
         <a href="#product-stock" id="toggle-product-stock" data-toggle="tab">
-            {{- 'ekyna_product.product.field.stock'|trans -}}
+            {{- 'product.field.stock'|trans({}, 'EkynaProduct') -}}
         </a>
     </li>
     {% endblock stock_tab %}
     {% block seo_tab %}
     <li>
         <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
-            {{ 'ekyna_core.field.seo'|trans }}
+            {{ 'field.seo'|trans({}, 'EkynaUi') }}
         </a>
     </li>
     {% endblock seo_tab %}

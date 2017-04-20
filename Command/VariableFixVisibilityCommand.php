@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,20 +18,14 @@ class VariableFixVisibilityCommand extends AbstractVariableCommand
 {
     protected static $defaultName = 'ekyna:product:variable:fix_visibility';
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
         $this->setDescription('Fixes the variables visibility');
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -38,7 +34,6 @@ class VariableFixVisibilityCommand extends AbstractVariableCommand
         $updater = new VariableUpdater($this->calculator);
 
         $count = 0;
-        /** @var ProductInterface $variable */
         foreach ($variables as $variable) {
             $name = $variable->getTitle();
             $output->write(sprintf('<comment>%s</comment> %s ',
@@ -62,5 +57,7 @@ class VariableFixVisibilityCommand extends AbstractVariableCommand
         if ($count % 20 != 0) {
             $this->manager->flush();
         }
+
+        return Command::SUCCESS;
     }
 }

@@ -1,144 +1,100 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
-use Ekyna\Bundle\AdminBundle\Helper\ResourceHelper;
-use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\AdminBundle\Action;
+use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
+use Ekyna\Bundle\ResourceBundle\Table\Type\AbstractResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class CategoryType
  * @package Ekyna\Bundle\ProductBundle\Table\Type
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class CategoryType extends ResourceTableType
+class CategoryType extends AbstractResourceType
 {
-    /**
-     * @var ResourceHelper
-     */
-    private $resourceHelper;
+    private ResourceHelper        $resourceHelper;
+    private UrlGeneratorInterface $urlGenerator;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ResourceHelper        $resourceHelper
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param string                $dataClass
-     */
-    public function __construct(ResourceHelper $resourceHelper, UrlGeneratorInterface $urlGenerator, $dataClass)
+    public function __construct(ResourceHelper $resourceHelper, UrlGeneratorInterface $urlGenerator)
     {
-        parent::__construct($dataClass);
-
         $this->resourceHelper = $resourceHelper;
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildTable(TableBuilderInterface $builder, array $options)
+    public function buildTable(TableBuilderInterface $builder, array $options): void
     {
-        // TODO public / editor action buttons
-
         $builder
             ->addDefaultSort('left')
             ->setSortable(false)
             ->setFilterable(false)
             ->setPerPageChoices([500])
             ->addColumn('name', BType\Column\NestedAnchorType::class, [
-                'label'                => 'ekyna_core.field.name',
-                'route_name'           => 'ekyna_product_category_admin_show',
-                'route_parameters_map' => [
-                    'categoryId' => 'id',
-                ],
-                'position'             => 10,
+                'label'    => t('field.name', [], 'EkynaUi'),
+                'position' => 10,
             ])
             ->addColumn('visible', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_core.field.visible',
-                'route_name'           => 'ekyna_product_category_admin_toggle',
-                'route_parameters'     => ['field' => 'visible'],
-                'route_parameters_map' => ['categoryId' => 'id'],
-                'position'             => 20,
+                'label'    => t('field.visible', [], 'EkynaUi'),
+                'property' => 'visible',
+                'position' => 20,
             ])
             ->addColumn('visibility', CType\Column\NumberType::class, [
-                'label'    => 'ekyna_product.common.visibility',
+                'label'    => t('common.visibility', [], 'EkynaProduct'),
                 'position' => 30,
             ])
             ->addColumn('createdAt', CType\Column\DateTimeType::class, [
-                'label'    => 'ekyna_core.field.created_at',
+                'label'    => t('field.created_at', [], 'EkynaUi'),
                 'position' => 40,
             ])
             ->addColumn('actions', BType\Column\NestedActionsType::class, [
-                'roots'                 => false,
-                'new_child_route'       => 'ekyna_product_category_admin_new_child',
-                'move_up_route'         => 'ekyna_product_category_admin_move_up',
-                'move_down_route'       => 'ekyna_product_category_admin_move_down',
-                'routes_parameters_map' => [
-                    'categoryId' => 'id',
+                'roots'    => false,
+                'resource' => $this->dataClass,
+                'actions'  => [
+                    Action\UpdateAction::class,
+                    Action\DeleteAction::class,
                 ],
-                'buttons'               => [
+                'buttons'  => [
                     function (RowInterface $row) {
-                        $category = $row->getData();
+                        $category = $row->getData(null);
 
-                        if (null !== $path = $this->resourceHelper->generatePublicUrl($category)) {
-                            return [
-                                'label'  => 'ekyna_admin.resource.button.show_front',
-                                'class'  => 'default',
-                                'icon'   => 'eye-open',
-                                'target' => '_blank',
-                                'path'   => $path,
-                            ];
+                        if (!$path = $this->resourceHelper->generatePublicUrl($category)) {
+                            return null;
                         }
 
-                        return null;
+                        return [
+                            'label'  => t('resource.button.show_front', [], 'EkynaAdmin'),
+                            'class'  => 'default',
+                            'icon'   => 'eye-open',
+                            'target' => '_blank',
+                            'path'   => $path,
+                        ];
                     },
                     function (RowInterface $row) {
-                        $category = $row->getData();
+                        $category = $row->getData(null);
 
-                        if (null !== $path = $this->resourceHelper->generatePublicUrl($category)) {
-                            return [
-                                'label'  => 'ekyna_admin.resource.button.show_editor',
-                                'class'  => 'default',
-                                'icon'   => 'edit',
-                                'target' => '_blank',
-                                'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
-                                    'path' => $path,
-                                ]),
-                            ];
+                        if (!$path = $this->resourceHelper->generatePublicUrl($category)) {
+                            return null;
                         }
 
-                        return null;
+                        return [
+                            'label'  => t('resource.button.show_editor', [], 'EkynaAdmin'),
+                            'class'  => 'default',
+                            'icon'   => 'edit',
+                            'target' => '_blank',
+                            'path'   => $this->urlGenerator->generate('admin_ekyna_cms_editor_index', [
+                                'path' => $path,
+                            ]),
+                        ];
                     },
-                    [
-                        'label'                => 'ekyna_core.button.edit',
-                        'icon'                 => 'pencil',
-                        'class'                => 'warning',
-                        'route_name'           => 'ekyna_product_category_admin_edit',
-                        'route_parameters_map' => [
-                            'categoryId' => 'id',
-                        ],
-                        'permission'           => 'edit',
-                    ],
-                    [
-                        'label'                => 'ekyna_core.button.remove',
-                        'icon'                 => 'trash',
-                        'class'                => 'danger',
-                        'route_name'           => 'ekyna_product_category_admin_remove',
-                        'route_parameters_map' => [
-                            'categoryId' => 'id',
-                        ],
-                        'permission'           => 'delete',
-                    ],
                 ],
             ]);
     }

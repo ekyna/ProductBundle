@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Decimal\Decimal;
+use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 
 /**
  * Interface OfferRepositoryInterface
@@ -16,42 +20,30 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
     /**
      * Find offers by product, context and quantity.
      *
-     * @param ProductInterface $product
-     * @param ContextInterface $context
-     * @param bool             $useCache
-     *
-     * @return array [['min_qty' => (float), 'percent' => (float), 'price' => (float)]]
+     * @return array [['min_qty' => (Decimal), 'percent' => (string), 'price' => (Decimal)]]
      */
     public function findByProductAndContext(
         ProductInterface $product,
         ContextInterface $context,
-        bool $useCache = true
+        bool             $useCache = true
     ): array;
 
     /**
      * Find one offer for the given product, context and quantity.
      *
-     * @param ProductInterface $product
-     * @param ContextInterface $context
-     * @param float            $quantity
-     * @param bool             $useCache
-     *
-     * @return null|array ['percent' => (float), 'special_offer_id' => (int), 'pricing_id' => (int)]
+     * @return null|array ['percent' => (string), 'special_offer_id' => (int), 'pricing_id' => (int)]
      */
     public function findOneByProductAndContextAndQuantity(
         ProductInterface $product,
         ContextInterface $context,
-        float $quantity = 1.0,
-        bool $useCache = true
+        Decimal          $quantity = null,
+        bool             $useCache = true
     ): ?array;
 
     /**
      * Finds offers by product.
      *
-     * @param ProductInterface $product
-     * @param bool             $asArray
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Offer[]|array[]
+     * @return array<Offer>|array<array>
      */
     public function findByProduct(ProductInterface $product, bool $asArray = false): array;
 }

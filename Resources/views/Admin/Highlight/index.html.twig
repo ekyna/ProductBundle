@@ -1,12 +1,9 @@
 {%- extends "@EkynaAdmin/Entity/layout.html.twig" -%}
 
-{%- block page_title -%}
-    {{ 'ekyna_product.highlight.title'|trans }} - {{ parent() }}
-{%- endblock page_title -%}
-
+{%- block page_title -%}{{ 'highlight.title'|trans({}, 'EkynaProduct') }}{%- endblock page_title -%}
 
 {%- block title -%}
-    <h1>{{ 'ekyna_product.highlight.title'|trans }}</h1>
+    <h1>{{ 'highlight.title'|trans({}, 'EkynaProduct') }}</h1>
 {%- endblock title -%}
 
 {%- block main -%}
@@ -18,37 +15,37 @@
             </th>
             <th class="sort">
                 <a class="none" data-property="brand" href="javascript: void(0)">
-                    {{- 'ekyna_product.brand.label.singular'|trans -}}
+                    {{- 'brand.label.singular'|trans({}, 'EkynaProduct') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="designation" href="javascript: void(0)">
-                    {{- 'ekyna_core.field.designation'|trans -}}
+                    {{- 'field.designation'|trans({}, 'EkynaUi') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="reference" href="javascript: void(0)">
-                    {{- 'ekyna_core.field.reference'|trans -}}
+                    {{- 'field.reference'|trans({}, 'EkynaUi') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="visible" href="javascript: void(0)">
-                    {{- 'ekyna_core.field.visible'|trans -}}
+                    {{- 'field.visible'|trans({}, 'EkynaUi') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="visibility" href="javascript: void(0)">
-                    {{- 'ekyna_product.common.visibility'|trans -}}
+                    {{- 'common.visibility'|trans({}, 'EkynaProduct') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="bestSeller" href="javascript: void(0)">
-                    {{- 'ekyna_product.product.field.best_seller'|trans -}}
+                    {{- 'product.field.best_seller'|trans({}, 'EkynaProduct') -}}
                 </a>
             </th>
             <th class="sort">
                 <a class="none" data-property="crossSelling" href="javascript: void(0)">
-                    {{- 'ekyna_product.product.field.cross_selling'|trans -}}
+                    {{- 'product.field.cross_selling'|trans({}, 'EkynaProduct') -}}
                 </a>
             </th>
         </tr>
@@ -107,8 +104,8 @@
                 {{- product.brand -}}
             </td>
             <td>
-                <a href="{{ path('ekyna_product_product_admin_show', {'productId' : product.id}) }}"
-                    data-summary='{"route": "ekyna_product_product_admin_summary", "parameters": {"productId": {{ product.id }}}}'>
+                <a href="{{ path('admin_ekyna_product_product_read', {'productId' : product.id}) }}"
+                    data-summary='{"route": "admin_ekyna_product_product_summary", "parameters": {"productId": {{ product.id }}}}'>
                     {{- product.designation -}}
                 </a>
             </td>

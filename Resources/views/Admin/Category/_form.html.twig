@@ -1,39 +1,30 @@
-{% apply spaceless %}
-<ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
-    <li class="active">
-        <a href="#category-general" id="toggle-general" data-toggle="tab">
-            {{ 'ekyna_core.field.general'|trans }}
-        </a>
-    </li>
+{% extends '@EkynaAdmin/Entity/Crud/_form_default.html.twig' %}
+
+{% block main_tabs -%}
+    {{ parent() }}
     <li>
-        <a href="#category-seo" id="toggle-seo" data-toggle="tab">
-            {{ 'ekyna_core.field.seo'|trans }}
+        <a href="#{{ resource_name }}-seo" id="toggle-seo" data-toggle="tab">
+            {{ 'field.seo'|trans({}, 'EkynaUi') }}
         </a>
     </li>
-</ul>
-<div class="panel-body form-body">
-    {{ bootstrap_set_style('horizontal') }}
-    {{ bootstrap_set_col_size('md') }}
-    {{ form_errors(form) }}
-    <div class="tab-content">
-        <div class="tab-pane active" id="category-general">
-            {{ form_row(form.name) }}
-            <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_row(form.visibility, {'label_col': 4, 'widget_col': 8}) }}
-                </div>
+{%- endblock main_tabs %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {{ form_row(form.name) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
             </div>
-            {{ form_row(form.parent) }}
-            {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-            {{ form_row(form.media) }}
+            <div class="col-md-6">
+                {{ form_row(form.visibility, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
         </div>
-        <div class="tab-pane" id="category-seo">
-            {{ form_row(form.seo) }}
-        </div>
+        {{ form_row(form.parent) }}
+        {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+        {{ form_row(form.media) }}
     </div>
-    {{ form_rest(form) }}
-</div>
-{% endapply %}
+    <div class="tab-pane" id="{{ resource_name }}-seo">
+        {{ form_row(form.seo) }}
+    </div>
+{%- endblock main_contents -%}

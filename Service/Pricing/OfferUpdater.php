@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
@@ -15,83 +17,37 @@ use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
  */
 class OfferUpdater
 {
-    /**
-     * @var EntityManager
-     */
-    protected $manager;
+    protected EntityManagerInterface   $manager;
+    protected OfferResolver            $offerResolver;
+    protected OfferRepositoryInterface $offerRepository;
+    protected PriceInvalidator         $priceInvalidator;
+    protected string                   $customerGroupClass;
+    protected string                   $countryClass;
+    protected string                   $pricingClass;
+    protected string                   $specialOfferClass;
 
-    /**
-     * @var OfferResolver
-     */
-    protected $offerResolver;
-
-    /**
-     * @var OfferRepositoryInterface
-     */
-    protected $offerRepository;
-
-    /**
-     * @var PriceInvalidator
-     */
-    protected $priceInvalidator;
-
-    /**
-     * @var string
-     */
-    protected $customerGroupClass;
-
-    /**
-     * @var string
-     */
-    protected $countryClass;
-
-    /**
-     * @var string
-     */
-    protected $pricingClass;
-
-    /**
-     * @var string
-     */
-    protected $specialOfferClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param EntityManager            $manager
-     * @param OfferResolver            $offerResolver
-     * @param OfferRepositoryInterface $offerRepository
-     * @param PriceInvalidator         $priceInvalidator
-     * @param string                   $customerGroupClass
-     * @param string                   $countryClass
-     * @param string                   $pricingClass
-     * @param string                   $specialOfferClass
-     */
     public function __construct(
-        EntityManager $manager,
-        OfferResolver $offerResolver,
+        EntityManagerInterface   $manager,
+        OfferResolver            $offerResolver,
         OfferRepositoryInterface $offerRepository,
-        PriceInvalidator $priceInvalidator,
-        string $customerGroupClass,
-        string $countryClass,
-        string $pricingClass,
-        string $specialOfferClass
+        PriceInvalidator         $priceInvalidator,
+        string                   $customerGroupClass,
+        string                   $countryClass,
+        string                   $pricingClass,
+        string                   $specialOfferClass
     ) {
-        $this->manager            = $manager;
-        $this->offerResolver      = $offerResolver;
-        $this->offerRepository    = $offerRepository;
-        $this->priceInvalidator   = $priceInvalidator;
+        $this->manager = $manager;
+        $this->offerResolver = $offerResolver;
+        $this->offerRepository = $offerRepository;
+        $this->priceInvalidator = $priceInvalidator;
         $this->customerGroupClass = $customerGroupClass;
-        $this->countryClass       = $countryClass;
-        $this->pricingClass       = $pricingClass;
-        $this->specialOfferClass  = $specialOfferClass;
+        $this->countryClass = $countryClass;
+        $this->pricingClass = $pricingClass;
+        $this->specialOfferClass = $specialOfferClass;
     }
 
     /**
      * Updates the product offers.
-     *
-     * @param ProductInterface $product
      *
      * @return bool Whether this product offers has been updated
      */
@@ -123,7 +79,7 @@ class OfferUpdater
             ->getQuery()
             ->execute(['product' => $product]);
 
-        // Creates offers
+        // Create offers
         foreach ($newOffers as $data) {
             $offer = new Offer();
             $offer
@@ -134,28 +90,24 @@ class OfferUpdater
                 ->setDetails($data['details']);
 
             if (!is_null($data['group_id'])) {
-                /** @noinspection PhpParamsInspection */
                 $offer->setGroup(
                     $this->manager->getReference($this->customerGroupClass, $data['group_id'])
                 );
             }
 
             if (!is_null($data['country_id'])) {
-                /** @noinspection PhpParamsInspection */
                 $offer->setCountry(
                     $this->manager->getReference($this->countryClass, $data['country_id'])
                 );
             }
 
             if (isset($data['pricing_id'])) {
-                /** @noinspection PhpParamsInspection */
                 $offer->setPricing(
                     $this->manager->getReference($this->pricingClass, $data['pricing_id'])
                 );
             }
 
             if (isset($data['special_offer_id'])) {
-                /** @noinspection PhpParamsInspection */
                 $offer->setSpecialOffer(
                     $this->manager->getReference($this->specialOfferClass, $data['special_offer_id'])
                 );
@@ -177,11 +129,6 @@ class OfferUpdater
 
     /**
      * Returns whether new and old offers are different.
-     *
-     * @param array $oldOffers
-     * @param array $newOffers
-     *
-     * @return bool
      */
     protected function hasDiff(array $oldOffers, array $newOffers): bool
     {
@@ -205,6 +152,7 @@ class OfferUpdater
                         continue 2; // Difference, next old
                     }
                 }
+
                 continue 2; // Equivalent found, next offer
             }
 

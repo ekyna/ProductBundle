@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Generator;
 
+use DateTime;
 use Ekyna\Component\Commerce\Common\Generator\AbstractGenerator;
 
 /**
@@ -11,11 +14,8 @@ use Ekyna\Component\Commerce\Common\Generator\AbstractGenerator;
  */
 class ReferenceGenerator extends AbstractGenerator
 {
-    /**
-     * @inheritDoc
-     */
     protected function getPrefix(): string
     {
-        return (new \DateTime())->format($this->prefix);
+        return (new DateTime())->format($this->prefix);
     }
 }

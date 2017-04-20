@@ -3,31 +3,31 @@
     <thead>
         <tr>
             <th>
-                {{- 'ekyna_core.field.designation'|trans -}}
+                {{- 'field.designation'|trans({}, 'EkynaUi') -}}
             </th>
             <th>
-                {{- 'ekyna_core.field.reference'|trans -}}
+                {{- 'field.reference'|trans({}, 'EkynaUi') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.field.geocode'|trans -}}
+                {{- 'field.geocode'|trans({}, 'EkynaCommerce') -}}
             </th>
             <th>
-                {{- 'ekyna_core.field.status'|trans -}}
+                {{- 'field.status'|trans({}, 'EkynaUi') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}
+                {{- 'stock_subject.field.floor'|trans({}, 'EkynaCommerce') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.field.in_stock'|trans -}}
+                {{- 'field.in_stock'|trans({}, 'EkynaCommerce') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.field.available_stock'|trans -}}
+                {{- 'field.available_stock'|trans({}, 'EkynaCommerce') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.field.virtual_stock'|trans -}}
+                {{- 'field.virtual_stock'|trans({}, 'EkynaCommerce') -}}
             </th>
             <th>
-                {{- 'ekyna_commerce.field.replenishment_eda'|trans -}}
+                {{- 'field.replenishment_eda'|trans({}, 'EkynaCommerce') -}}
             </th>
         </tr>
     </thead>
@@ -35,7 +35,7 @@
         {% for product in products -%}
         <tr>
             <td>
-                <a href="{{ url('ekyna_product_product_admin_show', {'productId': product.id}) }}">
+                <a href="{{ url('admin_ekyna_product_product_read', {'productId': product.id}) }}">
                     {{- product.getFullTitle(true) -}}
                 </a>
             </td>
@@ -49,20 +49,20 @@
                 {{- product|stock_subject_state_label -}}
             </td>
             <td class="right">
-                {{- product.stockFloor|localizednumber -}}
+                {{- product.stockFloor|format_number -}}
             </td>
             <td class="right">
-                {{- product.inStock|localizednumber -}}
+                {{- product.inStock|format_number -}}
             </td>
             <td class="right">
-                {{- product.availableStock|localizednumber -}}
+                {{- product.availableStock|format_number -}}
             </td>
             <td class="right">
-                {{- product.virtualStock|localizednumber -}}
+                {{- product.virtualStock|format_number -}}
             </td>
             <td class="right">
                 {%- if product.estimatedDateOfArrival is not empty -%}
-                    {{ product.estimatedDateOfArrival|localizeddate('short', 'none', locale) }}
+                    {{ product.estimatedDateOfArrival|format_datetime('short', 'none', locale) }}
                 {%- endif -%}
             </td>
         </tr>

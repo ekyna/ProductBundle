@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
@@ -16,7 +18,7 @@ use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SaleItemEventSubscriber
@@ -25,41 +27,12 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class SaleItemEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ContextProviderInterface
-     */
-    protected $contextProvider;
+    protected ContextProviderInterface $contextProvider;
+    protected ItemBuilder $itemBuilder;
+    protected FormBuilder $formBuilder;
+    protected OfferRepositoryInterface $offerRepository;
+    protected TranslatorInterface $translator;
 
-    /**
-     * @var ItemBuilder
-     */
-    protected $itemBuilder;
-
-    /**
-     * @var FormBuilder
-     */
-    protected $formBuilder;
-
-    /**
-     * @var OfferRepositoryInterface
-     */
-    protected $offerRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ContextProviderInterface $contextProvider
-     * @param ItemBuilder              $itemBuilder
-     * @param FormBuilder              $formBuilder
-     * @param OfferRepositoryInterface $offerRepository
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(
         ContextProviderInterface $contextProvider,
         ItemBuilder $itemBuilder,
@@ -76,12 +49,10 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Sale item initialize event handler.
-     *
-     * @param SaleItemEvent $event
      */
-    public function onSaleItemInitialize(SaleItemEvent $event)
+    public function onSaleItemInitialize(SaleItemEvent $event): void
     {
-        if (!$product = $this->getProductFromEvent($event)) {
+        if (null === $this->getProductFromEvent($event)) {
             return;
         }
 
@@ -99,12 +70,10 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Sale item build event handler.
-     *
-     * @param SaleItemEvent $event
      */
-    public function onSaleItemBuild(SaleItemEvent $event)
+    public function onSaleItemBuild(SaleItemEvent $event): void
     {
-        if (!$product = $this->getProductFromEvent($event)) {
+        if (null === $this->getProductFromEvent($event)) {
             return;
         }
 
@@ -117,14 +86,14 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Sale item discount event handler.
-     *
-     * @param SaleItemEvent $event
      */
-    public function onSaleItemDiscount(SaleItemEvent $event)
+    public function onSaleItemDiscount(SaleItemEvent $event): void
     {
-        if (!$product = $this->getProductFromEvent($event)) {
+        if (null === $this->getProductFromEvent($event)) {
             return;
         }
+
+        // TODO Move AdjustmentData build in a dedicated service.
 
         $offer = null;
         $item = $event->getItem();
@@ -141,7 +110,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
                 ->offerRepository
                 ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
 
-            if (!is_null($o) && (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2))) {
+            if (!is_null($o) && (is_null($offer) || $o['percent'] > $offer['percent'])) {
                 $offer = $o;
             }
 
@@ -156,31 +125,29 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         if (0 < $offer['special_offer_id']) {
-            $type = $this->translator->trans('ekyna_product.special_offer.label.singular');
+            $type = $this->translator->trans('special_offer.label.singular', [], 'EkynaProduct');
             $source = 'special_offer:' . $offer['special_offer_id'];
         } elseif (0 < $offer['pricing_id']) {
-            $type = $this->translator->trans('ekyna_product.pricing.label.singular');
+            $type = $this->translator->trans('pricing.label.singular', [], 'EkynaProduct');
             $source = 'pricing_id:' . $offer['pricing_id'];
         } else {
-            throw new RuntimeException("Unexpected offer type.");
+            throw new RuntimeException('Unexpected offer type.');
         }
 
         $event->addAdjustmentData(new AdjustmentData(
             AdjustmentModes::MODE_PERCENT,
             sprintf('%s %s%%', $type, $offer['percent']),
-            $offer['percent'], // TODO number_format
+            $offer['percent'],
             $source
         ));
     }
 
     /**
      * Sale item build form event handler.
-     *
-     * @param SaleItemFormEvent $event
      */
-    public function onSaleItemBuildForm(SaleItemFormEvent $event)
+    public function onSaleItemBuildForm(SaleItemFormEvent $event): void
     {
-        if (!$product = $this->getProductFromEvent($event)) {
+        if (!$this->getProductFromEvent($event)) {
             return;
         }
 
@@ -189,12 +156,10 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Sale item build form view event handler.
-     *
-     * @param SaleItemFormEvent $event
      */
-    public function onSaleItemBuildFormView(SaleItemFormEvent $event)
+    public function onSaleItemBuildFormView(SaleItemFormEvent $event): void
     {
-        if (!$product = $this->getProductFromEvent($event)) {
+        if (!$this->getProductFromEvent($event)) {
             return;
         }
 
@@ -203,12 +168,8 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Returns the product from the given event.
-     *
-     * @param SaleItemEvent $event
-     *
-     * @return ProductInterface|null
      */
-    protected function getProductFromEvent(SaleItemEvent $event)
+    protected function getProductFromEvent(SaleItemEvent $event): ?ProductInterface
     {
         $item = $event->getItem();
 
@@ -217,12 +178,8 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
     /**
      * Returns the product from the given sale item.
-     *
-     * @param SaleItemInterface $item
-     *
-     * @return ProductInterface|null
      */
-    protected function getProductFromItem(SaleItemInterface $item)
+    protected function getProductFromItem(SaleItemInterface $item): ?ProductInterface
     {
         $provider = $this->itemBuilder->getProvider();
 
@@ -240,10 +197,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],

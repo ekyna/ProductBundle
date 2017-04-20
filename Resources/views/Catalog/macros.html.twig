@@ -1,7 +1,5 @@
 {% macro show_product(slot) %}
-    {{ show_row(slot.product, 'entity', {
-        'label': 'ekyna_product.product.label.singular',
-        'route': 'ekyna_product_product_admin_show',
-        'route_parameters_map': {'productId': 'id'}
+    {{ show_row(slot.product, 'resource', {
+        'resource': 'ekyna_product.product'
     }) }}
 {% endmacro %}

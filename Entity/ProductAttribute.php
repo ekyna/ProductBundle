@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
@@ -15,113 +18,69 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  */
 class ProductAttribute implements ProductAttributeInterface
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                    $id            = null;
+    protected ?ProductInterface       $product       = null;
+    protected ?AttributeSlotInterface $attributeSlot = null;
+    /** @var Collection<AttributeChoiceInterface> */
+    protected Collection $choices;
+    protected ?string $value = null;
 
-    /**
-     * @var ProductInterface
-     */
-    protected $product;
-
-    /**
-     * @var AttributeSlotInterface
-     */
-    protected $attributeSlot;
-
-    /**
-     * @var ArrayCollection|AttributeChoiceInterface[]
-     */
-    protected $choices;
-
-    /**
-     * @var mixed
-     */
-    protected $value;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->choices = new ArrayCollection();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getProduct()
+    public function getProduct(): ?ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setProduct(ProductInterface $product = null)
+    public function setProduct(?ProductInterface $product): ProductAttributeInterface
     {
-        if ($this->product !== $product) {
-            if ($previous = $this->product) {
-                $this->product = null;
-                $previous->removeAttribute($this);
-            }
+        if ($this->product === $product) {
+            return $this;
+        }
 
-            if ($this->product = $product) {
-                $this->product->addAttribute($this);
-            }
+        if ($previous = $this->product) {
+            $this->product = null;
+            $previous->removeAttribute($this);
+        }
+
+        if ($this->product = $product) {
+            $this->product->addAttribute($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttributeSlot()
+    public function getAttributeSlot(): AttributeSlotInterface
     {
         return $this->attributeSlot;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setAttributeSlot(AttributeSlotInterface $attributeSlot)
+    public function setAttributeSlot(?AttributeSlotInterface $slot): ProductAttributeInterface
     {
-        $this->attributeSlot = $attributeSlot;
+        $this->attributeSlot = $slot;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getChoices()
+    public function getChoices(): Collection
     {
         return $this->choices;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasChoice(AttributeChoiceInterface $choice)
+    public function hasChoice(AttributeChoiceInterface $choice): bool
     {
         return $this->choices->contains($choice);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addChoice(AttributeChoiceInterface $choice)
+    public function addChoice(AttributeChoiceInterface $choice): ProductAttributeInterface
     {
         if (!$this->hasChoice($choice)) {
             $this->choices->add($choice);
@@ -130,10 +89,7 @@ class ProductAttribute implements ProductAttributeInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeChoice(AttributeChoiceInterface $choice)
+    public function removeChoice(AttributeChoiceInterface $choice): ProductAttributeInterface
     {
         if ($this->hasChoice($choice)) {
             $this->choices->removeElement($choice);
@@ -142,28 +98,19 @@ class ProductAttribute implements ProductAttributeInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setValue($value)
+    public function setValue(?string $value): ProductAttributeInterface
     {
         $this->value = $value;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return is_null($this->value) && 0 === $this->choices->count();
     }

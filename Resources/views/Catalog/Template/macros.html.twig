@@ -26,11 +26,11 @@
 {% macro infos(catalog, product) %}
 {% apply spaceless %}
     <p class="information">
-        <span class="field">{{ 'ekyna_core.field.reference'|trans }}</span>&nbsp;
+        <span class="field">{{ 'field.reference'|trans({}, 'EkynaUi') }}</span>&nbsp;
         <span class="reference">{{ product.reference }}</span><br>
         {% set ean13 = product|product_external_reference %}
         {% if ean13 is not empty %}
-            <span class="field">{{ 'ekyna_product.product_reference.type.ean13'|trans }}</span>&nbsp;
+            <span class="field">{{ 'product_reference.type.ean13'|trans({}, 'EkynaProduct') }}</span>&nbsp;
             <span class="reference">{{ ean13 }}</span><br>
         {% endif %}
         {% if catalog.displayPrices -%}
@@ -39,7 +39,7 @@
     </p>
     <p class="information">
         <a href="{{ product|subject_public_url(false) }}" class="btn btn-primary">
-            {{ 'ekyna_product.common.read_more'|trans }}
+            {{ 'common.read_more'|trans({}, 'EkynaProduct') }}
         </a>
     </p>
 {% endapply %}

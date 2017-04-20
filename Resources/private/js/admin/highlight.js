@@ -103,7 +103,7 @@ define(['jquery', 'routing'], function ($, Router) {
      * Line's quick edit buttons click handler
      */
     $list.on('click', 'a.quick-edit', function (e) {
-        return request(e, 'ekyna_product_inventory_admin_quick_edit');
+        return request(e, 'admin_ekyna_product_inventory_quick_edit');
     });
 
     /**
@@ -193,7 +193,7 @@ define(['jquery', 'routing'], function ($, Router) {
         }
 
         $.ajax({
-            url: Router.generate('ekyna_product_highlight_admin_update', {
+            url: Router.generate('admin_ekyna_product_highlight_update', {
                 productId: $tr.data('id')
             }),
             method: 'POST',

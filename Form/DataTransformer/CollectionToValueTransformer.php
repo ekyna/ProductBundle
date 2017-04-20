@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,29 +19,29 @@ class CollectionToValueTransformer implements DataTransformerInterface
     /**
      * Transforms a collection into an single value.
      *
-     * @param Collection $collection A collection of entities
+     * @param Collection $value A collection of entities
      *
      * @return mixed The first entity
      *
      * @throws TransformationFailedException
      */
-    public function transform($collection)
+    public function transform($value)
     {
-        if (null === $collection) {
+        if (null === $value) {
             return [];
         }
 
         // For cases when the collection getter returns $collection->toArray()
         // in order to prevent modifications of the returned collection
-        if (is_array($collection)) {
-            return $collection;
+        if (is_array($value)) {
+            return $value;
         }
 
-        if (!$collection instanceof Collection) {
+        if (!$value instanceof Collection) {
             throw new TransformationFailedException('Expected a Doctrine\Common\Collections\Collection object.');
         }
 
-        return $collection->first();
+        return $value->first();
     }
 
     /**

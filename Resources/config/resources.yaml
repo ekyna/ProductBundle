@@ -1,0 +1,427 @@
+namespaces:
+    ekyna_product:
+        label: label
+        trans_domain: EkynaProduct
+        prefix: /catalog
+
+resources:
+    ekyna_product:
+        attribute:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Attribute
+            repository:
+                class: Ekyna\Bundle\ProductBundle\Repository\AttributeRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\AttributeType
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation
+                fields: [title]
+            actions:
+                admin_crud:
+                    create: false
+                    templates: '@EkynaProduct/Admin/Attribute'
+                Ekyna\Bundle\ProductBundle\Action\Admin\Attribute\CreateAction: ~
+                admin_move_up: ~
+                admin_move_down: ~
+
+        attribute_choice:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\AttributeChoice
+            repository:
+                class: Ekyna\Bundle\ProductBundle\Repository\AttributeChoiceRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeChoiceType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\AttributeChoiceType
+            parent: ekyna_product.attribute
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeChoiceTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\AttributeChoiceTranslation
+                fields: [title]
+            actions:
+                admin_crud:
+                    templates: '@EkynaProduct/Admin/AttributeChoice'
+                admin_move_up: ~
+                admin_move_down: ~
+
+        attribute_set:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\AttributeSet
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\AttributeSetType
+            trans_domain: EkynaProduct
+            actions:
+                admin_crud:
+                    read: '@EkynaProduct/Admin/AttributeSet/read.html.twig'
+
+        attribute_slot:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\AttributeSlotInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\AttributeSlot
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSlotType
+            trans_domain: EkynaProduct
+
+        brand:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\BrandInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Brand
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\BrandRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\BrandRepository
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\BrandNormalizer
+            search:
+                class: Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository
+                global: true
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\BrandType
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\BrandTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BrandTranslation
+                fields: [title, description, slug]
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/Brand/_form.html.twig'
+                    read: '@EkynaProduct/Admin/Brand/read.html.twig'
+                admin_move_up: ~
+                admin_move_down: ~
+                admin_toggle:
+                    properties: visible
+                admin_tinymce: ~
+
+        bundle_choice:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BundleChoice
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceType
+            parent: ekyna_product.bundle_slot
+            trans_domain: EkynaProduct
+
+        bundle_choice_rule:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BundleChoiceRule
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceRuleType
+            parent: ekyna_product.bundle_choice
+            trans_domain: EkynaProduct
+            trans_prefix: bundle_rule
+
+        bundle_slot:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BundleSlot
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation
+                fields: [title, description]
+
+        bundle_slot_rule:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotRuleInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\BundleSlotRule
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotRuleType
+            parent: ekyna_product.bundle_slot
+            trans_domain: EkynaProduct
+            trans_prefix: bundle_rule
+
+        catalog:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\CatalogInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Catalog
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\CatalogRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\CatalogRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\CatalogType
+            trans_domain: EkynaProduct
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/Catalog/_form.html.twig'
+                    read: '@EkynaProduct/Admin/Catalog/read.html.twig'
+                Ekyna\Bundle\ProductBundle\Action\Admin\Catalog\PageFormAction:
+                    expose: true
+                Ekyna\Bundle\ProductBundle\Action\Admin\Catalog\RenderAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Catalog\RenderFromSaleAction: ~
+
+        category:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\CategoryInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Category
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\CategoryRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\CategoryRepository
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\CategoryNormalizer
+            search:
+                class: Ekyna\Bundle\ProductBundle\Service\Search\CategoryRepository
+                global: true
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Category\CategoryType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\CategoryType
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\CategoryTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\CategoryTranslation
+                fields: [title, description, slug]
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/Category/_form.html.twig'
+                    read: '@EkynaProduct/Admin/Category/read.html.twig'
+                admin_toggle:
+                    properties: visible
+                admin_tinymce: ~
+                admin_tree:
+                    create_child:
+                        template: '@EkynaProduct/Admin/Category/create_child.html.twig'
+                        form_template: '@EkynaProduct/Admin/Category/_form.html.twig'
+
+        component:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ComponentInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Component
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Component\ComponentType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        cross_selling:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\CrossSellingInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\CrossSelling
+            form: Ekyna\Bundle\ProductBundle\Form\Type\CrossSelling\CrossSellingType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        option:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\OptionInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Option
+            repository:
+                class: Ekyna\Bundle\ProductBundle\Repository\OptionRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Option\OptionType
+            parent: ekyna_product.option_group
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\OptionTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\OptionTranslation
+                fields: [title, description]
+
+        option_group:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\OptionGroup
+            repository:
+                class: Ekyna\Bundle\ProductBundle\Repository\OptionGroupRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Option\OptionGroupType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\OptionGroupTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation
+                fields: [title]
+
+        offer:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\OfferInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Offer
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\OfferRepository
+            trans_domain: EkynaProduct
+
+        price:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PriceInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Price
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\PriceRepository
+            trans_domain: EkynaProduct
+
+        pricing:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PricingInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Pricing
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\PricingRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Pricing\PricingType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\PricingType
+            trans_domain: EkynaProduct
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/Pricing/_form.html.twig'
+                    read: '@EkynaProduct/Admin/Pricing/read.html.twig'
+
+        pricing_rule:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\PricingRule
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Pricing\PricingRuleType
+            trans_domain: EkynaProduct
+
+        product:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Product
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\ProductRepository
+            factory:
+                interface: Ekyna\Bundle\ProductBundle\Factory\ProductFactoryInterface
+                class: Ekyna\Bundle\ProductBundle\Factory\ProductFactory
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\ProductNormalizer
+            search:
+                class: Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository
+                global: true
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\ProductType
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductTranslation
+                fields: [title, subTitle, attributesTitle, description, slug]
+            actions:
+                api_crud:
+                    search:
+                        parameters: [types]
+                admin_crud:
+                    templates: '@EkynaProduct/Admin/Product'
+                    summary: true
+                    create: false
+                    read:
+                        expose: true
+                admin_toggle:
+                    properties: visible
+                admin_tinymce: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\AttributesFormAction:
+                    expose: true
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\CreateAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\ConvertAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\DuplicateAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\ExportAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\GenerateReferenceAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\InvalidateOffersAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\MoveUpAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\MoveDownAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\CreateSupplierProductAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\ExportOrdersAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\LabelAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\RefreshStockAction: ~
+
+        product_adjustment:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductAdjustmentInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductAdjustment
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductAdjustmentType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        product_attribute:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductAttribute
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        product_media:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductMedia
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        product_mention:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductMentionInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductMention
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductMentionType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+            translation:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductMentionTranslationInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductMentionTranslation
+                fields: [content]
+
+        product_reference:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductReference
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\ProductReferenceRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\ProductReferenceRepository
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\ProductReferenceNormalizer
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductReferenceType
+            parent: ekyna_product.product
+            trans_domain: EkynaProduct
+
+        product_stock_unit:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductStockUnitInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductStockUnit
+            repository:
+                class: Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductStockUnitType
+            parent: ekyna_product.product
+            trans_domain: EkynaCommerce
+            trans_prefix: stock_unit
+            event:
+                priority: -1280
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/ProductStockUnit/_form.html.twig'
+                    read: '@EkynaProduct/Admin/ProductStockUnit/read.html.twig'
+                Ekyna\Bundle\CommerceBundle\Action\Admin\StockUnit\CreateAdjustmentAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\StockUnit\UpdateAdjustmentAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\StockUnit\DeleteAdjustmentAction: ~
+
+        special_offer:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\SpecialOffer
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\SpecialOffer\SpecialOfferType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\SpecialOfferType
+            trans_domain: EkynaProduct
+            actions:
+                admin_crud:
+                    form: '@EkynaProduct/Admin/SpecialOffer/_form.html.twig'
+                    read: '@EkynaProduct/Admin/SpecialOffer/read.html.twig'
+                admin_toggle:
+                    properties: enabled
+
+
+

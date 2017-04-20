@@ -16,8 +16,8 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="quantity" column="quantity" type="decimal" precision="7" scale="5" nullable="false"/>
-        <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="quantity" column="quantity" type="php_decimal" precision="7" scale="5" nullable="false"/>
+        <field name="netPrice" column="net_price" type="php_decimal" precision="10" scale="5" nullable="true"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="parent" inversed-by="components">

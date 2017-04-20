@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
@@ -14,67 +16,25 @@ use Ekyna\Component\Resource\Model as RM;
  */
 interface AttributeChoiceInterface extends MediaSubjectInterface, RM\SortableInterface, RM\TranslatableInterface
 {
-    /**
-     * Returns the attribute.
-     *
-     * @return AttributeInterface
-     */
-    public function getAttribute();
+    public function getAttribute(): ?AttributeInterface;
 
-    /**
-     * Sets the attribute.
-     *
-     * @param AttributeInterface $attribute
-     *
-     * @return $this|AttributeChoiceInterface
-     */
-    public function setAttribute(AttributeInterface $attribute = null);
+    public function setAttribute(?AttributeInterface $attribute): AttributeChoiceInterface;
 
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
 
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|AttributeChoiceInterface
-     */
-    public function setName($name);
+    public function setName(?string $name): AttributeChoiceInterface;
 
-    /**
-     * Returns the color.
-     *
-     * @return string
-     */
-    public function getColor();
+    public function getColor(): ?string;
 
-    /**
-     * Sets the color.
-     *
-     * @param string $color
-     *
-     * @return $this|AttributeChoiceInterface
-     */
-    public function setColor($color);
+    public function setColor(?string $color): AttributeChoiceInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Returns the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|AttributeChoiceInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(string $title): AttributeChoiceInterface;
 }

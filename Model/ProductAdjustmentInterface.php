@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Commerce\Common\Model\AdjustmentInterface;
@@ -11,19 +13,7 @@ use Ekyna\Component\Commerce\Common\Model\AdjustmentInterface;
  */
 interface ProductAdjustmentInterface extends AdjustmentInterface
 {
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
     public function getProduct(): ?ProductInterface;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|ProductAdjustmentInterface
-     */
-    public function setProduct(ProductInterface $product = null): ProductAdjustmentInterface;
+    public function setProduct(?ProductInterface $product): ProductAdjustmentInterface;
 }

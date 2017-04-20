@@ -13,8 +13,8 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="3" nullable="false"/>
-        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
+        <field name="minQuantity" column="min_quantity" type="php_decimal" precision="7" scale="3" nullable="false"/>
+        <field name="percent" column="percent" type="php_decimal" precision="4" scale="2" nullable="false"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\PricingInterface"
                      field="pricing" inversed-by="rules">

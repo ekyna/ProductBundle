@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
 use Ekyna\Bundle\CmsBundle\Model\TagInterface;
@@ -8,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class TagChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -15,17 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TagChoiceType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'    => 'ekyna_cms.tag.label.plural',
-                'mapped'   => false,
-                'tags'     => [],
-                'choices'  => function (Options $options, $value) {
+                'label'              => t('tag.label.plural', [], 'EkynaCms'),
+                'mapped'             => false,
+                'tags'               => [],
+                'choices'            => function (Options $options, $value) {
                     if (empty($value)) {
                         $tags = $options['tags'];
                         /** @var TagInterface $tag */
@@ -36,9 +37,9 @@ class TagChoiceType extends AbstractType
 
                     return $value;
                 },
-                'expanded' => true,
-                'multiple' => true,
-                'required' => false,
+                'expanded'           => true,
+                'multiple'           => true,
+                'required'           => false,
             ])
             ->setAllowedTypes('tags', 'array')
             ->setAllowedValues('tags', function ($value) {
@@ -56,10 +57,7 @@ class TagChoiceType extends AbstractType
             });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

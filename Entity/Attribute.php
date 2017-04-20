@@ -1,51 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model AS RM;
+use Ekyna\Component\Resource\Model as RM;
 
 /**
  * Class AttributeGroup
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method Model\AttributeTranslationInterface translate($locale = null, $create = false)
+ * @method Model\AttributeTranslationInterface translate(string $locale = null, bool $create = false)
  */
 class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterface
 {
     use RM\SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int    $id     = null;
+    protected ?string $name   = null;
+    protected ?string $type   = null;
+    protected array   $config = [];
+    /** @var Collection<Model\AttributeChoiceInterface> */
+    protected Collection $choices;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var ArrayCollection|Model\AttributeChoiceInterface[]
-     */
-    protected $choices;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct();
@@ -53,116 +34,75 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
         $this->choices = new ArrayCollection();
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New attribute';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function setName(?string $name): Model\AttributeInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setType($type)
+    public function setType(?string $type): Model\AttributeInterface
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setConfig(array $config)
+    public function setConfig(array $config): Model\AttributeInterface
     {
         $this->config = $config;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): Model\AttributeInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getChoices()
+    public function getChoices(): Collection
     {
         return $this->choices;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasChoice(Model\AttributeChoiceInterface $choice)
+    public function hasChoice(Model\AttributeChoiceInterface $choice): bool
     {
         return $this->choices->contains($choice);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addChoice(Model\AttributeChoiceInterface $choice)
+    public function addChoice(Model\AttributeChoiceInterface $choice): Model\AttributeInterface
     {
         if (!$this->hasChoice($choice)) {
             $this->choices->add($choice);
@@ -172,10 +112,7 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeChoice(Model\AttributeChoiceInterface $choice)
+    public function removeChoice(Model\AttributeChoiceInterface $choice): Model\AttributeInterface
     {
         if ($this->hasChoice($choice)) {
             $this->choices->removeElement($choice);
@@ -185,19 +122,13 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setChoices(ArrayCollection $choices)
+    public function setChoices(Collection $choices): Model\AttributeInterface
     {
         $this->choices = $choices;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getTranslationClass(): string
     {
         return AttributeTranslation::class;

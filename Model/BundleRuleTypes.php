@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
@@ -9,22 +11,18 @@ use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BundleRuleTypes extends AbstractConstants
+final class BundleRuleTypes extends AbstractConstants
 {
-    const HIDE_IF_ALL     = 'hide_if_all';
-    const HIDE_IF_ANY     = 'hide_if_any';
-    const SHOW_IF_ALL     = 'show_if_all';
-    const SHOW_IF_ANY     = 'show_if_any';
-    const REQUIRED_IF_ALL = 'required_if_all';
-    const REQUIRED_IF_ANY = 'required_if_any';
+    public const HIDE_IF_ALL     = 'hide_if_all';
+    public const HIDE_IF_ANY     = 'hide_if_any';
+    public const SHOW_IF_ALL     = 'show_if_all';
+    public const SHOW_IF_ANY     = 'show_if_any';
+    public const REQUIRED_IF_ALL = 'required_if_all';
+    public const REQUIRED_IF_ANY = 'required_if_any';
 
-
-    /**
-     * @inheritDoc
-     */
     public static function getConfig(): array
     {
-        $prefix = 'ekyna_product.bundle_rule.type.';
+        $prefix = 'bundle_rule.type.';
 
         return [
             self::HIDE_IF_ALL     => [$prefix . self::HIDE_IF_ALL],
@@ -36,9 +34,11 @@ class BundleRuleTypes extends AbstractConstants
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
+    public static function getTranslationDomain(): ?string
+    {
+        return 'EkynaProduct';
+    }
+
     public static function getTheme(string $constant): ?string
     {
         return null;
@@ -47,7 +47,7 @@ class BundleRuleTypes extends AbstractConstants
     /**
      * Returns the "* if all" types.
      *
-     * @return array
+     * @return array<string>
      */
     public static function getIfAllTypes(): array
     {
@@ -57,7 +57,7 @@ class BundleRuleTypes extends AbstractConstants
     /**
      * Returns the "* if any" types.
      *
-     * @return array
+     * @return array<string>
      */
     public static function getIfAnyTypes(): array
     {

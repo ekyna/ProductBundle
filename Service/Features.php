@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service;
 
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
+use Ekyna\Component\Commerce\Exception\LogicException;
+
+use function array_replace_recursive;
+use function array_shift;
+use function count;
+use function explode;
 
 /**
  * Class Features
@@ -16,28 +24,23 @@ class Features
     //public const COMPATIBILITY  = 'compatibility'; // TODO
     //public const CROSS_SELLING  = 'compatibility'; // TODO
 
-    /**
-     * @var array
-     */
-    private $config;
+    private const DEFAULTS = [
+        self::COMPONENT        => [
+            'enabled' => false,
+        ],
+        self::GTIN13_GENERATOR => [
+            'enabled'      => false,
+            'manufacturer' => null,
+        ],
+    ];
 
+    private array $config;
 
-    /**
-     * Constructor.
-     *
-     * @param array $config
-     */
     public function __construct(array $config)
     {
-        $this->config = array_replace([
-            self::COMPONENT        => [
-                'enabled' => false,
-            ],
-            self::GTIN13_GENERATOR => [
-                'enabled'      => false,
-                'manufacturer' => null,
-            ],
-        ], $config);
+        // Must be kept in sync with:
+        /** @see \Ekyna\Bundle\ProductBundle\DependencyInjection\Configuration::addFeatureSection */
+        $this->config = array_replace_recursive(self::DEFAULTS, $config);
     }
 
     /**
@@ -54,5 +57,37 @@ class Features
         }
 
         return $this->config[$feature]['enabled'];
+    }
+
+    /**
+     * Returns the feature configuration.
+     *
+     * @param string $feature
+     *
+     * @return mixed
+     */
+    public function getConfig(string $feature)
+    {
+        $paths = explode('.', $feature);
+
+        if (1 === count($paths)) {
+            $paths[] = 'enabled';
+        }
+
+        $config = $this->config;
+
+        while ($path = array_shift($paths)) {
+            if (!isset($config[$path])) {
+                throw new LogicException("Unknown feature '$feature'.");
+            }
+
+            $config = $config[$path];
+        }
+
+        if (!isset($config)) {
+            throw new LogicException("Unexpected feature '$feature'.");
+        }
+
+        return $config;
     }
 }

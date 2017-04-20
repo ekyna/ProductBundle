@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\TinymceType;
 use Ekyna\Bundle\ProductBundle\Entity\ProductTranslation;
+use Ekyna\Bundle\UiBundle\Form\Type\TinymceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductTranslationType
@@ -16,38 +20,32 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductTranslationType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $titleOptions = [
-            'label' => 'ekyna_core.field.title',
+            'label' => t('field.title', [], 'EkynaUi'),
         ];
         if ($options['variant_mode']) {
             $titleOptions['required'] = false;
             $titleOptions['attr'] = [
-                'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
             ];
         }
 
         $builder
             ->add('title', TextType::class, $titleOptions)
             ->add('subTitle', TextType::class, [
-                'label'    => 'ekyna_core.field.subtitle',
+                'label'    => t('field.subtitle', [], 'EkynaUi'),
                 'required' => false,
             ])
             ->add('description', TinymceType::class, [
-                'label'    => 'ekyna_core.field.description',
+                'label'    => t('field.description', [], 'EkynaUi'),
                 'theme'    => 'simple',
                 'required' => false,
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([

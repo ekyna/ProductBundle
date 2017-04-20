@@ -8,6 +8,7 @@
 
     <mapped-superclass
             name="Ekyna\Bundle\ProductBundle\Entity\Category"
+            repository-class="Gedmo\Tree\Entity\Repository\NestedTreeRepository"
             table="product_category">
 
         <id name="id" column="id" type="integer">

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,10 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class OptionEvents
 {
-    const INSERT = 'ekyna_product.option.insert';
-    const UPDATE = 'ekyna_product.option.update';
-    const DELETE = 'ekyna_product.option.delete';
-
+    public const INSERT = 'ekyna_product.option.insert';
+    public const UPDATE = 'ekyna_product.option.update';
+    public const DELETE = 'ekyna_product.option.delete';
 
     /**
      * Disabled constructor.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
@@ -18,129 +20,80 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     use MediaSubjectTrait;
     use RM\SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                      $id        = null;
+    protected ?Model\AttributeInterface $attribute = null;
+    protected ?string                   $name      = null;
+    protected ?string                   $color     = null;
 
-    /**
-     * @var Model\AttributeInterface
-     */
-    protected $attribute;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $color;
-
-
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New attribute choice';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttribute()
+    public function getAttribute(): ?Model\AttributeInterface
     {
         return $this->attribute;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setAttribute(Model\AttributeInterface $attribute = null)
+    public function setAttribute(?Model\AttributeInterface $attribute): Model\AttributeChoiceInterface
     {
-        if ($attribute !== $this->attribute) {
-            if ($previous = $this->attribute) {
-                $this->attribute = null;
-                $previous->removeChoice($this);
-            }
+        if ($attribute === $this->attribute) {
+            return $this;
+        }
 
-            if ($this->attribute = $attribute) {
-                $attribute->addChoice($this);
-            }
+        if ($previous = $this->attribute) {
+            $this->attribute = null;
+            $previous->removeChoice($this);
+        }
+
+        if ($this->attribute = $attribute) {
+            $attribute->addChoice($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function setName(?string $name): Model\AttributeChoiceInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getColor()
+    public function getColor(): ?string
     {
         return $this->color;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setColor($color)
+    public function setColor(?string $color): Model\AttributeChoiceInterface
     {
         $this->color = $color;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): Model\AttributeChoiceInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getTranslationClass(): string
     {
         return AttributeChoiceTranslation::class;

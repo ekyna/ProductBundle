@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Comparable;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
@@ -13,77 +15,35 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 interface AttributeSetInterface extends ResourceInterface, Comparable
 {
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
+
+    public function setName(?string $name): AttributeSetInterface;
 
     /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|AttributeSetInterface
+     * @return Collection<AttributeSlotInterface>
      */
-    public function setName($name);
+    public function getSlots(): Collection;
+
+    public function hasSlot(AttributeSlotInterface $slot): bool;
+
+    public function addSlot(AttributeSlotInterface $slot): AttributeSetInterface;
+
+    public function removeSlot(AttributeSlotInterface $slot): AttributeSetInterface;
 
     /**
-     * Returns the slot.
+     * @param Collection<AttributeSlotInterface> $slots
      *
-     * @return ArrayCollection|AttributeSlotInterface[]
-     */
-    public function getSlots();
-
-    /**
-     * Returns whether the set has the slot or not.
-     *
-     * @param AttributeSlotInterface $slot
-     *
-     * @return bool
-     */
-    public function hasSlot(AttributeSlotInterface $slot);
-
-    /**
-     * Adds the slot.
-     *
-     * @param AttributeSlotInterface $slot
-     *
-     * @return $this|AttributeSetInterface
-     */
-    public function addSlot(AttributeSlotInterface $slot);
-
-    /**
-     * Removes the slot.
-     *
-     * @param AttributeSlotInterface $slot
-     *
-     * @return $this|AttributeSetInterface
-     */
-    public function removeSlot(AttributeSlotInterface $slot);
-
-    /**
-     * Sets the slots.
-     *
-     * @param ArrayCollection|AttributeSlotInterface[] $slots
-     *
-     * @return $this|AttributeSetInterface
      * @internal
      */
-    public function setSlots(ArrayCollection $slots);
+    public function setSlots(Collection $slots): AttributeSetInterface;
 
     /**
      * Returns whether this attribute set has at least one required slot.
-     *
-     * @return bool
      */
-    public function hasRequiredSlot();
+    public function hasRequiredSlot(): bool;
 
     /**
      * Returns whether this attribute set has at least one naming slot.
-     *
-     * @return bool
      */
-    public function hasNamingSlot();
+    public function hasNamingSlot(): bool;
 }

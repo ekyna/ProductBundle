@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\CollectionToValueTransformer;
@@ -15,10 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SelectAttributeType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var AttributeInterface $attribute */
         $attribute = $options['attribute'];

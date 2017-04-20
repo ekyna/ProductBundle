@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductMentionInterface;
 use Ekyna\Component\Commerce\Common\Entity\AbstractMention;
 
 /**
@@ -10,42 +13,28 @@ use Ekyna\Component\Commerce\Common\Entity\AbstractMention;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductMention extends AbstractMention
+class ProductMention extends AbstractMention implements ProductMentionInterface
 {
-    /**
-     * @var ProductInterface|null
-     */
-    private $product;
+    private ?ProductInterface $product = null;
 
-
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface|null
-     */
-    public function getProduct(): ProductInterface
+    public function getProduct(): ?ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface|null $product
-     *
-     * @return ProductMention
-     */
-    public function setProduct(ProductInterface $product = null): ProductMention
+    public function setProduct(?ProductInterface $product): ProductMentionInterface
     {
-        if ($this->product !== $product) {
-            if ($previous = $this->product) {
-                $this->product = null;
-                $previous->removeMention($this);
-            }
+        if ($this->product === $product) {
+            return $this;
+        }
 
-            if ($this->product = $product) {
-                $this->product->addMention($this);
-            }
+        if ($previous = $this->product) {
+            $this->product = null;
+            $previous->removeMention($this);
+        }
+
+        if ($this->product = $product) {
+            $this->product->addMention($this);
         }
 
         return $this;

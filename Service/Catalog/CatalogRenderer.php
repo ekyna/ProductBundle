@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Catalog;
 
 use Behat\Transliterator\Transliterator;
-use Ekyna\Bundle\CommerceBundle\Service\Document\PdfGenerator;
-use Ekyna\Bundle\ProductBundle\Entity\Catalog;
+use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
+use Ekyna\Component\Resource\Exception\PdfException;
+use Ekyna\Component\Resource\Helper\PdfGenerator;
+use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Class CatalogRenderer
@@ -26,57 +30,23 @@ class CatalogRenderer
     public const FORMAT_HTML  = 'HTML';
     public const FORMAT_EMAIL = 'EMail';
 
-    /**
-     * @var CatalogRegistry
-     */
-    protected $registry;
+    protected CatalogRegistry $registry;
+    protected Environment $twig;
+    protected PdfGenerator $pdfGenerator;
+    protected SubjectHelperInterface $subjectHelper;
+    protected string $logoPath;
+    protected bool $debug;
 
-    /**
-     * @var EngineInterface
-     */
-    protected $templating;
-
-    /**
-     * @var PdfGenerator
-     */
-    protected $pdfGenerator;
-
-    /**
-     * @var SubjectHelperInterface
-     */
-    protected $subjectHelper;
-
-    /**
-     * @var string
-     */
-    protected $logoPath;
-
-    /**
-     * @var bool
-     */
-    protected $debug;
-
-
-    /**
-     * Constructor.
-     *
-     * @param CatalogRegistry        $registry
-     * @param EngineInterface        $templating
-     * @param PdfGenerator           $pdfGenerator
-     * @param SubjectHelperInterface $subjectHelper
-     * @param string                 $logoPath
-     * @param bool                   $debug
-     */
     public function __construct(
-        CatalogRegistry $registry,
-        EngineInterface $templating,
-        PdfGenerator $pdfGenerator,
+        CatalogRegistry        $registry,
+        Environment            $twig,
+        PdfGenerator           $pdfGenerator,
         SubjectHelperInterface $subjectHelper,
-        string $logoPath,
-        bool $debug = false
+        string                 $logoPath,
+        bool                   $debug = false
     ) {
         $this->registry = $registry;
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->pdfGenerator = $pdfGenerator;
         $this->subjectHelper = $subjectHelper;
         $this->logoPath = $logoPath;
@@ -86,19 +56,14 @@ class CatalogRenderer
     /**
      * Returns the catalog response.
      *
-     * @param Catalog      $catalog
-     * @param Request|null $request
-     *
-     * @return Response
-     *
-     * @throws \Ekyna\Component\Commerce\Exception\PdfException
+     * @throws PdfException
      */
-    public function respond(Catalog $catalog, Request $request = null)
+    public function respond(CatalogInterface $catalog, Request $request = null): Response
     {
         $response = new Response();
 
         $format = $catalog->getFormat();
-        $download = $request ? (bool)$request->query->get('download', 0) : false;
+        $download = $request && $request->query->get('download', 0);
 
         if ($format === static::FORMAT_PDF) {
             $response->headers->add(['Content-Type' => 'application/pdf']);
@@ -133,13 +98,9 @@ class CatalogRenderer
     /**
      * Renders the catalog.
      *
-     * @param Catalog $catalog
-     *
-     * @return string
-     *
-     * @throws \Ekyna\Component\Commerce\Exception\PdfException
+     * @throws PdfException
      */
-    public function render(Catalog $catalog)
+    public function render(CatalogInterface $catalog): string
     {
         $template = 'render';
         $theme = $this->registry->getTheme($catalog->getTheme())['path'];
@@ -148,7 +109,7 @@ class CatalogRenderer
             $this->buildPages($catalog);
         }
 
-        $content = $this->templating->render('@EkynaProduct/Catalog/render.html.twig', [
+        $content = $this->twig->render('@EkynaProduct/Catalog/render.html.twig', [
             'catalog'   => $catalog,
             'theme'     => $theme,
             'template'  => $template,
@@ -173,10 +134,8 @@ class CatalogRenderer
 
     /**
      * Builds the catalog pages from sale items list.
-     *
-     * @param Catalog $catalog
      */
-    private function buildPages(Catalog $catalog): void
+    private function buildPages(CatalogInterface $catalog): void
     {
         $products = [];
 
@@ -191,12 +150,12 @@ class CatalogRenderer
         }
 
         if (empty($products)) {
-            throw new \LogicException("No product found.");
+            throw new LogicException('No product found.');
         }
 
         $max = $this->registry->getTemplate($catalog->getTemplate())['slots'];
         if (0 >= $max) {
-            throw new \LogicException("Template does not have products slots.");
+            throw new LogicException('Template does not have products slots.');
         }
 
         $count = 0;
@@ -218,8 +177,6 @@ class CatalogRenderer
 
     /**
      * Validates the format.
-     *
-     * @param string $format
      */
     protected function validateFormat(string $format): void
     {
@@ -230,8 +187,6 @@ class CatalogRenderer
 
     /**
      * Returns the formats
-     *
-     * @return array
      */
     public static function getFormats(): array
     {

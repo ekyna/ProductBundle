@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
@@ -13,10 +15,6 @@ class ConfigurableUpdater extends AbstractUpdater
 {
     /**
      * Updates the configurable min price.
-     *
-     * @param Model\ProductInterface $bundle
-     *
-     * @return bool
      */
     public function updateMinPrice(Model\ProductInterface $bundle): bool
     {
@@ -24,7 +22,7 @@ class ConfigurableUpdater extends AbstractUpdater
 
         $minPrice = $this->priceCalculator->calculateConfigurableMinPrice($bundle);
 
-        if (is_null($bundle->getMinPrice()) || 0 !== bccomp($bundle->getMinPrice(), $minPrice, 5)) {
+        if (!$bundle->getMinPrice()->equals($minPrice)) {
             $bundle->setMinPrice($minPrice);
 
             return true;

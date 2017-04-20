@@ -1,0 +1,17 @@
+{% extends '@EkynaAdmin/Entity/Crud/create.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+
+{% block title %}
+    {{ parent() }} {{ resource|product_type_badge }}
+{% endblock title %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+    {{ macros.export_products_button() }}
+{% endblock actions %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/form.css')) }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}

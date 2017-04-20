@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection\Compiler;
 
-use Ekyna\Bundle\AdminBundle\Menu\MenuPool;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class AdminMenuPass
@@ -13,116 +14,134 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class AdminMenuPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(MenuPool::class)) {
+        if (!$container->hasDefinition('ekyna_admin.menu.pool')) {
             return;
         }
 
-        $pool = $container->getDefinition(MenuPool::class);
+        $pool = $container->getDefinition('ekyna_admin.menu.pool');
 
         // CATALOG
 
-        $pool->addMethodCall('createGroup', [[
-            'name'     => 'catalog',
-            'label'    => 'ekyna_product.menu',
-            'icon'     => 'cube',
-            'position' => 12,
-        ]]);
+        $pool->addMethodCall('createGroup', [
+            [
+                'name'     => 'catalog',
+                'label'    => 'label',
+                'domain'   => 'EkynaProduct',
+                'icon'     => 'cube',
+                'position' => 12,
+            ],
+        ]);
 
         // Products
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'products',
-            'route'    => 'ekyna_product_product_admin_list',
-            'label'    => 'ekyna_product.product.label.plural',
-            'resource' => 'ekyna_product_product',
-            'position' => 1,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'products',
+                'resource' => 'ekyna_product.product',
+                'position' => 1,
+            ],
+        ]);
 
         // Categories
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'categories',
-            'route'    => 'ekyna_product_category_admin_list',
-            'label'    => 'ekyna_product.category.label.plural',
-            'resource' => 'ekyna_product_category',
-            'position' => 2,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'categories',
+                'resource' => 'ekyna_product.category',
+                'position' => 2,
+            ],
+        ]);
 
         // Brands
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'brands',
-            'route'    => 'ekyna_product_brand_admin_list',
-            'label'    => 'ekyna_product.brand.label.plural',
-            'resource' => 'ekyna_product_brand',
-            'position' => 3,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'brands',
+                'resource' => 'ekyna_product.brand',
+                'position' => 3,
+            ],
+        ]);
 
         // Attribute sets
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'attribute_sets',
-            'route'    => 'ekyna_product_attribute_set_admin_list',
-            'label'    => 'ekyna_product.attribute_set.label.plural',
-            'resource' => 'ekyna_product_attribute_set',
-            'position' => 10,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'attribute_sets',
+                'resource' => 'ekyna_product.attribute_set',
+                'position' => 10,
+            ],
+        ]);
 
         // Attributes
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'attributes',
-            'route'    => 'ekyna_product_attribute_admin_list',
-            'label'    => 'ekyna_product.attribute.label.plural',
-            'resource' => 'ekyna_product_attribute',
-            'position' => 11,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'attributes',
+                'resource' => 'ekyna_product.attribute',
+                'position' => 11,
+            ],
+        ]);
 
         // Pricing
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'pricing',
-            'route'    => 'ekyna_product_pricing_admin_list',
-            'label'    => 'ekyna_product.pricing.label.plural',
-            'resource' => 'ekyna_product_pricing',
-            'position' => 70,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'pricing',
+                'resource' => 'ekyna_product.pricing',
+                'position' => 70,
+            ],
+        ]);
 
         // Special offers
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'special_offer',
-            'route'    => 'ekyna_product_special_offer_admin_list',
-            'label'    => 'ekyna_product.special_offer.label.plural',
-            'resource' => 'ekyna_product_special_offer',
-            'position' => 71,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'special_offer',
+                'resource' => 'ekyna_product.special_offer',
+                'position' => 71,
+            ],
+        ]);
 
         // Inventory
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'inventory',
-            'route'    => 'ekyna_product_inventory_admin_index',
-            'label'    => 'ekyna_product.inventory.title',
-            'resource' => 'ekyna_product_product',
-            'position' => 80,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'inventory',
+                'route'    => 'admin_ekyna_product_inventory_index',
+                'label'    => 'inventory.title',
+                'domain'   => 'EkynaProduct',
+                'resource' => 'ekyna_product.product',
+                'position' => 90,
+            ],
+        ]);
 
         // Highlight
-        $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'highlight',
-            'route'    => 'ekyna_product_highlight_admin_index',
-            'label'    => 'ekyna_product.highlight.title',
-            'resource' => 'ekyna_product_product',
-            'position' => 81,
-        ]]);
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'highlight',
+                'route'    => 'admin_ekyna_product_highlight_index',
+                'label'    => 'highlight.title',
+                'domain'   => 'EkynaProduct',
+                'resource' => 'ekyna_product.product',
+                'position' => 91,
+            ],
+        ]);
 
-        if ($container->getParameter('ekyna_product.catalog_enabled')) {
-            // Catalog
-            $pool->addMethodCall('createEntry', ['catalog', [
-                'name'     => 'catalog',
-                'route'    => 'ekyna_product_catalog_admin_list',
-                'label'    => 'ekyna_product.catalog.label.plural',
-                'resource' => 'ekyna_product_catalog',
-                'position' => 90,
-            ]]);
+        if (!$container->getParameter('ekyna_product.catalog_enabled')) {
+            return;
         }
+
+        // Catalog
+        $pool->addMethodCall('createEntry', [
+            'catalog',
+            [
+                'name'     => 'catalog',
+                'resource' => 'ekyna_product.catalog',
+                'position' => 80,
+            ],
+        ]);
     }
 }

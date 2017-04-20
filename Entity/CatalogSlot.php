@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -11,141 +13,70 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  */
 class CatalogSlot
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int              $id      = null;
+    private ?CatalogPage      $page    = null;
+    private ?ProductInterface $product = null;
+    private ?int              $number  = null;
+    private array             $options;
 
-    /**
-     * @var CatalogPage
-     */
-    private $page;
-
-    /**
-     * @var ProductInterface
-     */
-    private $product;
-
-    /**
-     * @var int
-     */
-    private $number;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-
-    /**
-     * Returns the id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Returns the page.
-     *
-     * @return CatalogPage
-     */
-    public function getPage()
+    public function getPage(): ?CatalogPage
     {
         return $this->page;
     }
 
-    /**
-     * Sets the page.
-     *
-     * @param CatalogPage $page
-     *
-     * @return CatalogSlot
-     */
-    public function setPage(CatalogPage $page = null)
+    public function setPage(?CatalogPage $page): CatalogSlot
     {
-        if ($page !== $this->page) {
-            if ($previous = $this->page) {
-                $this->page = null;
-                $previous->removeSlot($this);
-            }
+        if ($page === $this->page) {
+            return $this;
+        }
 
-            if ($this->page = $page) {
-                $this->page->addSlot($this);
-            }
+        if ($previous = $this->page) {
+            $this->page = null;
+            $previous->removeSlot($this);
+        }
+
+        if ($this->page = $page) {
+            $this->page->addSlot($this);
         }
 
         return $this;
     }
 
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct()
+    public function getProduct(): ?ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return CatalogSlot
-     */
-    public function setProduct(ProductInterface $product = null)
+    public function setProduct(?ProductInterface $product): CatalogSlot
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * Returns the number.
-     *
-     * @return int
-     */
-    public function getNumber()
+    public function getNumber(): ?int
     {
         return $this->number;
     }
 
-    /**
-     * Sets the number.
-     *
-     * @param int $number
-     *
-     * @return CatalogSlot
-     */
-    public function setNumber($number)
+    public function setNumber(?int $number): CatalogSlot
     {
         $this->number = $number;
 
         return $this;
     }
 
-    /**
-     * Returns the options.
-     *
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * Sets the options.
-     *
-     * @param array $options
-     *
-     * @return CatalogSlot
-     */
-    public function setOptions(array $options = [])
+    public function setOptions(array $options = []): CatalogSlot
     {
         $this->options = $options;
 

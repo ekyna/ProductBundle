@@ -26,8 +26,8 @@
 
         <field name="designation" column="designation" type="string" length="255" nullable="true"/>
         <field name="reference" column="reference" type="string" length="32" nullable="true"/>
-        <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
-        <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="weight" column="weight"  type="php_decimal" precision="7" scale="3" nullable="true"/>
+        <field name="netPrice" column="net_price" type="php_decimal" precision="10" scale="5" nullable="true"/>
 
         <field name="cascade" column="is_cascade" type="boolean">
             <options>

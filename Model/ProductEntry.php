@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -9,59 +11,27 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 class ProductEntry
 {
-    /**
-     * @var ProductInterface
-     */
-    private $product;
+    private ?ProductInterface $product  = null;
+    private ?int              $position = null;
 
-    /**
-     * @var int
-     */
-    private $position;
-
-
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct()
+    public function getProduct(): ?ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return ProductEntry
-     */
-    public function setProduct(ProductInterface $product = null)
+    public function setProduct(ProductInterface $product = null): self
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }
 
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return ProductEntry
-     */
-    public function setPosition($position)
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
 

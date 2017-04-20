@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
@@ -16,57 +19,25 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  */
 class Pricing implements Model\PricingInterface
 {
-    const REL_GROUPS    = 'groups';
-    const REL_COUNTRIES = 'countries';
-    const REL_BRANDS    = 'brands';
+    public const REL_GROUPS    = 'groups';
+    public const REL_COUNTRIES = 'countries';
+    public const REL_BRANDS    = 'brands';
 
-    use TaggedEntityTrait,
-        TrackAssociationTrait;
+    use TaggedEntityTrait;
+    use TrackAssociationTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int                    $id          = null;
+    protected ?string                 $name        = null;
+    protected ?Model\ProductInterface $product     = null;
+    /** @var Collection<CustomerGroupInterface> */
+    protected Collection $groups;
+    /** @var Collection<CountryInterface> */
+    protected Collection $countries;
+    /** @var Collection<Model\BrandInterface> */
+    protected Collection $brands;
+    /** @var Collection<Model\PricingRuleInterface> */
+    protected Collection $rules;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $designation;
-
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $product;
-
-    /**
-     * @var ArrayCollection|CustomerGroupInterface[]
-     */
-    protected $groups;
-
-    /**
-     * @var ArrayCollection|CountryInterface[]
-     */
-    protected $countries;
-
-    /**
-     * @var ArrayCollection|Model\BrandInterface[]
-     */
-    protected $brands;
-
-    /**
-     * @var ArrayCollection|Model\PricingRuleInterface[]
-     */
-    protected $rules;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -75,80 +46,51 @@ class Pricing implements Model\PricingInterface
         $this->rules = new ArrayCollection();
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New pricing';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function setName(?string $name): Model\PricingInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setProduct(Model\ProductInterface $product = null)
+    public function setProduct(?Model\ProductInterface $product): Model\PricingInterface
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getGroups()
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasGroup(CustomerGroupInterface $group)
+    public function hasGroup(CustomerGroupInterface $group): bool
     {
         return $this->groups->contains($group);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addGroup(CustomerGroupInterface $group)
+    public function addGroup(CustomerGroupInterface $group): Model\PricingInterface
     {
         if (!$this->hasGroup($group)) {
             $this->groups->add($group);
@@ -157,10 +99,7 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeGroup(CustomerGroupInterface $group)
+    public function removeGroup(CustomerGroupInterface $group): Model\PricingInterface
     {
         if ($this->hasGroup($group)) {
             $this->groups->removeElement($group);
@@ -169,26 +108,17 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getCountries()
+    public function getCountries(): Collection
     {
         return $this->countries;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasCountry(CountryInterface $country)
+    public function hasCountry(CountryInterface $country): bool
     {
         return $this->countries->contains($country);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addCountry(CountryInterface $country)
+    public function addCountry(CountryInterface $country): Model\PricingInterface
     {
         if (!$this->hasCountry($country)) {
             $this->countries->add($country);
@@ -197,10 +127,7 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeCountry(CountryInterface $country)
+    public function removeCountry(CountryInterface $country): Model\PricingInterface
     {
         if ($this->hasCountry($country)) {
             $this->countries->removeElement($country);
@@ -209,26 +136,17 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBrands()
+    public function getBrands(): Collection
     {
         return $this->brands;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasBrand(Model\BrandInterface $brand)
+    public function hasBrand(Model\BrandInterface $brand): bool
     {
         return $this->brands->contains($brand);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addBrand(Model\BrandInterface $brand)
+    public function addBrand(Model\BrandInterface $brand): Model\PricingInterface
     {
         if (!$this->hasBrand($brand)) {
             $this->brands->add($brand);
@@ -237,10 +155,7 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeBrand(Model\BrandInterface $brand)
+    public function removeBrand(Model\BrandInterface $brand): Model\PricingInterface
     {
         if ($this->hasBrand($brand)) {
             $this->brands->removeElement($brand);
@@ -249,26 +164,17 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getRules()
+    public function getRules(): Collection
     {
         return $this->rules;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasRule(Model\PricingRuleInterface $rule)
+    public function hasRule(Model\PricingRuleInterface $rule): bool
     {
         return $this->rules->contains($rule);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addRule(Model\PricingRuleInterface $rule)
+    public function addRule(Model\PricingRuleInterface $rule): Model\PricingInterface
     {
         if (!$this->hasRule($rule)) {
             $this->rules->add($rule);
@@ -278,10 +184,7 @@ class Pricing implements Model\PricingInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeRule(Model\PricingRuleInterface $rule)
+    public function removeRule(Model\PricingRuleInterface $rule): Model\PricingInterface
     {
         if ($this->hasRule($rule)) {
             $this->rules->removeElement($rule);
@@ -294,15 +197,12 @@ class Pricing implements Model\PricingInterface
     /**
      * Post load lifecycle event handler.
      */
-    public function onPostLoad()
+    public function onPostLoad(): void
     {
         $this->takeSnapshot();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getAssociationsProperties()
+    public static function getAssociationsProperties(): array
     {
         return [
             static::REL_GROUPS,
@@ -311,10 +211,7 @@ class Pricing implements Model\PricingInterface
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getEntityTagPrefix()
+    public static function getEntityTagPrefix(): string
     {
         return 'ekyna_product.pricing';
     }

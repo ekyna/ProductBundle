@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model;
@@ -17,7 +19,7 @@ interface ProductFilterInterface
      *
      * @param ContextInterface $context
      */
-    public function setContext(ContextInterface $context);
+    public function setContext(ContextInterface $context): void;
 
     /**
      * Returns whether the product is available.

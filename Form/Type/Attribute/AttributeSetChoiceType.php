@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class AttributeSetChoiceType
@@ -13,39 +17,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AttributeSetChoiceType extends AbstractType
 {
-    /**
-     * @var string
-     */
-    private $attributeSetClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $attributeSetClass
-     */
-    public function __construct($attributeSetClass)
-    {
-        $this->attributeSetClass = $attributeSetClass;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label'       => 'ekyna_product.attribute_set.label.singular',
-            'class'       => $this->attributeSetClass,
-            'placeholder' => 'ekyna_core.value.choose',
+            'label'       => t('attribute_set.label.singular', [], 'EkynaProduct'),
+            'resource'    => 'ekyna_product.attribute_set',
+            'placeholder' => t('value.choose', [], 'EkynaUi'),
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
-        return ResourceType::class;
+        return ResourceChoiceType::class;
     }
 }

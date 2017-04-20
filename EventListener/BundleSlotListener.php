@@ -101,7 +101,7 @@ class BundleSlotListener implements EventSubscriberInterface
             return;
         }
 
-        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $bundle);
+        $this->persistenceHelper->scheduleEvent($bundle, ProductEvents::CHILD_PRICE_CHANGE);
     }
 
     /**
@@ -124,7 +124,7 @@ class BundleSlotListener implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function getSubscribedEvents()
     {

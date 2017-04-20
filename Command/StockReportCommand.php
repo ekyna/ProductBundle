@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use DateTime;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
-use Ekyna\Bundle\SettingBundle\Manager\SettingsManagerInterface;
+use Ekyna\Bundle\SettingBundle\Manager\SettingManagerInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 /**
  * Class StockReportCommand
@@ -19,71 +25,37 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class StockReportCommand extends Command
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $repository;
+    protected static $defaultName = 'ekyna:product:stock:report';
 
-    /**
-     * @var EngineInterface
-     */
-    private $templating;
-
-    /**
-     * @var SettingsManagerInterface
-     */
-    private $settings;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var \Swift_Mailer
-     */
-    private $mailer;
+    private ProductRepositoryInterface $repository;
+    private Environment                $twig;
+    private SettingManagerInterface    $settings;
+    private TranslatorInterface        $translator;
+    private MailerInterface            $mailer;
 
 
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     * @param EngineInterface            $templating
-     * @param SettingsManagerInterface   $settings
-     * @param TranslatorInterface        $translator
-     * @param \Swift_Mailer              $mailer
-     */
     public function __construct(
         ProductRepositoryInterface $repository,
-        EngineInterface $templating,
-        SettingsManagerInterface $settings,
-        TranslatorInterface $translator,
-        \Swift_Mailer $mailer
+        Environment                $twig,
+        SettingManagerInterface    $settings,
+        TranslatorInterface        $translator,
+        MailerInterface            $mailer
     ) {
+        parent::__construct();
+
         $this->repository = $repository;
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->settings = $settings;
         $this->translator = $translator;
         $this->mailer = $mailer;
-
-        parent::__construct();
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
-        $this
-            ->setName('ekyna:product:stock:report')
-            ->setDescription("Generates a report about out of stock products.");
+        $this->setDescription('Generates a report about out of stock products.');
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $modes = [
             CStockModes::MODE_AUTO,
@@ -98,22 +70,24 @@ class StockReportCommand extends Command
                 str_pad('.', 44 - mb_strlen($mode), '.', STR_PAD_LEFT)
             ));
 
-            if ($this->sendReport($mode)) {
-                $output->writeln('<info>sent</info>');
-            } else {
-                $output->writeln('none');
+            try {
+                if ($this->sendReport($mode)) {
+                    $output->writeln('<info>sent</info>');
+                } else {
+                    $output->writeln('none');
+                }
+            } catch (TransportExceptionInterface $e) {
+                return Command::FAILURE;
             }
         }
+
+        return Command::SUCCESS;
     }
 
     /**
-     * Sends the report.
-     *
-     * @param string $mode
-     *
-     * @return bool
+     * @throws TransportExceptionInterface
      */
-    private function sendReport($mode)
+    private function sendReport(string $mode): bool
     {
         $products = $this->repository->findOutOfStockProducts($mode);
 
@@ -121,15 +95,15 @@ class StockReportCommand extends Command
             return false;
         }
 
-        $title = $this->translator->trans('ekyna_product.email.stock_report.title', [
-            '%mode%' => $this->translator->trans(BStockModes::getLabel($mode)),
-        ]);
+        $title = $this->translator->trans('email.stock_report.title', [
+            '%mode%' => BStockModes::getLabel($mode)->trans($this->translator),
+        ], 'EkynaProduct');
 
-        $body = $this->templating->render('@EkynaProduct/Email/stock_report.html.twig', [
+        $body = $this->twig->render('@EkynaProduct/Email/stock_report.html.twig', [
             'title'    => $title,
             'mode'     => $mode,
             'products' => $products,
-            'today'    => (new \DateTime())->setTime(0, 0, 0, 0),
+            'today'    => (new DateTime())->setTime(0, 0),
             'locale'   => $this->translator->getLocale(),
         ]);
 
@@ -137,13 +111,15 @@ class StockReportCommand extends Command
         $fromName = $this->settings->getParameter('notification.from_name');
         $toEmail = $this->settings->getParameter('notification.to_emails');
 
-        $message = new \Swift_Message();
+        $message = new Email();
         $message
-            ->setSubject($title)
-            ->setFrom($fromEmail, $fromName)
-            ->setTo($toEmail)
-            ->setBody($body, 'text/html');
+            ->subject($title)
+            ->from($fromEmail, $fromName)
+            ->to($toEmail)
+            ->html($body);
 
-        return 0 < $this->mailer->send($message);
+        $this->mailer->send($message);
+
+        return true;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Ekyna\Bundle\ProductBundle\Service\Highlight\Highlight;
@@ -13,10 +15,7 @@ use Twig\TwigFunction;
  */
 class HighlightExtension extends AbstractExtension
 {
-    /**
-     * @inheritdoc
-     */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction(

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
@@ -17,6 +19,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class VariantChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\SaleItem
@@ -24,33 +28,16 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class VariantChoiceType extends AbstractType
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
+    private FormBuilder $formBuilder;
 
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     * @param FormBuilder $formHelper
-     */
     public function __construct(ItemBuilder $itemBuilder, FormBuilder $formHelper)
     {
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formHelper;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var Model\ProductInterface $variable */
         $variable = $options['variable'];
@@ -72,18 +59,12 @@ class VariantChoiceType extends AbstractType
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr']['data-parent'] = $view->parent->vars['full_name'];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = function (Options $options, $value) {
             /** @var Model\ProductInterface $variable */
@@ -94,7 +75,7 @@ class VariantChoiceType extends AbstractType
 
         $resolver
             ->setDefaults([
-                'label'           => 'ekyna_product.sale_item_configure.variant',
+                'label'           => t('sale_item_configure.variant', [], 'EkynaProduct'),
                 'property_path'   => 'data[' . ItemBuilder::VARIANT_ID . ']',
                 'constraints'     => [
                     new NotNull(),
@@ -132,18 +113,12 @@ class VariantChoiceType extends AbstractType
             });
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'sale_item_variant';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

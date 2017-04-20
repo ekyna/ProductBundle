@@ -1,0 +1,75 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {{ show_row(specialOffer.name, 'text', {
+            'label': t('field.name', [], 'EkynaUi')
+        }) }}
+        <div class="row">
+            <div class="col-md-4">
+                {{ show_row(specialOffer.percent, 'number', {
+                    'label': t('common.percent', [], 'EkynaProduct'),
+                    'label_col': 6,
+                    'widget_col': 6,
+                }) }}
+            </div>
+            <div class="col-md-4">
+                {{ show_row(specialOffer.minQuantity, 'number', {
+                    'label': t('common.min_quantity', [], 'EkynaProduct'),
+                    'label_col': 6,
+                    'widget_col': 6,
+                }) }}
+            </div>
+            <div class="col-md-4">
+                {{ show_row(specialOffer.stack, 'boolean', {
+                    'label': t('special_offer.field.stack', [], 'EkynaProduct'),
+                    'color': true,
+                    'label_col': 6,
+                    'widget_col': 6,
+                }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{ show_row(specialOffer.startsAt, 'datetime', {
+                    'label': t('field.start_date', [], 'EkynaUi'),
+                    'label_col': 6,
+                    'widget_col': 6,
+                    'time': false
+                }) }}
+            </div>
+            <div class="col-md-4">
+                {{ show_row(specialOffer.endsAt, 'datetime', {
+                    'label': t('field.end_date', [], 'EkynaUi'),
+                    'label_col': 6,
+                    'widget_col': 6,
+                    'time': false
+                }) }}
+            </div>
+            <div class="col-md-4">
+                {{ show_row(specialOffer.enabled, 'boolean', {
+                    'label': t('field.enabled', [], 'EkynaUi'),
+                    'color': true,
+                    'label_col': 6,
+                    'widget_col': 6,
+                }) }}
+            </div>
+        </div>
+        {{ show_row(specialOffer.products, 'resource', {
+            'label': t('product.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.product'
+        }) }}
+        {{ show_row(specialOffer.brands, 'resource', {
+            'label': t('brand.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.brand'
+        }) }}
+        {{ show_row(specialOffer.groups, 'resource', {
+            'label': t('customer_group.label.plural', [], 'EkynaCommerce'),
+            'resource': 'ekyna_commerce.customer_group'
+        }) }}
+        {{ show_row(specialOffer.countries, 'resource', {
+            'label': t('special_offer.field.countries', [], 'EkynaProduct'),
+            'resource': 'ekyna_commerce.country'
+        }) }}
+    </div>
+{%- endblock main_contents %}

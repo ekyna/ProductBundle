@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotTranslationInterface;
@@ -12,47 +14,27 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  */
 class BundleSlotTranslation extends AbstractTranslation implements BundleSlotTranslationInterface
 {
-    /**
-     * @var string
-     */
-    protected $title;
+    protected ?string $title = null;
+    protected ?string $description = null;
 
-    /**
-     * @var string
-     */
-    protected $description;
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): BundleSlotTranslationInterface
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): BundleSlotTranslationInterface
     {
         $this->description = $description;
 

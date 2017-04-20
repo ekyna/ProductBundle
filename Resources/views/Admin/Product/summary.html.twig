@@ -16,12 +16,12 @@
     <tr>
         <td>
             <dl class="dl-horizontal">
-                <dt>{{ 'ekyna_core.field.reference'|trans }}</dt>
+                <dt>{{ 'field.reference'|trans({}, 'EkynaUi') }}</dt>
                 <dd>{{ reference|first }}</dd>
-                <dt>{{ 'ekyna_commerce.field.net_price'|trans }}</dt>
+                <dt>{{ 'field.net_price'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>
-                    {{ net_price|localizedcurrency(commerce_default_currency) -}}
-                    &nbsp;(min&nbsp;{{ min_price|localizedcurrency(commerce_default_currency) }})
+                    {{ net_price|format_currency(commerce_default_currency) -}}
+                    &nbsp;(min&nbsp;{{ min_price|format_currency(commerce_default_currency) }})
                 </dd>
             </dl>
         </td>
@@ -30,7 +30,7 @@
         <dl class="dl-horizontal">
             {% for supplier in suppliers -%}
                 <dt>{{ supplier.name }}</dt>
-                <dd>{{ supplier.price|localizedcurrency(supplier.currency) }}</dd>
+                <dd>{{ supplier.net_price|format_currency(supplier.currency) }}</dd>
             {%- endfor %}
         </dl>
         {%- endif %}
@@ -41,37 +41,37 @@
     <tr>
         <td>
             <dl class="dl-horizontal">
-                <dt>{{ 'ekyna_core.field.mode'|trans }}</dt>
+                <dt>{{ 'field.mode'|trans({}, 'EkynaUi') }}</dt>
                 <dd>{{ mode_badge|raw }}</dd>
-                <dt>{{ 'ekyna_commerce.field.geocode'|trans }}</dt>
+                <dt>{{ 'field.geocode'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ geocode }}</dd>
-                <dt>{{ 'ekyna_commerce.field.in_stock'|trans }}</dt>
+                <dt>{{ 'field.in_stock'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ in }}</dd>
-                <dt>{{ 'ekyna_commerce.field.virtual_stock'|trans }}</dt>
+                <dt>{{ 'field.virtual_stock'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ virtual }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.replenishment_time'|trans }}</dt>
+                <dt>{{ 'stock_subject.field.replenishment_time'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ replenishment }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.quote_only'|trans }}</dt>
+                <dt>{{ 'stock_subject.field.quote_only'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ quote_only }}</dd>
-                <dt>{{ 'ekyna_core.field.visible'|trans }}</dt>
-                <dd>{{ ('ekyna_core.value.' ~ (visible ? 'yes' : 'no'))|trans }}</dd>
+                <dt>{{ 'field.visible'|trans({}, 'EkynaUi') }}</dt>
+                <dd>{{ ('value.' ~ (visible ? 'yes' : 'no'))|trans({}, 'EkynaUi') }}</dd>
             </dl>
         </td>
         <td>
             <dl class="dl-horizontal">
-                <dt>{{ 'ekyna_core.field.status'|trans }}</dt>
+                <dt>{{ 'field.status'|trans({}, 'EkynaUi') }}</dt>
                 <dd>{{ state_badge|raw }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.minimum_order_quantity'|trans }}</dt>
+                <dt>{{ 'stock_subject.field.minimum_order_quantity'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ moq }}</dd>
-                <dt>{{ 'ekyna_commerce.field.available_stock'|trans }}</dt>
+                <dt>{{ 'field.available_stock'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ available }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.floor'|trans }}</dt>
+                <dt>{{ 'stock_subject.field.floor'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ floor }}</dd>
-                <dt>{{ 'ekyna_commerce.field.replenishment_eda'|trans }}</dt>
+                <dt>{{ 'field.replenishment_eda'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ eda }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.end_of_life'|trans }}</dt>
+                <dt>{{ 'stock_subject.field.end_of_life'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ end_of_life }}</dd>
-                <dt>{{ 'ekyna_product.common.visibility'|trans }}</dt>
+                <dt>{{ 'common.visibility'|trans({}, 'EkynaProduct') }}</dt>
                 <dd>{{ visibility }}</dd>
             </dl>
         </td>

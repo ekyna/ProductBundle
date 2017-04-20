@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
 
 /**
  * Class AttributeRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeRepository extends TranslatableResourceRepository
+class AttributeRepository extends TranslatableRepository
 {
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'a';
     }

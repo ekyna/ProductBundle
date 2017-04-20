@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -15,17 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class AbstractStockCommand extends Command
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    protected $repository;
+    protected ProductRepositoryInterface $repository;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     */
     public function __construct(ProductRepositoryInterface $repository)
     {
         parent::__construct();
@@ -35,22 +29,13 @@ abstract class AbstractStockCommand extends Command
 
     /**
      * Finds the product for the given id.
-     *
-     * @param $productId
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface
      */
-    protected function findProduct($productId)
+    protected function findProduct(int $productId): ProductInterface
     {
-        $productId = intval($productId);
-        if (0 >= $productId) {
-            throw new InvalidArgumentException("Please provide an integer greater than zero as product id.");
-        }
-
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var ProductInterface $product */
         $product = $this->repository->find($productId);
         if (null === $product) {
-            throw new InvalidArgumentException("Product with id $productId not found.");
+            throw new InvalidArgumentException('Product not found.');
         }
 
         return $product;
@@ -59,13 +44,12 @@ abstract class AbstractStockCommand extends Command
     /**
      * Display the products stock table.
      *
-     * @param OutputInterface                                      $output
-     * @param \Ekyna\Bundle\ProductBundle\Model\ProductInterface[] $products
+     * @param array<ProductInterface> $products
      */
-    protected function stockTable(OutputInterface $output, array $products)
+    protected function stockTable(OutputInterface $output, array $products): void
     {
         $table = new Table($output);
-        $table->setHeaders(array('Mode', 'State', 'In', 'Available', 'Virtual', 'EDA'));
+        $table->setHeaders(['Mode', 'State', 'In', 'Available', 'Virtual', 'EDA']);
 
         foreach ($products as $product) {
             $eda = $product->getEstimatedDateOfArrival();
@@ -76,10 +60,10 @@ abstract class AbstractStockCommand extends Command
             $table->addRow([
                 $product->getStockMode(),
                 $product->getStockState(),
-                $product->getInStock(),
-                $product->getAvailableStock(),
-                $product->getVirtualStock(),
-                $eda
+                $product->getInStock()->toFixed(3),
+                $product->getAvailableStock()->toFixed(3),
+                $product->getVirtualStock()->toFixed(3),
+                $eda,
             ]);
         }
 

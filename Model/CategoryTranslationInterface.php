@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\TranslationInterface;
@@ -13,51 +15,21 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  */
 interface CategoryTranslationInterface extends TranslationInterface
 {
-    /**
-     * Returns the title.
-     *
-     * @return string
-     */
-    public function getTitle();
+    public function getTitle(): ?string;
 
-    /**
-     * Sets the title.
-     *
-     * @param string $title
-     *
-     * @return $this|CategoryTranslationInterface
-     */
-    public function setTitle($title);
+    public function setTitle(?string $title): CategoryTranslationInterface;
 
-    /**
-     * Returns the description.
-     *
-     * @return string
-     */
-    public function getDescription();
+    public function getDescription(): ?string;
 
-    /**
-     * Sets the description.
-     *
-     * @param string $description
-     *
-     * @return $this|CategoryTranslationInterface
-     */
-    public function setDescription($description);
+    public function setDescription(?string $description): CategoryTranslationInterface;
 
     /**
      * Returns the slug (auto-generated).
-     *
-     * @return string
      */
-    public function getSlug();
+    public function getSlug(): ?string;
 
     /**
      * Sets the slug (auto-generated).
-     *
-     * @param string $slug
-     *
-     * @return $this|CategoryTranslationInterface
      */
-    public function setSlug($slug);
+    public function setSlug(?string $slug): CategoryTranslationInterface;
 }

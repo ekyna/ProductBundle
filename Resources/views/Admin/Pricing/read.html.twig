@@ -1,0 +1,59 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="pricing-general">
+        {{ show_row(pricing.name, 'text', {
+            'label': t('field.name', [], 'EkynaUi')
+        }) }}
+        {#{{ show_row(pricing.designation, 'text', {
+            'label': t('field.designation', [], 'EkynaUi')
+        }) }}#}
+        {{ show_row(pricing.groups, 'resource', {
+            'label': t('customer_group.label.plural', [], 'EkynaCommerce'),
+            'resource': 'ekyna_commerce.customer_group'
+        }) }}
+        {{ show_row(pricing.countries, 'resource', {
+            'label': t('pricing.field.countries', [], 'EkynaProduct'),
+            'resource': 'ekyna_commerce.country'
+        }) }}
+        {{ show_row(pricing.brands, 'resource', {
+            'label': t('brand.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.brand'
+        }) }}
+        <div class="row show-row">
+            <div class="col-md-2 show-label">
+                {{ 'pricing.field.rules'|trans({}, 'EkynaProduct') }}
+            </div>
+            <div class="col-md-10">
+                <div class="show-widget">
+                    <table class="table table-condensed table-striped table-alt-head">
+                        <thead>
+                        <tr>
+                            <th>{{ 'common.min_quantity'|trans({}, 'EkynaProduct') }}</th>
+                            <th>{{ 'common.percent'|trans({}, 'EkynaProduct') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for rule in pricing.rules %}
+                            <tr>
+                                <td class="text-right">
+                                    {{ rule.minQuantity }}
+                                </td>
+                                <td class="text-right">
+                                    {{ rule.percent }}&nbsp;%
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="2">
+                                    {{ 'pricing_rule.alert.no_item'|trans({}, 'EkynaProduct') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endblock main_contents -%}

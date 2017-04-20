@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Decimal\Decimal;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -14,131 +17,47 @@ use Ekyna\Component\Resource\Model as RM;
  */
 interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface, TaxableInterface
 {
-    /**
-     * Returns the group.
-     *
-     * @return OptionGroupInterface
-     */
-    public function getGroup();
+    public function getGroup(): ?OptionGroupInterface;
+
+    public function setGroup(?OptionGroupInterface $group): OptionInterface;
+
+    public function getProduct(): ?ProductInterface;
+
+    public function setProduct(?ProductInterface $product): OptionInterface;
 
     /**
-     * Sets the group.
-     *
-     * @param OptionGroupInterface $group
-     *
-     * @return $this|OptionInterface
+     * Returns whether option product's options should be added to the form (add to sale).
      */
-    public function setGroup(OptionGroupInterface $group = null);
+    public function isCascade(): bool;
 
     /**
-     * Returns the product.
-     *
-     * @return ProductInterface
+     * Sets whether option product's options should be added to the form (add to sale).
      */
-    public function getProduct();
+    public function setCascade(bool $cascade): OptionInterface;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|OptionInterface
-     */
-    public function setProduct(ProductInterface $product = null);
+    public function getDesignation(): ?string;
 
-    /**
-     * Returns whether to cascade option groups.
-     *
-     * @return bool
-     */
-    public function isCascade();
+    public function setDesignation(?string $designation): OptionInterface;
 
-    /**
-     * Sets whether to cascade option groups.
-     *
-     * @param bool $inherit
-     *
-     * @return $this|OptionInterface
-     */
-    public function setCascade(bool $inherit);
+    public function getReference(): ?string;
 
-    /**
-     * Returns the designation.
-     *
-     * @return string
-     */
-    public function getDesignation();
-
-    /**
-     * Sets the designation.
-     *
-     * @param string $designation
-     *
-     * @return $this|OptionInterface
-     */
-    public function setDesignation($designation);
-
-    /**
-     * Returns the reference.
-     *
-     * @return string
-     */
-    public function getReference();
-
-    /**
-     * Sets the reference.
-     *
-     * @param string $reference
-     *
-     * @return $this|OptionInterface
-     */
-    public function setReference($reference);
+    public function setReference(?string $reference): OptionInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Returns the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|OptionInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(?string $title): OptionInterface;
 
-    /**
-     * Returns the weight.
-     *
-     * @return float
-     */
-    public function getWeight();
+    public function getWeight(): ?Decimal;
 
-    /**
-     * Sets the weight.
-     *
-     * @param float $weight
-     *
-     * @return $this|OptionInterface
-     */
-    public function setWeight($weight);
+    public function setWeight(?Decimal $weight): OptionInterface;
 
-    /**
-     * Returns the net price.
-     *
-     * @return float|null
-     */
-    public function getNetPrice();
+    public function getNetPrice(): ?Decimal;
 
-    /**
-     * Sets the net price.
-     *
-     * @param float $netPrice
-     *
-     * @return $this|OptionInterface
-     */
-    public function setNetPrice($netPrice = null);
+    public function setNetPrice(?Decimal $netPrice): OptionInterface;
 }

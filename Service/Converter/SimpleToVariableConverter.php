@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
@@ -18,33 +20,22 @@ use Throwable;
  */
 class SimpleToVariableConverter extends AbstractConverter
 {
-    /**
-     * @inheritDoc
-     */
     public function supportsSourceType(string $type): bool
     {
         return $type === ProductTypes::TYPE_SIMPLE;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supportsTargetType(string $type): bool
     {
         return $type === ProductTypes::TYPE_VARIABLE;
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function init(): ProductInterface
     {
         // Flag to know if variant data has been cleared (see onConvert / onError)
         $this->set('purged', false);
 
-        /** @var ProductInterface $target */
-        $target = $this->productRepository->createNew();
-        $target->setType(ProductTypes::TYPE_VARIABLE);
+        $target = $this->productFactory->createWithType(ProductTypes::TYPE_VARIABLE);
 
         $this->source->setType(ProductTypes::TYPE_VARIANT);
         $this->source->setParent($target);
@@ -53,7 +44,7 @@ class SimpleToVariableConverter extends AbstractConverter
         // So we need to keep the product (with its id) as a variant,
         // associated with a new variable product.
 
-        // Pre load attributes choices
+        // Pre-load attributes choices
         foreach ($this->source->getAttributes() as $attribute) {
             $attribute->getChoices()->toArray();
         }
@@ -72,17 +63,11 @@ class SimpleToVariableConverter extends AbstractConverter
         return $target;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function buildForm(): FormInterface
     {
         return $this->formFactory->create(VariableType::class, $this->target);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onPreConvert(): void
     {
         parent::onPreConvert();
@@ -134,18 +119,15 @@ class SimpleToVariableConverter extends AbstractConverter
         $this->set('translationClass', $translationClass);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onConvert(): void
     {
         $translations = $this->get('translations');
         $translationClass = $this->get('translationClass');
 
-        $this->productManager->beginTransaction();
+        $this->entityManager->beginTransaction();
         try {
             // Clear variant's designation, seo and content to prevent unique constraints errors.
-            $this->productManager->createQuery(
+            $this->entityManager->createQuery(
                 'UPDATE ' . get_class($this->source) . ' p ' .
                 'SET p.designation = null, p.seo = null, p.content = null ' .
                 'WHERE p.id = :id'
@@ -154,7 +136,7 @@ class SimpleToVariableConverter extends AbstractConverter
             ]);
             // Clear variant's translations to prevent unique constraints errors.
             if (!empty($translationClass) && !empty($translations)) {
-                $q = $this->productManager->createQuery(
+                $q = $this->entityManager->createQuery(
                     'UPDATE ' . $translationClass . ' t ' .
                     'SET t.title = null,' .
                     '    t.attributesTitle = null,' .
@@ -166,17 +148,17 @@ class SimpleToVariableConverter extends AbstractConverter
                 $q->setMaxResults(count($translations));
                 $q->execute(['id' => array_keys($translations)]);
             }
-            $this->productManager->commit();
+            $this->entityManager->commit();
         } catch (Throwable $e) {
-            $this->productManager->rollback();
+            $this->entityManager->rollback();
 
-            throw new ConvertException("Failed to clear variant data.", 0, $e);
+            throw new ConvertException('Failed to clear variant data.', 0, $e);
         }
 
         $this->set('purged', true);
 
         // Reload the variant and reapply changes
-        $this->productManager->refresh($this->source);
+        $this->entityManager->refresh($this->source);
 
         // Add variant to variable
         $this->source->setType(ProductTypes::TYPE_VARIANT);
@@ -248,22 +230,16 @@ class SimpleToVariableConverter extends AbstractConverter
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onDoneConvert(): void
     {
         parent::onDoneConvert();
 
-        $this->getEvent()->addMessage(new ResourceMessage(
-            'ekyna_product.convert.simple_to_variable.warning',
+        $this->getEvent()->addMessage(ResourceMessage::create(
+            'convert.simple_to_variable.warning',
             ResourceMessage::TYPE_WARNING
-        ));
+        )->setDomain('EkynaProduct'));
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onError(): void
     {
         parent::onError();
@@ -273,7 +249,7 @@ class SimpleToVariableConverter extends AbstractConverter
         }
 
         // Restore product's designation, seo and content
-        $this->productManager->createQuery(
+        $this->entityManager->createQuery(
             'UPDATE ' . get_class($this->source) . ' p ' .
             'SET p.designation = :designation, p.seo = :seo, p.content = :content ' .
             'WHERE p.id = :id'
@@ -289,7 +265,7 @@ class SimpleToVariableConverter extends AbstractConverter
 
         // Restore product's translations slugs
         if (!empty($translationClass)) {
-            $q = $this->productManager->createQuery(
+            $q = $this->entityManager->createQuery(
                 'UPDATE ' . $translationClass . ' t ' .
                 'SET t.title = :title,' .
                 '    t.attributesTitle = :attr_title,' .

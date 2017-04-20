@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model as RM;
@@ -13,90 +15,40 @@ use Ekyna\Component\Resource\Model as RM;
  */
 interface ProductTranslationInterface extends RM\TranslationInterface
 {
-    /**
-     * Returns the title.
-     *
-     * @return string
-     */
-    public function getTitle();
+    public function getTitle(): ?string;
 
-    /**
-     * Sets the title.
-     *
-     * @param string $title
-     *
-     * @return $this|ProductTranslationInterface
-     */
-    public function setTitle($title);
+    public function setTitle(?string $title): ProductTranslationInterface;
 
-    /**
-     * Returns the subTitle.
-     *
-     * @return string
-     */
-    public function getSubTitle();
+    public function getSubTitle(): ?string;
 
-    /**
-     * Sets the subTitle.
-     *
-     * @param string $subTitle
-     *
-     * @return $this|ProductTranslationInterface
-     */
-    public function setSubTitle($subTitle);
+    public function setSubTitle(?string $subTitle): ProductTranslationInterface;
 
     /**
      * Returns the attributes (auto-generated) title.
-     *
-     * @return string
      */
-    public function getAttributesTitle();
+    public function getAttributesTitle(): ?string;
 
     /**
      * Sets the attributes (auto-generated) title.
-     *
-     * @param string $attributesTitle
-     *
-     * @return $this|ProductTranslationInterface
      */
-    public function setAttributesTitle($attributesTitle);
+    public function setAttributesTitle(?string $attributesTitle): ProductTranslationInterface;
 
-    /**
-     * Returns the description.
-     *
-     * @return string
-     */
-    public function getDescription();
+    public function getDescription(): ?string;
 
-    /**
-     * Sets the description.
-     *
-     * @param string $description
-     *
-     * @return $this|ProductTranslationInterface
-     */
-    public function setDescription($description);
+    public function setDescription(?string $description): ProductTranslationInterface;
 
     /**
      * Returns the slug (auto-generated).
-     *
-     * @return string
      */
-    public function getSlug();
+    public function getSlug(): ?string;
 
     /**
      * Sets the slug (auto-generated).
-     *
-     * @param string $slug
-     *
-     * @return $this|ProductTranslationInterface
      */
-    public function setSlug($slug);
+    public function setSlug(?string $slug): ProductTranslationInterface;
 
     /**
      * Clears the translation data.
-     *
-     * @return $this|ProductTranslationInterface
      */
-    public function clear();
+    public function clear(): ProductTranslationInterface;
 }

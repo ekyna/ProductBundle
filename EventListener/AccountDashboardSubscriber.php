@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\ProductBundle\Model;
@@ -9,6 +11,8 @@ use Ekyna\Bundle\UserBundle\Model\DashboardWidget;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class AccountDashboardSubscriber
  * @package Ekyna\Bundle\ProductBundle\EventListener
@@ -16,23 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class AccountDashboardSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ContextProviderInterface
-     */
-    private $contextProvider;
+    private ContextProviderInterface $contextProvider;
+    private PricingRepositoryInterface $pricingRepository;
 
-    /**
-     * @var PricingRepositoryInterface
-     */
-    private $pricingRepository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ContextProviderInterface   $contextProvider
-     * @param PricingRepositoryInterface $pricingRepository
-     */
     public function __construct(
         ContextProviderInterface $contextProvider,
         PricingRepositoryInterface $pricingRepository
@@ -41,12 +31,7 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
         $this->pricingRepository = $pricingRepository;
     }
 
-    /**
-     * Account dashboard event handler.
-     *
-     * @param DashboardEvent $event
-     */
-    public function onDashboard(DashboardEvent $event)
+    public function onDashboard(DashboardEvent $event): void
     {
         $context = $this->contextProvider->getContext();
 
@@ -59,12 +44,8 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
             $scalars[] = $this->scalarPricing($pricing);
         }
 
-        $widget = new DashboardWidget(
-            'ekyna_product.account.pricing.title',
-            '@EkynaProduct/Account/Dashboard/pricings.html.twig',
-            'default'
-        );
-        $widget
+        $widget = DashboardWidget::create('@EkynaProduct/Account/Dashboard/pricings.html.twig')
+            ->setTitle(t('account.pricing.title', [], 'EkynaProduct'))
             ->setParameters([
                 'pricings' => $scalars,
             ])
@@ -75,12 +56,8 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Builds the pricing scalar data.
-     *
-     * @param Model\PricingInterface $pricing
-     *
-     * @return array
      */
-    private function scalarPricing(Model\PricingInterface $pricing)
+    private function scalarPricing(Model\PricingInterface $pricing): array
     {
         $scalarRules = [];
         $previousMin = null;
@@ -91,7 +68,7 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
             $scalarRules[] = [
                 'min'     => $rule->getMinQuantity(),
                 'max'     => $previousMin,
-                'percent' => round($rule->getPercent(), 2),
+                'percent' => $rule->getPercent()->toFixed(2),
             ];
             $previousMin = $rule->getMinQuantity() - 1;
         }
@@ -106,13 +83,10 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            DashboardEvent::DASHBOARD => ['onDashboard', 0],
+            DashboardEvent::class => ['onDashboard', 0],
         ];
     }
 }

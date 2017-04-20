@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -9,496 +11,223 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 class InventoryContext
 {
-    /**
-     * @var int
-     */
-    private $brand;
+    private ?int    $brand         = null;
+    private ?int    $supplier      = null;
+    private ?string $reference     = null;
+    private ?string $designation   = null;
+    private ?string $geocode       = null;
+    private ?bool   $visible       = null;
+    private ?bool   $quoteOnly     = null;
+    private ?bool   $endOfLife     = null;
+    private ?string $mode          = null;
+    private ?string $state         = null;
+    private ?bool   $bookmark      = null;
+    private ?string $referenceCode = null;
+    private string  $profile       = InventoryProfiles::NONE;
+    private ?string $sortBy        = null;
+    private ?string $sortDir       = null;
 
-    /**
-     * @var int
-     */
-    private $supplier;
-
-    /**
-     * @var string
-     */
-    private $reference;
-
-    /**
-     * @var string
-     */
-    private $designation;
-
-    /**
-     * @var string
-     */
-    private $geocode;
-
-    /**
-     * @var bool
-     */
-    private $visible;
-
-    /**
-     * @var bool
-     */
-    private $quoteOnly;
-
-    /**
-     * @var bool
-     */
-    private $endOfLife;
-
-    /**
-     * @var string
-     */
-    private $mode;
-
-    /**
-     * @var string
-     */
-    private $state;
-
-    /**
-     * @var bool
-     */
-    private $bookmark;
-
-    /**
-     * @var string
-     */
-    private $referenceCode;
-
-    /**
-     * @var string
-     */
-    private $profile;
-
-    /**
-     * @var string
-     */
-    private $sortBy;
-
-    /**
-     * @var string
-     */
-    private $sortDir;
-
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->bookmark = null;
-        $this->profile = InventoryProfiles::NONE;
-    }
-
-    /**
-     * Returns the brand.
-     *
-     * @return int
-     */
-    public function getBrand()
+    public function getBrand(): ?int
     {
         return $this->brand;
     }
 
-    /**
-     * Sets the brand.
-     *
-     * @param int $brand
-     *
-     * @return InventoryContext
-     */
-    public function setBrand($brand)
+    public function setBrand(?int $brand): self
     {
-        $this->brand = (int)$brand;
+        $this->brand = $brand;
 
         return $this;
     }
 
-    /**
-     * Returns the supplier.
-     *
-     * @return int
-     */
-    public function getSupplier()
+    public function getSupplier(): ?int
     {
         return $this->supplier;
     }
 
-    /**
-     * Sets the supplier.
-     *
-     * @param int $supplier
-     *
-     * @return InventoryContext
-     */
-    public function setSupplier($supplier)
+    public function setSupplier(?int $supplier): self
     {
-        $this->supplier = (int)$supplier;
+        $this->supplier = $supplier;
 
         return $this;
     }
 
-    /**
-     * Returns the reference.
-     *
-     * @return string
-     */
-    public function getReference()
+    public function getReference(): ?string
     {
         return $this->reference;
     }
 
-    /**
-     * Sets the reference.
-     *
-     * @param string $reference
-     *
-     * @return InventoryContext
-     */
-    public function setReference($reference)
+    public function setReference(?string $reference): self
     {
-        $this->reference = (string)$reference;
+        $this->reference = $reference;
 
         return $this;
     }
 
-    /**
-     * Returns the designation.
-     *
-     * @return string
-     */
-    public function getDesignation()
+    public function getDesignation(): ?string
     {
         return $this->designation;
     }
 
-    /**
-     * Sets the designation.
-     *
-     * @param string $designation
-     *
-     * @return InventoryContext
-     */
-    public function setDesignation($designation)
+    public function setDesignation(?string $designation): self
     {
-        $this->designation = (string)$designation;
+        $this->designation = $designation;
 
         return $this;
     }
 
-    /**
-     * Returns the geocode.
-     *
-     * @return string
-     */
-    public function getGeocode()
+    public function getGeocode():?string
     {
         return $this->geocode;
     }
 
-    /**
-     * Sets the geocode.
-     *
-     * @param string $geocode
-     *
-     * @return InventoryContext
-     */
-    public function setGeocode($geocode)
+    public function setGeocode(?string $geocode): self
     {
-        $this->geocode = (string)$geocode;
+        $this->geocode = $geocode;
 
         return $this;
     }
 
-    /**
-     * Returns the visible.
-     *
-     * @return bool
-     */
     public function isVisible(): ?bool
     {
         return $this->visible;
     }
 
-    /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return InventoryContext
-     */
-    public function setVisible($visible): InventoryContext
+    public function setVisible(?bool $visible): self
     {
-        if (is_null($visible) || ("" === (string)$visible)) {
-            $this->visible = null;
-        } else {
-            $this->visible = (bool)$visible;
-        }
+        $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * Returns the quoteOnly.
-     *
-     * @return bool
-     */
     public function isQuoteOnly(): ?bool
     {
         return $this->quoteOnly;
     }
 
-    /**
-     * Sets the quoteOnly.
-     *
-     * @param bool $quoteOnly
-     *
-     * @return InventoryContext
-     */
-    public function setQuoteOnly($quoteOnly): InventoryContext
+    public function setQuoteOnly(?bool $quoteOnly): self
     {
-        if (is_null($quoteOnly) || ("" === (string)$quoteOnly)) {
-            $this->quoteOnly = null;
-        } else {
-            $this->quoteOnly = (bool)$quoteOnly;
-        }
+        $this->quoteOnly = $quoteOnly;
 
         return $this;
     }
 
-    /**
-     * Returns the endOfLife.
-     *
-     * @return bool
-     */
     public function isEndOfLife(): ?bool
     {
         return $this->endOfLife;
     }
 
-    /**
-     * Sets the endOfLife.
-     *
-     * @param bool $endOfLife
-     *
-     * @return InventoryContext
-     */
-    public function setEndOfLife($endOfLife): InventoryContext
+    public function setEndOfLife(?bool $endOfLife): self
     {
-        if (is_null($endOfLife) || ("" === (string)$endOfLife)) {
-            $this->endOfLife = null;
-        } else {
-            $this->endOfLife = (bool)$endOfLife;
-        }
+        $this->endOfLife = $endOfLife;
 
         return $this;
     }
 
-    /**
-     * Returns the mode.
-     *
-     * @return string
-     */
-    public function getMode()
+    public function getMode(): ?string
     {
         return $this->mode;
     }
 
-    /**
-     * Sets the mode.
-     *
-     * @param string $mode
-     *
-     * @return InventoryContext
-     */
-    public function setMode($mode)
+    public function setMode(?string $mode): self
     {
-        $this->mode = (string)$mode;
+        $this->mode = $mode;
 
         return $this;
     }
 
-    /**
-     * Returns the state.
-     *
-     * @return string
-     */
-    public function getState()
+    public function getState(): ?string
     {
         return $this->state;
     }
 
-    /**
-     * Sets the state.
-     *
-     * @param string $state
-     *
-     * @return InventoryContext
-     */
-    public function setState($state)
+    public function setState(?string $state): self
     {
         $this->state = (string)$state;
 
         return $this;
     }
 
-    /**
-     * Returns the (external) reference code.
-     *
-     * @return string
-     */
     public function getReferenceCode(): ?string
     {
         return $this->referenceCode;
     }
 
-    /**
-     * Sets the (external) reference code.
-     *
-     * @param string $code
-     *
-     * @return InventoryContext
-     */
-    public function setReferenceCode(string $code = null): InventoryContext
+    public function setReferenceCode(?string $code): self
     {
         $this->referenceCode = $code;
 
         return $this;
     }
 
-    /**
-     * Returns the bookmark.
-     *
-     * @return bool
-     */
     public function isBookmark(): ?bool
     {
         return $this->bookmark;
     }
 
-    /**
-     * Sets the bookmark.
-     *
-     * @param bool $bookmark
-     *
-     * @return InventoryContext
-     */
-    public function setBookmark($bookmark): InventoryContext
+    public function setBookmark(?bool $bookmark): self
     {
-        if (is_null($bookmark) || ("" === (string)$bookmark)) {
-            $this->bookmark = null;
-        } else {
-            $this->bookmark = (bool)$bookmark;
-        }
+        $this->bookmark = $bookmark;
 
         return $this;
     }
 
-    /**
-     * Returns the profile.
-     *
-     * @return string
-     */
-    public function getProfile()
+    public function getProfile(): string
     {
         return $this->profile;
     }
 
-    /**
-     * Sets the profile.
-     *
-     * @param string $profile
-     *
-     * @return InventoryContext
-     */
-    public function setProfile($profile)
+    public function setProfile(string $profile): self
     {
-        $this->profile = (string)$profile;
+        $this->profile = $profile;
 
         return $this;
     }
 
-    /**
-     * Returns the sort by.
-     *
-     * @return string
-     */
-    public function getSortBy()
+    public function getSortBy(): ?string
     {
         return $this->sortBy;
     }
 
-    /**
-     * Sets the sort by.
-     *
-     * @param string $sortBy
-     *
-     * @return InventoryContext
-     */
-    public function setSortBy($sortBy)
+    public function setSortBy(?string $sortBy): self
     {
-        $this->sortBy = (string)$sortBy;
+        $this->sortBy = $sortBy;
 
         return $this;
     }
 
-    /**
-     * Returns the sort dir.
-     *
-     * @return string
-     */
-    public function getSortDir()
+    public function getSortDir(): ?string
     {
         return $this->sortDir;
     }
 
-    /**
-     * Sets the sort dir.
-     *
-     * @param string $sortDir
-     *
-     * @return InventoryContext
-     */
-    public function setSortDir($sortDir)
+    public function setSortDir(?string $sortDir): self
     {
-        $this->sortDir = (string)$sortDir;
+        $this->sortDir = $sortDir;
 
         return $this;
     }
 
-    /**
-     * Loads form the given array.
-     *
-     * @param array $array
-     */
-    public function fromArray(array $array)
+    public function fromArray(array $array): void
     {
-        if (10 === count($array)) {
-            list(
-                $this->brand,
-                $this->supplier,
-                $this->reference,
-                $this->designation,
-                $this->geocode,
-                $this->mode,
-                $this->state,
-                $this->profile,
-                $this->sortBy,
-                $this->sortDir
-                ) = $array;
+        if (10 !== count($array)) {
+            return;
         }
+
+        [
+            $this->brand,
+            $this->supplier,
+            $this->reference,
+            $this->designation,
+            $this->geocode,
+            $this->mode,
+            $this->state,
+            $this->profile,
+            $this->sortBy,
+            $this->sortDir,
+        ] = $array;
     }
 
-    /**
-     * Converts to an array.
-     *
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             $this->brand,

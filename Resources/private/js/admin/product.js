@@ -1,4 +1,4 @@
-define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-ui'], function($, Dispatcher, StockUnits) {
+define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-spinner'], function($, Dispatcher, StockUnits) {
 
     var $stockRefreshBtn = $('#stock-view-refresh'),
         $stockView = $('#stock-view'),

@@ -7,10 +7,10 @@
             {% set address = get_setting('general.site_address') %}
         {%- endif -%}
         {%- if address.phone is not empty %}
-            {{ 'ekyna_core.field.phone'|trans }}
+            {{ 'field.phone'|trans({}, 'EkynaUi') }}
             {{ address.phone|phone_number_format }}<br>
         {%- elseif address.mobile is not empty -%}
-            {{ 'ekyna_core.field.mobile'|trans }}
+            {{ 'field.mobile'|trans({}, 'EkynaUi') }}
             {{ address.mobile|phone_number_format }}<br>
         {%- endif -%}
 
@@ -31,15 +31,15 @@
     {% block footer -%}
     <p>
         {% if catalog.displayPrices -%}
-            {{ 'ekyna_product.catalog.field.price_mention'|trans({
-                '%date%': catalog.context.date|localizeddate('short', 'none')
-            }) }}
+            {{ 'catalog.field.price_mention'|trans({
+                '%date%': catalog.context.date|format_datetime('short', 'none')
+            }, 'EkynaProduct') }}
         {%- endif %}
         <span class="pull-right">
-            {{- 'ekyna_product.catalog.field.pager'|trans({
+            {{- 'catalog.field.pager'|trans({
                 '%current%': loop.index,
                 '%total%': catalog.pages|length
-            }) -}}
+            }, 'EkynaProduct') -}}
         </span>
     </p>
     {%- endblock footer %}

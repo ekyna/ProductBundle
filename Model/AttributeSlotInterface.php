@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\ResourceInterface;
@@ -12,67 +14,31 @@ use Ekyna\Component\Resource\Model\SortableInterface;
  */
 interface AttributeSlotInterface extends ResourceInterface, SortableInterface
 {
-    /**
-     * Returns the set.
-     *
-     * @return AttributeSetInterface
-     */
-    public function getSet();
+    public function getSet(): ?AttributeSetInterface;
 
-    /**
-     * Sets the set.
-     *
-     * @param AttributeSetInterface $set
-     *
-     * @return $this|AttributeSlotInterface
-     */
-    public function setSet(AttributeSetInterface $set = null);
+    public function setSet(?AttributeSetInterface $set): AttributeSlotInterface;
 
-    /**
-     * Returns the attribute.
-     *
-     * @return AttributeInterface
-     */
-    public function getAttribute();
+    public function getAttribute(): ?AttributeInterface;
 
-    /**
-     * Sets the attribute.
-     *
-     * @param AttributeInterface $attribute
-     *
-     * @return $this|AttributeSlotInterface
-     */
-    public function setAttribute(AttributeInterface $attribute);
+    public function setAttribute(?AttributeInterface $attribute): AttributeSlotInterface;
 
     /**
      * Returns whether this slot's attribute is required.
-     *
-     * @return boolean
      */
-    public function isRequired();
+    public function isRequired(): bool;
 
     /**
      * Sets whether this slot's attribute is required.
-     *
-     * @param boolean $required
-     *
-     * @return $this|AttributeSlotInterface
      */
-    public function setRequired($required);
+    public function setRequired(bool $required): AttributeSlotInterface;
 
     /**
      * Returns whether this slot's attribute is used to generate variant names and designations.
-     *
-     * @return bool
      */
-    public function isNaming();
+    public function isNaming(): bool;
 
     /**
      * Sets whether this slot's attribute is used to generate variant names and designations.
-     *
-     * @param bool $naming
-     *
-     * @return $this|AttributeSlotInterface
      */
-    public function setNaming($naming);
+    public function setNaming(bool $naming): AttributeSlotInterface;
 }

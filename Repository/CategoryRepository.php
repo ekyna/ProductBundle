@@ -1,30 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\ORM\Query\Expr;
-use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\Util\TranslatableResourceRepositoryTrait;
-use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Ekyna\Bundle\ProductBundle\Model\CategoryInterface;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
 
 /**
  * Class CategoryRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class CategoryRepository extends NestedTreeRepository implements TranslatableResourceRepositoryInterface
+class CategoryRepository extends TranslatableRepository implements CategoryRepositoryInterface
 {
-    use TranslatableResourceRepositoryTrait;
-
-
-    /**
-     * Finds the category by slug.
-     *
-     * @param string $slug
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\CategoryInterface|null
-     */
-    public function findOneBySlug($slug)
+    public function findOneBySlug(string $slug): ?CategoryInterface
     {
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
@@ -38,7 +29,6 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->addSelect($as, 't', 's', 's_t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq('t.slug', ':slug'))
-            ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
             // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
@@ -49,12 +39,7 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->getOneOrNullResult();
     }
 
-    /**
-     * Finds the categories for the navbar menu.
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\CategoryInterface[]
-     */
-    public function findForMenu()
+    public function findForMenu(): array
     {
         $as = $this->getAlias();
         $qb = $this->getCollectionQueryBuilder();
@@ -74,10 +59,7 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'c';
     }

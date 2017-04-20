@@ -1,0 +1,56 @@
+admin_ekyna_product_inventory_index:
+    path: ""
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryController:index
+    methods: [GET]
+
+admin_ekyna_product_inventory_products:
+    path: /products
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryController:products
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_quick_edit:
+    path: /{productId}/quick-edit
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\QuickEditController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_batch_edit:
+    path: /batch-edit
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\BatchEditController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_stock_units:
+    path: /{productId}/stock-units
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\StockUnitsController
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_customer_orders:
+    path: /{productId}/customer-orders
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\CustomerOrdersController
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_resupply:
+    path: /{productId}/resupply
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ResupplyController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_export_products:
+    path: /export-products
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportProductsController
+    methods: [GET]
+
+admin_ekyna_product_inventory_export_units:
+    path: /export-units
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportUnitsController
+    methods: [GET]

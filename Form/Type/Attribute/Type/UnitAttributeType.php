@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type;
 
 use Ekyna\Bundle\CommerceBundle\Model\Units as BUnits;
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
-use Ekyna\Component\Commerce\Common\Model\Units AS CUnits;
+use Ekyna\Component\Commerce\Common\Model\Units as CUnits;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class UnitAttributeType
@@ -16,26 +18,14 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class UnitAttributeType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-
-    /**
-     * Constructor.
-     *
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var AttributeInterface $attribute */
         $attribute = $options['attribute'];
@@ -44,7 +34,7 @@ class UnitAttributeType extends AbstractType
         if ($config['unit'] === CUnits::PIECE) {
             $append = $config['suffix'];
         } else {
-            $append = $this->translator->trans(BUnits::getLabel($config['unit']));
+            $append = BUnits::getLabel($config['unit'])->trans($this->translator);
         }
 
         $builder->add('value', NumberType::class, [

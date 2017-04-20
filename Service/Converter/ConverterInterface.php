@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
@@ -13,12 +15,10 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  */
 interface ConverterInterface
 {
+    public const DI_TAG = 'ekyna_product.converter';
+
     /**
      * Performs the conversion.
-     *
-     * @param ProductInterface $source
-     *
-     * @return ConvertEvent
      *
      * @throws ConvertException
      */
@@ -26,19 +26,11 @@ interface ConverterInterface
 
     /**
      * Returns whether the source product type is supported.
-     *
-     * @param string $type
-     *
-     * @return bool
      */
     public function supportsSourceType(string $type): bool;
 
     /**
      * Returns whether the target product type is supported.
-     *
-     * @param string $type
-     *
-     * @return bool
      */
     public function supportsTargetType(string $type): bool;
 }

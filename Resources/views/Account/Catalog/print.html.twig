@@ -2,7 +2,7 @@
 
 {% block account %}
 {% apply spaceless %}
-    <h3>{{ 'ekyna_product.account.catalog.print.title'|trans|raw }}</h3>
+    <h3>{{ 'account.catalog.print.title'|trans({}, 'EkynaProduct')|trans|raw }}</h3>
     <hr>
     {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
     <div class="form-body">
@@ -17,7 +17,7 @@
     </div>
     {{ form_end(form) }}
     <hr>
-    <h3>{{ 'ekyna_product.account.catalog.title'|trans|raw }}</h3>
+    <h3>{{ 'account.catalog.title'|trans({}, 'EkynaProduct')|trans|raw }}</h3>
     <hr>
     {% include '@EkynaProduct/Account/Catalog/_list.html.twig' with {
         'catalogs': catalogs, 'customer': customer

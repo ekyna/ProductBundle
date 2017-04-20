@@ -1,37 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
-use Ekyna\Bundle\CoreBundle\Form\Type\TinymceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Type\TinymceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class CatalogType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Catalog
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CatalogType extends ResourceFormType
+class CatalogType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'ekyna_core.field.title',
+                'label' => t('field.title', [], 'EkynaUi'),
             ])
             ->add('description', TinymceType::class, [
-                'label'    => 'ekyna_core.field.description',
+                'label'    => t('field.description', [], 'EkynaUi'),
                 'theme'    => 'simple',
                 'required' => false,
             ])
             ->add('pages', CollectionType::class, [
-                'label'          => 'ekyna_product.catalog.field.pages',
+                'label'          => t('catalog.field.pages', [], 'EkynaProduct'),
                 'prototype_name' => '__page__',
                 'entry_type'     => $options['customer'] ? CatalogCustomerPageType::class : CatalogPageType::class,
                 'allow_add'      => true,
@@ -44,10 +45,7 @@ class CatalogType extends ResourceFormType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

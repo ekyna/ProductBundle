@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\MediaBundle\Model\GalleryMediaInterface;
@@ -12,19 +14,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 interface ProductMediaInterface extends GalleryMediaInterface, ResourceInterface
 {
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return ProductMediaInterface
-     */
-    public function setProduct(ProductInterface $product = null);
+    public function setProduct(?ProductInterface $product): ProductMediaInterface;
 
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
 }

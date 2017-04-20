@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
+use ArrayIterator;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -14,10 +17,6 @@ class VariableUpdater extends AbstractUpdater
 {
     /**
      * Updates the variable product min price.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool
      */
     public function updateNetPrice(Model\ProductInterface $variable): bool
     {
@@ -25,7 +24,7 @@ class VariableUpdater extends AbstractUpdater
 
         $netPrice = $this->priceCalculator->calculateComponentsPrice($variable);
 
-        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $netPrice, 5)) {
+        if (!$variable->getNetPrice()->equals($netPrice)) {
             $variable->setNetPrice($netPrice);
 
             return true;
@@ -36,10 +35,6 @@ class VariableUpdater extends AbstractUpdater
 
     /**
      * Updates the variable product min price.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool
      */
     public function updateMinPrice(Model\ProductInterface $variable): bool
     {
@@ -47,7 +42,7 @@ class VariableUpdater extends AbstractUpdater
 
         $minPrice = $this->priceCalculator->calculateVariableMinPrice($variable);
 
-        if (is_null($variable->getMinPrice()) || 0 !== bccomp($variable->getMinPrice(), $minPrice, 5)) {
+        if (!$variable->getMinPrice()->equals($minPrice)) {
             $variable->setMinPrice($minPrice);
 
             return true;
@@ -58,10 +53,6 @@ class VariableUpdater extends AbstractUpdater
 
     /**
      * Updates the variable availability.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool
      */
     public function updateAvailability(Model\ProductInterface $variable): bool
     {
@@ -106,10 +97,6 @@ class VariableUpdater extends AbstractUpdater
 
     /**
      * Updates the variable visibility.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool
      */
     public function updateVisibility(Model\ProductInterface $variable): bool
     {
@@ -139,18 +126,14 @@ class VariableUpdater extends AbstractUpdater
 
     /**
      * Indexes the variable's variants position.
-     *
-     * @param Model\ProductInterface $variable
-     * @param PersistenceHelperInterface $helper
-     *
-     * @return bool
      */
     public function indexVariantsPositions(
-        Model\ProductInterface $variable,
+        Model\ProductInterface     $variable,
         PersistenceHelperInterface $helper = null
     ): bool {
         Model\ProductTypes::assertVariable($variable);
 
+        /** @var ArrayIterator<Model\ProductInterface> $variants */
         $variants = $variable->getVariants()->getIterator();
 
         $changed = false;
@@ -168,7 +151,7 @@ class VariableUpdater extends AbstractUpdater
         $position = 0;
         /** @var Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-            if ($variant->getPosition() != $position || (null === $variant->getPosition() && $position === 0)) {
+            if ($variant->getPosition() !== $position) {
                 $variant->setPosition($position);
 
                 if ($helper && !$helper->isScheduledForRemove($variant)) {

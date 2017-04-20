@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
@@ -7,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
 /**
  * Class ProductStockUnitRepository
@@ -16,9 +18,6 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class ProductStockUnitRepository extends ResourceRepository implements StockUnitRepositoryInterface
 {
-    /**
-     * @inheritdoc
-     */
     public function findNewBySubject(StockSubjectInterface $subject): array
     {
         return $this->findBySubjectAndStates($subject, [
@@ -26,9 +25,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findPendingBySubject(StockSubjectInterface $subject): array
     {
         return $this->findBySubjectAndStates($subject, [
@@ -36,9 +32,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findReadyBySubject(StockSubjectInterface $subject): array
     {
         return $this->findBySubjectAndStates($subject, [
@@ -46,9 +39,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findPendingOrReadyBySubject(StockSubjectInterface $subject): array
     {
         return $this->findBySubjectAndStates($subject, [
@@ -57,9 +47,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findNotClosedBySubject(StockSubjectInterface $subject): array
     {
         return $this->findBySubjectAndStates($subject, [
@@ -69,9 +56,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findAssignableBySubject(StockSubjectInterface $subject): array
     {
         if (!$subject instanceof ProductInterface) {
@@ -102,9 +86,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findLinkableBySubject(StockSubjectInterface $subject): array
     {
         if (!$subject instanceof ProductInterface) {
@@ -133,12 +114,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
     /**
      * Finds stock units by subject and states.
-     *
-     * @param StockSubjectInterface $subject
-     * @param array                 $states
-     * @param string                $sort
-     *
-     * @return array
      */
     private function findBySubjectAndStates(StockSubjectInterface $subject, array $states, string $sort = 'ASC'): array
     {
@@ -175,9 +150,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->getResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findInStock(): array
     {
         $qb = $this->getQueryBuilder('psu');
@@ -194,9 +166,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->getResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findLatestNotClosedBySubject(StockSubjectInterface $subject, int $limit = 3): array
     {
         if (!$subject instanceof ProductInterface) {
@@ -223,9 +192,6 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->getResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findLatestClosedBySubject(StockSubjectInterface $subject, int $limit = 3): array
     {
         if (!$subject instanceof ProductInterface) {
@@ -252,10 +218,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'psu';
     }

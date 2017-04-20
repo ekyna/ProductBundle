@@ -24,7 +24,7 @@ class ProductController extends Controller
     {
         /** @var \Ekyna\Bundle\ProductBundle\Entity\Product $product */
         $product = $this
-            ->get('ekyna_product.product.repository')
+            ->get('ekyna_product.repository.product')
             ->findOneByReference($request->attributes->get('reference'));
 
         if (null === $product) {
@@ -60,7 +60,7 @@ class ProductController extends Controller
     public function dumpAction($productId)
     {
         /** @var \Ekyna\Bundle\ProductBundle\Entity\Product $product */
-        $product = $this->get('ekyna_product.product.repository')->find($productId);
+        $product = $this->get('ekyna_product.repository.product')->find($productId);
 
         if (null === $product) {
             throw $this->createNotFoundException("Product not found.");

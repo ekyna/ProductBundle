@@ -1,33 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
-use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
+
+use function array_column;
+use function array_merge;
+use function array_push;
+use function array_replace;
+use function array_unique;
+use function is_array;
+use function is_int;
+use function is_null;
+use function method_exists;
 
 /**
  * Class ProductRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductRepository extends TranslatableResourceRepository implements ProductRepositoryInterface
+class ProductRepository extends TranslatableRepository implements ProductRepositoryInterface
 {
     // TODO Store queries in private properties
 
-    /**
-     * @inheritdoc
-     */
-    public function getUpdateDateById($id, $visible = true, array $types = null)
+    public function getUpdateDateById(int $id, bool $visible = true, array $types = null): ?DateTimeInterface
     {
         $qb = $this->getUpdateDateQueryBuilder($visible, $types);
 
@@ -53,17 +66,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameters($parameters)
             ->setMaxResults(1);
 
-        if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
-            return new \DateTime($date);
+        if (null !== $date = $query->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR)) {
+            return new DateTime($date);
         }
 
         return null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getUpdateDateBySlug($slug, $visible = true, array $types = null)
+    public function getUpdateDateBySlug(string $slug, bool $visible = true, array $types = null): ?DateTimeInterface
     {
         $qb = $this->getUpdateDateQueryBuilder($visible, $types);
 
@@ -93,17 +103,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameters($parameters)
             ->setMaxResults(1);
 
-        if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
-            return new \DateTime($date);
+        if (null !== $date = $query->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR)) {
+            return new DateTime($date);
         }
 
         return null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOneById($id)
+    public function findOneById(int $id): ?Model\ProductInterface
     {
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
@@ -139,10 +146,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         return $product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOneBySlug($slug)
+    public function findOneBySlug(string $slug): ?Model\ProductInterface
     {
         $as = $this->getAlias();
         $qb = $this
@@ -164,7 +168,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->eq('t.slug', ':slug'))
-            ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
             // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
@@ -184,10 +187,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         return $product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOneByReference($reference)
+    public function findOneByReference(string $reference): ?Model\ProductInterface
     {
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
@@ -223,17 +223,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         return $product;
     }
 
-    /**
-     * Finds one product by external reference.
-     *
-     * @param string   $code    The product reference code
-     * @param string[] $types   To filter references types
-     * @param bool     $visible Whether to fetch visible products only
-     *
-     * @return Model\ProductInterface|null
-     */
-    public function findOneByExternalReference(string $code, array $types = [], bool $visible = true)
-    {
+    public function findOneByExternalReference(
+        string $code,
+        array  $types = [],
+        bool   $visible = true
+    ): ?Model\ProductInterface {
         foreach ($types as $type) {
             Model\ProductReferenceTypes::isValid($type);
         }
@@ -272,10 +266,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findByBrand(Model\BrandInterface $brand)
+    public function findByBrand(Model\BrandInterface $brand): array
     {
         $as = $this->getAlias();
         $qb = $this->getCollectionQueryBuilder();
@@ -310,10 +301,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findByCategory(Model\CategoryInterface $category, $recursive = false)
+    public function findByCategory(Model\CategoryInterface $category, bool $recursive = false): array
     {
         $as = $this->getAlias();
         $qb = $this->getCollectionQueryBuilder();
@@ -353,10 +341,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findParentsByBundled(Model\ProductInterface $bundled, $requiredSlots = false)
+    public function findParentsByBundled(Model\ProductInterface $bundled, bool $requiredSlots = false): array
     {
         if (is_null($bundled->getId())) {
             return [];
@@ -396,10 +381,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false)
+    public function findParentsByOptionProduct(Model\ProductInterface $product, bool $requiredGroups = false): array
     {
         if (is_null($product->getId())) {
             return [];
@@ -439,10 +421,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findParentsByComponent(Model\ProductInterface $product)
+    public function findParentsByComponent(Model\ProductInterface $product): array
     {
         if (is_null($product->getId())) {
             return [];
@@ -461,17 +440,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOutOfStockProducts($mode)
+    public function findOutOfStockProducts(string $mode): array
     {
         BStockModes::isValid($mode, true);
 
         $qb = $this->createQueryBuilder('p');
 
-        $today = new \DateTime();
-        $today->setTime(0, 0, 0, 0);
+        $today = new DateTime();
+        $today->setTime(0, 0);
 
         return $qb
             ->andWhere($qb->expr()->in('p.type', ':types'))
@@ -499,10 +475,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findForInventoryExport()
+    public function findForInventoryExport(): array
     {
         $qb = $this->createQueryBuilder('p');
 
@@ -516,10 +489,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOneByPendingOffers(string $type)
+    public function findOneByPendingOffers(string $type): ?Model\ProductInterface
     {
         $qb = $this->createQueryBuilder('p');
 
@@ -536,10 +506,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findOneByPendingPrices(string $type)
+    public function findOneByPendingPrices(string $type): ?Model\ProductInterface
     {
         $qb = $this->createQueryBuilder('p');
 
@@ -556,12 +523,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findDuplicateByReference(
         Model\ProductInterface $product,
-        array $ignore = []
+        array                  $ignore = []
     ): ?Model\ProductInterface {
         if (empty($reference = $product->getReference())) {
             return null;
@@ -586,12 +550,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findDuplicateByDesignationAndBrand(
         Model\ProductInterface $product,
-        array $ignore = []
+        array                  $ignore = []
     ): ?Model\ProductInterface {
         if (empty($designation = $product->getDesignation())) {
             return null;
@@ -621,9 +582,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findBySkuOrReferences(string $code): array
     {
         $qb = $this->createQueryBuilder('p');
@@ -640,9 +598,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getResult();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findForSitemap(): array
     {
         $qb = $this->getQueryBuilder('p');
@@ -664,8 +619,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Filters the products ids.
-     *
-     * @param array $ignore
      *
      * @return int[]
      */
@@ -690,152 +643,144 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         return array_unique($ids);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function loadMedias(Model\ProductInterface $product)
+    public function loadMedias(Model\ProductInterface $product): void
     {
-        if (!$this->isInitializedCollection($product->getMedias())) {
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->leftJoin('p.medias', 'pm')
-                ->leftJoin('pm.media', 'm')
-                ->leftJoin('m.translations', 'm_t', Expr\Join::WITH, $this->getLocaleCondition('m_t'))
-                ->select('PARTIAL p.{id}', 'pm', 'm', 'm_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $product->getId(),
-                ])
-                ->getResult();
+        if ($this->isInitializedCollection($product->getMedias())) {
+            return;
         }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->leftJoin('p.medias', 'pm')
+            ->leftJoin('pm.media', 'm')
+            ->leftJoin('m.translations', 'm_t', Expr\Join::WITH, $this->getLocaleCondition('m_t'))
+            ->select('PARTIAL p.{id}', 'pm', 'm', 'm_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $product->getId(),
+            ])
+            ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function loadOptions(Model\ProductInterface $product)
+    public function loadOptions(Model\ProductInterface $product): void
     {
-        if (!$this->isInitializedCollection($product->getOptionGroups())) {
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->leftJoin('p.optionGroups', 'og')
-                ->leftJoin('og.translations', 'og_t', Expr\Join::WITH, $this->getLocaleCondition('og_t'))
-                ->leftJoin('og.options', 'o')
-                ->leftJoin('o.translations', 'o_t', Expr\Join::WITH, $this->getLocaleCondition('o_t'))
-                ->select('PARTIAL p.{id}', 'og', 'og_t', 'o', 'o_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $product->getId(),
-                ])
-                ->getResult();
+        if ($this->isInitializedCollection($product->getOptionGroups())) {
+            return;
         }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->leftJoin('p.optionGroups', 'og')
+            ->leftJoin('og.translations', 'og_t', Expr\Join::WITH, $this->getLocaleCondition('og_t'))
+            ->leftJoin('og.options', 'o')
+            ->leftJoin('o.translations', 'o_t', Expr\Join::WITH, $this->getLocaleCondition('o_t'))
+            ->select('PARTIAL p.{id}', 'og', 'og_t', 'o', 'o_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $product->getId(),
+            ])
+            ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function loadVariants(Model\ProductInterface $variable)
+    public function loadVariants(Model\ProductInterface $variable): void
     {
         Model\ProductTypes::assertVariable($variable);
 
-        if (!$this->isInitializedCollection($variable->getVariants())) {
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->leftJoin('p.variants', 'v')
-                ->leftJoin('v.translations', 'v_t', Expr\Join::WITH, $this->getLocaleCondition('v_t'))
-                ->select('PARTIAL p.{id}', 'v', 'v_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $variable->getId(),
-                ])
-                ->getResult();
+        if ($this->isInitializedCollection($variable->getVariants())) {
+            return;
         }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->leftJoin('p.variants', 'v')
+            ->leftJoin('v.translations', 'v_t', Expr\Join::WITH, $this->getLocaleCondition('v_t'))
+            ->select('PARTIAL p.{id}', 'v', 'v_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $variable->getId(),
+            ])
+            ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function loadBundleSlots(Model\ProductInterface $bundle)
+    public function loadBundleSlots(Model\ProductInterface $bundle): void
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        if (!$this->isInitializedCollection($bundle->getBundleSlots())) {
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                // Slots
-                ->leftJoin('p.bundleSlots', 'bs')
-                ->leftJoin('bs.translations', 'bs_t', Expr\Join::WITH, $this->getLocaleCondition('bs_t'))
-                // Choices
-                ->leftJoin('bs.choices', 'bc')
-                // Choices products
-                ->leftJoin('bc.product', 'bcp')
-                ->leftJoin('bcp.translations', 'bcp_t', Expr\Join::WITH, $this->getLocaleCondition('bcp_t'))
-                // Choices products brands
-                ->leftJoin('bcp.brand', 'bcb')
-                ->leftJoin('bcb.translations', 'bcb_t', Expr\Join::WITH, $this->getLocaleCondition('bcb_t'))
-                ->select('PARTIAL p.{id}', 'bs', 'bs_t', 'bc', 'bcp', 'bcp_t', 'bcb', 'bcb_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $bundle->getId(),
-                ])
-                ->getResult();
+        if ($this->isInitializedCollection($bundle->getBundleSlots())) {
+            return;
         }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            // Slots
+            ->leftJoin('p.bundleSlots', 'bs')
+            ->leftJoin('bs.translations', 'bs_t', Expr\Join::WITH, $this->getLocaleCondition('bs_t'))
+            // Choices
+            ->leftJoin('bs.choices', 'bc')
+            // Choices products
+            ->leftJoin('bc.product', 'bcp')
+            ->leftJoin('bcp.translations', 'bcp_t', Expr\Join::WITH, $this->getLocaleCondition('bcp_t'))
+            // Choices products brands
+            ->leftJoin('bcp.brand', 'bcb')
+            ->leftJoin('bcb.translations', 'bcb_t', Expr\Join::WITH, $this->getLocaleCondition('bcb_t'))
+            ->select('PARTIAL p.{id}', 'bs', 'bs_t', 'bc', 'bcp', 'bcp_t', 'bcb', 'bcb_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $bundle->getId(),
+            ])
+            ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function loadConfigurableSlots(Model\ProductInterface $configurable)
+    public function loadConfigurableSlots(Model\ProductInterface $configurable): void
     {
         Model\ProductTypes::assertConfigurable($configurable);
 
-        if (!$this->isInitializedCollection($configurable->getBundleSlots())) {
-            // Slots
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->leftJoin('p.bundleSlots', 'bs')
-                ->leftJoin('bs.translations', 'bs_t', Expr\Join::WITH, $this->getLocaleCondition('bs_t'))
-                ->select('PARTIAL p.{id}', 'bs', 'bs_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $configurable->getId(),
-                ])
-                ->getResult();
-
-            // Slot choices
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->leftJoin('p.bundleSlots', 'bs')
-                ->leftJoin('bs.choices', 'bc')
-                ->leftJoin('bc.product', 'bcp')
-                ->leftJoin('bcp.translations', 'bcp_t', Expr\Join::WITH, $this->getLocaleCondition('bcp_t'))
-                ->leftJoin('bcp.brand', 'bcb')
-                ->leftJoin('bcb.translations', 'bcb_t', Expr\Join::WITH, $this->getLocaleCondition('bcb_t'))
-                ->select('PARTIAL p.{id}', 'PARTIAL bs.{id}', 'bc', 'bcp', 'bcp_t', 'bcb', 'bcb_t')
-                ->andWhere($qb->expr()->eq('p.id', ':id'))
-                ->getQuery()
-                ->useQueryCache(true)
-                ->setParameters([
-                    'id' => $configurable->getId(),
-                ])
-                ->getResult();
+        if ($this->isInitializedCollection($configurable->getBundleSlots())) {
+            return;
         }
+
+        // Slots
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->leftJoin('p.bundleSlots', 'bs')
+            ->leftJoin('bs.translations', 'bs_t', Expr\Join::WITH, $this->getLocaleCondition('bs_t'))
+            ->select('PARTIAL p.{id}', 'bs', 'bs_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $configurable->getId(),
+            ])
+            ->getResult();
+
+        // Slot choices
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->leftJoin('p.bundleSlots', 'bs')
+            ->leftJoin('bs.choices', 'bc')
+            ->leftJoin('bc.product', 'bcp')
+            ->leftJoin('bcp.translations', 'bcp_t', Expr\Join::WITH, $this->getLocaleCondition('bcp_t'))
+            ->leftJoin('bcp.brand', 'bcb')
+            ->leftJoin('bcb.translations', 'bcb_t', Expr\Join::WITH, $this->getLocaleCondition('bcb_t'))
+            ->select('PARTIAL p.{id}', 'PARTIAL bs.{id}', 'bc', 'bcp', 'bcp_t', 'bcb', 'bcb_t')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'id' => $configurable->getId(),
+            ])
+            ->getResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findNextStatUpdate(\DateTime $maxDate = null)
+    public function findNextStatUpdate(DateTimeInterface $maxDate = null): ?Model\ProductInterface
     {
         $qb = $this->createQueryBuilder('p');
         $ex = $qb->expr();
@@ -864,30 +809,86 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findBestSellers(array $options = []): array
     {
         return $this->findHighlight('bestSeller', $options);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findCrossSelling(array $options = []): array
     {
         return $this->findHighlight('crossSelling', $options);
     }
 
-    /**
-     * Returns the highlighted products.
-     *
-     * @param string $type      The type of highlight
-     * @param array  $options   The options : limit, exclude (ids), id_only
-     *
-     * @return Model\ProductInterface[]|int[]
-     */
+    public function findForHighlight(): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->select([
+                'p.id',
+                'b.name as brand',
+                'p.designation',
+                'p.reference',
+                'p.visible',
+                'p.visibility',
+                'p.bestSeller',
+                'p.crossSelling',
+            ])
+            ->join('p.brand', 'b')
+            ->where($qb->expr()->neq('p.type', ':not_type'))
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->setParameter('not_type', ProductTypes::TYPE_VARIANT)
+            ->getScalarResult();
+    }
+
+    public function findForExport(ExportConfig $config): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->join('p.brand', 'b')
+            ->addOrderBy('b.name', 'ASC')
+            ->addOrderBy('p.designation', 'ASC')
+            ->andWhere($qb->expr()->notIn('p.type', ':types'))
+            ->andWhere($qb->expr()->eq('p.quoteOnly', ':quote_only'))
+            ->andWhere(
+                $qb->expr()->not(
+                    $qb->expr()->andX(
+                        $qb->expr()->eq('p.endOfLife', ':end_of_life'),
+                        $qb->expr()->neq('p.stockState', ':stock_state')
+                    )
+                )
+            )
+            ->setParameters(
+                [
+                    'types'       => [
+                        ProductTypes::TYPE_VARIANT,
+                        ProductTypes::TYPE_CONFIGURABLE,
+                    ],
+                    'quote_only'  => false,
+                    'end_of_life' => true,
+                    'stock_state' => StockSubjectStates::STATE_IN_STOCK,
+                ]
+            );
+
+        $brands = $config->getBrands();
+        if (!$brands->isEmpty()) {
+            $qb
+                ->andWhere($qb->expr()->in('p.brand', ':brands'))
+                ->setParameter('brands', $brands->toArray());
+        }
+
+        if ($config->isVisible()) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+                ->setParameter('visible', true);
+        }
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
     protected function findHighlight(string $type, array $options): array
     {
         Model\HighlightModes::isValidType($type);
@@ -956,20 +957,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param array        $parameters
      * @param string       $type
      */
-    protected function filterFindHighlight(QueryBuilder $qb, array &$parameters, string $type)
+    protected function filterFindHighlight(QueryBuilder $qb, array &$parameters, string $type): void
     {
-
     }
 
     /**
      * Returns the getUpdateDateBy* query builder.
-     *
-     * @param bool       $visible
-     * @param array|null $types
-     *
-     * @return QueryBuilder
      */
-    private function getUpdateDateQueryBuilder($visible = true, array $types = null)
+    private function getUpdateDateQueryBuilder(bool $visible = true, array $types = null): QueryBuilder
     {
         $qb = $this->getQueryBuilder('p');
 
@@ -993,38 +988,35 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Loads the product associations.
-     *
-     * @param Model\ProductInterface|null $product
      */
-    protected function loadAssociations(Model\ProductInterface $product = null)
+    protected function loadAssociations(?Model\ProductInterface $product): void
     {
-        if (null !== $product) {
-            // Medias
-            $this->loadMedias($product);
+        if (null === $product) {
+            return;
+        }
 
-            if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                // Variants
-                $this->loadVariants($product);
-            } elseif ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                // Bundle slots
-                $this->loadBundleSlots($product);
-            } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
-                // Configurable slots
-                $this->loadConfigurableSlots($product);
-            }
+        // Medias
+        $this->loadMedias($product);
+
+        if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+            // Variants
+            $this->loadVariants($product);
+        } elseif ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+            // Bundle slots
+            $this->loadBundleSlots($product);
+        } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+            // Configurable slots
+            $this->loadConfigurableSlots($product);
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function joinPrice(QueryBuilder $qb, string $alias = null): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
         $ex = $qb->expr();
 
-        $qb2 = $this->getEntityManager()->createQueryBuilder();
+        $qb2 = $this->wrapped->createQueryBuilder('p');
         $qb2
             ->select('pri.sellPrice')
             ->from(Price::class, 'pri')
@@ -1039,15 +1031,12 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Adds the join parts for brand to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param bool         $withTranslations
-     *
-     * @return $this|ProductRepositoryInterface
      */
-    protected function joinBrand(QueryBuilder $qb, $alias = null, $withTranslations = true): ProductRepositoryInterface
-    {
+    protected function joinBrand(
+        QueryBuilder $qb,
+        string       $alias = null,
+        bool         $withTranslations = true
+    ): ProductRepositoryInterface {
         $alias = $alias ?: $this->getAlias();
 
         $qb->join($alias . '.brand', 'b');
@@ -1063,17 +1052,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Adds the join parts for categories to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param bool         $withTranslations
-     *
-     * @return $this|ProductRepositoryInterface
      */
     protected function joinCategories(
         QueryBuilder $qb,
-        $alias = null,
-        $withTranslations = false
+        string       $alias = null,
+        bool         $withTranslations = false
     ): ProductRepositoryInterface {
         $alias = $alias ?: $this->getAlias();
 
@@ -1090,13 +1073,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Adds the join parts for medias to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     *
-     * @return $this|ProductRepositoryInterface
      */
-    protected function joinMedias(QueryBuilder $qb, $alias = null): ProductRepositoryInterface
+    protected function joinMedias(QueryBuilder $qb, string $alias = null): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
@@ -1111,13 +1089,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Adds the join parts for seo to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     *
-     * @return $this|ProductRepositoryInterface
      */
-    protected function joinSeo(QueryBuilder $qb, $alias = null): ProductRepositoryInterface
+    protected function joinSeo(QueryBuilder $qb, string $alias = null): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
@@ -1131,17 +1104,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
     /**
      * Adds the join parts for option groups to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param bool         $andOptions
-     * @param string       $alias
-     *
-     * @return $this|ProductRepositoryInterface
      */
     protected function joinOptionGroups(
         QueryBuilder $qb,
-        $andOptions = false,
-        $alias = null
+        bool         $andOptions = false,
+        string       $alias = null
     ): ProductRepositoryInterface {
         $alias = $alias ?: $this->getAlias();
 
@@ -1161,23 +1128,16 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * Returns whether the collection has been initialized or not.
      *
-     * @param Collection $collection
-     *
-     * @return bool
-     *
      * @TODO Move in a AbstractResource or ResourceUtil class ? (search 'isInitialized' usages ...)
      */
-    protected function isInitializedCollection(Collection $collection = null): bool
+    protected function isInitializedCollection(?Collection $collection): bool
     {
         return (null !== $collection)
             && method_exists($collection, 'isInitialized')
             && $collection->{'isInitialized'}();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'p';
     }

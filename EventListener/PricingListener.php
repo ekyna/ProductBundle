@@ -154,7 +154,7 @@ class PricingListener implements EventSubscriberInterface
      */
     protected function buildName(PricingInterface $pricing)
     {
-        if (0 < strlen($pricing->getName())) {
+        if (!empty($pricing->getName())) {
             return;
         }
 

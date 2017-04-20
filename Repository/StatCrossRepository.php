@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use DatePeriod;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCross;
@@ -13,6 +16,12 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function array_column;
+use function array_map;
+use function array_replace;
+use function is_array;
+use function is_int;
+
 /**
  * Class StatCrossRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
@@ -20,37 +29,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class StatCrossRepository extends AbstractStatRepository
 {
-    /**
-     * @var Query
-     */
-    private $findOneQuery;
+    private ?Query $findOneQuery = null;
+    private ?Query $findBestByProductAndPeriodQuery = null;
+    private ?Query $findBestByProductAndPeriodAndGroupQuery = null;
+    private ?Query $findByProductAndTargetAndPeriodQuery = null;
+    private ?Query $findByProductAndTargetAndPeriodAndGroupQuery = null;
 
-    /**
-     * @var Query
-     */
-    private $findBestByProductAndPeriodQuery;
-
-    /**
-     * @var Query
-     */
-    private $findBestByProductAndPeriodAndGroupQuery;
-
-    /**
-     * @var Query
-     */
-    private $findByProductAndTargetAndPeriodQuery;
-
-    /**
-     * @var Query
-     */
-    private $findByProductAndTargetAndPeriodAndGroupQuery;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, StatCross::class);
@@ -58,13 +42,6 @@ class StatCrossRepository extends AbstractStatRepository
 
     /**
      * Finds one stat cross.
-     *
-     * @param Product $source
-     * @param Product $target
-     * @param Group   $group
-     * @param string  $date
-     *
-     * @return StatCross|null
      */
     public function findOne(Product $source, Product $target, Group $group, string $date): ?StatCross
     {
@@ -80,15 +57,9 @@ class StatCrossRepository extends AbstractStatRepository
     }
 
     /**
-     * Finds the best cross selling products by source and period (and optionally customer group).
-     *
-     * @param Product     $source
-     * @param \DatePeriod $period
-     * @param Group|null  $group
-     *
-     * @return int[]
+     * Finds the best cross-selling products by source and period (and optionally customer group).
      */
-    public function findBestByProductAndPeriod(Product $source, \DatePeriod $period, Group $group = null): array
+    public function findBestByProductAndPeriod(Product $source, DatePeriod $period, Group $group = null): array
     {
         $parameters = [
             'source'  => $source,
@@ -112,19 +83,14 @@ class StatCrossRepository extends AbstractStatRepository
     }
 
     /**
-     * Finds cross selling stats by source, target and period (and optionally customer group).
+     * Finds cross-selling stats by source, target and period (and optionally customer group).
      *
-     * @param Product     $source
-     * @param Product     $target
-     * @param \DatePeriod $period
-     * @param Group|null  $group
-     *
-     * @return int[]
+     * @return array<int>
      */
     public function findByProductAndTargetAndPeriod(
         Product $source,
         Product $target,
-        \DatePeriod $period,
+        DatePeriod $period,
         Group $group = null
     ): array {
         $parameters = [
@@ -151,9 +117,6 @@ class StatCrossRepository extends AbstractStatRepository
         return $return;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getFindProductsDefaultParameters(): array
     {
         return array_replace(parent::getFindProductsDefaultParameters(), [
@@ -161,9 +124,6 @@ class StatCrossRepository extends AbstractStatRepository
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function getFindProductsResults(Query $query, array $parameters): array
     {
         if ($parameters['id_only']) {
@@ -178,11 +138,6 @@ class StatCrossRepository extends AbstractStatRepository
         }, $query->getResult());
     }
 
-    /**
-     * Creates the "find products" query builder.
-     *
-     * @return QueryBuilder
-     */
     protected function createFindProductsQueryBuilder(): QueryBuilder
     {
         $qb = $this->createQueryBuilder('s');
@@ -194,12 +149,6 @@ class StatCrossRepository extends AbstractStatRepository
             ->andWhere($qb->expr()->eq('p.crossSelling', ':mode'));
     }
 
-    /**
-     * Configures the "find products" query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     */
     protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
     {
         $qb
@@ -209,10 +158,6 @@ class StatCrossRepository extends AbstractStatRepository
 
     /**
      * Configures the "find products" parameters resolver.
-     *
-     * @param OptionsResolver $resolver
-     *
-     * @noinspection PhpUnusedParameterInspection
      */
     protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
     {
@@ -238,9 +183,6 @@ class StatCrossRepository extends AbstractStatRepository
             });
     }
 
-    /**
-     * @return Query
-     */
     private function getFindBestByProductAndPeriodQuery(): Query
     {
         if ($this->findBestByProductAndPeriodQuery) {
@@ -265,9 +207,6 @@ class StatCrossRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindBestByProductAndPeriodAndGroupQuery(): Query
     {
         if ($this->findBestByProductAndPeriodAndGroupQuery) {
@@ -293,9 +232,6 @@ class StatCrossRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindByProductAndTargetAndPeriodQuery(): Query
     {
         if ($this->findByProductAndTargetAndPeriodQuery) {
@@ -316,9 +252,6 @@ class StatCrossRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindByProductAndTargetAndPeriodAndGroupQuery(): Query
     {
         if ($this->findByProductAndTargetAndPeriodAndGroupQuery) {
@@ -339,9 +272,6 @@ class StatCrossRepository extends AbstractStatRepository
             ->useQueryCache(true);
     }
 
-    /**
-     * @return Query
-     */
     private function getFindOneQuery(): Query
     {
         if ($this->findOneQuery) {

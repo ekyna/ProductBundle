@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
 
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
+use DateTime;
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
@@ -15,17 +18,8 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferResolver;
  */
 class Builder
 {
-    /**
-     * @var OfferResolver
-     */
-    protected $offerResolver;
+    protected OfferResolver $offerResolver;
 
-
-    /**
-     * Constructor.
-     *
-     * @param OfferResolver $offerResolver
-     */
     public function __construct(OfferResolver $offerResolver)
     {
         $this->offerResolver = $offerResolver;
@@ -34,24 +28,19 @@ class Builder
     /**
      * Builds the config tree for the given product.
      *
-     * @param Model\ProductInterface $product
-     * @param bool                   $visible
-     * @param array                  $exclude The option group ids to exclude
-     * @param float                  $netPrice
-     *
-     * @return Tree
+     * @param array $exclude The option group ids to exclude
      */
     public function build(
         Model\ProductInterface $product,
-        bool $visible = true,
-        array $exclude = [],
-        float $netPrice = null
+        bool                   $visible = true,
+        array                  $exclude = [],
+        Decimal                $netPrice = null
     ): Tree {
         $tree = new Tree();
         $tree->setVisible($visible);
 
         if (in_array($product->getType(), [Types::TYPE_VARIABLE, Types::TYPE_CONFIGURABLE], true)) {
-            throw new InvalidArgumentException("Unsupported product type.");
+            throw new InvalidArgumentException('Unsupported product type.');
         }
 
         $tree->setOffers($this->resolveOffers($product));
@@ -62,7 +51,7 @@ class Builder
         } elseif (!is_null($netPrice)) {
             $tree->addNetPrice($netPrice);
         } else {
-            $tree->addNetPrice($product->getNetPrice());
+            $tree->addNetPrice(clone $product->getNetPrice());
             if (Model\ProductTypes::isVariantType($product)) {
                 $this->buildComponents($tree, $product->getParent());
             } else {
@@ -80,16 +69,13 @@ class Builder
     /**
      * Builds the product's bundle slots tree children.
      *
-     * @param Tree                   $tree
-     * @param Model\ProductInterface $product
-     * @param bool                   $visible
-     * @param array                  $exclude
+     * @param array $exclude The option group ids to exclude
      */
     protected function buildBundleSlots(
-        Tree $tree,
+        Tree                   $tree,
         Model\ProductInterface $product,
-        bool $visible = true,
-        array $exclude = []
+        bool                   $visible = true,
+        array                  $exclude = []
     ): void {
         foreach ($product->getBundleSlots() as $slot) {
             /** @var Model\BundleChoiceInterface $choice */
@@ -111,23 +97,20 @@ class Builder
 
     /**
      * Builds the product's components tree children.
-     *
-     * @param Tree                   $tree
-     * @param Model\ProductInterface $product
      */
     protected function buildComponents(Tree $tree, Model\ProductInterface $product): void
     {
         foreach ($product->getComponents() as $component) {
             $price = is_null($component->getNetPrice())
-                ? $component->getChild()->getNetPrice()
-                : $component->getNetPrice();
+                ? clone $component->getChild()->getNetPrice()
+                : clone $component->getNetPrice();
 
             $child = new Tree();
             $child
                 ->setVisible(false)
                 ->setNetPrice($price)
                 ->setOffers($this->resolveOffers($component->getChild()))
-                ->setQuantity($component->getQuantity());
+                ->setQuantity(clone $component->getQuantity());
 
             $tree->addChild($child);
         }
@@ -136,12 +119,10 @@ class Builder
     /**
      * Builds the options groups.
      *
-     * @param Tree                         $tree
-     * @param Model\OptionGroupInterface[] $optionGroups
+     * @param array<Model\OptionGroupInterface> $optionGroups
      */
     protected function buildOptionGroups(Tree $tree, array $optionGroups): void
     {
-        /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($optionGroups as $optionGroup) {
             if (!$optionGroup->isRequired()) {
                 continue;
@@ -150,14 +131,14 @@ class Builder
             $og = new OptionGroup();
 
             foreach ($optionGroup->getOptions() as $option) {
-                $item = new Item(0);
+                $item = new Item();
 
-                if (null !== $product = $option->getProduct()) {
+                if ($product = $option->getProduct()) {
                     $item->setOffers($this->resolveOffers($product));
                     $item->setNetPrice($product->getNetPrice());
                 }
 
-                if (null !== $option->getNetPrice()) {
+                if ($option->getNetPrice()) {
                     $item->setNetPrice($option->getNetPrice());
                 }
 
@@ -170,16 +151,12 @@ class Builder
 
     /**
      * Resolves the product offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
      */
     protected function resolveOffers(Model\ProductInterface $product): array
     {
         $offers = [];
 
-        foreach ($this->offerResolver->resolve($product) as &$offer) {
+        foreach ($this->offerResolver->resolve($product) as $offer) {
             if (1 != $offer['min_qty']) {
                 continue;
             }
@@ -192,24 +169,14 @@ class Builder
 
     /**
      * Returns the key (<group_id>-<country_id>).
-     *
-     * @param array $data
-     *
-     * @return string
      */
     protected function getKey(array $data): string
     {
         return sprintf('%d-%d', $data['group_id'], $data['country_id']);
     }
 
-
     /**
-     * Flattens the given tree regarding to the given key.
-     *
-     * @param Tree   $tree
-     * @param string $key
-     *
-     * @return Result
+     * Flattens the given tree regarding the given key.
      */
     public function flatten(Tree $tree, string $key): Result
     {
@@ -227,17 +194,17 @@ class Builder
 
         if (0 < $price && !is_null($offer = $tree->getBestOffer($flat->getKey()))) {
             // Store discount amount for each type
-            foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+            foreach ([Model\OfferInterface::TYPE_SPECIAL, Model\OfferInterface::TYPE_PRICING] as $type) {
                 if (!isset($offer['details'][$type])) {
                     continue;
                 }
 
-                $discount = round($price * $offer['details'][$type] / 100, 5);
+                $discount = $price->mul($offer['details'][$type])->div(100)->round(5);
                 $flat->addDiscount($type, $discount);
                 $price -= $discount;
 
                 if (isset($offer['ends_at'])) {
-                    $flat->addEndsAt(new \DateTime($offer['ends_at']));
+                    $flat->addEndsAt(new DateTime($offer['ends_at']));
                 }
             }
         }
@@ -252,7 +219,7 @@ class Builder
         $visible = $tree->getVisible();
 
         foreach ($tree->getChildren() as $child) {
-            $price = $child->getNetPrice() * $child->getTotalQuantity();
+            $price = $child->getNetPrice()->mul($child->getTotalQuantity());
 
             $flat->addOriginalPrice($price);
 
@@ -260,15 +227,15 @@ class Builder
             if ($this->flattenTree($flat, $child)) {
                 $visible = true;
 
-                // Pick offer regarding to key
+                // Pick offer regarding key
                 if (null !== $offer = $child->getBestOffer($flat->getKey())) {
                     // Store discount amount for each type
-                    foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+                    foreach ([Model\OfferInterface::TYPE_SPECIAL, Model\OfferInterface::TYPE_PRICING] as $type) {
                         if (!isset($offer['details'][$type])) {
                             continue;
                         }
 
-                        $discount = round($price * $offer['details'][$type] / 100, 5);
+                        $discount = $price->mul($offer['details'][$type])->div(100)->round(5);
                         $flat->addDiscount($type, $discount);
                         $price -= $discount;
                     }
@@ -287,14 +254,14 @@ class Builder
         $visible = true;
         $flat->setStartingFrom(true);
 
-        foreach ($tree->getOptionGroups() as $group) {
+        foreach ($optionGroups as $group) {
             $bestOChild = $bestOPrice = null;
             $bestSChild = $bestSPrice = null;
             $bestDiscounts = [];
 
             // Find best option
             foreach ($group->getOptions() as $option) {
-                $oPrice = $option->getNetPrice() * $tree->getTotalQuantity();
+                $oPrice = $option->getNetPrice()->mul($tree->getTotalQuantity());
 
                 // Best original price
                 if (is_null($bestOChild) || $bestOPrice > $oPrice) {
@@ -310,7 +277,7 @@ class Builder
                 // TODO compare with tree root offer
 
                 // If option has the best sell price
-                $sPrice = round($oPrice * (1 - $offer['percent'] / 100), 5);
+                $sPrice = $oPrice->mul((string)(1 - $offer['percent'] / 100))->round(5);
                 if (is_null($bestSChild) || $bestSPrice > $sPrice) {
                     $bestSChild = $option;
                     $bestSPrice = $sPrice;
@@ -319,12 +286,12 @@ class Builder
 
                     // Store discount amount for each type
                     $base = $oPrice;
-                    foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+                    foreach ([Model\OfferInterface::TYPE_SPECIAL, Model\OfferInterface::TYPE_PRICING] as $type) {
                         if (!isset($offer['details'][$type])) {
                             continue;
                         }
 
-                        $discount = round($oPrice * $offer['details'][$type] / 100, 5);
+                        $discount = $oPrice->mul((string)($offer['details'][$type] / 100))->round(5);
                         $bestDiscounts[$type] = $discount;
                         $base -= $discount;
                     }
@@ -332,7 +299,7 @@ class Builder
             }
 
             if (is_null($bestOPrice)) {
-                $bestOPrice = 0;
+                $bestOPrice = new Decimal(0);
             }
             if (is_null($bestSPrice)) {
                 $bestSPrice = $bestOPrice;
@@ -342,7 +309,7 @@ class Builder
             $flat->addSellPrice($bestSPrice);
 
             // Add best option's discount amount for each types
-            foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+            foreach ([Model\OfferInterface::TYPE_SPECIAL, Model\OfferInterface::TYPE_PRICING] as $type) {
                 if (isset($bestDiscounts[$type])) {
                     $flat->addDiscount($type, $bestDiscounts[$type]);
                 }

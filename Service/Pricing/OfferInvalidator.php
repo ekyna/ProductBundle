@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,28 +16,13 @@ use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
  */
 class OfferInvalidator
 {
-    /**
-     * @var string
-     */
-    private $productClass;
+    private string $productClass;
+    /** @var array<int> */
+    private array $productIds;
+    /** @var array<int> */
+    private array $brandIds;
 
-    /**
-     * @var int[]
-     */
-    private $productIds;
-
-    /**
-     * @var int[]
-     */
-    private $brandIds;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $productClass
-     */
-    public function __construct($productClass)
+    public function __construct(string $productClass)
     {
         $this->productClass = $productClass;
 
@@ -48,13 +35,11 @@ class OfferInvalidator
     public function clear(): void
     {
         $this->productIds = [];
-        $this->brandIds   = [];
+        $this->brandIds = [];
     }
 
     /**
      * Invalidates scheduled offers.
-     *
-     * @param EntityManagerInterface $manager
      */
     public function flush(EntityManagerInterface $manager): void
     {
@@ -100,8 +85,6 @@ class OfferInvalidator
 
     /**
      * Invalidates offers for the given pricing.
-     *
-     * @param PricingInterface $pricing
      */
     public function invalidatePricing(PricingInterface $pricing): void
     {
@@ -118,8 +101,6 @@ class OfferInvalidator
 
     /**
      * Invalidates offers for the given special offer.
-     *
-     * @param SpecialOfferInterface $specialOffer
      */
     public function invalidateSpecialOffer(SpecialOfferInterface $specialOffer): void
     {
@@ -140,8 +121,6 @@ class OfferInvalidator
 
     /**
      * Schedule offer invalidation by product id.
-     *
-     * @param int $id
      */
     public function invalidateByProductId(int $id = null): void
     {
@@ -152,8 +131,6 @@ class OfferInvalidator
 
     /**
      * Schedule offer invalidation by brand id.
-     *
-     * @param int $id
      */
     public function invalidateByBrandId(int $id = null): void
     {

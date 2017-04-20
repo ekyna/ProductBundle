@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface;
@@ -15,12 +17,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResupplyOrdersType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var SupplierOrderInterface[] $supplierOrders */
+        /** @var array<SupplierOrderInterface> $supplierOrders */
         $supplierOrders = $options['supplier_orders'];
 
         foreach ($supplierOrders as $supplierOrder) {
@@ -35,10 +34,7 @@ class ResupplyOrdersType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -48,7 +44,7 @@ class ResupplyOrdersType extends AbstractType
             ->setAllowedValues('supplier_orders', function ($value) {
                 foreach ($value as $sp) {
                     if (!$sp instanceof SupplierOrderInterface) {
-                        throw new InvalidOptionsException("Expected array of " . SupplierOrderInterface::class);
+                        throw new InvalidOptionsException('Expected array of ' . SupplierOrderInterface::class);
                     }
                 }
 
@@ -56,10 +52,7 @@ class ResupplyOrdersType extends AbstractType
             });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_inventory_resupply_orders';
     }

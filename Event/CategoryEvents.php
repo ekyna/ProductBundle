@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,23 +11,20 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class CategoryEvents
 {
-    const INSERT      = 'ekyna_product.category.insert';
-    const UPDATE      = 'ekyna_product.category.update';
-    const DELETE      = 'ekyna_product.category.delete';
+    public const INSERT      = 'ekyna_product.category.insert';
+    public const UPDATE      = 'ekyna_product.category.update';
+    public const DELETE      = 'ekyna_product.category.delete';
 
-    const INITIALIZE  = 'ekyna_product.category.initialize';
+    public const PRE_CREATE  = 'ekyna_product.category.pre_create';
+    public const POST_CREATE = 'ekyna_product.category.post_create';
 
-    const PRE_CREATE  = 'ekyna_product.category.pre_create';
-    const POST_CREATE = 'ekyna_product.category.post_create';
+    public const PRE_UPDATE  = 'ekyna_product.category.pre_update';
+    public const POST_UPDATE = 'ekyna_product.category.post_update';
 
-    const PRE_UPDATE  = 'ekyna_product.category.pre_update';
-    const POST_UPDATE = 'ekyna_product.category.post_update';
+    public const PRE_DELETE  = 'ekyna_product.category.pre_delete';
+    public const POST_DELETE = 'ekyna_product.category.post_delete';
 
-    const PRE_DELETE  = 'ekyna_product.category.pre_delete';
-    const POST_DELETE = 'ekyna_product.category.post_delete';
-
-    const PUBLIC_URL  = 'ekyna_product.category.public_url';
-
+    public const PUBLIC_URL  = 'ekyna_product.category.public_url';
 
     /**
      * Disabled constructor.

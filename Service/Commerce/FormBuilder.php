@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
+use Ekyna\Component\Commerce\Common\Model\Units;
 use Ekyna\Component\Commerce\Stock\Helper\AvailabilityHelperInterface;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
+use NumberFormatter;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class FormBuilder
@@ -26,71 +33,25 @@ class FormBuilder
 {
     use Imagine\CacheManagerAwareTrait;
 
-    /**
-     * @var ProductProvider
-     */
-    protected $productProvider;
+    protected ProductProvider             $productProvider;
+    protected ProductFilter               $productFilter;
+    protected PriceCalculator             $priceCalculator;
+    protected AvailabilityHelperInterface $availabilityHelper;
+    protected LocaleProviderInterface     $localeProvider;
+    protected TranslatorInterface         $translator;
+    protected string                      $noImagePath;
+    protected NumberFormatter             $formatter;
 
-    /**
-     * @var ProductFilter
-     */
-    protected $productFilter;
+    protected ?ContextInterface $context = null;
 
-    /**
-     * @var PriceCalculator
-     */
-    protected $priceCalculator;
-
-    /**
-     * @var AvailabilityHelperInterface
-     */
-    protected $availabilityHelper;
-
-    /**
-     * @var LocaleProviderInterface
-     */
-    protected $localeProvider;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var string
-     */
-    protected $noImagePath;
-
-    /**
-     * @var \NumberFormatter
-     */
-    protected $formatter;
-
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductProvider             $productProvider
-     * @param ProductFilter               $productFilter
-     * @param PriceCalculator             $priceCalculator
-     * @param AvailabilityHelperInterface $availabilityHelper
-     * @param LocaleProviderInterface     $localeProvider
-     * @param TranslatorInterface         $translator
-     * @param string                      $noImagePath
-     */
     public function __construct(
-        ProductProvider $productProvider,
-        ProductFilter $productFilter,
-        PriceCalculator $priceCalculator,
+        ProductProvider             $productProvider,
+        ProductFilter               $productFilter,
+        PriceCalculator             $priceCalculator,
         AvailabilityHelperInterface $availabilityHelper,
-        LocaleProviderInterface $localeProvider,
-        TranslatorInterface $translator,
-        $noImagePath = '/bundles/ekynaproduct/img/no-image.gif'
+        LocaleProviderInterface     $localeProvider,
+        TranslatorInterface         $translator,
+        string                      $noImagePath = '/bundles/ekynaproduct/img/no-image.gif'
     ) {
         $this->productProvider = $productProvider;
         $this->productFilter = $productFilter;
@@ -101,50 +62,39 @@ class FormBuilder
         $this->noImagePath = $noImagePath;
 
         // TODO Use formatter factory
-        $this->formatter = \NumberFormatter::create(
+        $this->formatter = NumberFormatter::create(
             $this->localeProvider->getCurrentLocale(),
-            \NumberFormatter::CURRENCY
+            NumberFormatter::CURRENCY
         );
     }
 
-    /**
-     * Sets the context.
-     *
-     * @param ContextInterface $context
-     */
-    public function setContext(ContextInterface $context)
+    public function setContext(ContextInterface $context): void
     {
         $this->context = $context;
     }
 
-    /**
-     * Returns the context.
-     *
-     * @return ContextInterface
-     */
-    public function getContext()
+    public function getContext(): ?ContextInterface
     {
         return $this->context;
     }
 
     /**
      * Builds the sale item form.
-     *
-     * @param FormInterface     $form
-     * @param SaleItemInterface $item
      */
-    public function buildItemForm(FormInterface $form, SaleItemInterface $item)
+    public function buildItemForm(FormInterface $form, SaleItemInterface $item): void
     {
         /** @var Model\ProductInterface $product */
         $product = $this->productProvider->resolve($item);
 
         $this->buildProductForm($form, $product, is_null($item->getParent()));
 
+        $type = Units::PIECE === $product->getUnit() ? Sf\IntegerType::class : Sf\NumberType::class;
+
         // Quantity
-        // TODO packaging
-        $form->add('quantity', Sf\IntegerType::class, [
-            'label' => 'ekyna_core.field.quantity',
-            'attr'  => [
+        $form->add('quantity', $type, [
+            'label'   => t('field.quantity', [], 'EkynaUi'),
+            'decimal' => true,
+            'attr'    => [
                 'class' => 'sale-item-quantity',
             ],
         ]);
@@ -152,11 +102,8 @@ class FormBuilder
 
     /**
      * Builds the sale item form view.
-     *
-     * @param FormView          $view
-     * @param SaleItemInterface $item
      */
-    public function buildItemFormView(FormView $view, SaleItemInterface $item)
+    public function buildItemFormView(FormView $view, SaleItemInterface $item): void
     {
         /** @var Model\ProductInterface $product */
         $product = $this->productProvider->resolve($item);
@@ -172,25 +119,20 @@ class FormBuilder
 
     /**
      * Builds the bundle choice form.
-     *
-     * @param FormInterface               $form
-     * @param Model\BundleChoiceInterface $bundleChoice
      */
-    public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice)
+    public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice): void
     {
         // TODO Disable fields for non selected bundle choices.
         $this->buildProductForm($form, $bundleChoice->getProduct(), false, $bundleChoice->getExcludedOptionGroups());
 
-        // TODO Use packaging format (+ integer/number field type)
+        $unit = ($product = $bundleChoice->getProduct()) ? $product->getUnit() : Units::PIECE;
 
-        $min = $bundleChoice->getMinQuantity();
-        $max = $bundleChoice->getMaxQuantity();
+        $min = Units::fixed($bundleChoice->getMinQuantity(), $unit);
+        $max = Units::fixed($bundleChoice->getMaxQuantity(), $unit);
 
         $constraints = [
-            new Assert\Range([
-                'min' => $min,
-                'max' => $max,
-            ]),
+            new Assert\GreaterThanOrEqual($min),
+            new Assert\LessThanOrEqual($max),
         ];
 
         $attr = [
@@ -201,12 +143,15 @@ class FormBuilder
 
         $disabled = $min === $max;
         if ($disabled) {
-            $attr['data-locked'] = "1";
+            $attr['data-locked'] = '1';
         }
 
+        $type = Units::PIECE === $unit ? Sf\IntegerType::class : Sf\NumberType::class;
+
         // Quantity
-        $form->add('quantity', Sf\IntegerType::class, [
-            'label'       => 'ekyna_core.field.quantity',
+        $form->add('quantity', $type, [
+            'label'       => t('field.quantity', [], 'EkynaUi'),
+            'decimal'     => true,
             'disabled'    => $disabled,
             'constraints' => $constraints,
             'attr'        => $attr,
@@ -215,10 +160,8 @@ class FormBuilder
 
     /**
      * Clears the bundle choice form.
-     *
-     * @param FormInterface $form
      */
-    public function clearBundleChoiceForm(FormInterface $form)
+    public function clearBundleChoiceForm(FormInterface $form): void
     {
         foreach (['variant', 'configuration', 'options', 'quantity'] as $field) {
             if ($form->has($field)) {
@@ -229,12 +172,8 @@ class FormBuilder
 
     /**
      * Builds the bundle choice config.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
      */
-    public function buildBundleChoiceConfig(Model\ProductInterface $product)
+    public function buildBundleChoiceConfig(Model\ProductInterface $product): array
     {
         $config = [];
 
@@ -248,10 +187,6 @@ class FormBuilder
 
     /**
      * Builds the bundle slot config.
-     *
-     * @param Model\BundleSlotInterface $slot
-     *
-     * @return array
      */
     public function buildBundleSlotConfig(Model\BundleSlotInterface $slot): array
     {
@@ -263,12 +198,8 @@ class FormBuilder
 
     /**
      * Returns the bundle choice attributes.
-     *
-     * @param Model\BundleChoiceInterface $choice
-     *
-     * @return array
      */
-    public function bundleChoiceAttr(Model\BundleChoiceInterface $choice)
+    public function bundleChoiceAttr(Model\BundleChoiceInterface $choice): array
     {
         return [
             'data-rules' => $this->buildBundleRulesConfig($choice->getRules()->toArray()),
@@ -277,12 +208,8 @@ class FormBuilder
 
     /**
      * Returns the variant choice label.
-     *
-     * @param Model\ProductInterface|null $variant
-     *
-     * @return null|string
      */
-    public function variantChoiceLabel(Model\ProductInterface $variant = null)
+    public function variantChoiceLabel(Model\ProductInterface $variant = null): ?string
     {
         if (null === $variant) {
             return null;
@@ -298,14 +225,13 @@ class FormBuilder
     /**
      * Returns the variant choice attributes.
      *
-     * @param Model\ProductInterface|null $variant
-     * @param bool                        $root
-     * @param array                       $exclude The option groups ids to exclude
-     *
-     * @return array
+     * @param array $exclude The option groups ids to exclude
      */
-    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true, array $exclude = [])
-    {
+    public function variantChoiceAttr(
+        Model\ProductInterface $variant = null,
+        bool                   $root = true,
+        array                  $exclude = []
+    ): array {
         if (null === $variant) {
             return [];
         }
@@ -326,12 +252,8 @@ class FormBuilder
 
     /**
      * Returns the option choice label.
-     *
-     * @param Model\OptionInterface|null $option
-     *
-     * @return null|string
      */
-    public function optionChoiceLabel(Model\OptionInterface $option = null)
+    public function optionChoiceLabel(Model\OptionInterface $option = null): ?string
     {
         if (null === $option) {
             return null;
@@ -357,12 +279,9 @@ class FormBuilder
     /**
      * Returns the option choice attributes.
      *
-     * @param Model\OptionInterface|null $option
-     * @param array                      $exclude The option groups ids to exclude
-     *
-     * @return array
+     * @param array $exclude The option groups ids to exclude
      */
-    public function optionChoiceAttr(Model\OptionInterface $option = null, array $exclude = [])
+    public function optionChoiceAttr(Model\OptionInterface $option = null, array $exclude = []): array
     {
         if (null === $option) {
             return [];
@@ -376,14 +295,9 @@ class FormBuilder
     /**
      * Returns the main image for the given product.
      *
-     * @param Model\ProductInterface $product
-     * @param string                 $filter The imagine filter to apply
-     *
-     * @return string
-     *
-     * @TODO Refactor with (twig) ProductExtension::getProductImagePath()
+     * @TODO Refactor with \Ekyna\Bundle\ProductBundle\Twig\ProductRenderer::getProductImagePath
      */
-    public function getProductImagePath(Model\ProductInterface $product, $filter = 'slot_choice_thumb')
+    public function getProductImagePath(Model\ProductInterface $product, string $filter = 'slot_choice_thumb'): string
     {
         $images = $product->getMedias([MediaTypes::IMAGE]);
 
@@ -394,7 +308,7 @@ class FormBuilder
         }
 
         if (0 < $images->count()) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface $image */
+            /** @var ProductMediaInterface $image */
             $image = $images->first();
 
             // TODO Absolute path instead of url
@@ -411,7 +325,7 @@ class FormBuilder
      *
      * @return string
      */
-    public function getNoImagePath()
+    public function getNoImagePath(): string
     {
         return $this->noImagePath;
     }
@@ -423,7 +337,7 @@ class FormBuilder
      *
      * @return array
      */
-    public function getFormConfig(SaleItemInterface $item)
+    public function getFormConfig(SaleItemInterface $item): array
     {
         $config = [];
 
@@ -444,7 +358,7 @@ class FormBuilder
      *
      * @return array
      */
-    public function getFormGlobals()
+    public function getFormGlobals(): array
     {
         return [
             'mode'     => $this->context->getVatDisplayMode(),
@@ -454,37 +368,29 @@ class FormBuilder
 
     /**
      * Returns the sale item configure form translations.
-     *
-     * @return array
      */
-    public function getFormTranslations()
+    public function getFormTranslations(): array
     {
         return [
-            'quantity'    => $this->translate('ekyna_core.field.quantity'),
-            'discount'    => $this->translate('ekyna_product.sale_item_configure.discount'),
-            'unit_price'  => $this->translate('ekyna_product.sale_item_configure.unit_price'),
-            'total'       => $this->translate('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'  => $this->translate('ekyna_product.sale_item_configure.rule_table'),
-            'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
-            'ati'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.ati'),
-            'net'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.net'),
-            'from'        => $this->translate('ekyna_product.pricing_rule.field.from'),
-            'range'       => $this->translate('ekyna_product.pricing_rule.field.range'),
-            'add_to_cart' => $this->translate('ekyna_commerce.button.add_to_cart'),
-            'pre_order'   => $this->translate('ekyna_commerce.button.pre_order'),
+            'quantity'    => $this->translate('field.quantity', [], 'EkynaCore'),
+            'discount'    => $this->translate('sale_item_configure.discount', [], 'EkynaProduct'),
+            'unit_price'  => $this->translate('sale_item_configure.unit_price', [], 'EkynaProduct'),
+            'total'       => $this->translate('sale_item_configure.total_price', [], 'EkynaProduct'),
+            'rule_table'  => $this->translate('sale_item_configure.rule_table', [], 'EkynaProduct'),
+            'price_table' => $this->translate('sale_item_configure.price_table', [], 'EkynaProduct'),
+            'ati'         => $this->translate('pricing.vat_display_mode.ati', [], 'EkynaCommerce'),
+            'net'         => $this->translate('pricing.vat_display_mode.net', [], 'EkynaCommerce'),
+            'from'        => $this->translate('pricing_rule.field.from', [], 'EkynaProduct'),
+            'range'       => $this->translate('pricing_rule.field.range', [], 'EkynaProduct'),
+            'add_to_cart' => $this->translate('button.add_to_cart', [], 'EkynaCommerce'),
+            'pre_order'   => $this->translate('button.pre_order', [], 'EkynaCommerce'),
         ];
     }
 
     /**
      * Translates the given message.
-     *
-     * @param string $id
-     * @param array  $parameters
-     * @param string $domain
-     *
-     * @return string
      */
-    public function translate($id, array $parameters = [], $domain = null)
+    public function translate(string $id, array $parameters = [], string $domain = null): string
     {
         return $this->translator->trans($id, $parameters, $domain);
     }
@@ -498,11 +404,11 @@ class FormBuilder
      * @param array                  $exclude The option groups ids to exclude
      */
     protected function buildProductForm(
-        FormInterface $form,
+        FormInterface          $form,
         Model\ProductInterface $product,
-        bool $root = true,
-        array $exclude = []
-    ) {
+        bool                   $root = true,
+        array                  $exclude = []
+    ): void {
         $repository = $this->productProvider->getRepository();
 
         // Variable : add variant choice form
@@ -517,7 +423,6 @@ class FormBuilder
                 'root_item'       => $root,
                 'exclude_options' => $exclude,
             ]);
-
         } // Configurable : add configuration form
         elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             $repository->loadConfigurableSlots($product);
@@ -543,11 +448,12 @@ class FormBuilder
      * @param Model\OptionInterface $option  The option
      * @param array                 $exclude The option group ids to exclude
      * @param bool                  $cascade Whether to allow option cascading
-     *
-     * @return array
      */
-    protected function buildOptionConfig(Model\OptionInterface $option, array $exclude = [], $cascade = true)
-    {
+    protected function buildOptionConfig(
+        Model\OptionInterface $option,
+        array                 $exclude = [],
+        bool                  $cascade = true
+    ): array {
         $config = [];
 
         if (null !== $product = $option->getProduct()) {
@@ -571,11 +477,12 @@ class FormBuilder
      * @param Model\ProductInterface $product The product
      * @param array                  $exclude The option group ids to exclude
      * @param bool                   $cascade Whether to allow option cascading
-     *
-     * @return array
      */
-    protected function buildOptionsGroupsConfig(Model\ProductInterface $product, array $exclude = [], $cascade = true)
-    {
+    protected function buildOptionsGroupsConfig(
+        Model\ProductInterface $product,
+        array                  $exclude = [],
+        bool                   $cascade = true
+    ): array {
         $groups = [];
 
         $optionGroups = $this->productFilter->getOptionGroups($product, $exclude);
@@ -596,7 +503,7 @@ class FormBuilder
                 'id'          => $optionGroup->getId(),
                 'label'       => $optionGroup->getTitle(),
                 'required'    => $optionGroup->isRequired(),
-                'placeholder' => $this->translate('ekyna_product.sale_item_configure.choose_option'),
+                'placeholder' => $this->translate('sale_item_configure.choose_option', [], 'EkynaProduct'),
                 'position'    => $optionGroup->getPosition(),
                 'options'     => $options,
             ];
@@ -607,12 +514,8 @@ class FormBuilder
 
     /**
      * Builds the bundle rules config.
-     *
-     * @param array $rules
-     *
-     * @return array
      */
-    protected function buildBundleRulesConfig(array $rules)
+    protected function buildBundleRulesConfig(array $rules): array
     {
         $config = [];
 

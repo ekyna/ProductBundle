@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
@@ -17,57 +19,21 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 abstract class AbstractVariantHandler extends AbstractHandler
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface     $persistenceHelper;
+    protected LocaleProviderInterface        $localeProvider;
+    protected AttributeTypeRegistryInterface $typeRegistry;
+    protected PriceCalculator                $priceCalculator;
+    protected ProductRepositoryInterface     $productRepository;
 
-    /**
-     * @var LocaleProviderInterface
-     */
-    protected $localeProvider;
+    private ?VariantUpdater  $variantUpdater  = null;
+    private ?VariableUpdater $variableUpdater = null;
 
-    /**
-     * @var AttributeTypeRegistryInterface
-     */
-    protected $typeRegistry;
-
-    /**
-     * @var PriceCalculator
-     */
-    protected $priceCalculator;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    protected $productRepository;
-
-    /**
-     * @var VariantUpdater
-     */
-    private $variantUpdater;
-
-    /**
-     * @var VariableUpdater
-     */
-    private $variableUpdater;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface     $persistenceHelper
-     * @param LocaleProviderInterface        $localeProvider
-     * @param AttributeTypeRegistryInterface $typeRegistry
-     * @param PriceCalculator                $priceCalculator
-     * @param ProductRepositoryInterface     $productRepository
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider,
-        PriceCalculator $priceCalculator,
+        PersistenceHelperInterface     $persistenceHelper,
+        LocaleProviderInterface        $localeProvider,
+        PriceCalculator                $priceCalculator,
         AttributeTypeRegistryInterface $typeRegistry,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface     $productRepository
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->localeProvider = $localeProvider;
@@ -76,12 +42,7 @@ abstract class AbstractVariantHandler extends AbstractHandler
         $this->productRepository = $productRepository;
     }
 
-    /**
-     * Returns the variant updater.
-     *
-     * @return VariantUpdater
-     */
-    protected function getVariantUpdater()
+    protected function getVariantUpdater(): VariantUpdater
     {
         if (null !== $this->variantUpdater) {
             return $this->variantUpdater;
@@ -94,12 +55,7 @@ abstract class AbstractVariantHandler extends AbstractHandler
         );
     }
 
-    /**
-     * Returns the variable updater.
-     *
-     * @return VariableUpdater
-     */
-    protected function getVariableUpdater()
+    protected function getVariableUpdater(): VariableUpdater
     {
         if (null !== $this->variableUpdater) {
             return $this->variableUpdater;

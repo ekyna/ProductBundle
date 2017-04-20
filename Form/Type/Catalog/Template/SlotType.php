@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
@@ -16,10 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SlotType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['product']) {
             $builder->add('product', ProductSearchType::class, [
@@ -35,10 +34,7 @@ class SlotType extends AbstractType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'label'      => false,
@@ -48,10 +44,7 @@ class SlotType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): ?string
     {
         return 'ekyna_product_catalog_slot';
     }

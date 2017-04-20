@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type\TextAttributeType;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class TextType
@@ -13,10 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class TextType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function getConstraints(ProductAttributeInterface $productAttribute)
+    public function getConstraints(ProductAttributeInterface $productAttribute): array
     {
         if ($productAttribute->getAttributeSlot()->isRequired()) {
             return [
@@ -29,19 +31,18 @@ class TextType extends AbstractType
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFormType()
+    public function getFormType(): ?string
     {
         return TextAttributeType::class;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getLabel()
+    public function getLabel(): TranslatableInterface
     {
-        return 'ekyna_product.attribute.type.text';
+        return t('attribute.type.text', [], 'EkynaProduct');
+    }
+
+    public static function getName(): string
+    {
+        return 'text';
     }
 }

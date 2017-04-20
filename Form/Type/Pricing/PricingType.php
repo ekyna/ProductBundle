@@ -1,29 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Pricing;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\CountryChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Customer\CustomerGroupChoiceType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class PricingType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Pricing
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class PricingType extends ResourceFormType
+class PricingType extends AbstractResourceType
 {
-    /**
-     * @inheritdoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('groups', CustomerGroupChoiceType::class, [
@@ -36,13 +37,13 @@ class PricingType extends ResourceFormType
                 'required' => false,
             ])
             ->add('rules', CollectionType::class, [
-                'label'           => 'ekyna_product.pricing.field.rules',
+                'label'           => t('pricing.field.rules', [], 'EkynaProduct'),
                 'entry_type'      => PricingRuleType::class,
                 'entry_options'   => [],
                 'prototype_name'  => '__pricing_rule__',
                 'allow_add'       => true,
                 'allow_delete'    => true,
-                'add_button_text' => 'ekyna_product.pricing_rule.button.add',
+                'add_button_text' => t('pricing_rule.button.add', [], 'EkynaProduct'),
             ])
             ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\PricingInterface $pricing */
@@ -56,10 +57,10 @@ class PricingType extends ResourceFormType
         if (!$options['product_mode']) {
             $builder
                 ->add('name', TextType::class, [
-                    'label'    => 'ekyna_core.field.name',
+                    'label'    => t('field.name', [], 'EkynaUi'),
                     'required' => false,
                     'attr'     => [
-                        'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                        'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
                     ],
                 ])
                 ->add('brands', BrandChoiceType::class, [
@@ -68,18 +69,7 @@ class PricingType extends ResourceFormType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
-    {
-        return 'ekyna_product_pricing';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -88,5 +78,10 @@ class PricingType extends ResourceFormType
                 'product_mode' => false,
             ])
             ->setAllowedTypes('product_mode', 'bool');
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'ekyna_product_pricing';
     }
 }

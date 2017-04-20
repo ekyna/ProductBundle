@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
 use Symfony\Component\Form\AbstractType;
@@ -11,10 +13,7 @@ use Symfony\Component\Form\AbstractType;
  */
 class CoverType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OptionsType::class;
     }

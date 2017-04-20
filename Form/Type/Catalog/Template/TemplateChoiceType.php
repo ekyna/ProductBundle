@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
@@ -8,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class TemplateChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template
@@ -15,31 +19,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TemplateChoiceType extends AbstractType
 {
-    /**
-     * @var CatalogRegistry
-     */
-    protected $registry;
+    protected CatalogRegistry $registry;
 
-
-    /**
-     * Constructor.
-     *
-     * @param CatalogRegistry $registry
-     */
     public function __construct(CatalogRegistry $registry)
     {
         $this->registry = $registry;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-
         $resolver->setDefaults([
-            'label'      => 'ekyna_product.catalog.field.template',
-            'choices'    => function (Options $options) {
+            'label'                     => t('catalog.field.template', [], 'EkynaProduct'),
+            'choices'                   => function (Options $options) {
                 $choices = [];
 
                 foreach ($this->registry->allTemplates() as $name => $config) {
@@ -52,14 +43,12 @@ class TemplateChoiceType extends AbstractType
 
                 return $choices;
             },
-            'with_slots' => false,
+            'choice_translation_domain' => 'EkynaProduct',
+            'with_slots'                => false,
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

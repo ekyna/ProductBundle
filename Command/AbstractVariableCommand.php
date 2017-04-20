@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,45 +20,23 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 abstract class AbstractVariableCommand extends Command
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    protected $repository;
+    protected ProductRepositoryInterface $repository;
+    protected EntityManagerInterface     $manager;
+    protected PriceCalculator            $calculator;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $manager;
-
-    /**
-     * @var PriceCalculator
-     */
-    protected $calculator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     * @param EntityManagerInterface     $manager
-     * @param PriceCalculator            $calculator
-     */
     public function __construct(
         ProductRepositoryInterface $repository,
-        EntityManagerInterface $manager,
-        PriceCalculator $calculator
+        EntityManagerInterface     $manager,
+        PriceCalculator            $calculator
     ) {
         parent::__construct();
 
         $this->repository = $repository;
-        $this->manager    = $manager;
+        $this->manager = $manager;
         $this->calculator = $calculator;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('variableId', InputArgument::OPTIONAL, 'The variable product identifier.');
     }
@@ -76,7 +57,7 @@ abstract class AbstractVariableCommand extends Command
             ]);
 
             if (null === $variable) {
-                throw new \InvalidArgumentException("Variable product with id $variableId not found.");
+                throw new InvalidArgumentException('Variable product not found.');
             }
 
             return [$variable];

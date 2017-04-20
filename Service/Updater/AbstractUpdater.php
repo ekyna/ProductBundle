@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
@@ -11,17 +13,8 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
  */
 abstract class AbstractUpdater
 {
-    /**
-     * @var PriceCalculator
-     */
-    protected $priceCalculator;
+    protected PriceCalculator $priceCalculator;
 
-
-    /**
-     * Constructor.
-     *
-     * @param PriceCalculator $priceCalculator
-     */
     public function __construct(PriceCalculator $priceCalculator)
     {
         $this->priceCalculator = $priceCalculator;

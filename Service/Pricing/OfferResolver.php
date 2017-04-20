@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
+use Decimal\Decimal;
+use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
@@ -14,58 +17,35 @@ use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
  */
 class OfferResolver
 {
-    /**
-     * @var PricingRepositoryInterface
-     */
-    protected $pricingRepository;
+    protected PricingRepositoryInterface $pricingRepository;
+    protected SpecialOfferRepositoryInterface $specialOfferRepository;
+    protected PriceCalculator $priceCalculator;
 
-    /**
-     * @var SpecialOfferRepositoryInterface
-     */
-    protected $specialOfferRepository;
-
-    /**
-     * @var PriceCalculator
-     */
-    protected $priceCalculator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PricingRepositoryInterface      $pricingRepository
-     * @param SpecialOfferRepositoryInterface $specialOfferRepository
-     * @param PriceCalculator                 $priceCalculator
-     */
     public function __construct(
-        PricingRepositoryInterface $pricingRepository,
+        PricingRepositoryInterface      $pricingRepository,
         SpecialOfferRepositoryInterface $specialOfferRepository,
-        PriceCalculator $priceCalculator
+        PriceCalculator                 $priceCalculator
     ) {
-        $this->pricingRepository      = $pricingRepository;
+        $this->pricingRepository = $pricingRepository;
         $this->specialOfferRepository = $specialOfferRepository;
-        $this->priceCalculator        = $priceCalculator;
+        $this->priceCalculator = $priceCalculator;
     }
 
     /**
-     * Resolves the products's offers.
-     *
-     * @param ProductInterface $product
-     *
-     * @return array
+     * Resolves the products offers.
      */
-    public function resolve(ProductInterface $product)
+    public function resolve(ProductInterface $product): array
     {
         // Pricing rules
         $discounts = $this->pricingRepository->findRulesByProduct($product);
         foreach ($discounts as &$discount) {
-            $discount['details'] = [Offer::TYPE_PRICING => $discount['percent']];
+            $discount['details'] = [OfferInterface::TYPE_PRICING => $discount['percent']];
         }
 
         // Special offers rules
         $specialOffers = $this->specialOfferRepository->findRulesByProduct($product);
         foreach ($specialOffers as &$specialOffer) {
-            $specialOffer['details'] = [Offer::TYPE_SPECIAL => $specialOffer['percent']];
+            $specialOffer['details'] = [OfferInterface::TYPE_SPECIAL => $specialOffer['percent']];
         }
 
         // Stacking special offers rules
@@ -81,10 +61,11 @@ class OfferResolver
             foreach ($discounts as &$discount) {
                 if (rule_apply_to($stacking, $discount)) {
                     $percent = (1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100;
+                    $percent = new Decimal((string)$percent);
 
-                    $discount['percent']                      = round($percent, 5);
-                    $discount['special_offer_id']             = $stacking['special_offer_id'];
-                    $discount['details'][Offer::TYPE_SPECIAL] = $stacking['percent'];
+                    $discount['percent'] = $percent->round(5);
+                    $discount['special_offer_id'] = $stacking['special_offer_id'];
+                    $discount['details'][OfferInterface::TYPE_SPECIAL] = $stacking['percent'];
                 }
             }
         }
@@ -101,7 +82,7 @@ class OfferResolver
         $netPrice = $product->getMinPrice();
         foreach ($offers as &$data) {
             unset($data['stack']);
-            $data['net_price'] = round($netPrice * (1 - $data['percent'] / 100), 5);
+            $data['net_price'] = $netPrice->mul((new Decimal(1))->sub($data['percent']->div(100)));
         }
 
         return $offers;

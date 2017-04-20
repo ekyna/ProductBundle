@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\ProductBundle\Event\PricingRuleEvents;
-use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -19,37 +21,16 @@ class PricingRuleListener implements EventSubscriberInterface
 {
     protected const FIELDS = ['percent', 'minQuantity'];
 
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface $persistenceHelper;
+    protected OfferInvalidator           $offerInvalidator;
 
-    /**
-     * @var OfferInvalidator
-     */
-    protected $offerInvalidator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param OfferInvalidator           $offerInvalidator
-     */
     public function __construct(PersistenceHelperInterface $persistenceHelper, OfferInvalidator $offerInvalidator)
     {
         $this->persistenceHelper = $persistenceHelper;
         $this->offerInvalidator = $offerInvalidator;
     }
 
-    /**
-     * Insert event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingRuleInterface
-     */
-    public function onInsert(ResourceEventInterface $event)
+    public function onInsert(ResourceEventInterface $event): PricingRuleInterface
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
@@ -58,14 +39,7 @@ class PricingRuleListener implements EventSubscriberInterface
         return $pricingRule;
     }
 
-    /**
-     * Update event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingRuleInterface
-     */
-    public function onUpdate(ResourceEventInterface $event)
+    public function onUpdate(ResourceEventInterface $event): PricingRuleInterface
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
@@ -76,19 +50,12 @@ class PricingRuleListener implements EventSubscriberInterface
         return $pricingRule;
     }
 
-    /**
-     * Delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingRuleInterface
-     */
-    public function onDelete(ResourceEventInterface $event)
+    public function onDelete(ResourceEventInterface $event): PricingRuleInterface
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
         if (null === $pricing = $pricingRule->getPricing()) {
-            if (empty($cs = $this->persistenceHelper->getChangeSet($pricingRule, ['pricing']))) {
+            if (empty($cs = $this->persistenceHelper->getChangeSet($pricingRule, 'pricing'))) {
                 return $pricingRule;
             }
 
@@ -100,28 +67,18 @@ class PricingRuleListener implements EventSubscriberInterface
         return $pricingRule;
     }
 
-    /**
-     * Returns the pricing rule from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingRuleInterface
-     */
-    protected function getPricingRuleFromEvent(ResourceEventInterface $event)
+    protected function getPricingRuleFromEvent(ResourceEventInterface $event): PricingRuleInterface
     {
-        $pricingRule = $event->getResource();
+        $resource = $event->getResource();
 
-        if (!$pricingRule instanceof PricingRuleInterface) {
-            throw new InvalidArgumentException("Expected instance of " . PricingRuleInterface::class);
+        if (!$resource instanceof PricingRuleInterface) {
+            throw new UnexpectedTypeException($resource, PricingRuleInterface::class);
         }
 
-        return $pricingRule;
+        return $resource;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PricingRuleEvents::INSERT => ['onInsert', 0],

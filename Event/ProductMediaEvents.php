@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,10 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class ProductMediaEvents
 {
-    const INSERT = 'ekyna_product.product_media.insert';
-    const UPDATE = 'ekyna_product.product_media.update';
-    const DELETE = 'ekyna_product.product_media.delete';
-
+    public const INSERT = 'ekyna_product.product_media.insert';
+    public const UPDATE = 'ekyna_product.product_media.update';
+    public const DELETE = 'ekyna_product.product_media.delete';
 
     /**
      * Disabled constructor.

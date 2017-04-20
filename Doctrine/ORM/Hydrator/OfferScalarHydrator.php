@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator;
 
+use Decimal\Decimal;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
+
+use function intval;
+use function is_null;
+use function json_decode;
 
 /**
  * Class OfferScalarHydrator
@@ -11,58 +18,83 @@ use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
  */
 class OfferScalarHydrator extends AbstractHydrator
 {
-    const NAME = 'OfferScalarHydrator';
-
+    public const NAME = 'OfferScalarHydrator';
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    protected function hydrateAllData()
+    protected function hydrateAllData(): array
     {
         $result = [];
 
-        foreach ($this->_stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            $this->hydrateRowData($row, $result);
+        while ($data = $this->statement()->fetchAssociative()) {
+            $this->hydrateRowData($data, $result);
         }
 
         return $result;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    protected function hydrateRowData(array $data, array &$result)
+    protected function hydrateRowData(array $row, array &$result)
     {
         $tmp = [];
 
-        foreach ($data as $key => $value) {
+        foreach ($row as $key => $value) {
             $alias = $this->_rsm->getScalarAlias($key);
 
-            switch($alias) {
-                case 'id':
-                case 'group_id':
-                case 'country_id':
-                case 'special_offer_id':
-                case 'pricing_id':
-                    if (!is_null($value)) {
-                        $value = intval($value);
-                    }
-                    break;
-
-                case 'min_qty':
-                case 'percent':
-                case 'net_price':
-                    $value = floatval($value);
-                    break;
-
-                case 'details':
-                    $value = json_decode($value, true);
-                    break;
-            }
-
-            $tmp[$alias] = $value;
+            $tmp[$alias] = $this->normalizeValue($alias, $value);
         }
 
         $result[] = $tmp;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed value
+     *
+     * @return array|bool|Decimal|int|null
+     */
+    private function normalizeValue(string $name, $value)
+    {
+        switch ($name) {
+            case 'id':
+            case 'group_id':
+            case 'country_id':
+            case 'special_offer_id':
+            case 'pricing_id':
+                if (is_null($value)) {
+                    return null;
+                }
+
+                return intval($value);
+
+            case 'starting_from':
+                return (bool)$value;
+
+            case 'min_qty':
+            case 'original_price':
+            case 'sell_price':
+            case 'net_price':
+            case 'percent':
+                return new Decimal($value);
+
+            case 'details':
+                return $this->normalizeDetails($value);
+        }
+
+        return $value;
+    }
+
+    private function normalizeDetails(string $data): array
+    {
+        $data = json_decode($data, true);
+
+        foreach ($data as $key => $value) {
+            $data[$key] = new Decimal($value);
+        }
+
+        return $data;
     }
 }

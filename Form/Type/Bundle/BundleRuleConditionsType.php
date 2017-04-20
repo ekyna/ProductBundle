@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class BundleRuleConditionsType
@@ -13,9 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BundleRuleConditionsType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -24,23 +25,17 @@ class BundleRuleConditionsType extends AbstractType
                 'sub_widget_col'  => 11,
                 'button_col'      => 1,
                 'allow_sort'      => false,
-                'add_button_text' => 'ekyna_product.bundle_rule.button.add_condition',
+                'add_button_text' => t('bundle_rule.button.add_condition', [], 'EkynaProduct'),
                 'entry_type'      => BundleRuleConditionType::class,
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_bundle_rule_conditions';
     }

@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
-use Braincrafted\Bundle\BootstrapBundle\Form\Type\FormActionsType;
-use Ekyna\Bundle\AdminBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Bundle\UiBundle\Form\Type\FormActionsType;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class VariableType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -25,33 +28,14 @@ use Symfony\Component\Validator\Constraints;
  */
 class VariableType extends AbstractType
 {
-    /**
-     * @var ResourceHelper
-     */
-    private $resourceHelper;
+    private ResourceRepositoryInterface $attributeSetRepository;
 
-    /**
-     * @var ResourceRepositoryInterface
-     */
-    private $attributeSetRepository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ResourceHelper              $resourceHelper
-     * @param ResourceRepositoryInterface $attributeSetRepository
-     */
-    public function __construct(ResourceHelper $resourceHelper, ResourceRepositoryInterface $attributeSetRepository)
+    public function __construct(ResourceRepositoryInterface $attributeSetRepository)
     {
-        $this->resourceHelper = $resourceHelper;
         $this->attributeSetRepository = $attributeSetRepository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('attributeSet', AttributeSetChoiceType::class, [
@@ -66,7 +50,7 @@ class VariableType extends AbstractType
                         'type'    => Type\SubmitType::class,
                         'options' => [
                             'button_class' => 'primary',
-                            'label'        => 'ekyna_core.button.save',
+                            'label'        => t('button.save', [], 'EkynaUi'),
                             'attr'         => ['icon' => 'ok'],
                         ],
                     ],
@@ -86,16 +70,13 @@ class VariableType extends AbstractType
             $data = $event->getData();
 
             /** @var AttributeSetInterface $attributeSet */
-            $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
+            $attributeSet = $this->attributeSetRepository->find(intval($data['attributeSet']));
 
             $this->addVariantForm($event->getForm(), $attributeSet);
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -109,11 +90,8 @@ class VariableType extends AbstractType
 
     /**
      * Adds the variant form.
-     *
-     * @param FormInterface              $form
-     * @param AttributeSetInterface|null $attributeSet
      */
-    private function addVariantForm(FormInterface $form, AttributeSetInterface $attributeSet = null)
+    private function addVariantForm(FormInterface $form, AttributeSetInterface $attributeSet = null): void
     {
         /** @var ProductInterface $variable */
         $variable = $form->getData();
@@ -124,7 +102,7 @@ class VariableType extends AbstractType
             $form->add('option_group_selection', OptionGroupChoiceType::class, [
                 'optionGroups' => $optionGroups,
                 'attr'         => [
-                    'help_text' => 'ekyna_product.convert.simple_to_variable.option_group_choice',
+                    'help_text' => t('convert.simple_to_variable.option_group_choice', [], 'EkynaProduct'),
                 ],
             ]);
         }
@@ -133,7 +111,7 @@ class VariableType extends AbstractType
             $form->add('media_selection', MediaChoiceType::class, [
                 'medias' => $medias,
                 'attr'   => [
-                    'help_text' => 'ekyna_product.convert.simple_to_variable.media_choice',
+                    'help_text' => t('convert.simple_to_variable.media_choice', [], 'EkynaProduct'),
                 ],
             ]);
         }
@@ -142,7 +120,7 @@ class VariableType extends AbstractType
             $form->add('tag_selection', TagChoiceType::class, [
                 'tags' => $tags,
                 'attr' => [
-                    'help_text' => 'ekyna_product.convert.simple_to_variable.tag_choice',
+                    'help_text' => t('convert.simple_to_variable.tag_choice', [], 'EkynaProduct'),
                 ],
             ]);
         }

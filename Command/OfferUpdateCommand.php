@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceUpdater;
 use Symfony\Component\Console\Command\Command;
@@ -25,58 +27,27 @@ class OfferUpdateCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:offer:update';
 
-    /**
-     * @var ProductRepository
-     */
-    private $repository;
+    private ProductRepositoryInterface $repository;
+    private OfferUpdater               $offerUpdater;
+    private PriceUpdater               $priceUpdater;
+    private EntityManagerInterface     $manager;
+    private int                        $timeout;
 
-    /**
-     * @var OfferUpdater
-     */
-    private $offerUpdater;
-
-    /**
-     * @var PriceUpdater
-     */
-    private $priceUpdater;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-
-    /**
-     * @var int
-     */
-    private $timeout;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepository      $repository
-     * @param OfferUpdater           $offerUpdater
-     * @param PriceUpdater           $priceUpdater
-     * @param EntityManagerInterface $manager
-     */
     public function __construct(
-        ProductRepository $repository,
-        OfferUpdater $offerUpdater,
-        PriceUpdater $priceUpdater,
-        EntityManagerInterface $manager
+        ProductRepositoryInterface $repository,
+        OfferUpdater               $offerUpdater,
+        PriceUpdater               $priceUpdater,
+        EntityManagerInterface     $manager
     ) {
         parent::__construct();
 
-        $this->repository   = $repository;
+        $this->repository = $repository;
         $this->offerUpdater = $offerUpdater;
         $this->priceUpdater = $priceUpdater;
-        $this->manager      = $manager;
+        $this->manager = $manager;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Updates the product(s) offers')
@@ -84,10 +55,7 @@ class OfferUpdateCommand extends Command
             ->addOption('max_execution_time', 't', InputOption::VALUE_OPTIONAL, 'Max execution time in seconds', 59);
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -100,37 +68,36 @@ class OfferUpdateCommand extends Command
                 throw new InvalidArgumentException("Product with id $id not found.");
             }
 
-            $confirm = new ConfirmationQuestion("Do you want to continue ?");
-            $helper  = $this->getHelper('question');
+            $confirm = new ConfirmationQuestion('Do you want to continue ?');
+            $helper = $this->getHelper('question');
             if (!$helper->ask($input, $output, $confirm)) {
                 $output->writeln('Abort by user.');
 
-                return;
+                return Command::SUCCESS;
             }
 
             $this->updateProduct($output, $product);
 
-            return;
+            return Command::SUCCESS;
         }
 
-        $confirm = new ConfirmationQuestion("Do you want to continue ?");
-        $helper  = $this->getHelper('question');
+        $confirm = new ConfirmationQuestion('Do you want to continue ?');
+        $helper = $this->getHelper('question');
         if (!$helper->ask($input, $output, $confirm)) {
             $output->writeln('Abort by user.');
 
-            return;
+            return Command::SUCCESS;
         }
 
         $this->updateAll($output);
+
+        return Command::SUCCESS;
     }
 
     /**
      * Update the given product's offers and prices.
-     *
-     * @param OutputInterface  $output
-     * @param ProductInterface $product
      */
-    protected function updateProduct(OutputInterface $output, ProductInterface $product)
+    protected function updateProduct(OutputInterface $output, ProductInterface $product): void
     {
         $output->writeln('Updating offers:');
         $this->updateOffers($product, $output);
@@ -140,10 +107,8 @@ class OfferUpdateCommand extends Command
 
     /**
      * Update all the products offers and prices.
-     *
-     * @param OutputInterface $output
      */
-    protected function updateAll(OutputInterface $output)
+    protected function updateAll(OutputInterface $output): void
     {
         $output->writeln('Updating offers:');
         $output->writeln('');
@@ -181,11 +146,8 @@ class OfferUpdateCommand extends Command
 
     /**
      * Updates the product offers.
-     *
-     * @param ProductInterface $product
-     * @param OutputInterface  $output
      */
-    protected function updateOffers(ProductInterface $product, OutputInterface $output)
+    protected function updateOffers(ProductInterface $product, OutputInterface $output): void
     {
         $this->productName($product, $output);
 
@@ -200,11 +162,8 @@ class OfferUpdateCommand extends Command
 
     /**
      * Updates the product prices.
-     *
-     * @param ProductInterface $product
-     * @param OutputInterface  $output
      */
-    protected function updatePrices(ProductInterface $product, OutputInterface $output)
+    protected function updatePrices(ProductInterface $product, OutputInterface $output): void
     {
         $this->productName($product, $output);
 
@@ -219,15 +178,12 @@ class OfferUpdateCommand extends Command
 
     /**
      * Outputs the product name.
-     *
-     * @param ProductInterface $product
-     * @param OutputInterface  $output
      */
-    protected function productName(ProductInterface $product, OutputInterface $output)
+    protected function productName(ProductInterface $product, OutputInterface $output): void
     {
         $name = sprintf('[%d] (%s) %s', $product->getId(), $product->getType(), $product->getFullDesignation());
 
-        if (77 < $tmp = mb_strlen($name)) {
+        if (77 < mb_strlen($name)) {
             $name = mb_substr($name, 0, 77);
         }
 

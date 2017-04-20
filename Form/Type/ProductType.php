@@ -1,61 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function strlen;
 
 /**
  * Class ProductType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductType extends ResourceFormType
+class ProductType extends AbstractResourceType
 {
-    /**
-     * @var ProductTypeSubscriber
-     */
-    protected $subscriber;
+    private ProductTypeSubscriber $subscriber;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ProductTypeSubscriber $subscriber
-     * @param string                $productClass
-     */
-    public function __construct(ProductTypeSubscriber $subscriber, $productClass)
+    public function __construct(ProductTypeSubscriber $subscriber)
     {
-        parent::__construct($productClass);
-
         $this->subscriber = $subscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber($this->subscriber);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver->setDefaults([
             'validation_groups' => function (FormInterface $form) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+                /** @var ProductInterface $product */
                 $product = $form->getData();
 
-                if (!strlen($type = $product->getType())) {
-                    throw new \RuntimeException('Product type is not set.');
+                if (!strlen($product->getType())) {
+                    throw new RuntimeException('Product type is not set.');
                 }
 
                 return ['Default', $product->getType()];

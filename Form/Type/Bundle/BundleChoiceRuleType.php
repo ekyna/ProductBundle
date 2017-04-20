@@ -1,32 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Model\BundleRuleTypes;
-use Symfony\Component\Form\Extension\Core\Type;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class BundleChoiceRuleType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Bundle
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BundleChoiceRuleType extends ResourceFormType
+class BundleChoiceRuleType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('type', Type\ChoiceType::class, [
-                'label'   => 'ekyna_core.field.type',
-                'choices' => BundleRuleTypes::getChoices([
+            ->add('type', ConstantChoiceType::class, [
+                'label'   => t('field.type', [], 'EkynaUi'),
+                'class'   => BundleRuleTypes::class,
+                'filter'  => [
                     BundleRuleTypes::REQUIRED_IF_ALL,
-                    BundleRuleTypes::REQUIRED_IF_ANY
-                ], 0),
+                    BundleRuleTypes::REQUIRED_IF_ANY,
+                ],
                 'select2' => false,
             ])
             ->add('conditions', BundleRuleConditionsType::class, [
@@ -35,10 +37,7 @@ class BundleChoiceRuleType extends ResourceFormType
             ->add('position', CollectionPositionType::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_bundle_rule';
     }

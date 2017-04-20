@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleButtonsEvent;
 use Ekyna\Bundle\CommerceBundle\Model\QuoteInterface;
-use Ekyna\Bundle\CoreBundle\Model\UiButton;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Catalog\RenderFromSaleAction;
+use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
+use Ekyna\Bundle\UiBundle\Model\UiButton;
 use Ekyna\Component\Commerce\Order\Model\OrderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class SaleButtonsEventSubscriber
@@ -16,28 +21,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SaleButtonsEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGenerator;
+    private ResourceHelper $resourceHelper;
 
-
-    /**
-     * Constructor.
-     *
-     * @param UrlGeneratorInterface $urlGenerator
-     */
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceHelper $resourceHelper)
     {
-        $this->urlGenerator = $urlGenerator;
+        $this->resourceHelper = $resourceHelper;
     }
 
-    /**
-     * Sale buttons event handler.
-     *
-     * @param SaleButtonsEvent $event
-     */
-    public function onSaleButtons(SaleButtonsEvent $event)
+    public function onSaleButtons(SaleButtonsEvent $event): void
     {
         $sale = $event->getSale();
 
@@ -53,12 +44,12 @@ class SaleButtonsEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $path = $this->urlGenerator->generate('ekyna_product_catalog_admin_render_from_sale', [
+        $path = $this->resourceHelper->generateResourcePath('ekyna_product.catalog', RenderFromSaleAction::class,[
             'type' => $type,
             'id'   => $sale->getId(),
         ]);
 
-        $event->addButton(new UiButton('ekyna_product.catalog.button.render_from_sale', [
+        $event->addButton(new UiButton(t('catalog.button.render_from_sale', [], 'EkynaProduct'), [
             'path'  => $path,
             'theme' => 'default',
             'type'  => 'link',
@@ -66,10 +57,7 @@ class SaleButtonsEventSubscriber implements EventSubscriberInterface
         ]));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SaleButtonsEvent::SALE_BUTTONS => ['onSaleButtons', 0],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
 
 /**
@@ -9,19 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
  */
 class OptionGroup
 {
-    /**
-     * @var Item[]
-     */
-    protected $options = [];
+    /** @var array<Item> */
+    protected array $options = [];
 
-
-    /**
-     * Adds the option.
-     *
-     * @param Item $option
-     *
-     * @return $this
-     */
     public function addOption(Item $option): self
     {
         $this->options[] = $option;
@@ -30,9 +22,7 @@ class OptionGroup
     }
 
     /**
-     * Returns the options.
-     *
-     * @return Item[]
+     * @return array<Item>
      */
     public function getOptions(): array
     {

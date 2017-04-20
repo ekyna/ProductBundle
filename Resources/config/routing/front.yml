@@ -1,3 +1,0 @@
-ekyna_product_account:
-    resource: "front/account.yml"
-    prefix:   /my-account

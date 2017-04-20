@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute;
 
 /**
@@ -11,22 +13,13 @@ interface AttributeTypeRegistryInterface
 {
     /**
      * Registers the given attribute type.
-     *
-     * @param string             $name
-     * @param Type\TypeInterface $type
-     *
-     * @return AttributeTypeRegistry
      */
-    public function registerType($name, Type\TypeInterface $type);
+    public function registerType(Type\TypeInterface $type): self;
 
     /**
      * Returns whether a type is registered for the given name.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
-    public function hasType($name);
+    public function hasType(string $name): bool;
 
     /**
      * Returns the attribute type for the given name.
@@ -35,19 +28,12 @@ interface AttributeTypeRegistryInterface
      *
      * @return Type\TypeInterface
      */
-    public function getType($name);
-
-    /**
-     * Returns the type choices.
-     *
-     * @return array
-     */
-    public function getChoices();
+    public function getType(string $name): Type\TypeInterface;
 
     /**
      * Returns all the attribute types.
      *
-     * @return Type\TypeInterface[]
+     * @return array<string, Type\TypeInterface>
      */
-    public function getTypes();
+    public function getTypes(): array;
 }

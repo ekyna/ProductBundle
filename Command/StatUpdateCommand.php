@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use DateTime;
 use Ekyna\Bundle\ProductBundle\Service\Stat\StatUpdater;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,17 +20,8 @@ class StatUpdateCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:stat:update';
 
-    /**
-     * @var StatUpdater
-     */
-    private $updater;
+    private StatUpdater $updater;
 
-
-    /**
-     * Constructor.
-     *
-     * @param StatUpdater $updater
-     */
     public function __construct(StatUpdater $updater)
     {
         $this->updater = $updater;
@@ -35,10 +29,7 @@ class StatUpdateCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Updates the products stats')
@@ -49,10 +40,7 @@ class StatUpdateCommand extends Command
             ->addOption('breathe', null, InputOption::VALUE_REQUIRED, 'Delay between each product update in milliseconds', 0);
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $debug = !$input->getOption('no-debug');
         $force = (bool)$input->getOption('force');
@@ -69,7 +57,7 @@ class StatUpdateCommand extends Command
             $this->updater->purge();
         }
 
-        $this->updater->setMaxUpdateDate((new \DateTime())->modify("-$interval hours"));
+        $this->updater->setMaxUpdateDate((new DateTime())->modify("-$interval hours"));
 
         $limit *= 1000;
         $count = $sum = $avg = 0;
@@ -91,7 +79,9 @@ class StatUpdateCommand extends Command
 
         if ($debug) {
             $output->writeln("Updated <comment>$count</comment> products in <comment>{$sum}ms</comment>.");
-            $output->writeln("");
+            $output->writeln('');
         }
+
+        return Command::SUCCESS;
     }
 }

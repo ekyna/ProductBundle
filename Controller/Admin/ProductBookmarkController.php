@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Ekyna\Bundle\AdminBundle\Model\UserInterface;
-use Ekyna\Bundle\AdminBundle\Service\Security\UserProviderInterface;
 use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Ekyna\Component\User\Service\UserProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -21,40 +24,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ProductBookmarkController
 {
-    /**
-     * @var UserProviderInterface
-     */
-    private $userProvider;
+    private UserProviderInterface      $userProvider;
+    private ProductRepositoryInterface $productRepository;
+    private ProductBookmarkRepository  $bookmarkRepository;
+    private ManagerRegistry            $doctrine;
 
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var ProductBookmarkRepository
-     */
-    private $bookmarkRepository;
-
-    /**
-     * @var RegistryInterface
-     */
-    private $doctrine;
-
-
-    /**
-     * Constructor.
-     *
-     * @param UserProviderInterface      $userProvider
-     * @param ProductRepositoryInterface $productRepository
-     * @param ProductBookmarkRepository  $bookmarkRepository
-     * @param RegistryInterface          $doctrine
-     */
     public function __construct(
-        UserProviderInterface $userProvider,
+        UserProviderInterface      $userProvider,
         ProductRepositoryInterface $productRepository,
-        ProductBookmarkRepository $bookmarkRepository,
-        RegistryInterface $doctrine
+        ProductBookmarkRepository  $bookmarkRepository,
+        ManagerRegistry            $doctrine
     ) {
         $this->userProvider = $userProvider;
         $this->productRepository = $productRepository;
@@ -64,20 +43,15 @@ class ProductBookmarkController
 
     /**
      * Adds the user's product bookmark.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function add(Request $request): Response
     {
         $user = $this->getAdmin();
-        $product = $this->getProduct($request->attributes->get('productId'));
+        $product = $this->getProduct($request->attributes->getInt('productId'));
 
         $bookmark = $this->bookmarkRepository->findBookmark($user, $product);
-
         if ($bookmark) {
-            return new Response();
+            return (new Response())->setPrivate();
         }
 
         $bookmark = new ProductBookmark();
@@ -85,35 +59,31 @@ class ProductBookmarkController
             ->setUser($user)
             ->setProduct($product);
 
-        $em = $this->doctrine->getEntityManagerForClass(ProductBookmark::class);
+        $em = $this->doctrine->getManagerForClass(ProductBookmark::class);
         $em->persist($bookmark);
         $em->flush();
 
-        return new Response();
+        return (new Response())->setPrivate();
     }
 
     /**
      * Removes the user's product bookmark.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function remove(Request $request): Response
     {
         $user = $this->getAdmin();
-        $product = $this->getProduct($request->attributes->get('productId'));
+        $product = $this->getProduct($request->attributes->getInt('productId'));
 
         $bookmark = $this->bookmarkRepository->findBookmark($user, $product);
         if (!$bookmark) {
-            return new Response('Not found', Response::HTTP_NOT_FOUND);
+            return (new Response('Not found', Response::HTTP_NOT_FOUND))->setPrivate();
         }
 
-        $em = $this->doctrine->getEntityManagerForClass(ProductBookmark::class);
+        $em = $this->doctrine->getManagerForClass(ProductBookmark::class);
         $em->remove($bookmark);
         $em->flush();
 
-        return new Response();
+        return (new Response())->setPrivate();
     }
 
     private function getProduct(int $id): ProductInterface
@@ -121,7 +91,7 @@ class ProductBookmarkController
         $product = $this->productRepository->find($id);
 
         if (null === $product) {
-            throw new NotFoundHttpException("Product not found");
+            throw new NotFoundHttpException('Product not found');
         }
 
         return $product;
@@ -130,9 +100,15 @@ class ProductBookmarkController
     private function getAdmin(): UserInterface
     {
         if (!$this->userProvider->hasUser()) {
-            throw new AccessDeniedHttpException("User not found");
+            throw new AccessDeniedHttpException('User not found');
         }
 
-        return $this->userProvider->getUser();
+        $user = $this->userProvider->getUser();
+
+        if (!$user instanceof UserInterface) {
+            throw new UnexpectedTypeException($user, UserInterface::class);
+        }
+
+        return $user;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\AttributeTranslationInterface;
@@ -12,24 +14,14 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  */
 class AttributeTranslation extends AbstractTranslation implements AttributeTranslationInterface
 {
-    /**
-     * @var string
-     */
-    protected $title;
+    protected ?string $title = null;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): AttributeTranslationInterface
     {
         $this->title = $title;
 

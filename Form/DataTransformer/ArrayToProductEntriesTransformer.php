@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductEntry;
@@ -13,17 +15,8 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class ArrayToProductEntriesTransformer implements DataTransformerInterface
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $repository;
+    private ProductRepositoryInterface $repository;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     */
     public function __construct(ProductRepositoryInterface $repository)
     {
         $this->repository = $repository;

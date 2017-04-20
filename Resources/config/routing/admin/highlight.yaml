@@ -1,0 +1,13 @@
+admin_ekyna_product_highlight_index:
+    path: ''
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController::index
+    methods: [GET]
+
+admin_ekyna_product_highlight_update:
+    path: /{productId}/update
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController::update
+    methods: [POST]
+    requirements:
+        productId: \d+
+    options:
+        expose: true

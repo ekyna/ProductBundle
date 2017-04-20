@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Doctrine\ORM\PersistentCollection;
 use Ekyna\Bundle\ProductBundle\Entity\SpecialOffer;
 use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
@@ -13,10 +16,9 @@ use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
-use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SpecialOfferListener
@@ -27,35 +29,11 @@ class SpecialOfferListener implements EventSubscriberInterface
 {
     protected const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface $persistenceHelper;
+    protected OfferInvalidator $offerInvalidator;
+    protected PriceInvalidator $priceInvalidator;
+    protected TranslatorInterface $translator;
 
-    /**
-     * @var OfferInvalidator
-     */
-    protected $offerInvalidator;
-
-    /**
-     * @var PriceInvalidator
-     */
-    protected $priceInvalidator;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param OfferInvalidator           $offerInvalidator
-     * @param PriceInvalidator           $priceInvalidator
-     * @param TranslatorInterface        $translator
-     */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         OfferInvalidator $offerInvalidator,
@@ -68,14 +46,7 @@ class SpecialOfferListener implements EventSubscriberInterface
         $this->translator        = $translator;
     }
 
-    /**
-     * Pre insert event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return SpecialOfferInterface
-     */
-    public function onInsert(ResourceEventInterface $event)
+    public function onInsert(ResourceEventInterface $event): SpecialOfferInterface
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -88,14 +59,7 @@ class SpecialOfferListener implements EventSubscriberInterface
         return $specialOffer;
     }
 
-    /**
-     * Pre update event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return SpecialOfferInterface
-     */
-    public function onUpdate(ResourceEventInterface $event)
+    public function onUpdate(ResourceEventInterface $event): SpecialOfferInterface
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -113,14 +77,7 @@ class SpecialOfferListener implements EventSubscriberInterface
         return $specialOffer;
     }
 
-    /**
-     * Pre delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return SpecialOfferInterface
-     */
-    public function onDelete(ResourceEventInterface $event)
+    public function onDelete(ResourceEventInterface $event): SpecialOfferInterface
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -135,13 +92,7 @@ class SpecialOfferListener implements EventSubscriberInterface
         return $specialOffer;
     }
 
-    /**
-     * Invalidates the special offers.
-     *
-     * @param SpecialOfferInterface $specialOffer
-     * @param bool                  $andPrices
-     */
-    protected function invalidate(SpecialOfferInterface $specialOffer, bool $andPrices = false)
+    protected function invalidate(SpecialOfferInterface $specialOffer, bool $andPrices = false): void
     {
         $productCs = $this->persistenceHelper->getChangeSet($specialOffer, 'product');
 
@@ -213,30 +164,28 @@ class SpecialOfferListener implements EventSubscriberInterface
             if (in_array($brand->getId(), $brandIds)) {
                 $specialOffer->removeProduct($product);
 
-                $messages[] = $this->translator->trans('ekyna_product.special_offer.message.product_removed', [
+                $messages[] = $this->translator->trans('special_offer.message.product_removed', [
                     '{product}' => $product->getFullDesignation(),
                     '{brand}'   => $brand->getName(),
-                ]);
+                ], 'EkynaProduct');
             }
         }
 
         if (!empty($messages)) {
-            $event->addMessage(new ResourceMessage(implode('<br>', $messages)));
+            $event->addMessage(ResourceMessage::create(implode('<br>', $messages)));
         }
     }
 
     /**
      * Builds the special offer name.
-     *
-     * @param SpecialOfferInterface $specialOffer
      */
-    protected function buildName(SpecialOfferInterface $specialOffer)
+    protected function buildName(SpecialOfferInterface $specialOffer): void
     {
-        if (0 < strlen($specialOffer->getName())) {
+        if (!empty($specialOffer->getName())) {
             return;
         }
 
-        $parts = ['-' . $specialOffer->getPercent() . '%'];
+        $parts = ['-' . $specialOffer->getPercent()->toFixed(2) . '%'];
 
         if (null !== $product = $specialOffer->getProduct()) {
             if (32 > strlen($designation = $product->getDesignation())) {
@@ -244,14 +193,12 @@ class SpecialOfferListener implements EventSubscriberInterface
             } else {
                 $parts[] = substr($designation, 0, 32) . '...';
             }
+        } elseif (empty($brands = $specialOffer->getBrands()->toArray())) {
+            $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
         } else {
-            if (empty($brands = $specialOffer->getBrands()->toArray())) {
-                $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
-            } else {
-                $parts[] = implode('/', array_map(function (BrandInterface $brand) {
-                    return $brand->getName();
-                }, $brands));
-            }
+            $parts[] = implode('/', array_map(function (BrandInterface $brand) {
+                return $brand->getName();
+            }, $brands));
         }
 
         if (!empty($groups = $specialOffer->getGroups()->toArray())) {
@@ -273,12 +220,8 @@ class SpecialOfferListener implements EventSubscriberInterface
 
     /**
      * Returns whether the given special offer has changed.
-     *
-     * @param SpecialOfferInterface $specialOffer
-     *
-     * @return bool
      */
-    protected function specialOfferHasChanged(SpecialOfferInterface $specialOffer)
+    protected function specialOfferHasChanged(SpecialOfferInterface $specialOffer): bool
     {
         if ($this->persistenceHelper->isChanged($specialOffer, static::FIELDS)) {
             return true;
@@ -300,26 +243,19 @@ class SpecialOfferListener implements EventSubscriberInterface
 
     /**
      * Returns the special offer from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return SpecialOfferInterface
      */
-    protected function getSpecialOfferFromEvent(ResourceEventInterface $event)
+    protected function getSpecialOfferFromEvent(ResourceEventInterface $event): SpecialOfferInterface
     {
         $specialOffer = $event->getResource();
 
         if (!$specialOffer instanceof SpecialOfferInterface) {
-            throw new InvalidArgumentException("Expected instance of " . SpecialOfferInterface::class);
+            throw new UnexpectedTypeException($specialOffer, SpecialOfferInterface::class);
         }
 
         return $specialOffer;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SpecialOfferEvents::INSERT => ['onInsert', 0],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config;
 
 use Ekyna\Bundle\ProductBundle\Attribute\Type\BooleanType;
@@ -10,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class BooleanConfigType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config
@@ -17,22 +21,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class BooleanConfigType extends AbstractType
 {
-    /**
-     * @var string[]
-     */
-    private $locales;
+    private array  $locales;
+    private string $defaultLocale;
 
     /**
-     * @var string
-     */
-    private $defaultLocale;
-
-
-    /**
-     * Constructor.
-     *
      * @param string[] $locales
-     * @param string   $defaultLocale
      */
     public function __construct(array $locales, string $defaultLocale)
     {
@@ -40,20 +33,17 @@ class BooleanConfigType extends AbstractType
         $this->defaultLocale = $defaultLocale;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trueLabels = $builder
             ->create(BooleanType::TRUE, FormType::class, [
-                'label'    => 'ekyna_core.value.yes',
+                'label'    => t('value.yes', [], 'EkynaUi'),
                 'required' => false,
             ]);
 
         $falseLabels = $builder
             ->create(BooleanType::FALSE, FormType::class, [
-                'label'    => 'ekyna_core.value.no',
+                'label'    => t('value.no', [], 'EkynaUi'),
                 'required' => false,
             ]);
 
@@ -101,6 +91,7 @@ class BooleanConfigType extends AbstractType
                         unset($array[$value]);
                     }
                 }
+
                 return $array;
             }
         );

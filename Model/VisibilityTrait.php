@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 /**
@@ -9,59 +11,27 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 trait VisibilityTrait
 {
-    /**
-     * @var bool
-     */
-    protected $visible = false;
+    protected bool $visible = false;
+    protected int $visibility = 1;
 
-    /**
-     * @var int
-     */
-    protected $visibility = 1;
-
-
-    /**
-     * Returns whether this element is visible.
-     *
-     * @return bool
-     */
-    public function isVisible()
+    public function isVisible(): bool
     {
         return $this->visible;
     }
 
-    /**
-     * Sets whether this element is visible.
-     *
-     * @param bool $visible
-     *
-     * @return $this|VisibilityInterface
-     */
-    public function setVisible(bool $visible)
+    public function setVisible(bool $visible): VisibilityInterface
     {
         $this->visible = $visible;
 
         return $this;
     }
 
-    /**
-     * Returns the visibility.
-     *
-     * @return int
-     */
-    public function getVisibility()
+    public function getVisibility(): int
     {
         return $this->visibility;
     }
 
-    /**
-     * Sets the visibility.
-     *
-     * @param int $value
-     *
-     * @return $this|VisibilityInterface
-     */
-    public function setVisibility(int $value)
+    public function setVisibility(int $value): VisibilityInterface
     {
         $this->visibility = $value;
 

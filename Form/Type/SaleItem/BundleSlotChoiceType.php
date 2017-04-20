@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Symfony\Component\Form\AbstractType;
@@ -14,18 +16,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BundleSlotChoiceType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['id'] = $options['id'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setRequired('id')

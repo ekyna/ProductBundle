@@ -1,7 +1,0 @@
-ekyna_product_account_loader:
-    resource: .
-    type: product_account
-
-ekyna_product_account_product:
-    resource: 'account/product.yml'
-    prefix: /product

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,10 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class ProductStockUnitEvents
 {
-    const INSERT = 'ekyna_product.product_stock_unit.insert';
-    const UPDATE = 'ekyna_product.product_stock_unit.update';
-    const DELETE = 'ekyna_product.product_stock_unit.delete';
-
+    public const INSERT = 'ekyna_product.product_stock_unit.insert';
+    public const UPDATE = 'ekyna_product.product_stock_unit.update';
+    public const DELETE = 'ekyna_product.product_stock_unit.delete';
 
     /**
      * Disabled constructor.

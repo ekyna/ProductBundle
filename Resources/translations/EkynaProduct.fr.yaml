@@ -1,0 +1,503 @@
+label: Catalogue
+
+leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
+
+# TODO group translations (like visible) use commerce ones
+common:
+    percent: Pourcentage
+    min_quantity: Qte. min.
+    max_quantity: Qte. max.
+    read_more: En savoir plus
+    visibility: Visibilité
+
+email:
+    stock_report:
+        title: Rapport de stock [%mode%]
+
+account:
+    pricing:
+        title: Vos tarifs préférentiels
+        all_brands: Toutes marques
+    catalog:
+        title: Mes catalogues
+        new:
+            title: Nouveau catalogue
+            success: Le catalogue a bien été enregistré.
+        edit:
+            title: Modifier le catalogue
+            success: Le catalogue a bien été modifié.
+        remove:
+            title: Supprimer le catalogue
+            confirm: Êtes-vous sûr de vouloir supprimer ce catalogue ?
+            success: Le catalogue a bien été supprimé.
+        print:
+            title: Imprimer le catalogue
+            button: Imprimer
+        show: Détail du catalogue
+        empty_list: Aucun catalogue enregistré
+
+attribute:
+    label:
+        singular: Attribut
+        plural: Attributs
+    header:
+        list: Attributs <small>Liste des attribut</small>
+        show: Détail de l'attribut <small>%name%</small>
+        new: Créer un nouvel attribut
+        edit: Modifier l'attribut <small>%name%</small>
+        remove: Supprimer l'attribut <small>%name%</small>
+    type:
+        select: Selection
+        text: Texte
+        boolean: Booléen
+        unit: Unité
+    config:
+        multiple: Choix multiple
+        suffix: Suffixe
+    help:
+        suffix: "Saisissez une valeur (ex: &laquo; sachet(s) &raquo;) si vous choisissez l'unité 'Pièce'"
+    button:
+        list: Liste des attributs
+        show: Détail de l'attribut
+        new: Nouvel attribut
+        edit: Modifier l'attribut
+        remove: Supprimer l'attribut
+    alert:
+        no_item: Aucun attribut configuré
+
+attribute_choice:
+    label:
+        singular: Choix d'attributs
+        plural: Choix d'attributs
+    header:
+        list: Choix d'attributs <small>Liste des choix</small>
+        show: Détail du choix <small>%name%</small>
+        new: Créer un nouveau choix
+        edit: Modifier le choix <small>%name%</small>
+        remove: Supprimer le choix <small>%name%</small>
+    button:
+        list: Liste des choix
+        show: Détail du choix
+        new: Nouveau choix
+        edit: Modifier le choix
+        remove: Supprimer le choix
+    alert:
+        no_item: Aucun choix configuré
+
+attribute_set:
+    label:
+        singular: Archétype
+        plural: Archétypes
+    header:
+        list: Archétypes <small>Liste des archétypes</small>
+        show: Détail de l'archétype <small>%name%</small>
+        new: Créer un nouvel archétype
+        edit: Modifier l'archétype <small>%name%</small>
+        remove: Supprimer l'archétype <small>%name%</small>
+    button:
+        list: Liste des archétypes
+        show: Détail de l'archétype
+        new: Nouvel archétype
+        edit: Modifier l'archétype
+        remove: Supprimer l'archétype
+    alert:
+        no_item: Aucun archétype configuré
+
+attribute_slot:
+    field:
+        naming: Nommage
+    help:
+        naming: Générer les désignations des variantes avec cet attribut.
+
+brand:
+    label:
+        singular: Marque
+        plural: Marques
+    header:
+        list: Marques <small>Liste des marques</small>
+        show: Détail de la marque <small>%name%</small>
+        new: Créer une nouvelle marque
+        edit: Modifier la marque <small>%name%</small>
+        remove: Supprimer la marque <small>%name%</small>
+    button:
+        list: Liste des marques
+        show: Détail de la marque
+        new: Nouvelle marque
+        edit: Modifier la marque
+        remove: Supprimer la marque
+    alert:
+        no_item: Aucune marque configuré
+
+bundle_slot:
+    label:
+        singular: Emplacement
+        plural: Emplacements
+    button:
+        add: Ajouter un produit
+        add_configurable: Ajouter un emplacement
+
+bundle_choice:
+    label:
+        singular: Produit
+        plural: Choix
+    field:
+        hidden: Masqué
+        exclude_images: Exclure les images
+    button:
+        add: Ajouter un choix
+
+bundle_rule:
+    label:
+        singular: Règle
+        plural: Règles
+    type:
+        hide_if_all: Masquer si toutes conditions
+        hide_if_any: Masquer si au moins une condition
+        show_if_all: Afficher si toutes conditions
+        show_if_any: Afficher si au moins une condition
+        required_if_all: Requis si toutes conditions
+        required_if_any: Requis si au moins une condition
+    button:
+        add: Ajouter une règle
+        add_condition: Ajouter une condition
+
+cart:
+    configure: Configurer
+    success: Cet article a bien été ajouté à votre panier.
+
+catalog:
+    label:
+        singular: Catalogue
+        plural: Catalogues
+    header:
+        list: Catalogues <small>Liste des catalogues</small>
+        show: Détail du catalogue <small>%name%</small>
+        new: Créer un nouveau catalogue
+        edit: Modifier le catalogue <small>%name%</small>
+        remove: Supprimer le catalogue <small>%name%</small>
+        render: Rendu du catalogue <small>%name%</small>
+        render_from_sale: Catalogue d'après <small>%number%</small>
+    button:
+        list: Liste des catalogues
+        show: Détail du catalogue
+        new: Nouveau catalogue
+        edit: Modifier le catalogue
+        remove: Supprimer le catalogue
+        render: Générer un rendu
+        render_from_sale: Générer un catalogue
+    field:
+        template: Gabarit
+        pages: Pages
+        pager: 'Page %current% / %total%'
+        slots: Emplacements
+        display_prices: Afficher les prix
+        price_mention: 'Tarifs indicatifs au %date%'
+        save: Enregistrer en pièce jointe
+    theme:
+        default: Par défault
+    template:
+        cover: Couverture
+        separator: Séparateur
+        full: Article pleine page
+        half: Un article en haut, un article en bas
+        half_dual: Un article en haut, deux articles en bas
+        quarter: Deux articles en haut, deux articles en bas
+        sixth: Six produits
+        eighth: Huit produits
+    alert:
+        no_item: Aucun catalogue configuré
+
+category:
+    label:
+        singular: Catégorie
+        plural: Catégories
+    header:
+        list: Catégories <small>Liste des catégories</small>
+        show: Détail de la catégorie <small>%name%</small>
+        new: Créer une nouvelle catégorie
+        new_child: Créer une nouvelle catégorie sous <small>%name%</small>
+        edit: Modifier la catégorie <small>%name%</small>
+        remove: Supprimer la catégorie <small>%name%</small>
+    button:
+        list: Liste des catégories
+        show: Détail de la catégorie
+        new: Nouvelle catégorie
+        edit: Modifier la catégorie
+        remove: Supprimer la catégorie
+    alert:
+        no_item: Aucune catégorie configuré
+
+component:
+    label:
+        singular: Composant
+        plural: Composants
+    button:
+        add: Ajouter un composant
+
+convert:
+    warning: >
+        <strong>Attention !</strong> Cette opération n'est <strong>pas réversible</strong>.
+    simple_to_variable:
+        warning: Veuillez vérifier les informations du produit variable <strong>ET</strong> de la variante créée.
+        tag_choice: |
+            Sélectionnez les tags à destination du produit <strong>variable</strong>.
+            Les tags non sélectionnés seront transférés à la <strong>variante</strong> créée.
+        option_group_choice: |
+            Sélectionnez les groupes d'options à destination du produit <strong>variable</strong>.
+            Les groupes non sélectionnés seront transférés à la <strong>variante</strong> créée.
+        media_choice: |
+            Sélectionnez les médias à destination du produit <strong>variable</strong>.
+            Les médias non sélectionnés seront transférés à la <strong>variante</strong> créée.
+    bundle_to_simple:
+        confirm: Êtes-vous sûr de vouloir convertir ce pack en produit simple ? La composition sera perdue.
+        option_group_choice: |
+            Sélectionnez les groupes d'options des sous-produits du pack
+            à destination du produit <strong>simpe</strong>.
+    success: |
+        Conversion réussie.
+        <br><strong>Attention</strong> : le produit a été marqué &laquo; <strong>sur devis uniquement</strong> &raquo;.
+        <br>Veuillez vérifier l'ensemble des informations, notamment l'onglet &laquo; <strong>stock</strong> &raquo;.
+cross_selling:
+    label:
+        singular: Vente croisée
+        plural: Ventes croisées
+    field:
+        source: Source
+        target: Cible
+    button:
+        add: Ajouter une vente croisée
+
+export:
+    column:
+        net_price: Prix publique
+        buy_price: Prix d'achat
+        valid_until: Valide jusqu'au
+
+highlight:
+    title: Mise en valeur
+    mode:
+        auto: Auto
+        always: Toujours
+        never: Jamais
+    best_sellers: Meilleures ventes
+    cross_selling: Ces articles pourraient vous intéresser
+
+inventory:
+    title: Inventaire
+    field:
+        profile: Profil
+        bookmark: Favoris
+    button:
+        export_units: Exporter les unités de stock
+        export_products: Exporter les produits
+        batch_edit: Modifier les produits
+    modal:
+        orders: Commandes clients
+        resupply: Réassort
+    profile:
+        none: Aucun
+        treatment: Traitement
+        resupply: Réapprovisionnement
+        out_of_stock: Rupture
+        ordered: Commandé
+    message:
+        batch_edit_warning: >
+            Cochez les champs dont la valeur sera appliquée aux produits suivant
+
+offer:
+    label:
+        singular: Offre
+        plural: Offres
+
+option:
+    label:
+        singular: Option
+        plural: Options
+    button:
+        add: Ajouter une option
+
+option_group:
+    label:
+        singular: Groupe d'options
+        plural: Groupes d'options
+    field:
+        full_title: Titres complets (variantes)
+    button:
+        add: Ajouter un groupe d'options
+
+price:
+    label:
+        singular: Tarif affiché
+        plural: Tarifs affichés
+    alert:
+        no_item: Aucun tarif configuré
+    display:
+        special_offer: Offre spéciale -%percent%
+        pricing: Tarif préférentiel -%percent%
+        starting_from: <small>À partir de</small>
+        valid_until: Offre valable jusqu'au %date%
+        while_stock: Dans la limite des stocks disponibles
+
+pricing:
+    label:
+        singular: Tarification
+        plural: Tarifications
+    header:
+        list: Tarifications <small>Liste des tarifications</small>
+        show: Détail de la tarification <small>%name%</small>
+        new: Créer une nouvelle tarification
+        edit: Modifier la tarification <small>%name%</small>
+        remove: Supprimer la tarification <small>%name%</small>
+    button:
+        list: Liste des tarifications
+        show: Détail de la tarification
+        new: Nouvelle tarification
+        edit: Modifier la tarification
+        remove: Supprimer la tarification
+        add: Ajouter une tarification
+    field:
+        countries: Pays de facturation
+        rules: Règles
+    alert:
+        no_item: Aucune tarification configuré
+
+pricing_rule:
+    label:
+        singular: Règle de tarification
+        plural: Règles de tarification
+    field:
+        from: à partir de %min%
+        range: de %min% à %max%
+        discount: Remise
+        unit_price: Prix Unit.
+    button:
+        add: Ajouter une règle
+    alert:
+        no_item: Aucune régle configuré
+
+special_offer:
+    label:
+        singular: Promotion
+        plural: Promotions
+    header:
+        list: Promotions <small>Liste des promotions</small>
+        show: Détail de la promotion <small>%name%</small>
+        new: Créer une nouvelle promotion
+        edit: Modifier la promotion <small>%name%</small>
+        remove: Supprimer la promotion <small>%name%</small>
+    button:
+        list: Liste des promotions
+        show: Détail de la promotion
+        new: Nouvelle promotion
+        edit: Modifier la promotion
+        remove: Supprimer la promotion
+        add: Ajouter une promotion
+    field:
+        stack: Cumulable
+        countries: Pays de facturation
+    message:
+        product_removed: |
+            Le produit <strong>{product}</strong> a été retiré de la liste
+            car il appartient à la marque <strong>{brand}</strong>.
+    alert:
+        no_item: Aucune promotion configuré
+
+stat:
+    label: Statistiques
+    count: Nombre de ventes
+    cross: Cross selling
+
+product:
+    label:
+        singular: Produit
+        plural: Produits
+    header:
+        list: Produits <small>Liste des produits</small>
+        export: Produits <small>Catalogue et tarifs</small>
+        show: Détail du produit <small>%name%</small>
+        new: Créer un nouveau produit
+        duplicate: Dupliquer le produit <small>%name%</small>
+        convert: Convertir le produit <small>%name%</small>
+        edit: Modifier le produit <small>%name%</small>
+        remove: Supprimer le produit <small>%name%</small>
+    button:
+        list: Liste des produits
+        export: Export catalogue
+        show: Détail du produit
+        new: Nouveau produit
+        edit: Modifier le produit
+        duplicate: Dupliquer le produit
+        remove: Supprimer le produit
+        convert: Convertir
+        label: Étiquette
+        invalidate_offers: Recalculer les offres et tarifs
+    type:
+        simple: Simple
+        variable: Variable
+        variant: Variante
+        bundle: Pack
+        configurable: Pack personnalisable
+    field:
+        parent: Parent
+        relations: Relations
+        net_price: Prix HT # TODO use ekyna_commerce.field.net_price
+        min_price: Prix Min.
+        total_net_price: Prix total HT # TODO use ekyna_commerce.field... ?
+        pricing: Tarifs
+        stock: Stocks
+        best_seller: Meilleure vente
+        cross_selling: Cross selling
+        released_at: Date de sortie
+        composition: Composition
+        option_parents: Ce produit constitue une option des produits suivants
+        bundle_parents: Ce produit est inclus dans les packs suivants
+        component_parents: Ce produit est un composant des produits suivants
+        brand_naming: Inclure la marque dans le titre et la désignation
+        not_contractual: Visuels non contractuels
+        attributes_title: Titre d'attributs
+        attributes_designation: Désignation d'attributs
+    alert:
+        no_item: Aucun produit configuré
+        no_offer: Aucune offre configuré
+        no_price: Aucun tarif configuré
+        pending_offers: >
+            Les offres de ce produit sont en attente de mise à jour.
+        supplier_product_exists: >
+            Une référence fournisseur existe déjà pour le fournisseur <strong>%name%</strong>.
+        generate_gtin_13: >
+            Ce produit n'a pas de code EAN 13. <a href="%url%">Cliquez ici pour générer un code EAN 13</a>
+
+product_media:
+    label:
+        singular: Média
+        plural: Médias
+
+product_reference:
+    label:
+        singular: Réf. externe
+        plural: Réf. externes
+    type:
+        ean8: Code EAN 8
+        ean13: Code EAN 13
+        manufacturer: Référence fabricant
+
+sale_item_configure:
+    variant: Version
+    choose_option: Choisissez une option
+    discount: Remise
+    unit_price: Prix unit.
+    total_price: Total
+    rule_table: Vos tarifs
+    price_table: Détail du prix unititaire
+    bundle: Ce pack est composé des articles suivants
+    no_choice:
+        title: <strong>Sélectionnez un article&hellip;</strong>
+        description: <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>
+variant:
+    label:
+        singular: Variante
+        plural: Variantes
+    header:
+        list: Variantes <small>Liste des variantes</small>
+    button:
+        new: Nouvelle variante

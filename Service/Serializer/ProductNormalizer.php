@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
+use Ekyna\Component\Resource\Bridge\Symfony\Serializer\TranslatableNormalizer;
 use Ekyna\Component\Resource\Model\TranslationInterface;
-use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareTrait;
 
@@ -16,106 +18,86 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareTrait;
  * @package Ekyna\Bundle\ProductBundle\Service\Serializer
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheManagerAwareInterface
+class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAwareInterface
 {
     use CacheManagerAwareTrait;
 
-    /**
-     * @var SubjectNormalizerHelper
-     */
-    protected $helper;
+    protected SubjectNormalizerHelper            $helper;
+    protected SupplierProductRepositoryInterface $supplierProductRepository;
 
-    /**
-     * @var SupplierProductRepositoryInterface
-     */
-    protected $supplierProductRepository;
-
-
-    /**
-     * Sets the helper.
-     *
-     * @param SubjectNormalizerHelper $helper
-     */
-    public function setSubjectNormalizerHelper(SubjectNormalizerHelper $helper)
+    public function setSubjectNormalizerHelper(SubjectNormalizerHelper $helper): void
     {
         $this->helper = $helper;
     }
 
-    /**
-     * Sets the supplier product repository.
-     *
-     * @param SupplierProductRepositoryInterface $repository
-     */
-    public function setSupplierProductRepository(SupplierProductRepositoryInterface $repository)
+    public function setSupplierProductRepository(SupplierProductRepositoryInterface $repository): void
     {
         $this->supplierProductRepository = $repository;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      *
-     * @param Model\ProductInterface $product
+     * @param Model\ProductInterface $object
      */
-    public function normalize($product, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = [])
     {
         if ($this->contextHasGroup('StockView', $context)) {
-            return $this->helper->normalizeStock($product, $format, $context);
+            return $this->helper->normalizeStock($object, $format, $context);
         }
 
-        $data = parent::normalize($product, $format, $context);
+        $data = parent::normalize($object, $format, $context);
 
         // Reference (include variant's)
-        $reference = [$product->getReference()];
-        if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-            foreach ($product->getVariants() as $variant) {
+        $reference = [$object->getReference()];
+        if ($object->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+            foreach ($object->getVariants() as $variant) {
                 $reference[] = $variant->getReference();
             }
         }
 
         $data = array_replace([
-            'designation' => $product->getFullDesignation(),
-            'type'        => $product->getType(),
+            'designation' => $object->getFullDesignation(),
+            'type'        => $object->getType(),
             'reference'   => $reference,
-            'net_price'   => (float)$product->getNetPrice(),
-            'min_price'   => (float)$product->getMinPrice(),
-            'stock_state' => $product->getStockState(),
-            'visible'     => $product->isVisible(),
-            'tax_group'   => $product->getTaxGroup()->getId(),
+            'net_price'   => $object->getNetPrice()->toFixed(5),
+            'min_price'   => $object->getMinPrice()->toFixed(5),
+            'stock_state' => $object->getStockState(),
+            'visible'     => $object->isVisible(),
+            'tax_group'   => $object->getTaxGroup()->getId(),
         ], $data);
 
         if ($this->contextHasGroup(['Default', 'Product'], $context)) {
-
             // Brand
-            if (null !== $brand = $product->getBrand()) {
+            if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = $brand->getId();
             }
 
             // Image
-            if ($image = $product->getImage()) {
+            if ($image = $object->getImage()) {
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_front');
             }
 
             // Seo
-            if (null !== $seo = $product->getSeo()) {
+            if (null !== $seo = $object->getSeo()) {
                 $data['seo'] = $seo->getId();
             }
 
             // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) {
                 return $c->getId();
-            }, $product->getCategories()->toArray());
+            }, $object->getCategories()->toArray());
 
             // References
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
                 return $this->normalizeObject($r, $format, $context);
-            }, $product->getReferences()->toArray());
+            }, $object->getReferences()->toArray());
 
             // Option groups
-            $data['option_groups'] = $this->normalizeOptionGroups($product);
-
+            $data['option_groups'] = $this->normalizeOptionGroups($object);
         } elseif ($this->contextHasGroup('Search', $context)) {
             // Brand
-            if (null !== $brand = $product->getBrand()) {
+            if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = [
                     'id'      => $brand->getId(),
                     'name'    => $brand->getName(),
@@ -135,45 +117,43 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                     'name'    => $c->getName(),
                     'visible' => $c->isVisible(),
                 ];
-            }, $product->getCategories()->toArray());
+            }, $object->getCategories()->toArray());
 
             // References
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) {
                 return $r->getCode();
-            }, $product->getReferences()->toArray());
+            }, $object->getReferences()->toArray());
 
             // Option groups
-            $data['option_groups'] = $this->normalizeOptionGroups($product);
-            $data['quote_only'] = $product->isQuoteOnly();
-            $data['end_of_life'] = $product->isEndOfLife();
-
+            $data['option_groups'] = $this->normalizeOptionGroups($object);
+            $data['quote_only'] = $object->isQuoteOnly();
+            $data['end_of_life'] = $object->isEndOfLife();
         } elseif ($this->contextHasGroup('Summary', $context)) {
-
-            $data['visibility'] = $product->getVisibility();
+            $data['visibility'] = $object->getVisibility();
 
             // Brand
-            if (null !== $brand = $product->getBrand()) {
+            if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = $brand->getName();
             }
 
             // Image
-            if ($image = $product->getImage()) {
+            if ($image = $object->getImage()) {
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
             }
 
-            $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
+            $data = array_replace($data, $this->helper->normalizeStock($object, $format, $context));
 
             $data['suppliers'] = array_map(function (SupplierProductInterface $reference) {
                 return [
-                    'name'     => $reference->getSupplier()->getName(),
-                    'price'    => $reference->getNetPrice(),
-                    'currency' => $reference->getSupplier()->getCurrency()->getCode(),
+                    'name'      => $reference->getSupplier()->getName(),
+                    'net_price' => $reference->getNetPrice()->toFixed(5),
+                    'currency'  => $reference->getSupplier()->getCurrency()->getCode(),
                 ];
-            }, $this->supplierProductRepository->findBySubject($product));
+            }, $this->supplierProductRepository->findBySubject($object));
         }
 
         if ($this->contextHasGroup('Stock', $context)) {
-            $data = array_replace($this->helper->normalizeStock($product, $format, $context), $data);
+            $data = array_replace($this->helper->normalizeStock($object, $format, $context), $data);
         }
 
         return $data;
@@ -181,12 +161,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
 
     /**
      * Normalizes the product option groups.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
      */
-    protected function normalizeOptionGroups(Model\ProductInterface $product)
+    protected function normalizeOptionGroups(Model\ProductInterface $product): array
     {
         return array_map(function (Model\OptionGroupInterface $g) {
             return [
@@ -200,7 +176,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
     /**
      * @inheritDoc
      */
-    protected function filterTranslation(TranslationInterface $translation)
+    protected function filterTranslation(TranslationInterface $translation): bool
     {
         /** @var Model\ProductInterface $product */
         $product = $translation->getTranslatable();
@@ -213,9 +189,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
         //$resource = parent::denormalize($data, $class, $format, $context);
 
@@ -223,17 +199,17 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return $data instanceof Model\ProductInterface;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return class_exists($type) && is_subclass_of($type, Model\ProductInterface::class);
     }

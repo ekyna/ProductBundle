@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface;
@@ -18,26 +20,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResupplyProductType extends AbstractType
 {
-    /**
-     * @var SupplierOrderRepositoryInterface
-     */
-    private $supplierOrderRepository;
+    private SupplierOrderRepositoryInterface $supplierOrderRepository;
 
-
-    /**
-     * Constructor.
-     *
-     * @param SupplierOrderRepositoryInterface $supplierOrderRepository
-     */
     public function __construct(SupplierOrderRepositoryInterface $supplierOrderRepository)
     {
         $this->supplierOrderRepository = $supplierOrderRepository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var SupplierProductInterface $supplierProduct */
         $supplierProduct = $options['supplier_product'];
@@ -47,7 +37,7 @@ class ResupplyProductType extends AbstractType
         $builder
             ->add('choice', RadioType::class, [
                 'label'    => $supplierProduct->getDesignation(),
-                'value'    => $supplierProduct->getId(),
+                'value'    => (string)$supplierProduct->getId(),
                 'required' => true,
                 'attr' => [
                     'data-price' => $supplierProduct->getNetPrice(),
@@ -58,29 +48,20 @@ class ResupplyProductType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view['choice']->vars['full_name'] = 'supplierProduct';
         $view->vars['supplierProduct'] = $options['supplier_product'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('supplier_product', null)
             ->setAllowedTypes('supplier_product', SupplierProductInterface::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): ?string
     {
         return 'ekyna_product_inventory_resupply_product';
     }

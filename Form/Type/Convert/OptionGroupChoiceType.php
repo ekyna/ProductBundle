@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
 use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
@@ -8,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class OptionGroupChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -15,14 +19,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OptionGroupChoiceType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'        => 'ekyna_product.option_group.label.plural',
+                'label'        => t('option_group.label.plural', [], 'EkynaProduct'),
                 'mapped'       => false,
                 'optionGroups' => [],
                 'choices'      => function (Options $options, $value) {
@@ -56,10 +57,7 @@ class OptionGroupChoiceType extends AbstractType
             });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

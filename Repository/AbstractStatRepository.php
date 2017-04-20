@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -11,7 +15,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
-use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\LocaleAwareRepositoryTrait;
+use Exception;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,19 +30,13 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 {
     use LocaleAwareRepositoryTrait;
 
-
-    /**
-     * @var OptionsResolver
-     */
-    protected $findProductsOptionsResolver;
+    protected ?OptionsResolver $findProductsOptionsResolver = null;
 
 
     /**
      * Finds best sellers products.
      *
-     * @param array $parameters
-     *
-     * @return Product[]
+     * @return array<Product>
      */
     public function findProducts(array $parameters): array
     {
@@ -105,15 +104,11 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 
     /**
      * Creates the "find products" query builder.
-     *
-     * @return QueryBuilder
      */
     abstract protected function createFindProductsQueryBuilder(): QueryBuilder;
 
     /**
      * Returns the "find products" default parameters.
-     *
-     * @return array
      */
     public function getFindProductsDefaultParameters(): array
     {
@@ -128,11 +123,6 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 
     /**
      * Returns the 'find products' query results.
-     *
-     * @param Query $query
-     * @param array $parameters
-     *
-     * @return array
      */
     protected function getFindProductsResults(Query $query, array $parameters): array
     {
@@ -150,9 +140,6 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 
     /**
      * Configures the "find products" query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
      */
     protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
     {
@@ -161,8 +148,6 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 
     /**
      * Configures the "find products" parameters resolver.
-     *
-     * @param OptionsResolver $resolver
      */
     protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
     {
@@ -171,8 +156,6 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 
     /**
      * Returns the best sellers options resolver.
-     *
-     * @return OptionsResolver
      */
     protected function getFindProductsParametersResolver(): OptionsResolver
     {
@@ -184,15 +167,15 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
         $resolver
             ->setDefaults($this->getFindProductsDefaultParameters())
             ->setAllowedTypes('group', [Group::class, 'null'])
-            ->setAllowedTypes('from', [\DateTime::class, 'string'])
+            ->setAllowedTypes('from', [DateTimeInterface::class, 'string'])
             ->setAllowedTypes('limit', 'int')
             ->setAllowedTypes('exclude', 'array')
             ->setAllowedTypes('id_only', 'bool')
             ->setNormalizer('from', function(Options $options, $from) {
                 if (is_string($from)) {
                     try {
-                        $from = new \DateTime($from);
-                    } catch (\Exception $e) {
+                        $from = new DateTime($from);
+                    } catch (Exception $e) {
                         throw new InvalidOptionsException("Option 'from' is invalid: date expected.");
                     }
                 }
@@ -205,7 +188,7 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
                         return $e;
                     }
                     throw new InvalidOptionsException(
-                        "Invalid option 'exclude': expected array of intergers."
+                        "Invalid option 'exclude': expected array of integers."
                     );
                 }, $exclude);
             });

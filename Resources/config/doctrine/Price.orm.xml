@@ -6,7 +6,6 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="Ekyna\Bundle\ProductBundle\Entity\Price"
-            repository-class="Ekyna\Bundle\ProductBundle\Repository\PriceRepository"
             table="product_price">
 
         <id name="id" type="integer" column="id">
@@ -14,10 +13,10 @@
         </id>
 
         <field name="startingFrom" column="starting_from" type="boolean" nullable="false"/>
-        <field name="originalPrice" column="original_price" type="decimal" precision="10" scale="5" nullable="false"/>
-        <field name="sellPrice" column="sell_price" type="decimal" precision="10" scale="5" nullable="false"/>
-        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
-        <field name="details" column="details" type="json_array" nullable="false"/>
+        <field name="originalPrice" column="original_price" type="php_decimal" precision="10" scale="5" nullable="false"/>
+        <field name="sellPrice" column="sell_price" type="php_decimal" precision="10" scale="5" nullable="false"/>
+        <field name="percent" column="percent" type="php_decimal" precision="4" scale="2" nullable="false"/>
+        <field name="details" column="details" type="json" nullable="false"/>
         <field name="endsAt" column="ends_at" type="date" nullable="true"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">

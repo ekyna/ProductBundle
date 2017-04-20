@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
@@ -11,19 +13,7 @@ use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
  */
 interface ProductStockUnitInterface extends StockUnitInterface
 {
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct(): ProductInterface;
+    public function getProduct(): ?ProductInterface;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return $this|ProductStockUnitInterface
-     */
     public function setProduct(ProductInterface $product): ProductStockUnitInterface;
 }

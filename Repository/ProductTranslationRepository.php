@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+
+use function is_null;
 
 /**
  * Class ProductTranslationRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductTranslationRepository extends ResourceRepository implements ProductTranslationRepositoryInterface
+class ProductTranslationRepository extends ServiceEntityRepository implements ProductTranslationRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function findDuplicate(ProductTranslationInterface $translation): ?ProductTranslationInterface
     {
         if (empty($title = $translation->getTitle())) {
@@ -56,31 +56,5 @@ class ProductTranslationRepository extends ResourceRepository implements Product
             ->getQuery()
             ->useQueryCache(true)
             ->getOneOrNullResult();
-    }
-
-    /**
-     * @param array $ignore
-     *
-     * @return array
-     */
-    private function ignoreToIds(array $ignore): array
-    {
-        $ids = [];
-
-        foreach ($ignore as $id) {
-            if ($id instanceof ProductTranslationInterface) {
-                if (null === $id = $id->getId()) {
-                    continue;
-                }
-            }
-
-            if (!is_int($id)) {
-                throw new UnexpectedTypeException($id, ['int', ProductTranslationInterface::class]);
-            }
-
-            $ids[] = $id;
-        }
-
-        return array_unique($ids);
     }
 }

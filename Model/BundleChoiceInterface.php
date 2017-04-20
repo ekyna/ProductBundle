@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Bundle\ProductBundle\Entity\BundleChoice;
+use Decimal\Decimal;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 
@@ -14,175 +16,72 @@ use Ekyna\Component\Resource\Model\SortableInterface;
  */
 interface BundleChoiceInterface extends ResourceInterface, SortableInterface
 {
-    /**
-     * Returns the slot.
-     *
-     * @return BundleSlotInterface
-     */
-    public function getSlot();
+    public function getSlot(): ?BundleSlotInterface;
 
-    /**
-     * Sets the slot.
-     *
-     * @param BundleSlotInterface $slot
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setSlot(BundleSlotInterface $slot = null);
+    public function setSlot(?BundleSlotInterface $slot): BundleChoiceInterface;
 
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
 
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $choice
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setProduct(ProductInterface $choice);
+    public function setProduct(?ProductInterface $product): BundleChoiceInterface;
 
-    /**
-     * Returns the minimum quantity.
-     *
-     * @return float
-     */
-    public function getMinQuantity();
+    public function getMinQuantity(): Decimal;
 
-    /**
-     * Sets the minimum quantity.
-     *
-     * @param float $quantity
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setMinQuantity($quantity);
+    public function setMinQuantity(Decimal $quantity): BundleChoiceInterface;
 
-    /**
-     * Returns the maximum quantity.
-     *
-     * @return float
-     */
-    public function getMaxQuantity();
+    public function getMaxQuantity(): Decimal;
 
-    /**
-     * Sets the maximum quantity.
-     *
-     * @param float $quantity
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setMaxQuantity($quantity);
+    public function setMaxQuantity(Decimal $quantity): BundleChoiceInterface;
 
     /**
      * Returns the excluded option groups ids.
      *
-     * @return array
+     * @return array<int>
      */
-    public function getExcludedOptionGroups();
+    public function getExcludedOptionGroups(): array;
 
     /**
      * Sets the excluded option groups ids.
      *
-     * @param array $ids
-     *
-     * @return $this|BundleChoiceInterface
+     * @param array<int> $ids
      */
-    public function setExcludedOptionGroups(array $ids);
+    public function setExcludedOptionGroups(array $ids): BundleChoiceInterface;
+
+    public function getNetPrice(): ?Decimal;
+
+    public function setNetPrice(?Decimal $price): BundleChoiceInterface;
+
+    public function isHidden(): bool;
+
+    public function setHidden(bool $hidden): BundleChoiceInterface;
 
     /**
-     * Returns the net price.
-     *
-     * @return float
+     * @return Collection<BundleChoiceRuleInterface>
      */
-    public function getNetPrice();
-
-    /**
-     * Sets the net price.
-     *
-     * @param float $price
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setNetPrice($price);
-
-    /**
-     * Returns whether the choice is hidden or not.
-     *
-     * @return bool
-     */
-    public function isHidden();
-
-    /**
-     * Sets whether the choice is hidden or not.
-     *
-     * @param bool $hidden
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setHidden($hidden);
-
-    /**
-     * Returns the rules.
-     *
-     * @return ArrayCollection|BundleChoiceRuleInterface[]
-     */
-    public function getRules();
+    public function getRules(): Collection;
 
     /**
      * Returns whether the bundle choice has the rule or not.
-     *
-     * @param BundleChoiceRuleInterface $rule
-     *
-     * @return bool
      */
-    public function hasRule(BundleChoiceRuleInterface $rule);
+    public function hasRule(BundleChoiceRuleInterface $rule): bool;
+
+    public function addRule(BundleChoiceRuleInterface $rule): BundleChoiceInterface;
+
+    public function removeRule(BundleChoiceRuleInterface $rule): BundleChoiceInterface;
 
     /**
-     * Adds the rule.
+     * @param Collection<BundleChoiceRuleInterface> $rules
      *
-     * @param BundleChoiceRuleInterface $rule
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function addRule(BundleChoiceRuleInterface $rule);
-
-    /**
-     * Removes the rule.
-     *
-     * @param BundleChoiceRuleInterface $rule
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function removeRule(BundleChoiceRuleInterface $rule);
-
-    /**
-     * Sets the rules.
-     *
-     * @param ArrayCollection|BundleChoiceRuleInterface[] $rules
-     *
-     * @return $this|BundleChoiceInterface
      * @internal
      */
-    public function setRules(ArrayCollection $rules);
+    public function setRules(Collection $rules): BundleChoiceInterface;
 
     /**
      * Returns whether to exclude images (from parent gallery).
-     *
-     * @return bool
      */
     public function isExcludeImages(): bool;
 
     /**
      * Sets whether to exclude images (from parent gallery).
-     *
-     * @param bool $exclude
-     *
-     * @return BundleChoice
      */
     public function setExcludeImages(bool $exclude): BundleChoiceInterface;
 }

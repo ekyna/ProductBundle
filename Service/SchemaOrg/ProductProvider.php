@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 
 use Ekyna\Bundle\CmsBundle\Event\SchemaOrgEvent;
 use Ekyna\Bundle\CmsBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Common\Util\Money;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
+use Spatie\SchemaOrg\Brand;
 use Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\Type;
 
 /**
  * Class ProductProvider
@@ -19,23 +24,9 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
 {
     use SchemaOrg\BuilderAwareTrait;
 
-    /**
-     * @var ResourceEventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected ResourceEventDispatcherInterface $dispatcher;
+    protected string $defaultCurrency;
 
-    /**
-     * @var string
-     */
-    protected $defaultCurrency;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ResourceEventDispatcherInterface $dispatcher
-     * @param string                           $currency
-     */
     public function __construct(ResourceEventDispatcherInterface $dispatcher, string $currency)
     {
         $this->dispatcher = $dispatcher;
@@ -47,9 +38,9 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
      *
      * @param Model\ProductInterface $object
      */
-    public function build($object)
+    public function build(object $object): ?Type
     {
-        /** @var \Spatie\SchemaOrg\Brand $brand */
+        /** @var Brand $brand */
         $brand = $this->schemaBuilder->build($object->getBrand());
 
         $description = trim(strip_tags($object->getDescription()));
@@ -72,13 +63,13 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
             if (1 > $weight) {
                 $schema->weight(
                     Schema::quantitativeValue()
-                        ->value((string)round($weight * 1000))
+                        ->value($weight->mul(1000)->toFixed())
                         ->unitCode('GRM')
                 );
             } else {
                 $schema->weight(
                     Schema::quantitativeValue()
-                        ->value((string)round($weight, 3))
+                        ->value($weight->toFixed(3))
                         ->unitCode('KGM')
                 );
             }
@@ -109,10 +100,10 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
             Schema::offer()
                 ->availability($this->getAvailability($object))
                 ->itemCondition('https://schema.org/NewCondition')
-                ->price((string)round($object->getMinPrice(), 2))// TODO Round regarding to currency
+                ->price(Money::fixed($object->getMinPrice(), $this->defaultCurrency))
                 // TODO ->priceValidUntil()
                 ->priceCurrency($this->defaultCurrency)
-                // TODO ->seller()
+        // TODO ->seller()
         );
 
         if ($image = $object->getImage()) {
@@ -142,7 +133,7 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
             ->setSchema($schema)
             ->setResource($object);
 
-        $this->dispatcher->dispatch(ProductEvents::SCHEMA_ORG, $event);
+        $this->dispatcher->dispatch($event, ProductEvents::SCHEMA_ORG);
 
         return $schema;
     }
@@ -173,7 +164,7 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
     /**
      * @inheritDoc
      */
-    public function supports($object)
+    public function supports(object $object): bool
     {
         return $object instanceof Model\ProductInterface
             && $object->getType() !== Model\ProductTypes::TYPE_CONFIGURABLE;

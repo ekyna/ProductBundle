@@ -15,7 +15,7 @@ class BundleSlot extends Constraint
     public $required_with_rules = 'ekyna_product.bundle_slot.required_with_rules';
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getTargets()
     {

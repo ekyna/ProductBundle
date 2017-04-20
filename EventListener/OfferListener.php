@@ -2,9 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
+use Decimal\Decimal;
 use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
+use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
@@ -68,7 +70,7 @@ class OfferListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      *
-     * @return Offer
+     * @return OfferInterface
      */
     public function onChange(ResourceEventInterface $event)
     {
@@ -114,7 +116,7 @@ class OfferListener implements EventSubscriberInterface
                     );
                     CacheUtil::addKeyToList(
                         $this->cacheIds,
-                        CacheUtil::buildOfferKeyByIds($product, $group, $country, 1, false)
+                        CacheUtil::buildOfferKeyByIds($product, $group, $country, new Decimal(1), false)
                     );
                 }
             }
@@ -137,7 +139,7 @@ class OfferListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      *
-     * @return Offer
+     * @return OfferInterface
      */
     protected function getOfferFromEvent(ResourceEventInterface $event)
     {

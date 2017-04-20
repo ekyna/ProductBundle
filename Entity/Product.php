@@ -1,26 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use DateTimeInterface;
+use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model as Media;
-use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductMentionInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Model as RM;
 
+use function array_map;
+use function intval;
+use function sprintf;
+
 /**
  * Class Product
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method Model\ProductTranslationInterface translate($locale = null, $create = false)
- * @method Collection|Model\ProductTranslationInterface[] getTranslations()
+ * @method Model\ProductTranslationInterface translate(string $locale = null, bool $create = false)
+ * @method Collection<Model\ProductTranslationInterface> getTranslations()
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
@@ -35,148 +44,53 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     use RM\TimestampableTrait;
     use Stock\StockSubjectTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int               $id                    = null;
+    protected ?string            $type                  = null;
+    protected Decimal            $minPrice;
+    protected bool               $notContractual        = false;
+    protected ?string            $attributesDesignation = null;
+    protected bool               $brandNaming           = true; // Include brand name in designation and title
+    protected bool               $pendingOffers         = true; // Schedule offers update at creation
+    protected bool               $pendingPrices         = true; // Schedule prices update at creation
+    protected ?DateTimeInterface $releasedAt            = null;
+    protected string             $bestSeller            = Model\HighlightModes::MODE_AUTO;
+    protected string             $crossSelling          = Model\HighlightModes::MODE_AUTO;
+    protected ?DateTimeInterface $statUpdatedAt         = null;
 
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $parent;
+    protected ?Model\BrandInterface        $brand        = null;
+    protected ?Model\ProductInterface      $parent       = null;
+    protected ?Model\AttributeSetInterface $attributeSet = null;
 
-    /**
-     * @var Collection|Model\ProductInterface[]
-     */
-    protected $variants;
+    /** @var Collection<Model\ProductInterface> */
+    protected Collection $variants;
+    /** @var Collection<Model\ProductAttributeInterface> */
+    protected Collection $attributes;
+    /** @var Collection<Model\OptionGroupInterface> */
+    protected Collection $optionGroups;
+    /** @var Collection<Model\BundleSlotInterface> */
+    protected Collection $bundleSlots;
+    /** @var Collection<Model\ComponentInterface> */
+    protected Collection $components;
+    /** @var Collection<Model\CrossSellingInterface> */
+    protected Collection $crossSellings;
+    /** @var Collection<Model\SpecialOfferInterface> */
+    protected Collection $specialOffers;
+    /** @var Collection<Model\PricingInterface> */
+    protected Collection $pricings;
+    /** @var Collection<Model\CategoryInterface> */
+    protected Collection $categories;
+    /** @var Collection<CustomerGroupInterface> */
+    protected Collection $customerGroups;
+    /** @var Collection<Model\ProductMediaInterface> */
+    protected Collection $medias;
+    /** @var Collection<Model\ProductReferenceInterface> */
+    protected Collection $references;
 
-    /**
-     * @var Model\AttributeSetInterface
-     */
-    protected $attributeSet;
-
-    /**
-     * @var Collection|Model\ProductAttributeInterface[]
-     */
-    protected $attributes;
-
-    /**
-     * @var Collection|Model\OptionGroupInterface[]
-     */
-    protected $optionGroups;
-
-    /**
-     * @var Collection|Model\BundleSlotInterface[]
-     */
-    protected $bundleSlots;
-
-    /**
-     * @var Collection|Model\ComponentInterface[]
-     */
-    protected $components;
-
-    /**
-     * @var Collection|Model\CrossSellingInterface[]
-     */
-    protected $crossSellings;
-
-    /**
-     * @var Collection|Model\SpecialOfferInterface[]
-     */
-    protected $specialOffers;
-
-    /**
-     * @var Collection|Model\PricingInterface[]
-     */
-    protected $pricings;
-
-    /**
-     * @var Model\BrandInterface
-     */
-    protected $brand;
-
-    /**
-     * @var Collection|Model\CategoryInterface[]
-     */
-    protected $categories;
-
-    /**
-     * @var Collection|CustomerGroupInterface[]
-     */
-    protected $customerGroups;
-
-    /**
-     * @var Collection|Model\ProductMediaInterface[]
-     */
-    protected $medias;
-
-    /**
-     * @var bool
-     */
-    protected $notContractual = false;
-
-    /**
-     * @var Collection|Model\ProductReferenceInterface[]
-     */
-    protected $references;
-
-    /**
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * @var string
-     */
-    protected $attributesDesignation;
-
-    /**
-     * @var bool
-     */
-    protected $brandNaming = true; // Include brand name in designation and title
-
-    /**
-     * @var float
-     */
-    protected $minPrice = 0;
-
-    /**
-     * @var bool
-     */
-    protected $pendingOffers = true; // Schedule offers update at creation
-
-    /**
-     * @var bool
-     */
-    protected $pendingPrices = true; // Schedule prices update at creation
-
-    /**
-     * @var \DateTime
-     */
-    protected $releasedAt;
-
-    /**
-     * @var int
-     */
-    protected $bestSeller = Model\HighlightModes::MODE_AUTO;
-
-    /**
-     * @var int
-     */
-    protected $crossSelling = Model\HighlightModes::MODE_AUTO;
-
-    /**
-     * @var \DateTime
-     */
-    protected $statUpdatedAt;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct();
+
+        $this->minPrice = new Decimal(0);
 
         $this->attributes = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
@@ -188,17 +102,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->optionGroups = new ArrayCollection();
         $this->customerGroups = new ArrayCollection();
         $this->references = new ArrayCollection();
-        $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
 
+        $this->initializeTags();
         $this->initializeAdjustments();
         $this->initializeMentions();
         $this->initializeStock();
     }
 
-    /**
-     * Clones the product.
-     */
     public function __clone()
     {
         parent::__clone();
@@ -342,84 +253,313 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->references = new ArrayCollection();
         $this->visible = false;
         $this->notContractual = true;
-        //$this->netPrice = 0;
-        //$this->weight = 0;
+        $this->minPrice = new Decimal(0);
         //$this->releasedAt = null;
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->getFullDesignation(true) ?: 'New product';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getIdentifier()
+    public function getIdentifier(): int
     {
         return $this->getId();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getParent()
+    public function getType(): ?string
     {
-        return $this->parent;
+        return $this->type;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setParent(Model\ProductInterface $parent = null)
+    public function setType(string $type): Model\ProductInterface
     {
-        if ($this->parent !== $parent) {
-            if ($previous = $this->parent) {
-                $this->parent = null;
-                $previous->removeVariant($this);
-            }
+        $this->type = $type;
 
-            if ($this->parent = $parent) {
-                $this->parent->addVariant($this);
-            }
+        return $this;
+    }
+
+    public function getMinPrice(): Decimal
+    {
+        return $this->minPrice;
+    }
+
+    public function setMinPrice(Decimal $minPrice): Model\ProductInterface
+    {
+        $this->minPrice = $minPrice;
+
+        return $this;
+    }
+
+    public function isNotContractual(): bool
+    {
+        return $this->notContractual;
+    }
+
+    public function setNotContractual(bool $notContractual): Model\ProductInterface
+    {
+        $this->notContractual = $notContractual;
+
+        return $this;
+    }
+
+    public function getAttributesDesignation(): ?string
+    {
+        return $this->attributesDesignation;
+    }
+
+    public function setAttributesDesignation(?string $attributesDesignation): Model\ProductInterface
+    {
+        $this->attributesDesignation = $attributesDesignation;
+
+        return $this;
+    }
+
+    public function isBrandNaming(): bool
+    {
+        return $this->brandNaming;
+    }
+
+    public function setBrandNaming(bool $naming): Model\ProductInterface
+    {
+        $this->brandNaming = $naming;
+
+        return $this;
+    }
+
+    public function isPendingOffers(): bool
+    {
+        return $this->pendingOffers;
+    }
+
+    public function setPendingOffers(bool $pending): Model\ProductInterface
+    {
+        $this->pendingOffers = $pending;
+
+        return $this;
+    }
+
+    public function isPendingPrices(): bool
+    {
+        return $this->pendingPrices;
+    }
+
+    public function setPendingPrices(bool $pending): Model\ProductInterface
+    {
+        $this->pendingPrices = $pending;
+
+        return $this;
+    }
+
+    public function getReleasedAt(): ?DateTimeInterface
+    {
+        return $this->releasedAt;
+    }
+
+    public function setReleasedAt(?DateTimeInterface $date): Model\ProductInterface
+    {
+        $this->releasedAt = $date;
+
+        return $this;
+    }
+
+    public function getBestSeller(): string
+    {
+        return $this->bestSeller;
+    }
+
+    public function setBestSeller(string $mode): Model\ProductInterface
+    {
+        $this->bestSeller = $mode;
+
+        return $this;
+    }
+
+    public function getCrossSelling(): string
+    {
+        return $this->crossSelling;
+    }
+
+    public function setCrossSelling(string $mode): Model\ProductInterface
+    {
+        $this->crossSelling = $mode;
+
+        return $this;
+    }
+
+    public function getStatUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->statUpdatedAt;
+    }
+
+    public function setStatUpdatedAt(?DateTimeInterface $date): Model\ProductInterface
+    {
+        $this->statUpdatedAt = $date;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->translate()->getTitle();
+    }
+
+    public function setTitle(?string $title): Model\ProductInterface
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    public function getSubTitle(): ?string
+    {
+        return $this->translate()->getSubTitle();
+    }
+
+    public function setSubTitle(?string $subTitle): Model\ProductInterface
+    {
+        $this->translate()->setSubTitle($subTitle);
+
+        return $this;
+    }
+
+    public function getAttributesTitle(): ?string
+    {
+        return $this->translate()->getAttributesTitle();
+    }
+
+    public function setAttributesTitle(?string $attributesTitle): Model\ProductInterface
+    {
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            $this->translate()->setAttributesTitle($attributesTitle);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getVariants()
+    public function getFullTitle(bool $withBrand = false): ?string
+    {
+        $title = $this->getTitle();
+
+        // Variant : parent title + variant title
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            if (empty($title)) {
+                // Fallback to auto-generated title
+                $title = $this->getAttributesTitle();
+            }
+
+            return sprintf('%s %s', $this->parent->getFullTitle($withBrand), $title);
+        }
+
+        if ($withBrand && $this->brandNaming && $this->brand) {
+            return sprintf('%s %s', $this->brand->getTitle(), $title);
+        }
+
+        return $title;
+    }
+
+    public function getDescription(): ?string
+    {
+        // Variant : fallback to parent description
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            return $this->parent->getDescription();
+        }
+
+        return $this->translate()->getDescription();
+    }
+
+    public function setDescription(?string $description): Model\ProductInterface
+    {
+        if ($this->type !== Model\ProductTypes::TYPE_VARIANT) {
+            $this->translate()->setDescription($description);
+        }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->translate()->getSlug();
+    }
+
+    public function setSlug(?string $slug): Model\ProductInterface
+    {
+        $this->translate()->setSlug($slug);
+
+        return $this;
+    }
+
+    public function getFullDesignation(bool $withBrand = false): ?string
+    {
+        $designation = $this->getDesignation();
+
+        // Variant : parent designation + variant designation
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            if (empty($designation)) {
+                // Fallback to auto-generated designation
+                $designation = $this->getAttributesDesignation();
+            }
+
+            return sprintf('%s %s', $this->parent->getFullDesignation($withBrand), $designation);
+        }
+
+        // Prepend the brand
+        return $withBrand && $this->brandNaming
+            ? sprintf('%s %s', $this->brand->getName(), $designation)
+            : $designation;
+    }
+
+    public function getBrand(): ?Model\BrandInterface
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(Model\BrandInterface $brand): Model\ProductInterface
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function getParent(): ?Model\ProductInterface
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?Model\ProductInterface $parent): Model\ProductInterface
+    {
+        if ($this->parent === $parent) {
+            return $this;
+        }
+
+        if ($previous = $this->parent) {
+            $this->parent = null;
+            $previous->removeVariant($this);
+        }
+
+        if ($this->parent = $parent) {
+            $this->parent->addVariant($this);
+        }
+
+        return $this;
+    }
+
+    public function getVariants(): Collection
     {
         return $this->variants;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasVariant(Model\ProductInterface $variant)
+    public function hasVariant(Model\ProductInterface $variant): bool
     {
         return $this->variants->contains($variant);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addVariant(Model\ProductInterface $variant)
+    public function addVariant(Model\ProductInterface $variant): Model\ProductInterface
     {
         if (!$this->hasVariant($variant)) {
             $this->variants->add($variant);
@@ -429,10 +569,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeVariant(Model\ProductInterface $variant)
+    public function removeVariant(Model\ProductInterface $variant): Model\ProductInterface
     {
         if ($this->hasVariant($variant)) {
             $this->variants->removeElement($variant);
@@ -442,44 +579,29 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttributeSet()
+    public function getAttributeSet(): ?Model\AttributeSetInterface
     {
         return $this->attributeSet;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setAttributeSet(Model\AttributeSetInterface $attributeSet = null)
+    public function setAttributeSet(?Model\AttributeSetInterface $attributeSet): Model\ProductInterface
     {
         $this->attributeSet = $attributeSet;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAttributes()
+    public function getAttributes(): Collection
     {
         return $this->attributes;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasAttribute(Model\ProductAttributeInterface $attribute)
+    public function hasAttribute(Model\ProductAttributeInterface $attribute): bool
     {
         return $this->attributes->contains($attribute);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addAttribute(Model\ProductAttributeInterface $attribute)
+    public function addAttribute(Model\ProductAttributeInterface $attribute): Model\ProductInterface
     {
         if (!$this->hasAttribute($attribute)) {
             $this->attributes->add($attribute);
@@ -489,10 +611,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeAttribute(Model\ProductAttributeInterface $attribute)
+    public function removeAttribute(Model\ProductAttributeInterface $attribute): Model\ProductInterface
     {
         if ($this->hasAttribute($attribute)) {
             $this->attributes->removeElement($attribute);
@@ -502,34 +621,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getOptionGroups()
+    public function getOptionGroups(): Collection
     {
         return $this->optionGroups;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasOptionGroups()
+    public function hasOptionGroups(): bool
     {
         return 0 < $this->optionGroups->count();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasOptionGroup(Model\OptionGroupInterface $group)
+    public function hasOptionGroup(Model\OptionGroupInterface $group): bool
     {
         return $this->optionGroups->contains($group);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addOptionGroup(Model\OptionGroupInterface $group)
+    public function addOptionGroup(Model\OptionGroupInterface $group): Model\ProductInterface
     {
         if (!$this->hasOptionGroup($group)) {
             $this->optionGroups->add($group);
@@ -539,10 +646,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeOptionGroup(Model\OptionGroupInterface $group)
+    public function removeOptionGroup(Model\OptionGroupInterface $group): Model\ProductInterface
     {
         if ($this->hasOptionGroup($group)) {
             $this->optionGroups->removeElement($group);
@@ -552,30 +656,26 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setOptionGroups(Collection $optionGroups)
+    public function setOptionGroups(Collection $groups): Model\ProductInterface
     {
         foreach ($this->optionGroups as $group) {
             $this->removeOptionGroup($group);
         }
 
-        foreach ($optionGroups as $group) {
+        foreach ($groups as $group) {
             $this->addOptionGroup($group);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function hasRequiredOptionGroup(array $exclude = []): bool
     {
+        $exclude = array_map(fn($id) => intval($id), $exclude);
+
         // All types
         foreach ($this->optionGroups as $optionGroup) {
-            if (in_array($optionGroup->getId(), $exclude)) {
+            if (in_array($optionGroup->getId(), $exclude, true)) {
                 continue;
             }
 
@@ -587,7 +687,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         // A variant inherits options from his parent
         if ($this->parent) {
             foreach ($this->parent->getOptionGroups() as $optionGroup) {
-                if (in_array($optionGroup->getId(), $exclude)) {
+                if (in_array($optionGroup->getId(), $exclude, true)) {
                     continue;
                 }
 
@@ -621,11 +721,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $exclude = [];
         }
 
+        $exclude = array_map(fn($id) => intval($id), $exclude);
+
         $groups = [];
 
         if (Model\ProductTypes::isVariantType($this)) {
             foreach ($this->parent->getOptionGroups() as $group) {
-                if (in_array($group->getId(), $exclude)) {
+                if (in_array($group->getId(), $exclude, true)) {
                     continue;
                 }
 
@@ -637,7 +739,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 $choice = $slot->getChoices()->first();
                 $choiceGroups = $choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups(), true);
                 foreach ($choiceGroups as $group) {
-                    if (in_array($group->getId(), $exclude)) {
+                    if (in_array($group->getId(), $exclude, true)) {
                         continue;
                     }
 
@@ -647,7 +749,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         foreach ($this->getOptionGroups() as $group) {
-            if (in_array($group->getId(), $exclude)) {
+            if (in_array($group->getId(), $exclude, true)) {
                 continue;
             }
 
@@ -657,26 +759,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $groups;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBundleSlots()
+    public function getBundleSlots(): Collection
     {
         return $this->bundleSlots;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasBundleSlot(Model\BundleSlotInterface $slot)
+    public function hasBundleSlot(Model\BundleSlotInterface $slot): bool
     {
         return $this->bundleSlots->contains($slot);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addBundleSlot(Model\BundleSlotInterface $slot)
+    public function addBundleSlot(Model\BundleSlotInterface $slot): Model\ProductInterface
     {
         if (!$this->hasBundleSlot($slot)) {
             $this->bundleSlots->add($slot);
@@ -686,10 +779,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeBundleSlot(Model\BundleSlotInterface $slot)
+    public function removeBundleSlot(Model\BundleSlotInterface $slot): Model\ProductInterface
     {
         if ($this->hasBundleSlot($slot)) {
             $this->bundleSlots->removeElement($slot);
@@ -699,10 +789,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setBundleSlots(Collection $slots)
+    public function setBundleSlots(Collection $slots): Model\ProductInterface
     {
         foreach ($this->bundleSlots as $slot) {
             $this->removeBundleSlot($slot);
@@ -715,34 +802,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getComponents()
+    public function getComponents(): Collection
     {
         return $this->components;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasComponents()
+    public function hasComponents(): bool
     {
         return 0 < $this->components->count();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasComponent(Model\ComponentInterface $component)
+    public function hasComponent(Model\ComponentInterface $component): bool
     {
         return $this->components->contains($component);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addComponent(Model\ComponentInterface $component)
+    public function addComponent(Model\ComponentInterface $component): Model\ProductInterface
     {
         if (!$this->hasComponent($component)) {
             $this->components->add($component);
@@ -752,10 +827,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeComponent(Model\ComponentInterface $component)
+    public function removeComponent(Model\ComponentInterface $component): Model\ProductInterface
     {
         if ($this->hasComponent($component)) {
             $this->components->removeElement($component);
@@ -765,10 +837,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setComponents(Collection $components)
+    public function setComponents(Collection $components): Model\ProductInterface
     {
         foreach ($this->components as $component) {
             $this->removeComponent($component);
@@ -781,34 +850,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getCrossSellings()
+    public function getCrossSellings(): Collection
     {
         return $this->crossSellings;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasCrossSellings()
+    public function hasCrossSellings(): bool
     {
         return 0 < $this->crossSellings->count();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasCrossSelling(Model\CrossSellingInterface $crossSelling)
+    public function hasCrossSelling(Model\CrossSellingInterface $crossSelling): bool
     {
         return $this->crossSellings->contains($crossSelling);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addCrossSelling(Model\CrossSellingInterface $crossSelling)
+    public function addCrossSelling(Model\CrossSellingInterface $crossSelling): Model\ProductInterface
     {
         if (!$this->hasCrossSelling($crossSelling)) {
             $this->crossSellings->add($crossSelling);
@@ -818,10 +875,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeCrossSelling(Model\CrossSellingInterface $crossSelling)
+    public function removeCrossSelling(Model\CrossSellingInterface $crossSelling): Model\ProductInterface
     {
         if ($this->hasCrossSelling($crossSelling)) {
             $this->crossSellings->removeElement($crossSelling);
@@ -831,10 +885,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setCrossSellings(Collection $crossSellings)
+    public function setCrossSellings(Collection $crossSellings): Model\ProductInterface
     {
         foreach ($this->crossSellings as $crossSelling) {
             $this->removeCrossSelling($crossSelling);
@@ -847,26 +898,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSpecialOffers()
+    public function getSpecialOffers(): Collection
     {
         return $this->specialOffers;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasSpecialOffer(Model\SpecialOfferInterface $offer)
+    public function hasSpecialOffer(Model\SpecialOfferInterface $offer): bool
     {
         return $this->specialOffers->contains($offer);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addSpecialOffer(Model\SpecialOfferInterface $offer)
+    public function addSpecialOffer(Model\SpecialOfferInterface $offer): Model\ProductInterface
     {
         if (!$this->hasSpecialOffer($offer)) {
             $this->specialOffers->add($offer);
@@ -876,10 +918,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeSpecialOffer(Model\SpecialOfferInterface $offer)
+    public function removeSpecialOffer(Model\SpecialOfferInterface $offer): Model\ProductInterface
     {
         if ($this->hasSpecialOffer($offer)) {
             $this->specialOffers->removeElement($offer);
@@ -889,10 +928,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSpecialOffers(Collection $offers)
+    public function setSpecialOffers(Collection $offers): Model\ProductInterface
     {
         foreach ($this->specialOffers as $offer) {
             $this->removeSpecialOffer($offer);
@@ -905,26 +941,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getPricings()
+    public function getPricings(): Collection
     {
         return $this->pricings;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasPricing(Model\PricingInterface $pricing)
+    public function hasPricing(Model\PricingInterface $pricing): bool
     {
         return $this->pricings->contains($pricing);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addPricing(Model\PricingInterface $pricing)
+    public function addPricing(Model\PricingInterface $pricing): Model\ProductInterface
     {
         if (!$this->hasPricing($pricing)) {
             $this->pricings->add($pricing);
@@ -934,10 +961,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removePricing(Model\PricingInterface $pricing)
+    public function removePricing(Model\PricingInterface $pricing): Model\ProductInterface
     {
         if ($this->hasPricing($pricing)) {
             $this->pricings->removeElement($pricing);
@@ -947,10 +971,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setPricings(Collection $pricings)
+    public function setPricings(Collection $pricings): Model\ProductInterface
     {
         foreach ($this->pricings as $pricing) {
             $this->removePricing($pricing);
@@ -963,44 +984,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBrand()
-    {
-        return $this->brand;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setBrand(Model\BrandInterface $brand)
-    {
-        $this->brand = $brand;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCategories()
+    public function getCategories(): Collection
     {
         return $this->categories;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasCategory(Model\CategoryInterface $category)
+    public function hasCategory(Model\CategoryInterface $category): bool
     {
         return $this->categories->contains($category);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addCategory(Model\CategoryInterface $category)
+    public function addCategory(Model\CategoryInterface $category): Model\ProductInterface
     {
         if (!$this->hasCategory($category)) {
             $this->categories->add($category);
@@ -1009,10 +1003,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeCategory(Model\CategoryInterface $category)
+    public function removeCategory(Model\CategoryInterface $category): Model\ProductInterface
     {
         if ($this->hasCategory($category)) {
             $this->categories->removeElement($category);
@@ -1021,10 +1012,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setCategories(Collection $categories)
+    public function setCategories(Collection $categories): Model\ProductInterface
     {
         foreach ($this->categories as $category) {
             $this->removeCategory($category);
@@ -1037,26 +1025,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getCustomerGroups()
+    public function getCustomerGroups(): Collection
     {
         return $this->customerGroups;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasCustomerGroup(CustomerGroupInterface $group)
+    public function hasCustomerGroup(CustomerGroupInterface $group): bool
     {
         return $this->customerGroups->contains($group);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addCustomerGroup(CustomerGroupInterface $group)
+    public function addCustomerGroup(CustomerGroupInterface $group): Model\ProductInterface
     {
         if (!$this->hasCustomerGroup($group)) {
             $this->customerGroups->add($group);
@@ -1065,10 +1044,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeCustomerGroup(CustomerGroupInterface $group)
+    public function removeCustomerGroup(CustomerGroupInterface $group): Model\ProductInterface
     {
         if ($this->hasCustomerGroup($group)) {
             $this->customerGroups->removeElement($group);
@@ -1077,34 +1053,25 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setCustomerGroups(Collection $customerGroups)
+    public function setCustomerGroups(Collection $groups): Model\ProductInterface
     {
         foreach ($this->customerGroups as $group) {
             $this->removeCustomerGroup($group);
         }
 
-        foreach ($customerGroups as $group) {
+        foreach ($groups as $group) {
             $this->addCustomerGroup($group);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasMedia(Model\ProductMediaInterface $media)
+    public function hasMedia(Model\ProductMediaInterface $media): bool
     {
         return $this->medias->contains($media);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addMedia(Model\ProductMediaInterface $media)
+    public function addMedia(Model\ProductMediaInterface $media): Model\ProductInterface
     {
         if (!$this->hasMedia($media)) {
             $this->medias->add($media);
@@ -1115,10 +1082,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeMedia(Model\ProductMediaInterface $media)
+    public function removeMedia(Model\ProductMediaInterface $media): Model\ProductInterface
     {
         if ($this->hasMedia($media)) {
             $this->medias->removeElement($media);
@@ -1129,10 +1093,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getMedias(array $types = [])
+    public function getMedias(array $types = []): Collection
     {
         if (!empty($types)) {
             foreach ($types as $type) {
@@ -1140,43 +1101,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             }
 
             return $this->medias->filter(function (Model\ProductMediaInterface $media) use ($types) {
-                return in_array($media->getMedia()->getType(), $types);
+                return in_array($media->getMedia()->getType(), $types, true);
             });
         }
 
         return $this->medias;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isNotContractual(): bool
-    {
-        return $this->notContractual;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setNotContractual(bool $notContractual): Model\ProductInterface
-    {
-        $this->notContractual = $notContractual;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasReference(Model\ProductReferenceInterface $reference)
+    public function hasReference(Model\ProductReferenceInterface $reference): bool
     {
         return $this->references->contains($reference);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addReference(Model\ProductReferenceInterface $reference)
+    public function addReference(Model\ProductReferenceInterface $reference): Model\ProductInterface
     {
         if (!$this->hasReference($reference)) {
             $this->references->add($reference);
@@ -1186,10 +1123,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeReference(Model\ProductReferenceInterface $reference)
+    public function removeReference(Model\ProductReferenceInterface $reference): Model\ProductInterface
     {
         if ($this->hasReference($reference)) {
             $this->references->removeElement($reference);
@@ -1199,18 +1133,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getReferences()
+    public function getReferences(): Collection
     {
         return $this->references;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getReferenceByType($type)
+    public function getReferenceByType(string $type): ?string
     {
         Model\ProductReferenceTypes::isValid($type, true);
 
@@ -1223,348 +1151,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return null;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
-    {
-        return $this->translate()->getTitle();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
-    {
-        $this->translate()->setTitle($title);
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubTitle()
-    {
-        return $this->translate()->getSubTitle();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setSubTitle(string $subTitle)
-    {
-        $this->translate()->setSubTitle($subTitle);
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAttributesTitle()
-    {
-        return $this->translate()->getAttributesTitle();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAttributesTitle(string $attributesTitle)
-    {
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            $this->translate()->setAttributesTitle($attributesTitle);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFullTitle($withBrand = false)
-    {
-        $title = $this->getTitle();
-
-        // Variant : parent title + variant title
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            if (0 == strlen($title)) {
-                // Fallback to auto-generated title
-                $title = $this->getAttributesTitle();
-            }
-
-            return sprintf('%s %s', $this->parent->getFullTitle($withBrand), $title);
-        }
-
-        // Prepend the brand
-        return $withBrand && $this->brandNaming ? sprintf('%s %s', $this->brand->getTitle(), $title) : $title;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
-    {
-        // Variant : fallback to parent description
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            return $this->parent->getDescription();
-        }
-
-        return $this->translate()->getDescription();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDescription(string $description)
-    {
-        if ($this->type !== Model\ProductTypes::TYPE_VARIANT) {
-            $this->translate()->setDescription($description);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSlug()
-    {
-        return $this->translate()->getSlug();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setSlug(string $slug)
-    {
-        $this->translate()->setSlug($slug);
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAttributesDesignation()
-    {
-        return $this->attributesDesignation;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAttributesDesignation($attributesDesignation)
-    {
-        $this->attributesDesignation = $attributesDesignation;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isBrandNaming(): bool
-    {
-        return $this->brandNaming;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setBrandNaming(bool $naming): Model\ProductInterface
-    {
-        $this->brandNaming = $naming;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFullDesignation($withBrand = false)
-    {
-        $designation = $this->getDesignation();
-
-        // Variant : parent designation + variant designation
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            if (0 == strlen($designation)) {
-                // Fallback to auto-generated designation
-                $designation = $this->getAttributesDesignation();
-            }
-
-            return sprintf('%s %s', $this->parent->getFullDesignation($withBrand), $designation);
-        }
-
-        // Prepend the brand
-        return $withBrand && $this->brandNaming
-            ? sprintf('%s %s', $this->brand->getName(), $designation)
-            : $designation;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMinPrice()
-    {
-        return $this->minPrice;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setMinPrice($minPrice)
-    {
-        $this->minPrice = $minPrice;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isPendingOffers()
-    {
-        return $this->pendingOffers;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPendingOffers($pending)
-    {
-        $this->pendingOffers = (bool)$pending;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isPendingPrices()
-    {
-        return $this->pendingPrices;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPendingPrices($pending)
-    {
-        $this->pendingPrices = (bool)$pending;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getReleasedAt()
-    {
-        return $this->releasedAt;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setReleasedAt(\DateTime $date = null)
-    {
-        $this->releasedAt = $date;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getBestSeller()
-    {
-        return $this->bestSeller;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setBestSeller(int $value)
-    {
-        $this->bestSeller = $value;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCrossSelling()
-    {
-        return $this->crossSelling;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setCrossSelling(int $value)
-    {
-        $this->crossSelling = $value;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStatUpdatedAt()
-    {
-        return $this->statUpdatedAt;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setStatUpdatedAt(\DateTime $date = null)
-    {
-        $this->statUpdatedAt = $date;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasAdjustment(Common\AdjustmentInterface $adjustment)
+    public function hasAdjustment(Common\AdjustmentInterface $adjustment): bool
     {
         if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
-            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+            throw new UnexpectedTypeException($adjustment, Model\ProductAdjustmentInterface::class);
         }
 
         return $this->adjustments->contains($adjustment);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function addAdjustment(Common\AdjustmentInterface $adjustment)
+    public function addAdjustment(Common\AdjustmentInterface $adjustment): Common\AdjustableInterface
     {
         if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
-            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+            throw new UnexpectedTypeException($adjustment, Model\ProductAdjustmentInterface::class);
         }
 
         if (!$this->hasAdjustment($adjustment)) {
@@ -1575,13 +1174,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function removeAdjustment(Common\AdjustmentInterface $adjustment)
+    public function removeAdjustment(Common\AdjustmentInterface $adjustment): Common\AdjustableInterface
     {
         if (!$adjustment instanceof Model\ProductAdjustmentInterface) {
-            throw new InvalidArgumentException("Expected instance of ProductAdjustmentInterface.");
+            throw new UnexpectedTypeException($adjustment, Model\ProductAdjustmentInterface::class);
         }
 
         if ($this->hasAdjustment($adjustment)) {
@@ -1592,18 +1188,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasMention(ProductMention $mention): bool
+    public function hasMention(ProductMentionInterface $mention): bool
     {
         return $this->mentions->contains($mention);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function addMention(ProductMention $mention): Model\ProductInterface
+    public function addMention(ProductMentionInterface $mention): Model\ProductInterface
     {
         if (!$this->hasMention($mention)) {
             $this->mentions->add($mention);
@@ -1613,10 +1203,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function removeMention(ProductMention $mention): Model\ProductInterface
+    public function removeMention(ProductMentionInterface $mention): Model\ProductInterface
     {
         if ($this->hasMention($mention)) {
             $this->mentions->removeElement($mention);
@@ -1626,11 +1213,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    /**
-     * Returns the product's main image.
-     *
-     * @return Media\MediaInterface|null
-     */
     public function getImage(): ?Media\MediaInterface
     {
         $limit = 1;
@@ -1639,38 +1221,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $images->isEmpty() ? null : $images->first();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getImages($withChildren = true, $limit = 5)
+    public function getImages(bool $withChildren = true, int $limit = 5): Collection
     {
         return $this->gatherMedias(Media\MediaTypes::IMAGE, $withChildren, $limit);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getFiles($withChildren = false, $limit = 5)
+    public function getFiles(bool $withChildren = false, int $limit = 5): Collection
     {
         return $this->gatherMedias(Media\MediaTypes::FILE, $withChildren, $limit);
     }
 
-    /**
-     * Gathers medias
-     *
-     * @param string               $type
-     * @param bool                 $recurse
-     * @param int                  $limit
-     * @param ArrayCollection|null $collection
-     *
-     * @return ArrayCollection
-     */
     private function gatherMedias(
-        string $type,
-        bool $recurse = true,
-        int &$limit = 5,
+        string          $type,
+        bool            $recurse = true,
+        int             &$limit = 5,
         ArrayCollection $collection = null
-    ) {
+    ): Collection {
         if (null === $collection) {
             $collection = new ArrayCollection();
         }
@@ -1692,7 +1258,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 foreach ($this->variants as $variant) {
                     $variant->gatherMedias($type, false, $limit, $collection);
                 }
-            } elseif (in_array($this->type, [Model\ProductTypes::TYPE_BUNDLE, Model\ProductTypes::TYPE_CONFIGURABLE])) {
+            } elseif (in_array($this->type, [
+                Model\ProductTypes::TYPE_BUNDLE,
+                Model\ProductTypes::TYPE_CONFIGURABLE,
+            ], true)) {
                 foreach ($this->bundleSlots as $slot) {
                     $choices = $slot->getChoices();
                     foreach ($choices as $choice) {
@@ -1726,10 +1295,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $collection;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getUniquenessSignature()
+    public function getUniquenessSignature(): string
     {
         Model\ProductTypes::assertVariant($this);
 
@@ -1757,33 +1323,21 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return md5(implode('-', $couples));
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getTranslationClass(): string
     {
         return ProductTranslation::class;
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function getStockUnitClass(): string
     {
         return ProductStockUnit::class;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isStockCompound(): bool
     {
         return Model\ProductTypes::isParentType($this->type);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getStockComposition(): array
     {
         $composition = [];
@@ -1791,7 +1345,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
             // Variants as choices
             $composition[] = array_map(function (Model\ProductInterface $variant) {
-                return new Stock\StockComponent($variant, 1); // TODO Deal with units
+                return new Stock\StockComponent($variant, new Decimal(1)); // TODO Deal with units
             }, $this->variants->toArray());
         } elseif ($this->type === Model\ProductTypes::TYPE_BUNDLE) {
             // Slots choice as composition
@@ -1812,7 +1366,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         // Components
         foreach ($this->components as $component) {
-            $composition[] = new Stock\StockComponent($component->getChild(), $component->getQuantity());
+            $composition[] = new Stock\StockComponent($component->getChild(), clone $component->getQuantity());
         }
 
         // Options
@@ -1826,7 +1380,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 if (!$product = $option->getProduct()) {
                     continue;
                 }
-                $options[] = new Stock\StockComponent($product, 1);
+                $options[] = new Stock\StockComponent($product, new Decimal(1));
             }
 
             $composition[] = $options;
@@ -1835,17 +1389,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $composition;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getEntityTagPrefix()
+    public static function getEntityTagPrefix(): string
     {
         return 'ekyna_product.product';
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function getProviderName(): string
     {
         return ProductProvider::NAME;

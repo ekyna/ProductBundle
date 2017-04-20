@@ -1,117 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
-use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
+use DateTime;
+use DateTimeInterface;
+use Decimal\Decimal;
 use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
+use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
 use Ekyna\Component\Commerce\Supplier\Model;
-use Ekyna\Component\Commerce\Supplier\Repository;
 use Ekyna\Component\Commerce\Supplier\Util\SupplierUtil;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
+use Ekyna\Component\Resource\Factory\FactoryFactoryInterface;
+use Ekyna\Component\Resource\Manager\ManagerFactoryInterface;
+use Ekyna\Component\Resource\Repository\RepositoryFactoryInterface;
 
 /**
  * Class Resupply
  * @package Ekyna\Bundle\ProductBundle\Service\Stock
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @TODO Move to commerce component
+ * @TODO    Move to commerce component
  */
 class Resupply
 {
-    /**
-     * @var Repository\SupplierProductRepositoryInterface
-     */
-    private $referenceRepository;
+    private FactoryFactoryInterface    $factoryFactory;
+    private RepositoryFactoryInterface $repositoryFactory;
+    private ManagerFactoryInterface    $managerFactory;
+    private SubjectHelperInterface     $subjectHelper;
+    private ?ResourceEventInterface    $event = null;
 
-    /**
-     * @var ResourceOperatorInterface
-     */
-    private $referenceOperator;
-
-    /**
-     * @var Repository\SupplierOrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var Repository\SupplierOrderItemRepositoryInterface
-     */
-    private $orderItemRepository;
-
-    /**
-     * @var ResourceOperatorInterface
-     */
-    private $orderOperator;
-
-    /**
-     * @var Repository\SupplierDeliveryRepositoryInterface
-     */
-    private $deliveryRepository;
-
-    /**
-     * @var Repository\SupplierDeliveryItemRepositoryInterface
-     */
-    private $deliveryItemRepository;
-
-    /**
-     * @var ResourceOperatorInterface
-     */
-    private $deliveryOperator;
-
-    /**
-     * @var SubjectHelperInterface
-     */
-    private $subjectHelper;
-
-    /**
-     * @var ResourceEventInterface
-     */
-    private $event;
-
-
-    /**
-     * Constructor.
-     *
-     * @param Repository\SupplierProductRepositoryInterface   $referenceRepository
-     * @param ResourceOperatorInterface                       $referenceOperator
-     * @param Repository\SupplierOrderRepositoryInterface     $orderRepository
-     * @param Repository\SupplierOrderItemRepositoryInterface $orderItemRepository
-     * @param ResourceOperatorInterface                       $orderOperator
-     * @param Repository\SupplierDeliveryRepositoryInterface  $deliveryRepository
-     * @param ResourceRepositoryInterface                     $deliveryItemRepository
-     * @param ResourceOperatorInterface                       $deliveryOperator
-     * @param SubjectHelperInterface                          $subjectHelper
-     */
     public function __construct(
-        Repository\SupplierProductRepositoryInterface $referenceRepository,
-        ResourceOperatorInterface $referenceOperator,
-        Repository\SupplierOrderRepositoryInterface $orderRepository,
-        Repository\SupplierOrderItemRepositoryInterface $orderItemRepository,
-        ResourceOperatorInterface $orderOperator,
-        Repository\SupplierDeliveryRepositoryInterface $deliveryRepository,
-        ResourceRepositoryInterface $deliveryItemRepository,
-        ResourceOperatorInterface $deliveryOperator,
-        SubjectHelperInterface $subjectHelper
+        FactoryFactoryInterface    $factoryFactory,
+        RepositoryFactoryInterface $repositoryFactory,
+        ManagerFactoryInterface    $managerFactory,
+        SubjectHelperInterface     $subjectHelper
     ) {
-        $this->referenceRepository = $referenceRepository;
-        $this->referenceOperator = $referenceOperator;
-        $this->orderRepository = $orderRepository;
-        $this->orderItemRepository = $orderItemRepository;
-        $this->orderOperator = $orderOperator;
-        $this->deliveryRepository = $deliveryRepository;
-        $this->deliveryItemRepository = $deliveryItemRepository;
-        $this->deliveryOperator = $deliveryOperator;
+        $this->factoryFactory = $factoryFactory;
+        $this->repositoryFactory = $repositoryFactory;
+        $this->managerFactory = $managerFactory;
         $this->subjectHelper = $subjectHelper;
     }
 
-    /**
-     * Returns the event.
-     *
-     * @return ResourceEventInterface|null
-     */
-    public function getEvent()
+    public function getEvent(): ?ResourceEventInterface
     {
         return $this->event;
     }
@@ -119,50 +51,49 @@ class Resupply
     /**
      * Resupplies the given supplier product by creating a new supplier order
      * or adding it to the given supplier order.
-     *
-     * @param Model\SupplierProductInterface $reference
-     * @param float                          $quantity
-     * @param float                          $netPrice
-     * @param Model\SupplierOrderInterface   $order
-     * @param \DateTime                      $eda
-     *
-     * @return Model\SupplierOrderInterface|null
      */
     public function resupply(
         Model\SupplierProductInterface $reference,
-        $quantity,
-        $netPrice = null,
-        Model\SupplierOrderInterface $order = null,
-        \DateTime $eda = null
-    ) {
+        Decimal                        $quantity,
+        Decimal                        $netPrice = null,
+        Model\SupplierOrderInterface   $order = null,
+        DateTimeInterface              $eda = null
+    ): ?Model\SupplierOrderInterface {
         /** @var Model\SupplierOrderItemInterface $item */
         $item = null;
 
         if (null !== $order) {
             $item = $this
-                ->orderItemRepository
+                ->repositoryFactory
+                ->getRepository(Model\SupplierOrderItemInterface::class)
                 ->findOneBy([
                     'order'   => $order,
                     'product' => $reference,
                 ]);
         } else {
             $supplier = $reference->getSupplier();
-            $order = $this->orderRepository->createNew();
-            $order->setSupplier($supplier);
-
-            $this->orderOperator->initialize($order);
+            /** @var Model\SupplierOrderInterface $order */
+            $order = $this
+                ->factoryFactory
+                ->getFactory(Model\SupplierOrderInterface::class)
+                ->createWithSupplier($supplier);
         }
 
         if (null === $netPrice) {
-            $netPrice = $reference->getNetPrice();
+            $netPrice = clone $reference->getNetPrice();
         }
 
         if (null === $item) {
-            $item = $this->orderItemRepository->createNew();
+            /** @var Model\SupplierOrderItemInterface $item */
+            $item = $this
+                ->factoryFactory
+                ->getFactory(Model\SupplierOrderItemInterface::class)
+                ->create();
+
             $item
+                ->setQuantity($quantity)
                 ->setProduct($reference)
-                ->setNetPrice($netPrice)
-                ->setQuantity($quantity);
+                ->setNetPrice($netPrice);
 
             $order->addItem($item);
         } else {
@@ -180,7 +111,11 @@ class Resupply
             }
         }
 
-        $this->event = $this->orderOperator->persist($order);
+        $this->event = $this
+            ->managerFactory
+            ->getManager(Model\SupplierOrderInterface::class)
+            ->save($order);
+
         if ($this->event->hasErrors()) {
             return null;
         }
@@ -190,21 +125,27 @@ class Resupply
 
     /**
      * Finds or create the supplier reference for the given subject and supplier (helper for tests).
-     *
-     * @param SubjectInterface        $subject
-     * @param Model\SupplierInterface $supplier
-     *
-     * @return Model\SupplierProductInterface|null
      */
-    public function findOrCreateReference(SubjectInterface $subject, Model\SupplierInterface $supplier)
-    {
-        $reference = $this->referenceRepository->findOneBySubjectAndSupplier($subject, $supplier);
+    public function findOrCreateReference(
+        SubjectInterface        $subject,
+        Model\SupplierInterface $supplier
+    ): ?Model\SupplierProductInterface {
+        /** @var Model\SupplierProductInterface $reference */
+        $reference = $this
+            ->repositoryFactory
+            ->getRepository(Model\SupplierProductInterface::class)
+            ->findOneBySubjectAndSupplier($subject, $supplier);
 
         if ($reference) {
             return $reference;
         }
 
-        $reference = $this->referenceRepository->createNew();
+        /** @var Model\SupplierProductInterface $reference */
+        $reference = $this
+            ->factoryFactory
+            ->getFactory(Model\SupplierProductInterface::class)
+            ->create();
+
         $reference
             ->setReference($subject->getReference())
             ->setDesignation($subject->getDesignation())
@@ -212,7 +153,11 @@ class Resupply
 
         $this->subjectHelper->assign($reference, $subject);
 
-        $this->event = $this->referenceOperator->create($reference);
+        $this->event = $this
+            ->managerFactory
+            ->getManager(Model\SupplierProductInterface::class)
+            ->save($reference);
+
         if ($this->event->hasErrors()) {
             return null;
         }
@@ -222,21 +167,22 @@ class Resupply
 
     /**
      * Submits the given supplier order (helper for tests).
-     *
-     * @param Model\SupplierOrderInterface $order
-     * @param \DateTime                    $eda
-     *
-     * @return Model\SupplierOrderInterface|null
      */
-    public function submitOrder(Model\SupplierOrderInterface $order, \DateTime $eda = null)
-    {
-        $order->setOrderedAt(new \DateTime());
+    public function submitOrder(
+        Model\SupplierOrderInterface $order,
+        DateTimeInterface            $eda = null
+    ): ?Model\SupplierOrderInterface {
+        $order->setOrderedAt(new DateTime());
 
         if ($eda) {
             $order->setEstimatedDateOfArrival($eda);
         }
 
-        $this->event = $this->orderOperator->persist($order);
+        $this->event = $this
+            ->managerFactory
+            ->getManager(Model\SupplierOrderInterface::class)
+            ->save($order);
+
         if ($this->event->hasErrors()) {
             return null;
         }
@@ -246,17 +192,20 @@ class Resupply
 
     /**
      * Delivers the given supplier order (helper for tests).
-     *
-     * @param Model\SupplierOrderInterface $order
-     *
-     * @return Model\SupplierDeliveryInterface|null
      */
-    public function deliverOrder(Model\SupplierOrderInterface $order)
+    public function deliverOrder(Model\SupplierOrderInterface $order): ?Model\SupplierDeliveryInterface
     {
-        $delivery = $this->deliveryRepository->createNew();
+        $delivery = $this
+            ->factoryFactory
+            ->getFactory(Model\SupplierDeliveryInterface::class)
+            ->create();
 
         foreach ($order->getItems() as $item) {
-            $deliveryItem = $this->deliveryItemRepository->createNew();
+            $deliveryItem = $this
+                ->factoryFactory
+                ->getFactory(Model\SupplierDeliveryItemInterface::class)
+                ->create();
+
             $deliveryItem
                 ->setOrderItem($item)
                 ->setQuantity(SupplierUtil::calculateDeliveryRemainingQuantity($item))
@@ -267,7 +216,11 @@ class Resupply
 
         $order->addDelivery($delivery);
 
-        $this->event = $this->deliveryOperator->persist($delivery);
+        $this->event = $this
+            ->managerFactory
+            ->getManager(Model\SupplierDeliveryInterface::class)
+            ->save($delivery);
+
         if ($this->event->hasErrors()) {
             return null;
         }

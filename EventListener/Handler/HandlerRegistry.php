@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -12,29 +14,13 @@ use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
  */
 class HandlerRegistry
 {
-    /**
-     * @var array|HandlerInterface[]
-     */
-    private $handlers;
+    /** @var array<HandlerInterface> */
+    private array $handlers = [];
 
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->handlers = [];
-    }
-
-    /**
-     * Registers the handler.
-     *
-     * @param HandlerInterface $handler
-     */
-    public function addHandler(HandlerInterface $handler)
+    public function addHandler(HandlerInterface $handler): void
     {
         if (in_array($handler, $this->handlers, true)) {
-            throw new InvalidArgumentException("This handler is already registered.");
+            throw new InvalidArgumentException('This handler is already registered.');
         }
 
         $this->handlers[] = $handler;
@@ -43,11 +29,9 @@ class HandlerRegistry
     /**
      * Returns the handlers supporting the given product.
      *
-     * @param ProductInterface $product
-     *
-     * @return array|HandlerInterface[]
+     * @return array<HandlerInterface[]>
      */
-    public function getHandlers(ProductInterface $product)
+    public function getHandlers(ProductInterface $product): array
     {
         $handlers = [];
 

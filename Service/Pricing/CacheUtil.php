@@ -3,6 +3,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
@@ -30,21 +31,13 @@ final class CacheUtil
     /**
      * Builds and returns the offer(s) cache key.
      *
-     * @param ProductInterface       $product
-     * @param CustomerGroupInterface $group
-     * @param CountryInterface       $country
-     * @param float                  $quantity
-     * @param bool                   $multiple
-     *
-     * @return string
-     *
      * @see \Ekyna\Bundle\ProductBundle\Repository\OfferRepository
      */
     public static function buildOfferKey(
         ProductInterface $product,
         CustomerGroupInterface $group,
         CountryInterface $country,
-        float $quantity = null,
+        Decimal $quantity = null,
         bool $multiple = true
     ): string {
         return self::buildOfferKeyByIds(
@@ -59,21 +52,13 @@ final class CacheUtil
     /**
      * Builds and returns the offer(s) cache key.
      *
-     * @param int   $productId
-     * @param int   $groupId
-     * @param int   $countryId
-     * @param float $quantity
-     * @param bool  $multiple
-     *
-     * @return string
-     *
      * @see \Ekyna\Bundle\ProductBundle\EventListener\OfferListener
      */
     public static function buildOfferKeyByIds(
         int $productId,
         int $groupId,
         int $countryId,
-        float $quantity = null,
+        Decimal $quantity = null,
         bool $multiple = true
     ): string {
         $id = sprintf(
@@ -85,7 +70,7 @@ final class CacheUtil
         );
 
         if ($quantity) {
-            $id .= '_' . intval($quantity); // TODO deal with float
+            $id .= '_' . $quantity->toFixed(3);
         }
 
         return $id;

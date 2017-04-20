@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProductStockUnitListener extends AbstractStockUnitListener implements EventSubscriberInterface
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected function getStockUnitFromEvent(ResourceEventInterface $event)
     {
@@ -32,7 +32,7 @@ class ProductStockUnitListener extends AbstractStockUnitListener implements Even
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected function getSubjectStockUnitChangeEventName()
     {
@@ -40,7 +40,7 @@ class ProductStockUnitListener extends AbstractStockUnitListener implements Even
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function getSubscribedEvents()
     {

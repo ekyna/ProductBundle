@@ -13,7 +13,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
      * Pricing
      */
     var Pricing = {
-        price: 0,
+        net_price: 0,
         offers: [],
         taxes: []
     };
@@ -28,7 +28,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
      * @return {number}
      */
     Pricing.calculate = function (quantity, discounted, unit) {
-        if (typeof this.price !== 'number' || 0 > this.price) {
+        if (typeof this.net_price !== 'number' || 0 > this.net_price) {
             return 0;
         }
 
@@ -42,7 +42,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             unit = true;
         }
 
-        var result = Pricing.mode === 'ati' ? this.price : Math.fRound(this.price, 2), // TODO currency precision
+        var result = Pricing.mode === 'ati' ? this.net_price : Math.fRound(this.net_price, 2), // TODO currency precision
             offer = undefined;
 
         if (!unit) {
@@ -1174,6 +1174,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         }
     });
 
+
     $.fn.variant = function (item) {
         return this.each(function () {
             if (undefined === $(this).data('variant')) {
@@ -1222,9 +1223,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         init: function () {
             this.config = $.extend({
                 id: null,
-                price: 0,
+                net_price: 0,
                 pricing: {
-                    price: 0,
+                    net_price: 0,
                     offers: [],
                     taxes: []
                 },
@@ -1529,6 +1530,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 $.each(this.bundleSlots, function () {
                     if (this.hasChoice()) {
                         that.originalUnit += this.getChoice().getOriginalPrice();
+                        that.originalPrice += this.getChoice().getOriginalPrice();
                         that.finalPrice  += this.getChoice().getFinalPrice();
                     }
                 });
@@ -1566,7 +1568,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                         min: Number(offer.min_qty).localizedNumber(),
                         max: previousMin ? Number(previousMin).localizedNumber() : null,
                         percent: Math.fRound(offer.percent, 2).localizedNumber(),
-                        price: Number(that.originalUnit * (1 - offer.percent / 100)).localizedCurrency(Pricing.currency)
+                        net_price: Number(that.originalUnit * (1 - offer.percent / 100)).localizedCurrency(Pricing.currency)
                     });
                     previousMin = offer.min_qty - 1;
                 });

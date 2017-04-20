@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\ContextType;
@@ -14,6 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class CatalogRenderType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Catalog
@@ -21,10 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CatalogRenderType extends AbstractType
 {
-    /**
-     * @inheritdoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('theme', CatalogThemeChoiceType::class);
 
@@ -32,17 +33,18 @@ class CatalogRenderType extends AbstractType
             if ($options['admin_mode']) {
                 $builder
                     ->add('format', ChoiceType::class, [
-                        'label'   => 'ekyna_core.field.format',
+                        'label'   => t('field.format', [], 'EkynaUi'),
                         'choices' => CatalogRenderer::getFormats(),
                     ])
                     ->add('displayPrices', ChoiceType::class, [
-                        'label'    => 'ekyna_product.catalog.field.display_prices',
-                        'choices'  => [
-                            'ekyna_core.value.yes' => 1,
-                            'ekyna_core.value.no'  => 0,
+                        'label'                     => t('catalog.field.display_prices', [], 'EkynaProduct'),
+                        'choices'                   => [
+                            'value.yes' => 1,
+                            'value.no'  => 0,
                         ],
-                        'expanded' => true,
-                        'attr'     => [
+                        'choice_translation_domain' => 'EkynaUi',
+                        'expanded'                  => true,
+                        'attr'                      => [
                             'inline'            => true,
                             'align_with_widget' => true,
                         ],
@@ -50,7 +52,7 @@ class CatalogRenderType extends AbstractType
             }
 
             $builder->add('context', ContextType::class, [
-                'label'      => false,
+                'label' => false,
             ]);
 
             return;
@@ -61,24 +63,25 @@ class CatalogRenderType extends AbstractType
                 'with_slots' => true,
             ])
             ->add('displayPrices', ChoiceType::class, [
-                'label'    => 'ekyna_product.catalog.field.display_prices',
-                'choices'  => [
-                    'ekyna_core.value.yes' => 1,
-                    'ekyna_core.value.no'  => 0,
+                'label'                     => t('catalog.field.display_prices', [], 'EkynaProduct'),
+                'choices'                   => [
+                    'value.yes' => 1,
+                    'value.no'  => 0,
                 ],
-                'expanded' => true,
-                'attr'     => [
+                'choice_translation_domain' => 'EkynaUi',
+                'expanded'                  => true,
+                'attr'                      => [
                     'inline'            => true,
                     'align_with_widget' => true,
                 ],
             ])
             ->add('saleItems', SaleItemChoiceType::class, [
-                'sale'     => $options['sale'],
+                'sale'     => $sale,
                 'multiple' => true,
                 'expanded' => true,
             ])
             ->add('save', CheckboxType::class, [
-                'label'    => 'ekyna_product.catalog.field.save',
+                'label'    => t('catalog.field.save', [], 'EkynaProduct'),
                 'required' => false,
                 'attr'     => [
                     'align_with_widget' => true,
@@ -86,10 +89,7 @@ class CatalogRenderType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([

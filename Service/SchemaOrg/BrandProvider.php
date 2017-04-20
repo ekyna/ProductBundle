@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 use Ekyna\Bundle\CmsBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\Type;
 
 /**
  * Class BrandProvider
@@ -18,9 +19,9 @@ class BrandProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderAwa
     /**
      * @inheritDoc
      *
-     * @param BrandInterface $object
+     * @param object $object
      */
-    public function build($object)
+    public function build(object $object): ?Type
     {
         $schema = Schema::brand()
             ->name($object->getName())
@@ -37,7 +38,7 @@ class BrandProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderAwa
     /**
      * @inheritDoc
      */
-    public function supports($object)
+    public function supports(object $object): bool
     {
         return $object instanceof BrandInterface;
     }

@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Decimal\Decimal;
+use Doctrine\ORM\Query;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
+
+use function array_map;
 
 /**
  * Class PricingRepository
@@ -13,30 +19,30 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class PricingRepository extends ResourceRepository implements PricingRepositoryInterface
 {
-    /**
-     * @var \Doctrine\ORM\Query
-     */
-    private $byProductQuery;
+    private ?Query $byProductQuery = null;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function findRulesByProduct(Model\ProductInterface $product)
+    public function findRulesByProduct(Model\ProductInterface $product): array
     {
-        return $this
+        $rules = $this
             ->getByProductQuery()
             ->setParameters([
                 'brand'   => $product->getBrand(),
                 'product' => $product,
             ])
             ->getScalarResult();
+
+        return array_map(function ($rule) {
+            return [
+                'pricing_id' => (int)$rule['pricing_id'],
+                'group_id'   => $rule['group_id'] ? (int)$rule['group_id'] : null,
+                'country_id' => $rule['country_id'] ? (int)$rule['country_id'] : null,
+                'min_qty'    => new Decimal($rule['min_qty']),
+                'percent'    => new Decimal($rule['percent']),
+            ];
+        }, $rules);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function findByContext(ContextInterface $context)
+    public function findByContext(ContextInterface $context): array
     {
         $qb = $this->createQueryBuilder('p');
         $ex = $qb->expr();
@@ -62,10 +68,8 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
 
     /**
      * Returns the "find by brand" query.
-     *
-     * @return \Doctrine\ORM\Query
      */
-    private function getByProductQuery()
+    private function getByProductQuery(): Query
     {
         if (null !== $this->byProductQuery) {
             return $this->byProductQuery;
@@ -100,10 +104,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->useQueryCache(true);
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'p';
     }

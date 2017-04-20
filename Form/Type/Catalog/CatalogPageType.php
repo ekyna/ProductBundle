@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
-use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\SlotsType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\TemplateChoiceType;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
+use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -23,26 +25,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CatalogPageType extends AbstractType
 {
-    /**
-     * @var CatalogRegistry
-     */
-    protected $registry;
+    protected CatalogRegistry $registry;
 
-
-    /**
-     * Constructor.
-     *
-     * @param CatalogRegistry $registry
-     */
     public function __construct(CatalogRegistry $registry)
     {
         $this->registry = $registry;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('template', TemplateChoiceType::class, [
@@ -71,11 +61,8 @@ class CatalogPageType extends AbstractType
 
     /**
      * Build the data form.
-     *
-     * @param FormInterface $form
-     * @param string|null   $template
      */
-    public function buildOptionsForm(FormInterface $form, string $template = null)
+    public function buildOptionsForm(FormInterface $form, string $template = null): void
     {
         if (empty($template)) {
             return;
@@ -90,11 +77,8 @@ class CatalogPageType extends AbstractType
 
     /**
      * Build the slots form.
-     *
-     * @param FormInterface $form
-     * @param string|null   $template
      */
-    public function buildSlotsForm(FormInterface $form, string $template = null)
+    public function buildSlotsForm(FormInterface $form, string $template = null): void
     {
         $count = empty($template) ? 0 : (int)$this->registry->getTemplate($template)['slots'];
 
@@ -107,30 +91,21 @@ class CatalogPageType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         FormUtil::addClass($view, 'catalog-page');
 
         $view->vars['attr']['name'] = $view->vars['full_name'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => CatalogPage::class,
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_catalog_page';
     }

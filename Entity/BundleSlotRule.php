@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
@@ -14,56 +16,39 @@ class BundleSlotRule extends AbstractBundleRule implements Model\BundleSlotRuleI
 {
     use SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * @var Model\BundleSlotInterface
-     */
-    protected $slot;
+    protected ?int                       $id = null;
+    protected ?Model\BundleSlotInterface $slot;
 
 
-    /**
-     * Clones the bundle choice rule.
-     */
     public function __clone()
     {
         $this->id = null;
         $this->slot = null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getSlot()
+    public function getSlot(): ?Model\BundleSlotInterface
     {
         return $this->slot;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setSlot(Model\BundleSlotInterface $slot = null)
+    public function setSlot(?Model\BundleSlotInterface $slot): Model\BundleSlotRuleInterface
     {
-        if ($this->slot !== $slot) {
-            if ($previous = $this->slot) {
-                $this->slot = null;
-                $previous->removeRule($this);
-            }
+        if ($this->slot === $slot) {
+            return $this;
+        }
 
-            if ($this->slot = $slot) {
-                $this->slot->addRule($this);
-            }
+        if ($previous = $this->slot) {
+            $this->slot = null;
+            $previous->removeRule($this);
+        }
+
+        if ($this->slot = $slot) {
+            $this->slot->addRule($this);
         }
 
         return $this;

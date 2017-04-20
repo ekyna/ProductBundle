@@ -1,339 +1,173 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 
 /**
  * Class Offer
  * @package Ekyna\Bundle\ProductBundle\Entity
- * @author  Etienne Dauvergne <contact@ekyna.com>
+ * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Offer implements ResourceInterface
+class Offer implements OfferInterface
 {
-    const TYPE_SPECIAL = 'special';
-    const TYPE_PRICING = 'pricing';
+    private ?int                         $id           = null;
+    private Decimal                      $minQuantity;
+    private Decimal                      $percent;
+    private Decimal                      $netPrice;
+    /** @var array<string, string> */
+    private array                        $details      = [];
+    private ?Model\ProductInterface      $product      = null;
+    private ?CustomerGroupInterface      $group        = null;
+    private ?CountryInterface            $country      = null;
+    private ?Model\SpecialOfferInterface $specialOffer = null;
+    private ?Model\PricingInterface      $pricing      = null;
 
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
-     * @var int
-     */
-    private $minQuantity;
-
-    /**
-     * @var float
-     */
-    private $percent;
-
-    /**
-     * @var float
-     */
-    private $netPrice;
-
-    /**
-     * @var array
-     */
-    private $details = [];
-
-    /**
-     * @var Model\ProductInterface
-     */
-    private $product;
-
-    /**
-     * @var CustomerGroupInterface
-     */
-    private $group;
-
-    /**
-     * @var CountryInterface
-     */
-    private $country;
-
-    /**
-     * @var Model\SpecialOfferInterface
-     */
-    private $specialOffer;
-
-    /**
-     * @var Model\PricingInterface
-     */
-    private $pricing;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->details = [];
+        $this->minQuantity = new Decimal(0);
+        $this->percent = new Decimal(0);
+        $this->netPrice = new Decimal(0);
     }
 
-    /**
-     * Returns the id.
-     *
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Returns the minimum quantity.
-     *
-     * @return float
-     */
-    public function getMinQuantity()
+    public function getMinQuantity(): Decimal
     {
         return $this->minQuantity;
     }
 
-    /**
-     * Sets the minimum quantity.
-     *
-     * @param float $quantity
-     *
-     * @return Offer
-     */
-    public function setMinQuantity(float $quantity)
+    public function setMinQuantity(Decimal $quantity): OfferInterface
     {
         $this->minQuantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * Returns the percent.
-     *
-     * @return int
-     */
-    public function getPercent()
+    public function getPercent(): Decimal
     {
         return $this->percent;
     }
 
-    /**
-     * Sets the percent.
-     *
-     * @param float $percent
-     *
-     * @return Offer
-     */
-    public function setPercent(float $percent)
+    public function setPercent(Decimal $percent): OfferInterface
     {
         $this->percent = $percent;
 
         return $this;
     }
 
-    /**
-     * Returns the net price.
-     *
-     * @return float
-     */
-    public function getNetPrice()
+    public function getNetPrice(): Decimal
     {
         return $this->netPrice;
     }
 
-    /**
-     * Sets the net price.
-     *
-     * @param float $amount
-     *
-     * @return Offer
-     */
-    public function setNetPrice($amount)
+    public function setNetPrice(Decimal $amount): OfferInterface
     {
         $this->netPrice = $amount;
 
         return $this;
     }
 
-    /**
-     * Returns the details.
-     *
-     * @return array
-     */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
 
-    /**
-     * Sets the details.
-     *
-     * @param array $details
-     *
-     * @return Offer
-     */
-    public function setDetails(array $details)
+    public function setDetails(array $details): OfferInterface
     {
         foreach ($details as $type => $percent) {
-            $this->addDetails((string)$type, (float)$percent);
+            $this->addDetails($type, $percent);
         }
 
         return $this;
     }
 
-    /**
-     * Adds the detail.
-     *
-     * @param string $type
-     * @param float  $percent
-     *
-     * @return Offer
-     */
-    public function addDetails(string $type, float $percent)
+    public function addDetails(string $type, Decimal $percent): OfferInterface
     {
-        if (!in_array($type, [static::TYPE_PRICING, static::TYPE_SPECIAL], true)) {
-            throw new InvalidArgumentException("Unexpected offer type");
+        if (!in_array($type, [OfferInterface::TYPE_PRICING, OfferInterface::TYPE_SPECIAL], true)) {
+            throw new InvalidArgumentException('Unexpected offer type');
         }
 
-        $this->details[$type] = $percent;
+        $this->details[$type] = $percent->toFixed(2);
 
         return $this;
     }
 
-    /**
-     * Returns the product.
-     *
-     * @return Model\ProductInterface
-     */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * Sets the product.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return Offer
-     */
-    public function setProduct(Model\ProductInterface $product)
+    public function setProduct(?Model\ProductInterface $product): OfferInterface
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * Returns the group.
-     *
-     * @return CustomerGroupInterface
-     */
-    public function getGroup()
+    public function getGroup(): ?CustomerGroupInterface
     {
         return $this->group;
     }
 
-    /**
-     * Sets the group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return Offer
-     */
-    public function setGroup(CustomerGroupInterface $group = null)
+    public function setGroup(?CustomerGroupInterface $group): OfferInterface
     {
         $this->group = $group;
 
         return $this;
     }
 
-    /**
-     * Returns the country.
-     *
-     * @return CountryInterface
-     */
-    public function getCountry()
+    public function getCountry(): ?CountryInterface
     {
         return $this->country;
     }
 
-    /**
-     * Sets the country.
-     *
-     * @param CountryInterface $country
-     *
-     * @return Offer
-     */
-    public function setCountry(CountryInterface $country = null)
+    public function setCountry(?CountryInterface $country): OfferInterface
     {
         $this->country = $country;
 
         return $this;
     }
 
-    /**
-     * Returns the special offer.
-     *
-     * @return Model\SpecialOfferInterface
-     */
-    public function getSpecialOffer()
+    public function getSpecialOffer(): ?Model\SpecialOfferInterface
     {
         return $this->specialOffer;
     }
 
-    /**
-     * Sets the special offer.
-     *
-     * @param Model\SpecialOfferInterface $specialOffer
-     *
-     * @return Offer
-     */
-    public function setSpecialOffer(Model\SpecialOfferInterface $specialOffer = null)
+    public function setSpecialOffer(?Model\SpecialOfferInterface $specialOffer): OfferInterface
     {
         $this->specialOffer = $specialOffer;
 
         return $this;
     }
 
-    /**
-     * Returns the pricing.
-     *
-     * @return Model\PricingInterface
-     */
-    public function getPricing()
+    public function getPricing(): ?Model\PricingInterface
     {
         return $this->pricing;
     }
 
-    /**
-     * Sets the pricing.
-     *
-     * @param Model\PricingInterface $pricing
-     *
-     * @return Offer
-     */
-    public function setPricing(Model\PricingInterface $pricing = null)
+    public function setPricing(?Model\PricingInterface $pricing): OfferInterface
     {
         $this->pricing = $pricing;
 
         return $this;
     }
 
-    /**
-     * Returns the detailed percentages.
-     *
-     * @return float[]
-     */
-    public function getDetailedPercents()
+    public function getDetailedPercents(): array
     {
         $percents = [];
 
-        foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+        foreach ([OfferInterface::TYPE_SPECIAL, OfferInterface::TYPE_PRICING] as $type) {
             if (isset($this->details[$type])) {
                 $percents[] = $this->details[$type];
             }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\TranslationInterface;
@@ -13,35 +15,11 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  */
 interface BundleSlotTranslationInterface extends TranslationInterface
 {
-    /**
-     * Returns the title.
-     *
-     * @return string
-     */
-    public function getTitle();
+    public function getTitle(): ?string;
 
-    /**
-     * Sets the title.
-     *
-     * @param string $title
-     *
-     * @return $this|BundleSlotTranslationInterface
-     */
-    public function setTitle($title);
+    public function setTitle(?string $title): BundleSlotTranslationInterface;
 
-    /**
-     * Returns the description.
-     *
-     * @return string
-     */
-    public function getDescription();
+    public function getDescription(): ?string;
 
-    /**
-     * Sets the description.
-     *
-     * @param string $description
-     *
-     * @return $this|BundleSlotTranslationInterface
-     */
-    public function setDescription($description);
+    public function setDescription(?string $description): BundleSlotTranslationInterface;
 }

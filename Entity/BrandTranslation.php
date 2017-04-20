@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\BrandTranslationInterface;
@@ -12,70 +14,40 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  */
 class BrandTranslation extends AbstractTranslation implements BrandTranslationInterface
 {
-    /**
-     * @var string
-     */
-    protected $title;
+    protected ?string $title       = null;
+    protected ?string $description = null;
+    protected ?string $slug        = null;
 
-    /**
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * @var string
-     */
-    protected $slug;
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): BrandTranslationInterface
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): BrandTranslationInterface
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSlug($slug)
+    public function setSlug(?string $slug): BrandTranslationInterface
     {
         $this->slug = $slug;
 

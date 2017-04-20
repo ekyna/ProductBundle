@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
+use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
@@ -23,23 +28,9 @@ class ItemBuilder
     public const OPTION_ID        = 'option_id';
     public const COMPONENT_ID     = 'component_id';
 
-    /**
-     * @var ProductProvider
-     */
-    protected $provider;
+    protected ProductProvider $provider;
+    protected ProductFilterInterface $filter;
 
-    /**
-     * @var ProductFilterInterface
-     */
-    protected $filter;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductProvider        $provider
-     * @param ProductFilterInterface $filter
-     */
     public function __construct(ProductProvider $provider, ProductFilterInterface $filter)
     {
         $this->provider = $provider;
@@ -131,8 +122,8 @@ class ItemBuilder
         $item
             ->setDesignation((string)$product)
             ->setReference($product->getReference())
-            ->setNetPrice($product->getNetPrice())
-            ->setWeight($product->getPackageWeight())
+            ->setNetPrice(clone $product->getNetPrice())
+            ->setWeight(clone $product->getPackageWeight())
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(false)
             ->setConfigurable(false)
@@ -157,7 +148,7 @@ class ItemBuilder
         $variants = $this->filter->getVariants($product);
 
         if (empty($variants)) {
-            throw new Exception\LogicException("Variable product must have at least one variant.");
+            throw new Exception\LogicException('Variable product must have at least one variant.');
         }
 
         if (0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {
@@ -189,7 +180,7 @@ class ItemBuilder
 
         $this->buildFromSimple($item, $variant);
 
-        $item->setData(self::VARIANT_ID, $variant->getId());
+        $item->setData(self::VARIANT_ID, $variant->getId()); // TODO Useless
     }
 
     /**
@@ -207,16 +198,16 @@ class ItemBuilder
 
         // Bundle root item
         $item
-            ->setDesignation($product->getDesignation())
+            ->setDesignation((string)$product)
             ->setReference($product->getReference())
-            ->setNetPrice(.0)
+            ->setNetPrice(new Decimal(0))
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
             ->setConfigurable(false)
             ->setPrivate(!$product->isVisible());
 
         // (Do not filter bundle slots)
-        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface[] $bundlesSlots */
+        /** @var BundleSlotInterface[] $bundlesSlots */
         $bundlesSlots = $product->getBundleSlots()->toArray();
 
         // Every slot must match a single item
@@ -276,9 +267,9 @@ class ItemBuilder
 
         // Configurable root item
         $item
-            ->setDesignation($product->getDesignation())
+            ->setDesignation((string)$product)
             ->setReference($product->getReference())
-            ->setNetPrice(.0)
+            ->setNetPrice(new Decimal(0))
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
             ->setConfigurable(true)
@@ -353,12 +344,12 @@ class ItemBuilder
      * Builds the sale item from the given bundle choice.
      *
      * @param SaleItemInterface           $item    The sale item
-     * @param Model\BundleChoiceInterface $choice  The bundle choice
+     * @param BundleChoiceInterface $choice  The bundle choice
      * @param array|null                  $exclude The option group ids to exclude
      */
     protected function buildFromBundleChoice(
         SaleItemInterface $item,
-        Model\BundleChoiceInterface $choice,
+        BundleChoiceInterface $choice,
         array $exclude = null
     ): void {
         if (!is_null($exclude)) {
@@ -381,8 +372,8 @@ class ItemBuilder
         }
 
         // Override item net price (from product) with choice's net price if set
-        if (null !== $choice->getNetPrice()) {
-            $item->setNetPrice($choice->getNetPrice());
+        if ($price = $choice->getNetPrice()) {
+            $item->setNetPrice(clone $price);
         }
 
         $item
@@ -441,7 +432,7 @@ class ItemBuilder
                     $optionGroupIds[] = $optionGroupId;
 
                     $child
-                        ->setQuantity(1)
+                        ->setQuantity(new Decimal(1))
                         ->setPosition($optionGroup->getPosition());
 
                     // Check option choice
@@ -465,7 +456,7 @@ class ItemBuilder
                     if (!$found) {
                         if ($optionGroup->isRequired()) {
                             //$this->buildFromOption($child, reset($options));
-                            throw new Exception\LogicException("Option group is required.");
+                            throw new Exception\LogicException('Option group is required.');
                         } else {
                             $item->removeChild($child);
                         }
@@ -490,7 +481,7 @@ class ItemBuilder
     public function buildFromOption(SaleItemInterface $item, Model\OptionInterface $option, int $choiceCount): void
     {
         // Reset net price
-        $item->setNetPrice(0);
+        $item->setNetPrice(new Decimal(0));
 
         if (null !== $product = $option->getProduct()) {
             $this->buildFromProduct($item, $product, []); // TODO Cascade / exclude
@@ -505,19 +496,19 @@ class ItemBuilder
             $item
                 ->setDesignation($designation)
                 ->setReference($option->getReference())
-                ->setWeight($option->getWeight())
+                ->setWeight($option->getWeight() ? clone $option->getWeight() : null)
                 ->setTaxGroup($option->getTaxGroup());
         }
 
         // Override item net price (from product) with option's net price if set
-        if (null !== $option->getNetPrice()) {
-            $item->setNetPrice($option->getNetPrice());
+        if ($price = $option->getNetPrice()) {
+            $item->setNetPrice(clone $price);
         }
 
         $item
             ->setData(self::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setData(self::OPTION_ID, $option->getId())
-            ->setQuantity(1)
+            ->setQuantity(new Decimal(1))
             ->setImmutable(true)
             ->setConfigurable(false);
 
@@ -538,13 +529,13 @@ class ItemBuilder
         $this->buildFromProduct($item, $component->getChild());
 
         $item
-            ->setQuantity($component->getQuantity())
+            ->setQuantity(clone $component->getQuantity())
             ->setPrivate(true)
             ->setImmutable(true)
             ->setConfigurable(false);
 
-        if (!is_null($price = $component->getNetPrice())) {
-            $item->setNetPrice($price);
+        if ($price = $component->getNetPrice()) {
+            $item->setNetPrice(clone $price);
         }
     }
 
@@ -771,7 +762,7 @@ class ItemBuilder
                 ? $this->filter->getSlotChoices($bundleSlot)
                 : $bundleSlot->getChoices()->toArray();
 
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
+            /** @var BundleChoiceInterface $defaultChoice */
             $defaultChoice = current($bundlesChoices);
             $choiceProductIds = [];
 
@@ -835,12 +826,12 @@ class ItemBuilder
      * Initializes the sale item from the given bundle choice.
      *
      * @param SaleItemInterface           $item    The sale item
-     * @param Model\BundleChoiceInterface $choice  The bundle choice
+     * @param BundleChoiceInterface $choice  The bundle choice
      * @param array                       $exclude The option group ids to exclude
      */
     public function initializeFromBundleChoice(
         SaleItemInterface $item,
-        Model\BundleChoiceInterface $choice,
+        BundleChoiceInterface $choice,
         array $exclude = []
     ): void {
         $product = $this->fallbackVariableToVariant($choice->getProduct());
@@ -849,8 +840,8 @@ class ItemBuilder
         $this->initialize($item, array_unique(array_merge($exclude, $choice->getExcludedOptionGroups())));
 
         // Override item net price (from product) with choice's net price if set
-        if (null !== $choice->getNetPrice()) {
-            $item->setNetPrice($choice->getNetPrice());
+        if ($price = $choice->getNetPrice()) {
+            $item->setNetPrice(clone $price);
         }
 
         $item
@@ -901,7 +892,7 @@ class ItemBuilder
                     $optionGroupIds[] = $optionGroupId;
 
                     $child
-                        ->setQuantity(1)
+                        ->setQuantity(new Decimal(1))
                         ->setPosition($optionGroup->getPosition());
 
                     // Check option choice
@@ -949,7 +940,7 @@ class ItemBuilder
     {
         $item
             ->setData(self::OPTION_GROUP_ID, $optionGroup->getId())
-            ->setQuantity(1)
+            ->setQuantity(new Decimal(1))
             ->setPosition($optionGroup->getPosition());
 
         // Default choice if required
@@ -971,7 +962,7 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      *
-     * @return Model\BundleSlotInterface[]
+     * @return BundleSlotInterface[]
      */
     public function getBundleSlots(SaleItemInterface $item): array
     {
@@ -1021,7 +1012,7 @@ class ItemBuilder
             $variants = $this->filter->getVariants($product);
 
             if (empty($variants)) {
-                throw new Exception\InvalidArgumentException("Variable product must have at least one variant.");
+                throw new Exception\InvalidArgumentException('Variable product must have at least one variant.');
             }
 
             if ($item && 0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {

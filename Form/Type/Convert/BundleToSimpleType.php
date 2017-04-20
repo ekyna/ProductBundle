@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
-use Braincrafted\Bundle\BootstrapBundle\Form\Type\FormActionsType;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\UiBundle\Form\Type\FormActionsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,6 +16,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class BundleToSimpleType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -21,14 +25,11 @@ use Symfony\Component\Validator\Constraints;
  */
 class BundleToSimpleType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('confirm', Type\CheckboxType::class, [
-                'label'       => 'ekyna_product.convert.bundle_to_simple.confirm',
+                'label'       => t('convert.bundle_to_simple.confirm', [], 'EkynaProduct'),
                 'attr'        => ['align_with_widget' => true],
                 'mapped'      => false,
                 'required'    => true,
@@ -42,7 +43,7 @@ class BundleToSimpleType extends AbstractType
                         'type'    => Type\SubmitType::class,
                         'options' => [
                             'button_class' => 'primary',
-                            'label'        => 'ekyna_core.button.save',
+                            'label'        => t('button.save', [], 'EkynaUi'),
                             'attr'         => ['icon' => 'ok'],
                         ],
                     ],
@@ -58,10 +59,7 @@ class BundleToSimpleType extends AbstractType
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -74,9 +72,6 @@ class BundleToSimpleType extends AbstractType
 
     /**
      * Builds the bundle form.
-     *
-     * @param FormInterface    $form
-     * @param ProductInterface $bundle
      */
     private function addBundleForm(FormInterface $form, ProductInterface $bundle): void
     {
@@ -87,17 +82,13 @@ class BundleToSimpleType extends AbstractType
         $form->add('option_group_selection', OptionGroupChoiceType::class, [
             'optionGroups' => $optionGroups,
             'attr'         => [
-                'help_text' => 'ekyna_product.convert.bundle_to_simple.option_group_choice',
+                'help_text' => t('convert.bundle_to_simple.option_group_choice', [], 'EkynaProduct'),
             ],
         ]);
     }
 
     /**
      * Returns the bundle choices products options groups.
-     *
-     * @param ProductInterface $bundle
-     *
-     * @return array
      */
     private function getOptionsGroups(ProductInterface $bundle): array
     {

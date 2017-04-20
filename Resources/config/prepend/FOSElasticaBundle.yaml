@@ -1,0 +1,55 @@
+fos_elastica:
+    indexes:
+        ekyna_product.product:
+            index_name: '%env(ELASTICSEARCH_NAME)%_product_product'
+            serializer:
+                groups: [ Search ]
+            properties:
+                designation: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                type: { type: keyword }
+                stock_state: { type: keyword }
+                visible: { type: boolean }
+                quote_only: { type: boolean }
+                end_of_life: { type: boolean }
+                net_price: { type: float }
+                min_price: { type: float }
+                reference: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                references: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                brand.id: { type: integer }
+                brand.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                brand.visible: { type: boolean }
+                categories.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                categories.visible: { type: boolean }
+                option_groups.id: { type: integer }
+                option_groups.name: { type: text }
+                option_groups.required: { type: boolean }
+            persistence:
+                driver: orm
+                model: '%ekyna_product.class.product%'
+                provider: { batch_size: 25 }
+                listener: ~
+                finder: ~
+        ekyna_product.brand:
+            index_name: '%env(ELASTICSEARCH_NAME)%_product_brand'
+            serializer:
+                groups: [ Search ]
+            properties:
+                name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+            persistence:
+                driver: orm
+                model: '%ekyna_product.class.brand%'
+                provider: { batch_size: 25 }
+                listener: ~
+                finder: ~
+        ekyna_product.category:
+            index_name: '%env(ELASTICSEARCH_NAME)%_product_category'
+            serializer:
+                groups: [ Search ]
+            properties:
+                name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+            persistence:
+                driver: orm
+                model: '%ekyna_product.class.category%'
+                provider: { batch_size: 25 }
+                listener: ~
+                finder: ~

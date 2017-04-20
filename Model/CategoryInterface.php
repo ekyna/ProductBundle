@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Bundle\CoreBundle\Model\TreeInterface;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
@@ -20,122 +20,42 @@ interface CategoryInterface extends
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
     MediaSubjectInterface,
-    TreeInterface,
+    RM\TreeInterface,
     RM\TimestampableInterface,
     RM\TranslatableInterface,
     RM\TaggedEntityInterface
 {
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|CategoryInterface
-     */
-    public function setName($name);
+    public function getName(): ?string;
 
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Returns whether or not the category has the given child.
-     *
-     * @param CategoryInterface $child
-     *
-     * @return bool
-     */
-    public function hasChild(CategoryInterface $child);
-
-    /**
-     * Adds the child category.
-     *
-     * @param CategoryInterface $child
-     *
-     * @return $this|CategoryInterface
-     */
-    public function addChild(CategoryInterface $child);
-
-    /**
-     * Removes the child category.
-     *
-     * @param CategoryInterface $child
-     *
-     * @return $this|CategoryInterface
-     */
-    public function removeChild(CategoryInterface $child);
-
-    /**
-     * Returns the children categories.
-     *
-     * @return ArrayCollection|CategoryInterface[]
-     */
-    public function getChildren();
-
-    /**
-     * Sets the parent category.
-     *
-     * @param CategoryInterface $parent
-     *
-     * @return $this|CategoryInterface
-     */
-    public function setParent(CategoryInterface $parent = null);
-
-    /**
-     * Returns the parent category.
-     *
-     * @return CategoryInterface
-     */
-    public function getParent();
+    public function setName(?string $name): CategoryInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Sets the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|CategoryInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(?string $title): CategoryInterface;
 
     /**
      * Returns the (translated) description.
-     *
-     * @return string
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 
     /**
      * Sets the (translated) description.
-     *
-     * @param string $description
-     *
-     * @return $this|CategoryInterface
      */
-    public function setDescription(string $description);
+    public function setDescription(?string $description): CategoryInterface;
 
     /**
      * Returns the (translated) slug.
-     *
-     * @return string
      */
-    public function getSlug();
+    public function getSlug(): ?string;
 
     /**
      * Sets the (translated) slug.
-     *
-     * @param string $slug
-     *
-     * @return $this|CategoryInterface
      */
-    public function setSlug(string $slug);
+    public function setSlug(?string $slug): CategoryInterface;
 }

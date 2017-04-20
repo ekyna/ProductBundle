@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Table\Column;
 
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
@@ -16,10 +18,7 @@ use Ekyna\Component\Table\View\CellView;
  */
 class ProductTypeType extends AbstractColumnType
 {
-    /**
-     * @var \Ekyna\Bundle\ProductBundle\Service\ConstantsHelper
-     */
-    private $constantHelper;
+    private ConstantsHelper $constantHelper;
 
 
     /**
@@ -35,7 +34,7 @@ class ProductTypeType extends AbstractColumnType
     /**
      * @inheritDoc
      */
-    public function buildCellView(CellView $view, ColumnInterface $column, RowInterface $row, array $options)
+    public function buildCellView(CellView $view, ColumnInterface $column, RowInterface $row, array $options): void
     {
         $view->vars['value'] = $this->constantHelper->renderProductTypeBadge($view->vars['value'], false);
     }
@@ -43,7 +42,7 @@ class ProductTypeType extends AbstractColumnType
     /**
      * @inheritDoc
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'text';
     }
@@ -51,7 +50,7 @@ class ProductTypeType extends AbstractColumnType
     /**
      * @inheritDoc
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return PropertyType::class;
     }

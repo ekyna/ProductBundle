@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,21 +22,11 @@ use Symfony\Component\Form\FormInterface;
  */
 class OptionsGroupsListener implements EventSubscriberInterface
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
+    private array       $exclude;
 
     /**
-     * @var array
-     */
-    private $exclude;
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     * @param array       $exclude The option groups ids to exclude
+     * @param array $exclude The option groups ids to exclude
      */
     public function __construct(ItemBuilder $itemBuilder, array $exclude)
     {
@@ -46,7 +39,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      *
      * @param FormEvent $event
      */
-    public function onPreSetData(FormEvent $event)
+    public function onPreSetData(FormEvent $event): void
     {
         // Event data : Model data (doctrine collection of sale items)
         $this->buildForm($event->getForm());
@@ -57,7 +50,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      *
      * @param FormEvent $event
      */
-    public function onPreSubmit(FormEvent $event)
+    public function onPreSubmit(FormEvent $event): void
     {
         // Event data : Request data (associative array)
         $this->buildForm($event->getForm(), $event->getData());
@@ -67,7 +60,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * Builds the tree map.
      *
      * @param SaleItemInterface $item
-     * @param array             $data    The submitted data
+     * @param array|null        $data    The submitted data
      * @param bool              $cascade
      * @param array             $exclude The option groups ids to exclude
      *
@@ -75,10 +68,10 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function buildTreeMap(
         SaleItemInterface $item,
-        array $data = null,
-        bool $cascade = true,
-        array $exclude = []
-    ) {
+        array             $data = null,
+        bool              $cascade = true,
+        array             $exclude = []
+    ): array {
         $groups = $this->itemBuilder->getOptionGroups($item, $exclude);
 
         $groupIds = array_map(function (Model\OptionGroupInterface $group) {
@@ -93,7 +86,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
             'group_id' => null,
         ];
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var ProductInterface $product */
         $product = $this->itemBuilder->getProvider()->resolve($item);
 
         foreach ($item->getChildren() as $index => $child) {
@@ -126,7 +119,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
                         break;
                     }
-
                     /* if (!$found) {
                         throw new LogicException("Bundle choice not found.");
                     }*/
@@ -179,7 +171,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
                     break;
                 }
-
                 /*if (!$found) {
                     throw new LogicException("Option not found.");
                 }*/
@@ -195,7 +186,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * @param SaleItemInterface $item
      * @param array             $treeMap
      */
-    private function clearItems(SaleItemInterface $item, array $treeMap)
+    private function clearItems(SaleItemInterface $item, array $treeMap): void
     {
         $ids = $treeMap['ids'];
 
@@ -254,7 +245,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * @param SaleItemInterface $item
      * @param array             $treeMap
      */
-    private function createItems(SaleItemInterface $item, array $treeMap)
+    private function createItems(SaleItemInterface $item, array $treeMap): void
     {
         $groups = $treeMap['groups'];
 
@@ -316,7 +307,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * @param array             $flatMap
      * @param array             $indexes
      */
-    private function buildFlatMap(SaleItemInterface $item, array $treeMap, array &$flatMap, array $indexes = [])
+    private function buildFlatMap(SaleItemInterface $item, array $treeMap, array &$flatMap, array $indexes = []): void
     {
         /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($treeMap['groups'] as $optionGroup) {
@@ -330,7 +321,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 }
             }
 
-            throw new LogicException("Item children / Option groups miss match.");
+            throw new LogicException('Item children / Option groups miss match.');
         }
 
         // Recurse for children
@@ -373,7 +364,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * @param FormInterface $form
      * @param array         $flatMap
      */
-    private function clearForms(FormInterface $form, array $flatMap)
+    private function clearForms(FormInterface $form, array $flatMap): void
     {
         $groupIds = array_map(function (Model\OptionGroupInterface $group) {
             return $group->getId();
@@ -395,7 +386,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * @param FormInterface $form
      * @param array         $flatMap
      */
-    private function createForms(FormInterface $form, array $flatMap)
+    private function createForms(FormInterface $form, array $flatMap): void
     {
         // We need to revert the order of the form's children so that
         // fields for cascaded options are submitted first.
@@ -441,10 +432,9 @@ class OptionsGroupsListener implements EventSubscriberInterface
     /**
      * Builds the option groups forms.
      *
-     * @param FormInterface $form
-     * @param array         $data The submitted data
+     * @param array|null    $data The submitted data
      */
-    private function buildForm(FormInterface $form, array $data = null)
+    private function buildForm(FormInterface $form, array $data = null): void
     {
         /** @var SaleItemInterface $item */
         if (null === $item = $form->getParent()->getData()) {
@@ -463,10 +453,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         $this->createForms($form, $flatMap);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',

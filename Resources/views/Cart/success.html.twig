@@ -13,7 +13,7 @@
             <span>{{ product.fullTitle() }}</span>
         </p>
         <p class="text-success">
-            {{ 'ekyna_product.cart.success'|trans }}
+            {{ 'cart.success'|trans({}, 'EkynaProduct') }}
         </p>
     </div>
 </div>
@@ -21,7 +21,7 @@
 {% if products is not empty %}
 <div class="row">
     <div class="col-md-12">
-        <p>{{ 'ekyna_product.highlight.cross_selling'|trans }}</p>
+        <p>{{ 'highlight.cross_selling'|trans({}, 'EkynaProduct') }}</p>
     </div>
 </div>
 <div class="row">

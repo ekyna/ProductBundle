@@ -21,7 +21,7 @@
     {% if product is configurable_product -%}
         {{ product|subject_add_to_cart_button({
             'class': 'btn btn-sm btn-primary',
-            'add_to_cart': {'label': 'ekyna_product.cart.configure'}
+            'add_to_cart': {'label': t('cart.configure', {}, 'EkynaProduct')}
         }) }}
     {%- else -%}
         {{ product|subject_add_to_cart_button({'class': 'btn btn-sm btn-primary'}) }}

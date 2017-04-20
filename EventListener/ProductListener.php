@@ -49,11 +49,6 @@ class ProductListener implements EventSubscriberInterface
      */
     protected $priceInvalidator;
 
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    protected $stockSubjectUpdater;
-
 
     /**
      * Constructor.
@@ -81,13 +76,9 @@ class ProductListener implements EventSubscriberInterface
         $this->stockSubjectUpdater = $stockSubjectUpdater;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            ProductEvents::INITIALIZE                => ['onInitialize', 0],
             ProductEvents::PRE_CREATE                => ['onPreCreate', 0],
             ProductEvents::PRE_UPDATE                => ['onPreUpdate', 0],
             ProductEvents::PRE_DELETE                => ['onPreDelete', 0],
@@ -100,20 +91,6 @@ class ProductListener implements EventSubscriberInterface
             ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
             QueueEvents::QUEUE_CLOSE                 => ['onQueueClose', 0],
         ];
-    }
-
-    /**
-     * Pre create event handler.
-     *
-     * @param ResourceEventInterface $event
-     */
-    public function onInitialize(ResourceEventInterface $event)
-    {
-        $product = $this->getProductFromEvent($event);
-
-        if (ProductTypes::isChildType($product)) {
-            $this->stockSubjectUpdater->reset($product);
-        }
     }
 
     /**
@@ -172,7 +149,7 @@ class ProductListener implements EventSubscriberInterface
 
         $changed = $this->executeHandlers($event, HandlerInterface::INSERT);
 
-        $changed |= $this->generateReference($product);
+        $changed = $this->generateReference($product) || $changed;
 
         if ($changed) {
             $this->persistenceHelper->persistAndRecompute($product);
@@ -190,7 +167,7 @@ class ProductListener implements EventSubscriberInterface
 
         $changed = $this->executeHandlers($event, HandlerInterface::UPDATE);
 
-        $changed |= $this->generateReference($product);
+        $changed = $this->generateReference($product) || $changed;
 
         if ($changed) {
             $this->persistenceHelper->persistAndRecompute($product);
@@ -317,7 +294,7 @@ class ProductListener implements EventSubscriberInterface
 
         $handlers = $this->handlerRegistry->getHandlers($product);
         foreach ($handlers as $handler) {
-            $changed |= call_user_func([$handler, $method], $event);
+            $changed = call_user_func([$handler, $method], $event) || $changed;
         }
 
         return $changed;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\BundleChoiceOptionsTransformer;
@@ -12,6 +14,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class BundleChoiceOptionsType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Bundle
@@ -19,32 +23,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BundleChoiceOptionsType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(new BundleChoiceOptionsTransformer(array_values($options['choices'])));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr']['data-name'] = $view->vars['full_name'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setRequired('product')
             ->setAllowedTypes('product', [ProductInterface::class, 'null'])
             ->setDefaults([
-                'label'    => 'ekyna_product.option_group.label.plural',
+                'label'    => t('option_group.label.plural', [], 'EkynaProduct'),
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,
@@ -65,7 +60,7 @@ class BundleChoiceOptionsType extends AbstractType
 
                     foreach ($product->resolveOptionGroups([], true) as $group) {
                         $label = sprintf(
-                            "[%s] %s",
+                            '[%s] %s',
                             $group->isRequired() ? 'Required' : 'Optional',
                             $group->getName()
                         );
@@ -77,10 +72,7 @@ class BundleChoiceOptionsType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

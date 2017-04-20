@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 
 /**
  * Interface SpecialOfferRepositoryInterface
@@ -14,17 +17,13 @@ interface SpecialOfferRepositoryInterface extends ResourceRepositoryInterface
 {
     /**
      * Finds special offers rules by product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return array
      */
-    public function findRulesByProduct(ProductInterface $product);
+    public function findRulesByProduct(ProductInterface $product): array;
 
     /**
      * Returns special offers starting today or ending yesterday.
      *
-     * @return \Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface[]
+     * @return array<SpecialOfferInterface>
      */
-    public function findStartingTodayOrEndingYesterday();
+    public function findStartingTodayOrEndingYesterday(): array;
 }

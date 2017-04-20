@@ -1,0 +1,64 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block main_contents -%}
+<div class="tab-pane active" id="{{ resource_name }}-general">
+    {{ show_row(attributeSet.name, 'text', {
+        'label': t('field.email', [], 'EkynaUi')
+    }) }}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{ 'attribute.label.plural'|trans({}, 'EkynaProduct') }}
+        </div>
+        <div class="col-md-10">
+            <div class="show-widget">
+                <div class="ekyna-table">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-alt-head">
+                            <thead>
+                            <tr>
+                                <th>{{ 'attribute.label.singular'|trans({}, 'EkynaProduct') }}</th>
+                                <th>{{ 'field.required'|trans({}, 'EkynaUi') }}</th>
+                                <th>{{ 'attribute_slot.field.naming'|trans({}, 'EkynaProduct') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for slot in attributeSet.slots %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ admin_resource_path(slot.attribute) }}" class="show-entity">
+                                            {{ slot.attribute.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if slot.required %}
+                                            <span class="label label-success">
+                                                {{ 'value.yes'|trans({}, 'EkynaUi') }}
+                                            </span>
+                                        {% else %}
+                                            <span class="label label-default">
+                                                {{ 'value.no'|trans({}, 'EkynaUi') }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if slot.naming %}
+                                            <span class="label label-success">
+                                                {{ 'value.yes'|trans({}, 'EkynaUi') }}
+                                            </span>
+                                        {% else %}
+                                            <span class="label label-default">
+                                                {{ 'value.no'|trans({}, 'EkynaUi') }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endblock main_contents %}

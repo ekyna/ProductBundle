@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\CommerceBundle\Model\Units as BUnits;
@@ -9,10 +11,14 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Ekyna\Component\Commerce\Common\Model\Units as CUnits;
 use NumberFormatter;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
+
+use function sprintf;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class UnitType
@@ -21,26 +27,14 @@ use Symfony\Component\Validator\Constraints\Type;
  */
 class UnitType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-
-    /**
-     * Constructor.
-     *
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function render(ProductAttributeInterface $productAttribute, $locale = null)
+    public function render(ProductAttributeInterface $productAttribute, string $locale = null): ?string
     {
         $config = $productAttribute->getAttributeSlot()->getAttribute()->getConfig();
 
@@ -55,7 +49,9 @@ class UnitType extends AbstractType
         }
 
         if (BUnits::hasTranslatableFormat($config['unit'])) {
-            $format = $this->translator->trans(BUnits::getFormat($config['unit']), [], null, $locale);
+            $format = $this->translator->trans(
+                BUnits::getFormat($config['unit']), [], BUnits::getTranslationDomain(), $locale
+            );
         } else {
             $format = BUnits::getFormat($config['unit']);
         }
@@ -63,10 +59,7 @@ class UnitType extends AbstractType
         return sprintf($format, $formatter->format($value, NumberFormatter::TYPE_DEFAULT));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConstraints(ProductAttributeInterface $productAttribute)
+    public function getConstraints(ProductAttributeInterface $productAttribute): array
     {
         return [
             'value' => [
@@ -77,10 +70,7 @@ class UnitType extends AbstractType
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigShowFields(AttributeInterface $attribute)
+    public function getConfigShowFields(AttributeInterface $attribute): array
     {
         $config = $attribute->getConfig();
 
@@ -89,7 +79,7 @@ class UnitType extends AbstractType
                 'value'   => BUnits::getLabel($config['unit']),
                 'type'    => 'text',
                 'options' => [
-                    'label'        => 'ekyna_commerce.unit.label',
+                    'label'        => t('unit.label', [], 'EkynaCommerce'),
                     'trans_domain' => null,
                 ],
             ],
@@ -97,16 +87,13 @@ class UnitType extends AbstractType
                 'value'   => $config['suffix'],
                 'type'    => 'text',
                 'options' => [
-                    'label' => 'ekyna_product.attribute.config.suffix',
+                    'label' => t('attribute.config.suffix', [], 'EkynaProduct'),
                 ],
             ],
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigDefaults()
+    public function getConfigDefaults(): array
     {
         return [
             'unit'   => CUnits::PIECE,
@@ -114,27 +101,23 @@ class UnitType extends AbstractType
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigType()
+    public function getConfigType(): ?string
     {
         return UnitConfigType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFormType()
+    public function getFormType(): ?string
     {
         return UnitAttributeType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getLabel()
+    public function getLabel(): TranslatableInterface
     {
-        return 'ekyna_product.attribute.type.unit';
+        return t('attribute.type.unit', [], 'EkynaProduct');
+    }
+
+    public static function getName(): string
+    {
+        return 'unit';
     }
 }

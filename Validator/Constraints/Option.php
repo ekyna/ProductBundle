@@ -14,7 +14,7 @@ class Option extends Constraint
     public $recursive_choice        = 'ekyna_product.option.recursive_choice';
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getTargets()
     {

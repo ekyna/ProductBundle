@@ -1,41 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductReferenceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductReferenceType extends ResourceFormType
+class ProductReferenceType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('type', ChoiceType::class, [
-                'label'       => 'ekyna_core.field.type',
-                'choices'     => ProductReferenceTypes::getChoices(),
-                'placeholder' => 'ekyna_core.field.type',
+            ->add('type', ConstantChoiceType::class, [
+                'label'       => t('field.type', [], 'EkynaUi'),
+                'class'       => ProductReferenceTypes::class,
+                'placeholder' => t('field.type', [], 'EkynaUi'),
                 'select2'     => false,
             ])
             ->add('code', TextType::class, [
-                'label'  => 'ekyna_core.field.code',
-                'attr'   => [
-                    'placeholder' => 'ekyna_core.field.code',
+                'label' => t('field.code', [], 'EkynaUi'),
+                'attr'  => [
+                    'placeholder' => t('field.code', [], 'EkynaUi'),
                 ],
             ]);
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_reference';
     }

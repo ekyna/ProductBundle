@@ -1,14 +1,16 @@
-{% extends '@EkynaAdmin/Entity/Default/edit.html.twig' %}
+{% extends '@EkynaAdmin/Entity/Crud/update.html.twig' %}
+
+{% set product = context.resource %}
 
 {% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
 
 {% block title %}
-    <h1>{{ 'ekyna_product.product.header.duplicate'|trans({'%name%': source})|raw }}</h1>
+    <h1>{{ 'product.header.duplicate'|trans({'%name%': source}, 'EkynaProduct')|raw }}</h1>
     {{ product|product_type_badge }}
 {% endblock title %}
 
 {% block actions %}
-    {{ admin_resource_btn(product, 'list') }}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
     {{ macros.export_products_button() }}
     {{ macros.new_product_button() }}
 {% endblock actions %}
@@ -17,12 +19,12 @@
 {% block main %}
     <div class="alert alert-warning">
         {% set fields = [
-            'ekyna_core.field.designation',
-            'ekyna_core.field.visible',
-            'ekyna_commerce.field.net_price',
-            'ekyna_core.field.weight',
-            'ekyna_commerce.field.geocode',
-            'ekyna_product.product_reference.label.plural'
+            t('field.designation', {}, 'EkynaUi'),
+            t('field.visible', {}, 'EkynaUi'),
+            t('field.net_price', {}, 'EkynaCommerce'),
+            t('field.weight', {}, 'EkynaUi'),
+            t('field.geocode', {}, 'EkynaCommerce'),
+            t('product_reference.label.plural', {}, 'EkynaProduct'),
         ] %}
         <p>
             Veuillez vérifier les valeurs des champs :
@@ -38,24 +40,24 @@
     <h3>{{ source }}</h3>
     <hr>
     <dl class="dl-horizontal">
-        <dt>{{ 'ekyna_core.field.designation'|trans }}</dt>
+        <dt>{{ 'field.designation'|trans({}, 'EkynaUi') }}</dt>
         <dd>{{ source.designation }}</dd>
-        <dt>{{ 'ekyna_core.field.visible'|trans }}</dt>
-        <dd>{% if source.visible %}{{ 'ekyna_core.value.yes'|trans }}{% else %}{{ 'ekyna_core.value.no'|trans }}{% endif %}</dd>
-        <dt>{{ 'ekyna_commerce.field.net_price'|trans }}</dt>
-        <dd>{{ source.netPrice|localizedcurrency(commerce_default_currency) }}</dd>
-        <dt>{{ 'ekyna_core.field.weight'|trans }}</dt>
-        <dd>{{ source.weight|localizednumber }}&nbsp;kg</dd>
-        <dt>{{ 'ekyna_commerce.field.geocode'|trans }}</dt>
+        <dt>{{ 'field.visible'|trans({}, 'EkynaUi') }}</dt>
+        <dd>{% if source.visible %}{{ 'value.yes'|trans({}, 'EkynaUi') }}{% else %}{{ 'value.no'|trans({}, 'EkynaUi') }}{% endif %}</dd>
+        <dt>{{ 'field.net_price'|trans({}, 'EkynaCommerce') }}</dt>
+        <dd>{{ source.netPrice|format_currency(commerce_default_currency) }}</dd>
+        <dt>{{ 'field.weight'|trans({}, 'EkynaUi') }}</dt>
+        <dd>{{ source.weight|format_number }}&nbsp;kg</dd>
+        <dt>{{ 'field.geocode'|trans({}, 'EkynaCommerce') }}</dt>
         <dd>{{ source.geocode }}</dd>
-        <dt>{{ 'ekyna_product.product_reference.label.plural'|trans }}</dt>
+        <dt>{{ 'product_reference.label.plural'|trans({}, 'EkynaProduct') }}</dt>
         <dd>
             {% if source.references is not empty %}
                 {% for reference in source.references %}
                     <em>{{ reference|product_reference_type_label }}</em> : {{ reference.code }}<br>
                 {% endfor %}
             {% else %}
-                <em>{{ 'ekyna_core.value.none'|trans }}</em>
+                <em>{{ 'value.none'|trans({}, 'EkynaUi') }}</em>
             {% endif %}
         </dd>
     </dl>

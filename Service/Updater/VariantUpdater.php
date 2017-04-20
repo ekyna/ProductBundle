@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
+use Ekyna\Component\Commerce\Exception\CommerceExceptionInterface;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidProductException;
 use Ekyna\Bundle\ProductBundle\Model;
@@ -16,29 +19,10 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class VariantUpdater
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    private $persistenceHelper;
+    private PersistenceHelperInterface $persistenceHelper;
+    private LocaleProviderInterface $localeProvider;
+    private AttributeTypeRegistryInterface $typeRegistry;
 
-    /**
-     * @var LocaleProviderInterface
-     */
-    private $localeProvider;
-
-    /**
-     * @var AttributeTypeRegistryInterface
-     */
-    private $typeRegistry;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface     $persistenceHelper
-     * @param LocaleProviderInterface        $localeProvider
-     * @param AttributeTypeRegistryInterface $typeRegistry
-     */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         LocaleProviderInterface $localeProvider,
@@ -52,22 +36,19 @@ class VariantUpdater
     /**
      * Updates the attributes designation and title if needed.
      *
-     * @param Model\ProductInterface $variant The variant product
-     *
-     * @return bool Whether the variant has been changed or not.
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @throws CommerceExceptionInterface
      */
     public function updateAttributesDesignationAndTitle(Model\ProductInterface $variant): bool
     {
         $this->assertVariantWithParent($variant);
 
         if (null === $attributeSet = $variant->getParent()->getAttributeSet()) {
-            throw new RuntimeException("Variant's parent attribute set must be defined.");
+            throw new RuntimeException('Variant\'s parent attribute set must be defined.');
         }
 
         $changed = false;
 
-        // Attributes title for each locales
+        // Attributes title for each locale
         foreach ($this->localeProvider->getAvailableLocales() as $locale) {
             $titles = [];
             foreach ($attributeSet->getSlots() as $slot) {
@@ -155,12 +136,9 @@ class VariantUpdater
     }
 
     /**
-     * Updates the tax group regarding to its parent/variable product.
+     * Updates the tax group regarding its parent/variable product.
      *
-     * @param Model\ProductInterface $variant
-     *
-     * @return bool Whether the variant has been changed or not.
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @throws CommerceExceptionInterface
      */
     public function updateTaxGroup(Model\ProductInterface $variant): bool
     {
@@ -177,12 +155,9 @@ class VariantUpdater
     }
 
     /**
-     * Updates the quantity unit regarding to its parent/variable product.
+     * Updates the quantity unit regarding its parent/variable product.
      *
-     * @param Model\ProductInterface $variant
-     *
-     * @return bool Whether the variant has been changed or not.
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @throws CommerceExceptionInterface
      */
     public function updateUnit(Model\ProductInterface $variant): bool
     {
@@ -199,14 +174,11 @@ class VariantUpdater
     }
 
     /**
-     * Updates the brand regarding to its parent/variable product.
+     * Updates the brand regarding its parent/variable product.
      *
-     * @param Model\ProductInterface $variant
-     *
-     * @return bool Whether the variant has been changed or not.
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @throws CommerceExceptionInterface
      */
-    public function updateBrand(Model\ProductInterface $variant)
+    public function updateBrand(Model\ProductInterface $variant): bool
     {
         $this->assertVariantWithParent($variant);
 
@@ -221,11 +193,7 @@ class VariantUpdater
     }
 
     /**
-     * Updates the given variant availability regarding to its parent.
-     *
-     * @param Model\ProductInterface $variant
-     *
-     * @return bool
+     * Updates the given variant availability regarding its parent.
      */
     public function updateAvailability(Model\ProductInterface $variant): bool
     {
@@ -278,7 +246,7 @@ class VariantUpdater
      *
      * @param Model\ProductInterface $variant
      *
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @throws CommerceExceptionInterface
      */
     protected function assertVariantWithParent(Model\ProductInterface $variant)
     {

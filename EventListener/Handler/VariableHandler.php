@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
@@ -16,41 +18,21 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 class VariableHandler extends AbstractVariantHandler
 {
-    /**
-     * @var PriceInvalidator
-     */
-    private $priceInvalidator;
-
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    private $stockUpdater;
+    private PriceInvalidator             $priceInvalidator;
+    private StockSubjectUpdaterInterface $stockUpdater;
 
 
-    /**
-     * Sets the price invalidator.
-     *
-     * @param PriceInvalidator $invalidator
-     */
-    public function setPriceInvalidator($invalidator): void
+    public function setPriceInvalidator(PriceInvalidator $invalidator): void
     {
         $this->priceInvalidator = $invalidator;
     }
 
-    /**
-     * Sets the stock updater.
-     *
-     * @param StockSubjectUpdaterInterface $updater
-     */
     public function setStockUpdater(StockSubjectUpdaterInterface $updater): void
     {
         $this->stockUpdater = $updater;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleInsert(ResourceEventInterface $event)
+    public function handleInsert(ResourceEventInterface $event): bool
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
@@ -58,24 +40,19 @@ class VariableHandler extends AbstractVariantHandler
 
         $changed = $updater->updateAvailability($variable);
 
-        $changed |= $updater->updateNetPrice($variable);
+        $changed = $updater->updateNetPrice($variable) || $changed;
 
-        $changed |= $updater->updateMinPrice($variable);
-
-        return $changed;
+        return $updater->updateMinPrice($variable) || $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleUpdate(ResourceEventInterface $event)
+    public function handleUpdate(ResourceEventInterface $event): bool
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
         $variantIds = [];
         $variants = [];
 
-        $addVariant = function(ProductInterface $variant) use (&$variants, &$variantIds) {
+        $addVariant = function (ProductInterface $variant) use (&$variants, &$variantIds) {
             if (!in_array($variant->getId(), $variantIds)) {
                 $variantIds[] = $variant->getId();
                 $variants[] = $variant;
@@ -145,7 +122,12 @@ class VariableHandler extends AbstractVariantHandler
         }
 
         $stockProperties = [
-            'inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival', 'stockMode', 'stockState'
+            'inStock',
+            'availableStock',
+            'virtualStock',
+            'estimatedDateOfArrival',
+            'stockMode',
+            'stockState',
         ];
         if ($this->persistenceHelper->isChanged($variable, $stockProperties)) {
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
@@ -158,10 +140,7 @@ class VariableHandler extends AbstractVariantHandler
         return $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildPriceChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event): bool
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
@@ -170,7 +149,8 @@ class VariableHandler extends AbstractVariantHandler
         $updater = $this->getVariableUpdater();
 
         $changed = $updater->updateNetPrice($variable);
-        $changed |= $updater->updateMinPrice($variable);
+
+        $changed = $updater->updateMinPrice($variable) || $changed;
 
         if ($changed) {
             $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_PRICE_CHANGE]);
@@ -179,19 +159,16 @@ class VariableHandler extends AbstractVariantHandler
         return $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildAvailabilityChange(ResourceEventInterface $event)
+    public function handleChildAvailabilityChange(ResourceEventInterface $event): bool
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
         $updater = $this->getVariableUpdater();
 
         $changed = $updater->updateAvailability($variable);
-        $changed |= $updater->updateNetPrice($variable);
-        $changed |= $updater->updateMinPrice($variable);
-        $changed |= $updater->updateVisibility($variable);
+        $changed = $updater->updateNetPrice($variable) || $changed;
+        $changed = $updater->updateMinPrice($variable) || $changed;
+        $changed = $updater->updateVisibility($variable) || $changed;
 
         if ($changed) {
             $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
@@ -200,10 +177,7 @@ class VariableHandler extends AbstractVariantHandler
         return $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildStockChange(ResourceEventInterface $event)
+    public function handleChildStockChange(ResourceEventInterface $event): bool
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
@@ -218,11 +192,8 @@ class VariableHandler extends AbstractVariantHandler
 
     /**
      * Dispatches the child change events.
-     *
-     * @param ProductInterface $variable
-     * @param array            $events
      */
-    protected function scheduleChildChangeEvents(ProductInterface $variable, array $events)
+    protected function scheduleChildChangeEvents(ProductInterface $variable, array $events): void
     {
         ProductTypes::assertVariable($variable);
 
@@ -230,15 +201,12 @@ class VariableHandler extends AbstractVariantHandler
 
         foreach ($parents as $parent) {
             foreach ($events as $event) {
-                $this->persistenceHelper->scheduleEvent($event, $parent);
+                $this->persistenceHelper->scheduleEvent($parent, $event);
             }
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function supports(ProductInterface $product)
+    public function supports(ProductInterface $product): bool
     {
         return $product->getType() === ProductTypes::TYPE_VARIABLE;
     }

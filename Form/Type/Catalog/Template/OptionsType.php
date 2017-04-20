@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
-use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
+use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -14,10 +16,7 @@ use Symfony\Component\Form\FormView;
  */
 class OptionsType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         FormUtil::addClass($view, 'catalog-page-options');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\DataTransformer;
 
 use Ekyna\Component\Resource\Model\ResourceInterface;
@@ -13,37 +15,22 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class IdToChoiceObjectTransformer implements DataTransformerInterface
 {
-    /**
-     * @var ResourceInterface[]
-     */
-    private $choices;
+    /** @var array<ResourceInterface> */
+    private array $choices;
 
-    /**
-     * @var bool
-     */
-    private $required;
-
-
-    /**
-     * Constructor.
-     *
-     * @param array $choices
-     * @param bool  $required
-     */
-    public function __construct(array $choices, $required = true)
+    public function __construct(array $choices)
     {
         $this->choices = $choices;
-        $this->required = $required;
     }
 
     /**
      * @inheritDoc
      */
-    public function transform($id)
+    public function transform($value)
     {
-        if (0 < $id) {
+        if (0 < $value) {
             foreach ($this->choices as $choice) {
-                if ($choice->getId() == $id) {
+                if ($choice->getId() == $value) {
                     return $choice;
                 }
             }
@@ -56,11 +43,11 @@ class IdToChoiceObjectTransformer implements DataTransformerInterface
     /**
      * @inheritDoc
      */
-    public function reverseTransform($choice)
+    public function reverseTransform($value)
     {
-        if (null !== $choice) {
-            if (in_array($choice, $this->choices, true)) {
-                return $choice->getId();
+        if (null !== $value) {
+            if (in_array($value, $this->choices, true)) {
+                return $value->getId();
             }
             throw new TransformationFailedException('Failed to reverse transform the choice object.');
         }

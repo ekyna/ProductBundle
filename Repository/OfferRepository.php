@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Decimal\Decimal;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator;
+use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
 /**
  * Class OfferRepository
@@ -18,57 +22,30 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class OfferRepository extends ResourceRepository implements OfferRepositoryInterface
 {
-    /**
-     * @var array
-     */
-    private $cachedCountryCodes;
+    private array  $cachedCountryCodes;
+    private int    $cacheTtl                                   = 3600;
+    private ?Query $findByProductAndContextQuery               = null;
+    private ?Query $findOneByProductAndContextAndQuantityQuery = null;
 
-    /**
-     * @var int
-     */
-    private $cacheTtl = 3600;
-
-    /**
-     * @var Query
-     */
-    private $findByProductAndContextQuery;
-
-    /**
-     * @var Query
-     */
-    private $findOneByProductAndContextAndQuantityQuery;
-
-
-    /**
-     * Sets the cached country codes.
-     *
-     * @param array $codes
-     */
-    public function setCachedCountryCodes($codes)
+    public function setCachedCountryCodes(array $codes): void
     {
         $this->cachedCountryCodes = $codes;
     }
 
-    /**
-     * Sets the cache lifetime.
-     *
-     * @param int $cacheTtl
-     */
-    public function setCacheTtl(int $cacheTtl)
+    public function setCacheTtl(int $cacheTtl): void
     {
         $this->cacheTtl = $cacheTtl;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findByProductAndContext(
         ProductInterface $product,
         ContextInterface $context,
-        bool $useCache = true
+        bool             $useCache = true
     ): array {
-        $group   = $context->getCustomerGroup();
+        $group = $context->getCustomerGroup();
         $country = $context->getInvoiceCountry();
+
+        // TODO Use ekyna_product.cache ?
 
         $query = $this->getFindByProductAndContextQuery();
 
@@ -84,7 +61,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
                 'group'   => $group,
                 'country' => $country,
             ])
-            ->getResult(Query::HYDRATE_SCALAR);
+            ->getResult(OfferScalarHydrator::NAME);
 
         // Remove worst offers
         // TODO Should be done by the query :s
@@ -103,22 +80,19 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
         return $offers;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findOneByProductAndContextAndQuantity(
         ProductInterface $product,
         ContextInterface $context,
-        float $quantity = 1.0,
-        bool $useCache = true
+        Decimal          $quantity = null,
+        bool             $useCache = true
     ): ?array {
-        $group    = $context->getCustomerGroup();
-        $country  = $context->getInvoiceCountry();
-        $quantity = intval($quantity);
+        $group = $context->getCustomerGroup();
+        $country = $context->getInvoiceCountry();
+        $quantity = $quantity ?: new Decimal(1);
 
         $query = $this->getOneFindByProductAndContextAndQuantityQuery();
 
-        if ($useCache && (1 === $quantity) && $this->isCachedCountry($country)) {
+        if ($useCache && $quantity->equals(1) && $this->isCachedCountry($country)) {
             $key = CacheUtil::buildOfferKey($product, $group, $country, $quantity, false);
             $query->enableResultCache($this->cacheTtl, $key);
         } else {
@@ -132,24 +106,17 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
                 'country'  => $country,
                 'quantity' => $quantity,
             ])
-            ->getOneOrNullResult(Query::HYDRATE_SCALAR);
+            ->getOneOrNullResult(OfferScalarHydrator::NAME);
     }
 
     /**
      * Returns whether the given country is cached.
-     *
-     * @param CountryInterface|null $country
-     *
-     * @return bool
      */
-    private function isCachedCountry(CountryInterface $country = null): bool
+    private function isCachedCountry(?CountryInterface $country): bool
     {
         return $country && in_array($country->getCode(), $this->cachedCountryCodes, true);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function findByProduct(ProductInterface $product, bool $asArray = false): array
     {
         $qb = $this->createQueryBuilder('o');
@@ -170,9 +137,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     }
 
     /**
-     * Returns the "find by product and context" uery.
-     *
-     * @return Query
+     * Returns the "find by product and context" query.
      */
     private function getFindByProductAndContextQuery(): Query
     {
@@ -187,7 +152,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
             ->select([
                 'o.minQuantity as min_qty',
                 'o.percent as percent',
-                'o.netPrice as price',
+                'o.netPrice as net_price',
             ])
             ->andWhere($ex->eq('o.product', ':product'))
             ->andWhere($ex->orX($ex->eq('o.group', ':group'), $ex->isNull('o.group')))
@@ -202,8 +167,6 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
 
     /**
      * Returns the "find by product, context and quantity" query.
-     *
-     * @return Query
      */
     private function getOneFindByProductAndContextAndQuantityQuery(): Query
     {
@@ -217,7 +180,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
         return $this->findOneByProductAndContextAndQuantityQuery = $qb
             ->select([
                 'o.percent as percent',
-                'o.netPrice as price',
+                'o.netPrice as net_price',
                 'IDENTITY(o.specialOffer) as special_offer_id',
                 'IDENTITY(o.pricing) as pricing_id',
             ])
@@ -236,11 +199,6 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
 
     /**
      * Returns the query builder result as array.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     *
-     * @return array
      */
     private function arrayResult(QueryBuilder $qb, array $parameters): array
     {
@@ -264,10 +222,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     /**
      * Returns the query builder result as objects.
      *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Offer[]
+     * @return array<Offer>
      */
     private function objectResult(QueryBuilder $qb, array $parameters): array
     {

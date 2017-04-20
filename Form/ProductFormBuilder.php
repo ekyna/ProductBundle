@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\MentionsType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
@@ -19,9 +20,16 @@ use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Features;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+
+use function array_replace;
+use function in_array;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductFormBuilder
@@ -30,62 +38,37 @@ use Symfony\Component\Form\FormInterface;
  */
 class ProductFormBuilder
 {
-    /**
-     * @var Features
-     */
-    private $features;
+    private Features $features;
+    private string   $mediaClass;
 
-    /**
-     * @var string
-     */
-    private $mediaClass;
+    private ?ProductInterface $product = null;
+    /** @var FormInterface|FormBuilderInterface */
+    private $form = null;
 
-    /**
-     * @var FormInterface|FormBuilderInterface
-     */
-    private $form;
-
-    /**
-     * @var ProductInterface
-     */
-    private $product;
-
-
-    /**
-     * Constructor.
-     *
-     * @param Features $features
-     * @param string   $mediaClass
-     */
     public function __construct(Features $features, string $mediaClass)
     {
-        $this->features   = $features;
+        $this->features = $features;
         $this->mediaClass = $mediaClass;
     }
 
     /**
      * Initializes the builder.
      *
-     * @param ProductInterface                   $product
      * @param FormInterface|FormBuilderInterface $form
-     *
-     * @return ProductFormBuilder
      */
-    public function initialize(ProductInterface $product, $form)
+    public function initialize(ProductInterface $product, $form): ProductFormBuilder
     {
         if (!($form instanceof FormInterface || $form instanceof FormBuilderInterface)) {
             throw new UnexpectedTypeException($form, [FormInterface::class, FormBuilderInterface::class]);
         }
 
         $this->product = $product;
-        $this->form    = $form;
+        $this->form = $form;
 
         return $this;
     }
 
     /**
-     * Returns the form.
-     *
      * @return FormInterface|FormBuilderInterface
      */
     protected function getForm()
@@ -93,24 +76,15 @@ class ProductFormBuilder
         return $this->form;
     }
 
-    /**
-     * Returns the product.
-     *
-     * @return ProductInterface
-     */
-    public function getProduct()
+    public function getProduct(): ProductInterface
     {
         return $this->product;
     }
 
     /**
      * Adds the attribute set field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addAttributeSetField(array $options = [])
+    public function addAttributeSetField(array $options = []): ProductFormBuilder
     {
         if (!in_array($this->product->getType(), [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIABLE])) {
             throw new InvalidArgumentException("Expected 'simple' or 'variable' product.");
@@ -118,11 +92,11 @@ class ProductFormBuilder
 
         $options['required'] = true;
         $options['disabled'] = false;
-        $attr                = [];
+        $attr = [];
         if ($this->product->getType() === ProductTypes::TYPE_SIMPLE) {
             $options['required'] = false;
             if (null !== $this->product->getAttributeSet()) {
-                $options['disabled'] = true;;
+                $options['disabled'] = true;
             } else {
                 $attr['class'] = 'product-attribute-set';
             }
@@ -140,18 +114,13 @@ class ProductFormBuilder
 
     /**
      * Adds the attributes field.
-     *
-     * @param AttributeSetInterface $attributeSet
-     * @param array                 $options
-     *
-     * @return self
      */
-    public function addAttributesField(AttributeSetInterface $attributeSet = null, array $options = [])
+    public function addAttributesField(?AttributeSetInterface $attributeSet, array $options = []): ProductFormBuilder
     {
         ProductTypes::assertChildType($this->product);
 
         $options = array_replace([
-            'label'         => 'ekyna_product.attribute.label.plural',
+            'label'         => t('attribute.label.plural', [], 'EkynaProduct'),
             'attribute_set' => $attributeSet,
         ], $options);
 
@@ -162,12 +131,8 @@ class ProductFormBuilder
 
     /**
      * Adds the brand field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addBrandField(array $options = [])
+    public function addBrandField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
             'allow_new' => true,
@@ -181,15 +146,11 @@ class ProductFormBuilder
 
     /**
      * Adds the brand naming field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addBrandNamingField(array $options = [])
+    public function addBrandNamingField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'    => 'ekyna_product.product.field.brand_naming',
+            'label'    => t('product.field.brand_naming', [], 'EkynaProduct'),
             'required' => false,
             'attr'     => [
                 'align_with_widget' => true,
@@ -203,12 +164,8 @@ class ProductFormBuilder
 
     /**
      * Adds the bundle slots field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addBundleSlotsField(array $options = [])
+    public function addBundleSlotsField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
             'configurable' => false,
@@ -221,33 +178,25 @@ class ProductFormBuilder
 
     /**
      * Adds the categories field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addCategoriesField(array $options = [])
+    public function addCategoriesField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'     => 'ekyna_product.category.label.plural',
+            'resource'  => 'ekyna_product.category',
             'multiple'  => true,
             'allow_new' => true,
             'required'  => true,
         ], $options);
 
-        $this->form->add('categories', PR\Category\CategoryChoiceType::class, $options);
+        $this->form->add('categories', ResourceChoiceType::class, $options);
 
         return $this;
     }
 
     /**
      * Adds the components field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addComponentsField(array $options = [])
+    public function addComponentsField(array $options = []): ProductFormBuilder
     {
         if (!$this->features->isEnabled(Features::COMPONENT)) {
             return $this;
@@ -260,12 +209,8 @@ class ProductFormBuilder
 
     /**
      * Adds the cross sellings field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addCrossSellingsField(array $options = [])
+    public function addCrossSellingsField(array $options = []): ProductFormBuilder
     {
         /*if (!$this->features->isEnabled(Features::CROSS_SELLING)) {
             return $this;
@@ -278,15 +223,11 @@ class ProductFormBuilder
 
     /**
      * Adds the medias field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addMediasField(array $options = [])
+    public function addMediasField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'       => 'ekyna_core.field.medias',
+            'label'       => t('field.medias', [], 'EkynaUi'),
             'media_class' => $this->mediaClass,
             'types'       => [
                 MediaTypes::IMAGE,
@@ -305,12 +246,8 @@ class ProductFormBuilder
 
     /**
      * Adds the mentions field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addMentionsField(array $options = [])
+    public function addMentionsField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
             'mention_class'     => ProductMention::class,
@@ -324,15 +261,11 @@ class ProductFormBuilder
 
     /**
      * Adds the "not contractual" field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addNotContractualField(array $options = [])
+    public function addNotContractualField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'    => 'ekyna_product.product.field.not_contractual',
+            'label'    => t('product.field.not_contractual', [], 'EkynaProduct'),
             'required' => false,
             'attr'     => [
                 'align_with_widget' => true,
@@ -346,15 +279,11 @@ class ProductFormBuilder
 
     /**
      * Adds the option groups field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addOptionGroupsField(array $options = [])
+    public function addOptionGroupsField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'           => 'ekyna_product.option_group.label.plural',
+            'label'           => t('option_group.label.plural', [], 'EkynaProduct'),
             'prototype_name'  => '__option_group__',
             'sub_widget_col'  => 11,
             'button_col'      => 1,
@@ -362,7 +291,7 @@ class ProductFormBuilder
             'allow_add'       => true,
             'allow_delete'    => true,
             'allow_sort'      => true,
-            'add_button_text' => 'ekyna_product.option_group.button.add',
+            'add_button_text' => t('option_group.button.add', [], 'EkynaProduct'),
             'required'        => false,
         ], $options);
 
@@ -373,25 +302,21 @@ class ProductFormBuilder
 
     /**
      * Adds the pricings field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addPricingsField(array $options = [])
+    public function addPricingsField(array $options = []): ProductFormBuilder
     {
         if (in_array($this->product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE])) {
-            throw new InvalidArgumentException("Unexpected product type.");
+            throw new InvalidArgumentException('Unexpected product type.');
         }
 
         $options = array_replace([
-            'label'           => 'ekyna_product.pricing.label.plural',
+            'label'           => t('pricing.label.plural', [], 'EkynaProduct'),
             'entry_type'      => PR\Pricing\PricingType::class,
             'entry_options'   => ['product_mode' => true],
             'prototype_name'  => '__pricing__',
             'allow_add'       => true,
             'allow_delete'    => true,
-            'add_button_text' => 'ekyna_product.pricing.button.add',
+            'add_button_text' => t('pricing.button.add', [], 'EkynaProduct'),
             'required'        => false,
         ], $options);
 
@@ -402,15 +327,11 @@ class ProductFormBuilder
 
     /**
      * Adds the reference field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addReferenceField(array $options = [])
+    public function addReferenceField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'    => 'ekyna_core.field.reference',
+            'label'    => t('field.reference', [], 'EkynaUi'),
             'required' => false,
             'disabled' => !empty($this->product->getReference()),
         ], $options);
@@ -422,15 +343,11 @@ class ProductFormBuilder
 
     /**
      * Adds the references field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addReferencesField(array $options = [])
+    public function addReferencesField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'        => 'ekyna_product.product_reference.label.plural',
+            'label'        => t('product_reference.label.plural', [], 'EkynaProduct'),
             'entry_type'   => PR\ProductReferenceType::class,
             'allow_add'    => true,
             'allow_delete' => true,
@@ -444,16 +361,11 @@ class ProductFormBuilder
 
     /**
      * Adds the released at field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addReleasedAtField(array $options = [])
+    public function addReleasedAtField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'    => 'ekyna_product.product.field.released_at',
-            'format'   => 'dd/MM/yyyy',
+            'label'    => t('product.field.released_at', [], 'EkynaProduct'),
             'required' => false,
         ], $options);
 
@@ -464,12 +376,8 @@ class ProductFormBuilder
 
     /**
      * Adds the seo field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addSeoField(array $options = [])
+    public function addSeoField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
             'label'    => false,
@@ -483,24 +391,20 @@ class ProductFormBuilder
 
     /**
      * Adds the special offers field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addSpecialOffersField(array $options = [])
+    public function addSpecialOffersField(array $options = []): ProductFormBuilder
     {
         if (in_array($this->product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE])) {
-            throw new InvalidArgumentException("Unexpected product type.");
+            throw new InvalidArgumentException('Unexpected product type.');
         }
 
         $options = array_replace([
-            'label'           => 'ekyna_product.special_offer.label.plural',
+            'label'           => t('special_offer.label.plural', [], 'EkynaProduct'),
             'entry_type'      => PR\SpecialOffer\SpecialOfferType::class,
             'entry_options'   => ['product_mode' => true],
             'allow_add'       => true,
             'allow_delete'    => true,
-            'add_button_text' => 'ekyna_product.special_offer.button.add',
+            'add_button_text' => t('special_offer.button.add', [], 'EkynaProduct'),
             'required'        => false,
         ], $options);
 
@@ -511,18 +415,9 @@ class ProductFormBuilder
 
     /**
      * Adds the tags field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addTagsField(array $options = [])
+    public function addTagsField(array $options = []): ProductFormBuilder
     {
-        $options = array_replace([
-            'multiple' => true,
-            'required' => false,
-        ], $options);
-
         $this->form->add('tags', TagChoiceType::class, $options);
 
         return $this;
@@ -530,12 +425,8 @@ class ProductFormBuilder
 
     /**
      * Adds the translations field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addTranslationsField(array $options = [])
+    public function addTranslationsField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
             'form_type'      => PR\ProductTranslationType::class,
@@ -554,12 +445,8 @@ class ProductFormBuilder
 
     /**
      * Adds the variable field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addVariableField(array $options = [])
+    public function addVariableField(array $options = []): ProductFormBuilder
     {
         ProductTypes::assertVariant($this->product);
 
@@ -577,15 +464,11 @@ class ProductFormBuilder
 
     /**
      * Adds the visible field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addVisibleField(array $options = [])
+    public function addVisibleField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'    => 'ekyna_core.field.visible',
+            'label'    => t('field.visible', [], 'EkynaUi'),
             'required' => false,
             'attr'     => [
                 'align_with_widget' => true,
@@ -599,58 +482,46 @@ class ProductFormBuilder
 
     /**
      * Adds the visibility field.
-     *
-     * @param array $options
-     *
-     * @return self
      */
-    public function addVisibilityField(array $options = [])
+    public function addVisibilityField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label' => 'ekyna_product.common.visibility',
+            'label' => t('common.visibility', [], 'EkynaProduct'),
         ], $options);
 
-        $this->form->add('visibility', SF\NumberType::class, $options);
+        $this->form->add('visibility', SF\IntegerType::class, $options);
 
         return $this;
     }
 
     /**
-     * Adds the best seller field.
-     *
-     * @param array $options
-     *
-     * @return self
+     * Adds the best-seller field.
      */
-    public function addBestSellerField(array $options = [])
+    public function addBestSellerField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'   => 'ekyna_product.product.field.best_seller',
-            'choices' => HighlightModes::getChoices(),
+            'label'   => t('product.field.best_seller', [], 'EkynaProduct'),
+            'class'   => HighlightModes::class,
             'select2' => false,
         ], $options);
 
-        $this->form->add('bestSeller', SF\ChoiceType::class, $options);
+        $this->form->add('bestSeller', ConstantChoiceType::class, $options);
 
         return $this;
     }
 
     /**
-     * Adds the cross selling field.
-     *
-     * @param array $options
-     *
-     * @return self
+     * Adds the cross-selling field.
      */
-    public function addCrossSellingField(array $options = [])
+    public function addCrossSellingField(array $options = []): ProductFormBuilder
     {
         $options = array_replace([
-            'label'   => 'ekyna_product.product.field.cross_selling',
-            'choices' => HighlightModes::getChoices(),
+            'label'   => t('product.field.cross_selling', [], 'EkynaProduct'),
+            'class'   => HighlightModes::class,
             'select2' => false,
         ], $options);
 
-        $this->form->add('crossSelling', SF\ChoiceType::class, $options);
+        $this->form->add('crossSelling', ConstantChoiceType::class, $options);
 
         return $this;
     }

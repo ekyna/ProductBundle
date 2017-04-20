@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\DataFixtures;
 
-use Ekyna\Bundle\MediaBundle\Entity\MediaRepository;
+use Ekyna\Bundle\MediaBundle\Model\MediaInterface;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\MediaBundle\Repository\MediaRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMedia;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -17,24 +20,10 @@ use Fidry\AliceDataFixtures\ProcessorInterface;
  */
 class ProductProcessor implements ProcessorInterface
 {
-    /**
-     * @var ExternalReferenceGenerator
-     */
-    private $generator;
+    private ExternalReferenceGenerator $generator;
+    private MediaRepositoryInterface $mediaRepository;
 
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ExternalReferenceGenerator $generator
-     * @param MediaRepository            $mediaRepository
-     */
-    public function __construct(ExternalReferenceGenerator $generator, MediaRepository $mediaRepository)
+    public function __construct(ExternalReferenceGenerator $generator, MediaRepositoryInterface $mediaRepository)
     {
         $this->generator       = $generator;
         $this->mediaRepository = $mediaRepository;
@@ -56,7 +45,13 @@ class ProductProcessor implements ProcessorInterface
             return;
         }
 
-        $this->generator->generateGtin13($product);
+        if (ProductTypes::isChildType($product) && $product->getPackageWeight()->isZero()) {
+            $product->setPackageWeight($product->getWeight()->add('0.1'));
+        }
+
+        if ($product->getReference() !== 'HUB') {
+            $this->generator->generateGtin13($product);
+        }
 
         // TODO manufacturer code
 
@@ -70,6 +65,7 @@ class ProductProcessor implements ProcessorInterface
      */
     public function generateProductMedias(ProductInterface $product)
     {
+        /** @var array<MediaInterface> $images */
         $images = $this->mediaRepository->findRandomBy(['type' => MediaTypes::IMAGE], rand(2, 4));
 
         foreach ($images as $image) {

@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductSlideBlockType
@@ -14,14 +18,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class ProductSlideBlockType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('max_width', Type\TextType::class, [
-                'label'       => 'ekyna_cms.block.field.max_width',
+                'label'       => t('block.field.max_width', [], 'EkynaCms'),
                 'required'    => false,
                 'constraints' => [
                     new Assert\Regex([
@@ -31,8 +32,8 @@ class ProductSlideBlockType extends AbstractType
                 ],
             ])
             ->add('duration', Type\IntegerType::class, [
-                'label'    => 'ekyna_cms.block.field.duration',
-                'required' => false,
+                'label'       => t('block.field.duration', [], 'EkynaCms'),
+                'required'    => false,
                 'constraints' => [
                     new Assert\Range([
                         'min' => 1000,

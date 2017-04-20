@@ -1,16 +1,16 @@
-{% block widget_attributes -%}{% for key, value in attr %} {{ key }}="{{ value }}"{% endfor -%}{% endblock widget_attributes %}
+{% use '@EkynaAdmin/Show/show_div_layout.html.twig' %}
 
-{% block attribute_config_widget %}
-{% apply spaceless %}
+{% block product_attribute_config_widget -%}
+{% apply spaceless -%}
     {% set attr = attr|merge({'class': ('show-widget show-widget-block ' ~ attr.class|default(''))|trim }) %}
     <div{{ block('widget_attributes') }}>
         {% if value is empty -%}
-            <em>{{ 'ekyna_core.value.none'|trans }}</em>
+            <em>{{ 'value.none'|trans({}, 'EkynaUi') }}</em>
         {%- else -%}
             {% for config in value -%}
                 {{ show_row(config.value, config.type, config.options) }}
             {%- endfor %}
         {%- endif %}
     </div>
-{% endapply %}
-{% endblock attribute_config_widget %}
+{%- endapply %}
+{%- endblock product_attribute_config_widget %}

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class OptionValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate($option, Constraint $constraint)
     {

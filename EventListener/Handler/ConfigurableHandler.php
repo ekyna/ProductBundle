@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -9,7 +11,6 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\ConfigurableUpdater;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
  * Class ConfigurableHandler
@@ -18,56 +19,23 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class ConfigurableHandler extends AbstractHandler
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    private $persistenceHelper;
+    private PriceCalculator              $priceCalculator;
+    private PriceInvalidator             $priceInvalidator;
+    private StockSubjectUpdaterInterface $stockUpdater;
 
-    /**
-     * @var PriceCalculator
-     */
-    private $priceCalculator;
+    private ?ConfigurableUpdater $configurableUpdater = null;
 
-    /**
-     * @var PriceInvalidator
-     */
-    private $priceInvalidator;
-
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    private $stockUpdater;
-
-    /**
-     * @var ConfigurableUpdater
-     */
-    private $configurableUpdater;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface   $persistenceHelper
-     * @param PriceCalculator              $priceCalculator
-     * @param PriceInvalidator             $priceInvalidator
-     * @param StockSubjectUpdaterInterface $stockUpdater
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        PriceCalculator $priceCalculator,
-        PriceInvalidator $priceInvalidator,
+        PriceCalculator              $priceCalculator,
+        PriceInvalidator             $priceInvalidator,
         StockSubjectUpdaterInterface $stockUpdater
     ) {
-        $this->persistenceHelper = $persistenceHelper;
         $this->priceCalculator = $priceCalculator;
         $this->priceInvalidator = $priceInvalidator;
         $this->stockUpdater = $stockUpdater;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function handleInsert(ResourceEventInterface $event)
+    public function handleInsert(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
@@ -75,15 +43,10 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateMinPrice($bundle);
-
-        return $changed;
+        return $updater->updateMinPrice($bundle) || $changed;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function handleUpdate(ResourceEventInterface $event)
+    public function handleUpdate(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
@@ -91,15 +54,10 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateMinPrice($bundle);
-
-        return $changed;
+        return $updater->updateMinPrice($bundle) || $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildPriceChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
@@ -108,30 +66,19 @@ class ConfigurableHandler extends AbstractHandler
         return $this->getConfigurableUpdater()->updateMinPrice($bundle);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function handleChildStockChange(ResourceEventInterface $event)
+    public function handleChildStockChange(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
         return $this->stockUpdater->update($bundle);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function supports(ProductInterface $product)
+    public function supports(ProductInterface $product): bool
     {
         return $product->getType() === ProductTypes::TYPE_CONFIGURABLE;
     }
 
-    /**
-     * Returns the configurable updater.
-     *
-     * @return ConfigurableUpdater
-     */
-    protected function getConfigurableUpdater()
+    protected function getConfigurableUpdater(): ConfigurableUpdater
     {
         if (null !== $this->configurableUpdater) {
             return $this->configurableUpdater;

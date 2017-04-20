@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
@@ -16,10 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductEntryType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('product', ProductSearchType::class, [
@@ -36,10 +35,7 @@ class ProductEntryType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => ProductEntry::class,

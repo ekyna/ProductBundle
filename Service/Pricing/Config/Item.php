@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
+
+use Decimal\Decimal;
 
 /**
  * Class Item
@@ -9,118 +13,53 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
  */
 class Item
 {
-    /**
-     * @var float
-     */
-    protected $netPrice;
+    protected Decimal $netPrice;
+    protected Decimal $quantity;
+    protected bool    $visible = true;
+    protected array   $offers  = [];
 
-    /**
-     * @var float
-     */
-    protected $quantity;
-
-    /**
-     * @var bool
-     */
-    protected $visible = true;
-
-    /**
-     * @var array
-     */
-    protected $offers = [];
-
-
-    /**
-     * Constructor.
-     *
-     * @param float $netPrice
-     * @param float $quantity
-     */
-    public function __construct(float $netPrice = 0.0, float $quantity = 1.0)
+    public function __construct(Decimal $netPrice = null, Decimal $quantity = null)
     {
-        $this->netPrice = $netPrice;
-        $this->quantity = $quantity;
+        $this->netPrice = $netPrice ?: new Decimal(0);
+        $this->quantity = $quantity ?: new Decimal(1);
     }
 
-    /**
-     * Returns the net price.
-     *
-     * @return float
-     */
-    public function getNetPrice(): float
+    public function getNetPrice(): Decimal
     {
         return $this->netPrice;
     }
 
-    /**
-     * Sets the net price.
-     *
-     * @param float $price
-     *
-     * @return $this
-     */
-    public function setNetPrice(float $price): self
+    public function setNetPrice(Decimal $price): self
     {
         $this->netPrice = $price;
 
         return $this;
     }
 
-    /**
-     * Adds the net price.
-     *
-     * @param float $price
-     *
-     * @return $this
-     */
-    public function addNetPrice(float $price): self
+    public function addNetPrice(Decimal $price): self
     {
         $this->netPrice += $price;
 
         return $this;
     }
 
-    /**
-     * Returns the quantity.
-     *
-     * @return float
-     */
-    public function getQuantity(): float
+    public function getQuantity(): Decimal
     {
         return $this->quantity;
     }
 
-    /**
-     * Sets the quantity.
-     *
-     * @param float $quantity
-     *
-     * @return $this
-     */
-    public function setQuantity(float $quantity): self
+    public function setQuantity(Decimal $quantity): self
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * Returns the visible.
-     *
-     * @return bool
-     */
     public function getVisible(): bool
     {
         return $this->visible;
     }
 
-    /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return $this
-     */
     public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
@@ -128,30 +67,18 @@ class Item
         return $this;
     }
 
-    /**
-     * Returns the offers.
-     *
-     * @return array
-     */
     public function getOffers(): array
     {
         return $this->offers;
     }
 
-    /**
-     * Returns the offer corresponding to the given key.
-     *
-     * @param string $key
-     *
-     * @return array|null
-     */
     public function getOffer(string $key): ?array
     {
-        list($group, $country) = explode('-', $key);
+        [$group, $country] = explode('-', $key);
 
         $keys = array_unique([$key, '0-' . $country, $group . '-0', '0-0']);
 
-        foreach($keys as $k) {
+        foreach ($keys as $k) {
             if (isset($this->offers[$k])) {
                 return $this->offers[$k];
             }
@@ -160,13 +87,6 @@ class Item
         return null;
     }
 
-    /**
-     * Sets the offers.
-     *
-     * @param array $offers
-     *
-     * @return $this
-     */
     public function setOffers(array $offers): self
     {
         $this->offers = $offers;

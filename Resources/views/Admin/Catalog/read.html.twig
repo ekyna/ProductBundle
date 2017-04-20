@@ -1,0 +1,37 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block main_actions -%}
+    {{ admin_resource_btn(catalog, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Catalog\\RenderAction') }}
+    {{ parent() }}
+{%- endblock main_actions %}
+
+{% block main_tabs -%}
+    {{ parent() }}
+    <li>
+        <a href="#{{ resource_name }}-composition" data-toggle="tab">
+            {{ 'product.field.composition'|trans({}, 'EkynaProduct') }}
+        </a>
+    </li>
+{%- endblock main_tabs %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {{ show_row(catalog.title, 'text', {
+            'label': t('field.title', [], 'EkynaUi')
+        }) }}
+        {{ show_row(catalog|catalog_theme_label|trans({}, 'EkynaProduct'), 'text', {
+            'label': t('field.theme', [], 'EkynaUi')
+        }) }}
+        {{ show_row(catalog.description, 'textarea', {
+            'label': t('field.description', [], 'EkynaUi'),
+            'html': true
+        }) }}
+    </div>
+    <div class="tab-pane" id="{{ resource_name }}-composition">
+    {% for page in catalog.pages -%}
+        <h4>Page {{ loop.index }} <small>{{ page|catalog_page_template_label|trans({}, 'EkynaProduct') }}</small></h4>
+        {% include page|catalog_page_template_path('show') %}
+        <hr>
+    {%- endfor %}
+    </div>
+{%- endblock main_contents %}

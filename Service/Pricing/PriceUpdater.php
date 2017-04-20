@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
-use Doctrine\ORM\EntityManager;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
+use Ekyna\Component\Commerce\Common\Model\CountryInterface;
+use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Factory\ResourceFactoryInterface;
 
 /**
  * Class PriceUpdater
@@ -16,57 +22,26 @@ use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
  */
 class PriceUpdater
 {
-    /**
-     * @var EntityManager
-     */
-    protected $manager;
+    protected EntityManagerInterface   $manager;
+    protected OfferResolver            $offerResolver;
+    protected ResourceFactoryInterface $priceFactory;
+    protected PriceRepositoryInterface $priceRepository;
+    protected PriceInvalidator         $priceInvalidator;
+    protected string                   $customerGroupClass;
+    protected string                   $countryClass;
 
-    /**
-     * @var OfferResolver
-     */
-    protected $offerResolver;
-
-    /**
-     * @var PriceRepositoryInterface
-     */
-    protected $priceRepository;
-
-    /**
-     * @var PriceInvalidator
-     */
-    protected $priceInvalidator;
-
-    /**
-     * @var string
-     */
-    protected $customerGroupClass;
-
-    /**
-     * @var string
-     */
-    protected $countryClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param EntityManager            $manager
-     * @param OfferResolver            $offerResolver
-     * @param PriceRepositoryInterface $priceRepository
-     * @param PriceInvalidator         $priceInvalidator
-     * @param string                   $customerGroupClass
-     * @param string                   $countryClass
-     */
     public function __construct(
-        EntityManager $manager,
-        OfferResolver $offerResolver,
+        EntityManagerInterface   $manager,
+        OfferResolver            $offerResolver,
+        ResourceFactoryInterface $priceFactory,
         PriceRepositoryInterface $priceRepository,
-        PriceInvalidator $priceInvalidator,
-        string $customerGroupClass,
-        string $countryClass
+        PriceInvalidator         $priceInvalidator,
+        string                   $customerGroupClass,
+        string                   $countryClass
     ) {
         $this->manager = $manager;
         $this->offerResolver = $offerResolver;
+        $this->priceFactory = $priceFactory;
         $this->priceRepository = $priceRepository;
         $this->priceInvalidator = $priceInvalidator;
         $this->customerGroupClass = $customerGroupClass;
@@ -75,8 +50,6 @@ class PriceUpdater
 
     /**
      * Updates the product offers.
-     *
-     * @param Model\ProductInterface $product
      *
      * @return bool Whether this product offers has been updated
      */
@@ -97,16 +70,12 @@ class PriceUpdater
                 return $this->updateConfigurableProduct($product);
 
             default:
-                throw new InvalidArgumentException("Unexpected product type.");
+                throw new InvalidArgumentException('Unexpected product type.');
         }
     }
 
     /**
      * Updates child product.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function updateChildProduct(Model\ProductInterface $product): bool
     {
@@ -131,10 +100,6 @@ class PriceUpdater
 
     /**
      * Update the given variable product's offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function updateVariableProduct(Model\ProductInterface $product): bool
     {
@@ -168,10 +133,6 @@ class PriceUpdater
 
     /**
      * Update the given bundle product's offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function updateBundleProduct(Model\ProductInterface $product): bool
     {
@@ -196,10 +157,6 @@ class PriceUpdater
 
     /**
      * Update the given configurable product's offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return bool
      */
     protected function updateConfigurableProduct(Model\ProductInterface $product): bool
     {
@@ -208,11 +165,6 @@ class PriceUpdater
 
     /**
      * Updates the given product prices.
-     *
-     * @param Model\ProductInterface $product
-     * @param array                  $newPrices
-     *
-     * @return bool
      */
     protected function update(Model\ProductInterface $product, array $newPrices): bool
     {
@@ -230,14 +182,15 @@ class PriceUpdater
         // Delete old prices.
         $qb = $this->manager->createQueryBuilder();
         $qb
-            ->delete(Price::class, 'p')
+            ->delete($this->priceRepository->getClassName(), 'p')
             ->where($qb->expr()->eq('p.product', ':product'))
             ->getQuery()
             ->execute(['product' => $product]);
 
-        // Creates prices
+        // Create prices
         foreach ($newPrices as $data) {
-            $price = new Price();
+            /** @var Price $price */
+            $price = $this->priceFactory->create();
             $price
                 ->setProduct($product)
                 ->setStartingFrom($data['starting_from'])
@@ -245,16 +198,16 @@ class PriceUpdater
                 ->setSellPrice($data['sell_price'])
                 ->setPercent($data['percent'])
                 ->setDetails($data['details'])
-                ->setEndsAt($data['ends_at'] ? new \DateTime($data['ends_at']) : null);
+                ->setEndsAt($data['ends_at'] ? new DateTime($data['ends_at']) : null);
 
             if (!is_null($data['group_id'])) {
-                /** @var \Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface $group */
+                /** @var CustomerGroupInterface $group */
                 $group = $this->manager->getReference($this->customerGroupClass, $data['group_id']);
                 $price->setGroup($group);
             }
 
             if (!is_null($data['country_id'])) {
-                /** @var \Ekyna\Component\Commerce\Common\Model\CountryInterface $country */
+                /** @var CountryInterface $country */
                 $country = $this->manager->getReference($this->countryClass, $data['country_id']);
                 $price->setCountry($country);
             }
@@ -273,10 +226,6 @@ class PriceUpdater
 
     /**
      * Resolves the product offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
      */
     protected function resolvePrices(Model\ProductInterface $product): array
     {
@@ -293,11 +242,6 @@ class PriceUpdater
 
     /**
      * Returns whether new and old prices are different.
-     *
-     * @param array $oldPrices
-     * @param array $newPrices
-     *
-     * @return bool
      */
     protected function hasDiff(array $oldPrices, array $newPrices): bool
     {
@@ -335,10 +279,6 @@ class PriceUpdater
 
     /**
      * Returns the price key (<group_id>-<country_id>).
-     *
-     * @param array $price
-     *
-     * @return string
      */
     protected function getPriceKey(array $price): string
     {

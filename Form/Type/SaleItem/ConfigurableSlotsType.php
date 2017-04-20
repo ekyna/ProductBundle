@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Doctrine\Common\Collections\Collection;
@@ -18,42 +20,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ConfigurableSlotsType extends Form\AbstractType
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     */
     public function __construct(ItemBuilder $itemBuilder)
     {
         $this->itemBuilder = $itemBuilder;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildForm(Form\FormBuilderInterface $builder, array $options)
+    public function buildForm(Form\FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new ConfigurableSlotsListener($this->itemBuilder));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['attr']['name'] = $view->vars['full_name'];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -64,10 +48,7 @@ class ConfigurableSlotsType extends Form\AbstractType
             ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'sale_item_configurable_slots';
     }

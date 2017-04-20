@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface;
@@ -17,19 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ResupplyOrderType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['full_name'] = 'supplierOrder';
         $view->vars['supplierOrder'] = $options['supplier_order'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('supplier_order', null)
@@ -39,23 +35,17 @@ class ResupplyOrderType extends AbstractType
                     return $supplierOrder->getId();
                 }
 
-                return null;
+                return '0';
             })
             ->setAllowedTypes('supplier_order', ['null', SupplierOrderInterface::class]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_inventory_resupply_order';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return RadioType::class;
     }

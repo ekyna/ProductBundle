@@ -1,31 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\CrossSelling;
 
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class CrossSellingType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\CrossSelling
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CrossSellingType extends ResourceFormType
+class CrossSellingType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['collection']) {
             $builder->add('position', CollectionPositionType::class);
         } else {
             $builder->add('source', ProductSearchType::class, [
-                'label' => 'ekyna_product.cross_selling.field.source',
+                'label'    => t('cross_selling.field.source', [], 'EkynaProduct'),
                 'required' => true,
                 'types'    => [
                     ProductTypes::TYPE_SIMPLE,
@@ -37,7 +38,7 @@ class CrossSellingType extends ResourceFormType
         }
 
         $builder->add('target', ProductSearchType::class, [
-            'label' => 'ekyna_product.cross_selling.field.target',
+            'label'    => t('cross_selling.field.target', [], 'EkynaProduct'),
             'required' => true,
             'types'    => [
                 ProductTypes::TYPE_SIMPLE,
@@ -48,20 +49,14 @@ class CrossSellingType extends ResourceFormType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver->setDefault('collection', false);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_cross_selling';
     }

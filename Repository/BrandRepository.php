@@ -1,25 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\ORM\Query\Expr;
-use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
+use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
 
 /**
  * Class BrandRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BrandRepository extends TranslatableResourceRepository
+class BrandRepository extends TranslatableRepository implements BrandRepositoryInterface
 {
-    /**
-     * Finds the brand by slug.
-     *
-     * @param string $slug
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\BrandInterface|null
-     */
-    public function findOneBySlug($slug)
+    public function findOneBySlug(string $slug): ?BrandInterface
     {
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
@@ -33,7 +29,6 @@ class BrandRepository extends TranslatableResourceRepository
             ->addSelect($as, 't', 's', 's_t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq('t.slug', ':slug'))
-            ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
             // TODO ->enableResultCache(3600, Brand::getEntityTagPrefix() . '[slug=' . $slug . ']')
@@ -44,10 +39,7 @@ class BrandRepository extends TranslatableResourceRepository
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'b';
     }

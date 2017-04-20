@@ -6,6 +6,7 @@ use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Event\PriceEvents;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Model\PriceInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
@@ -63,7 +64,7 @@ class PriceListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      *
-     * @return Price
+     * @return PriceInterface
      */
     public function onChange(ResourceEventInterface $event)
     {
@@ -123,7 +124,7 @@ class PriceListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      *
-     * @return Price
+     * @return PriceInterface
      */
     protected function getPriceFromEvent(ResourceEventInterface $event)
     {

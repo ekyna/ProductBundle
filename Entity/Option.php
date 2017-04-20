@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
 use Ekyna\Component\Resource\Model as RM;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
@@ -15,57 +17,22 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  *
  * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
  *
- * @TODO Rename to 'OptionValue' or 'OptionChoice'
+ * @TODO    Rename to 'OptionValue' or 'OptionChoice'
  */
 class Option extends RM\AbstractTranslatable implements Model\OptionInterface, GroupSequenceProviderInterface
 {
     use RM\SortableTrait;
     use TaxableTrait;
 
-    /**
-     * @var integer
-     */
-    protected $id;
+    protected ?int                        $id          = null;
+    protected ?Model\OptionGroupInterface $group       = null;
+    protected ?Model\ProductInterface     $product     = null;
+    protected bool                        $cascade     = false;
+    protected ?string                     $designation = null;
+    protected ?string                     $reference   = null;
+    protected ?Decimal                    $weight      = null;
+    protected ?Decimal                    $netPrice    = null;
 
-    /**
-     * @var Model\OptionGroupInterface
-     */
-    protected $group;
-
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $product;
-
-    /**
-     * @var bool
-     */
-    protected $cascade = false;
-
-    /**
-     * @var string
-     */
-    protected $designation;
-
-    /**
-     * @var string
-     */
-    protected $reference;
-
-    /**
-     * @var float
-     */
-    protected $weight;
-
-    /**
-     * @var float
-     */
-    protected $netPrice;
-
-
-    /**
-     * Clones the option.
-     */
     public function __clone()
     {
         parent::__clone();
@@ -74,177 +41,117 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
         $this->group = null;
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->designation ?: 'New option';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getGroup()
+    public function getGroup(): ?Model\OptionGroupInterface
     {
         return $this->group;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setGroup(Model\OptionGroupInterface $group = null)
+    public function setGroup(?Model\OptionGroupInterface $group): Model\OptionInterface
     {
-        if ($this->group !== $group) {
-            if ($previous = $this->group) {
-                $this->group = null;
-                $previous->removeOption($this);
-            }
+        if ($this->group === $group) {
+            return $this;
+        }
 
-            if ($this->group = $group) {
-                $this->group->addOption($this);
-            }
+        if ($previous = $this->group) {
+            $this->group = null;
+            $previous->removeOption($this);
+        }
+
+        if ($this->group = $group) {
+            $this->group->addOption($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setProduct(Model\ProductInterface $product = null)
+    public function setProduct(?Model\ProductInterface $product): Model\OptionInterface
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * Returns whether option product's options should be added to the form (add to sale)..
-     *
-     * @return bool
-     */
-    public function isCascade()
+    public function isCascade(): bool
     {
         return $this->cascade;
     }
 
-    /**
-     * Sets whether option product's options should be added to the form (add to sale).
-     *
-     * @param bool $cascade
-     *
-     * @return Option
-     */
-    public function setCascade(bool $cascade)
+    public function setCascade(bool $cascade): Model\OptionInterface
     {
         $this->cascade = $cascade;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDesignation()
+    public function getDesignation(): ?string
     {
         return $this->designation;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setDesignation($designation)
+    public function setDesignation(?string $designation): Model\OptionInterface
     {
         $this->designation = $designation;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getReference()
+    public function getReference(): ?string
     {
         return $this->reference;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setReference($reference)
+    public function setReference(?string $reference): Model\OptionInterface
     {
         $this->reference = $reference;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): Model\OptionInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getWeight()
+    public function getWeight(): ?Decimal
     {
         return $this->weight;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setWeight($weight)
+    public function setWeight(?Decimal $weight): Model\OptionInterface
     {
         $this->weight = $weight;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getNetPrice()
+    public function getNetPrice(): ?Decimal
     {
         return $this->netPrice;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setNetPrice($netPrice = null)
+    public function setNetPrice(?Decimal $netPrice): Model\OptionInterface
     {
         $this->netPrice = $netPrice;
 
@@ -256,7 +163,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      *
      * @return string
      */
-    public function getMode()
+    public function getMode(): string
     {
         return null !== $this->product ? 'product' : 'data';
     }
@@ -266,7 +173,9 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      *
      * @param $mode
      */
-    public function setMode($mode) {/* Do nothing. */}
+    public function setMode($mode): void
+    {
+    }
 
     /**
      * @inheritDoc
@@ -284,9 +193,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
         return $groups;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function getTranslationClass(): string
     {
         return OptionTranslation::class;

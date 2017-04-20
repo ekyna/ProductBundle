@@ -2,14 +2,14 @@
 
 {% block account %}
 {% apply spaceless %}
-    <h3>{{ 'ekyna_product.account.catalog.title'|trans|raw }}</h3>
+    <h3>{{ 'account.catalog.title'|trans({}, 'EkynaProduct')|trans|raw }}</h3>
     <hr>
     {% include '@EkynaProduct/Account/Catalog/_list.html.twig' with {
         'catalogs': catalogs, 'customer': customer
     } only %}
     <p class="text-center">
-        <a href="{{ path('ekyna_product_account_catalog_new') }}" class="btn btn-sm btn-primary">
-            {{ 'ekyna_product.account.catalog.new.title'|trans }}
+        <a href="{{ path('ekyna_product_account_catalog_create') }}" class="btn btn-sm btn-primary">
+            {{ 'account.catalog.new.title'|trans({}, 'EkynaProduct')|trans }}
         </a>
     </p>
 {% endapply %}

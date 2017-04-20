@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute;
 
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+
+use function array_key_exists;
 
 /**
  * Class AttributeTypeRegistry
@@ -11,36 +15,13 @@ use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
  */
 class AttributeTypeRegistry implements AttributeTypeRegistryInterface
 {
-    /**
-     * @var Type\TypeInterface[]
-     */
-    private $types;
+    /** @var array<string, Type\TypeInterface> */
+    private array $types = [];
 
-    /**
-     * @var array
-     */
-    private $choices;
-
-
-    /**
-     * Constructor.
-     *
-     * @param Type\TypeInterface[] $types
-     */
-    public function __construct(array $types = [])
+    public function registerType(Type\TypeInterface $type): self
     {
-        $this->types = [];
+        $name = $type::getName();
 
-        foreach ($types as $name => $type) {
-            $this->registerType($name, $type);
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function registerType($name, Type\TypeInterface $type)
-    {
         if ($this->hasType($name)) {
             throw new InvalidArgumentException("Attribute type '$name' is already registered.");
         }
@@ -50,18 +31,12 @@ class AttributeTypeRegistry implements AttributeTypeRegistryInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function hasType($name)
+    public function hasType(string $name): bool
     {
-        return isset($this->types[$name]);
+        return array_key_exists($name, $this->types);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getType($name)
+    public function getType(string $name): Type\TypeInterface
     {
         if (!$this->hasType($name)) {
             throw new InvalidArgumentException("Attribute type '$name' is not registered.");
@@ -70,28 +45,7 @@ class AttributeTypeRegistry implements AttributeTypeRegistryInterface
         return $this->types[$name];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getChoices()
-    {
-        if (null !== $this->choices) {
-            return $this->choices;
-        }
-
-        $this->choices = [];
-
-        foreach ($this->types as $name => $type) {
-            $this->choices[$type->getLabel()] = $name;
-        }
-
-        return $this->choices;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->types;
     }

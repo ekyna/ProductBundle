@@ -1,56 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerAwareTrait;
+use Ekyna\Component\Resource\Bridge\Symfony\Serializer\ResourceNormalizer;
+use Exception;
 
 /**
  * Class ProductReferenceNormalizer
  * @package Ekyna\Bundle\ProductBundle\Service\Serializer
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductReferenceNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+class ProductReferenceNormalizer extends ResourceNormalizer
 {
-    use SerializerAwareTrait;
-
     /**
-     * @inheritdoc
+     * @inheritDoc
      *
-     * @param Model\ProductReferenceInterface $reference
+     * @param Model\ProductReferenceInterface $object
      */
-    public function normalize($reference, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = [])
     {
         return [
-            'id'   => $reference->getId(),
-            'type' => $reference->getType(),
-            'code' => $reference->getCode(),
+            'id'   => $object->getId(),
+            'type' => $object->getType(),
+            'code' => $object->getCode(),
         ];
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
-        throw new \Exception('Not yet implemented');
+        throw new Exception('Not yet implemented');
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return $data instanceof Model\ProductReferenceInterface;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return class_exists($type) && is_subclass_of($type, Model\ProductReferenceInterface::class);
     }

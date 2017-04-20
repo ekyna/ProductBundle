@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Supplier\SupplierChoiceType;
@@ -9,12 +11,15 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
 use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Repository\BrandRepository;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
-use Ekyna\Component\Table\Bridge\Doctrine\ORM\Form\IdToObjectTransformer;
+use Ekyna\Bundle\ResourceBundle\Form\DataTransformer\IdentifierToResourceTransformer;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class InventoryType
@@ -23,33 +28,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InventoryType extends AbstractType
 {
-    /**
-     * @var BrandRepository
-     */
-    private $brandRepository;
+    private BrandRepository             $brandRepository;
+    private ResourceRepositoryInterface $supplierRepository;
 
-    /**
-     * @var ResourceRepository
-     */
-    private $supplierRepository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param BrandRepository    $brandRepository
-     * @param ResourceRepository $supplierRepository
-     */
-    public function __construct(BrandRepository $brandRepository, ResourceRepository $supplierRepository)
+    public function __construct(BrandRepository $brandRepository, ResourceRepositoryInterface $supplierRepository)
     {
         $this->brandRepository = $brandRepository;
         $this->supplierRepository = $supplierRepository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add(
@@ -58,7 +46,7 @@ class InventoryType extends AbstractType
                         'required' => false,
                         'select2'  => false,
                     ])
-                    ->addModelTransformer(new IdToObjectTransformer($this->brandRepository))
+                    ->addModelTransformer(new IdentifierToResourceTransformer($this->brandRepository))
             )
             ->add(
                 $builder
@@ -66,93 +54,94 @@ class InventoryType extends AbstractType
                         'required' => false,
                         'select2'  => false,
                     ])
-                    ->addModelTransformer(new IdToObjectTransformer($this->supplierRepository))
+                    ->addModelTransformer(new IdentifierToResourceTransformer($this->supplierRepository))
             )
             ->add('designation', Type\TextType::class, [
-                'label'    => 'ekyna_core.field.designation',
+                'label'    => t('field.designation', [], 'EkynaUi'),
                 'required' => false,
             ])
             ->add('reference', Type\TextType::class, [
-                'label'    => 'ekyna_core.field.reference',
+                'label'    => t('field.reference', [], 'EkynaUi'),
                 'required' => false,
             ])
             ->add('geocode', Type\TextType::class, [
-                'label'    => 'ekyna_commerce.field.geocode',
+                'label'    => t('field.geocode', [], 'EkynaCommerce'),
                 'required' => false,
             ])
             ->add('visible', Type\ChoiceType::class, [
-                'label'    => 'ekyna_core.field.visible',
-                'choices'  => [
-                    'ekyna_core.value.yes' => 1,
-                    'ekyna_core.value.no'  => 0,
+                'label'                     => t('field.visible', [], 'EkynaUi'),
+                'choices'                   => [
+                    'value.yes' => 1,
+                    'value.no'  => 0,
                 ],
-                'required' => false,
-                'select2'  => false,
+                'choice_translation_domain' => 'EkynaUi',
+                'required'                  => false,
+                'select2'                   => false,
             ])
             ->add('quoteOnly', Type\ChoiceType::class, [
-                'label'    => 'ekyna_commerce.stock_subject.field.quote_only',
-                'choices'  => [
-                    'ekyna_core.value.yes' => 1,
-                    'ekyna_core.value.no'  => 0,
+                'label'                     => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
+                'choices'                   => [
+                    'value.yes' => 1,
+                    'value.no'  => 0,
                 ],
-                'required' => false,
-                'select2'  => false,
+                'choice_translation_domain' => 'EkynaUi',
+                'required'                  => false,
+                'select2'                   => false,
             ])
             ->add('endOfLife', Type\ChoiceType::class, [
-                'label'    => 'ekyna_commerce.stock_subject.field.end_of_life',
-                'choices'  => [
-                    'ekyna_core.value.yes' => 1,
-                    'ekyna_core.value.no'  => 0,
+                'label'                     => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
+                'choices'                   => [
+                    'value.yes' => 1,
+                    'value.no'  => 0,
                 ],
+                'choice_translation_domain' => 'EkynaUi',
+                'required'                  => false,
+                'select2'                   => false,
+            ])
+            ->add('mode', ConstantChoiceType::class, [
+                'label'    => t('stock_subject.field.mode', [], 'EkynaCommerce'),
+                'class'    => StockSubjectModes::class,
                 'required' => false,
                 'select2'  => false,
             ])
-            ->add('mode', Type\ChoiceType::class, [
-                'label'    => 'ekyna_commerce.stock_subject.field.mode',
-                'choices'  => StockSubjectModes::getChoices(),
-                'required' => false,
-                'select2'  => false,
-            ])
-            ->add('state', Type\ChoiceType::class, [
-                'label'    => 'ekyna_commerce.stock_subject.field.state',
-                'choices'  => StockSubjectStates::getChoices(),
+            ->add('state', ConstantChoiceType::class, [
+                'label'    => t('stock_subject.field.state', [], 'EkynaCommerce'),
+                'class'    => StockSubjectStates::class,
                 'required' => false,
                 'select2'  => false,
             ])
             ->add('bookmark', Type\ChoiceType::class, [
-                'label'    => 'ekyna_product.inventory.field.bookmark',
-                'choices'  => [
-                    'ekyna_core.value.yes' => 1,
-                    'ekyna_core.value.no'  => 0,
+                'label'                     => t('inventory.field.bookmark', [], 'EkynaProduct'),
+                'choices'                   => [
+                    'value.yes' => 1,
+                    'value.no'  => 0,
                 ],
-                'required' => false,
-                'select2'  => false,
+                'choice_translation_domain' => 'EkynaUi',
+                'required'                  => false,
+                'select2'                   => false,
             ])
-            ->add('profile', Type\ChoiceType::class, [
-                'label'   => 'ekyna_product.inventory.field.profile',
-                'choices' => InventoryProfiles::getChoices(),
+            ->add('profile', ConstantChoiceType::class, [
+                'label'   => t('inventory.field.profile', [], 'EkynaProduct'),
+                'class'   => InventoryProfiles::class,
                 'select2' => false,
             ])
             ->add('sortBy', Type\HiddenType::class)
             ->add('sortDir', Type\HiddenType::class)
             ->add('submit', Type\SubmitType::class, [
-                'label' => 'ekyna_core.button.apply',
+                'label' => t('button.apply', [], 'EkynaUi'),
                 'attr'  => [
                     'class' => 'btn-sm',
                 ],
             ])
             ->add('reset', Type\ResetType::class, [
-                'label' => 'ekyna_core.button.reset',
+                'label' => t('button.reset', [], 'EkynaUi'),
                 'attr'  => [
                     'class' => 'btn-sm',
                 ],
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', InventoryContext::class);
     }

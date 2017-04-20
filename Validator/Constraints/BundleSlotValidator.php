@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class BundleSlotValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate($bundleSlot, Constraint $constraint)
     {

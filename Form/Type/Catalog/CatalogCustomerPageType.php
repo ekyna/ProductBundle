@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
-use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\HalfType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\SlotsType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -19,10 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CatalogCustomerPageType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('number', CollectionPositionType::class)
@@ -48,20 +46,14 @@ class CatalogCustomerPageType extends AbstractType
             }, 2048);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => CatalogPage::class,
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_catalog_page';
     }

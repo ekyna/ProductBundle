@@ -1,14 +1,14 @@
 {% apply spaceless %}
 <hr>
-{{- admin_resource_btn(product, 'invalidate_offers', {
+{{- admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\InvalidateOffersAction', {
     'theme': 'primary',
     'size': 'sm'
 }, {
     'class': ('pull-right' ~ (product.pendingOffers ? ' disabled' : ''))
 }) -}}
-<h3>{{ 'ekyna_product.offer.label.plural'|trans }}</h3>
+<h3>{{ 'offer.label.plural'|trans({}, 'EkynaProduct') }}</h3>
 <div class="show-product-offers">
-{% for list in offers_list %}
+{% for list in product|product_offer_list %}
     {% if loop.index0 % 3 == 0 %}
     <div class="row">
     {% endif %}
@@ -24,22 +24,22 @@
                     </tr>
                     {% for offer in list.offers %}
                     <tr>
-                        <td>{{ offer.minQuantity|localizednumber }}</td>
+                        <td>{{ offer.minQuantity|format_number }}</td>
                         <td>
-                            <strong>{{ offer.percent|localizednumber }}&nbsp;%</strong>
+                            <strong>{{ offer.percent|format_number }}&nbsp;%</strong>
                             ({%- for percent in offer.detailedPercents -%}
-                                {{ percent|localizednumber }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
+                                {{ percent|format_number }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
                             {%- endfor -%})
                         </td>
                         <td>
-                            <strong class="text-primary">{{ offer.netPrice|localizedcurrency(commerce_default_currency) }}</strong>
+                            <strong class="text-primary">{{ offer.netPrice|format_currency(commerce_default_currency) }}</strong>
                         </td>
                         <td>
                         {% if offer.specialOffer is not null -%}
                         {% if offer.specialOffer.product is null -%}
                             <a href="{{ admin_resource_path(offer.specialOffer) }}"
                                class="btn btn-xs btn-primary"
-                               title="{{ 'ekyna_product.special_offer.label.singular'|trans }}">
+                               title="{{ 'special_offer.label.singular'|trans({}, 'EkynaProduct') }}">
                                 <i class="fa fa-arrow-right"></i>
                             </a>
                         {% endif -%}
@@ -48,7 +48,7 @@
                         {% if offer.pricing.product is null -%}
                         <a href="{{ admin_resource_path(offer.pricing) }}"
                            class="btn btn-xs btn-default"
-                            title="{{ 'ekyna_product.pricing.label.singular'|trans }}">
+                            title="{{ 'pricing.label.singular'|trans({}, 'EkynaProduct') }}">
                             <i class="fa fa-arrow-right"></i>
                         </a>
                         {%- endif %}
@@ -63,7 +63,7 @@
     </div>
     {% endif %}
 {% else %}
-    <p><em>{{ 'ekyna_product.product.alert.no_offer'|trans }}</em></p>
+    <p><em>{{ 'product.alert.no_offer'|trans({}, 'EkynaProduct') }}</em></p>
 {% endfor %}
 </div>
 {% endapply %}

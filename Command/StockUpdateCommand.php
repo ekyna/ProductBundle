@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,38 +27,16 @@ class StockUpdateCommand extends AbstractStockCommand
 {
     protected static $defaultName = 'ekyna:product:stock:update';
 
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    private $updater;
+    private StockSubjectUpdaterInterface $updater;
+    private EntityManagerInterface       $manager;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
+    private ?Query $query = null;
+    private int    $id;
 
-    /**
-     * @var Query
-     */
-    private $query;
-
-    /**
-     * @var int
-     */
-    private $id;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface   $repository
-     * @param StockSubjectUpdaterInterface $updater
-     * @param EntityManagerInterface       $manager
-     */
     public function __construct(
-        ProductRepositoryInterface $repository,
+        ProductRepositoryInterface   $repository,
         StockSubjectUpdaterInterface $updater,
-        EntityManagerInterface $manager
+        EntityManagerInterface       $manager
     ) {
         parent::__construct($repository);
 
@@ -62,46 +44,39 @@ class StockUpdateCommand extends AbstractStockCommand
         $this->manager = $manager;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function configure()
     {
         $this
-            ->setDescription("Updates the product stock.")
+            ->setDescription('Updates the product stock.')
             ->addArgument('id', InputArgument::OPTIONAL, "The product's id to update.");
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (0 < $id = (int)$input->getArgument('id')) {
             if (!$product = $this->findProduct($id)) {
-                $output->writeln("<error>No product found</error>");
+                $output->writeln('<error>No product found</error>');
 
-                return 1;
+                return Command::FAILURE;
             }
 
             if (!$this->doUpdate($output, $product)) {
-                $output->writeln('<info>Product is Up to date.</info>');
+                $output->writeln('<info>Product is up-to-date.</info>');
             }
 
-            return 0;
-
+            return Command::SUCCESS;
         }
 
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion('Update all products ?', false);
 
         if (!$helper->ask($input, $output, $question)) {
-            return 0;
+            return Command::SUCCESS;
         }
 
         $this->updateAll($output);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getQuery(): Query
@@ -111,7 +86,7 @@ class StockUpdateCommand extends AbstractStockCommand
         }
 
         if (!$this->repository instanceof EntityRepository) {
-            throw new \LogicException("Expected instance of " . EntityRepository::class);
+            throw new UnexpectedTypeException($this->repository, EntityRepository::class);
         }
 
         $qb = $this->repository->createQueryBuilder('p');
@@ -125,21 +100,6 @@ class StockUpdateCommand extends AbstractStockCommand
             ->getQuery();
 
         return $this->query = $query;
-    }
-
-    private function findNext(): ?ProductInterface
-    {
-        /** @var ProductInterface|null $product */
-        $product = $this
-            ->getQuery()
-            ->setParameter('id', $this->id)
-            ->getOneOrNullResult();
-
-        if ($product) {
-            $this->id = $product->getId();
-        }
-
-        return $product;
     }
 
     private function updateAll(OutputInterface $output): void
@@ -165,6 +125,21 @@ class StockUpdateCommand extends AbstractStockCommand
         }
 
         $output->writeln("Updated $count / $total product(s).");
+    }
+
+    private function findNext(): ?ProductInterface
+    {
+        /** @var ProductInterface|null $product */
+        $product = $this
+            ->getQuery()
+            ->setParameter('id', $this->id)
+            ->getOneOrNullResult();
+
+        if ($product) {
+            $this->id = $product->getId();
+        }
+
+        return $product;
     }
 
     private function doUpdate(OutputInterface $output, ProductInterface $product): bool
@@ -232,12 +207,12 @@ class StockUpdateCommand extends AbstractStockCommand
             // TODO Symfony 4.1+ (need Table::appendRow)
             //'id'                => $product->getId(),
             //'reference'         => $product->getReference(),
-            'Stock mode'        => $product->getStockMode(),
-            'stock state'       => $product->getStockState(),
-            'In stock'          => $product->getInStock(),
-            'Avaiablable stock' => $product->getAvailableStock(),
-            'Virtual stock'     => $product->getVirtualStock(),
-            'EDA'               => $eda,
+            'Stock mode'      => $product->getStockMode(),
+            'stock state'     => $product->getStockState(),
+            'In stock'        => $product->getInStock()->toFixed(3),
+            'Available stock' => $product->getAvailableStock()->toFixed(3),
+            'Virtual stock'   => $product->getVirtualStock()->toFixed(3),
+            'EDA'             => $eda,
         ];
     }
 }

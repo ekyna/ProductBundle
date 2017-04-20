@@ -125,10 +125,6 @@
             </constraint>
         </property>
         <property name="visibility">
-            <constraint name="NotBlank"/>
-            <constraint name="Type">
-                <option name="type">int</option>
-            </constraint>
             <constraint name="GreaterThan">
                 <option name="value">0</option>
             </constraint>
@@ -576,16 +572,12 @@
         </property>
         <property name="minQuantity">
             <constraint name="NotBlank"/>
-            <constraint name="Range">
-                <option name="min">1</option>
-            </constraint>
+            <constraint name="GreaterThanOrEqual">1</constraint>
         </property>
         <property name="percent">
             <constraint name="NotBlank"/>
-            <constraint name="Range">
-                <option name="min">0</option>
-                <option name="max">100</option>
-            </constraint>
+            <constraint name="GreaterThanOrEqual">0</constraint>
+            <constraint name="LessThanOrEqual">100</constraint>
         </property>
         <!-- TODO bug because pricing may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -985,10 +977,6 @@
         </property>
 
         <property name="visibility">
-            <constraint name="NotBlank"/>
-            <constraint name="Type">
-                <option name="type">int</option>
-            </constraint>
             <constraint name="GreaterThan">
                 <option name="value">0</option>
             </constraint>

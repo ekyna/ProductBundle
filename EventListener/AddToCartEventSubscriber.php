@@ -6,6 +6,7 @@ use Ekyna\Bundle\CommerceBundle\Event\AddToCartEvent;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Class AddToCartEventSubscriber
@@ -15,25 +16,18 @@ use Symfony\Component\Templating\EngineInterface;
 class AddToCartEventSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var string
      */
     protected $template;
 
-
-    /**
-     * Constructor.
-     *
-     * @param EngineInterface        $templating
-     * @param string                 $template
-     */
-    public function __construct(EngineInterface $templating, $template)
+    public function __construct(Environment $twig, string $template)
     {
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->template = $template;
     }
 
@@ -54,7 +48,7 @@ class AddToCartEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $content = $this->templating->render($this->template, [
+        $content = $this->twig->render($this->template, [
             'product' => $subject,
         ]);
 

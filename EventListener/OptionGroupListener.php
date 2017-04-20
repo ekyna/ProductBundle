@@ -96,7 +96,7 @@ class OptionGroupListener implements EventSubscriberInterface
      */
     protected function scheduleChildPriceChangeEvent(ProductInterface $product)
     {
-        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $product);
+        $this->persistenceHelper->scheduleEvent($product, ProductEvents::CHILD_PRICE_CHANGE);
     }
 
     /**
@@ -119,7 +119,7 @@ class OptionGroupListener implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function getSubscribedEvents()
     {

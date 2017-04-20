@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Event;
 
 /**
@@ -9,10 +11,9 @@ namespace Ekyna\Bundle\ProductBundle\Event;
  */
 final class ProductTranslationEvents
 {
-    const INSERT = 'ekyna_product.product_translation.insert';
-    const UPDATE = 'ekyna_product.product_translation.update';
-    const DELETE = 'ekyna_product.product_translation.delete';
-
+    public const INSERT = 'ekyna_product.product_translation.insert';
+    public const UPDATE = 'ekyna_product.product_translation.update';
+    public const DELETE = 'ekyna_product.product_translation.delete';
 
     /**
      * Disabled constructor.

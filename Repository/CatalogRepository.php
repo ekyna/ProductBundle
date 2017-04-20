@@ -1,25 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
-/**
- * Class CatalogRepository
- * @package Ekyna\Bundle\ProductBundle\Repository
- * @author  Etienne Dauvergne <contact@ekyna.com>
- */
-class CatalogRepository extends ResourceRepository
+class CatalogRepository extends ResourceRepository implements CatalogRepositoryInterface
 {
-    /**
-     * Finds catalogs by customer.
-     *
-     * @param CustomerInterface $customer
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Catalog[]
-     */
-    public function findByCustomer(CustomerInterface $customer)
+    public function findByCustomer(CustomerInterface $customer): array
     {
         $qb = $this->createQueryBuilder('c');
 
@@ -33,15 +24,7 @@ class CatalogRepository extends ResourceRepository
             ->getResult();
     }
 
-    /**
-     * Finds a catalog by customer and id.
-     *
-     * @param CustomerInterface $customer
-     * @param int               $id
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Catalog|null
-     */
-    public function findOneByCustomerAndId(CustomerInterface $customer, int $id)
+    public function findOneByCustomerAndId(CustomerInterface $customer, int $id): ?CatalogInterface
     {
         $qb = $this->createQueryBuilder('c');
 
@@ -56,10 +39,7 @@ class CatalogRepository extends ResourceRepository
             ->getOneOrNullResult();
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function getAlias()
+    protected function getAlias(): string
     {
         return 'c';
     }

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\AbstractTranslatable;
@@ -20,47 +23,22 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     use MediaSubjectTrait;
     use SortableTrait;
 
-    /**
-     * @var integer
-     */
-    protected $id;
+    protected ?int                    $id     = null;
+    protected ?Model\ProductInterface $bundle = null;
+    protected bool                    $required = true;
+    /** @var Collection<Model\BundleChoiceInterface> */
+    protected Collection $choices;
+    /** @var Collection<Model\BundleSlotRuleInterface> */
+    protected Collection $rules;
 
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $bundle;
-
-    /**
-     * @var ArrayCollection|Model\BundleChoiceInterface[]
-     */
-    protected $choices;
-
-    /**
-     * @var bool
-     */
-    protected $required;
-
-    /**
-     * @var ArrayCollection|Model\BundleSlotRuleInterface[]
-     */
-    protected $rules;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct();
 
         $this->choices = new ArrayCollection();
-        $this->required = true;
         $this->rules = new ArrayCollection();
     }
 
-    /**
-     * Clones the bundle slot.
-     */
     public function __clone()
     {
         parent::__clone();
@@ -81,26 +59,17 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBundle()
+    public function getBundle(): Model\ProductInterface
     {
         return $this->bundle;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setBundle(Model\ProductInterface $bundle = null)
+    public function setBundle(?Model\ProductInterface $bundle): Model\BundleSlotInterface
     {
         if ($this->bundle !== $bundle) {
             if ($previous = $this->bundle) {
@@ -116,62 +85,41 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): Model\BundleSlotInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->translate()->getDescription();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setDescription(string $description)
+    public function setDescription(?string $description): Model\BundleSlotInterface
     {
         $this->translate()->setDescription($description);
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getChoices()
+    public function getChoices(): Collection
     {
         return $this->choices;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasChoice(Model\BundleChoiceInterface $choice)
+    public function hasChoice(Model\BundleChoiceInterface $choice): bool
     {
         return $this->choices->contains($choice);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function addChoice(Model\BundleChoiceInterface $choice)
+    public function addChoice(Model\BundleChoiceInterface $choice): Model\BundleSlotInterface
     {
         if (!$this->hasChoice($choice)) {
             $this->choices->add($choice);
@@ -181,10 +129,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function removeChoice(Model\BundleChoiceInterface $choice)
+    public function removeChoice(Model\BundleChoiceInterface $choice): Model\BundleSlotInterface
     {
         if ($this->hasChoice($choice)) {
             $this->choices->removeElement($choice);
@@ -194,54 +139,36 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setChoices($choices)
+    public function setChoices(Collection $choices): Model\BundleSlotInterface
     {
         $this->choices = $choices;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setRequired($required)
+    public function setRequired(bool $required): Model\BundleSlotInterface
     {
-        $this->required = (bool)$required;
+        $this->required = $required;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getRules()
+    public function getRules(): Collection
     {
         return $this->rules;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasRule(Model\BundleSlotRuleInterface $rule)
+    public function hasRule(Model\BundleSlotRuleInterface $rule): bool
     {
         return $this->rules->contains($rule);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function addRule(Model\BundleSlotRuleInterface $rule)
+    public function addRule(Model\BundleSlotRuleInterface $rule): Model\BundleSlotInterface
     {
         if (!$this->hasRule($rule)) {
             $this->rules->add($rule);
@@ -251,10 +178,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function removeRule(Model\BundleSlotRuleInterface $rule)
+    public function removeRule(Model\BundleSlotRuleInterface $rule): Model\BundleSlotInterface
     {
         if ($this->hasRule($rule)) {
             $this->rules->removeElement($rule);
@@ -264,10 +188,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setRules(ArrayCollection $rules)
+    public function setRules(Collection $rules): Model\BundleSlotInterface
     {
         $this->rules = $rules;
 

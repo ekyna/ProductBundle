@@ -1,32 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Option;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class OptionType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Option
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class OptionType extends ResourceFormType
+class OptionType extends AbstractResourceType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('mode', Type\ChoiceType::class, [
-                'label'    => 'ekyna_core.field.mode',
+                'label'    => t('field.mode', [], 'EkynaUi'),
                 'choices'  => [
                     'Product' => 'product',
                     'Data'    => 'data',
@@ -47,24 +48,24 @@ class OptionType extends ResourceFormType
                 ],
             ])
             ->add('cascade', Type\CheckboxType::class, [
-                'label'    => 'ekyna_product.option.label.plural',
-                'required' => false,
-                'attr' => [
-                    'class' => 'product-cascade',
-                ]
-            ])
-            ->add('designation', Type\TextType::class, [
-                'label'    => 'ekyna_core.field.designation',
+                'label'    => t('option.label.plural', [], 'EkynaProduct'),
                 'required' => false,
                 'attr'     => [
-                    'placeholder' => 'ekyna_core.field.designation',
+                    'class' => 'product-cascade',
+                ],
+            ])
+            ->add('designation', Type\TextType::class, [
+                'label'    => t('field.designation', [], 'EkynaUi'),
+                'required' => false,
+                'attr'     => [
+                    'placeholder' => t('field.designation', [], 'EkynaUi'),
                 ],
             ])
             ->add('reference', Type\TextType::class, [
-                'label'    => 'ekyna_core.field.reference',
+                'label'    => t('field.reference', [], 'EkynaUi'),
                 'required' => false,
                 'attr'     => [
-                    'placeholder' => 'ekyna_core.field.reference',
+                    'placeholder' => t('field.reference', [], 'EkynaUi'),
                 ],
             ])
             ->add('translations', TranslationsFormsType::class, [
@@ -74,16 +75,17 @@ class OptionType extends ResourceFormType
                 'error_bubbling' => false,
             ])
             ->add('weight', Type\NumberType::class, [
-                'label'    => 'ekyna_core.field.weight',
+                'label'    => t('field.weight', [], 'EkynaUi'),
                 'required' => false,
+                'decimal'  => true,
                 'scale'    => 3,
                 'attr'     => [
-                    'placeholder' => 'ekyna_core.field.weight',
+                    'placeholder' => t('field.weight', [], 'EkynaUi'),
                     'input_group' => ['append' => 'kg'],
                 ],
             ])
             ->add('netPrice', PriceType::class, [
-                'label'    => 'ekyna_commerce.field.net_price',
+                'label'    => t('field.net_price', [], 'EkynaCommerce'),
                 'required' => false,
             ])
             ->add('taxGroup', TaxGroupChoiceType::class, [
@@ -92,10 +94,7 @@ class OptionType extends ResourceFormType
             ->add('position', CollectionPositionType::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_option';
     }

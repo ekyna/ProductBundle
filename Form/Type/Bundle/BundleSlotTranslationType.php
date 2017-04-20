@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\TinymceType;
 use Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation;
+use Ekyna\Bundle\UiBundle\Form\Type\TinymceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class BundleSlotTranslationType
@@ -16,30 +20,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BundleSlotTranslationType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', TextType::class, array(
-                'label'        => 'ekyna_core.field.title',
+            ->add('title', TextType::class, [
+                'label' => t('field.title', [], 'EkynaUi'),
 //                'admin_helper' => 'CMS_PAGE_TITLE',
-            ))
-            ->add('description', TinymceType::class, array(
-                'label'        => 'ekyna_core.field.content',
+            ])
+            ->add('description', TinymceType::class, [
+                'label' => t('field.content', [], 'EkynaUi'),
 //                'admin_helper' => 'CMS_PAGE_CONTENT',
-                'theme'        => 'front'
-            ));
+                'theme' => 'front',
+            ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => BundleSlotTranslation::class,
-        ));
+        ]);
     }
 }

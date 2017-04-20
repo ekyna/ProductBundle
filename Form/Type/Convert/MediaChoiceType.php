@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
@@ -10,6 +12,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class MediaChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -17,10 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MediaChoiceType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $medias = $options['medias'];
         $children = $view->children;
@@ -38,16 +39,13 @@ class MediaChoiceType extends AbstractType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'    => 'ekyna_media.media.label.plural',
+                'label'    => t('media.label.plural', [], 'EkynaMedia'),
                 'mapped'   => false,
-                'medias'     => [],
+                'medias'   => [],
                 'choices'  => function (Options $options, $value) {
                     if (empty($value)) {
                         $medias = $options['medias'];
@@ -79,18 +77,12 @@ class MediaChoiceType extends AbstractType
             });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_convert_media_choice';
     }

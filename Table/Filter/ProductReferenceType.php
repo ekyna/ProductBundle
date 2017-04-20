@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Table\Filter;
 
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntityAdapter;
@@ -18,10 +20,14 @@ use Ekyna\Component\Table\Source\AdapterInterface;
 class ProductReferenceType extends AbstractFilterType
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function applyFilter(AdapterInterface $adapter, FilterInterface $filter, ActiveFilter $activeFilter, array $options)
-    {
+    public function applyFilter(
+        AdapterInterface $adapter,
+        FilterInterface $filter,
+        ActiveFilter $activeFilter,
+        array $options
+    ): bool {
         if (!$adapter instanceof EntityAdapter) {
             return false;
         }
@@ -48,7 +54,7 @@ class ProductReferenceType extends AbstractFilterType
     /**
      * @inheritDoc
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }

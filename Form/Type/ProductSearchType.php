@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\EntitySearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceSearchType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,39 +17,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductSearchType extends AbstractType
 {
-    /**
-     * @var string
-     */
-    private $productClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $class
-     */
-    public function __construct($class)
-    {
-        $this->productClass = $class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'    => 'ekyna_product.product.label.singular',
-                'class'    => $this->productClass,
-                'route'    => function(Options $options) {
+                'resource'     => 'ekyna_product.product',
+                'search_route' => function (Options $options) {
                     return $options['admin_mode']
-                        ? 'ekyna_product_product_admin_search'
+                        ? 'api_ekyna_product_product_search'
                         : 'ekyna_product_account_product_search';
                 },
-                'required' => true,
-                'visible'  => false,
-                'types'    => [
+                'required'     => true,
+                'visible'      => false,
+                'types'        => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIABLE,
                     ProductTypes::TYPE_BUNDLE,
@@ -56,10 +38,11 @@ class ProductSearchType extends AbstractType
             ])
             ->setAllowedTypes('visible', 'bool')
             ->setAllowedTypes('types', 'array')
-            ->setNormalizer('route_params', function (Options $options, $value) {
+            ->setNormalizer('search_parameters', function (Options $options, $value) {
                 if (!isset($value['types'])) {
                     $value['types'] = $options['types'];
                 }
+
                 if (!isset($value['visible']) && $options['visible']) {
                     $value['visible'] = 1;
                 }
@@ -68,12 +51,9 @@ class ProductSearchType extends AbstractType
             });
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
-        return EntitySearchType::class;
+        return ResourceSearchType::class;
     }
 }
 

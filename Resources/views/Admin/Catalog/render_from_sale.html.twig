@@ -1,15 +1,10 @@
-{% extends '@EkynaAdmin/Entity/sided.html.twig' %}
+{% extends "@EkynaAdmin/Entity/Crud/update.html.twig" %}
 
-{% block page_title %}{{ sale.number }} - {{ parent() }}{% endblock page_title %}
+{% block page_title %}{{ sale.number }}{% endblock page_title %}
 
 {% block title %}
-    <h1>{{ 'ekyna_product.catalog.header.render_from_sale'|trans({'%number%': sale.number})|raw }}</h1>
+    <h1>{{ (context.config.transPrefix ~ '.header.render_from_sale')|trans({'%number%': sale.number}, context.config.transDomain)|raw }}</h1>
 {% endblock title %}
-
-{% block actions %}
-    {{ admin_resource_btn('ekyna_product_catalog', 'list') }}
-    {{ admin_resource_btn('ekyna_product_catalog', 'new') }}
-{% endblock actions %}
 
 {% block main %}
     {{ form_start(form) }}

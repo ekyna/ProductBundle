@@ -24,7 +24,7 @@
 
         <field name="name" column="name" type="string" length="32" nullable="false" unique="true"/>
         <field name="type" column="type" type="string" length="32" nullable="false"/>
-        <field name="config" column="config" type="json_array" nullable="true"/>
+        <field name="config" column="config" type="json" nullable="true"/>
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position/>

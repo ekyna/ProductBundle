@@ -1,0 +1,62 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block main_actions -%}
+    {{ admin_resource_btn(category, 'public') }}
+    {{ admin_resource_btn(category, 'editor') }}
+    {{ parent() }}
+{%- endblock main_actions %}
+
+{% block main_tabs -%}
+    {{ parent() }}
+    <li>
+        <a href="#{{ resource_name }}-seo" id="toggle-seo" data-toggle="tab">
+            {{ 'field.seo'|trans({}, 'EkynaUi') }}
+        </a>
+    </li>
+{%- endblock main_tabs %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {{ show_row(category.name, 'text', {
+            'label': t('field.name', [], 'EkynaUi')
+        }) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ show_row(category.visible, 'boolean', {
+                    'label': t('field.visible', [], 'EkynaUi'),
+                    'label_col': 4
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ show_row(category.visibility, 'number', {
+                    'label': t('common.visibility', [], 'EkynaProduct'),
+                    'label_col': 4
+                }) }}
+            </div>
+        </div>
+        {{ show_row(category.parent, 'resource', {
+            'label': t('field.parent', [], 'EkynaUi'),
+            'resource': 'ekyna_product.category'
+        }) }}
+        {{ show_row(category.translations, 'translations', {
+            'fields': {
+                'title': {'label': t('field.title', [], 'EkynaUi')},
+                'description': {
+                    'label': t('field.description', [], 'EkynaUi'),
+                    'type': 'tinymce',
+                    'property_path': null,
+                    'options': {
+                        'height': 150,
+                        'field' : 'description'
+                    }
+                }
+            }
+        }) }}
+        {{ show_row(category.media, 'media_media', {
+            'label': t('field.image', [], 'EkynaUi')
+        }) }}
+    </div>
+    <div class="tab-pane" id="{{ resource_name }}-seo">
+        {{ show_row(category.seo, 'seo') }}
+    </div>
+{%- endblock main_contents %}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -14,6 +16,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class ResupplyType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Inventory
@@ -21,26 +25,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ResupplyType extends AbstractType
 {
-    /**
-     * @var SupplierProductRepositoryInterface
-     */
-    private $supplierProductRepository;
+    private SupplierProductRepositoryInterface $supplierProductRepository;
 
-
-    /**
-     * Constructor.
-     *
-     * @param SupplierProductRepositoryInterface $supplierProductRepository
-     */
     public function __construct(SupplierProductRepositoryInterface $supplierProductRepository)
     {
         $this->supplierProductRepository = $supplierProductRepository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var ProductInterface $product */
         $product = $options['product'];
@@ -52,39 +44,39 @@ class ResupplyType extends AbstractType
                 'supplier_products' => $supplierProducts,
             ])
             ->add('quantity', NumberType::class, [
-                'label'       => 'ekyna_core.field.quantity',
+                'label'       => t('field.quantity', [], 'EkynaUi'),
+                'decimal'     => true,
+                'scale'       => 3, // TODO Packaging format
                 'constraints' => [
                     new NotBlank(),
                     new GreaterThanOrEqual(0),
                 ],
-                'attr' => [
+                'attr'        => [
                     'class' => 'resupply-quantity',
-                ]
+                ],
             ])
             ->add('netPrice', NumberType::class, [
-                'label'       => 'ekyna_commerce.field.buy_net_price',
+                'label'       => t('field.buy_net_price', [], 'EkynaCommerce'),
+                'decimal'     => true,
+                'scale'       => 5,
                 'constraints' => [
                     new NotBlank(),
                     new GreaterThanOrEqual(0),
                 ],
-                'attr' => [
+                'attr'        => [
                     'class' => 'resupply-net-price',
-                ]
+                ],
             ])
             ->add('estimatedDateOfArrival', DateTimeType::class, [
-                'label'    => 'ekyna_commerce.field.eta',
-                'format'   => 'dd/MM/yyyy',
+                'label'    => t('field.eta', [], 'EkynaCommerce'),
                 'required' => false,
-                'attr' => [
+                'attr'     => [
                     'class' => 'resupply-eda',
-                ]
+                ],
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         /** @var ProductInterface $product */
         $product = $options['product'];
@@ -92,20 +84,14 @@ class ResupplyType extends AbstractType
         $view->vars['product'] = $product;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('product', null)
             ->setAllowedTypes('product', ProductInterface::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_inventory_resupply';
     }

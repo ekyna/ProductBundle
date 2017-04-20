@@ -34,7 +34,7 @@ class CountChartBuilder extends AbstractChartBuilder
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function build(string $source = null)
     {

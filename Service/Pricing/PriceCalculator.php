@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
@@ -13,6 +17,11 @@ use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes;
 use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 
+use function array_merge;
+use function array_unique;
+
+use const SORT_NUMERIC;
+
 /**
  * Class PriceCalculator
  * @package Ekyna\Bundle\ProductBundle\Service\Pricing
@@ -20,62 +29,28 @@ use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
  */
 class PriceCalculator
 {
-    /**
-     * @var PriceRepositoryInterface
-     */
-    private $priceRepository;
+    private PriceRepositoryInterface   $priceRepository;
+    private OfferRepositoryInterface   $offerRepository;
+    private TaxResolverInterface       $taxResolver;
+    private CurrencyConverterInterface $currencyConverter;
+    private string                     $defaultCurrency;
 
-    /**
-     * @var OfferRepositoryInterface
-     */
-    private $offerRepository;
-
-    /**
-     * @var TaxResolverInterface
-     */
-    private $taxResolver;
-
-    /**
-     * @var CurrencyConverterInterface
-     */
-    private $currencyConverter;
-
-    /**
-     * @var string
-     */
-    private $defaultCurrency;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PriceRepositoryInterface   $priceRepository
-     * @param OfferRepositoryInterface   $offerRepository
-     * @param TaxResolverInterface       $taxResolver
-     * @param CurrencyConverterInterface $currencyConverter
-     * @param string                     $defaultCurrency
-     */
     public function __construct(
-        PriceRepositoryInterface $priceRepository,
-        OfferRepositoryInterface $offerRepository,
-        TaxResolverInterface $taxResolver,
+        PriceRepositoryInterface   $priceRepository,
+        OfferRepositoryInterface   $offerRepository,
+        TaxResolverInterface       $taxResolver,
         CurrencyConverterInterface $currencyConverter,
-        string $defaultCurrency
+        string                     $defaultCurrency
     ) {
-        $this->priceRepository   = $priceRepository;
-        $this->offerRepository   = $offerRepository;
-        $this->taxResolver       = $taxResolver;
+        $this->priceRepository = $priceRepository;
+        $this->offerRepository = $offerRepository;
+        $this->taxResolver = $taxResolver;
         $this->currencyConverter = $currencyConverter;
-        $this->defaultCurrency   = $defaultCurrency;
+        $this->defaultCurrency = $defaultCurrency;
     }
 
     /**
      * Returns the product price for one quantity.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
-     *
-     * @return array
      */
     public function getPrice(Model\ProductInterface $product, ContextInterface $context): array
     {
@@ -103,9 +78,9 @@ class PriceCalculator
             ];
         }
 
-        $mode     = $context->getVatDisplayMode();
+        $mode = $context->getVatDisplayMode();
         $currency = $context->getCurrency()->getCode();
-        $date     = $context->getDate();
+        $date = $context->getDate();
 
         // Currency conversion
         if ($currency !== $this->defaultCurrency) {
@@ -144,13 +119,9 @@ class PriceCalculator
     }
 
     /**
-     * @param float   $base
-     * @param float[] $taxes
-     * @param string  $currency
-     *
-     * @return float
+     * @param array<Decimal> $taxes
      */
-    private function addTaxes(float $base, array $taxes, string $currency): float
+    private function addTaxes(Decimal $base, array $taxes, string $currency): Decimal
     {
         $total = $base;
 
@@ -164,12 +135,9 @@ class PriceCalculator
     /**
      * Calculates the product's minimum price.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
-    public function calculateMinPrice(Model\ProductInterface $product, $exclude = []): float
+    public function calculateMinPrice(Model\ProductInterface $product, $exclude = []): Decimal
     {
         if (Types::isConfigurableType($product)) {
             return $this->calculateConfigurableMinPrice($product, $exclude);
@@ -189,30 +157,26 @@ class PriceCalculator
     /**
      * Calculates the product min options price.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
-    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = []): float
+    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = []): Decimal
     {
         if (true === $exclude) {
-            return 0;
+            return new Decimal(0);
         }
 
-        $price = 0;
+        $price = new Decimal(0);
 
         $optionGroups = $product->resolveOptionGroups($exclude);
 
         // For each option groups
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
         foreach ($optionGroups as $optionGroup) {
             // Skip non required option group
             if (!$optionGroup->isRequired()) {
                 continue;
             }
 
-            // Get option with lowest price
+            // Get option with the lowest price
             $lowestOption = null;
             foreach ($optionGroup->getOptions() as $option) {
                 if (null === $optionPrice = $option->getNetPrice()) {
@@ -236,21 +200,17 @@ class PriceCalculator
 
     /**
      * Calculates the components total price.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return float
      */
-    public function calculateComponentsPrice(Model\ProductInterface $product): float
+    public function calculateComponentsPrice(Model\ProductInterface $product): Decimal
     {
-        $price = 0;
+        $price = new Decimal(0);
 
         foreach ($product->getComponents() as $component) {
             if (is_null($p = $component->getNetPrice())) {
                 $p = $component->getChild()->getNetPrice();
             }
 
-            $price += $p * $component->getQuantity();
+            $price += $p->mul($component->getQuantity());
         }
 
         return $price;
@@ -259,14 +219,13 @@ class PriceCalculator
     /**
      * Calculates the (simple or variant) product min price.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     * @param float                  $price   Price override.
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
-    public function calculateProductMinPrice(Model\ProductInterface $product, $exclude = [], $price = null): float
-    {
+    public function calculateProductMinPrice(
+        Model\ProductInterface $product,
+                          $exclude = [],
+        Decimal                $price = null
+    ): Decimal {
         Types::assertChildType($product);
 
         if (is_null($price)) {
@@ -283,20 +242,16 @@ class PriceCalculator
     /**
      * Calculates the variable product min price.
      *
-     * @param Model\ProductInterface $variable
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     * @param float                  $price   Price override.
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
     public function calculateVariableMinPrice(
         Model\ProductInterface $variable,
-        $exclude = [],
-        float $price = null
-    ): float {
+                          $exclude = [],
+        Decimal                $price = null
+    ): Decimal {
         Types::assertVariable($variable);
 
-        if (!is_null($price)) {
+        if ($price) {
             return $price + $this->calculateMinOptionsPrice($variable, $exclude);
         }
 
@@ -317,8 +272,8 @@ class PriceCalculator
             }
         }
 
-        if (is_null($price)) {
-            $price = $lowestVariant;
+        if (null === $price) {
+            $price = $lowestVariant ?: new Decimal(0);
         }
 
         $price += $this->calculateComponentsPrice($variable);
@@ -329,28 +284,27 @@ class PriceCalculator
     /**
      * Calculates the bundle product min price.
      *
-     * @param Model\ProductInterface $bundle
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     * @param float                  $price   Price override.
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      *
      * @todo The product (bundle) min price should be processed and persisted during update (flush)
      */
-    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $exclude = [], $price = null): float
-    {
+    public function calculateBundleMinPrice(
+        Model\ProductInterface $bundle,
+                               $exclude = [],
+        Decimal                $price = null
+    ): Decimal {
         Types::assertBundle($bundle);
 
-        if (is_null($price)) {
-            $price = 0;
+        if (null === $price) {
+            $price = new Decimal(0);
             foreach ($bundle->getBundleSlots() as $slot) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-                $choice       = $slot->getChoices()->first();
+                /** @var BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
                 $childProduct = $choice->getProduct();
-                $choicePrice  = $choice->getNetPrice();
+                $choicePrice = $choice->getNetPrice();
 
                 if (true === $exclude) {
-                    $choiceExclude = $exclude;
+                    $choiceExclude = true;
                 } else {
                     $choiceExclude = array_unique(array_merge(
                         is_array($exclude) ? $exclude : [],
@@ -379,18 +333,15 @@ class PriceCalculator
     /**
      * Calculates the configurable product min price.
      *
-     * @param Model\ProductInterface $configurable
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
-     *
-     * @return float
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
      *
      * @todo The product (configurable) min price should be processed and persisted during update (flush)
      */
-    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = []): float
+    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = []): Decimal
     {
         Types::assertConfigurable($configurable);
 
-        $price = 0;
+        $price = new Decimal(0);
 
         // For each bundle slots
         foreach ($configurable->getBundleSlots() as $slot) {
@@ -399,13 +350,13 @@ class PriceCalculator
                 continue;
             }
 
-            // Get slot choice with lowest price.
+            // Get slot choice with the lowest price.
             $lowestPrice = null;
             // For each slot choices
             foreach ($slot->getChoices() as $choice) {
                 $childProduct = $choice->getProduct();
                 if (true === $exclude) {
-                    $choiceExclude = $exclude;
+                    $choiceExclude = true;
                 } else {
                     $choiceExclude = array_unique(array_merge(
                         is_array($exclude) ? $exclude : [],
@@ -441,19 +392,12 @@ class PriceCalculator
 
     /**
      * Returns the pricing data for the given product and context.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
-     * @param bool                   $withOffers
-     * @param bool                   $withTaxes
-     *
-     * @return array
      */
     public function buildProductPricing(
         Model\ProductInterface $product,
-        ContextInterface $context,
-        bool $withOffers = true,
-        bool $withTaxes = true
+        ContextInterface       $context,
+        bool                   $withOffers = true,
+        bool                   $withTaxes = true
     ): array {
         // Net price (bundle : min price without options)
         $amount = $product->getNetPrice();
@@ -472,7 +416,7 @@ class PriceCalculator
         }
 
         $pricing = [
-            'price'  => (float)$amount,
+            'net_price'  => $amount,
             'offers' => null,
             'taxes'  => null,
         ];
@@ -481,7 +425,7 @@ class PriceCalculator
         if ($withOffers) {
             $offers = $this->getOffers($product, $context);
             foreach ($offers as &$offer) {
-                unset($offer['price']);
+                unset($offer['net_price']);
             }
             $pricing['offers'] = $offers;
         }
@@ -507,11 +451,6 @@ class PriceCalculator
 
     /**
      * Returns the pricing grid for the given product and context.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface|null  $context
-     *
-     * @return array
      */
     public function getPricingGrid(Model\ProductInterface $product, ContextInterface $context): array
     {
@@ -541,7 +480,7 @@ class PriceCalculator
         }
 
         foreach ($offers as &$offer) {
-            $offer['price'] = round($price * (1 - $offer['percent'] / 100), 5);
+            $offer['net_price'] = round($price * (1 - $offer['percent'] / 100), 5);
         }
 
         return [
@@ -552,26 +491,19 @@ class PriceCalculator
 
     /**
      * Returns the pricing data for the given option and context.
-     *
-     * @param Model\OptionInterface $option
-     * @param ContextInterface      $context
-     * @param bool                  $withOffers
-     * @param bool                  $withTaxes
-     *
-     * @return array
      */
     public function buildOptionPricing(
         Model\OptionInterface $option,
-        ContextInterface $context,
-        bool $withOffers = true,
-        bool $withTaxes = true
+        ContextInterface      $context,
+        bool                  $withOffers = true,
+        bool                  $withTaxes = true
     ): array {
-        if (null !== $product = $option->getProduct()) {
+        if ($product = $option->getProduct()) {
             $pricing = $this->buildProductPricing($product, $context, $withOffers, $withTaxes);
 
             // Option's net price override
-            if (null !== $price = $option->getNetPrice()) {
-                $pricing['price'] = $this
+            if ($price = $option->getNetPrice()) {
+                $pricing['net_price'] = $this
                     ->currencyConverter
                     ->convert(
                         $price,
@@ -587,14 +519,14 @@ class PriceCalculator
         $price = $this
             ->currencyConverter
             ->convert(
-                (float)$option->getNetPrice(),
+                $option->getNetPrice(),
                 $this->defaultCurrency,
                 $context->getCurrency()->getCode(),
                 $context->getDate()
             );
 
         return [
-            'price'  => $price,
+            'net_price'  => $price,
             'offers' => [], // Prevent inheritance
             'taxes'  => $withTaxes ? $this->getTaxesRates($option, $context) : [],
         ];
@@ -603,10 +535,7 @@ class PriceCalculator
     /**
      * Returns the taxes rates for the given taxable and context.
      *
-     * @param TaxableInterface $taxable
-     * @param ContextInterface $context
-     *
-     * @return float[]
+     * @return array<Decimal>
      */
     public function getTaxesRates(TaxableInterface $taxable, ContextInterface $context): array
     {
@@ -620,13 +549,13 @@ class PriceCalculator
         return $taxes;
     }
 
+    public function getDefaultCurrency(): string
+    {
+        return $this->defaultCurrency;
+    }
+
     /**
      * Returns the product offers.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
-     *
-     * @return array
      */
     protected function getOffers(Model\ProductInterface $product, ContextInterface $context): array
     {
@@ -640,18 +569,18 @@ class PriceCalculator
 
         $this->listChildren($children, $product, $context, $offers);
 
-        $total = $hidden = 0;
+        $total = new Decimal(0);
 
         // Gather min quantities
         $quantities = array_map(function ($o) {
-            return $o['min_qty'];
+            return $o['min_qty']->toFixed(5);
         }, $offers);
-        foreach ($children as &$child) {
-            $total += $child['price'];
+        foreach ($children as $child) {
+            $total += $child['net_price'];
 
             foreach ($child['offers'] as $offer) {
-                if (!in_array($offer['min_qty'], $quantities)) {
-                    $quantities[] = $offer['min_qty'];
+                if (!in_array($qty = $offer['min_qty']->toFixed(5), $quantities, true)) {
+                    $quantities[] = $qty;
                 }
             }
         }
@@ -661,12 +590,12 @@ class PriceCalculator
 
         $mergedOffers = [];
         foreach ($quantities as $quantity) {
-            $discount = 0;
+            $discount = new Decimal(0);
 
             foreach ($children as $child) {
                 foreach ($child['offers'] as $offer) {
                     if ($offer['min_qty'] <= $quantity) {
-                        $discount += $child['price'] * $offer['percent'] / 100;
+                        $discount += $child['net_price'] * $offer['percent'] / 100;
                         continue 2;
                     }
                 }
@@ -674,7 +603,7 @@ class PriceCalculator
 
             $mergedOffers[] = [
                 'min_qty' => $quantity,
-                'percent' => round($discount / $total * 100, 5),
+                'percent' => $discount->div($total)->mul(100)->round(5),
             ];
         }
 
@@ -683,53 +612,51 @@ class PriceCalculator
 
     /**
      * List bundle children.
-     *
-     * @param array                  $list
-     * @param Model\ProductInterface $bundle
-     * @param ContextInterface       $context
-     * @param array                  $offers The parent offers
-     * @param int                    $qty
-     *
-     * @return bool
      */
     protected function listChildren(
-        array &$list,
+        array                  &$list,
         Model\ProductInterface $bundle,
-        ContextInterface $context,
-        array $offers,
-        $qty = 1
+        ContextInterface       $context,
+        array                  $parentOffers,
+        Decimal                    $qty = null
     ): bool {
         Types::assertBundle($bundle);
+
+        $qty = $qty ?: new Decimal(1);
 
         $visible = false;
 
         foreach ($bundle->getBundleSlots() as $slot) {
-            /** @var Model\BundleChoiceInterface $choice */
-            $choice  = $slot->getChoices()->first();
+            /** @var BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
             $product = $choice->getProduct();
 
             if (Types::isBundleType($product)) {
-                $offers = $this->mergeOffers(
-                    $offers,
+                $parentOffers = $this->mergeOffers(
+                    $parentOffers,
                     $this->offerRepository->findByProductAndContext($product, $context)
                 );
 
-                $visible |= $this->listChildren($list, $product, $context, $offers, $qty * $choice->getMinQuantity());
+                $visible = $this
+                    ->listChildren($list, $product, $context, $parentOffers, $qty->mul($choice->getMinQuantity()))
+                    || $visible;
             } else {
                 $child = [
-                    'price'  => $product->getNetPrice() * $qty * $choice->getMinQuantity(),
-                    'offers' => [],
+                    'net_price' => $product->getNetPrice()->mul($qty)->mul($choice->getMinQuantity()),
                 ];
 
-                if ($product->isVisible() && !$choice->isHidden()
-                    && $product->hasRequiredOptionGroup($choice->getExcludedOptionGroups())) {
-                    $visible         = true;
+                if (
+                    $product->isVisible()
+                    && !$choice->isHidden()
+                    && $product->hasRequiredOptionGroup($choice->getExcludedOptionGroups())
+                ) {
+                    $visible = true;
                     $child['offers'] = $this->mergeOffers(
-                        $offers,
+                        $parentOffers,
                         $this->offerRepository->findByProductAndContext($product, $context)
                     );
                 } else {
-                    $child['offers'] = $offers;
+                    $child['offers'] = $parentOffers;
                 }
 
                 $list[] = $child;
@@ -741,24 +668,17 @@ class PriceCalculator
 
     /**
      * Merges two offers lists.
-     *
-     * @param array $a
-     * @param array $b
-     *
-     * @return array
      */
     protected function mergeOffers(array $a, array $b): array
     {
         $offers = [];
 
-        $quantities = array_unique(array_map(function ($o) {
-            return $o['min_qty'];
-        }, $a, $b));
+        $quantities = array_unique(array_map(fn(array $o) => $o['min_qty'], array_merge($a, $b)));
 
         sort($quantities);
 
         foreach ($quantities as $quantity) {
-            $percent = 0;
+            $percent = new Decimal(0);
 
             foreach ($a as $o) {
                 if ($o['min_qty'] <= $quantity && $o['percent'] > $percent) {

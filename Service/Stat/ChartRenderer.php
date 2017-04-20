@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Class ChartRenderer
@@ -13,33 +15,14 @@ use Symfony\Component\Templating\EngineInterface;
  */
 class ChartRenderer
 {
-    /**
-     * @var ChartBuilderFactory
-     */
-    private $factory;
+    private ChartBuilderFactory $factory;
+    private Environment         $twig;
+    private array               $config;
 
-    /**
-     * @var EngineInterface
-     */
-    private $templating;
-
-    /**
-     * @var array
-     */
-    private $config;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ChartBuilderFactory $factory
-     * @param EngineInterface     $templating
-     * @param array               $config
-     */
-    public function __construct(ChartBuilderFactory $factory, EngineInterface $templating, array $config)
+    public function __construct(ChartBuilderFactory $factory, Environment $twig, array $config)
     {
         $this->factory = $factory;
-        $this->templating = $templating;
+        $this->twig = $twig;
 
         $this->config = array_replace([
             'template' => '@EkynaProduct/Admin/Stat/chart.html.twig',
@@ -48,13 +31,8 @@ class ChartRenderer
 
     /**
      * Renders the product count chart.
-     *
-     * @param ProductInterface $product
-     * @param string           $source
-     *
-     * @return string
      */
-    public function renderProductCountChart(ProductInterface $product, string $source = StatCount::SOURCE_ORDER)
+    public function renderProductCountChart(ProductInterface $product, string $source = StatCount::SOURCE_ORDER): string
     {
         $config = $this
             ->factory
@@ -62,7 +40,7 @@ class ChartRenderer
             ->setProduct($product)
             ->build($source);
 
-        return $this->templating->render($this->config['template'], [
+        return $this->twig->render($this->config['template'], [
             'id'     => 'product-' . $source . '-count-chart-' . $product->getId(),
             'config' => $config,
         ]);
@@ -70,12 +48,8 @@ class ChartRenderer
 
     /**
      * Renders the product cross chart.
-     *
-     * @param ProductInterface $product
-     *
-     * @return string
      */
-    public function renderProductCrossChart(ProductInterface $product)
+    public function renderProductCrossChart(ProductInterface $product): string
     {
         $config = $this
             ->factory
@@ -83,7 +57,7 @@ class ChartRenderer
             ->setProduct($product)
             ->build();
 
-        return $this->templating->render($this->config['template'], [
+        return $this->twig->render($this->config['template'], [
             'id'     => 'product-cross-chart-' . $product->getId(),
             'config' => $config,
         ]);

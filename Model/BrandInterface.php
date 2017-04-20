@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model as RM;
@@ -23,67 +25,37 @@ interface BrandInterface extends
     RM\TranslatableInterface,
     RM\TaggedEntityInterface
 {
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
 
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|BrandInterface
-     */
-    public function setName($name);
+    public function setName(?string $name): BrandInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Sets the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|BrandInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(?string $title): BrandInterface;
 
     /**
      * Returns the (translated) description.
-     *
-     * @return string
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 
     /**
      * Sets the (translated) description.
-     *
-     * @param string $description
-     *
-     * @return $this|BrandInterface
      */
-    public function setDescription(string $description);
+    public function setDescription(?string $description): BrandInterface;
 
     /**
      * Returns the (translated) slug.
-     *
-     * @return string
      */
-    public function getSlug();
+    public function getSlug(): ?string;
 
     /**
      * Sets the (translated) slug.
-     *
-     * @param string $slug
-     *
-     * @return $this|BrandInterface
      */
-    public function setSlug(string $slug);
+    public function setSlug(?string $slug): BrandInterface;
 }

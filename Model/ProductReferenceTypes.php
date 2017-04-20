@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
@@ -15,23 +17,22 @@ final class ProductReferenceTypes extends AbstractConstants
     public const TYPE_EAN_13       = 'ean13';
     public const TYPE_MANUFACTURER = 'manufacturer';
 
-    /**
-     * @inheritDoc
-     */
     public static function getConfig(): array
     {
-        $prefix = 'ekyna_product.product_reference.type.';
+        $prefix = 'product_reference.type.';
 
         return [
-            static::TYPE_EAN_8        => [$prefix . static::TYPE_EAN_8],
-            static::TYPE_EAN_13       => [$prefix . static::TYPE_EAN_13],
-            static::TYPE_MANUFACTURER => [$prefix . static::TYPE_MANUFACTURER],
+            self::TYPE_EAN_8        => [$prefix . self::TYPE_EAN_8],
+            self::TYPE_EAN_13       => [$prefix . self::TYPE_EAN_13],
+            self::TYPE_MANUFACTURER => [$prefix . self::TYPE_MANUFACTURER],
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
+    public static function getTranslationDomain(): ?string
+    {
+        return 'EkynaProduct';
+    }
+
     public static function getTheme(string $constant): ?string
     {
         return null;

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
-use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class BundleChoicesType
@@ -17,45 +21,40 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BundleChoicesType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'configurable'   => false,
-                'label'          => false,
+                'configurable'    => false,
+                'label'           => false,
                 'prototype_name'  => '__choice__',
-                'prototype_data' => function(Options $options, $value) {
+                'prototype_data'  => function (Options $options, $value) {
                     if (null !== $value) {
                         return $value;
                     }
 
-                    return new $options['choice_class'];
+                    return new $options['choice_class']();
                 },
-                'sub_widget_col' => function (Options $options) {
+                'sub_widget_col'  => function (Options $options) {
                     return $options['configurable'] ? 11 : 12;
                 },
-                'button_col'     => function (Options $options) {
+                'button_col'      => function (Options $options) {
                     return $options['configurable'] ? 1 : 0;
                 },
-                'allow_add'      => function (Options $options) {
+                'allow_add'       => function (Options $options) {
                     return $options['configurable'];
                 },
                 'add_button_text' => function (Options $options) {
-                    return $options['configurable']
-                        ? 'ekyna_product.bundle_choice.button.add'
-                        : false;
+                    return $options['configurable'] ? t('bundle_choice.button.add', [], 'EkynaProduct') : null;
                 },
-                'allow_sort'     => function (Options $options) {
+                'allow_sort'      => function (Options $options) {
                     return $options['configurable'];
                 },
-                'allow_delete'   => function (Options $options) {
+                'allow_delete'    => function (Options $options) {
                     return $options['configurable'];
                 },
-                'entry_type'     => BundleChoiceType::class,
-                'entry_options'  => function (Options $options) {
+                'entry_type'      => BundleChoiceType::class,
+                'entry_options'   => function (Options $options) {
                     return [
                         'configurable' => $options['configurable'],
                     ];
@@ -66,18 +65,12 @@ class BundleChoicesType extends AbstractType
             ->setAllowedTypes('choice_class', 'string');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         FormUtil::addClass($view, 'product-bundle-choices');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

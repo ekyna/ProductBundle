@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Decimal\Decimal;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -11,67 +14,19 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 interface ComponentInterface extends ResourceInterface
 {
-    /**
-     * Returns the parent.
-     *
-     * @return ProductInterface
-     */
     public function getParent(): ?ProductInterface;
 
-    /**
-     * Sets the parent.
-     *
-     * @param ProductInterface $parent
-     *
-     * @return ComponentInterface
-     */
-    public function setParent(ProductInterface $parent = null): ComponentInterface;
+    public function setParent(?ProductInterface $parent): ComponentInterface;
 
-    /**
-     * Returns the child.
-     *
-     * @return ProductInterface
-     */
     public function getChild(): ?ProductInterface;
 
-    /**
-     * Sets the child.
-     *
-     * @param ProductInterface $child
-     *
-     * @return ComponentInterface
-     */
-    public function setChild(ProductInterface $child): ComponentInterface;
+    public function setChild(?ProductInterface $child): ComponentInterface;
 
-    /**
-     * Returns the quantity.
-     *
-     * @return float
-     */
-    public function getQuantity(): ?float;
+    public function getQuantity(): Decimal;
 
-    /**
-     * Sets the quantity.
-     *
-     * @param float $quantity
-     *
-     * @return ComponentInterface
-     */
-    public function setQuantity(float $quantity): ComponentInterface;
+    public function setQuantity(Decimal $quantity): ComponentInterface;
 
-    /**
-     * Returns the net price.
-     *
-     * @return float
-     */
-    public function getNetPrice(): ?float;
+    public function getNetPrice(): ?Decimal;
 
-    /**
-     * Sets the net price.
-     *
-     * @param float $price
-     *
-     * @return ComponentInterface
-     */
-    public function setNetPrice(float $price = null): ComponentInterface;
+    public function setNetPrice(?Decimal $price): ComponentInterface;
 }

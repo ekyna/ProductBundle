@@ -1,0 +1,33 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block actions %}{% endblock %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="attribute-choice-general">
+        {{ show_row(attributeChoice.attribute, 'resource', {
+            'resource': 'ekyna_product.attribute'
+        }) }}
+        {{ show_row(attributeChoice.name, 'text', {
+            'label': t('field.name', [], 'EkynaUi')
+        }) }}
+        {{ show_row(attributeChoice.translations, 'translations', {
+            'fields': {
+                'title': {'label': t('field.title', [], 'EkynaUi')},
+            }
+        }) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ show_row(attributeChoice.media, 'media_media', {
+                    'label': t('field.image', [], 'EkynaUi'),
+                    'label_col': 4
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ show_row(attributeChoice.color, 'color', {
+                    'label': t('field.color', [], 'EkynaUi'),
+                    'label_col': 4
+                }) }}
+            </div>
+        </div>
+    </div>
+{%- endblock main_contents %}

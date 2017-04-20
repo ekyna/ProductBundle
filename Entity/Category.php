@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Bundle\CoreBundle\Model\TreeTrait;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\CategoryInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -18,207 +19,89 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Category extends RM\AbstractTranslatable implements Model\CategoryInterface
 {
+    use Model\VisibilityTrait;
     use Cms\ContentSubjectTrait;
     use Cms\SeoSubjectTrait;
     use MediaSubjectTrait;
-    use Model\VisibilityTrait;
     use RM\TaggedEntityTrait;
     use RM\TimestampableTrait;
-    use TreeTrait;
+    use RM\TreeTrait;
 
-    /**
-     * @var integer
-     */
-    protected $id;
+    protected ?int    $id   = null;
+    protected ?string $name = null;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var ArrayCollection
-     */
-    protected $children;
-
-    /**
-     * @var Category
-     */
-    protected $parent;
-
-
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         parent::__construct();
 
-        $this->children = new ArrayCollection();
+        $this->initializeNode();
+        $this->initializeTimestampable();
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->name ?: 'New category';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setName($name)
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): CategoryInterface
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasChild(Model\CategoryInterface $child)
-    {
-        return $this->children->contains($child);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function addChild(Model\CategoryInterface $child)
-    {
-        if (!$this->hasChild($child)) {
-            $child->setParent($this);
-            $this->children->add($child);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function removeChild(Model\CategoryInterface $child)
-    {
-        if ($this->hasChild($child)) {
-            $child->setParent(null);
-            $this->children->removeElement($child);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setParent(Model\CategoryInterface $parent = null)
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->translate()->getTitle();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setTitle(string $title)
+    public function setTitle(?string $title): CategoryInterface
     {
         $this->translate()->setTitle($title);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->translate()->getDescription();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setDescription(string $description)
+    public function setDescription(?string $description): CategoryInterface
     {
         $this->translate()->setDescription($description);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->translate()->getSlug();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setSlug(string $slug)
+    public function setSlug(?string $slug): CategoryInterface
     {
         $this->translate()->setSlug($slug);
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getTranslationClass(): string
     {
         return CategoryTranslation::class;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getEntityTagPrefix()
+    public static function getEntityTagPrefix(): string
     {
         return 'ekyna_product.category';
     }

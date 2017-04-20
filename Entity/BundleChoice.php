@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
@@ -15,73 +19,25 @@ class BundleChoice implements Model\BundleChoiceInterface
 {
     use SortableTrait;
 
-    /**
-     * @var integer
-     */
-    protected $id;
+    protected ?int                       $id                   = null;
+    protected ?Model\BundleSlotInterface $slot                 = null;
+    protected ?Model\ProductInterface    $product              = null;
+    protected Decimal                    $minQuantity;
+    protected Decimal                    $maxQuantity;
+    protected array                      $excludedOptionGroups = [];
+    protected ?Decimal                   $netPrice             = null;
+    protected bool                       $hidden               = true;
+    protected bool                       $excludeImages        = true;
+    /** @var Collection<Model\BundleChoiceRuleInterface> */
+    protected Collection $rules;
 
-    /**
-     * @var Model\BundleSlotInterface
-     */
-    protected $slot;
-
-    /**
-     * @var Model\ProductInterface
-     */
-    protected $product;
-
-    /**
-     * @var float
-     */
-    protected $minQuantity;
-
-    /**
-     * @var float
-     */
-    protected $maxQuantity;
-
-    /**
-     * @var array
-     */
-    protected $excludedOptionGroups;
-
-    /**
-     * @var float
-     */
-    protected $netPrice;
-
-    /**
-     * @var bool
-     */
-    protected $hidden;
-
-    /**
-     * @var ArrayCollection|Model\BundleChoiceRuleInterface[]
-     */
-    protected $rules;
-
-    /**
-     * @var bool
-     */
-    protected $excludeImages;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->minQuantity = 1;
-        $this->maxQuantity = 1;
-        $this->excludedOptionGroups = [];
-        $this->hidden = true;
-        $this->excludeImages = true;
         $this->rules = new ArrayCollection();
+        $this->minQuantity = new Decimal(1);
+        $this->maxQuantity = new Decimal(1);
     }
 
-    /**
-     * Clones the bundle choice.
-     */
     public function __clone()
     {
         $this->id = null;
@@ -94,169 +50,117 @@ class BundleChoice implements Model\BundleChoiceInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getSlot()
+    public function getSlot(): ?Model\BundleSlotInterface
     {
         return $this->slot;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setSlot(Model\BundleSlotInterface $slot = null)
+    public function setSlot(?Model\BundleSlotInterface $slot): Model\BundleChoiceInterface
     {
-        if ($this->slot !== $slot) {
-            if ($previous = $this->slot) {
-                $this->slot = null;
-                $previous->removeChoice($this);
-            }
+        if ($this->slot === $slot) {
+            return $this;
+        }
 
-            if ($this->slot = $slot) {
-                $this->slot->addChoice($this);
-            }
+        if ($previous = $this->slot) {
+            $this->slot = null;
+            $previous->removeChoice($this);
+        }
+
+        if ($this->slot = $slot) {
+            $this->slot->addChoice($this);
         }
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setProduct(Model\ProductInterface $product)
+    public function setProduct(?Model\ProductInterface $product): Model\BundleChoiceInterface
     {
         $this->product = $product;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getMinQuantity()
+    public function getMinQuantity(): Decimal
     {
         return $this->minQuantity;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setMinQuantity($quantity)
+    public function setMinQuantity(Decimal $quantity): Model\BundleChoiceInterface
     {
         $this->minQuantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getMaxQuantity()
+    public function getMaxQuantity(): Decimal
     {
         return $this->maxQuantity;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setMaxQuantity($quantity)
+    public function setMaxQuantity(Decimal $quantity): Model\BundleChoiceInterface
     {
         $this->maxQuantity = $quantity;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getExcludedOptionGroups()
+    public function getExcludedOptionGroups(): array
     {
         return $this->excludedOptionGroups;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setExcludedOptionGroups(array $ids)
+    public function setExcludedOptionGroups(array $ids): Model\BundleChoiceInterface
     {
         $this->excludedOptionGroups = $ids;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getNetPrice()
+    public function getNetPrice(): ?Decimal
     {
         return $this->netPrice;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setNetPrice($price)
+    public function setNetPrice(?Decimal $price): Model\BundleChoiceInterface
     {
         $this->netPrice = $price;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->hidden;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden): Model\BundleChoiceInterface
     {
-        $this->hidden = (bool)$hidden;
+        $this->hidden = $hidden;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getRules()
+    public function getRules(): Collection
     {
         return $this->rules;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasRule(Model\BundleChoiceRuleInterface $rule)
+    public function hasRule(Model\BundleChoiceRuleInterface $rule): bool
     {
         return $this->rules->contains($rule);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function addRule(Model\BundleChoiceRuleInterface $rule)
+    public function addRule(Model\BundleChoiceRuleInterface $rule): Model\BundleChoiceInterface
     {
         if (!$this->hasRule($rule)) {
             $this->rules->add($rule);
@@ -266,10 +170,7 @@ class BundleChoice implements Model\BundleChoiceInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function removeRule(Model\BundleChoiceRuleInterface $rule)
+    public function removeRule(Model\BundleChoiceRuleInterface $rule): Model\BundleChoiceInterface
     {
         if ($this->hasRule($rule)) {
             $this->rules->removeElement($rule);
@@ -279,27 +180,18 @@ class BundleChoice implements Model\BundleChoiceInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setRules(ArrayCollection $rules)
+    public function setRules(Collection $rules): Model\BundleChoiceInterface
     {
         $this->rules = $rules;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isExcludeImages(): bool
     {
         return $this->excludeImages;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function setExcludeImages(bool $exclude): Model\BundleChoiceInterface
     {
         $this->excludeImages = $exclude;

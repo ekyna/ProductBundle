@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
+
+use Decimal\Decimal;
 
 /**
  * Class PriceDisplay
@@ -9,135 +13,57 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 class PriceDisplay
 {
-    /**
-     * @var float
-     */
-    private $amount;
+    private Decimal $amount;
+    private string  $from;
+    private string  $originalPrice;
+    private string  $finalPrice;
+    private string  $endsAt;
+    private string  $specialPercent = '';
+    private string  $pricingPercent = '';
+    private string  $specialLabel   = '';
+    private string  $pricingLabel   = '';
+    /** @var array<string> */
+    private array $mentions = [];
 
-    /**
-     * @var string
-     */
-    private $from;
-
-    /**
-     * @var string
-     */
-    private $originalPrice;
-
-    /**
-     * @var string
-     */
-    private $finalPrice;
-
-    /**
-     * @var string
-     */
-    private $endsAt;
-
-    /**
-     * @var string
-     */
-    private $specialPercent;
-
-    /**
-     * @var string
-     */
-    private $pricingPercent;
-
-    /**
-     * @var string
-     */
-    private $specialLabel;
-
-    /**
-     * @var string
-     */
-    private $pricingLabel;
-
-    /**
-     * @var array
-     */
-    private $mentions;
-
-
-    /**
-     * Constructor.
-     *
-     * @param float $amount
-     * @param string $from
-     * @param string $originalPrice
-     * @param string $finalPrice
-     * @param string $endsAt
-     */
-    public function __construct(float $amount, string $from, string $originalPrice, string $finalPrice, string $endsAt)
-    {
+    public function __construct(
+        Decimal $amount,
+        string  $from,
+        string  $originalPrice,
+        string  $finalPrice,
+        string  $endsAt
+    ) {
         $this->amount = $amount;
         $this->from = $from;
         $this->originalPrice = $originalPrice;
         $this->finalPrice = $finalPrice;
         $this->endsAt = $endsAt;
-        $this->specialPercent = '';
-        $this->specialLabel = '';
-        $this->pricingPercent = '';
-        $this->pricingLabel = '';
-        $this->mentions = [];
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->from . $this->originalPrice . $this->finalPrice;
     }
 
-    /**
-     * Returns the amount.
-     *
-     * @return float
-     */
-    public function getAmount(): float
+    public function getAmount(): Decimal
     {
         return $this->amount;
     }
 
-    /**
-     * Returns the from.
-     *
-     * @return string
-     */
     public function getFrom(): string
     {
         return $this->from;
     }
 
-    /**
-     * Returns the original price.
-     *
-     * @return string
-     */
     public function getOriginalPrice(): string
     {
         return $this->originalPrice;
     }
 
-    /**
-     * Returns the final price.
-     *
-     * @return string
-     */
     public function getFinalPrice(): string
     {
         return $this->finalPrice;
     }
 
-    /**
-     * Returns the endsAt.
-     *
-     * @return string
-     */
     public function getEndsAt(): string
     {
         return $this->endsAt;
@@ -145,8 +71,6 @@ class PriceDisplay
 
     /**
      * Returns the special offer percentage.
-     *
-     * @return string
      */
     public function getSpecialPercent(): string
     {
@@ -155,10 +79,6 @@ class PriceDisplay
 
     /**
      * Sets the special offer percentage.
-     *
-     * @param string $percent
-     *
-     * @return PriceDisplay
      */
     public function setSpecialPercent(string $percent): self
     {
@@ -169,8 +89,6 @@ class PriceDisplay
 
     /**
      * Returns the special offer Label.
-     *
-     * @return string
      */
     public function getSpecialLabel(): string
     {
@@ -179,10 +97,6 @@ class PriceDisplay
 
     /**
      * Sets the special offer label.
-     *
-     * @param string $label
-     *
-     * @return PriceDisplay
      */
     public function setSpecialLabel(string $label): self
     {
@@ -193,8 +107,6 @@ class PriceDisplay
 
     /**
      * Returns the pricing offer percentage.
-     *
-     * @return string
      */
     public function getPricingPercent(): string
     {
@@ -203,10 +115,6 @@ class PriceDisplay
 
     /**
      * Sets the pricing offer percentage.
-     *
-     * @param string $percent
-     *
-     * @return PriceDisplay
      */
     public function setPricingPercent(string $percent): self
     {
@@ -217,8 +125,6 @@ class PriceDisplay
 
     /**
      * Returns the pricing offer label.
-     *
-     * @return string
      */
     public function getPricingLabel(): string
     {
@@ -227,10 +133,6 @@ class PriceDisplay
 
     /**
      * Sets the pricing offer label.
-     *
-     * @param string $label
-     *
-     * @return PriceDisplay
      */
     public function setPricingLabel(string $label): self
     {
@@ -239,13 +141,6 @@ class PriceDisplay
         return $this;
     }
 
-    /**
-     * Adds the mentions.
-     *
-     * @param string $mention
-     *
-     * @return $this
-     */
     public function addMention(string $mention): self
     {
         $this->mentions[] = $mention;
@@ -254,9 +149,7 @@ class PriceDisplay
     }
 
     /**
-     * Returns the mentions.
-     *
-     * @return string[]
+     * @return array<string>
      */
     public function getMentions(): array
     {

@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 
 /**
  * Interface PriceRepositoryInterface
@@ -16,25 +19,16 @@ interface PriceRepositoryInterface extends ResourceRepositoryInterface
     /**
      * Finds prices by product.
      *
-     * @param ProductInterface $product
-     * @param bool             $asArray
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\Price[]|array[]
+     * @return array<Price>|array<array>
      */
-    public function findByProduct(ProductInterface $product, $asArray = false);
+    public function findByProduct(ProductInterface $product, bool $asArray = false): array;
 
     /**
      * Finds one price by product and context.
-     *
-     * @param ProductInterface $product
-     * @param ContextInterface $context
-     * @param bool             $useCache
-     *
-     * @return array|null
      */
     public function findOneByProductAndContext(
         ProductInterface $product,
         ContextInterface $context,
-        $useCache = true
-    );
+        bool $useCache = true
+    ): ?array;
 }

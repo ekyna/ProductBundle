@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use DateTime;
+use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
@@ -9,10 +13,10 @@ use Ekyna\Bundle\ProductBundle\Service\Stock\Resupply;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierDeliveryInterface;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierDeliveryItemInterface;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface;
-use Ekyna\Component\Commerce\Supplier\Repository\SupplierDeliveryItemRepositoryInterface;
-use Ekyna\Component\Commerce\Supplier\Repository\SupplierDeliveryRepositoryInterface;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
-use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
+use Ekyna\Component\Resource\Factory\ResourceFactoryInterface;
+use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,87 +33,41 @@ class ResupplyCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:resupply';
 
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
+    private ProductRepositoryInterface         $productRepository;
+    private SupplierProductRepositoryInterface $referenceRepository;
+    private ResourceManagerInterface           $orderOperator;
+    private ResourceFactoryInterface           $deliveryFactory;
+    private ResourceFactoryInterface           $deliveryItemFactory;
+    private ResourceManagerInterface           $deliveryOperator;
+    private Resupply                           $resupply;
 
-    /**
-     * @var SupplierProductRepositoryInterface
-     */
-    private $referenceRepository;
-
-    /**
-     * @var ResourceOperatorInterface
-     */
-    private $orderOperator;
-
-    /**
-     * @var SupplierDeliveryRepositoryInterface
-     */
-    private $deliveryRepository;
-
-    /**
-     * @var SupplierDeliveryItemRepositoryInterface
-     */
-    private $deliveryItemRepository;
-
-    /**
-     * @var ResourceOperatorInterface
-     */
-    private $deliveryOperator;
-
-    /**
-     * @var Resupply
-     */
-    private $resupply;
-
-    /**
-     * @var int[]
-     */
-    private $supplierOrderIds;
-
-    /**
-     * @var SupplierOrderInterface[]
-     */
-    private $supplierOrders;
+    /** @var array<int> */
+    private array $supplierOrderIds;
+    /** @var array<SupplierOrderInterface> */
+    private array $supplierOrders;
 
 
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface              $productRepository
-     * @param SupplierProductRepositoryInterface      $referenceRepository
-     * @param ResourceOperatorInterface               $orderOperator
-     * @param SupplierDeliveryRepositoryInterface     $deliveryRepository
-     * @param SupplierDeliveryItemRepositoryInterface $deliveryItemRepository
-     * @param ResourceOperatorInterface               $deliveryOperator
-     * @param Resupply                                $resupply
-     */
     public function __construct(
-        ProductRepositoryInterface $productRepository,
+        ProductRepositoryInterface         $productRepository,
         SupplierProductRepositoryInterface $referenceRepository,
-        ResourceOperatorInterface $orderOperator,
-        SupplierDeliveryRepositoryInterface $deliveryRepository,
-        SupplierDeliveryItemRepositoryInterface $deliveryItemRepository,
-        ResourceOperatorInterface $deliveryOperator,
-        Resupply $resupply
+        ResourceManagerInterface           $orderOperator,
+        ResourceFactoryInterface           $deliveryFactory,
+        ResourceFactoryInterface           $deliveryItemFactory,
+        ResourceManagerInterface           $deliveryOperator,
+        Resupply                           $resupply
     ) {
         parent::__construct();
 
-        $this->productRepository      = $productRepository;
-        $this->referenceRepository    = $referenceRepository;
-        $this->orderOperator          = $orderOperator;
-        $this->deliveryRepository     = $deliveryRepository;
-        $this->deliveryItemRepository = $deliveryItemRepository;
-        $this->deliveryOperator       = $deliveryOperator;
-        $this->resupply               = $resupply;
+        $this->productRepository = $productRepository;
+        $this->referenceRepository = $referenceRepository;
+        $this->orderOperator = $orderOperator;
+        $this->deliveryFactory = $deliveryFactory;
+        $this->deliveryItemFactory = $deliveryItemFactory;
+        $this->deliveryOperator = $deliveryOperator;
+        $this->resupply = $resupply;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Resupply a product')
@@ -117,16 +75,13 @@ class ResupplyCommand extends Command
             ->addArgument('quantity', InputArgument::REQUIRED, 'The quantity');
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $id       = intval($input->getArgument('id'));
-        $quantity = intval($input->getArgument('quantity'));
+        $id = intval($input->getArgument('id'));
+        $quantity = new Decimal($input->getArgument('quantity'));
 
         if (0 >= $id || 1 > $quantity) {
-            throw new InvalidArgumentException("Unexpected id or quantity.");
+            throw new InvalidArgumentException('Unexpected id or quantity.');
         }
 
         $product = $this->findProduct($id);
@@ -134,16 +89,16 @@ class ResupplyCommand extends Command
         $output->writeln('<comment>This command should not be used in a production environment.</comment>');
         $output->writeln('');
 
-        $helper   = $this->getHelper('question');
+        $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion(
-            "Resupply '{$product->getFullTitle()}' for '{$quantity}' quantity ?", false
+            "Resupply '{$product->getFullTitle()}' for '$quantity' quantity ?", false
         );
         if (!$helper->ask($input, $output, $question)) {
-            return;
+            return Command::SUCCESS;
         }
 
         $this->supplierOrderIds = [];
-        $this->supplierOrders   = [];
+        $this->supplierOrders = [];
 
         $output->writeln('');
         $output->writeln('### Creating supplier orders');
@@ -152,7 +107,7 @@ class ResupplyCommand extends Command
         $this->resupplyProduct($output, $product, $quantity);
 
         if (empty($this->supplierOrders)) {
-            return;
+            return Command::SUCCESS;
         }
 
         $output->writeln('');
@@ -166,6 +121,8 @@ class ResupplyCommand extends Command
         $output->writeln('');
 
         $this->createDeliveries($output);
+
+        return Command::SUCCESS;
     }
 
     /**
@@ -173,7 +130,7 @@ class ResupplyCommand extends Command
      *
      * @param OutputInterface $output
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function submitOrders(OutputInterface $output)
     {
@@ -185,7 +142,7 @@ class ResupplyCommand extends Command
                 str_pad('.', 80 - mb_strlen($name), '.', STR_PAD_LEFT)
             ));
 
-            $order->setOrderedAt(new \DateTime());
+            $order->setOrderedAt(new DateTime());
 
             $event = $this->orderOperator->update($order);
 
@@ -204,7 +161,7 @@ class ResupplyCommand extends Command
      *
      * @param OutputInterface $output
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function createDeliveries(OutputInterface $output)
     {
@@ -217,12 +174,12 @@ class ResupplyCommand extends Command
             ));
 
             /** @var SupplierDeliveryInterface $delivery */
-            $delivery = $this->deliveryRepository->createNew();
+            $delivery = $this->deliveryFactory->create();
             $delivery->setOrder($order);
 
             foreach ($order->getItems() as $orderItem) {
                 /** @var SupplierDeliveryItemInterface $deliveryItem */
-                $deliveryItem = $this->deliveryItemRepository->createNew();
+                $deliveryItem = $this->deliveryItemFactory->create();
 
                 $deliveryItem
                     ->setOrderItem($orderItem)
@@ -251,26 +208,22 @@ class ResupplyCommand extends Command
      *
      * @return ProductInterface
      */
-    private function findProduct($id)
+    private function findProduct(int $id): ProductInterface
     {
         /** @var ProductInterface $product */
         $product = $this->productRepository->find($id);
 
-        if (null === $product) {
-            throw new InvalidArgumentException("Product not found for id " . $id);
+        if (!$product) {
+            throw new InvalidArgumentException('Product not found');
         }
 
         return $product;
     }
 
     /**
-     * Resupplies the given product regarding to his type.
-     *
-     * @param OutputInterface  $output
-     * @param ProductInterface $product
-     * @param float            $quantity
+     * Resupplies the given product regarding his type.
      */
-    private function resupplyProduct(OutputInterface $output, ProductInterface $product, $quantity)
+    private function resupplyProduct(OutputInterface $output, ProductInterface $product, Decimal $quantity): void
     {
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -297,12 +250,8 @@ class ResupplyCommand extends Command
 
     /**
      * Resupplies the given simple/variant product.
-     *
-     * @param OutputInterface  $output
-     * @param ProductInterface $product
-     * @param float            $quantity
      */
-    private function resupplySimple(OutputInterface $output, ProductInterface $product, $quantity)
+    private function resupplySimple(OutputInterface $output, ProductInterface $product, Decimal $quantity): void
     {
         ProductTypes::assertChildType($product);
 
@@ -346,7 +295,7 @@ class ResupplyCommand extends Command
 
         if (!in_array($supplierOrder->getId(), $this->supplierOrderIds, true)) {
             $this->supplierOrderIds[] = $supplierOrder->getId();
-            $this->supplierOrders[]   = $supplierOrder;
+            $this->supplierOrders[] = $supplierOrder;
         }
 
         $output->writeln('<info>success</info>');
@@ -354,12 +303,8 @@ class ResupplyCommand extends Command
 
     /**
      * Resupplies all the given product's variants.
-     *
-     * @param OutputInterface  $output
-     * @param ProductInterface $product
-     * @param float            $quantity
      */
-    private function resupplyVariable(OutputInterface $output, ProductInterface $product, $quantity)
+    private function resupplyVariable(OutputInterface $output, ProductInterface $product, Decimal $quantity): void
     {
         ProductTypes::assertVariable($product);
 
@@ -370,12 +315,8 @@ class ResupplyCommand extends Command
 
     /**
      * Resupplies all the given product's bundle slots choices.
-     *
-     * @param OutputInterface  $output
-     * @param ProductInterface $product
-     * @param float            $quantity
      */
-    private function resupplyBundle(OutputInterface $output, ProductInterface $product, $quantity)
+    private function resupplyBundle(OutputInterface $output, ProductInterface $product, Decimal $quantity): void
     {
         ProductTypes::assertBundled($product);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\TranslationInterface;
@@ -13,19 +15,7 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  */
 interface OptionGroupTranslationInterface extends TranslationInterface
 {
-    /**
-     * Returns the title.
-     *
-     * @return string
-     */
-    public function getTitle();
+    public function getTitle(): ?string;
 
-    /**
-     * Sets the title.
-     *
-     * @param string $title
-     *
-     * @return $this|OptionGroupTranslationInterface
-     */
-    public function setTitle($title);
+    public function setTitle(?string $title): OptionGroupTranslationInterface;
 }

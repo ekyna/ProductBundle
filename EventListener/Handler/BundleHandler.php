@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
@@ -20,51 +23,19 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class BundleHandler extends AbstractHandler
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    private $persistenceHelper;
+    private PersistenceHelperInterface   $persistenceHelper;
+    private ProductRepositoryInterface   $productRepository;
+    private PriceCalculator              $priceCalculator;
+    private PriceInvalidator             $priceInvalidator;
+    private StockSubjectUpdaterInterface $stockUpdater;
 
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
+    private ?BundleUpdater $bundleUpdater = null;
 
-    /**
-     * @var PriceCalculator
-     */
-    private $priceCalculator;
-
-    /**
-     * @var PriceInvalidator
-     */
-    private $priceInvalidator;
-
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    private $stockUpdater;
-
-    /**
-     * @var BundleUpdater
-     */
-    private $bundleUpdater;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface   $persistenceHelper
-     * @param ProductRepositoryInterface   $productRepository
-     * @param PriceCalculator              $priceCalculator
-     * @param PriceInvalidator             $priceInvalidator
-     * @param StockSubjectUpdaterInterface $stockUpdater
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        ProductRepositoryInterface $productRepository,
-        PriceCalculator $priceCalculator,
-        PriceInvalidator $priceInvalidator,
+        PersistenceHelperInterface   $persistenceHelper,
+        ProductRepositoryInterface   $productRepository,
+        PriceCalculator              $priceCalculator,
+        PriceInvalidator             $priceInvalidator,
         StockSubjectUpdaterInterface $stockUpdater
     ) {
         $this->persistenceHelper = $persistenceHelper;
@@ -74,10 +45,7 @@ class BundleHandler extends AbstractHandler
         $this->stockUpdater = $stockUpdater;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleInsert(ResourceEventInterface $event)
+    public function handleInsert(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
@@ -87,17 +55,12 @@ class BundleHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateNetPrice($bundle);
+        $changed = $updater->updateNetPrice($bundle) || $changed;
 
-        $changed |= $updater->updateMinPrice($bundle);
-
-        return $changed;
+        return $updater->updateMinPrice($bundle) || $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleUpdate(ResourceEventInterface $event)
+    public function handleUpdate(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
@@ -118,7 +81,7 @@ class BundleHandler extends AbstractHandler
             $changed = true;
         }
 
-        $changed |= $updater->updateMinPrice($bundle);
+        $changed = $updater->updateMinPrice($bundle) || $changed;
 
         if (!empty($events)) {
             $this->scheduleChildChangeEvents($bundle, $events);
@@ -127,10 +90,7 @@ class BundleHandler extends AbstractHandler
         return $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildPriceChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
@@ -152,10 +112,7 @@ class BundleHandler extends AbstractHandler
         return $changed;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function handleChildStockChange(ResourceEventInterface $event)
+    public function handleChildStockChange(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
@@ -168,28 +125,23 @@ class BundleHandler extends AbstractHandler
         return false;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function supports(ProductInterface $product)
+    public function supports(ProductInterface $product): bool
     {
         return $product->getType() === ProductTypes::TYPE_BUNDLE;
     }
 
     /**
      * Check the bundle slots choices quantities.
-     *
-     * @param ProductInterface $bundle
      */
-    protected function checkQuantities(ProductInterface $bundle)
+    protected function checkQuantities(ProductInterface $bundle): void
     {
         ProductTypes::assertBundle($bundle);
 
         foreach ($bundle->getBundleSlots() as $slot) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            /** @var BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
 
-            if ($choice->getMaxQuantity() !== $choice->getMinQuantity()) {
+            if (!$choice->getMaxQuantity()->equals($choice->getMinQuantity())) {
                 $choice->setMaxQuantity($choice->getMinQuantity());
 
                 $this->persistenceHelper->persistAndRecompute($choice, false);
@@ -197,12 +149,7 @@ class BundleHandler extends AbstractHandler
         }
     }
 
-    /**
-     * Returns the bundle updater.
-     *
-     * @return BundleUpdater
-     */
-    protected function getBundleUpdater()
+    protected function getBundleUpdater(): BundleUpdater
     {
         if (null !== $this->bundleUpdater) {
             return $this->bundleUpdater;
@@ -213,18 +160,15 @@ class BundleHandler extends AbstractHandler
 
     /**
      * Dispatches the child change events.
-     *
-     * @param ProductInterface $bundle
-     * @param array            $events
      */
-    protected function scheduleChildChangeEvents(ProductInterface $bundle, array $events)
+    protected function scheduleChildChangeEvents(ProductInterface $bundle, array $events): void
     {
         ProductTypes::assertBundle($bundle);
 
         $parents = $this->productRepository->findParentsByBundled($bundle);
         foreach ($parents as $parent) {
             foreach ($events as $event) {
-                $this->persistenceHelper->scheduleEvent($event, $parent);
+                $this->persistenceHelper->scheduleEvent($parent, $event);
             }
         }
     }

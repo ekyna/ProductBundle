@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,36 +16,23 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class BundleSlotType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Bundle
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BundleSlotType extends ResourceFormType
+class BundleSlotType extends AbstractResourceType
 {
-    /**
-     * @var string
-     */
-    private $bundleChoiceClass;
+    private string $bundleChoiceClass;
 
-
-    /**
-     * Constructor.
-     *
-     * @param string $bundleSlotClass
-     * @param string $bundleChoiceClass
-     */
-    public function __construct($bundleSlotClass, $bundleChoiceClass)
+    public function __construct(string $bundleChoiceClass)
     {
-        parent::__construct($bundleSlotClass);
-
         $this->bundleChoiceClass = $bundleChoiceClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['configurable']) {
             // Bundle type : ensure one and only one choice.
@@ -77,20 +66,20 @@ class BundleSlotType extends ResourceFormType
                     'error_bubbling' => false,
                 ])
                 ->add('media', MediaChoiceType::class, [
-                    'label'    => 'ekyna_core.field.image',
+                    'label'    => t('field.image', [], 'EkynaUi'),
                     'required' => false,
                     'types'    => [MediaTypes::IMAGE, MediaTypes::SVG],
                 ])
                 ->add('required', CheckboxType::class, [
-                    'label'    => 'ekyna_core.field.required',
+                    'label'    => t('field.required', [], 'EkynaUi'),
                     'required' => false,
                     'attr'     => [
                         'align_with_widget' => true,
                     ],
                 ])
                 ->add('rules', BundleRulesType::class, [
-                    'entry_type' => BundleSlotRuleType::class,
-                    'prototype_name'  => '__slot_rule__',
+                    'entry_type'     => BundleSlotRuleType::class,
+                    'prototype_name' => '__slot_rule__',
                 ]);
         }
 
@@ -102,18 +91,12 @@ class BundleSlotType extends ResourceFormType
             ->add('position', CollectionPositionType::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['configurable'] = $options['configurable'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -124,10 +107,7 @@ class BundleSlotType extends ResourceFormType
             ->setAllowedTypes('configurable', 'bool');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_bundle_slot';
     }

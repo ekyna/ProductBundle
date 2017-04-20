@@ -15,9 +15,6 @@ use Ekyna\Component\Commerce\Common\View\LineView;
  */
 class SaleViewType extends AbstractViewType
 {
-    /**
-     * @inheritDoc
-     */
     public function buildItemView(SaleItemInterface $item, LineView $view, array $options): void
     {
         if (!$options['private']) {
@@ -36,7 +33,7 @@ class SaleViewType extends AbstractViewType
 
         $link = [
             'data-summary'  => json_encode([
-                'route'      => 'ekyna_product_product_admin_summary',
+                'route'      => 'admin_ekyna_product_product_summary',
                 'parameters' => ['productId' => $subject->getId()],
             ])
         ];
@@ -47,17 +44,11 @@ class SaleViewType extends AbstractViewType
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supportsSale(SaleInterface $sale): bool
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getName(): string
     {
         return 'ekyna_product_sale';

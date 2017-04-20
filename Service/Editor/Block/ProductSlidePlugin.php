@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Editor\Block;
 
 use Ekyna\Bundle\CmsBundle\Editor\Adapter\AdapterInterface;
 use Ekyna\Bundle\CmsBundle\Editor\Model\BlockInterface;
 use Ekyna\Bundle\CmsBundle\Editor\Plugin\Block\AbstractPlugin;
+use Ekyna\Bundle\CmsBundle\Editor\View\WidgetView;
 use Ekyna\Bundle\ProductBundle\Form\Type\Editor\ProductSlideBlockType;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Twig\Environment;
 
 /**
  * Class ProductSlidePlugin
@@ -20,41 +24,23 @@ class ProductSlidePlugin extends AbstractPlugin
 {
     const NAME = 'ekyna_product_slide';
 
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $repository;
+    private ProductRepositoryInterface $repository;
+    private Environment                $twig;
 
-    /**
-     * @var EngineInterface
-     */
-    private $templating;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     * @param EngineInterface            $templating
-     * @param array                      $config TODO configurable template
-     */
     public function __construct(
         ProductRepositoryInterface $repository,
-        EngineInterface $templating,
-        array $config
+        Environment                $twig,
+        array                      $config
     ) {
         parent::__construct(array_replace([
-            'template' => '@EkynaProduct/Editor/Block/product_slide.html.twig',
+            'template' => '@EkynaProduct/Editor/Block/product_slide.html.twig', // TODO configurable
         ], $config));
 
         $this->repository = $repository;
-        $this->templating = $templating;
+        $this->twig = $twig;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function create(BlockInterface $block, array $data = [])
+    public function create(BlockInterface $block, array $data = []): void
     {
         parent::create($block, $data);
 
@@ -66,13 +52,10 @@ class ProductSlidePlugin extends AbstractPlugin
         $block->setData(array_merge($defaultData, $data));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function update(BlockInterface $block, Request $request, array $options = [])
+    public function update(BlockInterface $block, Request $request, array $options = []): ?Response
     {
         $options = array_replace([
-            'action' => $this->urlGenerator->generate('ekyna_cms_editor_block_edit', [
+            'action' => $this->urlGenerator->generate('admin_ekyna_cms_editor_block_edit', [
                 'blockId'         => $block->getId(),
                 'widgetType'      => $request->get('widgetType', $block->getType()),
                 '_content_locale' => $this->localeProvider->getCurrentLocale(),
@@ -93,22 +76,20 @@ class ProductSlidePlugin extends AbstractPlugin
             return null;
         }
 
-        return $this->createModal('Modifier le bloc carousel produits.', $form->createView());
+        return $this->createModalResponse('Modifier le bloc carousel produits.', $form->createView());
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function validate(BlockInterface $block, ExecutionContextInterface $context)
+    public function validate(BlockInterface $block, ExecutionContextInterface $context): void
     {
         // TODO: Implement validate() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function createWidget(BlockInterface $block, AdapterInterface $adapter, array $options, $position = 0)
-    {
+    public function createWidget(
+        BlockInterface   $block,
+        AdapterInterface $adapter,
+        array            $options,
+        int              $position = 0
+    ): WidgetView {
         $data = $block->getData();
 
         $products = [];
@@ -126,7 +107,7 @@ class ProductSlidePlugin extends AbstractPlugin
             $view->content = '<p>Edit this block to select products.</p>';
         } else {
             // TODO image source sets / imagine filters
-            $view->content = $this->templating->render($this->config['template'], [
+            $view->content = $this->twig->render($this->config['template'], [
                 'duration'  => isset($data['duration']) ? $data['duration'] : null,
                 'max_width' => isset($data['max_width']) ? $data['max_width'] : null,
                 'products'  => $products,
@@ -136,26 +117,17 @@ class ProductSlidePlugin extends AbstractPlugin
         return $view;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'Product carousel';
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getName()
+    public function getName(): string
     {
         return static::NAME;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getJavascriptFilePath()
+    public function getJavascriptFilePath(): string
     {
         return 'ekyna-product/editor/block/product-slide';
     }

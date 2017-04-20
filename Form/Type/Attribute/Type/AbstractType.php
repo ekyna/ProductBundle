@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
@@ -14,10 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractType extends BaseType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([

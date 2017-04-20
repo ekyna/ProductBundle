@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Symfony\Component\Form\AbstractType;
@@ -13,10 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BundleRuleConditionType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('slot', IntegerType::class, [
@@ -30,10 +29,7 @@ class BundleRuleConditionType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'ekyna_product_bundle_rule_condition';
     }

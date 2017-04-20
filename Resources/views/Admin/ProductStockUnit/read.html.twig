@@ -1,0 +1,56 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{#{% block title %}#}
+{#    <h1>{{ 'stock_unit.header.show'|trans({}, 'EkynaCommerce') }}</h1>#}
+{#{% endblock title %}#}
+
+{% block actions %}{% endblock %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        {# TODO status #}
+        <div class="row">
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.netPrice, 'number', {
+                    'label': t('field.buy_net_price', [], 'EkynaCommerce'),
+                    'label_col': 4
+                    'append': ' €'
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.geocodes|join(', '), 'text', {
+                    'label': t('field.geocode', [], 'EkynaCommerce'),
+                    'label_col': 4
+                }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.estimatedDateOfArrival, 'datetime', {
+                    'label': t('field.estimated_date_of_arrival', [], 'EkynaCommerce'),
+                    'label_col': 4
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.orderedQuantity, 'number', {
+                    'label': t('stock_unit.field.ordered_quantity', [], 'EkynaCommerce'),
+                    'label_col': 4
+                }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.receivedQuantity, 'number', {
+                    'label': t('stock_unit.field.received_quantity', [], 'EkynaCommerce'),
+                    'label_col': 4
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ show_row(productStockUnit.shippedQuantity, 'number', {
+                    'label': t('stock_unit.field.shipped_quantity', [], 'EkynaCommerce'),
+                    'label_col': 4
+                }) }}
+            </div>
+        </div>
+    </div>
+{%- endblock main_contents %}

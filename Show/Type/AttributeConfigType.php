@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Show\Type;
 
-use Ekyna\Bundle\AdminBundle\Show\Exception\InvalidArgumentException;
+use Ekyna\Bundle\AdminBundle\Show\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\AdminBundle\Show\Type\AbstractType;
 use Ekyna\Bundle\AdminBundle\Show\View;
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
@@ -15,10 +17,7 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
  */
 class AttributeConfigType extends AbstractType
 {
-    /**
-     * @var AttributeTypeRegistryInterface
-     */
-    private $typeRegistry;
+    private AttributeTypeRegistryInterface $registry;
 
 
     /**
@@ -28,21 +27,21 @@ class AttributeConfigType extends AbstractType
      */
     public function __construct(AttributeTypeRegistryInterface $typeRegistry)
     {
-        $this->typeRegistry = $typeRegistry;
+        $this->registry = $typeRegistry;
     }
 
     /**
      * @inheritDoc
      */
-    public function build(View $view, $value, array $options = [])
+    public function build(View $view, $value, array $options = []): void
     {
         parent::build($view, $value, $options);
 
         if (!$value instanceof AttributeInterface) {
-            throw new InvalidArgumentException("Expected instance of " . AttributeInterface::class);
+            throw new UnexpectedTypeException($value, AttributeInterface::class);
         }
 
-        $type = $this->typeRegistry->getType($value->getType());
+        $type = $this->registry->getType($value->getType());
 
         $fields = $type->getConfigShowFields($value);
 
@@ -52,8 +51,8 @@ class AttributeConfigType extends AbstractType
     /**
      * @inheritDoc
      */
-    public function getWidgetPrefix()
+    public static function getName(): string
     {
-        return 'attribute_config';
+        return 'product_attribute_config';
     }
 }

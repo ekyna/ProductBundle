@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\Convert\BundleToSimpleType;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Symfony\Component\Form\FormInterface;
@@ -15,57 +18,33 @@ use Symfony\Component\Form\FormInterface;
  */
 class BundleToSimpleConverter extends AbstractConverter
 {
-    /**
-     * @var StockSubjectUpdaterInterface
-     */
-    private $stockSubjectUpdater;
+    private StockSubjectUpdaterInterface $stockSubjectUpdater;
 
-
-    /**
-     * Sets the stockSubjectUpdater.
-     *
-     * @param StockSubjectUpdaterInterface $stockSubjectUpdater
-     */
     public function setStockSubjectUpdater(StockSubjectUpdaterInterface $stockSubjectUpdater): void
     {
         $this->stockSubjectUpdater = $stockSubjectUpdater;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supportsSourceType(string $type): bool
     {
         return $type === ProductTypes::TYPE_BUNDLE;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supportsTargetType(string $type): bool
     {
         return $type === ProductTypes::TYPE_SIMPLE;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function init()
+    protected function init(): ProductInterface
     {
         return $this->source;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function buildForm(): FormInterface
     {
         return $this->formFactory->create(BundleToSimpleType::class, $this->target);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onPreConvert(): void
     {
         $this->stockSubjectUpdater->reset($this->target);
@@ -75,9 +54,6 @@ class BundleToSimpleConverter extends AbstractConverter
         parent::onPreConvert();
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function onConvert(): void
     {
         $form = $this->getForm();

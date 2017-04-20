@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -14,111 +16,43 @@ use Ekyna\Component\Resource\Model as RM;
  */
 interface AttributeInterface extends RM\SortableInterface, RM\TranslatableInterface
 {
-    /**
-     * Returns the name.
-     *
-     * @return string
-     */
-    public function getName();
+    public function getName(): ?string;
 
-    /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return $this|AttributeInterface
-     */
-    public function setName($name);
+    public function setName(?string $name): AttributeInterface;
 
-    /**
-     * Returns the type.
-     *
-     * @return string
-     */
-    public function getType();
+    public function getType(): ?string;
 
-    /**
-     * Sets the type.
-     *
-     * @param string $type
-     *
-     * @return $this|AttributeInterface
-     */
-    public function setType($type);
+    public function setType(?string $type): AttributeInterface;
 
-    /**
-     * Returns the configuration.
-     *
-     * @return array
-     */
-    public function getConfig();
+    public function getConfig(): array;
 
-    /**
-     * Sets the configuration.
-     *
-     * @param array $configuration
-     *
-     * @return $this|AttributeInterface
-     */
-    public function setConfig(array $configuration);
+    public function setConfig(array $config): AttributeInterface;
 
     /**
      * Returns the (translated) title.
-     *
-     * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Returns the (translated) title.
-     *
-     * @param string $title
-     *
-     * @return $this|AttributeInterface
      */
-    public function setTitle(string $title);
+    public function setTitle(?string $title): AttributeInterface;
 
     /**
-     * Returns the attributes.
-     *
-     * @return ArrayCollection|AttributeChoiceInterface[]
+     * @return Collection<AttributeChoiceInterface>
      */
-    public function getChoices();
+    public function getChoices(): Collection;
 
     /**
-     * Returns whether the group has the attribute or not.
+     * @param Collection<AttributeChoiceInterface> $choices
      *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return bool
-     */
-    public function hasChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Adds the attribute.
-     *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function addChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Removes the attribute.
-     *
-     * @param AttributeChoiceInterface $choice
-     *
-     * @return $this|OptionGroupInterface
-     */
-    public function removeChoice(AttributeChoiceInterface $choice);
-
-    /**
-     * Sets the attributes.
-     *
-     * @param ArrayCollection|AttributeChoiceInterface[] $attributes
-     *
-     * @return $this|OptionGroupInterface
      * @internal
      */
-    public function setChoices(ArrayCollection $attributes);
+    public function setChoices(Collection $choices): AttributeInterface;
+
+    public function hasChoice(AttributeChoiceInterface $choice): bool;
+
+    public function addChoice(AttributeChoiceInterface $choice): AttributeInterface;
+
+    public function removeChoice(AttributeChoiceInterface $choice): AttributeInterface;
 }

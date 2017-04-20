@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
+use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
 /**
  * Class ProductReferenceRepository
@@ -13,9 +15,6 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  */
 class ProductReferenceRepository extends ResourceRepository implements ProductReferenceRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function findOneByTypeAndCode(string $type, string $code): ?ProductReferenceInterface
     {
         ProductReferenceTypes::isValid($type);

@@ -1,266 +1,129 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
+use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Component\Resource\Model as RM;
+use Ekyna\Component\Resource\Model\TimestampableTrait;
 
 /**
  * Class Catalog
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
+class Catalog implements CatalogInterface
 {
-    use RM\TimestampableTrait;
+    use TimestampableTrait;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id = null;
+    private ?CustomerInterface $customer = null;
+    private ?string $theme = null;
+    private ?string $title = null;
+    private ?string $description = null;
+    private ?string $slug = null;
+    /** @var Collection<CatalogPage> */
+    private Collection $pages;
+    private ?array $options = null;
 
-    /**
-     * @var CustomerInterface
-     */
-    private $customer;
+    /** Non-mapped fields */
 
-    /**
-     * @var string
-     */
-    private $theme;
+    private ?string $format = null;
+    private bool $displayPrices = false;
+    private ?ContextInterface $context = null;
+    private ?string $template = null;
+    /** @var Collection<SaleItemInterface> */
+    private Collection $saleItems;
+    /** (non-mapped) */
+    private bool $save = false;
 
-    /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var string
-     */
-    private $slug;
-
-    /**
-     * @var ArrayCollection|CatalogPage[]
-     */
-    private $pages;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-    /**
-     * (non-mapped)
-     * @var string
-     */
-    private $format;
-
-    /**
-     * (non-mapped)
-     * @var bool
-     */
-    private $displayPrices;
-
-    /**
-     * (non-mapped)
-     * @var ContextInterface
-     */
-    private $context;
-
-    /**
-     * (non-mapped)
-     * @var string
-     */
-    private $template;
-
-    /**
-     * (non-mapped)
-     * @var ArrayCollection|SaleItemInterface[]
-     */
-    private $saleItems;
-
-    /**
-     * (non-mapped)
-     * @var bool
-     */
-    private $save;
-
-
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->pages = new ArrayCollection();
         $this->saleItems = new ArrayCollection();
     }
 
-    /**
-     * Returns the string representation.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->title ?: 'New catalog';
     }
 
-    /**
-     * Returns the id.
-     *
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Returns the customer.
-     *
-     * @return CustomerInterface
-     */
-    public function getCustomer()
+    public function getCustomer(): ?CustomerInterface
     {
         return $this->customer;
     }
 
-    /**
-     * Sets the customer.
-     *
-     * @param CustomerInterface $customer
-     *
-     * @return Catalog
-     */
-    public function setCustomer(CustomerInterface $customer = null)
+    public function setCustomer(?CustomerInterface $customer): CatalogInterface
     {
         $this->customer = $customer;
 
         return $this;
     }
 
-    /**
-     * Returns the theme.
-     *
-     * @return string
-     */
-    public function getTheme()
+    public function getTheme(): ?string
     {
         return $this->theme;
     }
 
-    /**
-     * Sets the theme.
-     *
-     * @param string $theme
-     *
-     * @return Catalog
-     */
-    public function setTheme($theme)
+    public function setTheme(?string $theme): CatalogInterface
     {
         $this->theme = $theme;
 
         return $this;
     }
 
-    /**
-     * Returns the title.
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    /**
-     * Sets the title.
-     *
-     * @param string $title
-     *
-     * @return Catalog
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): CatalogInterface
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * Returns the description.
-     *
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * Sets the description.
-     *
-     * @param string $description
-     *
-     * @return Catalog
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): CatalogInterface
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * Returns the slug.
-     *
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    /**
-     * Sets the slug.
-     *
-     * @param string $slug
-     *
-     * @return Catalog
-     */
-    public function setSlug($slug)
+    public function setSlug(?string $slug): CatalogInterface
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    /**
-     * Returns the pages.
-     *
-     * @return ArrayCollection|CatalogPage[]
-     */
-    public function getPages()
+    public function getPages(): Collection
     {
         return $this->pages;
     }
 
-    /**
-     * Adds the pages.
-     *
-     * @param CatalogPage $page
-     *
-     * @return Catalog
-     */
-    public function addPage(CatalogPage $page)
+    public function addPage(CatalogPage $page): CatalogInterface
     {
         if (!$this->pages->contains($page)) {
             $this->pages->add($page);
@@ -270,14 +133,7 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
         return $this;
     }
 
-    /**
-     * Removes the pages.
-     *
-     * @param CatalogPage $page
-     *
-     * @return Catalog
-     */
-    public function removePage(CatalogPage $page)
+    public function removePage(CatalogPage $page): CatalogInterface
     {
         if ($this->pages->contains($page)) {
             $this->pages->removeElement($page);
@@ -287,144 +143,72 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
         return $this;
     }
 
-    /**
-     * Returns the options.
-     *
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): ?array
     {
         return $this->options;
     }
 
-    /**
-     * Sets the options.
-     *
-     * @param array $options
-     *
-     * @return Catalog
-     */
-    public function setOptions(array $options = [])
+    public function setOptions(?array $options): CatalogInterface
     {
         $this->options = $options;
 
         return $this;
     }
 
-    /**
-     * Returns the format.
-     *
-     * @return string
-     */
-    public function getFormat()
+    public function getFormat(): ?string
     {
         return $this->format;
     }
 
-    /**
-     * Sets the format.
-     *
-     * @param string $format
-     *
-     * @return Catalog
-     */
-    public function setFormat($format)
+    public function setFormat(?string $format): CatalogInterface
     {
         $this->format = $format;
 
         return $this;
     }
 
-    /**
-     * Returns whether to display prices.
-     *
-     * @return bool
-     */
-    public function isDisplayPrices()
+    public function isDisplayPrices(): bool
     {
         return $this->displayPrices;
     }
 
-    /**
-     * Sets whether to display prices.
-     *
-     * @param bool $display
-     *
-     * @return Catalog
-     */
-    public function setDisplayPrices($display)
+    public function setDisplayPrices(bool $display): CatalogInterface
     {
-        $this->displayPrices = (bool)$display;
+        $this->displayPrices = $display;
 
         return $this;
     }
 
-    /**
-     * Returns the context.
-     *
-     * @return ContextInterface
-     */
-    public function getContext()
+    public function getContext(): ?ContextInterface
     {
         return $this->context;
     }
 
-    /**
-     * Sets the context.
-     *
-     * @param ContextInterface $context
-     *
-     * @return Catalog
-     */
-    public function setContext(ContextInterface $context)
+    public function setContext(?ContextInterface $context): CatalogInterface
     {
         $this->context = $context;
 
         return $this;
     }
 
-    /**
-     * Returns the template.
-     *
-     * @return string
-     */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
 
-    /**
-     * Sets the template.
-     *
-     * @param string $template
-     *
-     * @return Catalog
-     */
-    public function setTemplate(string $template)
+    public function setTemplate(string $template): CatalogInterface
     {
         $this->template = $template;
 
         return $this;
     }
 
-    /**
-     * Returns the sale items.
-     *
-     * @return ArrayCollection|SaleItemInterface[]
-     */
-    public function getSaleItems()
+    public function getSaleItems(): Collection
     {
         return $this->saleItems;
     }
 
-    /**
-     * Sets the sale items.
-     *
-     * @param SaleItemInterface[] $items
-     *
-     * @return Catalog
-     */
-    public function setSaleItems(array $items)
+    public function setSaleItems(array $items): CatalogInterface
     {
         $this->saleItems = new ArrayCollection();
 
@@ -435,14 +219,7 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
         return $this;
     }
 
-    /**
-     * Adds the sale item.
-     *
-     * @param SaleItemInterface $item
-     *
-     * @return Catalog
-     */
-    public function addSaleItem(SaleItemInterface $item)
+    public function addSaleItem(SaleItemInterface $item): CatalogInterface
     {
         if (!$this->saleItems->contains($item)) {
             $this->saleItems->add($item);
@@ -451,14 +228,7 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
         return $this;
     }
 
-    /**
-     * Removes the sale item.
-     *
-     * @param SaleItemInterface $item
-     *
-     * @return Catalog
-     */
-    public function removeSaleItem(SaleItemInterface $item)
+    public function removeSaleItem(SaleItemInterface $item): CatalogInterface
     {
         if ($this->saleItems->contains($item)) {
             $this->saleItems->removeElement($item);
@@ -467,24 +237,12 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
         return $this;
     }
 
-    /**
-     * Returns whether to save the catalog render.
-     *
-     * @return bool
-     */
-    public function isSave()
+    public function isSave(): bool
     {
         return $this->save;
     }
 
-    /**
-     * Sets whether to save the catalog render.
-     *
-     * @param bool $save
-     *
-     * @return Catalog
-     */
-    public function setSave($save)
+    public function setSave(bool $save): CatalogInterface
     {
         $this->save = $save;
 

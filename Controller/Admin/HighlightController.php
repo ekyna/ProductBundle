@@ -1,99 +1,95 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
-use Ekyna\Bundle\AdminBundle\Menu\MenuBuilder;
-use Ekyna\Bundle\CoreBundle\Controller\Controller;
+use Ekyna\Bundle\AdminBundle\Service\Menu\MenuBuilder;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 /**
  * Class HighlightController
  * @package Ekyna\Bundle\ProductBundle\Controller\Admin
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class HighlightController extends Controller
+class HighlightController
 {
-    /**
-     * Highlight action.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction()
+    private ProductRepositoryInterface $productRepository;
+    private ResourceManagerInterface   $productManager;
+    private MenuBuilder                $menuBuilder;
+    private TranslatorInterface $translator;
+    private ValidatorInterface         $validator;
+    private Environment                $twig;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository,
+        ResourceManagerInterface   $productManager,
+        MenuBuilder                $menuBuilder,
+        TranslatorInterface $translator,
+        ValidatorInterface         $validator,
+        Environment                $twig
+    ) {
+        $this->productRepository = $productRepository;
+        $this->productManager = $productManager;
+        $this->menuBuilder = $menuBuilder;
+        $this->translator = $translator;
+        $this->validator = $validator;
+        $this->twig = $twig;
+    }
+
+    public function index(): Response
     {
-        $this
-            ->container
-            ->get(MenuBuilder::class)
-            ->breadcrumbAppend(
-                'ekyna_product_highlight',
-                'ekyna_product.highlight.title',
-                'ekyna_product_highlight_admin_index'
-            );
+        $this->menuBuilder->breadcrumbAppend([
+            'name'         => 'ekyna_product_highlight',
+            'label'        => 'highlight.title',
+            'trans_domain' => 'EkynaProduct',
+            'route'        => 'admin_ekyna_product_highlight_index',
+        ]);
 
-        $qb = $this
-            ->get('ekyna_product.product.repository')
-            ->createQueryBuilder('p');
-
-        $products = $qb
-            ->select([
-                'p.id',
-                'b.name as brand',
-                'p.designation',
-                'p.reference',
-                'p.visible',
-                'p.visibility',
-                'p.bestSeller',
-                'p.crossSelling',
-            ])
-            ->join('p.brand', 'b')
-            ->where($qb->expr()->neq('p.type', ':not_type'))
-            ->orderBy('p.id', 'ASC')
-            ->getQuery()
-            ->setParameter('not_type', ProductTypes::TYPE_VARIANT)
-            ->getScalarResult();
-
-        $translator = $this->getTranslator();
+        $products = $this->productRepository->findForHighlight();
 
         $visibleChoices = [
-            $translator->trans('ekyna_core.value.no')  => 0,
-            $translator->trans('ekyna_core.value.yes') => 1,
+            $this->translator->trans('value.no', [], 'EkynaUi')  => 0,
+            $this->translator->trans('value.yes', [], 'EkynaUi') => 1,
         ];
 
         $highlightChoices = [];
         foreach (HighlightModes::getChoices() as $key => $value) {
-            $highlightChoices[$translator->trans($key)] = $value;
+            $highlightChoices[$this->translator->trans($key, [], 'EkynaProduct')] = $value;
         }
 
-        return $this->render('@EkynaProduct/Admin/Highlight/index.html.twig', [
+        $content = $this->twig->render('@EkynaProduct/Admin/Highlight/index.html.twig', [
             'products'          => $products,
             'visible_choices'   => $visibleChoices,
             'highlight_choices' => $highlightChoices,
         ]);
+
+        return (new Response($content))->setPrivate();
     }
 
-    /**
-     * Updates the product.
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function updateAction(Request $request)
+    public function update(Request $request): Response
     {
-        $productId = $request->attributes->get('productId');
+        $productId = $request->attributes->getInt('productId');
         $property = $request->request->get('property');
         $value = $request->request->get('value');
 
         if (empty($productId) || empty($property) || is_null($value)) {
-            throw new BadRequestHttpException("Id, property and message must be defined with non empty values.");
+            throw new BadRequestHttpException('Id, property and message must be defined with non empty values.');
         }
 
-        $product = $this->get('ekyna_product.product.repository')->find($productId);
+        $product = $this->productRepository->find($productId);
         if (null === $product) {
-            throw $this->createNotFoundException('Product not found.');
+            throw new NotFoundHttpException('Product not found.');
         }
 
         switch ($property) {
@@ -119,16 +115,15 @@ class HighlightController extends Controller
                 throw new BadRequestHttpException("Unexpected property '$property'.");
         }
 
-        $violations = $this->getValidator()->validate($product, null, ['Default', $product->getType()]);
+        $violations = $this->validator->validate($product, null, ['Default', $product->getType()]);
         if (0 < $violations->count()) {
-            throw new BadRequestHttpException("Product is not valid.");
+            throw new BadRequestHttpException('Product is not valid.');
         }
 
-        $em = $this->get('ekyna_product.product.manager');
-        $em->persist($product);
-        $em->flush();
+        $this->productManager->persist($product);
+        $this->productManager->flush();
 
-        return JsonResponse::create([
+        return new JsonResponse([
             'id'           => $product->getId(),
             'visible'      => $product->isVisible() ? '1' : '0',
             'visibility'   => $product->getVisibility(),

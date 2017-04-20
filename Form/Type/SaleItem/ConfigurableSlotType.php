@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
@@ -13,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class ConfigurableSlotType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\SaleItem
@@ -20,33 +24,16 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class ConfigurableSlotType extends Form\AbstractType
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
+    private FormBuilder $formBuilder;
 
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     * @param FormBuilder $formBuilder
-     */
     public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder)
     {
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formBuilder;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildForm(Form\FormBuilderInterface $builder, array $options)
+    public function buildForm(Form\FormBuilderInterface $builder, array $options): void
     {
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
@@ -71,7 +58,7 @@ class ConfigurableSlotType extends Form\AbstractType
             ->create('choice', Type\ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::BUNDLE_CHOICE_ID . ']',
-                'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
+                'placeholder'   => t('sale_item_configure.choose_option', [], 'EkynaProduct'),
                 'required'      => $bundleSlot->isRequired(),
                 'constraints'   => $constraints,
                 'select2'       => false,
@@ -93,17 +80,13 @@ class ConfigurableSlotType extends Form\AbstractType
             ));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(Form\FormView $view, Form\FormInterface $form, array $options)
+    public function finishView(Form\FormView $view, Form\FormInterface $form, array $options): void
     {
         /** @var SaleItemInterface $item */
         $item = $form->getData();
 
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
-        /** @var Model\BundleChoiceInterface[] $bundleChoices */
         $bundleChoices = $this->itemBuilder->getFilter()->getSlotChoices($bundleSlot);
 
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
@@ -172,13 +155,13 @@ class ConfigurableSlotType extends Form\AbstractType
                 'config'             => '{}',
                 'choice_brand'       => null,
                 'choice_product'     => $this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.no_choice.title', [
+                    'sale_item_configure.no_choice.title', [
                         '%slot_title%' => $bundleSlot->getTitle(),
-                    ]
+                    ], 'EkynaProduct'
                 ),
                 'choice_reference'   => '',
                 'choice_description' => $this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.no_choice.description'
+                    'sale_item_configure.no_choice.description', [], 'EkynaProduct'
                 ),
                 'choice_thumb'       => $this->formBuilder->getNoImagePath(),
                 'choice_image'       => $this->formBuilder->getNoImagePath(),
@@ -207,7 +190,7 @@ class ConfigurableSlotType extends Form\AbstractType
      * @param Form\FormView               $view
      * @param Model\BundleChoiceInterface $bundleChoice
      */
-    private function addChoiceVars(Form\FormView $view, Model\BundleChoiceInterface $bundleChoice)
+    private function addChoiceVars(Form\FormView $view, Model\BundleChoiceInterface $bundleChoice): void
     {
         $product = $bundleChoice->getProduct();
 
@@ -222,10 +205,7 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['config'] = $this->formBuilder->buildBundleChoiceConfig($product);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -236,10 +216,7 @@ class ConfigurableSlotType extends Form\AbstractType
             ->setAllowedTypes('bundle_slot', Model\BundleSlotInterface::class);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'sale_item_configurable_slot';
     }

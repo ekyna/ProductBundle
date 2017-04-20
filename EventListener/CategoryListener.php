@@ -125,7 +125,7 @@ class CategoryListener implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function getSubscribedEvents()
     {

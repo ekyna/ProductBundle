@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
 
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
+use DateTimeInterface;
+use Decimal\Decimal;
+use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 
 /**
  * Class Result
@@ -11,79 +15,35 @@ use Ekyna\Bundle\ProductBundle\Entity\Offer;
  */
 class Result
 {
-    /**
-     * @var string
-     */
-    protected $key;
+    protected string  $key;
+    protected bool    $startingFrom = false;
+    protected Decimal $originalPrice;
+    protected Decimal $basePrice;
+    protected Decimal $sellPrice;
+    /** @var array<string, Decimal> */
+    protected array              $discounts;
+    protected ?DateTimeInterface $endsAt = null;
 
-    /**
-     * @var bool
-     */
-    protected $startingFrom = false;
-
-    /**
-     * @var float
-     */
-    protected $originalPrice;
-
-    /**
-     * @var float
-     */
-    protected $basePrice;
-
-    /**
-     * @var float
-     */
-    protected $sellPrice;
-
-    /**
-     * @var float[]
-     */
-    protected $discounts;
-
-    /**
-     * @var \DateTime
-     */
-    protected $endsAt;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $key
-     */
     public function __construct(string $key)
     {
         $this->key = $key;
 
-        $this->startingFrom  = false;
-        $this->originalPrice = 0;
-        $this->basePrice     = 0;
-        $this->sellPrice     = 0;
+        $this->startingFrom = false;
+        $this->originalPrice = new Decimal(0);
+        $this->basePrice = new Decimal(0);
+        $this->sellPrice = new Decimal(0);
 
         $this->discounts = [
-            Offer::TYPE_SPECIAL => 0,
-            Offer::TYPE_PRICING => 0,
+            OfferInterface::TYPE_SPECIAL => new Decimal(0),
+            OfferInterface::TYPE_PRICING => new Decimal(0),
         ];
     }
 
-    /**
-     * Returns the key.
-     *
-     * @return string
-     */
     public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * Sets the starting from.
-     *
-     * @param bool $from
-     *
-     * @return Result
-     */
     public function setStartingFrom(bool $from): self
     {
         $this->startingFrom = $from;
@@ -91,97 +51,51 @@ class Result
         return $this;
     }
 
-    /**
-     * Returns the starting from.
-     *
-     * @return bool
-     */
     public function isStartingFrom(): bool
     {
         return $this->startingFrom;
     }
 
-    /**
-     * Adds the original price.
-     *
-     * @param float $amount
-     *
-     * @return $this
-     */
-    public function addOriginalPrice(float $amount): self
+    public function addOriginalPrice(Decimal $amount): self
     {
         $this->originalPrice += $amount;
 
         return $this;
     }
 
-    /**
-     * Returns the netPrice.
-     *
-     * @return float
-     */
-    public function getOriginalPrice(): float
+    public function getOriginalPrice(): Decimal
     {
         return $this->originalPrice;
     }
 
-    /**
-     * Adds the base price.
-     *
-     * @param float $amount
-     *
-     * @return $this
-     */
-    public function addBasePrice(float $amount): self
+    public function addBasePrice(Decimal $amount): self
     {
         $this->basePrice += $amount;
 
         return $this;
     }
 
-    /**
-     * Returns the base price.
-     *
-     * @return float
-     */
-    public function getBasePrice(): float
+    public function getBasePrice(): Decimal
     {
         return $this->basePrice;
     }
 
-    /**
-     * Adds the sell price.
-     *
-     * @param float $amount
-     *
-     * @return $this
-     */
-    public function addSellPrice(float $amount): self
+    public function addSellPrice(Decimal $amount): self
     {
         $this->sellPrice += $amount;
 
         return $this;
     }
 
-    /**
-     * Returns the sell price.
-     *
-     * @return float
-     */
-    public function getSellPrice(): float
+    public function getSellPrice(): Decimal
     {
         return $this->sellPrice;
     }
 
     /**
      * Adds the discount amount for the given type.
-     *
-     * @param string $type
-     * @param float  $amount
-     *
-     * @return $this
      */
-    public function addDiscount(string $type, float $amount): self
+    public function addDiscount(string $type, Decimal $amount): self
     {
         $this->discounts[$type] += $amount;
 
@@ -190,24 +104,13 @@ class Result
 
     /**
      * Returns the discount amount for the given type.
-     *
-     * @param string $type
-     *
-     * @return float
      */
-    public function getDiscount(string $type): float
+    public function getDiscount(string $type): Decimal
     {
         return $this->discounts[$type];
     }
 
-    /**
-     * Adds "ends at" date.
-     *
-     * @param \DateTime $date
-     *
-     * @return $this
-     */
-    public function addEndsAt(\DateTime $date): self
+    public function addEndsAt(DateTimeInterface $date): self
     {
         if (is_null($this->endsAt) || $date < $this->endsAt) {
             $this->endsAt = $date;
@@ -216,21 +119,11 @@ class Result
         return $this;
     }
 
-    /**
-     * Returns the "ends at" date.
-     *
-     * @return \DateTime|null
-     */
-    public function getEndsAt(): ?\DateTime
+    public function getEndsAt(): ?DateTimeInterface
     {
         return $this->endsAt;
     }
 
-    /**
-     * Returns the array result.
-     *
-     * @return array|null
-     */
     public function toArray(): ?array
     {
         // Build price for this group/country couple
@@ -243,20 +136,20 @@ class Result
         }
 
         $details = [];
-        $base    = $this->originalPrice;
-        foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
-            if (empty($this->discounts[$type])) {
+        $base = $this->originalPrice;
+        foreach ([OfferInterface::TYPE_SPECIAL, OfferInterface::TYPE_PRICING] as $type) {
+            if ($this->discounts[$type]->isZero()) {
                 continue;
             }
 
-            $discount       = $this->discounts[$type];
-            $details[$type] = round($discount * 100 / $base, 5);
-            $base           -= $discount;
+            $discount = $this->discounts[$type];
+            $details[$type] = (new Decimal($discount * 100 / $base))->round(5);
+            $base -= $discount;
         }
 
-        $percent = 0;
+        $percent = new Decimal(0);
         if (0 < $this->originalPrice) {
-            $percent = round(($this->originalPrice - $this->sellPrice) * 100 / $this->originalPrice, 2);
+            $percent = (new Decimal(($this->originalPrice - $this->sellPrice) * 100 / $this->originalPrice))->round(2);
         }
 
         if (0 < $percent) {

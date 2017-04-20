@@ -1,21 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
 use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
+use Ekyna\Bundle\ProductBundle\Factory\ProductFactoryInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
-use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
+use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Throwable;
+
+use function array_key_exists;
+use function array_map;
+use function implode;
+use function iterator_to_array;
+use function sprintf;
 
 /**
  * Class AbstractConverter
@@ -24,90 +32,33 @@ use Throwable;
  */
 abstract class AbstractConverter implements ConverterInterface
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    protected $productRepository;
+    protected ProductFactoryInterface          $productFactory;
+    protected ResourceManagerInterface         $productManager;
+    protected EntityManagerInterface           $entityManager;
+    protected FormFactoryInterface             $formFactory;
+    protected RequestStack                     $requestStack;
+    protected ValidatorInterface               $validator;
+    protected ResourceEventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $productManager;
-
-    /**
-     * @var ResourceOperatorInterface
-     */
-    protected $productOperator;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $formFactory;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ValidatorInterface
-     */
-    protected $validator;
-
-    /**
-     * @var ResourceEventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var ProductInterface
-     */
-    protected $source;
-
-    /**
-     * @var ProductInterface|null
-     */
-    protected $target;
-
-    /**
-     * @var ConvertEvent
-     */
-    private $event;
-
-    /**
-     * @var FormInterface
-     */
-    private $form;
-
-    /**
-     * @var array
-     */
-    private $data;
+    protected ?ProductInterface $source = null;
+    protected ?ProductInterface $target = null;
+    private ?ConvertEvent       $event  = null;
+    private ?FormInterface      $form   = null;
+    private array               $data   = [];
 
 
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface       $productRepository
-     * @param EntityManagerInterface           $productManager
-     * @param ResourceOperatorInterface        $productOperator
-     * @param FormFactoryInterface             $formFactory
-     * @param RequestStack                     $requestStack
-     * @param ValidatorInterface               $validator
-     * @param ResourceEventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        EntityManagerInterface $productManager,
-        ResourceOperatorInterface $productOperator,
-        FormFactoryInterface $formFactory,
-        RequestStack $requestStack,
-        ValidatorInterface $validator,
+        ProductFactoryInterface          $productFactory,
+        ResourceManagerInterface         $productManager,
+        EntityManagerInterface           $entityManager,
+        FormFactoryInterface             $formFactory,
+        RequestStack                     $requestStack,
+        ValidatorInterface               $validator,
         ResourceEventDispatcherInterface $eventDispatcher
     ) {
-        $this->productRepository = $productRepository;
+        $this->productFactory = $productFactory;
         $this->productManager = $productManager;
-        $this->productOperator = $productOperator;
+        $this->entityManager = $entityManager;
         $this->formFactory = $formFactory;
         $this->requestStack = $requestStack;
         $this->validator = $validator;
@@ -154,7 +105,7 @@ abstract class AbstractConverter implements ConverterInterface
 
             $this->form = $this->buildForm();
 
-            $this->form->handleRequest($this->requestStack->getMasterRequest());
+            $this->form->handleRequest($this->requestStack->getMainRequest());
 
             if ($this->form->isSubmitted() && $this->form->isValid()) {
                 $this->onPreConvert();
@@ -189,7 +140,7 @@ abstract class AbstractConverter implements ConverterInterface
      *
      * @return ProductInterface The target product
      */
-    abstract protected function init();
+    abstract protected function init(): ProductInterface;
 
     /**
      * Builds the target form.
@@ -219,7 +170,6 @@ abstract class AbstractConverter implements ConverterInterface
      */
     protected function onDoneConvert(): void
     {
-
     }
 
     /**
@@ -264,12 +214,12 @@ abstract class AbstractConverter implements ConverterInterface
 
         try {
             if ($this->source === $this->target) {
-                $event = $this->productOperator->update($this->target);
+                $event = $this->productManager->update($this->target);
             } else {
-                $event = $this->productOperator->create($this->target);
+                $event = $this->productManager->create($this->target);
             }
         } catch (Throwable $e) {
-            throw new ConvertException("Persistence failed", 0, $e);
+            throw new ConvertException('Persistence failed', 0, $e);
         }
 
         $this->createEvent();
@@ -290,8 +240,7 @@ abstract class AbstractConverter implements ConverterInterface
     /**
      * Stores data.
      *
-     * @param string $key
-     * @param mixed  $data
+     * @param mixed $data
      */
     protected function set(string $key, $data): void
     {
@@ -300,8 +249,6 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Retrieves data.
-     *
-     * @param string $key
      *
      * @return mixed
      */
@@ -326,14 +273,12 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Dispatches the convert event.
-     *
-     * @param string $name
      */
     private function dispatch(string $name): void
     {
         $this->event = $this->createEvent();
 
-        $this->eventDispatcher->dispatch($name, $this->event);
+        $this->eventDispatcher->dispatch($this->event, $name);
 
         $this->eventToException();
     }
@@ -358,8 +303,6 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Creates a convert event.
-     *
-     * @return ConvertEvent
      */
     private function createEvent(): ConvertEvent
     {

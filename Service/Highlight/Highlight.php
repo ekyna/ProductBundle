@@ -11,6 +11,7 @@ use Ekyna\Component\Commerce\Cart\Provider\CartProviderInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Class Highlight
@@ -45,9 +46,9 @@ class Highlight
     private $crossRepository;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var array
@@ -55,32 +56,21 @@ class Highlight
     private $config;
 
 
-    /**
-     * Constructor.
-     *
-     * @param ContextProviderInterface   $contextProvider
-     * @param CartProviderInterface      $cartProvider
-     * @param ProductRepositoryInterface $productRepository
-     * @param StatCountRepository        $countRepository
-     * @param StatCrossRepository        $crossRepository
-     * @param EngineInterface            $templating
-     * @param array                      $config
-     */
     public function __construct(
-        ContextProviderInterface $contextProvider,
-        CartProviderInterface $cartProvider,
+        ContextProviderInterface   $contextProvider,
+        CartProviderInterface      $cartProvider,
         ProductRepositoryInterface $productRepository,
-        StatCountRepository $countRepository,
-        StatCrossRepository $crossRepository,
-        EngineInterface $templating,
-        array $config = []
+        StatCountRepository        $countRepository,
+        StatCrossRepository        $crossRepository,
+        Environment                $twig,
+        array                      $config = []
     ) {
         $this->contextProvider = $contextProvider;
         $this->cartProvider = $cartProvider;
         $this->productRepository = $productRepository;
         $this->countRepository = $countRepository;
         $this->crossRepository = $crossRepository;
-        $this->templating = $templating;
+        $this->twig = $twig;
 
         $this->config = array_replace([
             'thumb_template' => '@EkynaProduct/Highlight/thumb.html.twig',
@@ -175,7 +165,7 @@ class Highlight
             ]
         );
 
-        return $this->templating->render($options['template'], $options);
+        return $this->twig->render($options['template'], $options);
     }
 
     /**
@@ -278,7 +268,7 @@ class Highlight
             ]
         );
 
-        return $this->templating->render($options['template'], $options);
+        return $this->twig->render($options['template'], $options);
     }
 
     /**
@@ -316,7 +306,7 @@ class Highlight
 
             if ($item->hasSubjectIdentity()) {
                 if ($item->getSubjectIdentity()->getProvider() === ProductProvider::NAME) {
-                    $id = intval($item->getSubjectIdentity()->getIdentifier());
+                    $id = $item->getSubjectIdentity()->getIdentifier();
                     if (!in_array($id, $ids, true)) {
                         $ids[] = $id;
                     }

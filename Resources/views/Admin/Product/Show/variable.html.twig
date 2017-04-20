@@ -45,16 +45,19 @@
 
 {% block children_content %}
     <div class="sub-header">
-        <h2>{{ 'ekyna_product.variant.header.list'|trans|raw }}</h2>
+        <h2>{{ 'variant.header.list'|trans({}, 'EkynaProduct')|raw }}</h2>
     </div>
     <div class="actions">
-        {{ admin_resource_btn('ekyna_product.product', 'new', {
-            'label': 'ekyna_product.variant.button.new',
-            'path': path('ekyna_product_product_admin_new', {
+        {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\CreateAction', {
+            'label': t('variant.button.new', [], 'EkynaProduct'),
+            'parameters': {
                 'parent': product.id,
                 'type': 'variant'
-            })
+            }
         }) }}
     </div>
-    {{ ekyna_table_render(variants) }}
+    {{ ekyna_table_render(admin_resource_table('ekyna_product.product', {
+        'variant_mode': true,
+        'source': product.variants.toArray()
+    })) }}
 {% endblock children_content %}

@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
+use Decimal\Decimal;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Subject\Guesser\PurchaseCostGuesserInterface;
@@ -13,29 +17,10 @@ use Ekyna\Component\Commerce\Subject\Guesser\PurchaseCostGuesserInterface;
  */
 class PurchaseCostCalculator
 {
-    /**
-     * @var PriceCalculator
-     */
-    protected $priceCalculator;
+    protected PriceCalculator $priceCalculator;
+    protected PurchaseCostGuesserInterface $costGuesser;
+    private string $defaultCurrency;
 
-    /**
-     * @var PurchaseCostGuesserInterface
-     */
-    protected $costGuesser;
-
-    /**
-     * @var string
-     */
-    private $defaultCurrency;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PriceCalculator              $priceCalculator
-     * @param PurchaseCostGuesserInterface $guesser
-     * @param string                       $defaultCurrency
-     */
     public function __construct(
         PriceCalculator $priceCalculator,
         PurchaseCostGuesserInterface $guesser,
@@ -53,9 +38,9 @@ class PurchaseCostCalculator
      * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    public function calculateMinPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
+    public function calculateMinPurchaseCost(Product $product, $exclude = [], bool $shipping = false): Decimal
     {
         if (ProductTypes::isConfigurableType($product)) {
             return $this->calculateConfigurablePurchaseCost($product, $exclude, $shipping);
@@ -79,11 +64,11 @@ class PurchaseCostCalculator
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    protected function calculateMinOptionsPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
+    protected function calculateMinOptionsPurchaseCost(Product $product, $exclude = [], bool $shipping = false): Decimal
     {
-        $cost = 0;
+        $cost = new Decimal(0);
 
         $optionGroups = $product->resolveOptionGroups($exclude);
 
@@ -126,11 +111,11 @@ class PurchaseCostCalculator
      * @param Product $product
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    protected function calculateComponentsPurchaseCost(Product $product, bool $shipping = false): float
+    protected function calculateComponentsPurchaseCost(Product $product, bool $shipping = false): Decimal
     {
-        $total = 0;
+        $total = new Decimal(0);
 
         foreach ($product->getComponents() as $component) {
             $cost = $this->costGuesser->guess($component->getChild(), $this->defaultCurrency, $shipping);
@@ -148,13 +133,13 @@ class PurchaseCostCalculator
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    protected function calculateProductPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
+    protected function calculateProductPurchaseCost(Product $product, $exclude = [], bool $shipping = false): Decimal
     {
         ProductTypes::assertChildType($product);
 
-        $price = $this->costGuesser->guess($product, $this->defaultCurrency, $shipping);
+        $price = $this->costGuesser->guess($product, $this->defaultCurrency, $shipping) ?: new Decimal(0);
 
         $price += $this->calculateMinOptionsPurchaseCost($product, $exclude, $shipping);
 
@@ -170,9 +155,9 @@ class PurchaseCostCalculator
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    protected function calculateVariablePurchaseCost(Product $variable, $exclude = [], bool $shipping = false): float
+    protected function calculateVariablePurchaseCost(Product $variable, $exclude = [], bool $shipping = false): Decimal
     {
         ProductTypes::assertVariable($variable);
 
@@ -195,7 +180,7 @@ class PurchaseCostCalculator
                 + $this->calculateComponentsPurchaseCost($variable, $shipping);
         }
 
-        return 0;
+        return new Decimal(0);
     }
 
     /**
@@ -205,15 +190,15 @@ class PurchaseCostCalculator
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
-    protected function calculateBundlePurchaseCost(Product $bundle, $exclude = [], bool $shipping = false): float
+    protected function calculateBundlePurchaseCost(Product $bundle, $exclude = [], bool $shipping = false): Decimal
     {
         ProductTypes::assertBundle($bundle);
 
-        $total = 0;
+        $total = new Decimal(0);
         foreach ($bundle->getBundleSlots() as $slot) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            /** @var BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
             if (true === $exclude) {
                 $choiceExclude = true;
@@ -243,16 +228,16 @@ class PurchaseCostCalculator
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
-     * @return float
+     * @return Decimal
      */
     protected function calculateConfigurablePurchaseCost(
         Product $configurable,
         $exclude = [],
         bool $shipping = false
-    ): float {
+    ): Decimal {
         ProductTypes::assertConfigurable($configurable);
 
-        $total = 0;
+        $total = new Decimal(0);
 
         // For each bundle slots
         foreach ($configurable->getBundleSlots() as $slot) {
@@ -278,15 +263,15 @@ class PurchaseCostCalculator
                 if ($childProduct->getType() === ProductTypes::TYPE_BUNDLE) {
                     $choicePrice = $this
                         ->priceCalculator
-                        ->calculateBundleMinPrice($childProduct, $choiceExclude, $shipping);
+                        ->calculateBundleMinPrice($childProduct, $choiceExclude);
                 } elseif ($childProduct->getType() === ProductTypes::TYPE_VARIABLE) {
                     $choicePrice = $this
                         ->priceCalculator
-                        ->calculateVariableMinPrice($childProduct, $choiceExclude, $shipping);
+                        ->calculateVariableMinPrice($childProduct, $choiceExclude);
                 } else {
                     $choicePrice = $this
                         ->priceCalculator
-                        ->calculateProductMinPrice($childProduct, $choiceExclude, $shipping);
+                        ->calculateProductMinPrice($childProduct, $choiceExclude);
                 }
 
                 // TODO Use packaging format

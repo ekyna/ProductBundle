@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Table\Column;
 
 use Ekyna\Component\Table\Column\AbstractColumnType;
@@ -18,15 +20,15 @@ class ReferenceType extends AbstractColumnType
     /**
      * @inheritDoc
      */
-    public function buildCellView(CellView $view, ColumnInterface $column, RowInterface $row, array $options)
+    public function buildCellView(CellView $view, ColumnInterface $column, RowInterface $row, array $options): void
     {
-        $view->vars['attr']['data-clipboard-copy'] = (string) $view->vars['value'];
+        $view->vars['attr']['data-clipboard-copy'] = (string)$view->vars['value'];
     }
 
     /**
      * @inheritDoc
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'text';
     }
@@ -34,7 +36,7 @@ class ReferenceType extends AbstractColumnType
     /**
      * @inheritDoc
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }

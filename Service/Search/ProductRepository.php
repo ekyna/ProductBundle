@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Search;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Resource\Bridge\Symfony\Elastica\SearchRepository;
 use Ekyna\Component\Resource\Exception\UnexpectedTypeException;
 use Ekyna\Component\Resource\Locale;
-use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
 use Ekyna\Component\Resource\Search\Request;
 use Ekyna\Component\Resource\Search\Result;
 use Elastica\Query;
@@ -15,14 +17,10 @@ use Elastica\Query;
  * @package Ekyna\Bundle\ProductBundle\Service\Search
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class ProductRepository extends ResourceRepository implements Locale\LocaleProviderAwareInterface
+class ProductRepository extends SearchRepository implements Locale\LocaleProviderAwareInterface
 {
     use Locale\LocaleProviderAwareTrait;
 
-
-    /**
-     * @inheritDoc
-     */
     protected function createQuery(Request $request): Query\AbstractQuery
     {
         $query = parent::createQuery($request);
@@ -38,7 +36,7 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
 
         $bool = new Query\BoolQuery();
         $bool->addMust($query);
-        $bool->addMust((new Query\Terms())->setTerms('type', $types));
+        $bool->addMust(new Query\Terms('type', $types));
 
         if (!$request->isPrivate()) {
             $bool
@@ -70,13 +68,10 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
         return $result
             ->setTitle(sprintf('[%s] %s', $reference, $source['text']))
             ->setIcon('fa fa-cube')
-            ->setRoute('ekyna_product_product_admin_show')
+            ->setRoute('admin_ekyna_product_product_read') // TODO Use resource/action
             ->setParameters(['productId' => $source['id']]);
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function getDefaultFields(): array
     {
         $locale = $this->localeProvider->getCurrentLocale();
@@ -93,5 +88,10 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
             'brand.name',
             'brand.name.analyzed',
         ];
+    }
+
+    public function supports(Request $request): bool
+    {
+        return !empty($request->getExpression()) && 0 < $request->getLimit();
     }
 }

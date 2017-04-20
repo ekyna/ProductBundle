@@ -1,42 +1,46 @@
 {% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
 {% import '@EkynaCommerce/Admin/Stock/_subject_macros.html.twig' as _subject %}
 
+{% set optionParents = product|option_parents %}
+{% set componentParents = product|component_parents %}
+{% set bundleParents = product|bundle_parents %}
+
 <div class="show show-with-tabs">
-    <ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
+    <ul class="nav nav-tabs" data-tab-key="{{ resource_name }}">
         <li class="active">
-            <a href="#product-general" id="toggle-product-general" data-toggle="tab">
-                {{ 'ekyna_core.field.general'|trans }}
+            <a href="#{{ resource_name }}-general" id="toggle-product-general" data-toggle="tab">
+                {{ 'field.general'|trans({}, 'EkynaUi') }}
             </a>
         </li>
 
         {%- block content_tab -%}
         <li>
-            <a href="#product-content" id="toggle-product-content" data-toggle="tab">
-                {{- 'ekyna_core.field.content'|trans -}}
+            <a href="#{{ resource_name }}-content" id="toggle-product-content" data-toggle="tab">
+                {{- 'field.content'|trans({}, 'EkynaUi') -}}
             </a>
         </li>
         {%- endblock content_tab -%}
 
         {%- block pricing_tab -%}
         <li>
-            <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
-                {{- 'ekyna_product.product.field.pricing'|trans -}}
+            <a href="#{{ resource_name }}-pricing" id="toggle-product-pricing" data-toggle="tab">
+                {{- 'product.field.pricing'|trans({}, 'EkynaProduct') -}}
             </a>
         </li>
         {%- endblock pricing_tab -%}
 
         {%- block offers_tab -%}
         <li>
-            <a href="#product-offers" id="toggle-product-offers" data-toggle="tab">
-                {{- 'ekyna_product.offer.label.plural'|trans -}}
+            <a href="#{{ resource_name }}-offers" id="toggle-product-offers" data-toggle="tab">
+                {{- 'offer.label.plural'|trans({}, 'EkynaProduct') -}}
             </a>
         </li>
         {%- endblock offers_tab -%}
 
         {%- block stock_tab -%}
         <li>
-            <a href="#product-stock" id="toggle-product-stock" data-toggle="tab">
-                {{- 'ekyna_product.product.field.stock'|trans -}}
+            <a href="#{{ resource_name }}-stock" id="toggle-product-stock" data-toggle="tab">
+                {{- 'product.field.stock'|trans({}, 'EkynaProduct') -}}
             </a>
         </li>
         {%- endblock stock_tab -%}
@@ -44,18 +48,18 @@
         {%- block relations_tab -%}
         {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
         <li>
-            <a href="#product-relations" id="toggle-product-relations" data-toggle="tab">
-                {{ 'ekyna_product.product.field.relations'|trans }}
+            <a href="#{{ resource_name }}-relations" id="toggle-product-relations" data-toggle="tab">
+                {{ 'product.field.relations'|trans({}, 'EkynaProduct') }}
             </a>
         </li>
         {%- endif -%}
         {%- endblock relations_tab -%}
 
-        {%- if supplierProducts is defined -%}
+        {%- if product is child_product -%}
         {%- block suppliers_tab -%}
         <li>
-            <a href="#product-suppliers" id="toggle-product-suppliers" data-toggle="tab">
-                {{ 'ekyna_commerce.supplier.label.plural'|trans }}
+            <a href="#{{ resource_name }}-suppliers" id="toggle-product-suppliers" data-toggle="tab">
+                {{ 'supplier.label.plural'|trans({}, 'EkynaCommerce') }}
             </a>
         </li>
         {%- endblock suppliers_tab -%}
@@ -63,30 +67,30 @@
 
         {%- block stat_tab -%}
         <li>
-            <a href="#product-stat" id="toggle-product-stat" data-toggle="tab">
-                {{ 'ekyna_product.stat.label'|trans }}
+            <a href="#{{ resource_name }}-stat" id="toggle-product-stat" data-toggle="tab">
+                {{ 'stat.label'|trans({}, 'EkynaProduct') }}
             </a>
         </li>
         {%- endblock stat_tab -%}
 
         {%- block seo_tab -%}
         <li>
-            <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
-                {{ 'ekyna_core.field.seo'|trans }}
+            <a href="#{{ resource_name }}-seo" id="toggle-product-seo" data-toggle="tab">
+                {{ 'field.seo'|trans({}, 'EkynaUi') }}
             </a>
         </li>
         {%- endblock seo_tab -%}
     </ul>
     <div class="show-body">
         <div class="tab-content">
-            <div class="tab-pane active" id="product-general">
+            <div class="tab-pane active" id="{{ resource_name }}-general">
             {%- block general_content -%}
                 {{ _product.show_designation(product) }}
             {%- endblock general_content -%}
             </div>
 
             {%- block content_pane -%}
-                <div class="tab-pane" id="product-content">
+                <div class="tab-pane" id="{{ resource_name }}-content">
                 {%- block content_content -%}
                     {{ _product.show_translations(product) }}
                     {{ _product.show_medias(product) }}
@@ -96,7 +100,7 @@
             {%- endblock content_pane -%}
 
             {%- block pricing_pane -%}
-                <div class="tab-pane" id="product-pricing">
+                <div class="tab-pane" id="{{ resource_name }}-pricing">
                 {%- block pricing_content -%}
                     <div class="row">
                         <div class="col-md-4">
@@ -123,7 +127,7 @@
             {%- endblock pricing_pane -%}
 
             {%- block offers_pane -%}
-            <div class="tab-pane" id="product-offers">
+            <div class="tab-pane" id="{{ resource_name }}-offers">
                 {% block offers_content -%}
                 {{ _product.show_special_offers(product) }}
                 {{ _product.show_pricings(product) }}
@@ -134,13 +138,14 @@
             {%- endblock offers_pane -%}
 
             {%- block stock_pane -%}
-            <div class="tab-pane" id="product-stock">
+            <div class="tab-pane" id="{{ resource_name }}-stock">
             {%- block stock_content -%}
                 <p class="actions">
-                    {{ ui_button('ekyna_core.button.reload', {
+                    {{ ui_button('button.reload', {
+                        'trans_domain': 'EkynaUi',
                         'type': 'link',
                         'icon': 'refresh',
-                        'path': admin_resource_path(product, 'refresh_stock'),
+                        'path': admin_resource_path(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\RefreshStockAction'),
                         'size': 'xs'
                     }, {
                         'id': 'stock-view-refresh'
@@ -155,18 +160,18 @@
 
             {%- block relations_pane -%}
             {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
-            <div class="tab-pane" id="product-relations">
+            <div class="tab-pane" id="{{ resource_name }}-relations">
             {%- block relations_content -%}
                 {% if bundleParents is not empty -%}
-                    <p class="h4">{{ 'ekyna_product.product.field.bundle_parents'|trans }}</p>
+                    <p class="h4">{{ 'product.field.bundle_parents'|trans({}, 'EkynaProduct') }}</p>
                     {{ _product.show_relations(bundleParents) }}
                 {%- endif %}
                 {% if componentParents is not empty -%}
-                    <p class="h4">{{ 'ekyna_product.product.field.component_parents'|trans }}</p>
+                    <p class="h4">{{ 'product.field.component_parents'|trans({}, 'EkynaProduct') }}</p>
                     {{ _product.show_relations(componentParents) }}
                 {%- endif %}
                 {% if optionParents is not empty -%}
-                    <p class="h4">{{ 'ekyna_product.product.field.option_parents'|trans }}</p>
+                    <p class="h4">{{ 'product.field.option_parents'|trans({}, 'EkynaProduct') }}</p>
                     {{ _product.show_relations(optionParents) }}
                 {%- endif %}
             {%- endblock relations_content -%}
@@ -174,29 +179,30 @@
             {%- endif -%}
             {%- endblock relations_pane -%}
 
-            {%- if supplierProducts is defined -%}
+            {%- if product is child_product -%}
             {%- block suppliers_pane -%}
-            <div class="tab-pane" id="product-suppliers">
+            <div class="tab-pane" id="{{ resource_name }}-suppliers">
                 {% block suppliers_content -%}
-                {% if newSupplierProductForm is defined -%}
+                {% set form = (product|subject_create_supplier_product_form).createView() %}
                 <div style="text-align: right">
                     {{ bootstrap_set_sizing('sm') }}
-                    {{ form_start(newSupplierProductForm, { 'style': 'inline' }) }}
-                    {{ form_row(newSupplierProductForm.supplier) }}
-                    {{ form_widget(newSupplierProductForm.submit) }}
-                    {{ form_end(newSupplierProductForm) }}
+                    {{ form_start(form, { 'style': 'inline' }) }}
+                    {{ form_row(form.supplier) }}
+                    {{ form_widget(form.submit) }}
+                    {{ form_end(form) }}
                     {{ bootstrap_set_sizing('md') }}
                 </div>
                 <hr>
-                {%- endif %}
-                {{ ekyna_table_render(supplierProducts) }}
+                {{ ekyna_table_render(admin_resource_table('ekyna_commerce.supplier_product', {
+                    'subject': product
+                })) }}
                 {%- endblock suppliers_content %}
             </div>
             {%- endblock suppliers_pane -%}
             {%- endif -%}
 
             {%- block stat_pane -%}
-            <div class="tab-pane" id="product-stat">
+            <div class="tab-pane" id="{{ resource_name }}-stat">
             {%- block stat_content -%}
                 {{ _product.show_stat_charts(product) }}
             {%- endblock stat_content -%}
@@ -204,7 +210,7 @@
             {%- endblock stat_pane -%}
 
             {%- block seo_pane -%}
-            <div class="tab-pane" id="product-seo">
+            <div class="tab-pane" id="{{ resource_name }}-seo">
             {%- block seo_content -%}
                 {{ _product.show_seo(product) }}
             {%- endblock seo_content -%}

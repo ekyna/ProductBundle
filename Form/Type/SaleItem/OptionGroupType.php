@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
@@ -15,6 +17,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class OptionGroupType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\SaleItem
@@ -22,33 +26,16 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class OptionGroupType extends Form\AbstractType
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
+    private FormBuilder $formBuilder;
 
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     * @param FormBuilder $formBuilder
-     */
     public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder)
     {
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formBuilder;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(Form\FormBuilderInterface $builder, array $options)
+    public function buildForm(Form\FormBuilderInterface $builder, array $options): void
     {
         /** @var Model\OptionGroupInterface $optionGroup */
         $optionGroup = $options['option_group'];
@@ -79,7 +66,7 @@ class OptionGroupType extends Form\AbstractType
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
-                'placeholder'   => $required ? null : 'ekyna_product.sale_item_configure.choose_option',
+                'placeholder'   => $required ? null : t('sale_item_configure.choose_option', [], 'EkynaProduct'),
                 'required'      => $required,
                 'constraints'   => $constraints,
                 'select2'       => false,
@@ -97,27 +84,20 @@ class OptionGroupType extends Form\AbstractType
         $builder->add($field);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         /** @var Model\OptionGroupInterface $optionGroup */
         $optionGroup = $options['option_group'];
 
         $view->vars['group_id'] = $optionGroup->getId();
         $view->vars['group_position'] = $optionGroup->getPosition();
-
         /*$choices = $this->itemBuilder->getFilter()->getGroupOptions($optionGroup);
         if ($options['required'] && (1 === count($choices))) {
             $view->vars['attr']['style'] = 'display: none;';
         }*/
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setRequired(['option_group'])
@@ -127,7 +107,7 @@ class OptionGroupType extends Form\AbstractType
                 'required'        => function (
                     Options $options,
                     /** @noinspection PhpUnusedParameterInspection */
-                    $value
+                            $value
                 ) {
                     /** @var Model\OptionGroupInterface $optionGroup */
                     $optionGroup = $options['option_group'];

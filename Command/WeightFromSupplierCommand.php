@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use Decimal\Decimal;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
 use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -22,60 +24,36 @@ class WeightFromSupplierCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:weight_from_supplier';
 
-    /**
-     * @var EntityRepository
-     */
-    private $productRepository;
+    private EntityManagerInterface $manager;
+    private string                 $productClass;
+    private string                 $supplierProductClass;
 
-    /**
-     * @var EntityRepository
-     */
-    private $supplierProductRepository;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-
-
-    /**
-     * Constructor.
-     *
-     * @param EntityRepository       $productRepository
-     * @param EntityRepository       $supplierProductRepository
-     * @param EntityManagerInterface $manager
-     */
     public function __construct(
-        EntityRepository $productRepository,
-        EntityRepository $supplierProductRepository,
-        EntityManagerInterface $manager
+        EntityManagerInterface $manager,
+        string                 $productClass,
+        string                 $supplierProductClass
     ) {
         parent::__construct();
 
-        $this->productRepository         = $productRepository;
-        $this->supplierProductRepository = $supplierProductRepository;
-        $this->manager                   = $manager;
+        $this->manager = $manager;
+        $this->productClass = $productClass;
+        $this->supplierProductClass = $supplierProductClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Updates the products weights from the supplier references')
             ->addArgument('productId', InputArgument::OPTIONAL, 'The product identifier to update the weight.');
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        $qb = $this->productRepository->createQueryBuilder('p');
+        $qb = $this->manager->createQueryBuilder();
         $qb
+            ->from($this->productClass, 'p')
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->orX(
                 $qb->expr()->eq('p.weight', ':weight'),
@@ -99,12 +77,13 @@ class WeightFromSupplierCommand extends Command
         if (empty($products)) {
             $output->writeln('Not product with empty weight found.');
 
-            return;
+            return Command::SUCCESS;
         }
 
         $referenceQuery = $this
-            ->supplierProductRepository
-            ->createQueryBuilder('r')
+            ->manager
+            ->createQueryBuilder()
+            ->from($this->supplierProductClass, 'r')
             ->select('r.weight')
             ->andWhere($qb->expr()->eq('r.subjectIdentity.provider', ':provider'))
             ->andWhere($qb->expr()->eq('r.subjectIdentity.identifier', ':identifier'))
@@ -117,7 +96,7 @@ class WeightFromSupplierCommand extends Command
                 'weight'   => 0,
             ]);
 
-        $count  = 0;
+        $count = 0;
         $nCount = 0;
 
         /** @var ProductInterface $product */
@@ -128,9 +107,9 @@ class WeightFromSupplierCommand extends Command
                 str_pad('.', 32 - mb_strlen($name), '.', STR_PAD_LEFT)
             ));
 
-            $weight = (float)$referenceQuery
+            $weight = $referenceQuery
                 ->setParameter('identifier', $product->getIdentifier())
-                ->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR);
+                ->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
 
             if (0 == $weight) {
                 $output->writeln('<comment>not found</comment>');
@@ -139,7 +118,9 @@ class WeightFromSupplierCommand extends Command
                 continue;
             }
 
-            $this->manager->persist($product->setPackageWeight($weight));
+            $product->setPackageWeight(new Decimal($weight));
+
+            $this->manager->persist($product);
 
             $output->writeln('<info>' . round($weight, 3) . '</info>');
 
@@ -153,8 +134,10 @@ class WeightFromSupplierCommand extends Command
             $this->manager->flush();
         }
 
-        $output->writeln("");
+        $output->writeln('');
         $output->writeln("$count product(s) updated.");
         $output->writeln("$nCount product(s) skipped (weight not found).");
+
+        return Command::SUCCESS;
     }
 }

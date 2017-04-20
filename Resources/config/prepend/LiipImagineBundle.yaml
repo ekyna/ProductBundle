@@ -1,0 +1,35 @@
+# Liip Imagine
+liip_imagine:
+    filter_sets:
+        product_slide:
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [ 320, 240 ], mode: outbound }
+            post_processors:
+                jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
+                pngquant: { quality: '%ekyna_media.image.quality.png%' }
+        slot_thumb:
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [ 60, 60 ], mode: outbound }
+            post_processors:
+                jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
+                pngquant: { quality: '%ekyna_media.image.quality.png%' }
+        slot_choice_btn:
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [ 42, 42 ], mode: outbound }
+            post_processors:
+                jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
+                pngquant: { quality: '%ekyna_media.image.quality.png%' }
+        slot_choice_thumb:
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [ 444, 333 ], mode: outbound }
+            post_processors:
+                jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
+                pngquant: { quality: '%ekyna_media.image.quality.png%' }

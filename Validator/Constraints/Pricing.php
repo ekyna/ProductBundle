@@ -15,7 +15,7 @@ class Pricing extends Constraint
     public $at_least_one_brand   = 'ekyna_product.pricing.at_least_one_brand';
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getTargets()
     {

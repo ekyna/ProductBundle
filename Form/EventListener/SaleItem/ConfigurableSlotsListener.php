@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotType;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -17,17 +20,8 @@ use Symfony\Component\Form\FormInterface;
  */
 class ConfigurableSlotsListener implements EventSubscriberInterface
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder $itemBuilder;
 
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder $itemBuilder
-     */
     public function __construct(ItemBuilder $itemBuilder)
     {
         $this->itemBuilder = $itemBuilder;
@@ -35,22 +29,18 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
 
     /**
      * Pre set data event handler.
-     *
-     * @param FormEvent $event
      */
-    public function onPreSetData(FormEvent $event)
+    public function onPreSetData(FormEvent $event): void
     {
         $this->buildForm($event->getForm());
     }
 
     /**
      * Builds the configurable slots forms.
-     *
-     * @param FormInterface $form
      */
-    private function buildForm(FormInterface $form)
+    private function buildForm(FormInterface $form): void
     {
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+        /** @var SaleItemInterface $item */
         if (null === $item = $form->getParent()->getData()) {
             return;
         }
@@ -71,17 +61,13 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
 
             throw new LogicException(sprintf(
                 "Sale item was not found for bundle slot #%s.\n" .
-                "You must call ItemBuilder::initializeItem() first.",
+                'You must call ItemBuilder::initializeItem() first.',
                 $bundleSlot->getId()
             ));
         }
     }
 
-    /**
-     *
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',

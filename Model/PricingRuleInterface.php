@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Decimal\Decimal;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -11,51 +14,15 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 interface PricingRuleInterface extends ResourceInterface
 {
-    /**
-     * Returns the pricing.
-     *
-     * @return PricingInterface
-     */
-    public function getPricing();
+    public function getPricing(): ?PricingInterface;
 
-    /**
-     * Sets the pricing.
-     *
-     * @param PricingInterface $pricing
-     *
-     * @return $this|PricingRuleInterface
-     */
-    public function setPricing(PricingInterface $pricing = null);
+    public function setPricing(?PricingInterface $pricing): PricingRuleInterface;
 
-    /**
-     * Returns the minimum quantity.
-     *
-     * @return int
-     */
-    public function getMinQuantity();
+    public function getMinQuantity(): Decimal;
 
-    /**
-     * Sets the minimum quantity.
-     *
-     * @param int $quantity
-     *
-     * @return $this|PricingRuleInterface
-     */
-    public function setMinQuantity($quantity);
+    public function setMinQuantity(Decimal $quantity): PricingRuleInterface;
 
-    /**
-     * Returns the percent.
-     *
-     * @return float
-     */
-    public function getPercent();
+    public function getPercent(): Decimal;
 
-    /**
-     * Sets the percent.
-     *
-     * @param float $percent
-     *
-     * @return $this|PricingRuleInterface
-     */
-    public function setPercent($percent);
+    public function setPercent(Decimal $percent): PricingRuleInterface;
 }

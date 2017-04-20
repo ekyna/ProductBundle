@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\CrossSelling;
 
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use function Symfony\Component\Translation\t;
 
 /**
  * Class CrossSellingsType
@@ -13,29 +17,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CrossSellingsType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'           => 'ekyna_product.cross_selling.label.plural',
+                'label'           => t('cross_selling.label.plural', [], 'EkynaProduct'),
                 'prototype_name'  => '__component__',
                 'sub_widget_col'  => 10,
                 'button_col'      => 2,
                 'allow_sort'      => true,
-                'add_button_text' => 'ekyna_product.cross_selling.button.add',
+                'add_button_text' => t('cross_selling.button.add', [], 'EkynaProduct'),
                 'entry_type'      => CrossSellingType::class,
                 'entry_options'   => ['collection' => true],
                 'required'        => false,
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
+
+use Decimal\Decimal;
 
 /**
  * Class Tree
@@ -9,27 +13,12 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing\Config;
  */
 class Tree extends Item
 {
-    /**
-     * @var Tree
-     */
-    protected $parent;
+    protected ?Tree $parent= null;
+    /** @var array<Tree> */
+    protected array $children = [];
+    /** @var array<OptionGroup> */
+    protected array $optionGroups = [];
 
-    /**
-     * @var Tree[]
-     */
-    protected $children = [];
-
-    /**
-     * @var OptionGroup[]
-     */
-    protected $optionGroups = [];
-
-
-    /**
-     * Returns the tree root.
-     *
-     * @return Tree
-     */
     public function getRoot(): Tree
     {
         $root = $this;
@@ -41,23 +30,11 @@ class Tree extends Item
         return $root;
     }
 
-    /**
-     * Returns the parent.
-     *
-     * @return Tree
-     */
     public function getParent(): ?Tree
     {
         return $this->parent;
     }
 
-    /**
-     * Sets the parent.
-     *
-     * @param Tree $parent
-     *
-     * @return Tree
-     */
     public function setParent(Tree $parent): self
     {
         $this->parent = $parent;
@@ -65,23 +42,11 @@ class Tree extends Item
         return $this;
     }
 
-    /**
-     * Returns whether the tree as a parent.
-     *
-     * @return bool
-     */
     public function hasParent(): bool
     {
-        return !is_null($this->parent);
+        return null !== $this->parent;
     }
 
-    /**
-     * Adds the child.
-     *
-     * @param Tree $child
-     *
-     * @return $this
-     */
     public function addChild(Tree $child): self
     {
         $child->setParent($this);
@@ -92,22 +57,13 @@ class Tree extends Item
     }
 
     /**
-     * Returns the children.
-     *
-     * @return Tree[]
+     * @return array<Tree>
      */
     public function getChildren(): array
     {
         return $this->children;
     }
 
-    /**
-     * Adds the option group.
-     *
-     * @param OptionGroup $group
-     *
-     * @return $this
-     */
     public function addOptionGroup(OptionGroup $group): self
     {
         $this->optionGroups[] = $group;
@@ -116,26 +72,19 @@ class Tree extends Item
     }
 
     /**
-     * Returns the option groups.
-     *
-     * @return OptionGroup[]
+     * @return array<OptionGroup>
      */
     public function getOptionGroups(): array
     {
         return $this->optionGroups;
     }
 
-    /**
-     * Returns the total quantity.
-     *
-     * @return float
-     */
-    public function getTotalQuantity(): float
+    public function getTotalQuantity(): Decimal
     {
         $qty = $this->quantity;
 
         $parent = $this;
-        while (null !== $parent = $parent->getParent()) {
+        while ($parent = $parent->getParent()) {
             $qty *= $parent->getQuantity();
         }
 
@@ -143,11 +92,7 @@ class Tree extends Item
     }
 
     /**
-     * Returns the tree best offer for the given key (regarding to root ones).
-     *
-     * @param string $key
-     *
-     * @return array|null
+     * Returns the tree best offer for the given key (regarding root ones).
      */
     public function getBestOffer(string $key): ?array
     {
@@ -158,10 +103,10 @@ class Tree extends Item
             if (is_null($o = $item->getOffer($key))) {
                 continue;
             }
-            if (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2)) {
+            if (is_null($offer) || $o['percent'] >= $offer['percent']) {
                 $offer = $o;
             }
-        } while($item = $item->getParent());
+        } while ($item = $item->getParent());
 
         return $offer;
     }

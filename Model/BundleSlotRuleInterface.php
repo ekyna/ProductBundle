@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 
 /**
@@ -12,19 +13,7 @@ use Ekyna\Component\Resource\Model\SortableInterface;
  */
 interface BundleSlotRuleInterface extends BundleRuleInterface, SortableInterface
 {
-    /**
-     * Returns the choice.
-     *
-     * @return BundleSlotInterface
-     */
-    public function getSlot();
+    public function getSlot(): ?BundleSlotInterface;
 
-    /**
-     * Sets the choice.
-     *
-     * @param BundleSlotInterface $slot
-     *
-     * @return $this|BundleSlotRuleInterface
-     */
-    public function setSlot(BundleSlotInterface $slot = null);
+    public function setSlot(?BundleSlotInterface $slot): BundleSlotRuleInterface;
 }

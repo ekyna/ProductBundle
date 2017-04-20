@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -16,32 +20,13 @@ use Symfony\Component\Form\FormEvents;
  */
 class ConfigurableSlotListener implements EventSubscriberInterface
 {
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
+    private ItemBuilder                 $itemBuilder;
+    private FormBuilder                 $formBuilder;
+    private IdToChoiceObjectTransformer $transformer;
 
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
-    /**
-     * @var IdToChoiceObjectTransformer
-     */
-    private $transformer;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ItemBuilder                 $itemBuilder
-     * @param FormBuilder                 $formBuilder
-     * @param IdToChoiceObjectTransformer $transformer
-     */
     public function __construct(
-        ItemBuilder $itemBuilder,
-        FormBuilder $formBuilder,
+        ItemBuilder                 $itemBuilder,
+        FormBuilder                 $formBuilder,
         IdToChoiceObjectTransformer $transformer
     ) {
         $this->itemBuilder = $itemBuilder;
@@ -51,12 +36,10 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
     /**
      * Pre set data event handler.
-     *
-     * @param FormEvent $event
      */
-    public function onPreSetData(FormEvent $event)
+    public function onPreSetData(FormEvent $event): void
     {
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+        /** @var SaleItemInterface $item */
         if (null === $item = $event->getData()) {
             return;
         }
@@ -65,7 +48,7 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
         $choiceId = $item->getData(ItemBuilder::BUNDLE_CHOICE_ID);
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+        /** @var BundleChoiceInterface $choice */
         if (null !== $choice = $this->transformer->transform($choiceId)) {
             $this->formBuilder->buildBundleChoiceForm($form, $choice);
         } else {
@@ -75,10 +58,8 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
     /**
      * Pre submit event handler.
-     *
-     * @param FormEvent $event
      */
-    public function onPreSubmit(FormEvent $event)
+    public function onPreSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $item = $form->getData();
@@ -95,7 +76,7 @@ class ConfigurableSlotListener implements EventSubscriberInterface
             $this->formBuilder->clearBundleChoiceForm($form);
         }
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+        /** @var BundleChoiceInterface $choice */
         if (null !== $choice = $this->transformer->transform($choiceId)) {
             // Initialize the sale item from the bundle choice if it has changed
             if ($choice->getId() != $item->getData(ItemBuilder::BUNDLE_CHOICE_ID)) {
@@ -107,10 +88,7 @@ class ConfigurableSlotListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',

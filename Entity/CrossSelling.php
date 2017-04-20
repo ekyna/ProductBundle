@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\CrossSellingInterface;
@@ -15,60 +17,33 @@ class CrossSelling implements CrossSellingInterface
 {
     use SortableTrait;
 
-    /**
-     * @var int
-     */
-    protected $id;
+    protected ?int              $id     = null;
+    protected ?ProductInterface $source = null;
+    protected ?ProductInterface $target = null;
 
-    /**
-     * @var ProductInterface
-     */
-    protected $source;
-
-    /**
-     * @var ProductInterface
-     */
-    protected $target;
-
-
-    /**
-     * @inheritDoc
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getSource(): ?ProductInterface
     {
         return $this->source;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setSource(ProductInterface $source = null): CrossSellingInterface
+    public function setSource(?ProductInterface $source): CrossSellingInterface
     {
         $this->source = $source;
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getTarget(): ?ProductInterface
     {
         return $this->target;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setTarget(ProductInterface $target = null): CrossSellingInterface
+    public function setTarget(?ProductInterface $target): CrossSellingInterface
     {
         $this->target = $target;
 

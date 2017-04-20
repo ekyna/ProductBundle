@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Google;
 
 use Ekyna\Bundle\GoogleBundle\Tracking\Commerce\Product;
@@ -14,17 +16,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  */
 class TrackingHelper
 {
-    /**
-     * @var TrackingPool
-     */
-    private $pool;
+    private TrackingPool $pool;
 
-
-    /**
-     * Constructor.
-     *
-     * @param TrackingPool $pool
-     */
     public function __construct(TrackingPool $pool)
     {
         $this->pool = $pool;
@@ -32,11 +25,8 @@ class TrackingHelper
 
     /**
      * Tracks the given products view event.
-     *
-     * @param array  $products
-     * @param string $type
      */
-    public function track(array $products, string $type = Event::VIEW_ITEM)
+    public function track(array $products, string $type = Event::VIEW_ITEM): void
     {
         if (empty($products)) {
             return;
@@ -50,8 +40,7 @@ class TrackingHelper
             }
 
             $item = new Product($product->getReference(), $product->getFullDesignation());
-            $item
-                ->setPrice($product->getMinPrice());
+            $item->setPrice($product->getMinPrice()->toFixed(2));
 
             $event->addItem($item);
         }

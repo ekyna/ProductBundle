@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Attribute\Type;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute as Form;
@@ -8,6 +10,10 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Symfony\Component\Validator\Constraints\Count;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+use function Symfony\Component\Translation\t;
+
 /**
  * Class SelectType
  * @package Ekyna\Bundle\ProductBundle\Attribute\Type
@@ -15,12 +21,9 @@ use Symfony\Component\Validator\Constraints\Count;
  */
 class SelectType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
-    public function render(ProductAttributeInterface $productAttribute, $locale = null)
+    public function render(ProductAttributeInterface $productAttribute, string $locale = null): ?string
     {
-        $labels = array_map(function(AttributeChoiceInterface $choice) use ($locale) {
+        $labels = array_map(function (AttributeChoiceInterface $choice) use ($locale) {
             return $choice->translate($locale)->getTitle();
         }, $productAttribute->getChoices()->toArray());
 
@@ -31,18 +34,12 @@ class SelectType extends AbstractType
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasChoices()
+    public function hasChoices(): bool
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConstraints(ProductAttributeInterface $productAttribute)
+    public function getConstraints(ProductAttributeInterface $productAttribute): array
     {
         if ($productAttribute->getAttributeSlot()->isRequired()) {
             return [
@@ -57,10 +54,7 @@ class SelectType extends AbstractType
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigShowFields(AttributeInterface $attribute)
+    public function getConfigShowFields(AttributeInterface $attribute): array
     {
         $config = $attribute->getConfig();
 
@@ -69,43 +63,36 @@ class SelectType extends AbstractType
                 'value'   => $config['multiple'],
                 'type'    => 'boolean',
                 'options' => [
-                    'label' => 'ekyna_product.attribute.config.multiple',
+                    'label' => t('attribute.config.multiple', [], 'EkynaProduct'),
                 ],
             ],
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigDefaults()
+    public function getConfigDefaults(): array
     {
         return [
             'multiple' => true,
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getConfigType()
+    public function getConfigType(): ?string
     {
         return Form\Config\SelectConfigType::class;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFormType()
+    public function getFormType(): ?String
     {
         return Form\Type\SelectAttributeType::class;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getLabel()
+    public function getLabel(): TranslatableInterface
     {
-        return 'ekyna_product.attribute.type.select';
+        return t('attribute.type.select', [], 'EkynaProduct');
+    }
+
+    public static function getName(): string
+    {
+        return 'select';
     }
 }

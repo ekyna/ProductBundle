@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
@@ -14,26 +16,14 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BatchEditType extends AbstractType
 {
-    /**
-     * @var StockSubjectFormBuilder
-     */
-    private $builder;
+    private StockSubjectFormBuilder $builder;
 
-
-    /**
-     * Constructor.
-     *
-     * @param StockSubjectFormBuilder $builder
-     */
     public function __construct(StockSubjectFormBuilder $builder)
     {
         $this->builder = $builder;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $fields = ['stockMode', 'quoteOnly', 'endOfLife', 'stockFloor', 'replenishmentTime', 'minimumOrderQuantity'];
 

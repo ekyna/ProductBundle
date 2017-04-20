@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,33 +19,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductChoiceType extends AbstractType
 {
-    /**
-     * @var string
-     */
-    private $productClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $brandClass
-     */
-    public function __construct($brandClass)
-    {
-        $this->productClass = $brandClass;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
-                'label'         => function (Options $options) {
-                    return 'ekyna_product.product.label.' . ($options['multiple'] ? 'plural' : 'singular');
-                },
-                'class'         => $this->productClass,
+                'resource'      => 'ekyna_product.product',
                 'types'         => [],
                 'query_builder' => function (Options $options) {
                     return function (EntityRepository $er) use ($options) {
@@ -58,16 +38,16 @@ class ProductChoiceType extends AbstractType
                             ->addOrderBy('p.attributesDesignation', 'DESC');
                     };
                 },
-                'choice_value' => function(ProductInterface $product) {
+                'choice_value'  => function (ProductInterface $product) {
                     return $product->getId();
                 },
-                'choice_label' => function(ProductInterface $product) {
+                'choice_label'  => function (ProductInterface $product) {
                     return sprintf(
                         '[%s] %s',
                         $product->getReference(),
                         $product->getFullDesignation(true)
                     );
-                }
+                },
             ])
             ->setAllowedTypes('types', 'array')
             ->setAllowedValues('types', function ($value) {
@@ -81,11 +61,8 @@ class ProductChoiceType extends AbstractType
             });
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
-        return ResourceType::class;
+        return ResourceChoiceType::class;
     }
 }
