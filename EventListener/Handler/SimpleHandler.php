@@ -163,7 +163,7 @@ class SimpleHandler extends AbstractHandler
 
         return $changed;
 
-        // TODO Check that stock state update is ALWAYS done by the handUpdate method.
+        // TODO Check that stock state update is ALWAYS done by the handleUpdate method.
         // Stock state
         //return $this->stockUpdater->updateStockState($product) || $changed;
     }

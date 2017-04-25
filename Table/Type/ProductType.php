@@ -33,17 +33,23 @@ class ProductType extends ResourceTableType
      */
     protected $taxGroupClass;
 
+    /**
+     * @var string
+     */
+    protected $tagClass;
+
 
     /**
      * @inheritDoc
      */
-    public function __construct($productClass, $brandClass, $categoryClass, $taxGroupClass)
+    public function __construct($productClass, $brandClass, $categoryClass, $taxGroupClass, $tagClass)
     {
         parent::__construct($productClass);
 
         $this->brandClass = $brandClass;
         $this->categoryClass = $categoryClass;
         $this->taxGroupClass = $taxGroupClass;
+        $this->tagClass = $tagClass;
     }
 
     /**
@@ -100,6 +106,9 @@ class ProductType extends ResourceTableType
             ])
             ->addColumn('stockState', 'ekyna_commerce_stock_subject_state', [
                 'position' => 60,
+            ])
+            ->addColumn('tags', 'ekyna_cms_tags', [
+                'position' => 100,
             ]);
 
         /*if (!$variantMode) {
@@ -195,6 +204,12 @@ class ProductType extends ResourceTableType
                 ->addFilter('taxGroup', 'entity', [
                     'label'    => 'ekyna_commerce.tax_group.label.singular',
                     'class'    => $this->taxGroupClass,
+                    'property' => 'name',
+                    'position' => 100,
+                ])
+                ->addFilter('tags', 'entities', [
+                    'label'    => 'ekyna_cms.tag.label.plural',
+                    'class'    => $this->tagClass,
                     'property' => 'name',
                     'position' => 100,
                 ]);

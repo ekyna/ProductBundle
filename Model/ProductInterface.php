@@ -19,6 +19,7 @@ use Ekyna\Component\Resource\Model as RM;
 interface ProductInterface extends
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
+    Cms\TagsSubjectInterface,
     RM\TranslatableInterface,
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,

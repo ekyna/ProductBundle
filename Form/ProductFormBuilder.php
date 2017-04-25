@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
+use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\AdjustmentsType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
@@ -391,6 +392,25 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('seo', SeoType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the tags field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addTagsField(array $options = [])
+    {
+        $options = array_replace([
+            'multiple' => true,
+            'required' => false,
+        ], $options);
+
+        $this->form->add('tags', TagChoiceType::class, $options);
 
         return $this;
     }

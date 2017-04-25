@@ -80,6 +80,18 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Returns whether the type is a 'child' one.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    static public function isChildType($type)
+    {
+        return in_array($type, static::getChildTypes(), true);
+    }
+
+    /**
      * Returns the 'parent' types.
      *
      * @return array
@@ -91,6 +103,18 @@ class ProductTypes extends AbstractConstants
             ProductTypes::TYPE_BUNDLE,
             ProductTypes::TYPE_CONFIGURABLE,
         ];
+    }
+
+    /**
+     * Returns whether the type is a 'parent' one.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    static public function isParentType($type)
+    {
+        return in_array($type, static::getParentTypes(), true);
     }
 
     /**
@@ -174,7 +198,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertChildType(ProductInterface $product)
     {
-        if (!in_array($product->getType(), static::getChildTypes(), true)) {
+        if (!static::isChildType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'child' type.");
         }
     }
@@ -186,7 +210,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertParentType(ProductInterface $product)
     {
-        if (!in_array($product->getType(), static::getParentTypes(), true)) {
+        if (!static::isParentType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'parent' type.");
         }
     }

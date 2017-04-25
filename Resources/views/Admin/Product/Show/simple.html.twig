@@ -2,6 +2,7 @@
 
 
 {% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
+{% import "EkynaCmsBundle:Admin:show_macros.html.twig" as _cms %}
 
 
 {% block general_content %}
@@ -21,6 +22,7 @@
 
 
 {% block pricing_content %}
+    {{ _cms.show_tags(product) }}
     {{ parent() }}
     {{ macros.show_references(product) }}
     {{ macros.show_adjustments(product) }}

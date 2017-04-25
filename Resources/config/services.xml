@@ -140,6 +140,7 @@
             <argument>%ekyna_product.brand.class%</argument>
             <argument>%ekyna_product.category.class%</argument>
             <argument>%ekyna_commerce.tax_group.class%</argument>
+            <argument>%ekyna_cms.tag.class%</argument>
             <tag name="table.type" alias="ekyna_product_product"/>
         </service>
 

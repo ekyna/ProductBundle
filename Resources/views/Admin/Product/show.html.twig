@@ -4,7 +4,6 @@
 
 {% block title %}
     <h1>{{ 'ekyna_product.product.header.show'|trans({'%name%': product})|raw }}</h1>
-    {{ product|product_type_badge }}
 {% endblock title %}
 
 {% block actions %}
@@ -20,9 +19,15 @@
 {% endblock actions %}
 
 {% block main %}
-    <div class="actions">
-        {{ admin_resource_btn(product, 'edit') }}
-        {{ admin_resource_btn(product, 'remove') }}
+    <div class="main-header">
+        <div class="infos">
+            {{ product|product_type_badge }}
+            {{ product|cms_tags({'text': false}) }}
+        </div>
+        <div class="actions">
+            {{ admin_resource_btn(product, 'edit') }}
+            {{ admin_resource_btn(product, 'remove') }}
+        </div>
     </div>
     {% if product is simple_product %}
         {% include 'EkynaProductBundle:Admin/Product/Show:simple.html.twig' %}

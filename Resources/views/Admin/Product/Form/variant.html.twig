@@ -18,6 +18,7 @@
 
 
 {% block pricing_content %}
+    {{ form_row(form.tags) }}
     {{ parent() }}
     {{ form_row(form.references) }}
     {{ form_row(form.adjustments) }}

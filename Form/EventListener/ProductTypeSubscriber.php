@@ -90,6 +90,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
             ->addMediasField()
@@ -147,6 +148,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addTagsField()
             ->addTranslationsField([
                 'required'     => false,
                 'form_options' => [

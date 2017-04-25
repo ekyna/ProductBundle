@@ -25,6 +25,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     use Common\AdjustableTrait,
         Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
+        Cms\TagsSubjectTrait,
         RM\TimestampableTrait,
         RM\TaggedEntityTrait,
         Pricing\TaxableTrait,
@@ -145,6 +146,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->bundleSlots = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->references = new ArrayCollection();
+        $this->tags = new ArrayCollection();
 
         $this->visible = true;
 
