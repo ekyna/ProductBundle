@@ -79,8 +79,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
             ->andWhere($qb->expr()->orX(
                 $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not yet linked to a supplier order
-                $qb->expr()->lt($alias . '.reservedQuantity', $alias . '.orderedQuantity'),   // Reserved lower than ordered
-                $qb->expr()->eq('SIZE(' . $alias . '.stockAssignments)', 0) // No assignments TODO remove ?
+                $qb->expr()->lt($alias . '.soldQuantity', $alias . '.orderedQuantity')   // Sold lower than ordered
             ))
             ->setParameter('product', $subject)
             ->getQuery()
