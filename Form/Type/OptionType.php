@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 

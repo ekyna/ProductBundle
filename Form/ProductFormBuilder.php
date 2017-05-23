@@ -7,7 +7,7 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\AdjustmentsType;
-use Ekyna\Bundle\CommerceBundle\Form\Type\TaxGroupChoiceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
