@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
+use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -15,7 +15,8 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Option extends RM\AbstractTranslatable implements Model\OptionInterface
 {
-    use RM\SortableTrait;
+    use RM\SortableTrait,
+        TaxableTrait;
 
     /**
      * @var integer
@@ -46,11 +47,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
      * @var float
      */
     protected $netPrice;
-
-    /**
-     * @var TaxGroupInterface
-     */
-    protected $taxGroup;
 
 
     /**
@@ -165,24 +161,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
     public function setNetPrice($netPrice)
     {
         $this->netPrice = (float)$netPrice;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTaxGroup()
-    {
-        return $this->taxGroup;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setTaxGroup(TaxGroupInterface $group)
-    {
-        $this->taxGroup = $group;
 
         return $this;
     }

@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Ekyna\Component\Commerce\Pricing\Model\TaxGroupInterface;
+use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -12,7 +12,7 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method OptionTranslationInterface translate($locale = null, $create = false)
  */
-interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
+interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface, TaxableInterface
 {
     /**
      * Returns the group.
@@ -100,20 +100,4 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
      * @return $this|OptionInterface
      */
     public function setNetPrice($netPrice);
-
-    /**
-     * Returns the tax group.
-     *
-     * @return TaxGroupInterface
-     */
-    public function getTaxGroup();
-
-    /**
-     * Sets the tax group.
-     *
-     * @param TaxGroupInterface $group
-     *
-     * @return $this|OptionInterface
-     */
-    public function setTaxGroup(TaxGroupInterface $group);
 }
