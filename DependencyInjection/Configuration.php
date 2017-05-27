@@ -335,7 +335,6 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\ProductStockUnit')->end()
                                 ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository')->end()
                                 ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\ProductStockUnitType')->end()
-                                ->scalarNode('table')->defaultValue('Ekyna\Bundle\ProductBundle\Table\Type\ProductStockUnitType')->end()
                                 ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()
                                 ->arrayNode('event')
                                     ->addDefaultsIfNotSet()

@@ -7,6 +7,7 @@ use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Table\Type\ProductType;
 
 /**
  * Class ProductController
@@ -47,6 +48,9 @@ class ProductController extends ResourceController
         return $resource;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function createNewResourceForm(Context $context, $footer = true, array $options = [])
     {
         if (!array_key_exists('action', $options)) {
@@ -67,21 +71,21 @@ class ProductController extends ResourceController
         $product = $context->getResource();
 
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
-            $data['variants'] = $this->getTableFactory()
-                ->createBuilder('ekyna_product_product', [
-                    'name'     => 'ekyna_product.variant',
-                    'variable' => $product,
-                ])
-                ->getTable($context->getRequest())
-                ->createView();
+            $table = $this
+                ->getTableFactory()
+                ->createTable('variants', ProductType::class, [
+                    'variant_mode' => true,
+                    'source' => $product->getVariants()->toArray(),
+                ]);
+
+            if (null !== $response = $table->handleRequest($context->getRequest())) {
+                return $response;
+            }
+
+            $data['variants'] = $table->createView();
         }
 
         return null;
-    }
-
-    protected function fetchChildrenResources(array &$data, Context $context)
-    {
-
     }
 
     /**

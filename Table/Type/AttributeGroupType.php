@@ -3,8 +3,9 @@
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AttributeGroupType
@@ -19,14 +20,17 @@ class AttributeGroupType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'id')
-            ->addColumn('name', 'anchor', [
+            ->addDefaultSort('position')
+            ->setSortable(false)
+            ->setFilterable(false)
+            ->setPerPageChoices([100])
+            ->addColumn('name', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
                 'route_name'           => 'ekyna_product_attribute_group_admin_show',
                 'route_parameters_map' => ['attributeGroupId' => 'id'],
                 'position'             => 10,
             ])
-            ->addColumn('actions', 'admin_actions', [
+            ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
                     [
                         'label'                => 'ekyna_core.button.move_up',
@@ -60,30 +64,9 @@ class AttributeGroupType extends ResourceTableType
                     ],
                 ],
             ])
-            ->addFilter('name', 'text', [
+            ->addFilter('name', CType\Filter\TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'position' => 10,
             ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-
-        $resolver->setDefaults([
-            'default_sort' => 'position asc',
-            'max_per_page' => 100,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getName()
-    {
-        return 'ekyna_product_attribute_group';
     }
 }

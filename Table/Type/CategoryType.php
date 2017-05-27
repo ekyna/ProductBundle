@@ -3,8 +3,9 @@
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class CategoryType
@@ -19,20 +20,24 @@ class CategoryType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'id')
-            ->addColumn('name', 'nested_anchor', [
+            ->addDefaultSort('root')
+            ->addDefaultSort('left')
+            ->setSortable(false)
+            ->setFilterable(false)
+            ->setPerPageChoices([100])
+            ->addColumn('name', BType\Column\NestedAnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
                 'route_name'           => 'ekyna_product_category_admin_show',
                 'route_parameters_map' => [
                     'categoryId' => 'id',
                 ],
-                'position' => 10,
+                'position'             => 10,
             ])
-            ->addColumn('createdAt', 'datetime', [
-                'label' => 'ekyna_core.field.created_at',
+            ->addColumn('createdAt', CType\Column\DateTimeType::class, [
+                'label'    => 'ekyna_core.field.created_at',
                 'position' => 20,
             ])
-            ->addColumn('actions', 'admin_nested_actions', [
+            ->addColumn('actions', BType\Column\NestedActionsType::class, [
                 'new_child_route'       => 'ekyna_product_category_admin_new_child',
                 'move_up_route'         => 'ekyna_product_category_admin_move_up',
                 'move_down_route'       => 'ekyna_product_category_admin_move_down',
@@ -62,26 +67,5 @@ class CategoryType extends ResourceTableType
                     ],
                 ],
             ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-
-        $resolver->setDefaults([
-            'default_sort' => 'left asc',
-            'max_per_page' => 100,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getName()
-    {
-        return 'ekyna_product_category';
     }
 }

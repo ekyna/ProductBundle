@@ -190,6 +190,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
             // TODO medias ?
             // TODO adjustment ?
+
+            // TODO Disable stock
+            // TODO Disable visible
         }
     }
 

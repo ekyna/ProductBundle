@@ -130,7 +130,7 @@
         <service id="ekyna_product.product_type.column_type"
                  class="Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType">
             <argument type="service" id="ekyna_product.constants_helper"/>
-            <tag name="table.column_type" alias="ekyna_product_product_type"/>
+            <tag name="table.column_type"/>
         </service>
 
         <!-- Product table type -->
@@ -141,7 +141,7 @@
             <argument>%ekyna_product.category.class%</argument>
             <argument>%ekyna_commerce.tax_group.class%</argument>
             <argument>%ekyna_cms.tag.class%</argument>
-            <tag name="table.type" alias="ekyna_product_product"/>
+            <tag name="table.type"/>
         </service>
 
         <!-- Pricing resolver -->

@@ -2,18 +2,19 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Column;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
-use Ekyna\Component\Table\Extension\Core\Type\Column\TextType;
-use Ekyna\Component\Table\Table;
-use Ekyna\Component\Table\View\Cell;
+use Ekyna\Component\Table\Column\AbstractColumnType;
+use Ekyna\Component\Table\Column\ColumnInterface;
+use Ekyna\Component\Table\Extension\Core\Type\Column\PropertyType;
+use Ekyna\Component\Table\Source\RowInterface;
+use Ekyna\Component\Table\View\CellView;
 
 /**
  * Class ProductTypeType
  * @package Ekyna\Bundle\ProductBundle\Table\Column
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductTypeType extends TextType
+class ProductTypeType extends AbstractColumnType
 {
     /**
      * @var \Ekyna\Bundle\ProductBundle\Service\ConstantsHelper
@@ -32,32 +33,26 @@ class ProductTypeType extends TextType
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function buildViewCell(Cell $cell, Table $table, array $options)
+    public function buildCellView(CellView $view, ColumnInterface $column, RowInterface $row, array $options)
     {
-        parent::buildViewCell($cell, $table, $options);
-
-        $cell->setVars([
-            'type'  => 'text',
-            'value' => $this->constantHelper->renderProductTypeBadge($cell->vars['value'], false),
-        ]);
-
-        /*$value = $cell->vars['value'];
-        $cell->setVars([
-            'type'       => 'boolean',
-            'class'      => 'label-' . ProductTypes::getTheme($value),
-            'label'      => $this->constantHelper->renderProductTypeLabel($value),
-            'route'      => null,
-            'parameters' => [],
-        ]);*/
+        $view->vars['value'] = $this->constantHelper->renderProductTypeBadge($view->vars['value'], false);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return 'ekyna_product_product_type';
+        return 'text';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParent()
+    {
+        return PropertyType::class;
     }
 }

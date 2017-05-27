@@ -3,6 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
 
 /**
@@ -18,10 +20,7 @@ class AttributeSetType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addColumn('id', 'id', [
-                'sortable' => true,
-            ])
-            ->addColumn('name', 'anchor', [
+            ->addColumn('name', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
                 'property_path'        => null,
                 'sortable'             => true,
@@ -29,7 +28,7 @@ class AttributeSetType extends ResourceTableType
                 'route_parameters_map' => ['attributeSetId' => 'id'],
                 'position'             => 10,
             ])
-            ->addColumn('actions', 'admin_actions', [
+            ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
                     [
                         'label'                => 'ekyna_core.button.edit',
@@ -47,18 +46,9 @@ class AttributeSetType extends ResourceTableType
                     ],
                 ],
             ])
-            ->addFilter('id', 'number')
-            ->addFilter('name', 'text', [
+            ->addFilter('name', CType\Filter\TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'position' => 10,
             ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getName()
-    {
-        return 'ekyna_product_attribute_set';
     }
 }
