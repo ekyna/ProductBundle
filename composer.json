@@ -1,29 +1,28 @@
 {
-    "name" : "ekyna/product-bundle",
-    "description" : "Product management",
-    "type" : "symfony-bundle",
-    "authors" : [{
-            "name" : "Etienne Dauvergne",
-            "homepage" : "http://ekyna.com"
+    "name": "ekyna/product-bundle",
+    "description": "Product management",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Etienne Dauvergne",
+            "homepage": "http://ekyna.com"
         }
     ],
-    "keywords" : [
-        "symfony2",
+    "keywords": [
+        "symfony",
         "product",
         "bundle"
     ],
-    "homepage" : "https://github.com/ekyna/ProductBundle",
-    "license" : [
-        "MIT"
-    ],
-    "require" : {
-        "php" : ">=5.5.9",
-        "ekyna/commerce-bundle" : "0.6.x-dev",
-        "ekyna/cms-bundle" : "0.6.x-dev"
+    "homepage": "https://github.com/ekyna/ProductBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0",
+        "ekyna/commerce-bundle": "0.7.x-dev",
+        "ekyna/cms-bundle": "0.7.x-dev"
     },
-    "autoload" : {
-        "psr-4" : {
-            "Ekyna\\Bundle\\ProductBundle\\" : ""
+    "autoload": {
+        "psr-4": {
+            "Ekyna\\Bundle\\ProductBundle\\": ""
         }
     }
 }
