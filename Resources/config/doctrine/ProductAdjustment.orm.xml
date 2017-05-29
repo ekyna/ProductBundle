@@ -2,6 +2,7 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
@@ -12,17 +13,22 @@
             <index columns="position" name="idx_product_product_adjustment_position" />
         </indexes>
 
-        <!-- TODO <unique-constraints>
-            <unique-constraint columns="product_id,position" name="unique_product_adjustment_position"/>
-        </unique-constraints>-->
+        <unique-constraints>
+            <unique-constraint columns="product_id,position" name="unique_product_product_adjustment_position"/>
+        </unique-constraints>
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
 
+        <field name="position" column="position" type="smallint">
+            <gedmo:sortable-position/>
+        </field>
+
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="product" inversed-by="adjustments">
             <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+            <gedmo:sortable-group/>
         </many-to-one>
 
     </entity>

@@ -31,13 +31,6 @@
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
         <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
 
-        <!--<field name="stockMode" column="stock_mode" type="string" length="16" nullable="true"/>
-        <field name="stockState" column="stock_state" type="string" length="16" nullable="true"/>
-        <field name="inStock" column="in_stock" type="decimal" precision="10" scale="3" nullable="true"/>
-        <field name="orderedStock" column="ordered_stock" type="decimal" precision="10" scale="3" nullable="true"/>
-        <field name="shippedStock" column="shipped_stock" type="decimal" precision="10" scale="3" nullable="true"/>
-        <field name="estimatedDateOfArrival" column="estimated_date_of_arrival" type="datetime" nullable="true" />-->
-
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
 
         <field name="createdAt" type="datetime" column="created_at">
