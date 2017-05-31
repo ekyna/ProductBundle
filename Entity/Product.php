@@ -8,6 +8,7 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model as Common;
+use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
@@ -82,6 +83,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $categories;
 
     /**
+     * @var ArrayCollection|CustomerGroupInterface[]
+     */
+    protected $customerGroups;
+
+    /**
      * @var ArrayCollection|Model\ProductMediaInterface[]
      */
     protected $medias;
@@ -107,6 +113,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $visible;
 
     /**
+     * @var int
+     */
+    protected $deliveryTime;
+
+    /**
      * @var string
      */
     protected $reference;
@@ -119,12 +130,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var float
      */
-    protected $netPrice;
+    protected $netPrice = 0;
 
     /**
      * @var float
      */
-    protected $weight;
+    protected $weight = 0;
 
     /**
      * @var \DateTime
@@ -402,6 +413,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function hasOptionGroups()
+    {
+        return 0 < $this->optionGroups->count();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function hasOptionGroup(Model\OptionGroupInterface $group)
     {
         return $this->optionGroups->contains($group);
@@ -570,7 +589,68 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function setCategories(ArrayCollection $categories)
     {
-        $this->categories = $categories;
+        foreach ($this->categories as $category) {
+            $this->removeCategory($category);
+        }
+
+        foreach ($categories as $category) {
+            $this->addCategory($category);
+        }
+
+        return $this;
+    }
+    /**
+     * @inheritdoc
+     */
+    public function getCustomerGroups()
+    {
+        return $this->customerGroups;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasCustomerGroup(CustomerGroupInterface $group)
+    {
+        return $this->customerGroups->contains($group);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addCustomerGroup(CustomerGroupInterface $group)
+    {
+        if (!$this->hasCustomerGroup($group)) {
+            $this->customerGroups->add($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeCustomerGroup(CustomerGroupInterface $group)
+    {
+        if ($this->hasCustomerGroup($group)) {
+            $this->customerGroups->removeElement($group);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomerGroups(ArrayCollection $customerGroups)
+    {
+        foreach ($this->customerGroups as $group) {
+            $this->removeCustomerGroup($group);
+        }
+
+        foreach ($customerGroups as $group) {
+            $this->addCustomerGroup($group);
+        }
 
         return $this;
     }
@@ -773,6 +853,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setVisible($visible)
     {
         $this->visible = (bool)$visible;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDeliveryTime()
+    {
+        return $this->deliveryTime;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setDeliveryTime($days)
+    {
+        $this->deliveryTime = $days;
 
         return $this;
     }

@@ -8,11 +8,11 @@
 
 
 {% macro show_visible(product, options = {}) %}
-    {% spaceless %}
-        {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', {
-            'id': 'product_visible'
-        }|merge(options)) }}
-    {% endspaceless %}
+{% spaceless %}
+    {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', {
+        'id': 'product_visible'
+    }|merge(options)) }}
+{% endspaceless %}
 {% endmacro show_visible %}
 
 
@@ -38,6 +38,28 @@
 {% endmacro show_categories %}
 
 
+{% macro show_customer_groups(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.customerGroups, 'entity', 'ekyna_commerce.customer_group.label.plural', {
+        'route': 'ekyna_commerce_customer_group_admin_show',
+        'route_params_map': {'customerGroupId': 'id'},
+        'id': 'product_customerGroups'
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_customer_groups %}
+
+
+{% macro show_released_at(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.releasedAt, 'datetime', 'ekyna_product.product.field.released_at', {
+        'date_format': 'short',
+        'time_format': 'none',
+        'id': 'product_releasedAt'
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_released_at %}
+
+
 {% macro show_geocode(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.geocode, 'text', 'ekyna_product.product.field.geocode', {
@@ -45,6 +67,16 @@
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_geocode %}
+
+
+{% macro show_delivery_time(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.weight, 'number', 'ekyna_product.product.field.delivery_time', {
+        'id': 'product_deliveryTime',
+        'precision': 0
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_delivery_time %}
 
 
 {% macro show_reference(product, options = {}) %}
@@ -239,69 +271,70 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm">
                 {% for group in product.optionGroups %}
-                {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ show_row(group.name, 'text', 'ekyna_core.field.name', {
-                            'id': groupId ~ 'name',
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8
-                        }) }}
+                <div class="collection-item">
+                    {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ show_row(group.name, 'text', 'ekyna_core.field.name', {
+                                'id': groupId ~ 'name',
+                                'label_nb_col': 4,
+                                'widget_nb_col': 8
+                            }) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
+                                'id': groupId ~ 'required',
+                                'label_nb_col': 4,
+                                'widget_nb_col': 8
+                            }) }}
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        {{ show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
-                            'id': groupId ~ 'required',
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8
-                        }) }}
-                    </div>
-                </div>
-                {{ show_translations_row(group.translations, {
-                    'id': groupId ~ 'translations',
-                    'fields': {
-                        'title': {'label': 'ekyna_core.field.title'},
-                    }
-                }) }}
-                <div class="row show-row">
-                    <div class="col-md-2 show-label">
-                        {{ 'ekyna_product.option.label.plural'|trans }}
-                    </div>
-                    <div class="col-md-10">
-                        <div class="show-widget">
-                            <table class="table table-stripped table-condensed">
-                                <tr>
-                                    <th>{{ 'ekyna_core.field.designation'|trans }}</th>
-                                    <th>{{ 'ekyna_core.field.reference'|trans }}</th>
-                                    <th>{{ 'ekyna_core.field.weight'|trans }}</th>
-                                    <th>{{ 'ekyna_core.field.price'|trans }}</th>
-                                    <th>{{ 'ekyna_core.field.group'|trans }}</th>
-                                </tr>
-                                {% for option in group.options %}
-                                {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
-                                <tr>
-                                    <td id="{{ optionId ~ 'designation' }}">
-                                        {{ option.designation }}
-                                    </td>
-                                    <td id="{{ optionId ~ 'reference' }}">
-                                        {{ option.reference }}
-                                    </td>
-                                    <td id="{{ optionId ~ 'weight' }}">
-                                        {{ option.weight|localizednumber }} kg
-                                    </td>
-                                    <td id="{{ optionId ~ 'netPrice' }}">
-                                        {{ option.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
-                                    </td>
-                                    <td id="{{ optionId ~ 'taxGroup' }}">
-                                        {{ option.taxGroup }}
-                                    </td>
-                                </tr>
-                                {# TODO translations ? #}
-                                {% endfor %}
-                            </table>
+                    {{ show_translations_row(group.translations, {
+                        'id': groupId ~ 'translations',
+                        'fields': {
+                            'title': {'label': 'ekyna_core.field.title'},
+                        }
+                    }) }}
+                    <div class="row show-row">
+                        <div class="col-md-2 show-label">
+                            {{ 'ekyna_product.option.label.plural'|trans }}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="show-widget">
+                                <table class="table table-stripped table-condensed">
+                                    <tr>
+                                        <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+                                        <th>{{ 'ekyna_core.field.reference'|trans }}</th>
+                                        <th>{{ 'ekyna_core.field.weight'|trans }}</th>
+                                        <th>{{ 'ekyna_core.field.price'|trans }}</th>
+                                        <th>{{ 'ekyna_core.field.group'|trans }}</th>
+                                    </tr>
+                                    {% for option in group.options %}
+                                    {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
+                                    <tr>
+                                        <td id="{{ optionId ~ 'designation' }}">
+                                            {{ option.designation }}
+                                        </td>
+                                        <td id="{{ optionId ~ 'reference' }}">
+                                            {{ option.reference }}
+                                        </td>
+                                        <td id="{{ optionId ~ 'weight' }}">
+                                            {{ option.weight|localizednumber }} kg
+                                        </td>
+                                        <td id="{{ optionId ~ 'netPrice' }}">
+                                            {{ option.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                                        </td>
+                                        <td id="{{ optionId ~ 'taxGroup' }}">
+                                            {{ option.taxGroup }}
+                                        </td>
+                                    </tr>
+                                    {# TODO translations ? #}
+                                    {% endfor %}
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {% if not loop.last %}<hr>{% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -378,7 +411,7 @@
                 </p>
                 {% for slot in product.bundleSlots %}
                 {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
-                <div class="slot">
+                <div class="slot collection-item">
                     {{ show_translations_row(slot.translations, {
                         'id': slotId ~ 'translations',
                         'fields': {

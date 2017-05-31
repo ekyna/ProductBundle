@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
+use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
@@ -169,6 +170,13 @@ interface ProductInterface extends
     public function getOptionGroups();
 
     /**
+     * Returns whether the product has given option groups or not.
+     *
+     * @return bool
+     */
+    public function hasOptionGroups();
+
+    /**
      * Returns whether the product has the given option group or not.
      *
      * @param OptionGroupInterface $group
@@ -309,6 +317,49 @@ interface ProductInterface extends
     public function setCategories(ArrayCollection $categories);
 
     /**
+     * Returns the customer groups.
+     *
+     * @return ArrayCollection|CustomerGroupInterface[]
+     */
+    public function getCustomerGroups();
+
+    /**
+     * Returns whether the product has the given given customer group.
+     *
+     * @param CustomerGroupInterface $group
+     *
+     * @return bool
+     */
+    public function hasCustomerGroup(CustomerGroupInterface $group);
+
+    /**
+     * Adds the customer group.
+     *
+     * @param CustomerGroupInterface $group
+     *
+     * @return $this|ProductInterface
+     */
+    public function addCustomerGroup(CustomerGroupInterface $group);
+
+    /**
+     * Removes the customer group.
+     *
+     * @param CustomerGroupInterface $group
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeCustomerGroup(CustomerGroupInterface $group);
+
+    /**
+     * Sets the customer groups.
+     *
+     * @param ArrayCollection|CustomerGroupInterface[] $groups
+     *
+     * @return $this|ProductInterface
+     */
+    public function setCustomerGroups(ArrayCollection $groups);
+
+    /**
      * Returns whether or not the product has the given media.
      *
      * @param ProductMediaInterface $media
@@ -316,6 +367,15 @@ interface ProductInterface extends
      * @return bool
      */
     public function hasMedia(ProductMediaInterface $media);
+
+    /**
+     * Returns the medias, optionally filtered by (media) types.
+     *
+     * @param array $types
+     *
+     * @return ArrayCollection|ProductMediaInterface[]
+     */
+    public function getMedias(array $types = []);
 
     /**
      * Adds the product media.
@@ -334,15 +394,6 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function removeMedia(ProductMediaInterface $media);
-
-    /**
-     * Returns the medias, optionally filtered by (media) types.
-     *
-     * @param array $types
-     *
-     * @return ArrayCollection|ProductMediaInterface[]
-     */
-    public function getMedias(array $types = []);
 
     /**
      * Returns whether or not the product has the given reference.
@@ -453,6 +504,22 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setVisible($visible);
+
+    /**
+     * Returns the delivery time in days.
+     *
+     * @return int
+     */
+    public function getDeliveryTime();
+
+    /**
+     * Sets the delivery time in days.
+     *
+     * @param int $days
+     *
+     * @return $this|ProductInterface
+     */
+    public function setDeliveryTime($days);
 
     /**
      * Returns the reference.

@@ -2,7 +2,6 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
-use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -51,14 +50,11 @@ class FormBuilder
 
         $repository = $this->provider->getProductRepository();
 
-        // TODO load options ?
-        // $repository->loadOptions($product);
-
         // Variable : add variant choice form
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
             $repository->loadVariants($product);
 
-            $form->add('variant', Pr\VariantChoiceType::class, [
+            $form->add('variant', Pr\SaleItem\VariantChoiceType::class, [
                 'variable' => $product,
             ]);
 
@@ -72,10 +68,11 @@ class FormBuilder
                 }
             }
 
-            $form->add('configuration', Pr\ConfigurableSlotsType::class, [
-                'bundle_slots' => $product->getBundleSlots()->toArray(),
-                'item'         => $item,
-            ]);
+            $form->add('configuration', Pr\SaleItem\ConfigurableSlotsType::class);
+        }
+
+        if ($product->hasOptionGroups()) {
+            $form->add('options', Pr\SaleItem\OptionGroupsType::class);
         }
 
         // Quantity

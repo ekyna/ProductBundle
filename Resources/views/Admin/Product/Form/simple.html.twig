@@ -4,14 +4,21 @@
 {% block general_content %}
     {{ parent() }}
     <div class="row">
-        <div class="col-md-6">
-            {{ form_row(form.brand, {'label_col': 4, 'widget_col': 8}) }}
+        <div class="col-md-8">
+            {{ form_row(form.brand, {'label_col': 3, 'widget_col': 9}) }}
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
+        <div class="col-md-4">
+            {{ form_row(form.visible, {'label_col': 6, 'widget_col': 6}) }}
         </div>
     </div>
-    {{ form_row(form.categories) }}
+    <div class="row">
+        <div class="col-md-8">
+            {{ form_row(form.categories, {'label_col': 3, 'widget_col': 9}) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.releasedAt, {'label_col': 6, 'widget_col': 6}) }}
+        </div>
+    </div>
     {{ form_row(form.translations) }}
     {{ form_row(form.medias) }}
 {% endblock general_content %}
@@ -20,6 +27,14 @@
 {% block pricing_content %}
     {{ form_row(form.tags) }}
     {{ parent() }}
+    <div class="row">
+        <div class="col-md-8">
+            {{ form_row(form.customerGroups, {'label_col': 3, 'widget_col': 9}) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.deliveryTime, {'label_col': 6, 'widget_col': 6}) }}
+        </div>
+    </div>
     {{ form_row(form.references) }}
     {{ form_row(form.adjustments) }}
     {{ form_row(form.optionGroups) }}

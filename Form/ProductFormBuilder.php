@@ -6,8 +6,7 @@ use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
-use Ekyna\Bundle\CommerceBundle\Form\Type\Common\AdjustmentsType;
-use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -118,7 +117,7 @@ class ProductFormBuilder
             'types'                 => [AdjustmentTypes::TYPE_INCLUDED],
         ], $options);
 
-        $this->form->add('adjustments', AdjustmentsType::class, $options);
+        $this->form->add('adjustments', CO\Common\AdjustmentsType::class, $options);
 
         return $this;
     }
@@ -228,6 +227,26 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the customer groups field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addCustomerGroupsField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_commerce.customer_group.label.plural',
+            'multiple' => true,
+            'required' => false,
+        ], $options);
+
+        $this->form->add('customerGroups', CO\Customer\CustomerGroupChoiceType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the designation field.
      *
      * @param array $options
@@ -241,6 +260,25 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('designation', SF\TextType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the delivery time field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addDeliveryTimeField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.delivery_time',
+            'required' => false,
+        ], $options);
+
+        $this->form->add('deliveryTime', SF\IntegerType::class, $options);
 
         return $this;
     }
@@ -281,7 +319,7 @@ class ProductFormBuilder
                 MediaTypes::SVG,
                 MediaTypes::FLASH,
                 MediaTypes::VIDEO,
-                MediaTypes::FILE
+                MediaTypes::FILE,
             ],
             'required'    => false,
         ], $options);
@@ -378,6 +416,26 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the released at field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addReleasedAtField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.released_at',
+            'format'   => 'dd/MM/yyyy',
+            'required' => false,
+        ], $options);
+
+        $this->form->add('releasedAt', SF\DateTimeType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the seo field.
      *
      * @param array $options
@@ -428,7 +486,7 @@ class ProductFormBuilder
             'allow_new' => true,
         ], $options);
 
-        $this->form->add('taxGroup', TaxGroupChoiceType::class, $options);
+        $this->form->add('taxGroup', CO\Pricing\TaxGroupChoiceType::class, $options);
 
         return $this;
     }

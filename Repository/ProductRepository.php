@@ -159,6 +159,29 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
+    public function loadOptions(Model\ProductInterface $product)
+    {
+        if (!$this->isInitializedCollection($product->getOptionGroups())) {
+            $qb = $this->createQueryBuilder('p');
+            $qb
+                ->leftJoin('p.optionGroups', 'og')
+                ->leftJoin('og.translations', 'og_t', Expr\Join::WITH, $this->getLocaleCondition('og_t'))
+                ->leftJoin('og.options', 'o')
+                ->leftJoin('o.translations', 'o_t', Expr\Join::WITH, $this->getLocaleCondition('o_t'))
+                ->select('PARTIAL p.{id}', 'og', 'og_t', 'o', 'o_t')
+                ->andWhere($qb->expr()->eq('p.id', ':id'))
+                ->getQuery()
+                ->useQueryCache(true)
+                ->setParameters([
+                    'id' => $product->getId(),
+                ])
+                ->getResult();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function loadVariants(Model\ProductInterface $variable)
     {
         Model\ProductTypes::assertVariable($variable);

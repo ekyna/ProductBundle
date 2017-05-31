@@ -8,11 +8,6 @@
     <parameters>
         <parameter key="ekyna_product.attribute_slot.class">Ekyna\Bundle\ProductBundle\Entity\AttributeSlot</parameter>
 
-        <parameter key="ekyna_product.configurable_slot.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ConfigurableSlotType</parameter>
-
-        <parameter key="ekyna_product.option_group.class">Ekyna\Bundle\ProductBundle\Entity\OptionGroup</parameter>
-        <parameter key="ekyna_product.option.class">Ekyna\Bundle\ProductBundle\Entity\Option</parameter>
-
         <parameter key="ekyna_product.pricing.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\PricingType</parameter>
 
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
@@ -83,12 +78,12 @@
 
         <!-- Configurable slot form types -->
         <service id="ekyna_product.configurable_slots.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\ConfigurableSlotsType">
-            <argument>%ekyna_product.configurable_slot.form_type.class%</argument>
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
+            <argument type="service" id="ekyna_product.product.subject_provider"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.configurable_slot.form_type"
-                 class="%ekyna_product.configurable_slot.form_type.class%">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotType">
             <argument type="service" id="ekyna_product.product.subject_provider"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <call method="setCacheManager">
@@ -96,6 +91,19 @@
             </call>
             <tag name="form.type"/>
             <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot" />
+        </service>
+
+        <!-- Sale item options/groups form types -->
+        <service id="ekyna_product.sale_item.option_groups.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupsType">
+            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.sale_item.option_group.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType">
+            <argument type="service" id="ekyna_product.option.repository"/>
+            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <tag name="form.type"/>
         </service>
 
         <!-- Pricing form types -->

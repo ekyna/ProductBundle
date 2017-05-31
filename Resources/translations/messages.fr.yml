@@ -213,6 +213,8 @@ ekyna_product:
             composition: Composition
             geocode: Geocode
             visible: Visible
+            released_at: Date de sortie
+            delivery_time: Délai de livraison
         alert:
             no_item: Aucun produit configuré
 

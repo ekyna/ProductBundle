@@ -87,9 +87,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addBrandField()
             ->addVisibleField()
             ->addCategoriesField()
+            ->addCustomerGroupsField()
+            ->addReleasedAtField()
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addDeliveryTimeField()
             ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
@@ -145,9 +148,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 ],
             ])
             ->addVisibleField()
+            ->addCustomerGroupsField()
+            ->addReleasedAtField()
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addDeliveryTimeField()
             ->addTagsField()
             ->addTranslationsField([
                 'required'     => false,

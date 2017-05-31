@@ -8,14 +8,21 @@
 {% block general_content %}
     {{ parent() }}
     <div class="row">
-        <div class="col-md-6">
-            {{ macros.show_brand(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+        <div class="col-md-8">
+            {{ macros.show_brand(product, {'label_nb_col': 3, 'widget_nb_col': 9}) }}
         </div>
-        <div class="col-md-6">
-            {{ macros.show_visible(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+        <div class="col-md-4">
+            {{ macros.show_visible(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
         </div>
     </div>
-    {{ macros.show_categories(product) }}
+    <div class="row">
+        <div class="col-md-8">
+            {{ macros.show_categories(product, {'label_nb_col': 3, 'widget_nb_col': 8}) }}
+        </div>
+        <div class="col-md-4">
+            {{ macros.show_released_at(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
+        </div>
+    </div>
     {{ macros.show_translations(product) }}
     {{ macros.show_medias(product) }}
 {% endblock general_content %}
@@ -24,6 +31,14 @@
 {% block pricing_content %}
     {{ _cms.show_tags(product) }}
     {{ parent() }}
+    <div class="row">
+        <div class="col-md-8">
+            {{ macros.show_customer_groups(product, {'label_nb_col': 3, 'widget_nb_col': 8}) }}
+        </div>
+        <div class="col-md-4">
+            {{ macros.show_delivery_time(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
+        </div>
+    </div>
     {{ macros.show_references(product) }}
     {{ macros.show_adjustments(product) }}
     {{ macros.show_option_groups(product) }}

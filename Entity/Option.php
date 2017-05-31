@@ -41,12 +41,12 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
     /**
      * @var float
      */
-    protected $weight;
+    protected $weight = 0;
 
     /**
      * @var float
      */
-    protected $netPrice;
+    protected $netPrice = 0;
 
 
     /**

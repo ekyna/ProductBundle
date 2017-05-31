@@ -4,8 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Event\SaleItemAdjustmentEvent;
@@ -30,16 +28,6 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      * @var PriceResolver
      */
     private $priceResolver;
-
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
-
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
 
 
     /**
@@ -66,6 +54,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         $this
+            ->provider
             ->getItemBuilder()
             ->initializeItem($event->getItem());
     }
@@ -82,8 +71,9 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         $this
+            ->provider
             ->getItemBuilder()
-            ->buildItem($event->getItem(), $event->getData());
+            ->buildItem($event->getItem());
     }
 
     /**
@@ -122,6 +112,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         $this
+            ->provider
             ->getFormBuilder()
             ->buildItemForm($event->getForm(), $event->getItem());
     }
@@ -145,34 +136,6 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         return null;
-    }
-
-    /**
-     * Returns the item builder.
-     *
-     * @return ItemBuilder
-     */
-    private function getItemBuilder()
-    {
-        if (null !== $this->itemBuilder) {
-            return $this->itemBuilder;
-        }
-
-        return $this->itemBuilder = new ItemBuilder($this->provider);
-    }
-
-    /**
-     * Returns the form builder.
-     *
-     * @return FormBuilder
-     */
-    private function getFormBuilder()
-    {
-        if (null !== $this->formBuilder) {
-            return $this->formBuilder;
-        }
-
-        return $this->formBuilder = new FormBuilder($this->provider);
     }
 
     /**

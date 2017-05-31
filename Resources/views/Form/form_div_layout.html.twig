@@ -22,41 +22,45 @@
 
 {% block ekyna_product_bundle_slot_widget %}
 {% spaceless %}
-    {{ form_errors(form) }}
-    {#{% if configurable %}
+    <div class="ekyna-collection-item">
+        {{ form_errors(form) }}
+        {#{% if configurable %}
 
-    {% else %}
+        {% else %}
 
-    {% endif %}#}
-    {% if form.translations is defined %}
-        {{ form_row(form.translations, {'widget_col': 12}) }}
-    {% endif %}
-    {{ form_row(form.choices, {'widget_col': 12}) }}
-    {{ form_widget(form.position) }}
-    {{ form_rest(form) }}
+        {% endif %}#}
+        {% if form.translations is defined %}
+            {{ form_row(form.translations, {'widget_col': 12}) }}
+        {% endif %}
+        {{ form_row(form.choices, {'widget_col': 12}) }}
+        {{ form_widget(form.position) }}
+        {{ form_rest(form) }}
+    </div>
 {% endspaceless %}
 {% endblock ekyna_product_bundle_slot_widget %}
 
 
 {% block ekyna_product_bundle_choice_widget %}
 {% spaceless %}
-    {{ form_errors(form) }}
-    {{ form_row(form.product, {'label_col': 2, 'widget_col': 10}) }}
-    {% if configurable %}
-        <div class="row">
-            <div class="col-md-6">
-                {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) }}
+    <div class="ekyna-collection-item">
+        {{ form_errors(form) }}
+        {{ form_row(form.product, {'label_col': 2, 'widget_col': 10}) }}
+        {% if configurable %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) }}
-            </div>
-        </div>
-        {{ form_row(form.rules, {'label_col': 2, 'widget_col': 10}) }}
-        {{ form_widget(form.position) }}
-    {% else %}
-        {{ form_row(form.quantity, {'label_col': 2, 'widget_col': 10}) }}
-    {% endif %}
-    {{ form_rest(form) }}
+            {{ form_row(form.rules, {'label_col': 2, 'widget_col': 10}) }}
+            {{ form_widget(form.position) }}
+        {% else %}
+            {{ form_row(form.quantity, {'label_col': 2, 'widget_col': 10}) }}
+        {% endif %}
+        {{ form_rest(form) }}
+    </div>
 {% endspaceless %}
 {% endblock ekyna_product_bundle_choice_widget %}
 
@@ -132,51 +136,72 @@
 {% endblock ekyna_product_configurable_slot_widget %}
 
 
+{% block ekyna_product_sale_item_option_groups_row %}
+{% spaceless %}
+    {% for child in form %}
+        {{ form_row(child) }}
+    {% endfor %}
+{% endspaceless %}
+{% endblock ekyna_product_sale_item_option_groups_row %}
+
+
+{% block ekyna_product_sale_item_option_group_widget %}
+{% spaceless %}
+    {{ form_widget(form.choice, {'label_col': 0, 'widget_col': 12}) }}
+{% endspaceless %}
+{% endblock ekyna_product_sale_item_option_group_widget %}
+
+
+
 {% block ekyna_product_option_widget %}
 {% spaceless %}
-    {{ form_errors(form) }}
-    <div class="row form-group">
-        <div class="col-md-12">
-            {{ form_widget(form.designation) }}
+    <div class="ekyna-collection-item">
+        {{ form_errors(form) }}
+        <div class="row form-group">
+            <div class="col-md-12">
+                {{ form_widget(form.designation) }}
+            </div>
         </div>
+        {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+        <div class="row form-group">
+            <div class="col-md-6">
+                {{ form_widget(form.reference) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_widget(form.weight) }}
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-6">
+                {{ form_widget(form.netPrice) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_widget(form.taxGroup) }}
+            </div>
+        </div>
+        {{ form_widget(form.position) }}
+        {{ form_rest(form) }}
     </div>
-    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-    <div class="row form-group">
-        <div class="col-md-6">
-            {{ form_widget(form.reference) }}
-        </div>
-        <div class="col-md-6">
-            {{ form_widget(form.weight) }}
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-md-6">
-            {{ form_widget(form.netPrice) }}
-        </div>
-        <div class="col-md-6">
-            {{ form_widget(form.taxGroup) }}
-        </div>
-    </div>
-    {{ form_widget(form.position) }}
-    {{ form_rest(form) }}
 {% endspaceless %}
 {% endblock ekyna_product_option_widget %}
 
 
 {% block ekyna_product_option_group_widget %}
 {% spaceless %}
-    {{ form_errors(form) }}
-    <div class="row">
-        <div class="col-md-6">
-            {{ form_row(form.name, {'label_col': 4, 'widget_col': 8}) }}
+    <div class="ekyna-collection-item">
+        {{ form_errors(form) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.name, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
-        </div>
+        {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+        {{ form_widget(form.position) }}
+        {{ form_rest(form) }}
     </div>
-    {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-    {{ form_widget(form.position) }}
-    {{ form_rest(form) }}
 {% endspaceless %}
 {% endblock ekyna_product_option_group_widget %}
 

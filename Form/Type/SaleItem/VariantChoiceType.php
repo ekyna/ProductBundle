@@ -1,17 +1,19 @@
 <?php
 
-namespace Ekyna\Bundle\ProductBundle\Form\Type;
+namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class VariantChoiceType
- * @package Ekyna\Bundle\ProductBundle\Form\Type
+ * @package Ekyna\Bundle\ProductBundle\Form\Type\SaleItem
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
 class VariantChoiceType extends AbstractType
@@ -24,13 +26,14 @@ class VariantChoiceType extends AbstractType
         $resolver
             ->setDefaults([
                 'label'         => 'ekyna_product.variant.label.singular',
-                'property_path' => 'subjectData[' . ItemBuilder::VARIANT_ID . ']',
+                'data_class'    => SaleItemInterface::class,
+                'property_path' => 'data[' . ItemBuilder::VARIANT_ID . ']',
                 'select2'       => false,
                 'choices'       => function (Options $options, $value) {
                     if (empty($value)) {
+                        /** @var Model\ProductInterface $variable */
                         $variable = $options['variable'];
 
-                        /** @var Model\ProductInterface $variant */
                         foreach ($variable->getVariants() as $variant) {
                             $value[$variant->getTitle()] = $variant->getId();
                         }
@@ -38,9 +41,12 @@ class VariantChoiceType extends AbstractType
 
                     return $value;
                 },
+                'constraints'   => [
+                    new NotBlank(),
+                ],
             ])
             ->setRequired(['variable'])
-            ->setAllowedTypes('variable', 'Ekyna\Bundle\ProductBundle\Model\ProductInterface')
+            ->setAllowedTypes('variable', Model\ProductInterface::class)
             ->setAllowedValues('variable', function (Model\ProductInterface $variable) {
                 return $variable->getType() === Model\ProductTypes::TYPE_VARIABLE;
             });

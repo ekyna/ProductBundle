@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekyna\Bundle\ProductBundle\Form\Type;
+namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\ProductToBundleSlotChoiceTransformer;
@@ -9,23 +9,16 @@ use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
-use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ConfigurableSlotType
- * @package Ekyna\Bundle\ProductBundle\Form\Type
+ * @package Ekyna\Bundle\ProductBundle\Form\Type\SaleItem
  * @author  Etienne Dauvergne <contact@ekyna.com>
- *
- * @todo    CommerceBundle DI pass
  */
-class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerAwareInterface
+class ConfigurableSlotType extends Form\AbstractType implements Imagine\CacheManagerAwareInterface
 {
     use Imagine\CacheManagerAwareTrait;
 
@@ -55,14 +48,11 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
     /**
      * @inheritdoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(Form\FormBuilderInterface $builder, array $options)
     {
         /** @var BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
 
-        // TODO subject property does no longer exist on sale item.
-        // -> mapped = false
-        // -> 'post_submit' event to re assign (need higher priority than sale item 'build' event)
         $subjectField = $builder
             ->create('subject', Type\ChoiceType::class, [
                 'property_path' => 'subjectIdentity.subject',
@@ -87,7 +77,7 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
                     'min' => 1,
                 ],
             ])
-            ->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
+            ->addEventListener(Form\FormEvents::POST_SUBMIT, function(Form\FormEvent $event) {
                 /** @var SaleItemInterface $item */
                 $item  = $event->getData();
 
@@ -95,8 +85,6 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
                 $item->getSubjectIdentity()->clear();
 
                 $this->productProvider->assign($item, $product);
-
-                $event->setData($item);
             }, 2048);
     }
 
@@ -131,7 +119,7 @@ class ConfigurableSlotType extends AbstractType implements Imagine\CacheManagerA
     /**
      * @inheritDoc
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(Form\FormView $view, Form\FormInterface $form, array $options)
     {
         /** @var BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];

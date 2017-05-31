@@ -67,6 +67,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function loadMedias(Model\ProductInterface $product);
 
     /**
+     * Loads the product's option groups and options.
+     *
+     * @param Model\ProductInterface $product
+     */
+    public function loadOptions(Model\ProductInterface $product);
+
+    /**
      * Loads the variable's variants.
      *
      * @param Model\ProductInterface $variable

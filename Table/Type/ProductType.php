@@ -84,7 +84,7 @@ class ProductType extends ResourceTableType
         $builder
             ->addColumn('designation', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.designation',
-                'property_path'        => null,
+                'property_path'        => false,
                 'route_name'           => 'ekyna_product_product_admin_show',
                 'route_parameters_map' => [
                     'productId' => 'id',
