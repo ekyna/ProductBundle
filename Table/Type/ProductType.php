@@ -84,7 +84,6 @@ class ProductType extends ResourceTableType
         $builder
             ->addColumn('designation', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.designation',
-                'property_path'        => false,
                 'route_name'           => 'ekyna_product_product_admin_show',
                 'route_parameters_map' => [
                     'productId' => 'id',
@@ -194,8 +193,8 @@ class ProductType extends ResourceTableType
                     'choices'  => StockSubjectStates::getChoices(),
                     'position' => 70,
                 ])
-                ->addFilter('category', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_product.category.label.singular',
+                ->addFilter('categories', DType\Filter\EntityType::class, [
+                    'label'        => 'ekyna_product.category.label.plural',
                     'class'        => $this->categoryClass,
                     'entity_label' => 'name',
                     'position'     => 80,
