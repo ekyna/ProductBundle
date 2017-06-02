@@ -50,11 +50,6 @@ class OptionGroupType extends Form\AbstractType
         /** @var Model\OptionGroupInterface $optionGroup */
         $optionGroup = $options['option_group'];
 
-        $choices = [];
-        foreach ($optionGroup->getOptions() as $option) {
-            $choices[$option->getTitle()] = $option->getId();
-        }
-
         $required = false;
         $constraints = [];
         if ($optionGroup->isRequired()) {
@@ -62,15 +57,49 @@ class OptionGroupType extends Form\AbstractType
             $required = true;
         }
 
+        $choices = $optionGroup->getOptions();
+
         $options = $builder
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
-                'choices'       => $choices,
+                'choices'       => $optionGroup->getOptions(),
+                'choice_label' => function(Model\OptionInterface $option) {
+                    return $option->getTitle();
+                },
+                'choice_attr' => function(Model\OptionInterface $option) {
+                    return [
+                        'data-price' => $option->getNetPrice(),
+                    ];
+                },
+                'attr' => [
+                    'class' => 'sale-item-option',
+                ],
                 'constraints'   => $constraints,
                 'required'      => $required,
                 'select2'       => false,
             ])
+            ->addModelTransformer(new Form\CallbackTransformer(
+                // id to option
+                function($value) use ($choices) {
+                    /** @var Model\OptionInterface $option */
+                    foreach ($choices as $option) {
+                        if ($option->getId() == $value) {
+                            return $option;
+                        }
+                    }
+
+                    return $value;
+                },
+                // option to id
+                function($value) use ($choices) {
+                    if ($value instanceof Model\OptionInterface) {
+                        return $value->getId();
+                    }
+
+                    return $value;
+                }
+            ))
             ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) use ($optionGroup) {
                 /** @var SaleItemInterface $data */
                 $item = $event->getForm()->getParent()->getData();
@@ -103,7 +132,7 @@ class OptionGroupType extends Form\AbstractType
     {
         $resolver
             ->setDefaults([
-                'data_class' => SaleItemInterface::class
+                'data_class' => SaleItemInterface::class,
             ])
             ->setRequired(['option_group'])
             ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);

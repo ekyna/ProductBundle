@@ -77,12 +77,12 @@
         </service>
 
         <!-- Configurable slot form types -->
-        <service id="ekyna_product.configurable_slots.form_type"
+        <service id="ekyna_product.sale_item.configurable_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
             <argument type="service" id="ekyna_product.product.subject_provider"/>
             <tag name="form.type"/>
         </service>
-        <service id="ekyna_product.configurable_slot.form_type"
+        <service id="ekyna_product.sale_item.configurable_slot.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotType">
             <argument type="service" id="ekyna_product.product.subject_provider"/>
             <argument>%ekyna_product.default.no_image%</argument>
@@ -104,6 +104,14 @@
             <argument type="service" id="ekyna_product.option.repository"/>
             <argument type="service" id="ekyna_product.product.subject_provider"/>
             <tag name="form.type"/>
+        </service>
+
+        <!-- Sale item subject configure type extension -->
+        <service id="ekyna_product.sale_item_subject_configure.type_extension"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\SaleItemSubjectConfigureTypeExtension">
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <tag name="form.type_extension" extended-type="Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemSubjectConfigureType"/>
+            <tag name="form.js" selector=".sale-item-subject-configure" path="ekyna-product/form/sale-item-subject-configure" />
         </service>
 
         <!-- Pricing form types -->
@@ -152,7 +160,7 @@
             <tag name="table.type"/>
         </service>
 
-        <!-- Pricing resolver -->
+        <!-- Price resolver -->
         <service id="ekyna_product.pricing.resolver"
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver"
                  lazy="true">
@@ -161,10 +169,21 @@
             <argument id="ekyna_commerce.country.repository" type="service"/>
         </service>
 
+        <!-- Price calculator -->
+        <service id="ekyna_product.pricing.calculator"
+                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator"
+                 lazy="true">
+            <argument id="ekyna_product.product.subject_provider" type="service"/>
+            <argument id="ekyna_product.pricing.resolver" type="service"/>
+            <argument id="ekyna_commerce.customer.security_provider" type="service"/>
+            <argument id="ekyna_commerce.cart.session_provider" type="service"/>
+        </service>
+
         <!-- Twig extension -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
             <argument type="service" id="ekyna_product.constants_helper"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <tag name="twig.extension"/>
         </service>
 

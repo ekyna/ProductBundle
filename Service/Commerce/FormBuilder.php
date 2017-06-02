@@ -79,6 +79,7 @@ class FormBuilder
         $form->add('quantity', Sf\IntegerType::class, [
             'label' => 'ekyna_core.field.quantity',
             'attr'  => [
+                'class' => 'sale-item-quantity',
                 'min' => 1,
             ],
         ]);

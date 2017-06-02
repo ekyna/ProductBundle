@@ -132,7 +132,7 @@ class PriceResolver
 
         $pricing = $this->findPricing($product, $group, $country);
 
-        if (null !== $pricing) {
+        if (!empty($pricing)) {
             foreach ($pricing['rules'] as $qty => $percent) {
                 if ($qty <= $quantity) {
                     return new AdjustmentData(
@@ -154,7 +154,7 @@ class PriceResolver
      * @param CustomerGroupInterface $group
      * @param CountryInterface       $country
      *
-     * @return array|null
+     * @return array
      */
     public function findPricing(
         ProductInterface $product,
@@ -175,7 +175,7 @@ class PriceResolver
             $product->getBrand()->getId(),
         ]);
 
-        return isset($this->grid[$hash]) ? $this->grid[$hash] : null;
+        return isset($this->grid[$hash]) ? $this->grid[$hash] : [];
     }
 
     /**
