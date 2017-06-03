@@ -103,6 +103,7 @@
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType">
             <argument type="service" id="ekyna_product.option.repository"/>
             <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="form.type"/>
         </service>
 

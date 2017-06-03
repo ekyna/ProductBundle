@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
+use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,17 +30,27 @@ class OptionGroupType extends Form\AbstractType
      */
     private $provider;
 
+    /**
+     * @var LocaleProviderInterface
+     */
+    private $localeProvider;
+
 
     /**
      * Constructor.
      *
      * @param ResourceRepositoryInterface $optionRepository
      * @param ProductProvider             $provider
+     * @param LocaleProviderInterface     $localeProvider
      */
-    public function __construct(ResourceRepositoryInterface $optionRepository, ProductProvider $provider)
-    {
+    public function __construct(
+        ResourceRepositoryInterface $optionRepository,
+        ProductProvider $provider,
+        LocaleProviderInterface $localeProvider
+    ) {
         $this->optionRepository = $optionRepository;
         $this->provider = $provider;
+        $this->localeProvider = $localeProvider;
     }
 
     /**
@@ -59,29 +70,32 @@ class OptionGroupType extends Form\AbstractType
 
         $choices = $optionGroup->getOptions();
 
+        $formatter = \NumberFormatter::create($this->localeProvider->getCurrentLocale(), \NumberFormatter::CURRENCY);
+
         $options = $builder
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
                 'choices'       => $optionGroup->getOptions(),
-                'choice_label' => function(Model\OptionInterface $option) {
-                    return $option->getTitle();
+                'choice_label'  => function (Model\OptionInterface $option) use ($formatter) {
+                    // TODO User's currency
+                    return sprintf('%s (%s)', $option->getTitle(), $formatter->formatCurrency($option->getNetPrice(), 'EUR'));
                 },
-                'choice_attr' => function(Model\OptionInterface $option) {
+                'choice_attr'   => function (Model\OptionInterface $option) {
                     return [
                         'data-price' => $option->getNetPrice(),
                     ];
                 },
-                'attr' => [
+                'attr'          => [
                     'class' => 'sale-item-option',
                 ],
                 'constraints'   => $constraints,
+                'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
                 'required'      => $required,
                 'select2'       => false,
             ])
             ->addModelTransformer(new Form\CallbackTransformer(
-                // id to option
-                function($value) use ($choices) {
+                function ($value) use ($choices) { // id to option
                     /** @var Model\OptionInterface $option */
                     foreach ($choices as $option) {
                         if ($option->getId() == $value) {
@@ -91,8 +105,7 @@ class OptionGroupType extends Form\AbstractType
 
                     return $value;
                 },
-                // option to id
-                function($value) use ($choices) {
+                function ($value) use ($choices) { // option to id
                     if ($value instanceof Model\OptionInterface) {
                         return $value->getId();
                     }

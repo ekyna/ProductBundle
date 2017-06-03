@@ -237,6 +237,13 @@ ekyna_product:
             singular: Unitée de stock
             plural: Unitées de stock
 
+    sale_item_configure:
+        choose_option: Choisissez une option
+        discount: Remise
+        from: "à partir de {{min}}"
+        range: "{{min}} à {{max}}"
+        unit_net_price: Prix unit. HT
+
     variant:
         label:
             singular: Variante
