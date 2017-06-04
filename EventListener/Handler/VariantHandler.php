@@ -33,6 +33,11 @@ class VariantHandler extends AbstractVariantHandler
             $changed = true;
         }
 
+        // Set brand regarding to parent/variable if needed
+        if ($this->getVariantUpdater()->updateBrand($variant)) {
+            $changed = true;
+        }
+
         return $changed;
     }
 

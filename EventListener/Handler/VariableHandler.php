@@ -21,7 +21,6 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-
         return $this->ensureDisabledStockMode($variable)
             || $this->getVariableUpdater()->updateMinPrice($variable);
     }
@@ -36,7 +35,14 @@ class VariableHandler extends AbstractVariantHandler
         if ($this->persistenceHelper->isChanged($variable, 'taxGroup')) {
             foreach ($variable->getVariants() as $variant) {
                 if ($this->getVariantUpdater()->updateTaxGroup($variant)) {
-                    $this->persistenceHelper->persistAndRecompute($variant, true);
+                    $this->persistenceHelper->persistAndRecompute($variant);
+                }
+            }
+        }
+        if ($this->persistenceHelper->isChanged($variable, 'brand')) {
+            foreach ($variable->getVariants() as $variant) {
+                if ($this->getVariantUpdater()->updateBrand($variant)) {
+                    $this->persistenceHelper->persistAndRecompute($variant);
                 }
             }
         }

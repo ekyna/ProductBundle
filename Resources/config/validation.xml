@@ -605,7 +605,7 @@
             <constraint name="Valid"/>
         </property>
 
-        <!-- Brand (null for variants) -->
+        <!-- Brand -->
         <property name="brand">
             <constraint name="NotNull">
                 <option name="groups">
@@ -613,11 +613,6 @@
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
-                </option>
-            </constraint>
-            <constraint name="IsNull">
-                <option name="groups">
-                    <value>variant</value>
                 </option>
             </constraint>
         </property>

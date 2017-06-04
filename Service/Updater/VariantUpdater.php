@@ -182,6 +182,28 @@ class VariantUpdater
     }
 
     /**
+     * Updates the brand regarding to his parent/variable product.
+     *
+     * @param Model\ProductInterface $variant
+     *
+     * @return bool Whether the variant has been changed or not.
+     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     */
+    public function updateBrand(Model\ProductInterface $variant)
+    {
+        $this->assertVariantWithParent($variant);
+
+        $brand = $variant->getParent()->getBrand();
+        if ($variant->getBrand() !== $brand) {
+            $variant->setBrand($brand);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Asserts that the variant has a parent.
      *
      * @param Model\ProductInterface $variant
