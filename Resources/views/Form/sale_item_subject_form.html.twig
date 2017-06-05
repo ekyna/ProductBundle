@@ -4,7 +4,7 @@
 {{ form_errors(form) }}
 
 {% if form.variant is defined %}
-    {{ form_widget(form.variant) }}
+    {{ form_row(form.variant) }}
 {% elseif form.configuration is defined %}
     {{ form_widget(form.configuration) }}
 {% endif %}

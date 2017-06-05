@@ -106,6 +106,12 @@
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="form.type"/>
         </service>
+        <service id="ekyna_product.sale_item.variant_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\VariantChoiceType">
+            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <tag name="form.type"/>
+        </service>
 
         <!-- Sale item subject configure type extension -->
         <service id="ekyna_product.sale_item_subject_configure.type_extension"

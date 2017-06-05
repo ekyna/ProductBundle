@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
+use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
@@ -68,24 +69,65 @@ class OptionGroupType extends Form\AbstractType
             $required = true;
         }
 
-        $choices = $optionGroup->getOptions();
+        $choices = $optionGroup->getOptions()->toArray();
 
+        $transformer = new IdToChoiceObjectTransformer($choices);
         $formatter = \NumberFormatter::create($this->localeProvider->getCurrentLocale(), \NumberFormatter::CURRENCY);
+
+        $choiceValue = function (Model\OptionInterface $option = null) {
+            if (null !== $option) {
+                return $option->getId();
+            }
+            return null;
+        };
+
+        $choiceLabel = function (Model\OptionInterface $option = null) use ($formatter) {
+            if (null !== $option) {
+                if (0 < $netPrice = $option->getNetPrice()) {
+                    // TODO User currency
+                    return sprintf('%s (%s)', $option->getTitle(), $formatter->formatCurrency($option->getNetPrice(), 'EUR'));
+                }
+
+                return $option->getTitle();
+            }
+
+            return null;
+        };
+
+        $choiceAttributes = function (Model\OptionInterface $option = null) {
+            if (null !== $option) {
+                return [
+                    'data-price' => $option->getNetPrice(),
+                ];
+            }
+            return [];
+        };
+
+        $postSubmitListener = function (Form\FormEvent $event) use ($optionGroup, $transformer) {
+            /** @var SaleItemInterface $data */
+            $item = $event->getForm()->getParent()->getData();
+            $data = $event->getData();
+
+            if (null !== $option = $transformer->reverseTransform($data)) {
+                /** @var Model\OptionInterface $option */
+                $this
+                    ->provider
+                    ->getItemBuilder()
+                    ->buildItemFromOption($item, $option);
+            } elseif (!$optionGroup->isRequired()) {
+                // Prevent validation (item will be removed)
+                $event->stopPropagation();
+            }
+        };
 
         $options = $builder
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
-                'choices'       => $optionGroup->getOptions(),
-                'choice_label'  => function (Model\OptionInterface $option) use ($formatter) {
-                    // TODO User's currency
-                    return sprintf('%s (%s)', $option->getTitle(), $formatter->formatCurrency($option->getNetPrice(), 'EUR'));
-                },
-                'choice_attr'   => function (Model\OptionInterface $option) {
-                    return [
-                        'data-price' => $option->getNetPrice(),
-                    ];
-                },
+                'choices'       => $choices,
+                'choice_value'  => $choiceValue,
+                'choice_label'  => $choiceLabel,
+                'choice_attr'   => $choiceAttributes,
                 'attr'          => [
                     'class' => 'sale-item-option',
                 ],
@@ -94,46 +136,8 @@ class OptionGroupType extends Form\AbstractType
                 'required'      => $required,
                 'select2'       => false,
             ])
-            ->addModelTransformer(new Form\CallbackTransformer(
-                function ($value) use ($choices) { // id to option
-                    /** @var Model\OptionInterface $option */
-                    foreach ($choices as $option) {
-                        if ($option->getId() == $value) {
-                            return $option;
-                        }
-                    }
-
-                    return $value;
-                },
-                function ($value) use ($choices) { // option to id
-                    if ($value instanceof Model\OptionInterface) {
-                        return $value->getId();
-                    }
-
-                    return $value;
-                }
-            ))
-            ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) use ($optionGroup) {
-                /** @var SaleItemInterface $data */
-                $item = $event->getForm()->getParent()->getData();
-
-                $option = null;
-                $optionId = $event->getData();
-                if (0 < $optionId) {
-                    /** @var Model\OptionInterface $option */
-                    if (null !== $option = $this->optionRepository->find($optionId)) {
-                        $this
-                            ->provider
-                            ->getItemBuilder()
-                            ->buildItemFromOption($item, $option);
-                    }
-                }
-
-                if (null === $option && !$optionGroup->isRequired()) {
-                    // Prevent validation (item will be removed)
-                    $event->stopPropagation();
-                }
-            }, 1024);
+            ->addModelTransformer($transformer)
+            ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
 
         $builder->add($options);
     }
