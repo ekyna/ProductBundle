@@ -31,8 +31,6 @@
 
 {% block pricing_content %}
     {{ parent() }}
-    {#{{ macros.show_option_groups(product) }}#}
-    <hr>
     {{ macros.show_bundle_composition(product) }}
 {% endblock pricing_content %}
 

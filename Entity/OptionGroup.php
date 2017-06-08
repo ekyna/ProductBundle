@@ -143,7 +143,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
      */
     public function setRequired($required)
     {
-        $this->required = $required;
+        $this->required = (bool)$required;
 
         return $this;
     }

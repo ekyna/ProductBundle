@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model as RM;
+use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
  * Class Option
@@ -13,7 +14,7 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
  */
-class Option extends RM\AbstractTranslatable implements Model\OptionInterface
+class Option extends RM\AbstractTranslatable implements Model\OptionInterface, GroupSequenceProviderInterface
 {
     use RM\SortableTrait,
         TaxableTrait;
@@ -22,6 +23,11 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
      * @var integer
      */
     protected $id;
+
+    /**
+     * @var Model\ProductInterface
+     */
+    protected $product;
 
     /**
      * @var Model\OptionGroupInterface
@@ -81,6 +87,24 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
     public function setGroup(Model\OptionGroupInterface $group = null)
     {
         $this->group = $group;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setProduct(Model\ProductInterface $product = null)
+    {
+        $this->product = $product;
 
         return $this;
     }
@@ -163,6 +187,39 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface
         $this->netPrice = (float)$netPrice;
 
         return $this;
+    }
+
+    /**
+     * Returns the mode (for the option form type).
+     *
+     * @return string
+     */
+    public function getMode()
+    {
+        return null !== $this->product ? 'product' : 'data';
+    }
+
+    /**
+     * Fake setter (for the option form type).
+     *
+     * @param $mode
+     */
+    public function setMode($mode) {/* Do nothing. */}
+
+    /**
+     * @inheritDoc
+     */
+    public function getGroupSequence()
+    {
+        $groups = ['Option'];
+
+        if (null !== $this->product) {
+            $groups[] = 'product';
+        } else {
+            $groups[] = 'data';
+        }
+
+        return $groups;
     }
 
     /**

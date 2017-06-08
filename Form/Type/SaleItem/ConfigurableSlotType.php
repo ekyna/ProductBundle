@@ -60,11 +60,7 @@ class ConfigurableSlotType extends Form\AbstractType implements Imagine\CacheMan
                 'choices'       => $bundleSlot->getChoices(),
                 'choice_value'  => 'id',
                 'choice_label'  => 'product.designation',
-                'choice_attr'   => function (BundleChoiceInterface $choice) {
-                    return [
-                        'data-config' => json_encode($this->buildChoiceAttributes($choice)),
-                    ];
-                },
+                'choice_attr'   => [$this, 'buildChoiceAttr'],
                 'expanded'      => true,
             ])
             ->addModelTransformer(new ProductToBundleSlotChoiceTransformer($bundleSlot));
@@ -91,11 +87,11 @@ class ConfigurableSlotType extends Form\AbstractType implements Imagine\CacheMan
     /**
      * @inheritDoc
      */
-    public function buildChoiceAttributes(BundleChoiceInterface $choice)
+    public function buildChoiceAttr(BundleChoiceInterface $choice)
     {
         $product = $choice->getProduct();
 
-        $attributes = [
+        $config = [
             'min_quantity' => $choice->getMinQuantity(),
             'max_quantity' => $choice->getMaxQuantity(),
             'title'        => $product->getTitle(),
@@ -108,12 +104,14 @@ class ConfigurableSlotType extends Form\AbstractType implements Imagine\CacheMan
         if (0 < $images->count()) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface $image */
             $image = $images->first();
-            $attributes['image'] = $this
+            $config['image'] = $this
                 ->cacheManager
                 ->getBrowserPath($image->getMedia()->getPath(), 'configurable_slot');
         }
 
-        return $attributes;
+        return [
+            'data-config' => json_encode($config),
+        ];
     }
 
     /**
@@ -136,6 +134,7 @@ class ConfigurableSlotType extends Form\AbstractType implements Imagine\CacheMan
         $resolver
             ->setDefault('label', false)
             ->setDefault('data_class', SaleItemInterface::class)
+            ->setDefault('attr', ['class' => 'row product-configurable-slot'])
             ->setRequired(['bundle_slot'])
             ->setAllowedTypes('bundle_slot', BundleSlotInterface::class);
     }

@@ -94,7 +94,7 @@
 {% block ekyna_product_configurable_slot_widget %}
 {% spaceless %}
     {# TODO form_errors(form) #}
-    <div class="row product-configurable-slot">
+    <div {{ block('widget_container_attributes') }}>
         <div class="col-md-6 col-md-push-6">
             <div class="slot-info">
                 <h3 class="slot-title">{{ form.vars.slot_title }}</h3>
@@ -123,6 +123,7 @@
             <ul>
             {% for child in form.subject %}
                 <li>
+                    {# TODO No image path parameter #}
                     <img src="{{ asset('bundles/ekynaproduct/img/no-image.gif') }}" class="img-responsive">
                     <p>
                         {{ form_widget(child) }}
@@ -136,47 +137,40 @@
 {% endblock ekyna_product_configurable_slot_widget %}
 
 
-{% block ekyna_product_sale_item_option_groups_row %}
-{% spaceless %}
-    {% for child in form %}
-        {{ form_row(child) }}
-    {% endfor %}
-{% endspaceless %}
-{% endblock ekyna_product_sale_item_option_groups_row %}
-
-
-{% block ekyna_product_sale_item_option_group_widget %}
-{% spaceless %}
-    {{ form_widget(form.choice, {'label_col': 0, 'widget_col': 12}) }}
-{% endspaceless %}
-{% endblock ekyna_product_sale_item_option_group_widget %}
-
-
-
 {% block ekyna_product_option_widget %}
 {% spaceless %}
-    <div class="ekyna-collection-item">
+    <div class="ekyna-collection-item product-option">
         {{ form_errors(form) }}
         <div class="row form-group">
             <div class="col-md-12">
-                {{ form_widget(form.designation) }}
+                {{ form_widget(form.mode) }}
             </div>
         </div>
-        {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-        <div class="row form-group">
-            <div class="col-md-6">
-                {{ form_widget(form.reference) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_widget(form.weight) }}
-            </div>
+        <div class="option-product option-wrapper">
+            {{ form_widget(form.product) }}
         </div>
-        <div class="row form-group">
-            <div class="col-md-6">
-                {{ form_widget(form.netPrice) }}
+        <div class="option-data option-wrapper">
+            <div class="row form-group">
+                <div class="col-md-12">
+                    {{ form_widget(form.designation) }}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form_widget(form.taxGroup) }}
+            {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+            <div class="row form-group">
+                <div class="col-md-6">
+                    {{ form_widget(form.reference) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_widget(form.weight) }}
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-6">
+                    {{ form_widget(form.netPrice) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_widget(form.taxGroup) }}
+                </div>
             </div>
         </div>
         {{ form_widget(form.position) }}

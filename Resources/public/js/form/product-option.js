@@ -1,0 +1,1 @@
+define(["jquery"],function(a){"use strict";return a.fn.optionWidget=function(){return this.each(function(){function b(){var a=d.filter(":checked").val();c.find(".option-wrapper").hide(),c.find(".option-"+a).show()}var c=a(this),d=c.find('div.option-mode input[type="radio"]');d.on("change",b),b()}),this},{init:function(a){a.optionWidget()}}});

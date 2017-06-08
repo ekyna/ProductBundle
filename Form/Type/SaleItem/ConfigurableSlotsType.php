@@ -65,6 +65,8 @@ class ConfigurableSlotsType extends Form\AbstractType
                 }
             })
             ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) {
+                // TODO Should be done by the ConfigurableSlotType
+
                 /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
                 $item = $event->getForm()->getParent()->getData();
                 $product = $this->productProvider->resolve($item);
@@ -72,7 +74,7 @@ class ConfigurableSlotsType extends Form\AbstractType
                 $this
                     ->productProvider
                     ->getItemBuilder()
-                    ->buildItemFromProduct($item, $product);
+                    ->buildFromProduct($item, $product);
 
                 $event->setData($item);
             }, 2048);

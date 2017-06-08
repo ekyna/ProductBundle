@@ -7,6 +7,7 @@ module.exports = {
     'build:product_js': [
        // 'ts:product',
        // 'uglify:product_ts',
+       'twig:product',
        'uglify:product_js'
        // 'clean:product_ts'
     ],

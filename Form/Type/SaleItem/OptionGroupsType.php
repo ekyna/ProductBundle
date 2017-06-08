@@ -2,10 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
-use Ekyna\Bundle\ProductBundle\Exception\LogicException;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\OptionsGroupsListener;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Symfony\Component\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -36,34 +37,15 @@ class OptionGroupsType extends Form\AbstractType
      */
     public function buildForm(Form\FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->addEventListener(Form\FormEvents::PRE_SET_DATA, function (Form\FormEvent $event) {
-                /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-                $item = $event->getForm()->getParent()->getData();
-                $product = $this->productProvider->resolve($item);
+        $builder->addEventSubscriber(new OptionsGroupsListener($this->productProvider));
+    }
 
-                $form = $event->getForm();
-
-                foreach ($product->getOptionGroups() as $optionGroup) {
-                    foreach ($item->getChildren() as $index => $child) {
-                        if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
-                            $form->add('option_group_' . $optionGroup->getId(), OptionGroupType::class, [
-                                'label'         => $optionGroup->getTitle(),
-                                'property_path' => '[' . $index . ']',
-                                'option_group'  => $optionGroup,
-                            ]);
-
-                            continue 2;
-                        }
-                    }
-
-                    throw new LogicException(sprintf(
-                        "Sale item was not found for option group #%s.\n" .
-                        "You must call ItemBuilder::initializeItem() first.",
-                        $optionGroup->getId()
-                    ));
-                }
-            });
+    /**
+     * @inheritDoc
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['attr']['name'] = $view->vars['full_name'];
     }
 
     /**
@@ -74,8 +56,12 @@ class OptionGroupsType extends Form\AbstractType
         $resolver
             ->setDefaults([
                 'label'         => false,
+                'compound'      => true,
                 'property_path' => 'children',
                 'data_class'    => 'Doctrine\Common\Collections\Collection',
+                'attr' => [
+                    'class' => 'sale-item-options',
+                ]
             ]);
     }
 
@@ -84,6 +70,6 @@ class OptionGroupsType extends Form\AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'ekyna_product_sale_item_option_groups';
+        return 'sale_item_option_groups';
     }
 }

@@ -130,6 +130,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled' => true,
             ])
             ->addTaxGroupField()
+            ->addOptionGroupsField()
             // Seo
             ->addSeoField();
     }
@@ -206,6 +207,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled'  => true,
             ])
             ->addBundleSlotsField()
+            ->addOptionGroupsField()
             // Seo
             ->addSeoField();
     }
@@ -242,6 +244,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addBundleSlotsField([
                 'configurable' => true,
             ])
+            ->addOptionGroupsField()
             // Seo
             ->addSeoField();
     }

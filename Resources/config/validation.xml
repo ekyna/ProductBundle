@@ -143,6 +143,7 @@
             <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
                 <option name="types">
                     <value>simple</value>
+                    <value>variable</value>
                     <value>variant</value>
                 </option>
             </constraint>
@@ -278,42 +279,55 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
+        <group-sequence-provider />
         <property name="group">
             <constraint name="NotNull"/>
         </property>
         <property name="reference">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">data</option>
+            </constraint>
             <constraint name="Length">
                 <option name="max">16</option>
+                <option name="groups">data</option>
             </constraint>
         </property>
         <property name="netPrice">
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
+                <option name="groups">data</option>
             </constraint>
         </property>
         <property name="weight">
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
+                <option name="groups">data</option>
             </constraint>
         </property>
         <property name="taxGroup">
-            <constraint name="NotNull"/>
+            <constraint name="NotNull">
+                <option name="groups">data</option>
+            </constraint>
         </property>
         <property name="translations">
             <constraint name="Count">
                 <option name="min">1</option>
+                <option name="groups">data</option>
             </constraint>
         </property>
         <!-- Unique reference -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">reference</option>
+            <option name="groups">data</option>
         </constraint>
         <property name="designation">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">data</option>
+            </constraint>
             <constraint name="Length">
                 <option name="min">3</option>
                 <option name="max">255</option>
+                <option name="groups">data</option>
             </constraint>
         </property>
         <!-- Unique designation per group -->
@@ -323,6 +337,7 @@
                 <value>group</value>
                 <value>designation</value>
             </option>
+            <option name="groups">data</option>
         </constraint>-->
     </class>
 

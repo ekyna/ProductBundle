@@ -6,11 +6,14 @@ use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Bundle\ProductBundle\Service\FormHelper;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -32,9 +35,9 @@ class OptionGroupType extends Form\AbstractType
     private $provider;
 
     /**
-     * @var LocaleProviderInterface
+     * @var FormHelper
      */
-    private $localeProvider;
+    private $formHelper;
 
 
     /**
@@ -42,16 +45,16 @@ class OptionGroupType extends Form\AbstractType
      *
      * @param ResourceRepositoryInterface $optionRepository
      * @param ProductProvider             $provider
-     * @param LocaleProviderInterface     $localeProvider
+     * @param FormHelper                  $formHelper
      */
     public function __construct(
         ResourceRepositoryInterface $optionRepository,
         ProductProvider $provider,
-        LocaleProviderInterface $localeProvider
+        FormHelper $formHelper
     ) {
         $this->optionRepository = $optionRepository;
         $this->provider = $provider;
-        $this->localeProvider = $localeProvider;
+        $this->formHelper = $formHelper;
     }
 
     /**
@@ -72,51 +75,18 @@ class OptionGroupType extends Form\AbstractType
         $choices = $optionGroup->getOptions()->toArray();
 
         $transformer = new IdToChoiceObjectTransformer($choices);
-        $formatter = \NumberFormatter::create($this->localeProvider->getCurrentLocale(), \NumberFormatter::CURRENCY);
-
-        $choiceValue = function (Model\OptionInterface $option = null) {
-            if (null !== $option) {
-                return $option->getId();
-            }
-            return null;
-        };
-
-        $choiceLabel = function (Model\OptionInterface $option = null) use ($formatter) {
-            if (null !== $option) {
-                if (0 < $netPrice = $option->getNetPrice()) {
-                    // TODO User currency
-                    return sprintf('%s (%s)', $option->getTitle(), $formatter->formatCurrency($option->getNetPrice(), 'EUR'));
-                }
-
-                return $option->getTitle();
-            }
-
-            return null;
-        };
-
-        $choiceAttributes = function (Model\OptionInterface $option = null) {
-            if (null !== $option) {
-                return [
-                    'data-price' => $option->getNetPrice(),
-                ];
-            }
-            return [];
-        };
 
         $postSubmitListener = function (Form\FormEvent $event) use ($optionGroup, $transformer) {
-            /** @var SaleItemInterface $data */
             $item = $event->getForm()->getParent()->getData();
+            /** @var int $data */
             $data = $event->getData();
 
-            if (null !== $option = $transformer->reverseTransform($data)) {
+            if (null !== $option = $transformer->transform($data)) {
                 /** @var Model\OptionInterface $option */
                 $this
                     ->provider
                     ->getItemBuilder()
-                    ->buildItemFromOption($item, $option);
-            } elseif (!$optionGroup->isRequired()) {
-                // Prevent validation (item will be removed)
-                $event->stopPropagation();
+                    ->buildFromOption($item, $option);
             }
         };
 
@@ -124,17 +94,18 @@ class OptionGroupType extends Form\AbstractType
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
-                'choices'       => $choices,
-                'choice_value'  => $choiceValue,
-                'choice_label'  => $choiceLabel,
-                'choice_attr'   => $choiceAttributes,
-                'attr'          => [
-                    'class' => 'sale-item-option',
-                ],
-                'constraints'   => $constraints,
                 'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
                 'required'      => $required,
+                'constraints'   => $constraints,
                 'select2'       => false,
+                'attr'          => [
+                    'class' => 'sale-item-option',
+                    'group_id'
+                ],
+                'choices'       => $choices,
+                'choice_value'  => 'id',
+                'choice_label'  => [$this->formHelper, 'optionChoiceLabel'],
+                'choice_attr'   => [$this->formHelper, 'optionChoiceAttr'],
             ])
             ->addModelTransformer($transformer)
             ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
@@ -145,11 +116,29 @@ class OptionGroupType extends Form\AbstractType
     /**
      * @inheritDoc
      */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var Model\OptionGroupInterface $optionGroup */
+        $optionGroup = $options['option_group'];
+
+        $view->vars['group_id'] = $optionGroup->getId();
+        $view->vars['group_type'] = $optionGroup->getProduct()->getType();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
+        /** @noinspection PhpUnusedParameterInspection */
         $resolver
             ->setDefaults([
                 'data_class' => SaleItemInterface::class,
+                'required' => function(Options $options, $value) {
+                    /** @var Model\OptionGroupInterface $optionGroup */
+                    $optionGroup = $options['option_group'];
+                    return $optionGroup->isRequired();
+                }
             ])
             ->setRequired(['option_group'])
             ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);

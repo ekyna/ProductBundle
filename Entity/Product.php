@@ -48,11 +48,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $variants;
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    /**
      * @var Model\AttributeSetInterface
      */
     protected $attributeSet;
@@ -96,6 +91,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      * @var ArrayCollection|Model\ProductReferenceInterface[]
      */
     protected $references;
+
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * @var string
@@ -214,18 +214,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function __toString()
     {
-        $designation = $this->getDesignation();
-
-        // Variant : parent designation + variant designation
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            if (0 == strlen($designation)) {
-                // Fallback to auto-generated designation
-                $designation = $this->getAttributesDesignation();
-            }
-            $designation = sprintf('%s %s', $this->parent->getDesignation(), $designation);
-        }
-
-        return sprintf('%s %s', $this->brand, $designation);
+        return $this->getFullDesignation(true);
     }
 
     /**
@@ -312,24 +301,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $this->variants->removeElement($variant);
             $variant->setParent(null);
         }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
 
         return $this;
     }
@@ -599,6 +570,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         return $this;
     }
+
     /**
      * @inheritdoc
      */
@@ -606,7 +578,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         return $this->customerGroups;
     }
-
     /**
      * @inheritdoc
      */
@@ -754,17 +725,26 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTitle()
     {
-        // Variant : parent title + variant title
-        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
-            if (0 == strlen($title = $this->translate()->getTitle())) {
-                // Fallback to auto-generated title
-                $title = $this->getAttributesTitle();
-            }
-            return sprintf('%s %s', $this->parent->getTitle(), $title);
-        }
-
         return $this->translate()->getTitle();
     }
 
@@ -774,6 +754,27 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function getAttributesTitle()
     {
         return $this->translate()->getAttributesTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFullTitle($withBrand = false)
+    {
+        $title = $this->getTitle();
+
+        // Variant : parent title + variant title
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            if (0 == strlen($title)) {
+                // Fallback to auto-generated title
+                $title = $this->getAttributesTitle();
+            }
+
+            $title = sprintf('%s %s', $this->parent->getTitle(), $title);
+        }
+
+        // Prepend the brand
+        return $withBrand ? sprintf('%s %s', $this->brand->getTitle(), $title) : $title;
     }
 
     /**
@@ -831,6 +832,26 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->attributesDesignation = $attributesDesignation;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFullDesignation($withBrand = false)
+    {
+        $designation = $this->getDesignation();
+
+        // Variant : parent designation + variant designation
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            if (0 == strlen($designation)) {
+                // Fallback to auto-generated designation
+                $designation = $this->getAttributesDesignation();
+            }
+            $designation = sprintf('%s %s', $this->parent->getDesignation(), $designation);
+        }
+
+        // Prepend the brand
+        return $withBrand ? sprintf('%s %s', $this->brand->getName(), $designation) : $designation;
     }
 
     /**

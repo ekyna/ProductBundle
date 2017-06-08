@@ -182,7 +182,7 @@ class ProductFormBuilder
             'required'  => true,
         ], $options);
 
-        $this->form->add('brand', PR\BrandChoiceType::class, $options);
+        $this->form->add('brand', PR\Brand\BrandChoiceType::class, $options);
 
         return $this;
     }
@@ -200,7 +200,7 @@ class ProductFormBuilder
             'configurable' => false,
         ], $options);
 
-        $this->form->add('bundleSlots', PR\BundleSlotsType::class, $options);
+        $this->form->add('bundleSlots', PR\Bundle\BundleSlotsType::class, $options);
 
         return $this;
     }
@@ -221,7 +221,7 @@ class ProductFormBuilder
             'required'  => true,
         ], $options);
 
-        $this->form->add('categories', PR\CategoryChoiceType::class, $options);
+        $this->form->add('categories', PR\Category\CategoryChoiceType::class, $options);
 
         return $this;
     }
@@ -367,7 +367,7 @@ class ProductFormBuilder
             'sub_widget_col'  => 11,
             'button_col'      => 1,
             'allow_sort'      => true,
-            'entry_type'      => PR\OptionGroupType::class,
+            'entry_type'      => PR\Option\OptionGroupType::class,
             'add_button_text' => 'ekyna_product.option_group.button.add',
             'required'        => false,
         ], $options);

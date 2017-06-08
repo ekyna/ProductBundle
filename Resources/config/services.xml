@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <container
-    xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services
                         http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
@@ -27,17 +27,23 @@
             <argument type="service" id="translator"/>
         </service>
 
+        <!-- Form helper -->
+        <service id="ekyna_product.form_helper"
+                 class="Ekyna\Bundle\ProductBundle\Service\FormHelper">
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+        </service>
+
         <!-- TODO Remove resources form types definitions (see configuration), by using resource choice form types -->
 
         <!-- Attribute form types -->
         <service id="ekyna_product.attribute.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\AttributeType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeType">
             <argument>%ekyna_product.attribute.class%</argument>
             <argument>%ekyna_product.attribute_group.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.attribute_slot.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\AttributeSlotType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSlotType">
             <argument>%ekyna_product.attribute_slot.class%</argument>
             <argument>%ekyna_product.attribute_group.class%</argument>
             <tag name="form.type"/>
@@ -45,25 +51,25 @@
 
         <!-- Brand choice form type -->
         <service id="ekyna_product.brand_choice.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\BrandChoiceType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType">
             <argument>%ekyna_product.brand.class%</argument>
             <tag name="form.type"/>
         </service>
 
         <!-- Bundle form types -->
         <service id="ekyna_product.bundle_choice.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleChoiceType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceType">
             <argument>%ekyna_product.bundle_choice.class%</argument>
             <argument>%ekyna_product.product.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.bundle_choice_rule.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleChoiceRuleType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceRuleType">
             <argument>%ekyna_product.bundle_choice_rule.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.bundle_slot.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\BundleSlotType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotType">
             <argument>%ekyna_product.bundle_slot.class%</argument>
             <argument>%ekyna_product.bundle_choice.class%</argument>
             <tag name="form.type"/>
@@ -71,7 +77,7 @@
 
         <!-- Category choice form type -->
         <service id="ekyna_product.category_choice.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\CategoryChoiceType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Category\CategoryChoiceType">
             <argument>%ekyna_product.category.class%</argument>
             <tag name="form.type"/>
         </service>
@@ -90,7 +96,7 @@
                 <argument type="service" id="liip_imagine.cache.manager"/>
             </call>
             <tag name="form.type"/>
-            <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot" />
+            <tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot"/>
         </service>
 
         <!-- Sale item options/groups form types -->
@@ -103,22 +109,40 @@
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType">
             <argument type="service" id="ekyna_product.option.repository"/>
             <argument type="service" id="ekyna_product.product.subject_provider"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.form_helper"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.sale_item.variant_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\VariantChoiceType">
             <argument type="service" id="ekyna_product.product.subject_provider"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.form_helper"/>
             <tag name="form.type"/>
         </service>
 
         <!-- Sale item subject configure type extension -->
         <service id="ekyna_product.sale_item_subject_configure.type_extension"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\SaleItemSubjectConfigureTypeExtension">
+                 class="Ekyna\Bundle\ProductBundle\Form\Extension\SaleItemSubjectConfigureTypeExtension">
             <argument type="service" id="ekyna_product.pricing.calculator"/>
-            <tag name="form.type_extension" extended-type="Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemSubjectConfigureType"/>
-            <tag name="form.js" selector=".sale-item-subject-configure" path="ekyna-product/form/sale-item-subject-configure" />
+            <argument type="service" id="translator"/>
+            <tag name="form.type_extension"
+                 extended-type="Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemSubjectConfigureType"/>
+            <tag name="form.js" selector=".sale-item-subject-configure"
+                 path="ekyna-product/form/sale-item-subject-configure"/>
+        </service>
+
+        <!-- Option form types -->
+        <service id="ekyna_product.option.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Option\OptionType">
+            <argument>%ekyna_product.option.class%</argument>
+            <tag name="form.js" selector=".product-option" path="ekyna-product/form/product-option"/>
+            <tag name="form.type"/>
+        </service>
+
+        <!-- Option event listener -->
+        <service id="ekyna_product.option.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\OptionListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Pricing form types -->
@@ -145,6 +169,11 @@
         <service id="ekyna_product.product.form_type"
                  class="%ekyna_product.product.form_type.class%">
             <argument type="service" id="ekyna_product.product.form_type.event_subscriber"/>
+            <argument>%ekyna_product.product.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.product_search.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Product\ProductSearchType">
             <argument>%ekyna_product.product.class%</argument>
             <tag name="form.type"/>
         </service>
@@ -288,7 +317,7 @@
         <service id="ekyna_product.validator.variant_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
-            <tag name="validator.constraint_validator" />
+            <tag name="validator.constraint_validator"/>
         </service>
 
         <!-- Search -->

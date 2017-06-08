@@ -73,7 +73,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         $this
             ->provider
             ->getItemBuilder()
-            ->buildItem($event->getItem());
+            ->build($event->getItem());
     }
 
     /**

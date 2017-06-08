@@ -311,21 +311,22 @@
                                     </tr>
                                     {% for option in group.options %}
                                     {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
+                                    {% set data = option.product ?: option %}
                                     <tr>
                                         <td id="{{ optionId ~ 'designation' }}">
-                                            {{ option.designation }}
+                                            {{ data.designation }}
                                         </td>
                                         <td id="{{ optionId ~ 'reference' }}">
-                                            {{ option.reference }}
+                                            {{ data.reference }}
                                         </td>
                                         <td id="{{ optionId ~ 'weight' }}">
-                                            {{ option.weight|localizednumber }} kg
+                                            {{ data.weight|localizednumber }} kg
                                         </td>
                                         <td id="{{ optionId ~ 'netPrice' }}">
-                                            {{ option.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                                            {{ data.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
                                         </td>
                                         <td id="{{ optionId ~ 'taxGroup' }}">
-                                            {{ option.taxGroup }}
+                                            {{ data.taxGroup }}
                                         </td>
                                     </tr>
                                     {# TODO translations ? #}

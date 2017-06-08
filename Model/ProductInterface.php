@@ -88,22 +88,6 @@ interface ProductInterface extends
     public function removeVariant(ProductInterface $variant);
 
     /**
-     * Returns the type.
-     *
-     * @return string
-     */
-    public function getType();
-
-    /**
-     * Sets the type.
-     *
-     * @param string $type
-     *
-     * @return $this|ProductInterface
-     */
-    public function setType($type);
-
-    /**
      * Returns the attribute set.
      *
      * @return AttributeSetInterface
@@ -430,6 +414,22 @@ interface ProductInterface extends
     public function getReferences();
 
     /**
+     * Returns the type.
+     *
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * Sets the type.
+     *
+     * @param string $type
+     *
+     * @return $this|ProductInterface
+     */
+    public function setType($type);
+
+    /**
      * Returns the (translated) title.
      *
      * @return string
@@ -442,6 +442,15 @@ interface ProductInterface extends
      * @return string
      */
     public function getAttributesTitle();
+
+    /**
+     * Returns the (translated) full title.
+     *
+     * @param bool $withBrand Whether to prepend the brand name
+     *
+     * @return string
+     */
+    public function getFullTitle($withBrand = false);
 
     /**
      * Returns the (translated) description.
@@ -488,6 +497,15 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setAttributesDesignation($attributesDesignation);
+
+    /**
+     * Returns the full designation.
+     *
+     * @param bool $withBrand Whether to prepend the brand name
+     *
+     * @return string
+     */
+    public function getFullDesignation($withBrand = false);
 
     /**
      * Returns the visible.

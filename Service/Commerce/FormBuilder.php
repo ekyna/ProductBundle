@@ -71,9 +71,7 @@ class FormBuilder
             $form->add('configuration', Pr\SaleItem\ConfigurableSlotsType::class);
         }
 
-        if ($product->hasOptionGroups()) {
-            $form->add('options', Pr\SaleItem\OptionGroupsType::class);
-        }
+        $form->add('options', Pr\SaleItem\OptionGroupsType::class);
 
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [

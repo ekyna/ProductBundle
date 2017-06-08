@@ -31,6 +31,22 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
     public function setGroup(OptionGroupInterface $group = null);
 
     /**
+     * Returns the product.
+     *
+     * @return ProductInterface
+     */
+    public function getProduct();
+
+    /**
+     * Sets the product.
+     *
+     * @param ProductInterface $product
+     *
+     * @return $this|OptionInterface
+     */
+    public function setProduct(ProductInterface $product = null);
+
+    /**
      * Returns the designation.
      *
      * @return string
