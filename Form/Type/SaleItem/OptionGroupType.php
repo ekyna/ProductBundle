@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Bundle\ProductBundle\Service\FormHelper;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -25,11 +24,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
 class OptionGroupType extends Form\AbstractType
 {
     /**
-     * @var ResourceRepositoryInterface
-     */
-    private $optionRepository;
-
-    /**
      * @var ProductProvider
      */
     private $provider;
@@ -43,16 +37,11 @@ class OptionGroupType extends Form\AbstractType
     /**
      * Constructor.
      *
-     * @param ResourceRepositoryInterface $optionRepository
-     * @param ProductProvider             $provider
-     * @param FormHelper                  $formHelper
+     * @param ProductProvider $provider
+     * @param FormHelper      $formHelper
      */
-    public function __construct(
-        ResourceRepositoryInterface $optionRepository,
-        ProductProvider $provider,
-        FormHelper $formHelper
-    ) {
-        $this->optionRepository = $optionRepository;
+    public function __construct(ProductProvider $provider, FormHelper $formHelper)
+    {
         $this->provider = $provider;
         $this->formHelper = $formHelper;
     }
@@ -72,11 +61,12 @@ class OptionGroupType extends Form\AbstractType
             $required = true;
         }
 
-        $choices = $optionGroup->getOptions()->toArray();
+        $options = $optionGroup->getOptions()->toArray();
 
-        $transformer = new IdToChoiceObjectTransformer($choices);
+        $transformer = new IdToChoiceObjectTransformer($options);
 
-        $postSubmitListener = function (Form\FormEvent $event) use ($optionGroup, $transformer) {
+        // TODO move into OptionsGroupsListener ?
+        $postSubmitListener = function (Form\FormEvent $event) use ($transformer) {
             $item = $event->getForm()->getParent()->getData();
             /** @var int $data */
             $data = $event->getData();
@@ -90,7 +80,7 @@ class OptionGroupType extends Form\AbstractType
             }
         };
 
-        $options = $builder
+        $field = $builder
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
@@ -98,11 +88,8 @@ class OptionGroupType extends Form\AbstractType
                 'required'      => $required,
                 'constraints'   => $constraints,
                 'select2'       => false,
-                'attr'          => [
-                    'class' => 'sale-item-option',
-                    'group_id'
-                ],
-                'choices'       => $choices,
+                'attr'          => ['class' => 'sale-item-option'],
+                'choices'       => $options,
                 'choice_value'  => 'id',
                 'choice_label'  => [$this->formHelper, 'optionChoiceLabel'],
                 'choice_attr'   => [$this->formHelper, 'optionChoiceAttr'],
@@ -110,7 +97,7 @@ class OptionGroupType extends Form\AbstractType
             ->addModelTransformer($transformer)
             ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
 
-        $builder->add($options);
+        $builder->add($field);
     }
 
     /**
@@ -134,11 +121,12 @@ class OptionGroupType extends Form\AbstractType
         $resolver
             ->setDefaults([
                 'data_class' => SaleItemInterface::class,
-                'required' => function(Options $options, $value) {
+                'required'   => function (Options $options, $value) {
                     /** @var Model\OptionGroupInterface $optionGroup */
                     $optionGroup = $options['option_group'];
+
                     return $optionGroup->isRequired();
-                }
+                },
             ])
             ->setRequired(['option_group'])
             ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);
@@ -149,6 +137,6 @@ class OptionGroupType extends Form\AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'ekyna_product_sale_item_option_group';
+        return 'sale_item_option_group';
     }
 }

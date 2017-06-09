@@ -24,15 +24,26 @@ class ProductExtension extends \Twig_Extension
     private $priceCalculator;
 
     /**
+     * @var string
+     */
+    private $defaultImage;
+
+
+    /**
      * Constructor.
      *
      * @param ConstantsHelper $constantHelper
      * @param PriceCalculator $priceCalculator
+     * @param string          $defaultImage
      */
-    public function __construct(ConstantsHelper $constantHelper, PriceCalculator $priceCalculator)
-    {
+    public function __construct(
+        ConstantsHelper $constantHelper,
+        PriceCalculator $priceCalculator,
+        $defaultImage = ''
+    ) {
         $this->constantHelper = $constantHelper;
         $this->priceCalculator = $priceCalculator;
+        $this->defaultImage = $defaultImage;
     }
 
     /**
@@ -82,11 +93,15 @@ class ProductExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction(
-                'get_product_types',
+                'product_default_image',
+                [$this, 'getDefaultImage']
+            ),
+            new \Twig_SimpleFunction(
+                'product_types',
                 [Model\ProductTypes::class, 'getTypes']
             ),
             new \Twig_SimpleFunction(
-                'get_product_create_types',
+                'product_create_types',
                 [Model\ProductTypes::class, 'getCreateTypes']
             ),
         ];
@@ -114,6 +129,16 @@ class ProductExtension extends \Twig_Extension
                 return $product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE;
             }),
         ];
+    }
+
+    /**
+     * Returns the default product image path.
+     *
+     * @return string
+     */
+    public function getDefaultImage()
+    {
+        return $this->defaultImage;
     }
 
     /**

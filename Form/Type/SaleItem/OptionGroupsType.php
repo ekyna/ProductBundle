@@ -19,17 +19,17 @@ class OptionGroupsType extends Form\AbstractType
     /**
      * @var ProductProvider
      */
-    private $productProvider;
+    private $provider;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $productProvider
+     * @param ProductProvider $provider
      */
-    public function __construct(ProductProvider $productProvider)
+    public function __construct(ProductProvider $provider)
     {
-        $this->productProvider = $productProvider;
+        $this->provider = $provider;
     }
 
     /**
@@ -37,7 +37,7 @@ class OptionGroupsType extends Form\AbstractType
      */
     public function buildForm(Form\FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new OptionsGroupsListener($this->productProvider));
+        $builder->addEventSubscriber(new OptionsGroupsListener($this->provider));
     }
 
     /**
@@ -59,9 +59,9 @@ class OptionGroupsType extends Form\AbstractType
                 'compound'      => true,
                 'property_path' => 'children',
                 'data_class'    => 'Doctrine\Common\Collections\Collection',
-                'attr' => [
+                'attr'          => [
                     'class' => 'sale-item-options',
-                ]
+                ],
             ]);
     }
 

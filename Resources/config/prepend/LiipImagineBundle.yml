@@ -1,11 +1,19 @@
 # Liip Imagine
 liip_imagine:
     filter_sets:
-        configurable_slot:
-            quality: 70
+        slot_choice_btn:
+            quality: 60
             cache: local_media
             data_loader: local_media
             filters:
-                thumbnail: { size: [539, 404], mode: outbound }
+                thumbnail: { size: [50, 50], mode: inbound }
+            post_processors:
+                jpegoptim: {}
+        slot_choice_thumb:
+            quality: 60
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [444, 333], mode: outbound }
             post_processors:
                 jpegoptim: {}

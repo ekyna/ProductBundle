@@ -20,5 +20,6 @@ class EkynaProductExtension extends AbstractExtension
         $config = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
 
         $container->setParameter('ekyna_product.default.no_image', $config['default']['no_image']);
+        $container->setParameter('ekyna_product.default.sale_item_form_theme', $config['default']['sale_item_form_theme']);
     }
 }

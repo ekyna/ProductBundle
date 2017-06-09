@@ -1,0 +1,147 @@
+{% block sale_item_configurable_slots_widget %}
+    <div id="{{ form.vars.id }}" class="sale-item-bundle-slots">
+        {%- for child in form %}{{ form_widget(child) }}{% endfor -%}
+    </div>
+{% endblock sale_item_configurable_slots_widget %}
+
+
+{% block sale_item_configurable_slot %}
+{% spaceless %}
+    <div class="row">
+        <div class="col-sm-7 col-sm-push-5">
+            <h3 class="choice-title">{{ itemForm.vars.choice_title }}</h3>
+            <div class="choice-description">{{ itemForm.vars.choice_description|raw }}</div>
+            {{- block('sale_item_form') -}}
+        </div>
+        <div class="col-sm-5 col-sm-pull-7">
+            <img src="{{ asset(itemForm.vars.choice_image) }}" class="img-responsive">
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock sale_item_configurable_slot %}
+
+
+{% block sale_item_configurable_slot_widget %}
+{% spaceless %}
+    {# TODO form_errors(form) #}
+    <div class="bundle-slot">
+        <div class="slot-info">
+            <ul class="slot-buttons">
+                {%- for child in form.choice -%}
+                <li>
+                    <label for="{{ child.vars.id }}">
+                        <img src="{{ asset(child.vars.choice_image) }}" width="50" height="50">
+                        {{- form_widget(child) -}}
+                    </label>
+                </li>
+                {%- endfor -%}
+            </ul>
+            <h4 class="slot-title">{{ form.vars.slot_title }}</h4>
+            <div class="slot-description">{{ form.vars.slot_description|raw }}</div>
+        </div>
+        <div class="slot-choices">
+            <a href="javascript: void(0)" class="prev">
+                <span class="fa fa-chevron-left"></span>
+            </a>
+            <a href="javascript: void(0)" class="next">
+                <span class="fa fa-chevron-right"></span>
+            </a>
+            <fieldset id="{{ form.vars.id }}" class="slot-choice-form" data-id="{{ form.vars.choice_id }}">
+                {%- set itemForm = form -%}
+                {{- block('sale_item_configurable_slot') -}}
+            </fieldset>
+            {%- for itemForm in form.vars.choices_forms -%}
+            <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" data-id="{{ itemForm.vars.choice_id }}" style="display:none;" disabled="disabled">
+                {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
+            </fieldset>
+            {%- endfor %}
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock sale_item_configurable_slot_widget %}
+
+
+{% block sale_item_option_groups_widget %}
+{% spaceless %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for child in form %}
+        <div class="form-group" data-id="{{ child.vars.group_id }}" data-type="{{ child.vars.group_type }}">
+            {{- form_label(child) -}}
+            <div class="col-xs-10">
+                {{- form_widget(child.choice, {'label_col': 0, 'widget_col': 12}) -}}
+                {{- form_errors(child.choice) -}}
+            </div>
+        </div>
+        {% endfor %}
+        {{- form_rest(form) -}}
+    </div>
+{% endspaceless %}
+{% endblock sale_item_option_groups_widget %}
+
+
+{% block sale_item_pricing %}
+{% spaceless %}
+    <div class="row">
+        <div class="col-xs-6">
+            {{- form_row(itemForm.quantity, {'label_col': 4, 'widget_col': 8}) -}}
+        </div>
+        <div class="col-xs-6">
+            <div class="form-group" id="{{ itemForm.vars.id }}_pricing" style="display: none;">
+                <label class="control-label col-xs-4" for="{{ itemForm.vars.id }}_price">
+                    {{ 'ekyna_core.field.price'|trans }}
+                </label>
+                <div class="col-xs-8">
+                    {%- if itemForm.vars.pricing is defined and 0 < pricing.rules|length -%}
+                    {%- set pricing = itemForm.vars.pricing -%}
+                    <div class="input-group">
+                        <span class="form-control" id="{{ itemForm.vars.id }}_price_total"></span>
+                        <div class="input-group-btn dropup">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li id="{{ itemForm.vars.id }}_price_help"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {%- else -%}
+                    <span class="form-control" id="{{ itemForm.vars.id }}_price_total"></span>
+                    {%- endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock %}
+
+
+{% block sale_item_form %}
+{% spaceless %}
+    {{ form_errors(itemForm) }}
+
+    {% if itemForm.variant is defined -%}
+        {{- form_row(itemForm.variant) -}}
+    {%- elseif itemForm.configuration is defined -%}
+        {{- form_widget(itemForm.configuration) -}}
+    {%- endif %}
+
+    {% if itemForm.options is defined -%}
+        {{- form_widget(itemForm.options) -}}
+    {%- endif %}
+
+    {{- block('sale_item_pricing') -}}
+{% endspaceless %}
+{% endblock sale_item_form %}
+
+
+{% block sale_item_configure_widget %}
+{% spaceless %}
+    {{- bootstrap_set_style('horizontal') -}}
+    {{- bootstrap_set_col_size('xs') -}}
+
+    {%- set itemForm = form -%}
+    {{- block('sale_item_form') }}
+{% endspaceless %}
+{% endblock sale_item_configure_widget %}

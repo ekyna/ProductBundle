@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\OptionInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
@@ -17,10 +18,11 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
  */
 class ItemBuilder
 {
-    const VARIANT_ID        = 'variant_id';
-    const BUNDLE_SLOT_ID    = 'bundle_slot_id';
-    const OPTION_GROUP_ID   = 'option_group_id';
-    const OPTION_ID         = 'option_id';
+    const VARIANT_ID       = 'variant_id';
+    const BUNDLE_SLOT_ID   = 'bundle_slot_id';
+    const BUNDLE_CHOICE_ID = 'bundle_choice_id';
+    const OPTION_GROUP_ID  = 'option_group_id';
+    const OPTION_ID        = 'option_id';
 
     /**
      * @var ProductProvider
@@ -39,20 +41,19 @@ class ItemBuilder
     }
 
     /**
-     * @inheritdoc
+     * Builds the sale item (subject must be assigned).
+     *
+     * @param SaleItemInterface $item
      */
     public function build(SaleItemInterface $item)
     {
-        // TODO assert ProductInterface
         $product = $this->provider->resolve($item);
 
         $this->buildFromProduct($item, $product);
-
-        $this->buildItemOptions($item, $product);
     }
 
     /**
-     * Builds the sale item from the product.
+     * Builds the sale item from the given product.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
@@ -78,15 +79,17 @@ class ItemBuilder
             default:
                 throw new InvalidArgumentException('Unexpected product type');
         }
+
+        $this->buildOptions($item, $product);
     }
 
     /**
-     * Builds the sale item form the simple product.
+     * Builds the sale item from the simple product.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function buildFromSimple(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromSimple(SaleItemInterface $item, ProductInterface $product)
     {
         ProductTypes::assertChildType($product);
 
@@ -100,6 +103,41 @@ class ItemBuilder
             ->setTaxGroup($product->getTaxGroup());
     }
 
+    /**
+     * Builds the sale item from the given variable product.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $product
+     */
+    public function buildFromVariable(SaleItemInterface $item, ProductInterface $product)
+    {
+        ProductTypes::assertVariable($product);
+
+        $variant = null;
+
+        if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
+            foreach ($product->getVariants() as $v) {
+                if ($variantId == $v->getId()) {
+                    $variant = $v;
+                    break;
+                }
+            }
+        }
+
+        if (null === $variant) {
+            /** @var ProductInterface $variant */
+            $variant = $product->getVariants()->first();
+        }
+
+        $this->buildFromVariant($item, $variant);
+    }
+
+    /**
+     * Builds the sale item from the given variant product.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $variant
+     */
     public function buildFromVariant(SaleItemInterface $item, ProductInterface $variant)
     {
         ProductTypes::assertVariant($variant);
@@ -117,41 +155,12 @@ class ItemBuilder
     }
 
     /**
-     * Builds the sale item form the variable product.
+     * Builds the sale item from the given bundle product.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function buildFromVariable(SaleItemInterface $item, ProductInterface $product)
-    {
-        ProductTypes::assertVariable($product);
-
-        $variant = null;
-
-        if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
-            foreach ($product->getVariants() as $v) {
-                if ($variantId == $v->getId()) {
-                    $variant = $v;
-                    break;
-                }
-            }
-        }
-
-        if (null === $variant) {
-            throw new RuntimeException("Failed to resolve variable's selected variant.");
-            //$variant = $product->getVariants()->first();
-        }
-
-        $this->buildFromVariant($item, $variant);
-    }
-
-    /**
-     * Builds the sale item form the bundle product.
-     *
-     * @param SaleItemInterface $item
-     * @param ProductInterface  $product
-     */
-    protected function buildFromBundle(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromBundle(SaleItemInterface $item, ProductInterface $product)
     {
         ProductTypes::assertBundle($product);
 
@@ -189,7 +198,7 @@ class ItemBuilder
                 /** @var ProductInterface $childItemProduct */
                 $childItemProduct = $this->provider->resolve($childItem);
 
-                // Build the item form the bundle choice's product
+                // Build the item from the bundle choice's product
                 $this->buildFromProduct($childItem, $childItemProduct);
                 $childItem->setData(static::BUNDLE_SLOT_ID, $bundleSlotId);
 
@@ -204,7 +213,8 @@ class ItemBuilder
         }
 
         // Removes miss match items
-        /*if ($removeMissMatch) {
+        /* if ($removeMissMatch) {
+            // TODO Don't remove options
             foreach ($item->getChildren() as $childItem) {
                 $childProduct = $this->provider->resolve($childItem);
                 if (null === $childProduct || !in_array($childProduct->getId(), $bundleProductIds)) {
@@ -215,17 +225,14 @@ class ItemBuilder
     }
 
     /**
-     * Builds the sale item form the configurable product.
+     * Builds the sale item from the given configurable product.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product)
     {
         ProductTypes::assertConfigurable($product);
-
-        // Remove miss match option
-        //$removeMissMatch = $this->doRemoveMissMatch($data);
 
         $this->provider->assign($item, $product);
 
@@ -305,12 +312,28 @@ class ItemBuilder
     }
 
     /**
+     * Builds the sale item from the given bundle choice.
+     *
+     * @param SaleItemInterface     $item
+     * @param BundleChoiceInterface $bundleChoice
+     */
+    public function buildFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
+    {
+        $this->buildFromProduct($item, $bundleChoice->getProduct());
+
+        $item
+            ->setData(static::BUNDLE_SLOT_ID, $bundleChoice->getSlot()->getId())
+            ->setData(static::BUNDLE_CHOICE_ID, $bundleChoice->getId())
+            ->setImmutable(true);
+    }
+
+    /**
      * Builds the item's options.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function buildItemOptions(SaleItemInterface $item, ProductInterface $product)
+    public function buildOptions(SaleItemInterface $item, ProductInterface $product)
     {
         $optionGroups = $this->getProductOptionGroups($item);
 
@@ -423,7 +446,7 @@ class ItemBuilder
         if ($product->getType() === ProductTypes::TYPE_VARIABLE && $item->hasData(ItemBuilder::VARIANT_ID)) {
             if (0 < $variantId = intval($item->getData(ItemBuilder::VARIANT_ID))) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
-                $variant =  $this->provider->getProductRepository()->find($variantId);
+                $variant = $this->provider->getProductRepository()->find($variantId);
                 foreach ($variant->getOptionGroups() as $optionGroup) {
                     array_push($optionsGroups, $optionGroup);
                 }
@@ -438,30 +461,60 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      */
-    public function initializeItem(SaleItemInterface $item)
+    public function initialize(SaleItemInterface $item)
     {
         $product = $this->provider->resolve($item);
 
-        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
-            /** @var ProductInterface $variant */
-            $variant = $product->getVariants()->first();
-            $item->setData(static::VARIANT_ID, $variant->getId());
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            $this->initializeFromVariant($item, $product);
+
+        } elseif ($product->getType() === ProductTypes::TYPE_VARIABLE) {
+            $this->initializeFromVariable($item, $product);
 
         } elseif (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
-            $this->initializeBundleChildren($item, $product);
+            $this->initializeFromBundle($item, $product);
         }
 
-        // Initialization is done by the option groups form type.
-        //$this->initializeOptionChildren($item);
+        // TODO Initialization is done by the option groups form type.
+        $this->initializeOptions($item);
     }
 
     /**
-     * Initializes the item's children regarding to the product's bundles slots.
+     * Initializes the sale item from the given variable item.
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function initializeBundleChildren(SaleItemInterface $item, ProductInterface $product)
+    public function initializeFromVariable(SaleItemInterface $item, ProductInterface $product)
+    {
+        ProductTypes::assertVariable($product);
+
+        /** @var ProductInterface $variant */
+        $variant = $product->getVariants()->first();
+
+        $this->initializeFromVariant($item, $variant);
+    }
+
+    /**
+     * Initializes the sale item from the given variant item.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $product
+     */
+    public function initializeFromVariant(SaleItemInterface $item, ProductInterface $product)
+    {
+        ProductTypes::assertVariant($product);
+
+        $item->setData(static::VARIANT_ID, $product->getId());
+    }
+
+    /**
+     * Initializes the item from the given bundle (or configurable) product.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $product
+     */
+    public function initializeFromBundle(SaleItemInterface $item, ProductInterface $product)
     {
         // For each bundle/configurable slots
         $bundleSlotIds = [];
@@ -491,20 +544,18 @@ class ItemBuilder
                     }
                     $bundleSlotIds[] = $bundleSlotId;
 
+                    // TODO Work with static::BUNDLE_CHOICE_ID ?
+
                     // Get/resolve item subject
                     $childProduct = $this->provider->resolve($child);
 
                     // If invalid choice
                     if (!in_array($childProduct, $choiceProducts)) {
-                        // Assign the default product
                         $child->getSubjectIdentity()->clear();
-                        $this->provider->assign($child, $defaultChoice->getProduct());
 
-                        // Set quantity
-                        $child->setQuantity($defaultChoice->getMinQuantity());
+                        // Initialize default choice
+                        $this->initializeFromFromBundleChoice($child, $defaultChoice);
                     }
-
-                    $child->setPosition($bundleSlot->getPosition());
 
                     // Next bundle slot
                     continue 2;
@@ -515,23 +566,37 @@ class ItemBuilder
             /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
-            $this->provider->assign($child, $defaultChoice->getProduct());
-
-            $child
-                ->setQuantity($defaultChoice->getMinQuantity())
-                ->setPosition($bundleSlot->getPosition())
-                ->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
+            $this->initializeFromFromBundleChoice($child, $defaultChoice);
         }
 
         // TODO Sort items by position ?
     }
 
     /**
-     * Initializes the item's children regarding to the product's options.
+     * Initializes the sale item from the given bundle choice.
+     *
+     * @param SaleItemInterface     $item
+     * @param BundleChoiceInterface $bundleChoice
+     */
+    public function initializeFromFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
+    {
+        $this->provider->assign($item, $bundleChoice->getProduct());
+
+        $this->initialize($item);
+
+        $item
+            ->setQuantity($bundleChoice->getMinQuantity())
+            ->setPosition($bundleChoice->getSlot()->getPosition())
+            ->setData(static::BUNDLE_SLOT_ID, $bundleChoice->getSlot()->getId())
+            ->setData(static::BUNDLE_CHOICE_ID, $bundleChoice->getId());
+    }
+
+    /**
+     * Initializes the sale item's children regarding to the product's option groups.
      *
      * @param SaleItemInterface $item
      */
-    protected function initializeOptionChildren(SaleItemInterface $item)
+    public function initializeOptions(SaleItemInterface $item)
     {
         $optionGroups = $this->getProductOptionGroups($item);
 
@@ -599,6 +664,8 @@ class ItemBuilder
     }
 
     /**
+     * Initializes the sale item from the given option group.
+     *
      * @param SaleItemInterface    $item
      * @param OptionGroupInterface $optionGroup
      */

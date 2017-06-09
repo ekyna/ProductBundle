@@ -1,13 +1,99 @@
 define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templates) {
     "use strict";
 
+
+    // -------------------------------- BUNDLE SLOT --------------------------------
+
+    function BundleSlot($element) {
+        this.$element = $element;
+        this.id = $element.attr('id');
+
+        this.init();
+    }
+
+    $.extend(BundleSlot.prototype, {
+        init: function() {
+            this.$radio = this.$element.find('.slot-buttons input[type=radio]');
+            this.$choice = undefined;
+
+            this.bindEvents();
+            this.selectChoice();
+        },
+
+        bindEvents: function() {
+            var that = this;
+            this.$radio.on('change', function() {
+                that.selectChoice();
+            });
+        },
+
+        unbindEvents: function() {
+            this.$radio.off('change');
+        },
+
+        destroy: function() {
+            this.unbindEvents();
+            this.$element.removeData();
+            if (this.$choice) {
+                this.$choice.data('saleItem').destroy();
+            }
+        },
+
+        selectChoice: function() {
+            var that = this,
+                choiceId = this.$radio.filter(':checked').val(),
+                $choice = this.$element.find('.slot-choice-form[data-id="' + choiceId + '"]');
+
+            if (1 !== $choice.size()) {
+                return;
+            }
+
+            var showChoice = function() {
+                that.$choice = $choice
+                    .prop('disabled', false)
+                    .saleItem()
+                    .fadeIn(250);
+
+                that.$element.trigger('change');
+            };
+
+            if (this.$choice) {
+                this.$choice
+                    .fadeOut(250, function() {
+                        that.$choice.data('saleItem').destroy();
+                        that.$choice.prop('disabled', true);
+                        showChoice();
+                    });
+            } else {
+                showChoice();
+            }
+        },
+
+        getPrice: function() {
+            if (this.$choice) {
+                this.$choice.data('saleItem').getTotalPrice();
+            }
+
+            return 0;
+        }
+    });
+
+    $.fn.bundleSlot = function() {
+        return this.each(function() {
+            if (undefined === $(this).data('bundleSlot')) {
+                $(this).data('bundleSlot', new BundleSlot($(this)));
+            }
+        });
+    };
+
+
     // -------------------------------- OPTION GROUP --------------------------------
 
     function OptionGroup($element, $parent) {
         this.$element = $element;
 
         if (undefined === $parent || $parent.size() === 0) {
-            throw "Invalid '$groups' argument";
+            throw "Invalid '$parent' argument";
         }
         this.$parent = $parent;
 
@@ -160,8 +246,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
 
     $.extend(Variant.prototype, {
         init: function() {
-            this.$variant = undefined;
-
             this.selectVariant();
             this.bindEvents();
         },
@@ -184,9 +268,14 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
 
         selectVariant: function() {
             this.$variant = undefined;
+            this.variantConfig = [];
             var $variant = this.$element.find('option[value="' + this.$element.val() + '"]');
-            if (1 === $variant.size() && 0 < $variant.data('price')) {
+            if (1 === $variant.size() && $variant.data('config')) {
                 this.$variant = $variant;
+                this.variantConfig = $.extend({
+                    price: 0,
+                    groups: []
+                }, $variant.data('config'));
             }
         },
 
@@ -195,11 +284,11 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
         },
 
         getPrice: function() {
-            return this.$variant ? parseFloat(this.$variant.data('price')) : 0;
+            return this.variantConfig ? parseFloat(this.variantConfig.price) : 0;
         },
 
         getOptionGroups: function() {
-            return this.$variant ? this.$variant.data('optionGroups') : [];
+            return this.variantConfig ? this.variantConfig.groups : [];
         }
     });
 
@@ -215,32 +304,41 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
 
     // -------------------------------- SALE ITEM --------------------------------
 
-    function SaleItem($element, $parent) {
+    function SaleItem($element) {
         this.$element = $element;
-        this.$parent = $parent;
-        this.name = $element.attr('name');
+        this.id = $element.attr('id');
 
-        this.config = this.$element.data('config');
+        this.config = $.extend({
+            net_price: 0,
+            currency: 'EUR',
+            rules: []
+        }, this.$element.data('config'));
 
         this.init();
     }
 
     $.extend(SaleItem.prototype, {
         init: function() {
-            this.$optionGroups = this.$element.find('#' + this.name + '_options').optionGroups(this.$element);
+            this.$bundleSlots = this.$element.find('#' + this.id + '_configuration > .bundle-slot');
+            console.log('bundle slots', this.$bundleSlots.size());
+            if (0 < this.$bundleSlots.size()) {
+                this.$bundleSlots.bundleSlot();
+            }
 
-            this.$variant = this.$element.find('#' + this.name + '_variant');
+            this.$optionGroups = this.$element.find('#' + this.id + '_options').optionGroups(this.$element);
+
+            this.$variant = this.$element.find('#' + this.id + '_variant');
             if (this.$variant.size() === 1) {
                 this.$variant.variant();
             } else {
                 this.$variant = undefined;
             }
 
-            this.$quantity = this.$element.find('#' + this.name + '_quantity');
+            this.$quantity = this.$element.find('#' + this.id + '_quantity');
 
-            this.$element.find('#' + this.name + '_pricing').show();
-            this.$priceTotal = this.$element.find('#' + this.name + '_price_total');
-            this.$priceHelp = this.$element.find('#' + this.name + '_price_help');
+            this.$element.find('#' + this.id + '_pricing').show();
+            this.$priceTotal = this.$element.find('#' + this.id + '_price_total');
+            this.$priceHelp = this.$element.find('#' + this.id + '_price_help');
 
             this.quantity = 1;
             this.activeRule = undefined;
@@ -333,8 +431,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
         },
 
         resolveActiveRule: function() {
-            var activeRule;
             if (0 < this.config.rules.length) {
+                var activeRule = undefined;
                 $.each(this.config.rules, function(i, rule) {
                     if (this.quantity >= parseFloat(rule.quantity)) {
                         activeRule = rule;
@@ -402,121 +500,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
             }
         });
     };
-
-
-
-    /*$.fn.saleItemWidget = function() {
-        this.each(function() {
-
-            var $form = $(this),
-                config = $form.data('config');
-                $options = $form.find('select.sale-item-option'),
-                $quantity = $form.find('input.sale-item-quantity'),
-                $priceTotal = $form.find('p.sale-item-price-total'),
-                $priceHelp = $form.find('em.sale-item-price-help'),
-                $rules = $form.find('table.sale-item-rules'),
-                quantity = parseFloat($quantity.val() || 1),
-                activeRule = null;
-
-            var basePrice = parseFloat(config.pricing.net_price);
-
-            function resolveRule() {
-                if (1 === $rules.length) {
-                    $rules.find('> tbody > tr').removeClass('success');
-                    $.each(config.pricing.rules, function (index, rule) {
-                        if (quantity >= parseFloat(rule.quantity)) {
-                            activeRule = rule;
-                            $rules.find('> tbody > tr[data-quantity="' + rule.quantity + '"]').addClass('success');
-                            return false;
-                        }
-                    });
-                }
-            }
-
-            function calculateTotalPrice() {
-                var price = basePrice * quantity;
-                if (null !== activeRule) {
-                    price *= (100 - parseFloat(activeRule.percent)) / 100;
-                }
-                $priceTotal.html(price.formatPrice(config.pricing.currency));
-            }
-
-            function updatePricingTable() {
-                $rules.find('tr').each(function() {
-                    var price = basePrice * (100 - $(this).data('percent')) / 100;
-                    $(this).find('td:last-child').html(price.formatPrice(config.pricing.currency));
-                });
-            }
-
-            function onQuantityChange() {
-                quantity = parseFloat($quantity.val() || 1);
-                resolveRule();
-                calculateTotalPrice();
-                updateHelpText();
-            }
-
-            function updateHelpText() {
-                var $sumParts = [];
-
-                $options.each(function() {
-                    var value = $(this).val();
-                    if (0 <= value) {
-                        var $option = $(this).find('option[value="' + value + '"]');
-                        if (1 === $option.length && 0 < $option.data('price')) {
-                            $sumParts.push(parseFloat($option.data('price')).toLocaleString());
-                        }
-                    }
-                });
-
-                var help = '';
-                if (0 < $sumParts.length) {
-                    $sumParts.unshift(parseFloat(config.pricing.net_price).toLocaleString());
-                    help += '<br>' + $sumParts.join(' + ') + ' = ';
-                }
-                help += basePrice.formatPrice(config.pricing.currency);
-                if (null !== activeRule) {
-                    if (null !== activeRule) {
-                        help += '<br>- ' + parseFloat(activeRule.percent).toLocaleString() + '% = '
-                            + (basePrice * (100 - activeRule.percent) / 100).formatPrice(config.pricing.currency);
-                    }
-                }
-
-                $priceHelp.html(help);
-            }
-
-
-            function onOptionsChange() {
-                basePrice = parseFloat(config.pricing.net_price);
-
-                $options.each(function() {
-                    var value = $(this).val();
-                    if (0 <= value) {
-                        var $option = $(this).find('option[value="' + value + '"]');
-                        if (1 === $option.length && 0 < $option.data('price')) {
-                            basePrice += parseFloat($option.data('price'));
-                        }
-                    }
-                });
-
-                updatePricingTable();
-                calculateTotalPrice();
-                updateHelpText();
-            }
-
-            $form.find('div.sale-item-price').show();
-            $rules.show();
-
-            $options.on('change', onOptionsChange);
-            $quantity.on('keyup mouseup change', onQuantityChange);
-
-            resolveRule();
-            onOptionsChange();
-
-            // TODO On user login => load pricing data
-        });
-
-        return this;
-    };*/
 
     return {
         init: function($element) {

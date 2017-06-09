@@ -75,7 +75,9 @@ class OptionsGroupsListener implements EventSubscriberInterface
     private function buildForm(FormInterface $form)
     {
         /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-        $item = $form->getParent()->getData();
+        if (null === $item = $form->getParent()->getData()) {
+            return;
+        }
 
         $itemBuilder = $this->provider->getItemBuilder();
 
@@ -149,12 +151,19 @@ class OptionsGroupsListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Post submit event handler.
+     *
+     * @param FormEvent $event
+     */
     public function onPostSubmit(FormEvent $event)
     {
         // Event data : Normalized data (doctrine collection of sale items)
 
         /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-        $item = $event->getForm()->getParent()->getData();
+        if (null === $item = $event->getForm()->getParent()->getData()) {
+            return;
+        }
 
         $itemBuilder = $this->provider->getItemBuilder();
 
@@ -178,6 +187,9 @@ class OptionsGroupsListener implements EventSubscriberInterface
                             foreach ($optionGroup->getOptions() as $option) {
                                 if ($optionId == $option->getId()) {
                                     // Option found => next item child
+
+                                    // TODO build item from option ?
+
                                     continue 3;
                                 }
                             }

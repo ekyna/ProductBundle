@@ -6,6 +6,8 @@ use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Symfony\Component\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -18,17 +20,17 @@ class ConfigurableSlotsType extends Form\AbstractType
     /**
      * @var ProductProvider
      */
-    private $productProvider;
+    private $provider;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $productProvider
+     * @param ProductProvider $provider
      */
-    public function __construct(ProductProvider $productProvider)
+    public function __construct(ProductProvider $provider)
     {
-        $this->productProvider = $productProvider;
+        $this->provider = $provider;
     }
 
     /**
@@ -40,7 +42,7 @@ class ConfigurableSlotsType extends Form\AbstractType
             ->addEventListener(Form\FormEvents::PRE_SET_DATA, function (Form\FormEvent $event) {
                 /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
                 $item = $event->getForm()->getParent()->getData();
-                $product = $this->productProvider->resolve($item);
+                $product = $this->provider->resolve($item);
 
                 $form = $event->getForm();
 
@@ -56,7 +58,7 @@ class ConfigurableSlotsType extends Form\AbstractType
                         }
                     }
 
-
+                    // TODO Use ItemBuilder initialize* method
                     throw new LogicException(sprintf(
                         "Sale item was not found for bundle slot #%s.\n" .
                         "You must call ItemBuilder::initializeItem() first.",
@@ -64,20 +66,29 @@ class ConfigurableSlotsType extends Form\AbstractType
                     ));
                 }
             })
-            ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) {
-                // TODO Should be done by the ConfigurableSlotType
+//            ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) {
+//                // TODO Should be done by the ConfigurableSlotType
+//
+//                /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+//                $item = $event->getForm()->getParent()->getData();
+//                $product = $this->productProvider->resolve($item);
+//
+//                $this
+//                    ->productProvider
+//                    ->getItemBuilder()
+//                    ->buildFromProduct($item, $product);
+//
+//                $event->setData($item);
+//            }, 2048)
+        ;
+    }
 
-                /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-                $item = $event->getForm()->getParent()->getData();
-                $product = $this->productProvider->resolve($item);
-
-                $this
-                    ->productProvider
-                    ->getItemBuilder()
-                    ->buildFromProduct($item, $product);
-
-                $event->setData($item);
-            }, 2048);
+    /**
+     * @inheritDoc
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['attr']['name'] = $view->vars['full_name'];
     }
 
     /**
@@ -98,6 +109,6 @@ class ConfigurableSlotsType extends Form\AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'ekyna_product_configurable_slots';
+        return 'sale_item_configurable_slots';
     }
 }

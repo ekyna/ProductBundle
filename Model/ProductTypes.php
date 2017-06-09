@@ -118,6 +118,31 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Returns the 'bundled' types.
+     *
+     * @return array
+     */
+    static public function getBundledTypes()
+    {
+        return [
+            ProductTypes::TYPE_BUNDLE,
+            ProductTypes::TYPE_CONFIGURABLE,
+        ];
+    }
+
+    /**
+     * Returns whether the type is a 'bundled' one.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    static public function isBundled($type)
+    {
+        return in_array($type, static::getBundledTypes(), true);
+    }
+
+    /**
      * Returns the theme for the given state.
      *
      * @param string $state

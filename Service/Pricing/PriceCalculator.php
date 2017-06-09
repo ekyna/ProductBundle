@@ -122,13 +122,15 @@ class PriceCalculator
             'rules'     => [],
         ];
 
-        if ($customer && $country) {
-            $pricing = $this->priceResolver->findPricing($product, $customer->getCustomerGroup(), $country);
-            if (isset($pricing['rules'])) {
-                $data['rules'] = $pricing['rules'];
+        if (!Model\ProductTypes::isBundled($product->getType())) {
+            if ($customer && $country) {
+                $pricing = $this->priceResolver->findPricing($product, $customer->getCustomerGroup(), $country);
+                if (isset($pricing['rules'])) {
+                    $data['rules'] = $pricing['rules'];
+                }
+            } elseif ($fallback) {
+                $data['rules'] = $this->getProductPricingRules($product);
             }
-        } elseif ($fallback) {
-            $data['rules'] = $this->getProductPricingRules($product);
         }
 
         return $data;

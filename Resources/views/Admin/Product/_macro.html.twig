@@ -1,6 +1,6 @@
 {% macro new_product_button() %}
 <div class="btn-group btn-group-sm">
-    <a href="{{ admin_resource_path('ekyna_product.product', 'new', {'type': get_product_create_types()|first}) }}"
+    <a href="{{ admin_resource_path('ekyna_product.product', 'new', {'type': product_create_types()|first}) }}"
        class="btn btn-primary">
         {{ 'ekyna_product.product.button.new'|trans }}
     </a>
@@ -10,7 +10,7 @@
         <span class="sr-only">Toggle Dropdown</span>{# TODO trans #}
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-        {% for type in get_product_create_types() %}
+        {% for type in product_create_types() %}
             <li>
                 <a href="{{ admin_resource_path('ekyna_product.product', 'new', {'type': type}) }}">
                     {{ type|product_type_label|trans }}

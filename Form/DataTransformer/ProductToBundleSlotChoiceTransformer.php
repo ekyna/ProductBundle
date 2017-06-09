@@ -10,6 +10,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Class ProductToBundleSlotChoiceTransformer
  * @package Ekyna\Bundle\ProductBundle\Form\DataTransformer
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @deprecated
+ * @todo remove as no longer used
  */
 class ProductToBundleSlotChoiceTransformer implements DataTransformerInterface
 {
