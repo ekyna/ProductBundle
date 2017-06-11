@@ -27,8 +27,9 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
                 'g.id as group_id',
                 'c.id as country_id',
                 'b.id as brand_id',
-                'r.minQuantity as min_quantity',
-                'r.percent'
+                'r.id as rule_id',
+                'r.minQuantity as rule_quantity',
+                'r.percent as rule_percent'
             ])
             ->join('p.groups', 'g')
             ->join('p.countries', 'c')

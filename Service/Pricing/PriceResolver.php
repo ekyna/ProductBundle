@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
@@ -124,22 +125,18 @@ class PriceResolver
         CustomerGroupInterface $group = null,
         CountryInterface $country = null
     ) {
-        // TODO Variable -> "master" variant
+        if (ProductTypes::isChildType($product->getType())) {
+            $pricing = $this->findPricing($product, $group, $country);
 
-        // TODO Bundle -> sum of slot's products
-
-        // TODO Configurable -> sum of cheapest slot's products (TSTORE / compatibility)
-
-        $pricing = $this->findPricing($product, $group, $country);
-
-        if (!empty($pricing)) {
-            foreach ($pricing['rules'] as $qty => $percent) {
-                if ($qty <= $quantity) {
-                    return new AdjustmentData(
-                        AdjustmentModes::MODE_PERCENT,
-                        sprintf('%s -%s%%', $pricing['name'], $percent), // TODO translation / number_format
-                        $percent
-                    );
+            if (!empty($pricing)) {
+                foreach ($pricing['rules'] as $rule) {
+                    if ($rule['quantity'] <= $quantity) {
+                        return new AdjustmentData(
+                            AdjustmentModes::MODE_PERCENT,
+                            sprintf('%s -%s%%', $pricing['name'], $rule['percent']), // TODO translation / number_format
+                            $rule['percent']
+                        );
+                    }
                 }
             }
         }

@@ -1,6 +1,6 @@
-<div class="form-group" data-id="{{ id }}" data-type="{{ type }}">
-    <label class="control-label col-xs-2{% if required %} required{% endif %}">{{ label }}</label>
-    <div class="col-xs-10">
+<div class="form-group form-group-sm" data-id="{{ id }}" data-type="{{ type }}">
+    <label class="control-label col-xs-3{% if required %} required{% endif %}">{{ label }}</label>
+    <div class="col-xs-9">
         <select name="{{ parent }}[option_group_{{ id }}][choice]"
                 {% if required %} required="required"{% endif %} class="sale-item-option form-control">
             {% if not required %}<option disabled="disabled" selected="selected" value="">{{ placeholder }}</option>{% endif %}

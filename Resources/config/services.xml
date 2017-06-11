@@ -8,7 +8,7 @@
     <parameters>
         <parameter key="ekyna_product.attribute_slot.class">Ekyna\Bundle\ProductBundle\Entity\AttributeSlot</parameter>
 
-        <parameter key="ekyna_product.pricing.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\PricingType</parameter>
+        <parameter key="ekyna_product.pricing.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\Pricing\PricingType</parameter>
 
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
         <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
@@ -125,6 +125,7 @@
         <service id="ekyna_product.sale_item_configure.type_extension"
                  class="Ekyna\Bundle\ProductBundle\Form\Extension\SaleItemConfigureTypeExtension">
             <argument type="service" id="ekyna_product.form_helper"/>
+            <argument type="service" id="translator"/>
             <argument type="service" id="twig"/>
             <argument>%ekyna_product.default.sale_item_form_theme%</argument>
             <tag name="form.type_extension"

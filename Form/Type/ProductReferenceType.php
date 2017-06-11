@@ -24,13 +24,11 @@ class ProductReferenceType extends ResourceFormType
             ->add('type', ChoiceType::class, [
                 'label'       => 'ekyna_core.field.type',
                 'choices'     => ProductReferenceTypes::getChoices(),
-                'sizing'      => 'sm',
                 'placeholder' => 'ekyna_core.field.type',
                 'select2'     => false,
             ])
             ->add('number', TextType::class, [
                 'label'  => 'ekyna_core.field.number',
-                'sizing' => 'sm',
                 'attr'   => [
                     'placeholder' => 'ekyna_core.field.number',
                 ],

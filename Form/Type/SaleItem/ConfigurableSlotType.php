@@ -136,8 +136,11 @@ class ConfigurableSlotType extends Form\AbstractType
         foreach ($view->children['choice']->children as $subjectChoiceView) {
             /** @var Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = $transformer->transform($subjectChoiceView->vars['value']);
-            $path = $this->formHelper->getProductImagePath($bundleChoice->getProduct(), 'slot_choice_btn');
+            $product = $bundleChoice->getProduct();
+            $path = $this->formHelper->getProductImagePath($product, 'slot_choice_btn');
             $subjectChoiceView->vars['choice_image'] = $path;
+            $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
+            $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
         }
 
         // Builds each slot choice's form
@@ -192,7 +195,8 @@ class ConfigurableSlotType extends Form\AbstractType
         $product = $bundleChoice->getProduct();
 
         $view->vars['choice_id'] = $bundleChoice->getId();
-        $view->vars['choice_title'] = $product->getFullTitle(true);
+        $view->vars['choice_brand'] = $product->getBrand()->getTitle();
+        $view->vars['choice_product'] = $product->getFullTitle();
         $view->vars['choice_description'] = $product->getDescription();
         $view->vars['choice_image'] = $this->formHelper->getProductImagePath($product);
     }
@@ -209,7 +213,6 @@ class ConfigurableSlotType extends Form\AbstractType
         $config = $this->formHelper->getPricingConfig($item, $fallback);
 
         $view->vars['pricing'] = $config;
-        $view->vars['attr']['data-config'] = json_encode($config);
     }
 
     /**

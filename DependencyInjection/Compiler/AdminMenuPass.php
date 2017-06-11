@@ -23,24 +23,6 @@ class AdminMenuPass implements CompilerPassInterface
 
         $pool = $container->getDefinition('ekyna_admin.menu.pool');
 
-        // SALES
-
-        $pool->addMethodCall('createGroup', [[
-            'name'     => 'sales',
-            'label'    => 'ekyna_commerce.sale.label.plural',
-            'icon'     => 'file',
-            'position' => 10,
-        ]]);
-
-        // Pricings
-        $pool->addMethodCall('createEntry', ['sales', [
-            'name'     => 'pricings',
-            'route'    => 'ekyna_product_pricing_admin_home',
-            'label'    => 'ekyna_product.pricing.label.plural',
-            'resource' => 'ekyna_product_pricing',
-            'position' => 99,
-        ]]);
-
         // CATALOG
 
         $pool->addMethodCall('createGroup', [[
@@ -93,6 +75,15 @@ class AdminMenuPass implements CompilerPassInterface
             'label'    => 'ekyna_product.attribute_group.label.plural',
             'resource' => 'ekyna_product_attribute_group',
             'position' => 11,
+        ]]);
+
+        // Pricings
+        $pool->addMethodCall('createEntry', ['catalog', [
+            'name'     => 'pricings',
+            'route'    => 'ekyna_product_pricing_admin_home',
+            'label'    => 'ekyna_product.pricing.label.plural',
+            'resource' => 'ekyna_product_pricing',
+            'position' => 99,
         ]]);
 
     }

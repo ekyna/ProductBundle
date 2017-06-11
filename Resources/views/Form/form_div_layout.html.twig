@@ -42,6 +42,8 @@
 
 {% block ekyna_product_bundle_choice_widget %}
 {% spaceless %}
+    {{ bootstrap_backup_form_settings() }}
+    {{ bootstrap_set_sizing('sm') }}
     <div class="ekyna-collection-item">
         {{ form_errors(form) }}
         {{ form_row(form.product, {'label_col': 2, 'widget_col': 10}) }}
@@ -61,6 +63,7 @@
         {% endif %}
         {{ form_rest(form) }}
     </div>
+    {{ bootstrap_restore_form_settings() }}
 {% endspaceless %}
 {% endblock ekyna_product_bundle_choice_widget %}
 
@@ -70,10 +73,10 @@
     {{ form_errors(form) }}
     <div class="row">
         <div class="col-md-3">
-            {{ form_widget(form.type) }}
+            {{ form_widget(form.type, {'sizing': 'sm'}) }}
         </div>
         <div class="col-md-9">
-            {{ form_widget(form.expression) }}
+            {{ form_widget(form.expression, {'sizing': 'sm'}) }}
         </div>
     </div>
     {{ form_widget(form.position) }}
@@ -84,6 +87,8 @@
 
 {% block ekyna_product_option_widget %}
 {% spaceless %}
+    {{ bootstrap_backup_form_settings() }}
+    {{ bootstrap_set_sizing('sm') }}
     <div class="ekyna-collection-item product-option">
         {{ form_errors(form) }}
         <div class="row form-group">
@@ -121,12 +126,15 @@
         {{ form_widget(form.position) }}
         {{ form_rest(form) }}
     </div>
+    {{ bootstrap_restore_form_settings() }}
 {% endspaceless %}
 {% endblock ekyna_product_option_widget %}
 
 
 {% block ekyna_product_option_group_widget %}
 {% spaceless %}
+    {{ bootstrap_backup_form_settings() }}
+    {{ bootstrap_set_sizing('sm') }}
     <div class="ekyna-collection-item">
         {{ form_errors(form) }}
         <div class="row">
@@ -141,6 +149,7 @@
         {{ form_widget(form.position) }}
         {{ form_rest(form) }}
     </div>
+    {{ bootstrap_restore_form_settings() }}
 {% endspaceless %}
 {% endblock ekyna_product_option_group_widget %}
 
@@ -150,10 +159,10 @@
     {{ form_errors(form) }}
     <div class="row">
         <div class="col-md-6">
-            {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) }}
+            {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) }}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.percent, {'label_col': 4, 'widget_col': 8}) }}
+            {{ form_row(form.percent, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) }}
         </div>
     </div>
     {{ form_rest(form) }}
@@ -166,10 +175,10 @@
     {{ form_errors(form) }}
     <div class="row">
         <div class="col-md-6">
-            {{ form_widget(form.type) }}
+            {{ form_widget(form.type, {'sizing': 'sm'}) }}
         </div>
         <div class="col-md-6">
-            {{ form_widget(form.number) }}
+            {{ form_widget(form.number, {'sizing': 'sm'}) }}
         </div>
     </div>
     {{ form_rest(form) }}

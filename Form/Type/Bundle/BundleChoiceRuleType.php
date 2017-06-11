@@ -21,14 +21,12 @@ class BundleChoiceRuleType extends ResourceFormType
     {
         $builder
             ->add('type', Type\ChoiceType::class, [
-                'sizing'  => 'sm',
                 'label'   => 'ekyna_core.field.type',
                 'choices' => BundleChoiceRuleTypes::getChoices(),
                 'select2' => false,
             ])
             ->add('expression', Type\TextType::class, [
-                'label'  => 'ekyna_product.bundle_choice_rule.field.expression',
-                'sizing' => 'sm',
+                'label' => 'ekyna_product.bundle_choice_rule.field.expression',
             ])
             ->add('position', Type\HiddenType::class, [
                 'attr' => [

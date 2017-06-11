@@ -239,10 +239,13 @@ ekyna_product:
 
     sale_item_configure:
         choose_option: Choisissez une option
-        discount: Remise
         from: "à partir de {{min}}"
         range: "{{min}} à {{max}}"
+        discount: Remise
         unit_net_price: Prix unit. HT
+        total_price: Total HT
+        rule_table: Vos tarifs
+        price_table: Détail du prix unit. HT.
 
     variant:
         label:

@@ -111,7 +111,7 @@ class FormHelper implements Imagine\CacheManagerAwareInterface
                     $options[] = [
                         'id'    => $option->getId(),
                         'label' => $this->optionChoiceLabel($option),
-                        'price' => $option->getNetPrice(),
+                        'price' => floatval($option->getNetPrice()),
                     ];
                 }
                 $groups[] = [
@@ -125,7 +125,7 @@ class FormHelper implements Imagine\CacheManagerAwareInterface
             }
 
             $config = [
-                'price'  => $variant->getNetPrice(),
+                'price'  => floatval($variant->getNetPrice()),
                 'groups' => $groups,
             ];
 
@@ -183,7 +183,7 @@ class FormHelper implements Imagine\CacheManagerAwareInterface
             }
 
             return [
-                'data-price' => $netPrice,
+                'data-price' => floatval($netPrice),
             ];
         }
 
@@ -236,34 +236,24 @@ class FormHelper implements Imagine\CacheManagerAwareInterface
         if (!empty($config['rules'])) {
             $rules = [];
             $previousQuantity = null;
-            foreach (array_reverse($config['rules'], true) as $quantity => $percent) {
+            foreach ($config['rules'] as $rule) {
                 if ($previousQuantity) {
-                    $label = $this->translator->trans('ekyna_product.sale_item_configure.range', [
-                        '{{min}}' => $quantity,
+                    $rule['label'] = $this->translator->trans('ekyna_product.sale_item_configure.range', [
+                        '{{min}}' => $rule['quantity'],
                         '{{max}}' => $previousQuantity - 1,
                     ]);
                 } else {
-                    $label = $this->translator->trans('ekyna_product.sale_item_configure.from', [
-                        '{{min}}' => $quantity,
+                    $rule['label'] = $this->translator->trans('ekyna_product.sale_item_configure.from', [
+                        '{{min}}' => $rule['quantity'],
                     ]);
                 }
 
-                $rules[] = [
-                    'label'    => $label,
-                    'quantity' => $quantity,
-                    'percent'  => $percent,
-                ];
+                $rules[] = $rule;
 
-                $previousQuantity = $quantity;
+                $previousQuantity = $rule['quantity'];
             }
 
-            $config['rules'] = array_reverse($rules);
-
-            $config['headers'] = [
-                'quantity' => $this->translator->trans('ekyna_core.field.quantity'),
-                'percent'  => $this->translator->trans('ekyna_product.sale_item_configure.discount'),
-                'price'    => $this->translator->trans('ekyna_product.sale_item_configure.unit_net_price'),
-            ];
+            $config['rules'] = $rules;
         }
 
         return $config;

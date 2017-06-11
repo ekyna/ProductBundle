@@ -22,8 +22,7 @@ class OptionGroupType extends ResourceFormType
     {
         $builder
             ->add('name', Type\TextType::class, [
-                'label'  => 'ekyna_core.field.name',
-                'sizing' => 'sm',
+                'label' => 'ekyna_core.field.name',
             ])
             ->add('translations', TranslationsFormsType::class, [
                 'form_type'      => OptionGroupTranslationType::class,
@@ -32,7 +31,6 @@ class OptionGroupType extends ResourceFormType
             ])
             ->add('required', Type\CheckboxType::class, [
                 'label'    => 'ekyna_core.field.required',
-                'sizing'   => 'sm',
                 'required' => false,
                 'attr'     => [
                     'align_with_widget' => true,

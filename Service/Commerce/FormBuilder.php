@@ -7,6 +7,7 @@ use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class FormBuilder
@@ -47,6 +48,9 @@ class FormBuilder
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [
             'label' => 'ekyna_core.field.quantity',
+            'constraints' => [
+                new Assert\GreaterThanOrEqual(1),
+            ],
             'attr'  => [
                 'class' => 'sale-item-quantity',
                 'min'   => 1,
@@ -64,13 +68,23 @@ class FormBuilder
     {
         $this->buildProductForm($form, $bundleChoice->getProduct());
 
+        $min = $bundleChoice->getMinQuantity();
+        $max = $bundleChoice->getMaxQuantity();
+
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [
-            'label' => 'ekyna_core.field.quantity',
-            'attr'  => [
+            'label'    => 'ekyna_core.field.quantity',
+            'disabled' => $min === $max,
+            'constraints' => [
+                new Assert\Range([
+                    'min' => $min,
+                    'max' => $max,
+                ])
+            ],
+            'attr'     => [
                 'class' => 'sale-item-quantity',
-                'min'   => $bundleChoice->getMinQuantity(),
-                'max'   => $bundleChoice->getMaxQuantity(),
+                'min'   => $min,
+                'max'   => $max,
             ],
         ]);
     }

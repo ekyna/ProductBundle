@@ -47,7 +47,6 @@ class BundleChoiceType extends ResourceFormType
         $builder
             ->add('product', ResourceType::class, [
                 'label'         => 'ekyna_product.product.label.singular',
-                'sizing'        => 'sm',
 //                'allow_new'     => true,
                 'class'         => $this->productClass,
                 'query_builder' => function (EntityRepository $er) {
@@ -72,12 +71,10 @@ class BundleChoiceType extends ResourceFormType
                     'entry_type'      => BundleChoiceRuleType::class,
                 ])
                 ->add('minQuantity', Type\NumberType::class, [
-                    'label'  => 'ekyna_product.bundle_choice.field.min_quantity',
-                    'sizing' => 'sm',
+                    'label' => 'ekyna_product.bundle_choice.field.min_quantity',
                 ])
                 ->add('maxQuantity', Type\NumberType::class, [
-                    'label'  => 'ekyna_product.bundle_choice.field.max_quantity',
-                    'sizing' => 'sm',
+                    'label' => 'ekyna_product.bundle_choice.field.max_quantity',
                 ])
                 ->add('position', Type\HiddenType::class, [
                     'attr' => [

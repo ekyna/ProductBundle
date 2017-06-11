@@ -6,7 +6,7 @@ liip_imagine:
             cache: local_media
             data_loader: local_media
             filters:
-                thumbnail: { size: [50, 50], mode: inbound }
+                thumbnail: { size: [42, 42], mode: inbound }
             post_processors:
                 jpegoptim: {}
         slot_choice_thumb:

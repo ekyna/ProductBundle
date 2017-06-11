@@ -117,9 +117,9 @@ class PriceCalculator
         }
 
         $data = [
-            'net_price' => $product->getNetPrice(),
-            'currency'  => $currency,
-            'rules'     => [],
+            'price'    => floatval($product->getNetPrice()),
+            'currency' => $currency,
+            'rules'    => [],
         ];
 
         if (!Model\ProductTypes::isBundled($product->getType())) {

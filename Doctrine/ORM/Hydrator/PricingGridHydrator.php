@@ -45,12 +45,18 @@ class PricingGridHydrator extends AbstractHydrator
             $tmp['brand_id'],
         ]);
 
+        $rule = [
+            'id'       => intval($tmp['rule_id']),
+            'quantity' => floatval($tmp['rule_quantity']),
+            'percent'  => floatval($tmp['rule_percent']),
+        ];
+
         if (isset($result[$hash])) {
-            $result[$hash]['rules'][$tmp['min_quantity']] = $tmp['percent'];
+            $result[$hash]['rules'][] = $rule;
         } else {
             $result[$hash] = [
                 'name'  => $tmp['name'],
-                'rules' => [$tmp['min_quantity'] => $tmp['percent']],
+                'rules' => [$rule],
             ];
         }
     }

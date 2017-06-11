@@ -40,16 +40,14 @@ class OptionType extends ResourceFormType
             ])
             ->add('designation', Type\TextType::class, [
                 'label'    => 'ekyna_core.field.designation',
-                'sizing'   => 'sm',
                 'required' => false,
                 'attr'     => [
                     'placeholder' => 'ekyna_core.field.designation',
                 ],
             ])
             ->add('reference', Type\TextType::class, [
-                'label'  => 'ekyna_core.field.reference',
-                'sizing' => 'sm',
-                'attr'   => [
+                'label' => 'ekyna_core.field.reference',
+                'attr'  => [
                     'placeholder' => 'ekyna_core.field.reference',
                 ],
             ])
@@ -59,26 +57,23 @@ class OptionType extends ResourceFormType
                 'error_bubbling' => false,
             ])
             ->add('weight', Type\NumberType::class, [
-                'label'  => 'ekyna_core.field.weight',
-                'sizing' => 'sm',
-                'scale'  => 3,
-                'attr'   => [
+                'label' => 'ekyna_core.field.weight',
+                'scale' => 3,
+                'attr'  => [
                     'placeholder' => 'ekyna_core.field.weight',
                     'input_group' => ['append' => 'kg'],
                 ],
             ])
             ->add('netPrice', Type\NumberType::class, [
-                'label'  => 'ekyna_product.product.field.net_price',
-                'sizing' => 'sm',
-                'scale'  => 5,
-                'attr'   => [
+                'label' => 'ekyna_product.product.field.net_price',
+                'scale' => 5,
+                'attr'  => [
                     'placeholder' => 'ekyna_product.product.field.net_price',
                     'input_group' => ['append' => '€'],
                 ],
             ])
             // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
-                'sizing'  => 'sm',
                 'select2' => false,
             ])
             ->add('position', Type\HiddenType::class, [
