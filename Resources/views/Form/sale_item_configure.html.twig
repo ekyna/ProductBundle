@@ -65,6 +65,8 @@
                 </li>
                 {%- endfor -%}
             </ul>
+            {% else %}
+            {{- form_widget(form.choice.children|first, {'attr': {'data-index': 0}}) -}}
             {% endif %}
             <h4 class="slot-title">{{ form.vars.slot_title }}</h4>
             <div class="slot-description">{{ form.vars.slot_description|raw }}</div>

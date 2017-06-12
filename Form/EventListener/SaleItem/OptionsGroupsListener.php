@@ -55,23 +55,15 @@ class OptionsGroupsListener implements EventSubscriberInterface
     public function onPreSubmit(FormEvent $event)
     {
         // Event data : Request data (associative array)
-        /*$data = $event->getData();
-        /*array (
-            'option_group_1' =>
-                array (
-                    'choice' => '1',
-                ),
-            'option_group_2' =>
-                array (
-                    'choice' => '',
-                ),
-        )*/
 
         $this->buildForm($event->getForm());
-
-        // TODO Change data : unset key/option group miss matches
     }
 
+    /**
+     * Builds the option group form.
+     *
+     * @param FormInterface $form
+     */
     private function buildForm(FormInterface $form)
     {
         /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
@@ -188,7 +180,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
                                 if ($optionId == $option->getId()) {
                                     // Option found => next item child
 
-                                    // TODO build item from option ?
+                                    // TODO build item from option ? (currently done by the OptionGroupType)
 
                                     continue 3;
                                 }
@@ -211,6 +203,9 @@ class OptionsGroupsListener implements EventSubscriberInterface
         $event->setData($item->getChildren());
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function getSubscribedEvents()
     {
         return [

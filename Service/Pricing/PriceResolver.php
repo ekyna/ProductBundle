@@ -125,7 +125,7 @@ class PriceResolver
         CustomerGroupInterface $group = null,
         CountryInterface $country = null
     ) {
-        if (ProductTypes::isChildType($product->getType())) {
+        if (!ProductTypes::isBundled($product->getType())) {
             $pricing = $this->findPricing($product, $group, $country);
 
             if (!empty($pricing)) {
