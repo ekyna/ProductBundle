@@ -13,7 +13,7 @@
                 <strong>{{ itemForm.vars.choice_brand }}</strong>
                 {{ itemForm.vars.choice_product }}
             </h3>
-            <div class="choice-description">{{ itemForm.vars.choice_description|raw }}</div>
+            <div class="choice-description">{{ itemForm.vars.choice_description|truncate_html(128)|raw }}</div>
 
             {%- if itemForm.variant is defined -%}
                 {{- form_row(itemForm.variant) -}}
