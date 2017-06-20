@@ -209,6 +209,8 @@ class ItemBuilder
             }
 
             // Not found : call prepareItem() first.
+            //TODO$childItem = $item->createChild();
+            //$this->bui
             throw new RuntimeException("Bundle slot matching item not found.");
         }
 
@@ -554,7 +556,7 @@ class ItemBuilder
                         $child->getSubjectIdentity()->clear();
 
                         // Initialize default choice
-                        $this->initializeFromFromBundleChoice($child, $defaultChoice);
+                        $this->initializeFromBundleChoice($child, $defaultChoice);
                     }
 
                     // Next bundle slot
@@ -566,7 +568,7 @@ class ItemBuilder
             /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
-            $this->initializeFromFromBundleChoice($child, $defaultChoice);
+            $this->initializeFromBundleChoice($child, $defaultChoice);
         }
 
         // TODO Sort items by position ?
@@ -578,7 +580,7 @@ class ItemBuilder
      * @param SaleItemInterface     $item
      * @param BundleChoiceInterface $bundleChoice
      */
-    public function initializeFromFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
+    public function initializeFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
     {
         $this->provider->assign($item, $bundleChoice->getProduct());
 

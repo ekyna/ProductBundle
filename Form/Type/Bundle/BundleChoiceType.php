@@ -2,10 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
-use Doctrine\ORM\EntityRepository;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -44,20 +43,18 @@ class BundleChoiceType extends ResourceFormType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('product', ResourceType::class, [
-                'label'         => 'ekyna_product.product.label.singular',
-//                'allow_new'     => true,
-                'class'         => $this->productClass,
-                'query_builder' => function (EntityRepository $er) {
-                    $qb = $er->createQueryBuilder('p');
-
-                    return $qb->andWhere($qb->expr()->in('p.type', [
-                        ProductTypes::TYPE_SIMPLE,
-                        ProductTypes::TYPE_VARIANT,
-                    ]));
-                },
-            ]);
+        $builder->add('product', ProductSearchType::class, [
+            'types' => $options['configurable'] ? [
+                ProductTypes::TYPE_SIMPLE,
+                ProductTypes::TYPE_VARIABLE,
+                ProductTypes::TYPE_VARIANT,
+                ProductTypes::TYPE_BUNDLE,
+            ] : [
+                ProductTypes::TYPE_SIMPLE,
+                ProductTypes::TYPE_VARIANT,
+                ProductTypes::TYPE_BUNDLE,
+            ],
+        ]);
 
         if ($options['configurable']) {
             // TODO options ( + fixed/user defined)
@@ -82,11 +79,10 @@ class BundleChoiceType extends ResourceFormType
                     ],
                 ]);
         } else {
-            $builder
-                ->add('quantity', Type\NumberType::class, [
-                    'label'         => 'ekyna_core.field.quantity',
-                    'property_path' => 'minQuantity',
-                ]);
+            $builder->add('quantity', Type\NumberType::class, [
+                'label'         => 'ekyna_core.field.quantity',
+                'property_path' => 'minQuantity',
+            ]);
         }
     }
 
@@ -106,9 +102,7 @@ class BundleChoiceType extends ResourceFormType
         parent::configureOptions($resolver);
 
         $resolver
-            ->setDefaults([
-                'configurable' => false,
-            ])
+            ->setDefault('configurable', false)
             ->setAllowedTypes('configurable', 'bool');
     }
 

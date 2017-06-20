@@ -786,6 +786,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
     return {
         init: function($element) {
             $element.saleItem();
+        },
+        destroy: function($element) {
+            var saleItem = $element.data('saleItem');
+            if (undefined !== saleItem) {
+                saleItem.destroy();
+            }
         }
     };
 });

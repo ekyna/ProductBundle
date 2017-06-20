@@ -5,7 +5,6 @@ namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**

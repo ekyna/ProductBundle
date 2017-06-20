@@ -5,7 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Option;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
-use Ekyna\Bundle\ProductBundle\Form\Type\Product\ProductSearchType;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -37,6 +38,11 @@ class OptionType extends ResourceFormType
             ])
             ->add('product', ProductSearchType::class, [
                 'required' => false,
+                'types' => [
+                    ProductTypes::TYPE_SIMPLE,
+                    ProductTypes::TYPE_VARIANT,
+                    ProductTypes::TYPE_BUNDLE,
+                ],
             ])
             ->add('designation', Type\TextType::class, [
                 'label'    => 'ekyna_core.field.designation',

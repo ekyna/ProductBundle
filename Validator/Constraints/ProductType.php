@@ -4,7 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**

@@ -24,6 +24,13 @@ class BundleChoicesType extends AbstractType
                 'configurable'   => false,
                 'label'          => false,
                 'prototype_name'  => '__choice__',
+                'prototype_data' => function(Options $options, $value) {
+                    if (null !== $value) {
+                        return $value;
+                    }
+
+                    return new $options['choice_class'];
+                },
                 'sub_widget_col' => function (Options $options) {
                     return $options['configurable'] ? 11 : 12;
                 },

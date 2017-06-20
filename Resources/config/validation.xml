@@ -26,12 +26,12 @@
             </constraint>
         </property>
         <!-- Unique name per group -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+        <!--<constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
                 <value>group</value>
                 <value>name</value>
             </option>
-        </constraint>
+        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation">
@@ -141,10 +141,24 @@
         <property name="product">
             <constraint name="NotNull"/>
             <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="groups">
+                    <value>bundle</value>
+                </option>
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="groups">
+                    <value>configurable</value>
+                </option>
                 <option name="types">
                     <value>simple</value>
                     <value>variable</value>
                     <value>variant</value>
+                    <value>bundle</value>
                 </option>
             </constraint>
         </property>
@@ -157,9 +171,6 @@
         <property name="maxQuantity">
             <constraint name="IsNull">
                 <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                    <value>variable</value>
                     <value>bundle</value>
                 </option>
             </constraint>
@@ -283,6 +294,26 @@
         <property name="group">
             <constraint name="NotNull"/>
         </property>
+        <property name="product">
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="groups">product</option>
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="designation">
+            <constraint name="NotBlank">
+                <option name="groups">data</option>
+            </constraint>
+            <constraint name="Length">
+                <option name="min">3</option>
+                <option name="max">255</option>
+                <option name="groups">data</option>
+            </constraint>
+        </property>
         <property name="reference">
             <constraint name="NotBlank">
                 <option name="groups">data</option>
@@ -293,12 +324,18 @@
             </constraint>
         </property>
         <property name="netPrice">
+            <constraint name="NotBlank">
+                <option name="groups">data</option>
+            </constraint>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">data</option>
             </constraint>
         </property>
         <property name="weight">
+            <constraint name="NotBlank">
+                <option name="groups">data</option>
+            </constraint>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">data</option>
@@ -316,20 +353,14 @@
             </constraint>
         </property>
         <!-- Unique reference -->
+        <!-- TODO bug because option group may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">reference</option>
+            <option name="fields">
+                <value>group</value>
+                <value>reference</value>
+            </option>
             <option name="groups">data</option>
-        </constraint>
-        <property name="designation">
-            <constraint name="NotBlank">
-                <option name="groups">data</option>
-            </constraint>
-            <constraint name="Length">
-                <option name="min">3</option>
-                <option name="max">255</option>
-                <option name="groups">data</option>
-            </constraint>
-        </property>
+        </constraint>-->
         <!-- Unique designation per group -->
         <!-- TODO bug because option group may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -348,7 +379,7 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup">
-        <property name="product">
+        <!--<property name="product">
             <constraint name="NotNull"/>
             <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
                 <option name="types">
@@ -356,7 +387,7 @@
                     <value>variant</value>
                 </option>
             </constraint>
-        </property>
+        </property>-->
         <property name="name">
             <constraint name="NotBlank"/>
         </property>

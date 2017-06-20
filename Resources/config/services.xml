@@ -177,7 +177,7 @@
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.product_search.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Product\ProductSearchType">
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType">
             <argument>%ekyna_product.product.class%</argument>
             <tag name="form.type"/>
         </service>

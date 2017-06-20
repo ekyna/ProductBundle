@@ -66,6 +66,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     {
         $this->userOption = false;
         $this->minQuantity = 1;
+        $this->maxQuantity = 1;
         $this->rules = new ArrayCollection();
     }
 

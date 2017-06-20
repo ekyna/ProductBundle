@@ -7,7 +7,10 @@ use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Table\Type\ProductType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ProductController
@@ -18,6 +21,39 @@ class ProductController extends ResourceController
 {
     use RC\TinymceTrait,
         RC\ToggleableTrait;
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function searchAction(Request $request)
+    {
+        //$callback = $request->query->get('callback');
+        $limit = intval($request->query->get('limit'));
+        $query = trim($request->query->get('query'));
+        $types = $request->query->get('types');
+
+        $repository = $this->get('fos_elastica.manager')->getRepository($this->config->getResourceClass());
+        if (!$repository instanceOf ProductRepository) {
+            throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
+        }
+
+        if (empty($types)) {
+            $results = $repository->defaultSearch($query, $limit);
+        } else {
+            $results = $repository->searchByTypes($query, $types, $limit);
+        }
+
+        $data = $this->container->get('serializer')->serialize([
+            'results'     => $results,
+            'total_count' => count($results),
+        ], 'json', ['groups' => ['Default']]);
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'text/javascript');
+
+        return $response;
+    }
 
     /**
      * @inheritdoc
