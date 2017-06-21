@@ -122,7 +122,7 @@
             </join-table>
         </many-to-many>
 
-        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Entity\CustomerGroup"
+        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                       field="customerGroups">
             <join-table name="product_product_customer_group">
                 <join-columns>

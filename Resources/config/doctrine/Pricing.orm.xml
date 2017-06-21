@@ -25,7 +25,7 @@
             </order-by>
         </one-to-many>
 
-        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Entity\CustomerGroup"
+        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                       field="groups">
             <join-table name="product_pricing_group">
                 <join-columns>
