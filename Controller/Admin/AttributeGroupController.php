@@ -5,7 +5,6 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\Resource\SortableTrait;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
-use Ekyna\Bundle\ProductBundle\Table\Type\AttributeType;
 
 /**
  * Class AttributeGroupController
@@ -28,9 +27,11 @@ class AttributeGroupController extends ResourceController
         /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface $attributeGroup */
         $attributeGroup = $context->getResource();
 
+        $type = $this->get('ekyna_product.attribute.configuration')->getTableType();
+
         $table = $this
             ->getTableFactory()
-            ->createTable('attributes', AttributeType::class, [
+            ->createTable('attributes', $type, [
                 'source' => $attributeGroup->getAttributes()->toArray(),
             ]);
 

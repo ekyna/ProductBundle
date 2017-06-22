@@ -8,7 +8,6 @@ use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
-use Ekyna\Bundle\ProductBundle\Table\Type\ProductType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -109,7 +108,7 @@ class ProductController extends ResourceController
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
             $table = $this
                 ->getTableFactory()
-                ->createTable('variants', ProductType::class, [
+                ->createTable('variants', $this->config->getTableType(), [
                     'variant_mode' => true,
                     'source' => $product->getVariants()->toArray(),
                 ]);
