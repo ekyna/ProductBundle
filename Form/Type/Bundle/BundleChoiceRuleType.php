@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleTypes;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,11 +29,7 @@ class BundleChoiceRuleType extends ResourceFormType
             ->add('expression', Type\TextType::class, [
                 'label' => 'ekyna_product.bundle_choice_rule.field.expression',
             ])
-            ->add('position', Type\HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     /**

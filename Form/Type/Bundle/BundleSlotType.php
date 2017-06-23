@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -79,11 +80,7 @@ class BundleSlotType extends ResourceFormType
                 'configurable' => $options['configurable'],
                 'choice_class' => $this->bundleChoiceClass,
             ])
-            ->add('position', HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     /**

@@ -148,7 +148,7 @@ class FormHelper implements Imagine\CacheManagerAwareInterface
     {
         if (null !== $option) {
             if (null !== $product = $option->getProduct()) {
-                $label = $product->getTitle();
+                $label = $product->getFullTitle();
                 $netPrice = $product->getNetPrice();
             } else {
                 $label = $option->getTitle();

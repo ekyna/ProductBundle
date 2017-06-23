@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -73,11 +74,7 @@ class BundleChoiceType extends ResourceFormType
                 ->add('maxQuantity', Type\NumberType::class, [
                     'label' => 'ekyna_product.bundle_choice.field.max_quantity',
                 ])
-                ->add('position', Type\HiddenType::class, [
-                    'attr' => [
-                        'data-collection-role' => 'position',
-                    ],
-                ]);
+                ->add('position', CollectionPositionType::class);
         } else {
             $builder->add('quantity', Type\NumberType::class, [
                 'label'         => 'ekyna_core.field.quantity',

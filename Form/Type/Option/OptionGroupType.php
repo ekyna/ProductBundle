@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Option;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -45,11 +46,7 @@ class OptionGroupType extends ResourceFormType
                 'entry_type'      => OptionType::class,
                 'add_button_text' => 'ekyna_product.option.button.add',
             ])
-            ->add('position', Type\HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     /**

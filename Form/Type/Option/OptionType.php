@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Option;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
+use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -82,11 +83,7 @@ class OptionType extends ResourceFormType
             ->add('taxGroup', TaxGroupChoiceType::class, [
                 'select2' => false,
             ])
-            ->add('position', Type\HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     /**
