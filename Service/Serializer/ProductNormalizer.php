@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\TranslationInterface;
 use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
 
 /**
@@ -23,13 +24,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
 
         $groups = isset($context['groups']) ? (array)$context['groups'] : [];
 
-        $designation = $product->getDesignation();
-        if (0 == strlen($designation) && $product->getType() === Model\ProductTypes::TYPE_VARIANT) {
-            $designation = $product->getAttributesDesignation();
-        }
-
         $data = array_replace([
-            'designation' => $designation,
+            'designation' => $product->getFullDesignation(),
             'type'        => $product->getType(),
             'reference'   => $product->getReference(),
         ], $data);
@@ -87,6 +83,21 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function filterTranslation(TranslationInterface $translation)
+    {
+        /** @var Model\ProductInterface $product */
+        $product = $translation->getTranslatable();
+
+        if ($product->getType() === 'variant') {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -32,9 +32,16 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
 
         $boolQuery = new Query\BoolQuery();
 
+        $locale = $this->localeProvider->getCurrentLocale();
+
         $matchQuery = new Query\MultiMatch();
-        $matchQuery->setQuery($expression)->setFields($this->getDefaultMatchFields());
-        $boolQuery->addShould($matchQuery);
+        $matchQuery->setQuery($expression)->setFields([
+            'designation^5',
+            'reference',
+            'translations.' . $locale . '.title',
+            'brand.name',
+        ]);
+        $boolQuery->addMust($matchQuery);
 
         $typesQuery = new Query\Terms();
         $typesQuery->setTerms('type', $types);
@@ -51,14 +58,14 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
         $locale = $this->localeProvider->getCurrentLocale();
 
         return [
-            'reference^5',
-            'references^5',
-            'designation^3',
-            'translations.' . $locale . '.title^3',
-            'seo.translations.' . $locale . '.title^3',
+            'designation^6',
+            'reference^4',
+            'translations.' . $locale . '.title^2',
+            'references',
             'brand.name',
             'categories.name',
             'translations.' . $locale . '.description',
+            'seo.translations.' . $locale . '.title',
             'seo.translations.' . $locale . '.description',
         ];
     }
