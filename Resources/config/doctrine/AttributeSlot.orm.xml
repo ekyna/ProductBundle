@@ -14,9 +14,9 @@
             <index columns="position" name="idx_attribute_slot_position" />
         </indexes>
 
-        <unique-constraints>
+        <!--<unique-constraints>
             <unique-constraint columns="set_id,position" name="unique_attribute_slot_position"/>
-        </unique-constraints>
+        </unique-constraints>-->
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>

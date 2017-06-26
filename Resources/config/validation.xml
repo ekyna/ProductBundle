@@ -485,7 +485,8 @@
 
         <!-- Reference -->
         <property name="reference">
-            <constraint name="NotBlank">
+            <constraint name="Length">
+                <option name="max">16</option>
                 <option name="groups">
                     <value>simple</value>
                     <value>variant</value>
@@ -493,9 +494,6 @@
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
-            </constraint>
-            <constraint name="Length">
-                <option name="max">16</option>
             </constraint>
         </property>
 

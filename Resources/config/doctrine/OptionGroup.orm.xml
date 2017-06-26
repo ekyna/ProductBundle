@@ -17,7 +17,7 @@
 
         <unique-constraints>
             <unique-constraint columns="product_id,name" name="unique_option_group_name" />
-            <unique-constraint columns="product_id,position" name="unique_option_group_position"/>
+            <!--<unique-constraint columns="product_id,position" name="unique_option_group_position"/>-->
         </unique-constraints>
 
         <id name="id" type="integer" column="id">

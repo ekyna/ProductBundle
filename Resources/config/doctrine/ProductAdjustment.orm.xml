@@ -13,9 +13,9 @@
             <index columns="position" name="idx_product_product_adjustment_position" />
         </indexes>
 
-        <unique-constraints>
+        <!--<unique-constraints>
             <unique-constraint columns="product_id,position" name="unique_product_product_adjustment_position"/>
-        </unique-constraints>
+        </unique-constraints>-->
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>

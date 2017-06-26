@@ -17,7 +17,7 @@
 
         <unique-constraints>
             <unique-constraint columns="group_id,reference" name="unique_option_reference" />
-            <unique-constraint columns="group_id,position" name="unique_option_position"/>
+            <!--<unique-constraint columns="group_id,position" name="unique_option_position"/>-->
         </unique-constraints>
 
         <id name="id" type="integer" column="id">

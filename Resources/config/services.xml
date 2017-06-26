@@ -88,7 +88,7 @@
             <tag name="form.type"/>
         </service>
 
-        <!-- Configurable slot form types -->
+        <!-- Sale item configurable/slots form types -->
         <service id="ekyna_product.sale_item.configurable_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
             <argument type="service" id="ekyna_product.product.subject_provider"/>
@@ -99,7 +99,6 @@
             <argument type="service" id="ekyna_product.product.subject_provider"/>
             <argument type="service" id="ekyna_product.form_helper"/>
             <tag name="form.type"/>
-            <!--<tag name="form.js" selector=".product-configurable-slot" path="ekyna-product/form/configurable-slot"/>-->
         </service>
 
         <!-- Sale item options/groups form types -->
@@ -308,6 +307,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\ProductEventSubscriber">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.product.event_subscriber.handler_registry"/>
+            <argument type="service" id="ekyna_product.product.reference_generator"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
@@ -323,6 +323,14 @@
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <tag name="validator.constraint_validator"/>
+        </service>
+
+        <!-- Reference generator -->
+        <service id="ekyna_product.product.reference_generator"
+                 class="Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGenerator">
+            <argument>%kernel.data_dir%/product_reference</argument>
+            <argument>ym</argument>
+            <argument>8</argument>
         </service>
 
         <!-- Search -->

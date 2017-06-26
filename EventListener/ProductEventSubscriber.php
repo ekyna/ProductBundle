@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGeneratorInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -28,19 +29,27 @@ class ProductEventSubscriber implements EventSubscriberInterface
      */
     private $handlerRegistry;
 
+    /**
+     * @var ReferenceGeneratorInterface
+     */
+    private $referenceGenerator;
+
 
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param Handler\HandlerRegistry    $registry
+     * @param PersistenceHelperInterface  $persistenceHelper
+     * @param Handler\HandlerRegistry     $registry
+     * @param ReferenceGeneratorInterface $referenceGenerator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        Handler\HandlerRegistry $registry
+        Handler\HandlerRegistry $registry,
+        ReferenceGeneratorInterface $referenceGenerator
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
+        $this->referenceGenerator = $referenceGenerator;
     }
 
     /**
@@ -54,12 +63,9 @@ class ProductEventSubscriber implements EventSubscriberInterface
 
         $changed = $this->executeHandlers($event, HandlerInterface::INSERT);
 
-        // TODO Timestampable behavior/listener
-        $product
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime());
+        $changed |= $this->generateReference($product);
 
-        if ($changed || true) { // TODO
+        if ($changed) {
             $this->persistenceHelper->persistAndRecompute($product);
         }
     }
@@ -75,10 +81,9 @@ class ProductEventSubscriber implements EventSubscriberInterface
 
         $changed = $this->executeHandlers($event, HandlerInterface::UPDATE);
 
-        // TODO Timestampable behavior/listener
-        $product->setUpdatedAt(new \DateTime());
+        $changed |= $this->generateReference($product);
 
-        if ($changed || true) { // TODO
+        if ($changed) {
             $this->persistenceHelper->persistAndRecompute($product);
         }
     }
@@ -144,7 +149,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
      *
      * @return bool
      */
-    private function executeHandlers(ResourceEventInterface $event, $method)
+    protected function executeHandlers(ResourceEventInterface $event, $method)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -159,13 +164,31 @@ class ProductEventSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Generates the product reference if it is empty.
+     *
+     * @param ProductInterface $product
+     *
+     * @return bool
+     */
+    protected function generateReference(ProductInterface $product)
+    {
+        if (0 == strlen($product->getReference())) {
+            $this->referenceGenerator->generate($product);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the product from the event.
      *
      * @param ResourceEventInterface $event
      *
      * @return ProductInterface
      */
-    private function getProductFromEvent(ResourceEventInterface $event)
+    protected function getProductFromEvent(ResourceEventInterface $event)
     {
         $resource = $event->getResource();
 
