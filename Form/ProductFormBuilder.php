@@ -387,7 +387,8 @@ class ProductFormBuilder
     public function addReferenceField(array $options = [])
     {
         $options = array_replace([
-            'label' => 'ekyna_core.field.reference',
+            'label'    => 'ekyna_core.field.reference',
+            'required' => false,
         ], $options);
 
         $this->form->add('reference', SF\TextType::class, $options);

@@ -21,22 +21,40 @@
 
     <services>
 
-        <!-- Constants helper -->
-        <service id="ekyna_product.constants_helper"
-                 class="Ekyna\Bundle\ProductBundle\Service\ConstantsHelper">
-            <argument type="service" id="translator"/>
+        <!-- Product subject provider -->
+        <service id="ekyna_product.commerce.subject_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.pricing.resolver"/>
+            <argument>%ekyna_product.product.class%</argument>
+            <tag name="ekyna_commerce.subject_provider"/>
         </service>
-
-        <!-- Form helper -->
-        <service id="ekyna_product.form_helper"
-                 class="Ekyna\Bundle\ProductBundle\Service\FormHelper">
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+        <service id="ekyna_product.commerce.product_filter"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductFilter">
+            <argument type="service" id="ekyna_commerce.customer.security_provider"/>
+        </service>
+        <service id="ekyna_product.commerce.item_builder"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder">
+            <argument type="service" id="ekyna_product.commerce.subject_provider"/>
+            <argument type="service" id="ekyna_product.commerce.product_filter"/>
+        </service>
+        <service id="ekyna_product.commerce.form_builder"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder">
+            <argument type="service" id="ekyna_product.commerce.subject_provider"/>
+            <argument type="service" id="ekyna_product.commerce.product_filter"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument type="service" id="translator"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <call method="setCacheManager">
                 <argument type="service" id="liip_imagine.cache.manager"/>
             </call>
+        </service>
+
+        <!-- Constants helper -->
+        <service id="ekyna_product.constants_helper"
+                 class="Ekyna\Bundle\ProductBundle\Service\ConstantsHelper">
+            <argument type="service" id="translator"/>
         </service>
 
         <!-- TODO Remove resources form types definitions (see configuration), by using resource choice form types -->
@@ -91,40 +109,39 @@
         <!-- Sale item configurable/slots form types -->
         <service id="ekyna_product.sale_item.configurable_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.sale_item.configurable_slot.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotType">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
-            <argument type="service" id="ekyna_product.form_helper"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
+            <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <tag name="form.type"/>
         </service>
 
         <!-- Sale item options/groups form types -->
         <service id="ekyna_product.sale_item.option_groups.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupsType">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.sale_item.option_group.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
-            <argument type="service" id="ekyna_product.form_helper"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
+            <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.sale_item.variant_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\VariantChoiceType">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
-            <argument type="service" id="ekyna_product.form_helper"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
+            <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <tag name="form.type"/>
         </service>
 
         <!-- Sale item configure type extension -->
         <service id="ekyna_product.sale_item_configure.type_extension"
                  class="Ekyna\Bundle\ProductBundle\Form\Extension\SaleItemConfigureTypeExtension">
-            <argument type="service" id="ekyna_product.form_helper"/>
-            <argument type="service" id="translator"/>
+            <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <argument type="service" id="twig"/>
             <argument>%ekyna_product.default.sale_item_form_theme%</argument>
             <tag name="form.type_extension"
@@ -212,7 +229,7 @@
         <service id="ekyna_product.pricing.calculator"
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator"
                  lazy="true">
-            <argument id="ekyna_product.product.subject_provider" type="service"/>
+            <argument id="ekyna_product.commerce.subject_provider" type="service"/>
             <argument id="ekyna_product.pricing.resolver" type="service"/>
             <argument id="ekyna_commerce.customer.security_provider" type="service"/>
             <argument id="ekyna_commerce.cart.session_provider" type="service"/>
@@ -227,17 +244,8 @@
             <tag name="twig.extension"/>
         </service>
 
-        <!-- Product subject provider -->
-        <service id="ekyna_product.product.subject_provider"
-                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
-            <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_product.pricing.resolver"/>
-            <argument>%ekyna_product.product.class%</argument>
-            <tag name="ekyna_commerce.subject_provider"/>
-        </service>
-
         <!-- Sale view vars builder -->
-        <service id="ekyna_product.sale_view_type"
+        <service id="ekyna_product.commerce.sale_view_type"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\SaleViewType"
                  parent="ekyna_commerce.abstract_view_type">
             <tag name="ekyna_commerce.view_type"/>
@@ -246,7 +254,8 @@
         <!-- Sale item event listener -->
         <service id="ekyna_product.sale_item.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber">
-            <argument type="service" id="ekyna_product.product.subject_provider"/>
+            <argument type="service" id="ekyna_product.commerce.item_builder"/>
+            <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <argument type="service" id="ekyna_product.pricing.resolver"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -287,14 +296,16 @@
         <service id="ekyna_product.product.event_subscriber.bundle_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\BundleHandler"
                  public="false">
-            <!--<argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>-->
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->
         <service id="ekyna_product.product.event_subscriber.configurable_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\ConfigurableHandler"
                  public="false">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
 

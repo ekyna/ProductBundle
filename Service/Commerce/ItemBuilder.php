@@ -2,9 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
-use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
-use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
-use Ekyna\Bundle\ProductBundle\Model\OptionInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
@@ -29,15 +27,42 @@ class ItemBuilder
      */
     private $provider;
 
+    /**
+     * @var ProductFilterInterface
+     */
+    private $filter;
+
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
+     * @param ProductProvider        $provider
+     * @param ProductFilterInterface $filter
      */
-    public function __construct(ProductProvider $provider)
+    public function __construct(ProductProvider $provider, ProductFilterInterface $filter)
     {
         $this->provider = $provider;
+        $this->filter = $filter;
+    }
+
+    /**
+     * Returns the product provider.
+     *
+     * @return ProductProvider
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+
+    /**
+     * Returns the product filter.
+     *
+     * @return ProductFilterInterface
+     */
+    public function getFilter()
+    {
+        return $this->filter;
     }
 
     /**
@@ -114,9 +139,10 @@ class ItemBuilder
         ProductTypes::assertVariable($product);
 
         $variant = null;
+        $variants = $this->filter->getVariants($product);
 
         if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
-            foreach ($product->getVariants() as $v) {
+            foreach ($variants as $v) {
                 if ($variantId == $v->getId()) {
                     $variant = $v;
                     break;
@@ -172,14 +198,14 @@ class ItemBuilder
             ->setReference($product->getReference())
             ->setCompound(true);
 
+        // Filter bundle slots
+        $bundlesSlots = $this->filter->getBundleSlots($product);
+
         // Every slot must match a single item
-        $bundleProductIds = [];
         $bundleSlotIds = [];
-        foreach ($product->getBundleSlots() as $bundleSlot) {
+        foreach ($bundlesSlots as $bundleSlot) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = $bundleSlot->getChoices()->first();
-            $bundleProduct = $bundleChoice->getProduct();
-            $bundleProductIds[] = $bundleProduct->getId();
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
@@ -195,35 +221,19 @@ class ItemBuilder
                 }
                 $bundleSlotIds[] = $bundleSlotId;
 
-                /** @var ProductInterface $childItemProduct */
-                $childItemProduct = $this->provider->resolve($childItem);
-
                 // Build the item from the bundle choice's product
-                $this->buildFromProduct($childItem, $childItemProduct);
-                $childItem->setData(static::BUNDLE_SLOT_ID, $bundleSlotId);
-
-                // Item is immutable
-                $childItem->setImmutable(true);
+                $this->buildFromBundleChoice($childItem, $bundleChoice);
 
                 continue 2;
             }
 
-            // Not found : call prepareItem() first.
-            //TODO$childItem = $item->createChild();
-            //$this->bui
-            throw new RuntimeException("Bundle slot matching item not found.");
+            $bundleSlotIds[] = $bundleSlot->getId();
+
+            // Not found : Create and build the item from the bundle choice's product
+            $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
         }
 
-        // Removes miss match items
-        /* if ($removeMissMatch) {
-            // TODO Don't remove options
-            foreach ($item->getChildren() as $childItem) {
-                $childProduct = $this->provider->resolve($childItem);
-                if (null === $childProduct || !in_array($childProduct->getId(), $bundleProductIds)) {
-                    $item->removeChild($childItem);
-                }
-            }
-        }*/
+        $this->cleanUpBundleSlots($item, $bundleSlotIds);
     }
 
     /**
@@ -245,9 +255,14 @@ class ItemBuilder
             ->setCompound(true)
             ->setConfigurable(true);
 
+        // Filter bundle slots
+        $bundlesSlots = $this->filter->getBundleSlots($product);
+
         // Every slot must match a single item
         $bundleSlotIds = [];
-        foreach ($product->getBundleSlots() as $bundleSlot) {
+        foreach ($bundlesSlots as $bundleSlot) {
+            $bundleChoice = $bundleSlot->getChoices()->first();
+
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
                 $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID));
@@ -262,66 +277,47 @@ class ItemBuilder
                 }
                 $bundleSlotIds[] = $bundleSlotId;
 
-                /** @var ProductInterface $childItemProduct */
-                $childItemProduct = $this->provider->resolve($childItem);
+                // Resolve choice
+                if (0 < $bundleChoiceId = intval($childItem->getData(static::BUNDLE_CHOICE_ID))) {
+                    foreach ($bundleSlot->getChoices() as $choice) {
+                        if ($bundleChoiceId === $choice->getId()) {
+                            $bundleChoice = $choice;
+                            break;
+                        }
+                    }
+                }
 
-                // Sets the bundle product
-                $this->buildFromProduct($childItem, $childItemProduct);
-                $childItem->setData(static::BUNDLE_SLOT_ID, $bundleSlotId);
-
-                // Item is immutable
-                $childItem->setImmutable(true);
+                // Build the item from the bundle choice's product
+                $this->buildFromBundleChoice($childItem, $bundleChoice);
 
                 continue 2;
             }
 
-            throw new RuntimeException("Bundle slot matching item not found.");
+            $bundleSlotIds[] = $bundleSlot->getId();
+
+            // Not found : Create and build the item from the bundle choice's product
+            $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
         }
 
-        // Removes miss match items
-//        if ($removeMissMatch) {
-//            // TODO Don't remove options ...
-//            foreach ($item->getChildren() as $childItem) {
-//                /** @var ProductInterface $childProduct */
-//                $childProduct = $this->provider->resolve($childItem);
-//                if (null === $childProduct) {
-//                    $item->removeChild($childItem);
-//                    continue;
-//                }
-//
-//                // Find matching slot
-//                $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID));
-//                $bundleSlots = $product->getBundleSlots()->matching(
-//                    Criteria::create()->where(Criteria::expr()->eq('id', $bundleSlotId))
-//                );
-//                if (1 != $bundleSlots->count()) {
-//                    $item->removeChild($childItem);
-//                    continue;
-//                }
-//
-//                $slotProductsIds = [];
-//                $bundleSlot = $bundleSlots->first();
-//                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
-//                foreach ($bundleSlot->getChoices() as $bundleChoice) {
-//                    $slotProductsIds[] = $bundleChoice->getProduct()->getId();
-//                }
-//
-//                if (!in_array($childProduct->getId(), $slotProductsIds)) {
-//                    $item->removeChild($childItem);
-//                }
-//            }
-//        }
+        $this->cleanUpBundleSlots($item, $bundleSlotIds);
     }
 
     /**
      * Builds the sale item from the given bundle choice.
      *
-     * @param SaleItemInterface     $item
-     * @param BundleChoiceInterface $bundleChoice
+     * @param SaleItemInterface           $item
+     * @param Model\BundleChoiceInterface $bundleChoice
      */
-    public function buildFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
+    public function buildFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $bundleChoice)
     {
         $this->buildFromProduct($item, $bundleChoice->getProduct());
+
+        // Normalize quantity
+        if ($item->getQuantity() < $bundleChoice->getMinQuantity()) {
+            $item->setQuantity($bundleChoice->getMinQuantity());
+        } elseif ($item->getQuantity() > $bundleChoice->getMaxQuantity()) {
+            $item->setQuantity($bundleChoice->getMaxQuantity());
+        }
 
         $item
             ->setData(static::BUNDLE_SLOT_ID, $bundleChoice->getSlot()->getId())
@@ -337,17 +333,17 @@ class ItemBuilder
      */
     public function buildOptions(SaleItemInterface $item, ProductInterface $product)
     {
-        $optionGroups = $this->getProductOptionGroups($item);
+        $optionGroups = $this->filter->getOptionGroups($product);
 
         if (empty($optionGroups)) {
-            // TODO Remove item children related to options ?
+            $this->cleanUpOptionGroups($item);
             return;
         }
 
         $item->setConfigurable(true);
 
         $optionGroupIds = [];
-        foreach ($product->getOptionGroups() as $optionGroup) {
+        foreach ($optionGroups as $optionGroup) {
             // Find option group matching item
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
@@ -399,15 +395,17 @@ class ItemBuilder
                 }
             }
         }
+
+        //$this->cleanUpOptionGroups($item, $optionGroupIds);
     }
 
     /**
      * Builds the item from the option.
      *
-     * @param SaleItemInterface $item
-     * @param OptionInterface   $option
+     * @param SaleItemInterface     $item
+     * @param Model\OptionInterface $option
      */
-    public function buildFromOption(SaleItemInterface $item, OptionInterface $option)
+    public function buildFromOption(SaleItemInterface $item, Model\OptionInterface $option)
     {
         if (null !== $product = $option->getProduct()) {
             $this->buildFromProduct($item, $product);
@@ -423,39 +421,48 @@ class ItemBuilder
                 ->setReference($option->getReference())
                 ->setNetPrice($option->getNetPrice())
                 ->setWeight($option->getWeight())
-                ->setQuantity(1)
                 ->setTaxGroup($option->getTaxGroup());
         }
 
         $item
             ->setData(static::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setData(static::OPTION_ID, $option->getId())
+            ->setQuantity(1)
             ->setImmutable(true);
     }
 
     /**
-     * Returns the option groups for the given sale item (merges variable and variant groups).
+     * Removes irrelevant bundle slot child items.
      *
      * @param SaleItemInterface $item
-     *
-     * @return OptionGroupInterface[]
+     * @param array             $bundleSlotIds
      */
-    public function getProductOptionGroups($item)
+    private function cleanUpBundleSlots(SaleItemInterface $item, array $bundleSlotIds = [])
     {
-        $product = $this->provider->resolve($item);
-        $optionsGroups = $product->getOptionGroups()->toArray();
-
-        if ($product->getType() === ProductTypes::TYPE_VARIABLE && $item->hasData(ItemBuilder::VARIANT_ID)) {
-            if (0 < $variantId = intval($item->getData(ItemBuilder::VARIANT_ID))) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
-                $variant = $this->provider->getProductRepository()->find($variantId);
-                foreach ($variant->getOptionGroups() as $optionGroup) {
-                    array_push($optionsGroups, $optionGroup);
+        foreach ($item->getChildren() as $childItem) {
+            if (0 < $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID))) {
+                if (!in_array($bundleSlotId, $bundleSlotIds)) {
+                    $item->removeChild($childItem);
                 }
-            };
+            }
         }
+    }
 
-        return $optionsGroups;
+    /**
+     * Removes irrelevant option groups child item.
+     *
+     * @param SaleItemInterface $item
+     * @param array             $optionGroupIds
+     */
+    private function cleanUpOptionGroups(SaleItemInterface $item, array $optionGroupIds = [])
+    {
+        foreach ($item->getChildren() as $childItem) {
+            if (0 < $optionGroupId = intval($childItem->getData(static::OPTION_GROUP_ID))) {
+                if (!in_array($optionGroupId, $optionGroupIds)) {
+                    $item->removeChild($childItem);
+                }
+            }
+        }
     }
 
     /**
@@ -491,8 +498,14 @@ class ItemBuilder
     {
         ProductTypes::assertVariable($product);
 
+        $variants = $this->filter->getVariants($product);
+
+        if (empty($variants)) {
+            return;
+        }
+
         /** @var ProductInterface $variant */
-        $variant = $product->getVariants()->first();
+        $variant = current($variants);
 
         $this->initializeFromVariant($item, $variant);
     }
@@ -518,15 +531,21 @@ class ItemBuilder
      */
     public function initializeFromBundle(SaleItemInterface $item, ProductInterface $product)
     {
+        // Filter bundle slots
+        $bundlesSlots = $this->filter->getBundleSlots($product);
+
         // For each bundle/configurable slots
         $bundleSlotIds = [];
-        foreach ($product->getBundleSlots() as $bundleSlot) {
+        foreach ($bundlesSlots as $bundleSlot) {
+            // Filter bundle slots
+            $bundlesChoices = $this->filter->getSlotChoices($bundleSlot);
+
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
-            $defaultChoice = $bundleSlot->getChoices()->first();
+            $defaultChoice = current($bundlesChoices);
             $choiceProducts = [];
 
             // Valid and default slot product(s)
-            foreach ($bundleSlot->getChoices() as $choice) {
+            foreach ($bundlesChoices as $choice) {
                 $choiceProducts[] = $choice->getProduct();
             }
 
@@ -577,10 +596,10 @@ class ItemBuilder
     /**
      * Initializes the sale item from the given bundle choice.
      *
-     * @param SaleItemInterface     $item
-     * @param BundleChoiceInterface $bundleChoice
+     * @param SaleItemInterface           $item
+     * @param Model\BundleChoiceInterface $bundleChoice
      */
-    public function initializeFromBundleChoice(SaleItemInterface $item, BundleChoiceInterface $bundleChoice)
+    public function initializeFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $bundleChoice)
     {
         $this->provider->assign($item, $bundleChoice->getProduct());
 
@@ -600,7 +619,7 @@ class ItemBuilder
      */
     public function initializeOptions(SaleItemInterface $item)
     {
-        $optionGroups = $this->getProductOptionGroups($item);
+        $optionGroups = $this->getOptionGroups($item);
 
         $optionGroupIds = [];
         foreach ($optionGroups as $optionGroup) {
@@ -668,10 +687,10 @@ class ItemBuilder
     /**
      * Initializes the sale item from the given option group.
      *
-     * @param SaleItemInterface    $item
-     * @param OptionGroupInterface $optionGroup
+     * @param SaleItemInterface          $item
+     * @param Model\OptionGroupInterface $optionGroup
      */
-    public function initializeFromOptionGroup(SaleItemInterface $item, OptionGroupInterface $optionGroup)
+    public function initializeFromOptionGroup(SaleItemInterface $item, Model\OptionGroupInterface $optionGroup)
     {
         $item
             ->setData(static::OPTION_GROUP_ID, $optionGroup->getId())
@@ -686,5 +705,64 @@ class ItemBuilder
                 $item->setData(static::OPTION_ID, $option->getId());
             }
         }
+    }
+
+    /**
+     * Returns the available variants for the given sale item.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return Model\ProductInterface[]
+     */
+    public function getVariants(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        return $this->filter->getVariants($product);
+    }
+
+    /**
+     * Returns the available bundle slots for the given sale item.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return Model\BundleSlotInterface[]
+     */
+    public function getBundleSlots(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        return $this->filter->getBundleSlots($product);
+    }
+
+    /**
+     * Returns the available option groups for the given sale item (merges variable and variant groups).
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return Model\OptionGroupInterface[]
+     */
+    public function getOptionGroups(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        // Filter product option groups
+        $groups = $this->filter->getOptionGroups($product);
+
+        if ($product->getType() === ProductTypes::TYPE_VARIABLE && $item->hasData(ItemBuilder::VARIANT_ID)) {
+            if (0 < $variantId = intval($item->getData(ItemBuilder::VARIANT_ID))) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
+                $variant = $this->provider->getProductRepository()->find($variantId);
+
+                // Filter variant option groups
+                $variantGroups = $this->filter->getOptionGroups($variant);
+
+                foreach ($variantGroups as $optionGroup) {
+                    array_push($groups, $optionGroup);
+                }
+            };
+        }
+
+        return $groups;
     }
 }

@@ -31,6 +31,11 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     protected $choices;
 
     /**
+     * @var bool
+     */
+    protected $required;
+
+    /**
      * @var integer
      */
     protected $position;
@@ -44,6 +49,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         parent::__construct();
 
         $this->choices = new ArrayCollection();
+        $this->required = true;
     }
 
     /**
@@ -170,6 +176,30 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     public function setChoices($choices)
     {
         $this->choices = $choices;
+
+        return $this;
+    }
+
+    /**
+     * Returns the required.
+     *
+     * @return bool
+     */
+    public function isRequired()
+    {
+        return $this->required;
+    }
+
+    /**
+     * Sets the required.
+     *
+     * @param bool $required
+     *
+     * @return BundleSlot
+     */
+    public function setRequired($required)
+    {
+        $this->required = (bool)$required;
 
         return $this;
     }

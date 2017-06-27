@@ -4,8 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater;
-use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -19,12 +19,12 @@ class BundleHandler extends AbstractHandler
     /**
      * @var PersistenceHelperInterface
      */
-    //private $persistenceHelper;
+    private $persistenceHelper;
 
     /**
-     * @var StockSubjectUpdaterInterface
+     * @var PriceCalculator
      */
-    //private $stockUpdater;
+    private $priceCalculator;
 
     /**
      * @var BundleUpdater
@@ -35,18 +35,16 @@ class BundleHandler extends AbstractHandler
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface       $persistenceHelper
-     * @param StockSubjectUpdaterInterface     $stockUpdater
+     * @param PersistenceHelperInterface $persistenceHelper
+     * @param PriceCalculator            $priceCalculator
      */
-    /*public function __construct(
+    public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        StockSubjectUpdaterInterface $stockUpdater
+        PriceCalculator $priceCalculator
     ) {
         $this->persistenceHelper = $persistenceHelper;
-        $this->stockUpdater = $stockUpdater;
-
-        $this->bundleUpdater = new BundleUpdater();
-    }*/
+        $this->priceCalculator = $priceCalculator;
+    }
 
     /**
      * @inheritdoc
@@ -55,9 +53,9 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        //$this->stockUpdater->update($bundle);
+        $changed = $this->getBundleUpdater()->updateStock($bundle);
 
-        return $this->ensureDisabledStockMode($bundle);
+        return $changed || $this->ensureDisabledStockMode($bundle);
     }
 
     /**
@@ -67,11 +65,27 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        /*if ($this->persistenceHelper->isChanged($bundle, ['inStock', 'virtualStock', 'estimatedDateOfArrival'])) {
-            return $this->stockUpdater->updateStockState($bundle);
-        }*/
-
         return $this->ensureDisabledStockMode($bundle);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handleChildDataChange(ResourceEventInterface $event)
+    {
+        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
+
+        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
+
+        if ($netPrice !== $bundle->getNetPrice()) {
+            $bundle->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        // TODO weight ?
+
+        return false;
     }
 
     /**

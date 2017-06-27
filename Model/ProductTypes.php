@@ -241,6 +241,18 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Asserts that the product is of 'bundled' type.
+     *
+     * @param ProductInterface $product
+     */
+    static public function assertBundled(ProductInterface $product)
+    {
+        if (!static::isBundled($product->getType())) {
+            throw new InvalidArgumentException("Expected product of 'bundled' type.");
+        }
+    }
+
+    /**
      * Asserts that the product has the given type.
      *
      * @param ProductInterface $product

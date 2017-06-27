@@ -102,9 +102,24 @@ interface BundleSlotInterface extends TranslatableInterface
      * @param ArrayCollection|BundleChoiceInterface[] $choices
      *
      * @return $this|BundleSlotInterface
-     * @internal
      */
     public function setChoices($choices);
+
+    /**
+     * Returns the required.
+     *
+     * @return bool
+     */
+    public function isRequired();
+
+    /**
+     * Sets the required.
+     *
+     * @param bool $required
+     *
+     * @return $this|BundleSlotInterface
+     */
+    public function setRequired($required);
 
     /**
      * Returns the position.

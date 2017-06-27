@@ -24,13 +24,11 @@
 {% spaceless %}
     <div class="ekyna-collection-item">
         {{ form_errors(form) }}
-        {#{% if configurable %}
-
-        {% else %}
-
-        {% endif %}#}
         {% if form.translations is defined %}
             {{ form_row(form.translations, {'widget_col': 12}) }}
+        {% endif %}
+        {% if form.required is defined %}
+            {{ form_row(form.required, {'label_col': 2, 'widget_col': 10}) }}
         {% endif %}
         {{ form_row(form.choices, {'widget_col': 12}) }}
         {{ form_rest(form) }}

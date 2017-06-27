@@ -33,16 +33,6 @@ class ProductProvider implements SubjectProviderInterface
      */
     private $productClass;
 
-    /**
-     * @var ItemBuilder
-     */
-    private $itemBuilder;
-
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
 
     /**
      * Constructor.
@@ -169,34 +159,6 @@ class ProductProvider implements SubjectProviderInterface
     public function getLabel()
     {
         return 'ekyna_product.product.label.singular';
-    }
-
-    /**
-     * Returns the item builder.
-     *
-     * @return ItemBuilder
-     */
-    public function getItemBuilder()
-    {
-        if (null !== $this->itemBuilder) {
-            return $this->itemBuilder;
-        }
-
-        return $this->itemBuilder = new ItemBuilder($this);
-    }
-
-    /**
-     * Returns the form builder.
-     *
-     * @return FormBuilder
-     */
-    public function getFormBuilder()
-    {
-        if (null !== $this->formBuilder) {
-            return $this->formBuilder;
-        }
-
-        return $this->formBuilder = new FormBuilder($this);
     }
 
     /**

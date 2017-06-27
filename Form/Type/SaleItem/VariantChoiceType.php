@@ -4,9 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Bundle\ProductBundle\Service\FormHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,26 +25,26 @@ use Symfony\Component\Validator\Constraints\NotNull;
 class VariantChoiceType extends AbstractType
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
 
     /**
-     * @var FormHelper
+     * @var FormBuilder
      */
-    private $formHelper;
+    private $formBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
-     * @param FormHelper      $formHelper
+     * @param ItemBuilder $itemBuilder
+     * @param FormBuilder  $formHelper
      */
-    public function __construct($provider, FormHelper $formHelper)
+    public function __construct(ItemBuilder $itemBuilder, FormBuilder $formHelper)
     {
-        $this->provider = $provider;
-        $this->formHelper = $formHelper;
+        $this->itemBuilder = $itemBuilder;
+        $this->formBuilder = $formHelper;
     }
 
     /**
@@ -56,7 +55,9 @@ class VariantChoiceType extends AbstractType
         /** @var Model\ProductInterface $variable */
         $variable = $options['variable'];
 
-        $transformer = new IdToChoiceObjectTransformer($variable->getVariants()->toArray());
+        $variants = $this->itemBuilder->getFilter()->getVariants($variable);
+
+        $transformer = new IdToChoiceObjectTransformer($variants);
 
         $builder->addModelTransformer($transformer);
 
@@ -66,7 +67,7 @@ class VariantChoiceType extends AbstractType
 
             $item = $event->getForm()->getParent()->getData();
 
-            $this->provider->getItemBuilder()->buildFromVariant($item, $transformer->transform($data));
+            $this->itemBuilder->buildFromVariant($item, $transformer->transform($data));
         });
     }
 
@@ -87,7 +88,7 @@ class VariantChoiceType extends AbstractType
             /** @var Model\ProductInterface $variable */
             $variable = $options['variable'];
 
-            return $variable->getVariants();
+            return $this->itemBuilder->getFilter()->getVariants($variable);
         };
 
         $resolver
@@ -103,8 +104,8 @@ class VariantChoiceType extends AbstractType
                 ],
                 'choices'       => $choices,
                 'choice_value'  => 'id',
-                'choice_label'  => [$this->formHelper, 'variantChoiceLabel'],
-                'choice_attr'   => [$this->formHelper, 'variantChoiceAttr'],
+                'choice_label'  => [$this->formBuilder, 'variantChoiceLabel'],
+                'choice_attr'   => [$this->formBuilder, 'variantChoiceAttr'],
             ])
             ->setRequired(['variable'])
             ->setAllowedTypes('variable', Model\ProductInterface::class)

@@ -18,6 +18,7 @@ interface HandlerInterface
     const DELETE             = 'handleDelete';
     const STOCK_UNIT_CHANGE  = 'handleStockUnitChange';
     const STOCK_UNIT_REMOVAL = 'handleStockUnitRemoval';
+    const CHILD_DATA_CHANGE  = 'handleChildDataChange';
     const CHILD_STOCK_CHANGE = 'handleChildStockChange';
 
 
@@ -63,6 +64,15 @@ interface HandlerInterface
      * @return bool Whether or not the product has been changed.
      */
     public function handleStockUnitRemoval(SubjectStockUnitEvent $event);
+
+    /**
+     * Handles the child data (price/weight) change event.
+     *
+     * @param ResourceEventInterface $event
+     *
+     * @return bool Whether or not the product has been changed.
+     */
+    public function handleChildDataChange(ResourceEventInterface $event);
 
     /**
      * Handles the child stock change event.

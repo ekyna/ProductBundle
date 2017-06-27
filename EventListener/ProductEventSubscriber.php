@@ -127,7 +127,21 @@ class ProductEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Stock unit change event handler.
+     * Child data change event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function onChildDataChange(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if ($this->executeHandlers($event, HandlerInterface::CHILD_DATA_CHANGE)) {
+            $this->persistenceHelper->persistAndRecompute($product, true);
+        }
+    }
+
+    /**
+     * Child stock change event handler.
      *
      * @param ResourceEventInterface $event
      */
@@ -210,6 +224,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
             ProductEvents::DELETE             => ['onDelete', 0],
             ProductEvents::STOCK_UNIT_CHANGE  => ['onStockUnitChange', 0],
             ProductEvents::STOCK_UNIT_REMOVAL => ['onStockUnitRemoval', 0],
+            ProductEvents::CHILD_DATA_CHANGE  => ['onChildDataChange', 0],
             ProductEvents::CHILD_STOCK_CHANGE => ['onChildStockChange', 0],
         ];
     }

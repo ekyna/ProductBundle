@@ -74,6 +74,68 @@ class PriceCalculator
     }
 
     /**
+     * Calculates the product (bundle) total price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     *
+     * @todo The product (bundle) min price should be processed and persisted during update (flush)
+     */
+    public function calculateBundleTotalPrice(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertBundle($product);
+
+        $total = 0;
+
+        foreach ($product->getBundleSlots() as $slot) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
+
+            $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
+
+            // TODO required options ?
+        }
+
+        return $total;
+    }
+
+    /**
+     * Calculates the product (configurable) total.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     *
+     * @todo The product (configurable) min price should be processed and persisted during update (flush)
+     */
+    public function calculateConfigurableTotalPrice(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertConfigurable($product);
+
+        $total = 0;
+
+        foreach ($product->getBundleSlots() as $slot) {
+            $lowerPrice = null;
+
+            foreach ($slot->getChoices() as $choice) {
+                $childProduct = $choice->getProduct();
+                $childPrice = $childProduct->getNetPrice() * $choice->getMinQuantity();
+
+                // TODO required options ?
+
+                if (null === $lowerPrice || $childPrice < $lowerPrice) {
+                    $lowerPrice = $childPrice;
+                }
+            }
+
+            $total += $lowerPrice;
+        }
+
+        return $total;
+    }
+
+    /**
      * Returns the pricing data for the given sale item.
      *
      * @param SaleItemInterface $item
@@ -153,63 +215,6 @@ class PriceCalculator
         }
 
         return [];
-    }
-
-    /**
-     * Calculates the product (bundle) total price.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return float|int
-     *
-     * @todo The product (bundle) min price should be processed and persisted during update (flush)
-     */
-    public function calculateBundleTotalPrice(Model\ProductInterface $product)
-    {
-        Model\ProductTypes::assertBundle($product);
-
-        $total = 0;
-
-        foreach ($product->getBundleSlots() as $slot) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-            $choice = $slot->getChoices()->first();
-
-            $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
-        }
-
-        return $total;
-    }
-
-    /**
-     * Calculates the product (configurable) total.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return float|int
-     *
-     * @todo The product (configurable) min price should be processed and persisted during update (flush)
-     */
-    public function calculateConfigurableTotalPrice(Model\ProductInterface $product)
-    {
-        Model\ProductTypes::assertConfigurable($product);
-
-        $total = 0;
-
-        foreach ($product->getBundleSlots() as $slot) {
-            $lowerChoice = $lowerPrice = null;
-
-            // TODO Check compatibility
-            foreach ($slot->getChoices() as $choice) {
-                $price = $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
-                if (null === $lowerPrice || $price < $lowerPrice) {
-                    $lowerChoice = $choice;
-                }
-            }
-
-            $total += $lowerChoice->getProduct()->getNetPrice() * $lowerChoice->getMinQuantity();
-        }
-
-        return $total;
     }
 
     /**

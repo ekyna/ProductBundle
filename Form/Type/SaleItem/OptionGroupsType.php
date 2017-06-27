@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\OptionsGroupsListener;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Symfony\Component\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -17,19 +17,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class OptionGroupsType extends Form\AbstractType
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
+     * @param ItemBuilder $itemBuilder
      */
-    public function __construct(ProductProvider $provider)
+    public function __construct(ItemBuilder $itemBuilder)
     {
-        $this->provider = $provider;
+        $this->itemBuilder = $itemBuilder;
     }
 
     /**
@@ -37,7 +37,7 @@ class OptionGroupsType extends Form\AbstractType
      */
     public function buildForm(Form\FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new OptionsGroupsListener($this->provider));
+        $builder->addEventSubscriber(new OptionsGroupsListener($this->itemBuilder));
     }
 
     /**

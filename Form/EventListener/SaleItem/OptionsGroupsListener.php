@@ -6,7 +6,6 @@ use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType;
 use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -20,19 +19,19 @@ use Symfony\Component\Form\FormInterface;
 class OptionsGroupsListener implements EventSubscriberInterface
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $productProvider
+     * @param ItemBuilder $itemBuilder
      */
-    public function __construct(ProductProvider $productProvider)
+    public function __construct(ItemBuilder $itemBuilder)
     {
-        $this->provider = $productProvider;
+        $this->itemBuilder = $itemBuilder;
     }
 
     /**
@@ -60,90 +59,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
     }
 
     /**
-     * Builds the option group form.
-     *
-     * @param FormInterface $form
-     */
-    private function buildForm(FormInterface $form)
-    {
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-        if (null === $item = $form->getParent()->getData()) {
-            return;
-        }
-
-        $itemBuilder = $this->provider->getItemBuilder();
-
-        $optionsGroups = $itemBuilder->getProductOptionGroups($item);
-
-        $optionsGroupIds = array_map(function(OptionGroupInterface $group) {
-            return $group->getId();
-        }, $optionsGroups);
-
-        // Remove item children that does not match option groups
-        foreach ($item->getChildren() as $index => $child) {
-            if (!$child->hasData(ItemBuilder::OPTION_GROUP_ID)) {
-                continue;
-            }
-
-            $optionGroupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID));
-            if (0 < $optionGroupId && in_array($optionGroupId, $optionsGroupIds)) {
-                continue;
-            }
-
-            $item->removeChild($child);
-        }
-
-        // Creates missing item children
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
-        foreach ($optionsGroups as $optionGroup) {
-            // Find matching sale item's child
-            foreach ($item->getChildren() as $index => $child) {
-                if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
-                    continue 2;
-                }
-            }
-
-            // Not found => initialize it
-            $child = $item->createChild();
-
-            $itemBuilder->initializeFromOptionGroup($child, $optionGroup);
-        }
-
-        // Remove form children that does not match option groups
-        foreach ($form as $name => $child) {
-            if (preg_match('~^option_group_([\d]+)$~', $name, $matches)) {
-                if (!in_array($matches[1], $optionsGroupIds)) {
-                    $form->remove($name);
-                }
-            }
-        }
-
-        // Creates missing form children
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
-        foreach ($optionsGroups as $optionGroup) {
-            $name = 'option_group_' . $optionGroup->getId();
-            if ($form->has($name)) {
-                continue;
-            }
-
-            // Find matching sale item's child
-            foreach ($item->getChildren() as $index => $child) {
-                if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
-                    $form->add($name, OptionGroupType::class, [
-                        'label'         => $optionGroup->getTitle(),
-                        'property_path' => '[' . $index . ']',
-                        'option_group'  => $optionGroup,
-                    ]);
-
-                    continue 2;
-                }
-            }
-
-            throw new LogicException("Item children / Option groups miss match.");
-        }
-    }
-
-    /**
      * Post submit event handler.
      *
      * @param FormEvent $event
@@ -157,9 +72,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
             return;
         }
 
-        $itemBuilder = $this->provider->getItemBuilder();
-
-        $optionsGroups = $itemBuilder->getProductOptionGroups($item);
+        $optionsGroups = $this->itemBuilder->getOptionGroups($item);
 
         // Remove item children that do not match option groups
         foreach ($item->getChildren() as $index => $child) {
@@ -201,6 +114,88 @@ class OptionsGroupsListener implements EventSubscriberInterface
         }
 
         $event->setData($item->getChildren());
+    }
+
+    /**
+     * Builds the option groups forms.
+     *
+     * @param FormInterface $form
+     */
+    private function buildForm(FormInterface $form)
+    {
+        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+        if (null === $item = $form->getParent()->getData()) {
+            return;
+        }
+
+        $optionsGroups = $this->itemBuilder->getOptionGroups($item);
+
+        $optionsGroupIds = array_map(function(OptionGroupInterface $group) {
+            return $group->getId();
+        }, $optionsGroups);
+
+        // Remove item children that does not match option groups
+        foreach ($item->getChildren() as $index => $child) {
+            if (!$child->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                continue;
+            }
+
+            $optionGroupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID));
+            if (0 < $optionGroupId && in_array($optionGroupId, $optionsGroupIds)) {
+                continue;
+            }
+
+            $item->removeChild($child);
+        }
+
+        // Creates missing item children
+        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
+        foreach ($optionsGroups as $optionGroup) {
+            // Find matching sale item's child
+            foreach ($item->getChildren() as $index => $child) {
+                if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                    continue 2;
+                }
+            }
+
+            // Not found => initialize it
+            $child = $item->createChild();
+
+            $this->itemBuilder->initializeFromOptionGroup($child, $optionGroup);
+        }
+
+        // Remove form children that does not match option groups
+        foreach ($form as $name => $child) {
+            if (preg_match('~^option_group_([\d]+)$~', $name, $matches)) {
+                if (!in_array($matches[1], $optionsGroupIds)) {
+                    $form->remove($name);
+                }
+            }
+        }
+
+        // Creates missing form children
+        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
+        foreach ($optionsGroups as $optionGroup) {
+            $name = 'option_group_' . $optionGroup->getId();
+            if ($form->has($name)) {
+                continue;
+            }
+
+            // Find matching sale item's child
+            foreach ($item->getChildren() as $index => $child) {
+                if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                    $form->add($name, OptionGroupType::class, [
+                        'label'         => $optionGroup->getTitle(),
+                        'property_path' => '[' . $index . ']',
+                        'option_group'  => $optionGroup,
+                    ]);
+
+                    continue 2;
+                }
+            }
+
+            throw new LogicException("Item children / Option groups miss match.");
+        }
     }
 
     /**

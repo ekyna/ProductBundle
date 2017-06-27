@@ -3,9 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Bundle\ProductBundle\Service\FormHelper;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Form;
@@ -21,28 +20,26 @@ use Symfony\Component\Validator\Constraints\NotNull;
 class ConfigurableSlotType extends Form\AbstractType
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
 
     /**
-     * @var FormHelper
+     * @var FormBuilder
      */
-    private $formHelper;
+    private $formBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
-     * @param FormHelper      $formHelper
+     * @param ItemBuilder $itemBuilder
+     * @param FormBuilder $formBuilder
      */
-    public function __construct(
-        ProductProvider $provider,
-        FormHelper $formHelper
-    ) {
-        $this->provider = $provider;
-        $this->formHelper = $formHelper;
+    public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder)
+    {
+        $this->itemBuilder = $itemBuilder;
+        $this->formBuilder = $formBuilder;
     }
 
     /**
@@ -53,9 +50,9 @@ class ConfigurableSlotType extends Form\AbstractType
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
 
-        $choices = $bundleSlot->getChoices()->toArray();
+        $bundleChoices = $this->itemBuilder->getFilter()->getSlotChoices($bundleSlot);
 
-        $transformer = new IdToChoiceObjectTransformer($choices);
+        $transformer = new IdToChoiceObjectTransformer($bundleChoices);
 
         $postSubmitListener = function (Form\FormEvent $event) use ($transformer) {
             $item = $event->getForm()->getParent()->getData();
@@ -66,7 +63,7 @@ class ConfigurableSlotType extends Form\AbstractType
 
             /** @var Model\BundleChoiceInterface $choice */
             if (null !== $choice = $transformer->transform($data)) {
-                $this->provider->assign($item, $choice->getProduct());
+                $this->itemBuilder->getProvider()->assign($item, $choice->getProduct());
             }
         };
 
@@ -83,23 +80,21 @@ class ConfigurableSlotType extends Form\AbstractType
                 'select2'       => false,
                 'expanded'      => true,
                 'attr'          => ['class' => 'sale-item-bundle-choice'],
-                'choices'       => $choices,
+                'choices'       => $bundleChoices,
                 'choice_value'  => 'id',
                 'choice_label'  => $choiceLabel,
             ])
             ->addModelTransformer($transformer)
             ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
 
-        $formBuilder = $this->provider->getFormBuilder();
-
-        $buildForm = function (Form\FormEvent $event) use ($transformer, $formBuilder) {
+        $buildForm = function (Form\FormEvent $event) use ($transformer) {
             $form = $event->getForm();
             $choiceId = $form->get('choice')->getData();
 
             /** @var Model\BundleChoiceInterface $choice */
             $choice = $transformer->transform($choiceId);
 
-            $formBuilder->buildBundleChoiceForm($form, $choice);
+            $this->formBuilder->buildBundleChoiceForm($form, $choice);
         };
 
         $builder
@@ -114,7 +109,7 @@ class ConfigurableSlotType extends Form\AbstractType
                 /** @var Model\BundleChoiceInterface $choice */
                 $choice = $transformer->transform($choiceId);
 
-                $this->provider->getItemBuilder()->buildFromBundleChoice($item, $choice);
+                $this->itemBuilder->buildFromBundleChoice($item, $choice);
             });
     }
 
@@ -129,7 +124,8 @@ class ConfigurableSlotType extends Form\AbstractType
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
         /** @var Model\BundleChoiceInterface[] $bundleChoices */
-        $bundleChoices = $bundleSlot->getChoices()->toArray();
+        $bundleChoices = $this->itemBuilder->getFilter()->getSlotChoices($bundleSlot);
+
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
 
         // Add image to each subject choice radio buttons vars
@@ -137,7 +133,7 @@ class ConfigurableSlotType extends Form\AbstractType
             /** @var Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = $transformer->transform($subjectChoiceView->vars['value']);
             $product = $bundleChoice->getProduct();
-            $path = $this->formHelper->getProductImagePath($product, 'slot_choice_btn');
+            $path = $this->formBuilder->getProductImagePath($product, 'slot_choice_btn');
             $subjectChoiceView->vars['choice_image'] = $path;
             $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
             $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
@@ -145,7 +141,6 @@ class ConfigurableSlotType extends Form\AbstractType
 
         // Builds each slot choice's form
         $formFactory = $form->getConfig()->getFormFactory();
-        $formBuilder = $this->provider->getFormBuilder();
 
         $choiceId = $form->get('choice')->getData();
         $choicesForms = [];
@@ -160,12 +155,12 @@ class ConfigurableSlotType extends Form\AbstractType
                     'data_class' => SaleItemInterface::class,
                 ]);
 
-                $formBuilder->buildBundleChoiceForm($choiceForm, $bundleChoice);
+                $this->formBuilder->buildBundleChoiceForm($choiceForm, $bundleChoice);
 
                 // Create a fake item
                 $fakeItem = $item->createChild();
 
-                $this->provider->assign($fakeItem, $bundleChoice->getProduct());
+                $this->formBuilder->getProvider()->assign($fakeItem, $bundleChoice->getProduct());
                 $choiceForm->setData($fakeItem);
 
                 $choiceFormView = $choiceForm->createView();
@@ -198,7 +193,7 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['choice_brand'] = $product->getBrand()->getTitle();
         $view->vars['choice_product'] = $product->getFullTitle();
         $view->vars['choice_description'] = $product->getDescription();
-        $view->vars['choice_image'] = $this->formHelper->getProductImagePath($product);
+        $view->vars['choice_image'] = $this->formBuilder->getProductImagePath($product);
     }
 
     /**
@@ -210,7 +205,7 @@ class ConfigurableSlotType extends Form\AbstractType
      */
     private function addPricingVars(Form\FormView $view, SaleItemInterface $item, $fallback)
     {
-        $config = $this->formHelper->getPricingConfig($item, $fallback);
+        $config = $this->formBuilder->getPricingConfig($item, $fallback);
 
         $view->vars['pricing'] = $config;
     }

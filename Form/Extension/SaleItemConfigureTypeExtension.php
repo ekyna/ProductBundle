@@ -4,11 +4,10 @@ namespace Ekyna\Bundle\ProductBundle\Form\Extension;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemConfigureType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Service\FormHelper;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SaleItemConfigureTypeExtension
@@ -18,14 +17,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class SaleItemConfigureTypeExtension extends AbstractTypeExtension
 {
     /**
-     * @var FormHelper
+     * @var FormBuilder
      */
-    private $formHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private $formBuilder;
 
     /**
      * @var \Twig_Environment
@@ -41,19 +35,16 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
     /**
      * Constructor.
      *
-     * @param FormHelper          $formHelper
-     * @param TranslatorInterface $translator
+     * @param FormBuilder         $formBuilder
      * @param \Twig_Environment   $twig
      * @param string              $theme
      */
     public function __construct(
-        FormHelper $formHelper,
-        TranslatorInterface $translator,
+        FormBuilder $formBuilder,
         \Twig_Environment $twig,
         $theme = 'EkynaProductBundle:Form:sale_item_configure.html.twig'
     ) {
-        $this->formHelper = $formHelper;
-        $this->translator = $translator;
+        $this->formBuilder = $formBuilder;
         $this->twig = $twig;
         $this->theme = $theme;
     }
@@ -79,16 +70,9 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         $extension = $this->twig->getExtension('form');
         $extension->renderer->setTheme($view, $this->theme);
 
-        $config = $this->formHelper->getPricingConfig($item, !$options['admin_mode']);
+        $config = $this->formBuilder->getPricingConfig($item, !$options['admin_mode']);
 
-        $config['trans'] = [
-            'quantity'    => $this->translator->trans('ekyna_core.field.quantity'),
-            'discount'    => $this->translator->trans('ekyna_product.sale_item_configure.discount'),
-            'unit_price'  => $this->translator->trans('ekyna_product.sale_item_configure.unit_net_price'),
-            'total'       => $this->translator->trans('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'  => $this->translator->trans('ekyna_product.sale_item_configure.rule_table'),
-            'price_table' => $this->translator->trans('ekyna_product.sale_item_configure.price_table'),
-        ];
+        $config['trans'] = $this->formBuilder->getTranslations();
 
         $view->vars['attr']['data-config'] = json_encode($config);
     }

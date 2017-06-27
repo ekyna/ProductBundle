@@ -4,9 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Bundle\ProductBundle\Service\FormHelper;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -24,26 +23,26 @@ use Symfony\Component\Validator\Constraints\NotNull;
 class OptionGroupType extends Form\AbstractType
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
 
     /**
-     * @var FormHelper
+     * @var FormBuilder
      */
-    private $formHelper;
+    private $formBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
-     * @param FormHelper      $formHelper
+     * @param ItemBuilder $itemBuilder
+     * @param FormBuilder $formBuilder
      */
-    public function __construct(ProductProvider $provider, FormHelper $formHelper)
+    public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder)
     {
-        $this->provider = $provider;
-        $this->formHelper = $formHelper;
+        $this->itemBuilder = $itemBuilder;
+        $this->formBuilder = $formBuilder;
     }
 
     /**
@@ -61,7 +60,7 @@ class OptionGroupType extends Form\AbstractType
             $required = true;
         }
 
-        $options = $optionGroup->getOptions()->toArray();
+        $options = $this->itemBuilder->getFilter()->getGroupOptions($optionGroup);
 
         $transformer = new IdToChoiceObjectTransformer($options);
 
@@ -73,10 +72,7 @@ class OptionGroupType extends Form\AbstractType
 
             if (null !== $option = $transformer->transform($data)) {
                 /** @var Model\OptionInterface $option */
-                $this
-                    ->provider
-                    ->getItemBuilder()
-                    ->buildFromOption($item, $option);
+                $this->itemBuilder->buildFromOption($item, $option);
             }
         };
 
@@ -91,8 +87,8 @@ class OptionGroupType extends Form\AbstractType
                 'attr'          => ['class' => 'sale-item-option'],
                 'choices'       => $options,
                 'choice_value'  => 'id',
-                'choice_label'  => [$this->formHelper, 'optionChoiceLabel'],
-                'choice_attr'   => [$this->formHelper, 'optionChoiceAttr'],
+                'choice_label'  => [$this->formBuilder, 'optionChoiceLabel'],
+                'choice_attr'   => [$this->formBuilder, 'optionChoiceAttr'],
             ])
             ->addModelTransformer($transformer)
             ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);

@@ -68,13 +68,7 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if ($this->stockUpdater->update($product)) {
-            $this->handleChildStockUpdate($product);
-
-            return true;
-        }
-
-        return false;
+        return $this->stockUpdater->update($product);
     }
 
     /**
@@ -84,15 +78,26 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
+        $changed = false;
+        $childEvents = [];
+
         if ($this->persistenceHelper->isChanged($product, ['inStock', 'virtualStock', 'estimatedDateOfArrival'])) {
             if ($this->stockUpdater->updateStockState($product)) {
-                $this->handleChildStockUpdate($product);
+                $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
 
-                return true;
+                $changed = true;
             }
         }
 
-        return false;
+        if ($this->persistenceHelper->isChanged($product, ['netPrice', 'weight'])) {
+            $childEvents[] = ProductEvents::CHILD_DATA_CHANGE;
+        }
+
+        if (!empty($childEvents)) {
+            $this->scheduleChildChangeEvents($product, $childEvents);
+        }
+
+        return $changed;
     }
 
     /**
@@ -109,7 +114,7 @@ class SimpleHandler extends AbstractHandler
         }
 
         if ($changed) {
-            $this->handleChildStockUpdate($product);
+            $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
         }
 
         return $changed;
@@ -129,7 +134,7 @@ class SimpleHandler extends AbstractHandler
         }
 
         if ($changed) {
-            $this->handleChildStockUpdate($product);
+            $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
         }
 
         return $changed;
@@ -169,11 +174,12 @@ class SimpleHandler extends AbstractHandler
     }
 
     /**
-     * Handles the child stock update by dispatching an event to the parent(s).
+     * Dispatches the child change events.
      *
      * @param ProductInterface $child
+     * @param array            $events
      */
-    private function handleChildStockUpdate(ProductInterface $child)
+    protected function scheduleChildChangeEvents(ProductInterface $child, array $events)
     {
         ProductTypes::assertChildType($child);
 
@@ -181,24 +187,17 @@ class SimpleHandler extends AbstractHandler
             if (!$variable = $child->getParent()) {
                 throw new RuntimeException("Variant's parent must be set.");
             }
-            $this->scheduleChildStockChangeEvent($variable);
+
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $variable);
+            }
         }
 
         $parents = $this->productRepository->findParentsByBundled($child);
         foreach ($parents as $parent) {
-            $this->scheduleChildStockChangeEvent($parent);
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $parent);
+            }
         }
-    }
-
-    /**
-     * Dispatches the parent (variable/bundle/configurable) "child stock change" event.
-     *
-     * @param ProductInterface $parent
-     */
-    private function scheduleChildStockChangeEvent(ProductInterface $parent)
-    {
-        ProductTypes::assertParentType($parent);
-
-        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_STOCK_CHANGE, $parent);
     }
 }

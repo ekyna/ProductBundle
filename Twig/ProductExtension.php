@@ -76,10 +76,6 @@ class ProductExtension extends \Twig_Extension
                 [$this->priceCalculator, 'calculateConfigurableTotalPrice']
             ),
             new \Twig_SimpleFilter(
-                'product_pricing_rules',
-                [$this->priceCalculator, 'g']
-            ),
-            new \Twig_SimpleFilter(
                 'product_attributes',
                 [$this, 'transformProductAttributes']
             ),

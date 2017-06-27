@@ -22,6 +22,12 @@
             <generator strategy="AUTO"/>
         </id>
 
+        <field name="required" type="boolean" column="required">
+            <options>
+                <option name="default">1</option>
+            </options>
+        </field>
+
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />
         </field>

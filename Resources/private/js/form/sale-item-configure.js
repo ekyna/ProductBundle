@@ -199,6 +199,11 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
             this.$select = this.$element.find('select');
             this.$option = undefined;
 
+            // hide if only Placeholder + Single option
+            if (2 >= this.$select.children().length) {
+                this.$element.hide();
+            }
+
             this.selectOption();
             this.bindEvents();
         },
@@ -477,8 +482,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
             this.$quantity = this.$element.find('#' + this.id + '_quantity');
             this.quantity = this.$quantity.val();
             if (this.parentItem) {
-                this.$parentQuantity = $('<span class="input-group-addon sale-item-parent-qty"></span>');
-                this.$parentQuantity.insertBefore(this.$quantity);
+                this.$parentQuantity = this.$quantity.parent().find('.sale-item-parent-qty');
+                if (this.$parentQuantity.size() === 0) {
+                    this.$parentQuantity = $('<span class="input-group-addon sale-item-parent-qty"></span>');
+                    this.$parentQuantity.insertBefore(this.$quantity);
+                }
+
                 this.updateParentQuantity();
             }
 
@@ -709,9 +718,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number'], function($, Templa
 
             // Lines
             $.each(this.bundleSlots, function() {
+                var price = this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
                 lines.push({
                     label: this.getLabel(),
-                    price: this.getChoice().getUnitPrice().formatPrice(that.config.currency)
+                    price: price.formatPrice(that.config.currency)
                 });
             });
             if (this.optionGroups.hasOptions()) {

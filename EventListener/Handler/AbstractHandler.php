@@ -58,6 +58,14 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @inheritdoc
      */
+    public function handleChildDataChange(ResourceEventInterface $event)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function handleChildStockChange(ResourceEventInterface $event)
     {
         return false;
@@ -66,14 +74,14 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * Check that the product stock mode is disabled.
      *
-     * @param ProductInterface $variable
+     * @param ProductInterface $parent
      *
      * @return bool Whether or not the product has been changed.
      */
-    protected function ensureDisabledStockMode(ProductInterface $variable)
+    protected function ensureDisabledStockMode(ProductInterface $parent)
     {
-        if ($variable->getStockMode() != StockSubjectModes::MODE_DISABLED) {
-            $variable->setStockMode(StockSubjectModes::MODE_DISABLED);
+        if ($parent->getStockMode() != StockSubjectModes::MODE_DISABLED) {
+            $parent->setStockMode(StockSubjectModes::MODE_DISABLED);
 
             return true;
         }

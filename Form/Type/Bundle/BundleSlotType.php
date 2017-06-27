@@ -6,6 +6,7 @@ use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -68,11 +69,19 @@ class BundleSlotType extends ResourceFormType
                     }
                 ));
         } else {
-            $builder->add('translations', TranslationsFormsType::class, [
-                'form_type'      => BundleSlotTranslationType::class,
-                'label'          => false,
-                'error_bubbling' => false,
-            ]);
+            $builder
+                ->add('translations', TranslationsFormsType::class, [
+                    'form_type'      => BundleSlotTranslationType::class,
+                    'label'          => false,
+                    'error_bubbling' => false,
+                ])
+                ->add('required', CheckboxType::class, [
+                    'label'    => 'ekyna_core.field.required',
+                    'required' => false,
+                    'attr' => [
+                        'align_with_widget' => true,
+                    ]
+                ]);
         }
 
         $builder

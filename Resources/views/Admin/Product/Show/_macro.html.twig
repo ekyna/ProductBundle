@@ -71,7 +71,7 @@
 
 {% macro show_delivery_time(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.weight, 'number', 'ekyna_product.product.field.delivery_time', {
+    {{ show_row(product.deliveryTime, 'number', 'ekyna_product.product.field.delivery_time', {
         'id': 'product_deliveryTime',
         'precision': 0
     }|merge(options)) }}
@@ -266,38 +266,39 @@
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_product.option_group.label.plural'|trans }}
+            {{- 'ekyna_product.option_group.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
+            {%- if product.optionGroups|length -%}
             <div class="show-widget show-widget-sm">
                 {% for group in product.optionGroups %}
                 <div class="collection-item">
                     {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
                     <div class="row">
                         <div class="col-md-6">
-                            {{ show_row(group.name, 'text', 'ekyna_core.field.name', {
+                            {{- show_row(group.name, 'text', 'ekyna_core.field.name', {
                                 'id': groupId ~ 'name',
                                 'label_nb_col': 4,
                                 'widget_nb_col': 8
-                            }) }}
+                            }) -}}
                         </div>
                         <div class="col-md-6">
-                            {{ show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
+                            {{- show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
                                 'id': groupId ~ 'required',
                                 'label_nb_col': 4,
                                 'widget_nb_col': 8
-                            }) }}
+                            }) -}}
                         </div>
                     </div>
-                    {{ show_translations_row(group.translations, {
+                    {{- show_translations_row(group.translations, {
                         'id': groupId ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
                         }
-                    }) }}
+                    }) -}}
                     <div class="row show-row">
                         <div class="col-md-2 show-label">
-                            {{ 'ekyna_product.option.label.plural'|trans }}
+                            {{- 'ekyna_product.option.label.plural'|trans -}}
                         </div>
                         <div class="col-md-10">
                             <div class="show-widget">
@@ -314,19 +315,23 @@
                                     {% set data = option.product ?: option %}
                                     <tr>
                                         <td id="{{ optionId ~ 'designation' }}">
+                                        {%- if option.product -%}
+                                            <a href="{{ admin_resource_path(option.product) }}">{{ data.designation }}</a>
+                                        {%- else -%}
                                             {{ data.designation }}
+                                        {%- endif -%}
                                         </td>
                                         <td id="{{ optionId ~ 'reference' }}">
-                                            {{ data.reference }}
+                                            {{- data.reference -}}
                                         </td>
                                         <td id="{{ optionId ~ 'weight' }}">
-                                            {{ data.weight|localizednumber }} kg
+                                            {{- data.weight|localizednumber }} kg
                                         </td>
                                         <td id="{{ optionId ~ 'netPrice' }}">
-                                            {{ data.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                                            {{- data.netPrice|localizedcurrency('EUR') -}}{# TODO currency #}
                                         </td>
                                         <td id="{{ optionId ~ 'taxGroup' }}">
-                                            {{ data.taxGroup }}
+                                            {{- data.taxGroup -}}
                                         </td>
                                     </tr>
                                     {# TODO translations ? #}
@@ -338,6 +343,11 @@
                 </div>
                 {% endfor %}
             </div>
+            {%- else -%}
+            <div class="show-widget show-widget-inline">
+                <em>{{ 'ekyna_core.value.none'|trans }}</em>
+            </div>
+            {%- endif -%}
         </div>
     </div>
 {% endspaceless %}
@@ -420,7 +430,9 @@
                             'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
                         }
                     }) }}
-
+                    {{ show_row(slot.required, 'checkbox', 'ekyna_core.field.required', {
+                        'id': slotId ~ 'required'
+                    }|merge(options)) }}
                     <table class="table table-stripped table-condensed">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>

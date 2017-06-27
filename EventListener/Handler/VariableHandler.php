@@ -4,7 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
 /**
@@ -48,6 +47,16 @@ class VariableHandler extends AbstractVariantHandler
         }
 
         return $this->ensureDisabledStockMode($variable);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handleChildDataChange(ResourceEventInterface $event)
+    {
+        $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
+
+        return $this->getVariableUpdater()->updateMinPrice($variable);
     }
 
     /**

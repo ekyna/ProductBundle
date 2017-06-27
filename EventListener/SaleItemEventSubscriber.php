@@ -4,7 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Event\SaleItemAdjustmentEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
@@ -20,9 +21,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SaleItemEventSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var ProductProvider
+     * @var ItemBuilder
      */
-    private $provider;
+    private $itemBuilder;
+
+    /**
+     * @var FormBuilder
+     */
+    private $formBuilder;
 
     /**
      * @var PriceResolver
@@ -33,12 +39,14 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     /**
      * Constructor.
      *
-     * @param ProductProvider $provider
-     * @param PriceResolver   $priceResolver
+     * @param ItemBuilder   $itemBuilder
+     * @param FormBuilder   $formBuilder
+     * @param PriceResolver $priceResolver
      */
-    public function __construct(ProductProvider $provider, PriceResolver $priceResolver)
+    public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder, PriceResolver $priceResolver)
     {
-        $this->provider = $provider;
+        $this->itemBuilder = $itemBuilder;
+        $this->formBuilder = $formBuilder;
         $this->priceResolver = $priceResolver;
     }
 
@@ -53,10 +61,13 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this
-            ->provider
-            ->getItemBuilder()
-            ->initialize($event->getItem());
+        $item = $event->getItem();
+
+        if ($sale = $item->getSale()) {
+            $this->itemBuilder->getFilter()->setCustomerGroup($sale->getCustomerGroup());
+        }
+
+        $this->itemBuilder->initialize($event->getItem());
     }
 
     /**
@@ -70,10 +81,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this
-            ->provider
-            ->getItemBuilder()
-            ->build($event->getItem());
+        $this->itemBuilder->build($event->getItem());
     }
 
     /**
@@ -111,10 +119,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this
-            ->provider
-            ->getFormBuilder()
-            ->buildItemForm($event->getForm(), $event->getItem());
+        $this->formBuilder->buildItemForm($event->getForm(), $event->getItem());
     }
 
     /**
@@ -128,9 +133,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     {
         $item = $event->getItem();
 
-        if ($this->provider->supportsRelative($item)) {
+        $provider = $this->itemBuilder->getProvider();
+
+        if ($provider->supportsRelative($item)) {
             try {
-                return $this->provider->resolve($item);
+                return $provider->resolve($item);
             } catch (SubjectException $e) {
             }
         }
