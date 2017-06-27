@@ -55,7 +55,9 @@ class BundleHandler extends AbstractHandler
 
         $changed = $this->getBundleUpdater()->updateStock($bundle);
 
-        return $changed || $this->ensureDisabledStockMode($bundle);
+        $changed |= $this->ensureDisabledStockMode($bundle);
+
+        return $changed;
     }
 
     /**

@@ -25,16 +25,12 @@ class BundleUpdater
         Model\ProductTypes::assertBundle($bundle);
 
         $justInTime = true;
-        $inStock = $virtualStock = 0;
-        $eda = null;
+        $inStock = $virtualStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
         if (0 < $bundleSlots->count()) {
             foreach ($bundleSlots as $slot) {
-
-                // TODO For configurable, look for availability over all choices
-
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
                 $product = $choice->getProduct();
@@ -49,13 +45,13 @@ class BundleUpdater
 
                 // In stock
                 $slotInStock = $product->getInStock() / $choice->getMinQuantity();
-                if (0 == $inStock || $slotInStock < $inStock) {
+                if (null === $inStock || $slotInStock < $inStock) {
                     $inStock = $slotInStock;
                 }
 
                 // Virtual stock
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
-                if (0 == $virtualStock || $slotVirtualStock < $virtualStock) {
+                if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
                     $virtualStock = $slotVirtualStock;
                 }
                 if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {

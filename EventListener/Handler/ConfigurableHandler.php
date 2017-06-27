@@ -55,7 +55,9 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->getConfigurableUpdater()->updateStock($bundle);
 
-        return $changed || $this->ensureDisabledStockMode($bundle);
+        $changed |= $this->ensureDisabledStockMode($bundle);
+
+        return $changed;
     }
 
     /**

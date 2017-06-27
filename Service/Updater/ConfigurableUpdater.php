@@ -22,21 +22,64 @@ class ConfigurableUpdater
      */
     public function updateStock(Model\ProductInterface $bundle)
     {
-        Model\ProductTypes::assertBundle($bundle);
+        Model\ProductTypes::assertConfigurable($bundle);
 
         $justInTime = true;
-        $inStock = $virtualStock = 0;
-        $eda = null;
+        $inStock = $virtualStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
         if (0 < $bundleSlots->count()) {
+            $slotsBestChoices = [];
+
+            // Resolve best choice for each slots
             foreach ($bundleSlots as $slot) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bestChoice */
+                $bestChoice = null;
 
-                // TODO For configurable, look for availability over all choices
+                foreach ($slot->getChoices() as $choice) {
+                    $product = $choice->getProduct();
 
-                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-                $choice = $slot->getChoices()->first();
+                    if (null === $bestChoice || $product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                        $bestChoice = $choice;
+                        continue;
+                    }
+
+                    $bestProduct = $bestChoice->getProduct();
+
+                    // In stock
+                    if (0 < $inStock = $product->getInStock() / $choice->getMinQuantity()) {
+                        $bestInStock = $bestProduct->getInStock() / $bestChoice->getMinQuantity();
+                        if ($bestInStock < $inStock) {
+                            $bestChoice = $choice;
+                            continue;
+                        }
+                    }
+
+                    // Virtual stock
+                    if (0 < $virtualStock = $product->getVirtualStock() / $choice->getMinQuantity()) {
+                        $bestVirtualStock = $bestProduct->getVirtualStock() / $bestChoice->getMinQuantity();
+                        if ($bestVirtualStock < $virtualStock) {
+                            $bestChoice = $choice;
+                            continue;
+                        }
+
+                        // Estimated date of arrival
+                        if (null !== $eda = $product->getEstimatedDateOfArrival()) {
+                            $bestEda = $bestProduct->getEstimatedDateOfArrival();
+                            if (null === $bestEda || $bestEda > $eda) {
+                                $bestChoice = $choice;
+                            }
+                        }
+                    }
+                }
+
+                $slotsBestChoices[] = $bestChoice;
+            }
+
+            // For each slot's best choice
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            foreach ($slotsBestChoices as $choice) {
                 $product = $choice->getProduct();
 
                 // State
@@ -49,13 +92,13 @@ class ConfigurableUpdater
 
                 // In stock
                 $slotInStock = $product->getInStock() / $choice->getMinQuantity();
-                if (0 == $inStock || $slotInStock < $inStock) {
+                if (null === $inStock || $slotInStock < $inStock) {
                     $inStock = $slotInStock;
                 }
 
                 // Virtual stock
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
-                if (0 == $virtualStock || $slotVirtualStock < $virtualStock) {
+                if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
                     $virtualStock = $slotVirtualStock;
                 }
                 if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
