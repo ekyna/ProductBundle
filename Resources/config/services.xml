@@ -372,6 +372,11 @@
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>
+        <service id="ekyna_product.product_reference.normalizer"
+                 class="Ekyna\Bundle\ProductBundle\Service\Serializer\ProductReferenceNormalizer">
+            <tag name="serializer.normalizer"/>
+            <tag name="serializer.denormalizer"/>
+        </service>
         <service id="ekyna_product.brand.normalizer"
                  class="Ekyna\Bundle\ProductBundle\Service\Serializer\BrandNormalizer"
                  parent="ekyna_resource.serializer.resource_normalizer">
