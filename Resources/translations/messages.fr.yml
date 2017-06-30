@@ -129,6 +129,10 @@ ekyna_product:
         alert:
             no_item: Aucune catégorie configuré
 
+    inventory:
+        title: Inventaire
+
+
     option:
         label:
             singular: Option
@@ -192,12 +196,14 @@ ekyna_product:
             new: Créer un nouveau produit
             edit: Modifier le produit <small>%name%</small>
             remove: Supprimer le produit <small>%name%</small>
+            convert: Convertir le produit <small>%name%</small>
         button:
             list: Liste des produits
             show: Détail du produit
             new: Nouveau produit
             edit: Modifier le produit
             remove: Supprimer le produit
+            convert: Convertir
         type:
             simple: Simple
             variable: Variable

@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ProductController
@@ -52,6 +53,13 @@ class ProductController extends ResourceController
         $response->headers->set('Content-Type', 'text/javascript');
 
         return $response;
+    }
+
+    public function convertAction(Request $request)
+    {
+        // TODO
+
+         throw new NotFoundHttpException('Not yet implemented.');
     }
 
     /**

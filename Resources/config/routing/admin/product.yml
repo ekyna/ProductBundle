@@ -29,6 +29,14 @@ ekyna_product_product_admin_edit:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_convert:
+    path: /{productId}/convert/{type}
+    defaults: { _controller: "ekyna_product.product.controller:convertAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+        type: '^[a-z]+$'
+
 ekyna_product_product_admin_tinymce:
     path: /{productId}/tinymce
     defaults: { _controller: "ekyna_product.product.controller:tinymceAction", field: description }

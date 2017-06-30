@@ -21,6 +21,22 @@
 
     <services>
 
+        <service id="ekyna_product.inventory"
+                 class="Ekyna\Bundle\ProductBundle\Service\Stock\Inventory">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product_stock_unit.repository"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="translator"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="session"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+        </service>
+        <service id="ekyna_product.inventory_search.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\InventorySearchType">
+            <argument type="service" id="ekyna_product.brand.repository"/>
+            <tag name="form.type"/>
+        </service>
+
         <!-- Product subject provider -->
         <service id="ekyna_product.commerce.subject_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">

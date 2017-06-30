@@ -22,7 +22,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     public function findNewBySubject(StockSubjectInterface $subject)
     {
         return $this->findBySubjectAndStates($subject, [
-            StockUnitStates::STATE_NEW
+            StockUnitStates::STATE_NEW,
         ]);
     }
 
@@ -32,7 +32,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     public function findPendingBySubject(StockSubjectInterface $subject)
     {
         return $this->findBySubjectAndStates($subject, [
-            StockUnitStates::STATE_PENDING
+            StockUnitStates::STATE_PENDING,
         ]);
     }
 
@@ -43,7 +43,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     {
         return $this->findBySubjectAndStates($subject, [
             StockUnitStates::STATE_PENDING,
-            StockUnitStates::STATE_READY
+            StockUnitStates::STATE_READY,
         ]);
     }
 
@@ -55,7 +55,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         return $this->findBySubjectAndStates($subject, [
             StockUnitStates::STATE_NEW,
             StockUnitStates::STATE_PENDING,
-            StockUnitStates::STATE_READY
+            StockUnitStates::STATE_READY,
         ]);
     }
 

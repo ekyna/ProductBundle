@@ -25,6 +25,7 @@
             {{ product|cms_tags({'text': false}) }}
         </div>
         <div class="actions">
+            {#{{ macros.convert_product_button(product) }}#}
             {{ admin_resource_btn(product, 'edit') }}
             {{ admin_resource_btn(product, 'remove') }}
         </div>

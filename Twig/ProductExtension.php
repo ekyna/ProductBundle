@@ -100,6 +100,10 @@ class ProductExtension extends \Twig_Extension
                 'product_create_types',
                 [Model\ProductTypes::class, 'getCreateTypes']
             ),
+            new \Twig_SimpleFunction(
+                'product_convert_types',
+                [Model\ProductTypes::class, 'getConversionTypes']
+            ),
         ];
     }
 

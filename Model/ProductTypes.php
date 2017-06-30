@@ -18,6 +18,23 @@ class ProductTypes extends AbstractConstants
     const TYPE_BUNDLE       = 'bundle';
     const TYPE_CONFIGURABLE = 'configurable';
 
+    /**
+     * Supported conversion types map.
+     *
+     * @var array
+     */
+    const CONVERSION_MAP = [
+        ProductTypes::TYPE_SIMPLE       => [
+            ProductTypes::TYPE_VARIABLE,
+            ProductTypes::TYPE_BUNDLE,
+        ],
+        ProductTypes::TYPE_VARIABLE     => [],
+        ProductTypes::TYPE_VARIANT      => [],
+        ProductTypes::TYPE_BUNDLE       => [
+            ProductTypes::TYPE_CONFIGURABLE,
+        ],
+        ProductTypes::TYPE_CONFIGURABLE => [],
+    ];
 
     /**
      * {@inheritdoc}
@@ -27,10 +44,10 @@ class ProductTypes extends AbstractConstants
         $prefix = 'ekyna_product.product.type.';
 
         return [
-            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE,       'default'],
-            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'primary'],
-            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT,      'success'],
-            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE,       'warning'],
+            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE, 'default'],
+            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE, 'primary'],
+            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT, 'success'],
+            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE, 'warning'],
             static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'danger'],
         ];
     }
@@ -253,9 +270,22 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Returns the available types the given product can be converted to.
+     *
+     * @param ProductInterface $product
+     *
+     * @return string[]
+     */
+    static public function getConversionTypes(ProductInterface $product)
+    {
+        return static::CONVERSION_MAP[$product->getType()];
+    }
+
+    /**
      * Asserts that the product has the given type.
      *
      * @param ProductInterface $product
+     * @param string           $type
      *
      * @throws InvalidArgumentException
      */

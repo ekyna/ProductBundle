@@ -1,0 +1,20 @@
+<tr data-id="{{ id }}">
+    <td>{{ brand }}</td>
+    <td><a href="{{ url }}">{{ designation }}</a></td>
+    <td>{{ reference }}</td>
+    <td>{{ geocode }}</td>
+    <td><span class="label label-{{ stock_mode_theme }}">{{ stock_mode_label }}</span></td>
+    <td><span class="label label-{{ stock_state_theme }}">{{ stock_state_label }}</span></td>
+    <td class="text-right">{{ in_stock }}</td>
+    <td class="text-right">{{ virtual_stock }}</td>
+    <td class="text-right">{{ eda }}</td>
+    <td class="text-right">{{ ordered }}</td>
+    <td class="text-right">{{ received }}</td>
+    <td class="text-right">{{ sold }}</td>
+    <td class="text-right">{{ shipped }}</td>
+    <td class="text-right">
+        <a href="javascript: void(0)" class="btn btn-xs btn-default stock-units">
+            <span class="fa fa-info"></span>
+        </a>
+    </td>
+</tr>

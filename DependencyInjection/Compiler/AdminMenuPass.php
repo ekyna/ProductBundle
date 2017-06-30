@@ -83,6 +83,15 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_pricing_admin_home',
             'label'    => 'ekyna_product.pricing.label.plural',
             'resource' => 'ekyna_product_pricing',
+            'position' => 98,
+        ]]);
+
+        // Inventory
+        $pool->addMethodCall('createEntry', ['catalog', [
+            'name'     => 'inventory',
+            'route'    => 'ekyna_product_inventory_admin_index',
+            'label'    => 'ekyna_product.inventory.title',
+            'resource' => 'ekyna_product_product',
             'position' => 99,
         ]]);
 

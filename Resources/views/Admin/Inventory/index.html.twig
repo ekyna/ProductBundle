@@ -1,0 +1,138 @@
+{% extends "EkynaAdminBundle:Entity:layout.html.twig" %}
+
+{% macro sortLinkAttribute(data, field) %}
+{% spaceless %}
+    {%- set sortClass = 'none' -%}
+    {%- if data.sortBy == field -%}
+        {% set sortClass =  data.sortDir|lower %}
+    {%- endif -%}
+    href="javascript:void(0)" class="{{ sortClass }}" data-by="{{ field }}"
+{% endspaceless %}
+{% endmacro sortLinkAttribute %}
+
+{% import _self as macro %}
+
+{% block title %}
+    <h1>{{ 'ekyna_product.inventory.title'|trans }}</h1>
+{% endblock title %}
+
+{% block actions %}
+
+{% endblock actions %}
+
+{% block main %}
+{% spaceless %}
+    {{ form_start(form) }}
+    {{ bootstrap_set_sizing('sm') }}
+    <table id="inventory_filters">
+        <thead>
+        <tr>
+            {%- for field in ['brand', 'designation', 'reference', 'geocode', 'mode', 'state'] -%}
+            <th>{{ form_label(form[field]) }}</th>
+            {%- endfor -%}
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {%- for field in ['brand', 'designation', 'reference', 'geocode', 'mode', 'state'] -%}
+            <td>{{ form_widget(form[field]) }}{{ form_errors(form[field]) }}</td>
+            {%- endfor %}
+            <td>{{ form_widget(form.submit) }}</td>
+            <td>{{ form_widget(form.reset) }}</td>
+        </tr>
+        </tbody>
+    </table>
+    {{ form_errors(form) }}
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-condensed table-hover">
+            <thead id="inventory_sort">
+                <tr>
+                    <th class="sort">
+                        <a {{ macro.sortLinkAttribute(data, 'brand') }}>
+                            {{- 'ekyna_product.brand.label.singular'|trans -}}
+                        </a>
+                    </th>
+                    <th class="sort">
+                        <a {{ macro.sortLinkAttribute(data, 'designation') }}>
+                            {{- 'ekyna_core.field.designation'|trans -}}
+                        </a>
+                    </th>
+                    <th class="sort">
+                        <a {{ macro.sortLinkAttribute(data, 'reference') }}>
+                            {{- 'ekyna_core.field.reference'|trans -}}
+                        </a>
+                    </th>
+                    <th class="sort">
+                        <a {{ macro.sortLinkAttribute(data, 'geocode') }}>
+                            {{- 'ekyna_product.product.field.geocode'|trans -}}
+                        </a>
+                    </th>
+                    <th>
+                        {{- 'ekyna_core.field.mode'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_core.field.status'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_subject.field.in_stock'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_subject.field.virtual_stock'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_subject.field.estimated_date_of_arrival'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_unit.field.ordered_quantity'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_unit.field.received_quantity'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_unit.field.sold_quantity'|trans -}}
+                    </th>
+                    <th>
+                        {{- 'ekyna_commerce.stock_unit.field.shipped_quantity'|trans -}}
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="inventory_wait">
+                    <td colspan="10">
+                        <p class="text-center">
+                            Please wait&hellip;
+                        </p>
+                    </td>
+                </tr>
+                <tr id="inventory_none" style="display:none">
+                    <td colspan="10">
+                        <p class="text-center">
+                            Aucun résultat.
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody id="inventory_list"></tbody>
+        </table>
+    </div>
+{% endspaceless %}
+{% endblock main %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">require(['ekyna-product/inventory']);</script>
+{% endblock javascripts %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/ekynaproduct/css/inventory.css') }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}
