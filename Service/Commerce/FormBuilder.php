@@ -196,9 +196,9 @@ class FormBuilder
                 $options = [];
                 foreach ($optionGroup->getOptions() as $option) {
                     $options[] = [
-                        'id'    => $option->getId(),
-                        'label' => $this->optionChoiceLabel($option),
-                        'price' => floatval($option->getNetPrice()),
+                        'id'     => $option->getId(),
+                        'label'  => $this->optionChoiceLabel($option),
+                        'config' => $this->buildOptionConfig($option),
                     ];
                 }
                 $groups[] = [
@@ -214,6 +214,8 @@ class FormBuilder
             $config = [
                 'price'  => floatval($variant->getNetPrice()),
                 'groups' => $groups,
+                'thumb'  => $this->getProductImagePath($variant),
+                'image'  => $this->getProductImagePath($variant, 'media_front'),
             ];
 
             return [
@@ -263,18 +265,36 @@ class FormBuilder
     public function optionChoiceAttr(Model\OptionInterface $option = null)
     {
         if (null !== $option) {
-            if (null !== $product = $option->getProduct()) {
-                $netPrice = $product->getNetPrice();
-            } else {
-                $netPrice = $option->getNetPrice();
-            }
-
             return [
-                'data-price' => floatval($netPrice),
+                'data-config' => json_encode($this->buildOptionConfig($option)),
             ];
         }
 
         return [];
+    }
+
+    /**
+     * Builds the option config.
+     *
+     * @param Model\OptionInterface $option
+     *
+     * @return array
+     */
+    private function buildOptionConfig(Model\OptionInterface $option)
+    {
+        $config = [];
+
+        if (null !== $product = $option->getProduct()) {
+            $netPrice = $product->getNetPrice();
+            $config['thumb'] = $this->getProductImagePath($product);
+            $config['image'] = $this->getProductImagePath($product, 'media_front');
+        } else {
+            $netPrice = $option->getNetPrice();
+        }
+
+        $config['price'] = floatval($netPrice);
+
+        return $config;
     }
 
     /**

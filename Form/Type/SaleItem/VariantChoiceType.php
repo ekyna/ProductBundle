@@ -39,7 +39,7 @@ class VariantChoiceType extends AbstractType
      * Constructor.
      *
      * @param ItemBuilder $itemBuilder
-     * @param FormBuilder  $formHelper
+     * @param FormBuilder $formHelper
      */
     public function __construct(ItemBuilder $itemBuilder, FormBuilder $formHelper)
     {
@@ -93,7 +93,7 @@ class VariantChoiceType extends AbstractType
 
         $resolver
             ->setDefaults([
-                'label'         => 'ekyna_product.variant.label.singular',
+                'label'         => 'ekyna_product.sale_item_configure.variant',
                 'property_path' => 'data[' . ItemBuilder::VARIANT_ID . ']',
                 'constraints'   => [
                     new NotNull(),

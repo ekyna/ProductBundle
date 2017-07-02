@@ -108,6 +108,9 @@ ekyna_product:
             expression: Expression
         button:
             add: Ajouter une règle
+    cart:
+        message:
+            success: Cet article a bien été ajouté à votre panier
 
     category:
         label:
@@ -244,6 +247,7 @@ ekyna_product:
             plural: Unitées de stock
 
     sale_item_configure:
+        variant: Version
         choose_option: Choisissez une option
         from: "à partir de {{min}}"
         range: "{{min}} à {{max}}"

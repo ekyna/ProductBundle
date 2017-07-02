@@ -41,8 +41,14 @@
                 <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
             </div>
         </div>
-        <div class="col-sm-4 col-sm-pull-8 choice-image">
-            <img src="{{ asset(itemForm.vars.choice_image) }}" class="img-responsive">
+        <div class="col-sm-4 col-sm-pull-8">
+            <div class="item-gallery" id="{{ itemForm.vars.id }}_gallery">
+                <a href="{{ asset(itemForm.vars.choice_image) }}"
+                   title="{{ itemForm.vars.choice_brand ~ ' ' ~ itemForm.vars.choice_product }}">
+                    <img src="{{ asset(itemForm.vars.choice_thumb) }}">
+                </a>
+                <div class="item-gallery-children"></div>
+            </div>
         </div>
     </div>
 {% endspaceless %}

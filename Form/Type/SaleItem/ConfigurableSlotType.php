@@ -193,7 +193,8 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['choice_brand'] = $product->getBrand()->getTitle();
         $view->vars['choice_product'] = $product->getFullTitle();
         $view->vars['choice_description'] = $product->getDescription();
-        $view->vars['choice_image'] = $this->formBuilder->getProductImagePath($product);
+        $view->vars['choice_thumb'] = $this->formBuilder->getProductImagePath($product);
+        $view->vars['choice_image'] = $this->formBuilder->getProductImagePath($product, 'media_front');
     }
 
     /**
