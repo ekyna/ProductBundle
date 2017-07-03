@@ -550,20 +550,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$gallery = undefined;
             var $gallery = $('#' + this.id + '_gallery');
             if (1 === $gallery.size()) {
-                this.$gallery = $gallery.on('click', 'a', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    var src = String($(this).attr('href'));
-                    if (src.length) {
-                        $.fancybox.open({
-                            src: src,
-                            caption: $(this).attr('title')
-                        });
-                    }
-
-                    return false;
-                });
+                this.$gallery = $gallery;
             }
 
             // Quantity
@@ -880,6 +867,22 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         });
     };
+
+    $('.sale-item-configure .item-gallery').on('click', 'a', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var src = String($(this).attr('href'));
+        if (src.length) {
+            $.fancybox.open({
+                src: src,
+                caption: $(this).attr('title'),
+                protect: true
+            });
+        }
+
+        return false;
+    });
 
     return {
         init: function($element) {

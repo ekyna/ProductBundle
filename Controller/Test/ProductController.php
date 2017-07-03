@@ -35,7 +35,9 @@ class ProductController extends Controller
         // Add to cart form
         $cartHelper = $this->get('ekyna_commerce.cart_helper');
         $form = $cartHelper
-            ->createAddSubjectToCartForm($product)
+            ->createAddSubjectToCartForm($product, [
+                'extended' => false,
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Ajouter',
             ]);
