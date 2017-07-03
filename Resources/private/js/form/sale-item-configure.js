@@ -893,3 +893,4 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         }
     };
 });
+

@@ -11,6 +11,7 @@ use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -75,7 +76,7 @@ class FormBuilder
         PriceCalculator $priceCalculator,
         LocaleProviderInterface $localeProvider,
         TranslatorInterface $translator,
-        $noImagePath = 'bundles/ekynaproduct/img/no-image.gif'
+        $noImagePath = '/bundles/ekynaproduct/img/no-image.gif'
     ) {
         $this->productProvider = $productProvider;
         $this->productFilter = $productFilter;
@@ -123,6 +124,26 @@ class FormBuilder
                 'class' => 'sale-item-quantity',
                 'min'   => 1,
             ],
+        ]);
+    }
+
+    /**
+     * Builds the sale item form view.
+     *
+     * @param FormView          $view
+     * @param SaleItemInterface $item
+     */
+    public function buildItemFormView(FormView $view, SaleItemInterface $item)
+    {
+        /** @var Model\ProductInterface $product */
+        $product = $this->productProvider->resolve($item);
+
+        $view->vars = array_replace($view->vars, [
+            'brand'       => $product->getBrand()->getTitle(),
+            'product'     => $product->getFullTitle(),
+            'description' => $product->getDescription(),
+            'thumb'       => $this->getProductImagePath($product),
+            'image'       => $this->getProductImagePath($product, 'media_front'),
         ]);
     }
 

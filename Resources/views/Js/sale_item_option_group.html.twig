@@ -3,8 +3,8 @@
     <div class="col-xs-9">
         <select name="{{ parent }}[option_group_{{ id }}][choice]"
                 {% if required %} required="required"{% endif %} class="sale-item-option form-control">
-            {% if not required %}<option disabled="disabled" selected="selected" value="">{{ placeholder }}</option>{% endif %}
-            {% for option in options %}<option value="{{ option.id }}" data-config="{{ option.config|json_encode }}">{{ option.label }}</option>{% endfor %}
+            {% if not required %}<option disabled="disabled" selected="selected" value>{{ placeholder }}</option>{% endif %}
+            {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode }}'>{{ option.label }}</option>{% endfor %}
         </select>
     </div>
 </div>

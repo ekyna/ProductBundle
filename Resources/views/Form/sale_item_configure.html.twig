@@ -9,11 +9,12 @@
 {% spaceless %}
     <div class="row">
         <div class="col-sm-8 col-sm-push-4">
-            <h3 class="choice-title">
-                <strong>{{ itemForm.vars.choice_brand }}</strong>
-                {{ itemForm.vars.choice_product }}
+            <h3 class="product-title">
+                <strong>{{ itemForm.vars.choice_brand }}</strong> {{ itemForm.vars.choice_product -}}
             </h3>
-            <div class="choice-description">{{ itemForm.vars.choice_description|truncate_html(128)|raw }}</div>
+            <div class="product-description">
+                {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
+            </div>
 
             {%- if itemForm.variant is defined -%}
                 {{- form_row(itemForm.variant) -}}
@@ -35,7 +36,7 @@
                                 {{- form_widget(itemForm.quantity, {'attr': {'class': 'input-sm'}}) -}}
                             </div>
                         </div>
-                        {{ bootstrap_restore_form_settings() }}
+                        {{- bootstrap_restore_form_settings() -}}
                     </div>
                 </div>
                 <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
@@ -60,7 +61,7 @@
     {# TODO form_errors(form) #}
     <div class="bundle-slot">
         <div class="slot-info">
-            {% if 1 < form.choice.children|length %}
+            {%- if 1 < form.choice.children|length -%}
             <ul class="slot-buttons">
                 {%- for child in form.choice -%}
                 <li>
@@ -71,21 +72,21 @@
                 </li>
                 {%- endfor -%}
             </ul>
-            {% else %}
+            {%- else -%}
             {{- form_widget(form.choice.children|first, {'attr': {'data-index': 0}}) -}}
-            {% endif %}
+            {%- endif -%}
             <h4 class="slot-title">{{ form.vars.slot_title }}</h4>
             <div class="slot-description">{{ form.vars.slot_description|raw }}</div>
         </div>
         <div class="slot-choices{% if 1 == form.choice.children|length %} single-choice{% endif %}">
-            {% if 1 < form.choice.children|length %}
+            {%- if 1 < form.choice.children|length -%}
             <a href="javascript: void(0)" class="prev">
                 <span class="fa fa-chevron-left"></span>
             </a>
             <a href="javascript: void(0)" class="next">
                 <span class="fa fa-chevron-right"></span>
             </a>
-            {% endif %}
+            {%- endif -%}
             <fieldset id="{{ form.vars.id }}" class="slot-choice-form"
                       data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.pricing|json_encode|raw }}'>
                 {%- set itemForm = form -%}
@@ -138,30 +139,54 @@
 
     {%- if form.configuration is defined -%}
         {{- form_widget(form.configuration) -}}
+        <div class="sale-item-inner sale-item-footer">
+    {% else %}
+        <div class="sale-item-inner">
+            <div class="row">
+                <div class="col-sm-8 col-sm-push-4">
+                    <h3 class="product-title">
+                        <strong>{{ form.vars.brand }}</strong> {{ form.vars.product -}}
+                    </h3>
+                    <div class="product-description">
+                        {{- form.vars.description|truncate_html(128)|raw -}}
+                    </div>
     {%- endif %}
 
-    <div class="sale-item-inner{% if form.configuration is defined %} sale-item-footer{% endif %}">
+        {%- if form.variant is defined -%}
+            {{- form_row(form.variant) -}}
+        {%- endif -%}
 
-    {% if form.variant is defined -%}
-        {{- form_row(form.variant) -}}
-    {%- endif %}
+        {%- if form.options is defined -%}
+            {{- form_widget(form.options) -}}
+        {%- endif -%}
 
-    {% if form.options is defined -%}
-        {{- form_widget(form.options) -}}
-    {%- endif %}
-
-    <div class="row">
-        <div class="col-xs-6">
-            {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
+        <div class="row">
+            <div class="col-xs-6">
+                {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
+            </div>
+            <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
         </div>
-        <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
-    </div>
+
+    {%- if form.configuration is not defined -%}
+        </div>
+        <div class="col-sm-4 col-sm-pull-8">
+            <div class="item-gallery" id="{{ form.vars.id }}_gallery">
+                <a href="{{ asset(form.vars.image) }}"
+                   title="{{ form.vars.brand ~ ' ' ~ form.vars.product }}">
+                    <img src="{{ asset(form.vars.thumb) }}">
+                </a>
+                <div class="item-gallery-children"></div>
+            </div>
+        </div>
+    </div>{# End .row #}
+    {%- endif -%}
 
     {%- if form.submit is defined -%}
         <p class="text-center">
             {{- form_widget(form.submit) -}}
         </p>
     {%- endif %}
+    </div>{# End .sale-item-inner #}
 
     </div>
 {% endspaceless %}

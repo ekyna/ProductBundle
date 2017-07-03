@@ -123,6 +123,20 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Sale item build form view event handler.
+     *
+     * @param SaleItemFormEvent $event
+     */
+    public function onSaleItemBuildFormView(SaleItemFormEvent $event)
+    {
+        if (!$product = $this->getProductFromEvent($event)) {
+            return;
+        }
+
+        $this->formBuilder->buildItemFormView($event->getView(), $event->getItem());
+    }
+
+    /**
      * Returns the product from the given event.
      *
      * @param SaleItemEvent $event
@@ -155,6 +169,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             SaleItemEvents::BUILD         => ['onSaleItemBuild'],
             SaleItemEvents::ADJUSTMENTS   => ['onSaleItemAdjustments'],
             SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
+            SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];
     }
 }

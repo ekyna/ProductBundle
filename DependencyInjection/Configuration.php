@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('no_image')
-                            ->defaultValue('bundles/ekynaproduct/img/no-image.gif')
+                            ->defaultValue('/bundles/ekynaproduct/img/no-image.gif')
                         ->end()
                         ->scalarNode('sale_item_form_theme')
                             ->defaultValue('EkynaProductBundle:Form:sale_item_configure.html.twig')
