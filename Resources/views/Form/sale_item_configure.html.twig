@@ -142,7 +142,7 @@
     {%- endif %}
 
     <div class="sale-item-inner{% if form.configuration is defined %} sale-item-footer{% endif %}">
-        {%- if form.vars.extended -%}
+        {%- if form.vars.extended and form.configuration is not defined -%}
         <div class="row">
             <div class="col-sm-8 col-sm-push-4">
                 <h3 class="product-title">
@@ -151,42 +151,42 @@
                 <div class="product-description">
                     {{- form.vars.description|truncate_html(128)|raw -}}
                 </div>
-    {% endif %}
+        {% endif %}
 
-    {%- if form.variant is defined -%}
-        {{- form_row(form.variant) -}}
-    {%- endif -%}
+        {%- if form.variant is defined -%}
+            {{- form_row(form.variant) -}}
+        {%- endif -%}
 
-    {%- if form.options is defined -%}
-        {{- form_widget(form.options) -}}
-    {%- endif -%}
+        {%- if form.options is defined -%}
+            {{- form_widget(form.options) -}}
+        {%- endif -%}
 
-    <div class="row">
-        <div class="col-xs-6">
-            {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
-        </div>
-        <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
-    </div>
-
-    {%- if form.vars.extended and form.configuration is not defined -%}
-        </div>
-        <div class="col-sm-4 col-sm-pull-8">
-            <div class="item-gallery" id="{{ form.vars.id }}_gallery">
-                <a href="{{ asset(form.vars.image) }}"
-                   title="{{ form.vars.brand ~ ' ' ~ form.vars.product }}">
-                    <img src="{{ asset(form.vars.thumb) }}">
-                </a>
-                <div class="item-gallery-children"></div>
+        <div class="row">
+            <div class="col-xs-6">
+                {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
             </div>
+            <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
         </div>
-    </div>{# End .row #}
-    {%- endif -%}
 
-    {%- if form.submit is defined -%}
+        {%- if form.vars.extended and form.configuration is not defined -%}
+            </div>
+            <div class="col-sm-4 col-sm-pull-8">
+                <div class="item-gallery" id="{{ form.vars.id }}_gallery">
+                    <a href="{{ asset(form.vars.image) }}"
+                       title="{{ form.vars.brand ~ ' ' ~ form.vars.product }}">
+                        <img src="{{ asset(form.vars.thumb) }}">
+                    </a>
+                    <div class="item-gallery-children"></div>
+                </div>
+            </div>
+        </div>{# End .row #}
+        {%- endif -%}
+
+        {%- if form.submit is defined -%}
         <p class="text-center">
             {{- form_widget(form.submit) -}}
         </p>
-    {%- endif %}
+        {%- endif %}
     </div>{# End .sale-item-inner #}
 {% endspaceless %}
 {% endblock sale_item_configure_widget %}

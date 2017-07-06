@@ -1,5 +1,6 @@
 ekyna_product:
     catalog: Catalogue
+    leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
 
     attribute:
         label:
@@ -265,5 +266,3 @@ ekyna_product:
             list: Variantes <small>Liste des variantes</small>
         button:
             new: Nouvelle variante
-        help:
-            leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.

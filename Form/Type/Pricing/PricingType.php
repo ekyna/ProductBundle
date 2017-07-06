@@ -55,7 +55,18 @@ class PricingType extends ResourceFormType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'ekyna_core.field.name',
+                'label'    => 'ekyna_core.field.name',
+                'required' => false,
+                'attr'     => [
+                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                ],
+            ])
+            ->add('designation', TextType::class, [
+                'label'    => 'ekyna_core.field.designation',
+                'required' => false,
+                'attr'     => [
+                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                ],
             ])
             ->add('groups', ResourceType::class, [
                 'label'    => 'ekyna_commerce.customer_group.label.plural',

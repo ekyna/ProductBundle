@@ -23,7 +23,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->createQueryBuilder($this->getAlias())
             ->select([
                 'p.id as id',
-                'p.name as name',
+                'p.designation as designation',
                 'g.id as group_id',
                 'c.id as country_id',
                 'b.id as brand_id',

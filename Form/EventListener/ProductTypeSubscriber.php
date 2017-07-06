@@ -145,7 +145,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField([
                 'required' => false,
                 'attr'     => [
-                    'help_text' => 'ekyna_product.variant.help.leave_blank_to_auto_generate',
+                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
                 ],
             ])
             ->addVisibleField()

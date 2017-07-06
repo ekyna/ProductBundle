@@ -35,16 +35,11 @@ class PriceResolver
     protected $countryRepository;
 
     /**
-     * @TODO
-     */
-    protected $cache;
-
-    /**
      * @var array
      *
      * [
      *     '{hash}' => [
-     *         'name' => '{name}',
+     *         'designation' => '{designation}',
      *         'rules' => [
      *             {min_quantity} => {percent}
      *         ],
@@ -133,7 +128,7 @@ class PriceResolver
                     if ($rule['quantity'] <= $quantity) {
                         return new AdjustmentData(
                             AdjustmentModes::MODE_PERCENT,
-                            sprintf('%s -%s%%', $pricing['name'], $rule['percent']), // TODO translation / number_format
+                            sprintf('%s %s%%', $pricing['designation'], $rule['percent']), // TODO translation / number_format
                             $rule['percent']
                         );
                     }

@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityInterface;
@@ -30,9 +31,25 @@ interface PricingInterface extends TaggedEntityInterface
     public function setName($name);
 
     /**
+     * Returns the designation.
+     *
+     * @return string
+     */
+    public function getDesignation();
+
+    /**
+     * Sets the designation.
+     *
+     * @param string $designation
+     *
+     * @return $this|PricingInterface
+     */
+    public function setDesignation($designation);
+
+    /**
      * Returns the customer groups.
      *
-     * @return CustomerGroupInterface[]
+     * @return Collection|CustomerGroupInterface[]
      */
     public function getGroups();
 
@@ -66,7 +83,7 @@ interface PricingInterface extends TaggedEntityInterface
     /**
      * Returns the countries.
      *
-     * @return CountryInterface[]
+     * @return Collection|CountryInterface[]
      */
     public function getCountries();
 
@@ -100,7 +117,7 @@ interface PricingInterface extends TaggedEntityInterface
     /**
      * Returns the brands.
      *
-     * @return BrandInterface[]
+     * @return Collection|BrandInterface[]
      */
     public function getBrands();
 
@@ -134,7 +151,7 @@ interface PricingInterface extends TaggedEntityInterface
     /**
      * Returns the rules.
      *
-     * @return PricingRuleInterface[]
+     * @return Collection|PricingRuleInterface[]
      */
     public function getRules();
 

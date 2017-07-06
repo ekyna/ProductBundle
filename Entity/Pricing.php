@@ -30,6 +30,11 @@ class Pricing implements PricingInterface
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $designation;
+
+    /**
      * @var CustomerGroupInterface[]
      */
     protected $groups;
@@ -80,9 +85,7 @@ class Pricing implements PricingInterface
     }
 
     /**
-     * Returns the name.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName()
     {
@@ -90,15 +93,29 @@ class Pricing implements PricingInterface
     }
 
     /**
-     * Sets the name.
-     *
-     * @param string $name
-     *
-     * @return Pricing
+     * @inheritdoc
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDesignation()
+    {
+        return $this->designation;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setDesignation($designation)
+    {
+        $this->designation = $designation;
 
         return $this;
     }

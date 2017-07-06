@@ -80,7 +80,7 @@ class OptionGroupType extends Form\AbstractType
             ->create('choice', ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::OPTION_ID . ']',
-                'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
+                'placeholder'   => $required ? null : 'ekyna_product.sale_item_configure.choose_option',
                 'required'      => $required,
                 'constraints'   => $constraints,
                 'select2'       => false,

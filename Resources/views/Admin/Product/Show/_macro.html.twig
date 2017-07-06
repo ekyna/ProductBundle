@@ -318,7 +318,11 @@
                                         {%- if option.product -%}
                                             <a href="{{ admin_resource_path(option.product) }}">{{ data.designation }}</a>
                                         {%- else -%}
-                                            {{ data.designation }}
+                                            {% if option.product %}
+                                                {{ option.product.fullDesignation }}
+                                            {% else %}
+                                                {{ data.designation }}
+                                            {% endif %}
                                         {%- endif -%}
                                         </td>
                                         <td id="{{ optionId ~ 'reference' }}">

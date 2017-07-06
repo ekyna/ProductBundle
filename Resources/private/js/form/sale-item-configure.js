@@ -168,7 +168,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         },*/
 
         getLabel: function() {
-            return this.$choice.find('.choice-title').html();
+            return this.$choice.find('.product-title').html();
         }
     });
 
@@ -199,10 +199,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$select = this.$element.find('select');
             this.$option = this.option = undefined;
 
-            // hide if only Placeholder + Single option
-            if (2 >= this.$select.children().length && this.$select.prop('required')) {
-                this.$element.hide();
-            }
+            this.updateDisplay();
 
             // Image
             this.$image = this.optionGroups.item.$gallery.find('a[data-option-id="' + this.$element.data('id') + '"]');
@@ -213,6 +210,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.selectOption();
             this.bindEvents();
+        },
+
+        updateDisplay: function() {
+            // hide if only Placeholder + Single option
+            if (this.$element.find('label').hasClass('required') && 1 >= this.$select.children().length) {
+                this.$element.hide();
+            }
         },
 
         bindEvents: function() {
@@ -377,7 +381,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 return;
             }
 
-            if (0 === this.$groups.filter('[data-id="' +  data.id + '"]')) {
+            var $group = this.$groups.filter('[data-id="' +  data.id + '"]');
+            if (1 === $group.size()) {
+                $group.data('optionGroup').updateDisplay();
                 return;
             }
 

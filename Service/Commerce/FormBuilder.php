@@ -188,7 +188,9 @@ class FormBuilder
     public function variantChoiceLabel(Model\ProductInterface $variant = null)
     {
         if (null !== $variant) {
-            $label = $variant->getFullTitle();
+            if (0 == strlen($label = $variant->getTitle())) {
+                $label = $variant->getAttributesTitle();
+            }
 
             if (0 < $netPrice = $variant->getNetPrice()) {
                 // TODO User currency
@@ -213,9 +215,14 @@ class FormBuilder
         if (null !== $variant) {
             $groups = [];
 
-            foreach ($variant->getOptionGroups() as $optionGroup) {
+            $optionGroups = $this->productFilter->getOptionGroups($variant);
+
+            /** @var Model\OptionGroupInterface $optionGroup */
+            foreach ($optionGroups as $optionGroup) {
+                $groupOptions = $this->productFilter->getGroupOptions($optionGroup);
                 $options = [];
-                foreach ($optionGroup->getOptions() as $option) {
+                /** @var Model\OptionInterface $option */
+                foreach ($groupOptions as $option) {
                     $options[] = [
                         'id'     => $option->getId(),
                         'label'  => $this->optionChoiceLabel($option),
@@ -258,7 +265,13 @@ class FormBuilder
     {
         if (null !== $option) {
             if (null !== $product = $option->getProduct()) {
-                $label = $product->getFullTitle();
+                if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
+                    if (0 == strlen($label = $product->getTitle())) {
+                        $label = $product->getAttributesTitle();
+                    }
+                } else {
+                    $label = $product->getFullTitle();
+                }
                 $netPrice = $product->getNetPrice();
             } else {
                 $label = $option->getTitle();

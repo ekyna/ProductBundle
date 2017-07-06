@@ -10,6 +10,11 @@
     <div class="tab-content">
         <div class="tab-pane active" id="pricing-general">
             {{ form_row(form.name) }}
+            {{ form_row(form.designation) }}
+            {{ form_row(form.groups) }}
+            {{ form_row(form.countries) }}
+            {{ form_row(form.brands) }}
+            {{ form_row(form.rules) }}
         </div>
     </div>
     {{ form_rest(form) }}

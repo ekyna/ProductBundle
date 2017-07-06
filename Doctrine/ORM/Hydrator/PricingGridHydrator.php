@@ -55,8 +55,8 @@ class PricingGridHydrator extends AbstractHydrator
             $result[$hash]['rules'][] = $rule;
         } else {
             $result[$hash] = [
-                'name'  => $tmp['name'],
-                'rules' => [$rule],
+                'designation' => $tmp['designation'],
+                'rules'       => [$rule],
             ];
         }
     }

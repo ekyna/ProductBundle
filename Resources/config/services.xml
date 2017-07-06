@@ -251,6 +251,12 @@
             <argument id="ekyna_commerce.cart.session_provider" type="service"/>
         </service>
 
+        <!-- Pricing event listener -->
+        <service id="ekyna_product.pricing.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber">
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Twig extension -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
