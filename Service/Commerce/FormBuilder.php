@@ -155,26 +155,36 @@ class FormBuilder
      */
     public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice)
     {
+        // TODO Disable fields for non selected bundle choices.
         $this->buildProductForm($form, $bundleChoice->getProduct());
 
         $min = $bundleChoice->getMinQuantity();
         $max = $bundleChoice->getMaxQuantity();
 
+        $constraints = [
+            new Assert\Range([
+                'min' => $min,
+                'max' => $max,
+            ]),
+        ];
+
+        $attr = [
+            'class' => 'sale-item-quantity',
+            'min'   => $min,
+            'max'   => $max,
+        ];
+
+        $disabled = $min === $max;
+        if ($disabled) {
+            $attr['data-locked'] = "1";
+        }
+
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [
             'label'       => 'ekyna_core.field.quantity',
-            'disabled'    => $min === $max,
-            'constraints' => [
-                new Assert\Range([
-                    'min' => $min,
-                    'max' => $max,
-                ]),
-            ],
-            'attr'        => [
-                'class' => 'sale-item-quantity',
-                'min'   => $min,
-                'max'   => $max,
-            ],
+            'disabled'    => $disabled,
+            'constraints' => $constraints,
+            'attr'        => $attr,
         ]);
     }
 
@@ -418,7 +428,7 @@ class FormBuilder
                 'variable' => $product,
             ]);
 
-            // Configurable : add configuration form
+        // Configurable : add configuration form
         } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             $repository->loadConfigurableSlots($product);
 

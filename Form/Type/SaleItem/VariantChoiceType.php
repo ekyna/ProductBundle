@@ -62,12 +62,13 @@ class VariantChoiceType extends AbstractType
         $builder->addModelTransformer($transformer);
 
         // On post submit, build item from variant
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($transformer) {
-            $data = $event->getData();
-
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             $item = $event->getForm()->getParent()->getData();
 
-            $this->itemBuilder->buildFromVariant($item, $transformer->transform($data));
+            /** @var Model\ProductInterface $variant */
+            $variant = $event->getData();
+
+            $this->itemBuilder->buildFromVariant($item, $variant);
         });
     }
 

@@ -105,7 +105,7 @@ class ItemBuilder
                 throw new InvalidArgumentException('Unexpected product type');
         }
 
-        $this->buildOptions($item, $product);
+        $this->buildOptions($item);
     }
 
     /**
@@ -140,6 +140,10 @@ class ItemBuilder
 
         $variant = null;
         $variants = $this->filter->getVariants($product);
+
+        if (empty($variants)) {
+            throw new InvalidArgumentException("Variable product must have at least one variant.");
+        }
 
         if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
             foreach ($variants as $v) {
@@ -329,11 +333,10 @@ class ItemBuilder
      * Builds the item's options.
      *
      * @param SaleItemInterface $item
-     * @param ProductInterface  $product
      */
-    public function buildOptions(SaleItemInterface $item, ProductInterface $product)
+    public function buildOptions(SaleItemInterface $item)
     {
-        $optionGroups = $this->filter->getOptionGroups($product);
+        $optionGroups = $this->getOptionGroups($item);
 
         if (empty($optionGroups)) {
             $this->cleanUpOptionGroups($item);
@@ -396,7 +399,7 @@ class ItemBuilder
             }
         }
 
-        //$this->cleanUpOptionGroups($item, $optionGroupIds);
+        $this->cleanUpOptionGroups($item, $optionGroupIds);
     }
 
     /**
@@ -484,7 +487,6 @@ class ItemBuilder
             $this->initializeFromBundle($item, $product);
         }
 
-        // TODO Initialization is done by the option groups form type.
         $this->initializeOptions($item);
     }
 
@@ -501,11 +503,23 @@ class ItemBuilder
         $variants = $this->filter->getVariants($product);
 
         if (empty($variants)) {
-            return;
+            throw new InvalidArgumentException("Variable product must have at least one variant.");
         }
 
-        /** @var ProductInterface $variant */
-        $variant = current($variants);
+        $variant = null;
+        if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
+            foreach ($variants as $v) {
+                if ($variantId == $v->getId()) {
+                    $variant = $v;
+                    break;
+                }
+            }
+        }
+
+        if (null === $variant) {
+            /** @var ProductInterface $variant */
+            $variant = $product->getVariants()->first();
+        }
 
         $this->initializeFromVariant($item, $variant);
     }
@@ -565,8 +579,6 @@ class ItemBuilder
                     }
                     $bundleSlotIds[] = $bundleSlotId;
 
-                    // TODO Work with static::BUNDLE_CHOICE_ID ?
-
                     // Get/resolve item subject
                     $childProduct = $this->provider->resolve($child);
 
@@ -589,8 +601,6 @@ class ItemBuilder
 
             $this->initializeFromBundleChoice($child, $defaultChoice);
         }
-
-        // TODO Sort items by position ?
     }
 
     /**
@@ -622,6 +632,7 @@ class ItemBuilder
         $optionGroups = $this->getOptionGroups($item);
 
         $optionGroupIds = [];
+
         foreach ($optionGroups as $optionGroup) {
             // Find option group matching item
             if ($item->hasChildren()) {
@@ -646,7 +657,6 @@ class ItemBuilder
 
                     $child
                         ->setQuantity(1)
-                        // TODO Check integrity (variable or variant options groups / bundle slots)
                         ->setPosition($optionGroup->getPosition());
 
                     // Check option choice
@@ -695,7 +705,6 @@ class ItemBuilder
         $item
             ->setData(static::OPTION_GROUP_ID, $optionGroup->getId())
             ->setQuantity(1)
-            // TODO Check integrity (variable or variant options groups / bundle slots)
             ->setPosition($optionGroup->getPosition());
 
         // Default choice if required

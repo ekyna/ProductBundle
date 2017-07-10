@@ -95,6 +95,7 @@
             {%- for itemForm in form.vars.choices_forms -%}
             <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" style="display:none;" disabled="disabled"
                       data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.pricing|json_encode|raw }}'>
+                {% form_theme itemForm _self %}
                 {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
             </fieldset>
             {%- endfor %}
@@ -122,10 +123,6 @@
     </div>
 {% endspaceless %}
 {% endblock sale_item_option_groups_widget %}
-
-
-{% block sale_item_pricing %}
-{% endblock sale_item_pricing %}
 
 
 {% block sale_item_configure_widget %}

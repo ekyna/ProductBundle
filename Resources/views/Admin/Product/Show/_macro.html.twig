@@ -316,13 +316,11 @@
                                     <tr>
                                         <td id="{{ optionId ~ 'designation' }}">
                                         {%- if option.product -%}
-                                            <a href="{{ admin_resource_path(option.product) }}">{{ data.designation }}</a>
-                                        {%- else -%}
-                                            {% if option.product %}
+                                            <a href="{{ admin_resource_path(option.product) }}">
                                                 {{ option.product.fullDesignation }}
-                                            {% else %}
-                                                {{ data.designation }}
-                                            {% endif %}
+                                            </a>
+                                        {%- else -%}
+                                            {{ data.designation }}
                                         {%- endif -%}
                                         </td>
                                         <td id="{{ optionId ~ 'reference' }}">

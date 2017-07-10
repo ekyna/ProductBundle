@@ -40,7 +40,7 @@ class IdToChoiceObjectTransformer implements DataTransformerInterface
                     return $choice;
                 }
             }
-            //throw new TransformationFailedException('Failed to transform to a choice object.');
+            throw new TransformationFailedException('Failed to transform to a choice object.');
         }
 
         return null;
@@ -51,13 +51,13 @@ class IdToChoiceObjectTransformer implements DataTransformerInterface
      */
     public function reverseTransform($choice)
     {
-        if (in_array($choice, $this->choices, true)) {
-            return $choice->getId();
+        if (null !== $choice) {
+            if (in_array($choice, $this->choices, true)) {
+                return $choice->getId();
+            }
+            throw new TransformationFailedException('Failed to reverse transform the choice object.');
         }
-
-        //throw new TransformationFailedException('Failed to reverse transform the choice object.');
 
         return null;
     }
-
 }

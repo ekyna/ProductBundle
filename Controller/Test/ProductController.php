@@ -63,4 +63,18 @@ class ProductController extends Controller
 
         return $this->configureSharedCache($response, $product->getEntityTags());
     }
+
+    public function dumpAction($productId)
+    {
+        /** @var \Ekyna\Bundle\ProductBundle\Entity\Product $product */
+        $product = $this->get('ekyna_product.product.repository')->find($productId);
+
+        if (null === $product) {
+            throw $this->createNotFoundException("Product not found.");
+        }
+
+        return $this->render('EkynaProductBundle:Test/Product:dump.html.twig', [
+            'product' => $product,
+        ]);
+    }
 }

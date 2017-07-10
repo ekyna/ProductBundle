@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
+use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\ConfigurableSlotListener;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
@@ -54,19 +55,6 @@ class ConfigurableSlotType extends Form\AbstractType
 
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
 
-        $postSubmitListener = function (Form\FormEvent $event) use ($transformer) {
-            $item = $event->getForm()->getParent()->getData();
-            $item->getSubjectIdentity()->clear();
-
-            /** @var int $data */
-            $data = $event->getData();
-
-            /** @var Model\BundleChoiceInterface $choice */
-            if (null !== $choice = $transformer->transform($data)) {
-                $this->itemBuilder->getProvider()->assign($item, $choice->getProduct());
-            }
-        };
-
         $choiceLabel = function (Model\BundleChoiceInterface $choice) {
             return $choice->getProduct()->getFullDesignation(true);
         };
@@ -84,33 +72,15 @@ class ConfigurableSlotType extends Form\AbstractType
                 'choice_value'  => 'id',
                 'choice_label'  => $choiceLabel,
             ])
-            ->addModelTransformer($transformer)
-            ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
-
-        $buildForm = function (Form\FormEvent $event) use ($transformer) {
-            $form = $event->getForm();
-            $choiceId = $form->get('choice')->getData();
-
-            /** @var Model\BundleChoiceInterface $choice */
-            $choice = $transformer->transform($choiceId);
-
-            $this->formBuilder->buildBundleChoiceForm($form, $choice);
-        };
+            ->addModelTransformer($transformer);
 
         $builder
             ->add($field)
-            ->addEventListener(Form\FormEvents::POST_SET_DATA, $buildForm)
-            ->addEventListener(Form\FormEvents::PRE_SUBMIT, $buildForm)
-            ->addEventListener(Form\FormEvents::POST_SUBMIT, function (Form\FormEvent $event) use ($transformer) {
-                /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-                $item = $event->getData();
-                $choiceId = $event->getForm()->get('choice')->getData();
-
-                /** @var Model\BundleChoiceInterface $choice */
-                $choice = $transformer->transform($choiceId);
-
-                $this->itemBuilder->buildFromBundleChoice($item, $choice);
-            });
+            ->addEventSubscriber(new ConfigurableSlotListener(
+                $this->itemBuilder,
+                $this->formBuilder,
+                $transformer
+            ));
     }
 
     /**

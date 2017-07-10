@@ -44,37 +44,6 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
     }
 
     /**
-     * Pre submit event handler.
-     *
-     * @param FormEvent $event
-     */
-    public function onPreSubmit(FormEvent $event)
-    {
-        $this->buildForm($event->getForm());
-    }
-
-    /**
-     * Post submit event handler.
-     *
-     * @param FormEvent $event
-     */
-    public function onPostSubmit(FormEvent $event)
-    {
-//        // TODO Should be done by the ConfigurableSlotType
-//
-//        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-//        $item = $event->getForm()->getParent()->getData();
-//        $product = $this->productProvider->resolve($item);
-//
-//        $this
-//            ->productProvider
-//            ->getItemBuilder()
-//            ->buildFromProduct($item, $product);
-//
-//        $event->setData($item);
-    }
-
-    /**
      * Builds the configurable slots forms.
      *
      * @param FormInterface $form
@@ -117,8 +86,6 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',
-            FormEvents::PRE_SUBMIT   => 'onPreSubmit',
-            FormEvents::POST_SUBMIT  => 'onPostSubmit',
         ];
     }
 }

@@ -2,3 +2,8 @@ ekyna_product_front_product_detail:
     path: /test/product/detail/{productId}
     defaults:
         _controller: EkynaProductBundle:Test/Product:detail
+
+ekyna_product_front_product_dump:
+    path: /test/product/dump/{productId}
+    defaults:
+        _controller: EkynaProductBundle:Test/Product:dump

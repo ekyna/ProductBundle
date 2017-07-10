@@ -1,0 +1,103 @@
+{% import _self as macros %}
+
+
+{% macro optionGroups(groups) %}
+    {% import _self as macros %}
+    {% for group in groups %}
+    <div class="children">
+        <p>Option group <strong>{{ group.id }}</strong> {% if group.required %}[<strong>required</strong>]{% endif %} <em>{{ group.name }}</em></p>
+        <div class="children">
+        <table>
+            <tbody>
+            {% for option in group.options %}
+                <tr>
+                    <td>Option <strong>{{ option.id }}</strong></td>
+                    <td>
+                        {% if option.product %}
+                            {% set p = option.product %}
+                            {{ p.type|capitalize }} <strong>{{ p.id }}</strong> <em>{{ p.fullDesignation }}</em>
+                        {% else %}
+                            {{ option.designation }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+    {% endfor %}
+{% endmacro optionGroups %}
+
+
+
+{% macro variable(variable) %}
+    {% import _self as macros %}
+    {% for variant in variable.variants %}
+    <div class="children">
+        {{ macros.product(variant) }}
+    </div>
+    {% endfor %}
+{% endmacro variable %}
+
+
+
+{% macro bundle(bundle) %}
+    {% import _self as macros %}
+    {% for slot in bundle.bundleSlots %}
+    <div class="children">
+        <p>Bundle slot <strong>{{ slot.id }}</strong> {% if slot.required %}[<strong>required</strong>]{% endif %}</p>
+        {% for choice in slot.choices %}
+        <div class="children">
+            <p>Bundle choice <strong>{{ choice.id }}</strong></p>
+            <div class="children">
+                {{ macros.product(choice.product) }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endmacro bundle %}
+
+
+
+{% macro product(product) %}
+    {% import _self as macros %}
+    <p>{{ product.type|capitalize }} <strong>{{ product.id }}</strong> <em>{{ product.fullDesignation }}</em></p>
+
+    {{ macros.optionGroups(product.optionGroups) }}
+
+    {% if product is configurable_product or product is bundle_product %}
+        {{ macros.bundle(product) }}
+    {% elseif product is variable_product %}
+        {{ macros.variable(product) }}
+    {% endif %}
+{% endmacro product %}
+
+
+<!doctype html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        p {
+            margin: 0;
+        }
+        em {
+            color: #CCC;
+        }
+        .children {
+            padding-left: 20px;
+            border-left: 1px solid #EEE;
+        }
+    </style>
+</head>
+<body>
+    {{ macros.product(product) }}
+</body>
+</html>
+

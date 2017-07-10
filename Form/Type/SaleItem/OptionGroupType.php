@@ -64,14 +64,11 @@ class OptionGroupType extends Form\AbstractType
 
         $transformer = new IdToChoiceObjectTransformer($options);
 
-        // TODO move into OptionsGroupsListener ?
-        $postSubmitListener = function (Form\FormEvent $event) use ($transformer) {
+        $postSubmitListener = function (Form\FormEvent $event) {
             $item = $event->getForm()->getParent()->getData();
-            /** @var int $data */
-            $data = $event->getData();
 
-            if (null !== $option = $transformer->transform($data)) {
-                /** @var Model\OptionInterface $option */
+            /** @var Model\OptionInterface $option */
+            if (null !== $option = $event->getData()) {
                 $this->itemBuilder->buildFromOption($item, $option);
             }
         };
@@ -91,7 +88,7 @@ class OptionGroupType extends Form\AbstractType
                 'choice_attr'   => [$this->formBuilder, 'optionChoiceAttr'],
             ])
             ->addModelTransformer($transformer)
-            ->addEventListener(Form\FormEvents::POST_SUBMIT, $postSubmitListener, 1024);
+            ->addEventListener(Form\FormEvents::SUBMIT, $postSubmitListener, 1024);
 
         $builder->add($field);
     }

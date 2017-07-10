@@ -59,64 +59,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
     }
 
     /**
-     * Post submit event handler.
-     *
-     * @param FormEvent $event
-     */
-    public function onPostSubmit(FormEvent $event)
-    {
-        // Event data : Normalized data (doctrine collection of sale items)
-
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
-        if (null === $item = $event->getForm()->getParent()->getData()) {
-            return;
-        }
-
-        $optionsGroups = $this->itemBuilder->getOptionGroups($item);
-
-        // Remove item children that do not match option groups
-        foreach ($item->getChildren() as $index => $child) {
-            // Skip non option group children
-            if (!$child->hasData(ItemBuilder::OPTION_GROUP_ID)) {
-                continue;
-            }
-
-            $optionGroupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID));
-            if (0 < $optionGroupId) {
-                // Finds the matching option group
-                foreach ($optionsGroups as $optionGroup) {
-                    if ($optionGroupId == $optionGroup->getId()) {
-                        // Group found => find the matching option
-                        $optionId = intval($child->getData(ItemBuilder::OPTION_ID));
-                        if (0 < $optionId) {
-                            foreach ($optionGroup->getOptions() as $option) {
-                                if ($optionId == $option->getId()) {
-                                    // Option found => next item child
-
-                                    // TODO build item from option ? (currently done by the OptionGroupType)
-
-                                    continue 3;
-                                }
-                            }
-                        }
-
-                        // Option not found => skip if group is required
-                        if ($optionGroup->isRequired()) {
-                            continue 2;
-                        }
-                    }
-                }
-            }
-
-            // Group not found
-            // or Option not found and Group not required
-            $item->removeChild($child);
-        }
-
-        $event->setData($item->getChildren());
-    }
-
-    /**
      * Builds the option groups forms.
      *
      * @param FormInterface $form
@@ -206,7 +148,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',
             FormEvents::PRE_SUBMIT   => 'onPreSubmit',
-            FormEvents::POST_SUBMIT  => 'onPostSubmit',
         ];
     }
 }
