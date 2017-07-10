@@ -10,7 +10,7 @@
     <td class="text-right">{{ eda }}</td>
     <td class="text-right">{{ ordered }}</td>
     <td class="text-right">{{ received }}</td>
-    <td class="text-right">{{ sold }}</td>
+    <td class="text-right{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
     <td class="text-right">{{ shipped }}</td>
     <td class="text-right">
         <a href="javascript: void(0)" class="btn btn-xs btn-default stock-units">

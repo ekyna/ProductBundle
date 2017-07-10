@@ -15,6 +15,11 @@ class InventorySearch
     private $brand;
 
     /**
+     * @var int
+     */
+    private $supplier;
+
+    /**
      * @var string
      */
     private $reference;
@@ -70,6 +75,30 @@ class InventorySearch
     public function setBrand($brand)
     {
         $this->brand = $brand;
+
+        return $this;
+    }
+
+    /**
+     * Returns the supplier.
+     *
+     * @return int
+     */
+    public function getSupplier()
+    {
+        return $this->supplier;
+    }
+
+    /**
+     * Sets the supplier.
+     *
+     * @param int $supplier
+     *
+     * @return InventorySearch
+     */
+    public function setSupplier($supplier)
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }
@@ -249,16 +278,19 @@ class InventorySearch
      */
     public function fromArray(array $array)
     {
-        list(
-            $this->brand,
-            $this->reference,
-            $this->designation,
-            $this->geocode,
-            $this->mode,
-            $this->state,
-            $this->sortBy,
-            $this->sortDir
-        ) = $array;
+        if (9 === count($array)) {
+            list(
+                $this->brand,
+                $this->supplier,
+                $this->reference,
+                $this->designation,
+                $this->geocode,
+                $this->mode,
+                $this->state,
+                $this->sortBy,
+                $this->sortDir
+            ) = $array;
+        }
     }
 
     /**
@@ -270,6 +302,7 @@ class InventorySearch
     {
         return [
             $this->brand,
+            $this->supplier,
             $this->reference,
             $this->designation,
             $this->geocode,

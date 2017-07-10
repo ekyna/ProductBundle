@@ -11,6 +11,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
+use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
@@ -32,6 +33,11 @@ class Inventory
      * @var ProductRepository
      */
     private $productRepository;
+
+    /**
+     * @var ResourceRepository
+     */
+    private $supplierProductRepository;
 
     /**
      * @var ProductStockUnitRepository
@@ -83,6 +89,7 @@ class Inventory
      * Constructor.
      *
      * @param ProductRepository          $productRepository
+     * @param ResourceRepository         $supplierProductRepository
      * @param ProductStockUnitRepository $stockUnitRepository
      * @param UrlGeneratorInterface      $urlGenerator
      * @param TranslatorInterface        $translator
@@ -92,6 +99,7 @@ class Inventory
      */
     public function __construct(
         ProductRepository $productRepository,
+        ResourceRepository $supplierProductRepository,
         ProductStockUnitRepository $stockUnitRepository,
         UrlGeneratorInterface $urlGenerator,
         TranslatorInterface $translator,
@@ -100,6 +108,7 @@ class Inventory
         LocaleProviderInterface $localeProvider
     ) {
         $this->productRepository = $productRepository;
+        $this->supplierProductRepository = $supplierProductRepository;
         $this->stockUnitRepository = $stockUnitRepository;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
@@ -110,6 +119,54 @@ class Inventory
             $localeProvider->getCurrentLocale(),
             \NumberFormatter::TYPE_DEFAULT
         );
+    }
+
+    /**
+     * Returns the search form.
+     *
+     * @return FormInterface
+     */
+    public function getSearchForm()
+    {
+        if ($this->searchForm) {
+            return $this->searchForm;
+        }
+
+        return $this->searchForm = $this
+            ->formFactory
+            ->create(
+                InventorySearchType::class,
+                $this->getSearchData(),
+                ['method' => 'GET']
+            );
+    }
+
+    /**
+     * Returns the search data.
+     *
+     * @return InventorySearch
+     */
+    public function getSearchData()
+    {
+        if ($this->searchData) {
+            return $this->searchData;
+        }
+
+        $this->searchData = new InventorySearch();
+
+        if ($this->session->has(static::SESSION_KEY)) {
+            $this->searchData->fromArray(json_decode($this->session->get(static::SESSION_KEY)));
+        }
+
+        return $this->searchData;
+    }
+
+    /**
+     * Saves the search data.
+     */
+    public function saveSearchData()
+    {
+        $this->session->set(static::SESSION_KEY, json_encode($this->getSearchData()->toArray()));
     }
 
     /**
@@ -180,6 +237,12 @@ class Inventory
             $product['sold'] = $this->formatter->format($stock['sold']);
             $product['shipped'] = $this->formatter->format($stock['shipped']);
 
+            // Stock themes
+            $product['sold_theme'] = '';
+            if ($product['sold'] > $product['ordered']) {
+                $product['sold_theme'] = 'danger';
+            }
+
             // Stock mode badge
             $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
             $product['stock_mode_theme'] = $this->config['stock_modes'][$product['stock_mode']]['theme'];
@@ -248,6 +311,13 @@ class Inventory
                 ->setParameter('brand', $brand);
         }
 
+        // Supplier filter
+        if (0 < $supplier = $search->getSupplier()) {
+            $qb
+                ->andWhere($expr->exists($this->getSupplierSubQuery()))
+                ->setParameter('supplier', $supplier);
+        }
+
         // Designation filter
         if (0 < strlen($designation = $search->getDesignation())) {
             $qb
@@ -300,6 +370,22 @@ class Inventory
     }
 
     /**
+     * Returns the supplier sub query's DQL.
+     *
+     * @return string
+     */
+    private function getSupplierSubQuery()
+    {
+        $sQb = $this->supplierProductRepository->createQueryBuilder('sp');
+        $sQb
+            ->select('sp.subjectIdentity.identifier')
+            ->andWhere($sQb->expr()->eq('sp.subjectIdentity.identifier', 'p.id'))
+            ->andWhere($sQb->expr()->eq('sp.supplier', ':supplier'));
+
+        return $sQb->getDQL();
+    }
+
+    /**
      * Returns the stock units query builder.
      *
      * @return QueryBuilder
@@ -320,54 +406,6 @@ class Inventory
             ->andWhere($expr->neq('s.state', ':state'))
             ->andWhere($expr->eq('s.product', ':product'))
             ->setParameter('state', StockUnitStates::STATE_CLOSED);
-    }
-
-    /**
-     * Returns the search form.
-     *
-     * @return FormInterface
-     */
-    public function getSearchForm()
-    {
-        if ($this->searchForm) {
-            return $this->searchForm;
-        }
-
-        return $this->searchForm = $this
-            ->formFactory
-            ->create(
-                InventorySearchType::class,
-                $this->getSearchData(),
-                ['method' => 'GET']
-            );
-    }
-
-    /**
-     * Returns the search data.
-     *
-     * @return InventorySearch
-     */
-    public function getSearchData()
-    {
-        if ($this->searchData) {
-            return $this->searchData;
-        }
-
-        $this->searchData = new InventorySearch();
-
-        if ($this->session->has(static::SESSION_KEY)) {
-            $this->searchData->fromArray(json_decode($this->session->get(static::SESSION_KEY)));
-        }
-
-        return $this->searchData;
-    }
-
-    /**
-     * Saves the search data.
-     */
-    public function saveSearchData()
-    {
-        $this->session->set(static::SESSION_KEY, json_encode($this->getSearchData()->toArray()));
     }
 
     /**

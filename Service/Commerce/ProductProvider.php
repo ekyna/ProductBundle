@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
@@ -37,9 +38,9 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * Constructor.
      *
-     * @param ProductRepositoryInterface   $productRepository
-     * @param PriceResolver                $priceResolver
-     * @param string                       $productClass
+     * @param ProductRepositoryInterface $productRepository
+     * @param PriceResolver              $priceResolver
+     * @param string                     $productClass
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -143,6 +144,25 @@ class ProductProvider implements SubjectProviderInterface
     public function getSubjectClass()
     {
         return $this->productClass;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSearchRouteAndParameters($context)
+    {
+        $result = [
+            'route'      => 'ekyna_product_product_admin_search',
+            'parameters' => [],
+        ];
+
+        if ($context === static::CONTEXT_SUPPLIER) {
+            $result['parameters'] = [
+                'types' => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
+            ];
+        }
+
+        return $result;
     }
 
     /**

@@ -24,6 +24,7 @@
         <service id="ekyna_product.inventory"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Inventory">
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
             <argument type="service" id="ekyna_product.product_stock_unit.repository"/>
             <argument type="service" id="router"/>
             <argument type="service" id="translator"/>
@@ -34,6 +35,7 @@
         <service id="ekyna_product.inventory_search.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\InventorySearchType">
             <argument type="service" id="ekyna_product.brand.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier.repository"/>
             <tag name="form.type"/>
         </service>
 

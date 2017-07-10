@@ -24,10 +24,11 @@
 {% spaceless %}
     {{ form_start(form) }}
     {{ bootstrap_set_sizing('sm') }}
+    {% set fields = ['brand', 'supplier', 'designation', 'reference', 'geocode', 'mode', 'state'] %}
     <table id="inventory_filters">
         <thead>
         <tr>
-            {%- for field in ['brand', 'designation', 'reference', 'geocode', 'mode', 'state'] -%}
+            {%- for field in fields -%}
             <th>{{ form_label(form[field]) }}</th>
             {%- endfor -%}
             <th>&nbsp;</th>
@@ -36,7 +37,7 @@
         </thead>
         <tbody>
         <tr>
-            {%- for field in ['brand', 'designation', 'reference', 'geocode', 'mode', 'state'] -%}
+            {%- for field in fields -%}
             <td>{{ form_widget(form[field]) }}{{ form_errors(form[field]) }}</td>
             {%- endfor %}
             <td>{{ form_widget(form.submit) }}</td>
