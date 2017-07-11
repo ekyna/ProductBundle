@@ -44,7 +44,7 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * Finds products by category, optionally including children categories.
      *
      * @param Model\CategoryInterface $category
-     * @param bool              $recursive
+     * @param bool                    $recursive
      *
      * @return array|Model\ProductInterface[]
      */
@@ -54,10 +54,21 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * Finds the parents products of the given bundled product.
      *
      * @param Model\ProductInterface $bundled
+     * @param bool                   $requiredSlots
      *
      * @return array|Model\ProductInterface[]
      */
-    public function findParentsByBundled(Model\ProductInterface $bundled);
+    public function findParentsByBundled(Model\ProductInterface $bundled, $requiredSlots = false);
+
+    /**
+     * Finds the products having the given product as option.
+     *
+     * @param Model\ProductInterface $product
+     * @param bool                   $requiredGroups
+     *
+     * @return array|Model\ProductInterface[]
+     */
+    public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false);
 
     /**
      * Loads the product's medias.

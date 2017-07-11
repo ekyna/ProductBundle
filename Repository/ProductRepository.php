@@ -119,18 +119,52 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
-    public function findParentsByBundled(Model\ProductInterface $bundled)
+    public function findParentsByBundled(Model\ProductInterface $bundled, $requiredSlots = false)
     {
+        // TODO cache queries in properties
+
         $as = $this->getAlias();
-        $qb = $this->getQueryBuilder(); // TODO do we need translation join ?
+        $qb = $this->getQueryBuilder();
+
+        $qb
+            ->leftJoin($as . '.bundleSlots', 's')
+            ->leftJoin('s.choices', 'c')
+            ->andWhere($qb->expr()->eq('c.product', ':bundled'));
+
+        if ($requiredSlots) {
+            $qb->andWhere($qb->expr()->eq('s.required', true));
+        }
 
         return $qb
-            ->leftJoin($as . '.bundleSlots', 'slot')
-            ->leftJoin('slot.choices', 'choice')
-            ->andWhere($qb->expr()->eq('choice.product', ':bundled'))
-            ->setParameter('bundled', $bundled)
             ->getQuery()
-            ->useQueryCache(true)
+            //->useQueryCache(true)
+            ->setParameter('bundled', $bundled)
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false)
+    {
+        // TODO cache queries in properties
+
+        $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        $qb
+            ->leftJoin($as . '.optionGroups', 'g')
+            ->leftJoin('g.options', 'o')
+            ->andWhere($qb->expr()->eq('o.product', ':product'));
+
+        if ($requiredGroups) {
+            $qb->andWhere($qb->expr()->eq('g.required', true));
+        }
+
+        return $qb
+            ->getQuery()
+            //->useQueryCache(true)
+            ->setParameter('product', $product)
             ->getResult();
     }
 
