@@ -156,7 +156,7 @@ class ItemBuilder
 
         if (null === $variant) {
             /** @var ProductInterface $variant */
-            $variant = $product->getVariants()->first();
+            $variant = reset($variants);
         }
 
         $this->buildFromVariant($item, $variant);
@@ -208,8 +208,13 @@ class ItemBuilder
         // Every slot must match a single item
         $bundleSlotIds = [];
         foreach ($bundlesSlots as $bundleSlot) {
+            $choices = $this->filter->getSlotChoices($bundleSlot);
+            if (empty($choices)) {
+                continue;
+            }
+
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
-            $bundleChoice = $bundleSlot->getChoices()->first();
+            $bundleChoice = current($choices);
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
@@ -265,7 +270,13 @@ class ItemBuilder
         // Every slot must match a single item
         $bundleSlotIds = [];
         foreach ($bundlesSlots as $bundleSlot) {
-            $bundleChoice = $bundleSlot->getChoices()->first();
+            $choices = $this->filter->getSlotChoices($bundleSlot);
+            if (empty($choices)) {
+                continue;
+            }
+
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
+            $bundleChoice = current($choices);
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
@@ -283,7 +294,7 @@ class ItemBuilder
 
                 // Resolve choice
                 if (0 < $bundleChoiceId = intval($childItem->getData(static::BUNDLE_CHOICE_ID))) {
-                    foreach ($bundleSlot->getChoices() as $choice) {
+                    foreach ($choices as $choice) {
                         if ($bundleChoiceId === $choice->getId()) {
                             $bundleChoice = $choice;
                             break;
@@ -347,6 +358,12 @@ class ItemBuilder
 
         $optionGroupIds = [];
         foreach ($optionGroups as $optionGroup) {
+            // Skip if group has no options
+            $options = $this->filter->getGroupOptions($optionGroup);
+            if (empty($options)) {
+                continue;
+            }
+
             // Find option group matching item
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
@@ -370,7 +387,7 @@ class ItemBuilder
                     // Check option choice
                     $found = false;
                     if (0 < $optionId = intval($child->getData(static::OPTION_ID))) {
-                        foreach ($optionGroup->getOptions() as $option) {
+                        foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
 
@@ -518,7 +535,7 @@ class ItemBuilder
 
         if (null === $variant) {
             /** @var ProductInterface $variant */
-            $variant = $product->getVariants()->first();
+            $variant = reset($variants);
         }
 
         $this->initializeFromVariant($item, $variant);
@@ -634,6 +651,12 @@ class ItemBuilder
         $optionGroupIds = [];
 
         foreach ($optionGroups as $optionGroup) {
+            // Skip if group has no options
+            $options = $this->filter->getGroupOptions($optionGroup);
+            if (empty($options)) {
+                continue;
+            }
+
             // Find option group matching item
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
@@ -662,7 +685,7 @@ class ItemBuilder
                     // Check option choice
                     $found = false;
                     if (0 < $optionId = intval($child->getData(static::OPTION_ID))) {
-                        foreach ($optionGroup->getOptions() as $option) {
+                        foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
                                 break;
@@ -676,7 +699,7 @@ class ItemBuilder
                         // Default choice if required
                         if ($optionGroup->isRequired()) {
                             /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
-                            if ($option = $optionGroup->getOptions()->first()) {
+                            if ($option = current($options)) {
                                 $child->setData(static::OPTION_ID, $option->getId());
                             }
                         }
