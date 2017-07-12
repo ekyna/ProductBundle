@@ -732,8 +732,14 @@ class ItemBuilder
 
         // Default choice if required
         if ($optionGroup->isRequired()) {
+            // Skip if group has no options
+            $options = $this->filter->getGroupOptions($optionGroup);
+            if (empty($options)) {
+                return;
+            }
+
             /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
-            if ($option = $optionGroup->getOptions()->first()) {
+            if ($option = current($options)) {
                 $item->setData(static::OPTION_ID, $option->getId());
             }
         }
