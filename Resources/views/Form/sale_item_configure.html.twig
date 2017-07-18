@@ -10,38 +10,42 @@
     <div class="row">
         <div class="col-sm-8 col-sm-push-4">
             <h3 class="product-title">
-                <strong>{{ itemForm.vars.choice_brand }}</strong> {{ itemForm.vars.choice_product -}}
+                {%- if itemForm.vars.choice_brand is not empty %}<strong>{{ itemForm.vars.choice_brand }}</strong>{% endif %}
+                {{ itemForm.vars.choice_product -}}
             </h3>
             <div class="product-description">
                 {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
             </div>
 
-            {%- if itemForm.variant is defined -%}
-                {{- form_row(itemForm.variant) -}}
-            {%- endif -%}
+            {%- if itemForm.quantity is defined -%}
+                {%- form_theme itemForm _self -%}
+                {%- if itemForm.variant is defined -%}
+                    {{- form_row(itemForm.variant) -}}
+                {%- endif -%}
 
-            {%- if itemForm.options is defined -%}
-                {{- form_widget(itemForm.options) -}}
-            {%- endif -%}
-
-            <div class="row">
-                <div class="col-xs-6">
-                    <div class="form-group form-group-sm">
-                        {{- bootstrap_backup_form_settings() -}}
-                        {{- bootstrap_set_label_col(6) -}}
-                        {{- bootstrap_set_widget_col(6) -}}
-                        {{- form_label(itemForm.quantity) -}}
-                        <div class="col-sm-6">
-                            <div class="input-group input-group-sm">
-                                {{- form_widget(itemForm.quantity, {'attr': {'class': 'input-sm'}}) -}}
+                {%- if itemForm.options is defined -%}
+                    {{- form_widget(itemForm.options) -}}
+                {%- endif -%}
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group form-group-sm">
+                            {{- bootstrap_backup_form_settings() -}}
+                            {{- bootstrap_set_label_col(6) -}}
+                            {{- bootstrap_set_widget_col(6) -}}
+                            {{- form_label(itemForm.quantity) -}}
+                            <div class="col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    {{- form_widget(itemForm.quantity, {'attr': {'class': 'sale-item-quantity input-sm'}}) -}}
+                                </div>
                             </div>
+                            {{- bootstrap_restore_form_settings() -}}
                         </div>
-                        {{- bootstrap_restore_form_settings() -}}
                     </div>
+                    <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
                 </div>
-                <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
-            </div>
+            {% endif %}
         </div>
+        {%- if itemForm.quantity is defined -%}
         <div class="col-sm-4 col-sm-pull-8">
             <div class="item-gallery" id="{{ itemForm.vars.id }}_gallery">
                 <a href="{{ asset(itemForm.vars.choice_image) }}"
@@ -51,6 +55,7 @@
                 <div class="item-gallery-children"></div>
             </div>
         </div>
+        {%- endif -%}
     </div>
 {% endspaceless %}
 {% endblock sale_item_configurable_slot %}
@@ -95,7 +100,6 @@
             {%- for itemForm in form.vars.choices_forms -%}
             <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" style="display:none;" disabled="disabled"
                       data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.pricing|json_encode|raw }}'>
-                {% form_theme itemForm _self %}
                 {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
             </fieldset>
             {%- endfor %}

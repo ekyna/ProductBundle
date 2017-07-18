@@ -18,15 +18,22 @@ class IdToChoiceObjectTransformer implements DataTransformerInterface
      */
     private $choices;
 
+    /**
+     * @var bool
+     */
+    private $required;
+
 
     /**
      * Constructor.
      *
      * @param array $choices
+     * @param bool  $required
      */
-    public function __construct(array $choices)
+    public function __construct(array $choices, $required = true)
     {
         $this->choices = $choices;
+        $this->required = $required;
     }
 
     /**

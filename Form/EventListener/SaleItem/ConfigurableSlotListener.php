@@ -61,12 +61,16 @@ class ConfigurableSlotListener implements EventSubscriberInterface
             return;
         }
 
+        $form = $event->getForm();
+
         $choiceId = $item->getData(ItemBuilder::BUNDLE_CHOICE_ID);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-        $choice = $this->transformer->transform($choiceId);
-
-        $this->formBuilder->buildBundleChoiceForm($event->getForm(), $choice);
+        if (null !== $choice = $this->transformer->transform($choiceId)) {
+            $this->formBuilder->buildBundleChoiceForm($form, $choice);
+        } else {
+            $this->formBuilder->clearBundleChoiceForm($form);
+        }
     }
 
     /**
@@ -84,15 +88,17 @@ class ConfigurableSlotListener implements EventSubscriberInterface
         $choiceId = $event->getData()['choice'];
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-        $choice = $this->transformer->transform($choiceId);
+        if (null !== $choice = $this->transformer->transform($choiceId)) {
+            // Initialize the sale item from the bundle choice if it has changed
+            if ($choice->getId() != $item->getData(ItemBuilder::BUNDLE_CHOICE_ID)) {
+                $this->itemBuilder->initializeFromBundleChoice($item, $choice);
+            }
 
-        // Initialize the sale item from the bundle choice if it has changed
-        if ($choice->getId() != $item->getData(ItemBuilder::BUNDLE_CHOICE_ID)) {
-            $this->itemBuilder->initializeFromBundleChoice($item, $choice);
+            // (Re)Build the form
+            $this->formBuilder->buildBundleChoiceForm($form, $choice);
+        } else {
+            $this->formBuilder->clearBundleChoiceForm($form);
         }
-
-        // (Re)Build the form
-        $this->formBuilder->buildBundleChoiceForm($form, $choice);
     }
 
     /**

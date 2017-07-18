@@ -372,6 +372,16 @@ class FormBuilder
     }
 
     /**
+     * Returns the no image path.
+     *
+     * @return string
+     */
+    public function getNoImagePath()
+    {
+        return $this->noImagePath;
+    }
+
+    /**
      * Returns the form's pricing config for the given sale item.
      *
      * @param SaleItemInterface $item
@@ -428,7 +438,7 @@ class FormBuilder
                 'variable' => $product,
             ]);
 
-        // Configurable : add configuration form
+            // Configurable : add configuration form
         } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             $repository->loadConfigurableSlots($product);
 
@@ -446,6 +456,20 @@ class FormBuilder
     }
 
     /**
+     * Clears the bundle choice form.
+     *
+     * @param FormInterface $form
+     */
+    public function clearBundleChoiceForm(FormInterface $form)
+    {
+        foreach (['variant', 'configuration', 'options', 'quantity'] as $field) {
+            if ($form->has($field)) {
+                $form->remove($field);
+            }
+        }
+    }
+
+    /**
      * Returns the sale item configure form translations.
      *
      * @return array
@@ -453,12 +477,26 @@ class FormBuilder
     public function getTranslations()
     {
         return [
-            'quantity'    => $this->translator->trans('ekyna_core.field.quantity'),
-            'discount'    => $this->translator->trans('ekyna_product.sale_item_configure.discount'),
-            'unit_price'  => $this->translator->trans('ekyna_product.sale_item_configure.unit_net_price'),
-            'total'       => $this->translator->trans('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'  => $this->translator->trans('ekyna_product.sale_item_configure.rule_table'),
-            'price_table' => $this->translator->trans('ekyna_product.sale_item_configure.price_table'),
+            'quantity'    => $this->translate('ekyna_core.field.quantity'),
+            'discount'    => $this->translate('ekyna_product.sale_item_configure.discount'),
+            'unit_price'  => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
+            'total'       => $this->translate('ekyna_product.sale_item_configure.total_price'),
+            'rule_table'  => $this->translate('ekyna_product.sale_item_configure.rule_table'),
+            'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
         ];
+    }
+
+    /**
+     * Translates the given message.
+     *
+     * @param string $id
+     * @param array  $parameters
+     * @param string $domain
+     *
+     * @return string
+     */
+    public function translate($id, array $parameters = [], $domain = null)
+    {
+        return $this->translator->trans($id, $parameters, $domain);
     }
 }

@@ -39,7 +39,7 @@ class OptionType extends ResourceFormType
             ])
             ->add('product', ProductSearchType::class, [
                 'required' => false,
-                'types' => [
+                'types'    => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIANT,
                     ProductTypes::TYPE_BUNDLE,
@@ -53,35 +53,39 @@ class OptionType extends ResourceFormType
                 ],
             ])
             ->add('reference', Type\TextType::class, [
-                'label' => 'ekyna_core.field.reference',
-                'attr'  => [
+                'label'    => 'ekyna_core.field.reference',
+                'required' => false,
+                'attr'     => [
                     'placeholder' => 'ekyna_core.field.reference',
                 ],
             ])
             ->add('translations', TranslationsFormsType::class, [
                 'form_type'      => OptionTranslationType::class,
+                'required'       => false,
                 'label'          => false,
                 'error_bubbling' => false,
             ])
             ->add('weight', Type\NumberType::class, [
-                'label' => 'ekyna_core.field.weight',
-                'scale' => 3,
-                'attr'  => [
+                'label'    => 'ekyna_core.field.weight',
+                'required' => false,
+                'scale'    => 3,
+                'attr'     => [
                     'placeholder' => 'ekyna_core.field.weight',
                     'input_group' => ['append' => 'kg'],
                 ],
             ])
             ->add('netPrice', Type\NumberType::class, [
-                'label' => 'ekyna_product.product.field.net_price',
-                'scale' => 5,
-                'attr'  => [
+                'label'    => 'ekyna_product.product.field.net_price',
+                'required' => false,
+                'scale'    => 5,
+                'attr'     => [
                     'placeholder' => 'ekyna_product.product.field.net_price',
                     'input_group' => ['append' => '€'],
                 ],
             ])
-            // TODO weight
             ->add('taxGroup', TaxGroupChoiceType::class, [
-                'select2' => false,
+                'select2'  => false,
+                'required' => false,
             ])
             ->add('position', CollectionPositionType::class);
     }

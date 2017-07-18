@@ -330,7 +330,7 @@
                                             {{- data.weight|localizednumber }} kg
                                         </td>
                                         <td id="{{ optionId ~ 'netPrice' }}">
-                                            {{- data.netPrice|localizedcurrency('EUR') -}}{# TODO currency #}
+                                            {{- option.netPrice|localizedcurrency('EUR') -}}{# TODO currency #}
                                         </td>
                                         <td id="{{ optionId ~ 'taxGroup' }}">
                                             {{- data.taxGroup -}}

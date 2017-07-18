@@ -1,8 +1,8 @@
-define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], function($, Templates) {
+define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], function ($, Templates) {
     "use strict";
 
 
-    var toggleDisabled = function($element, disabled) {
+    var toggleDisabled = function ($element, disabled) {
         $element
             .prop('disabled', disabled)
             .find('input, select, button, textarea')
@@ -10,7 +10,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             .prop('disabled', disabled);
     };
 
-    var roundPrice = function(price) {
+    var roundPrice = function (price) {
         return Math.round(parseFloat(price) * 100) / 100;
     };
 
@@ -28,8 +28,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     }
 
     $.extend(BundleSlot.prototype, {
-        init: function() {
-            this.id = this.$element.attr('id');
+        init: function () {
             this.busy = false;
 
             this.$choice = undefined;
@@ -40,7 +39,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$prev = this.$element.find('.slot-choices > a.prev');
             this.$next = this.$element.find('.slot-choices > a.next');
 
-            this.$element.find('.slot-choice-form[disabled]').each(function() {
+            this.$element.find('.slot-choice-form[disabled]').each(function () {
                 toggleDisabled($(this), true);
             });
 
@@ -48,28 +47,28 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.selectChoice();
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
             if (0 === this.$radio.size()) {
                 return;
             }
 
             var that = this;
 
-            this.$radio.on('change', function(e) {
+            this.$radio.on('change', function (e) {
                 that.selectChoice();
 
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             });
-            this.$label.on('click', function(e) {
+            this.$label.on('click', function (e) {
                 if (that.busy) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
             });
-            this.$prev.on('click', function(e) {
+            this.$prev.on('click', function (e) {
                 if (that.busy) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -86,7 +85,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 $prev.prop('checked', true);
                 that.selectChoice();
             });
-            this.$next.on('click', function(e) {
+            this.$next.on('click', function (e) {
                 if (that.busy) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -105,7 +104,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             });
         },
 
-        unbindEvents: function() {
+        unbindEvents: function () {
             if (0 === this.$radio.size()) {
                 return;
             }
@@ -116,7 +115,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$next.off('click');
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
             this.$element.removeData();
             if (this.$choice) {
@@ -124,7 +123,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        selectChoice: function() {
+        selectChoice: function () {
             if (0 === this.$radio.size()) {
                 this.$choice = this.$element.find('.slot-choice-form').saleItem(this.parentItem);
                 this.choice = this.$choice.data('saleItem');
@@ -134,7 +133,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             var that = this,
                 $current = that.$choice,
-                choiceId = this.$radio.filter(':checked').val(),
+                choiceId = this.$radio.filter(':checked').val() || 0,
                 $selected = this.$element.find('.slot-choice-form[data-id="' + choiceId + '"]');
 
             if (1 !== $selected.size()) {
@@ -143,20 +142,26 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.busy = true;
 
-            var showChoice = function() {
+            var showChoice = function () {
                 toggleDisabled($selected, false);
                 that.$choice = $selected;
-                that.$choice.saleItem(that.parentItem).fadeIn(250);
-                that.choice = that.$choice.data('saleItem');
-
+                if (1 === that.$choice.find('input.sale-item-quantity').size()) {
+                    that.$choice.saleItem(that.parentItem);
+                    that.choice = that.$choice.data('saleItem');
+                } else {
+                    that.choice = undefined;
+                }
+                that.$choice.fadeIn(250);
                 that.$element.trigger('change');
                 that.busy = false;
             };
 
             if ($current) {
                 $current
-                    .fadeOut(250, function() {
-                        $current.data('saleItem').destroy();
+                    .fadeOut(250, function () {
+                        if ($current.data('saleItem')) {
+                            $current.data('saleItem').destroy();
+                        }
                         toggleDisabled($current, true);
                         showChoice();
                     });
@@ -165,23 +170,27 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        updateQuantity: function() {
+        updateQuantity: function () {
             if (this.choice) {
                 this.choice.onQuantityChange();
             }
         },
 
-        getChoice: function() {
-            return this.choice
+        hasChoice: function () {
+            return undefined !== this.choice;
         },
 
-        getLabel: function() {
+        getChoice: function () {
+            return this.choice;
+        },
+
+        getLabel: function () {
             return this.$choice.find('.product-title').html();
         }
     });
 
-    $.fn.bundleSlot = function(parentItem) {
-        return this.each(function() {
+    $.fn.bundleSlot = function (parentItem) {
+        return this.each(function () {
             if (undefined === $(this).data('bundleSlot')) {
                 $(this).data('bundleSlot', new BundleSlot($(this), parentItem));
             }
@@ -203,7 +212,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     }
 
     $.extend(OptionGroup.prototype, {
-        init: function() {
+        init: function () {
             this.$select = this.$element.find('select');
             this.$option = this.option = undefined;
             this.locked = !!this.$select.attr('data-locked');
@@ -220,35 +229,27 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.bindEvents();
         },
 
-        updateDisplay: function() {
+        updateDisplay: function () {
+            return;
+
             // Hide if locked or disabled
-            if (this.locked || this.$select.prop('disabled')) {
-                this.hide();
+            if (this.locked) {
+                this.$select.prop('disabled', true);
                 return;
             }
 
             // Hide if Placeholder + Single option
             if (this.$element.find('label').hasClass('required') && 1 >= this.$select.children().length) {
-                this.hide();
+                this.$select.prop('disabled', true);
                 return;
             }
 
-            this.show();
+            this.$select.prop('disabled', false);
         },
 
-        hide: function() {
-            this.$image.hide();
-            this.$element.hide();
-        },
-
-        show: function() {
-            this.$image.show();
-            this.$element.show();
-        },
-
-        bindEvents: function() {
+        bindEvents: function () {
             var that = this;
-            this.$select.on('change', function(e) {
+            this.$select.on('change', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -260,7 +261,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             });
         },
 
-        selectOption: function() {
+        selectOption: function () {
             this.$option = this.option = undefined;
 
             var $option = this.$select.find('option[value="' + this.$select.val() + '"]');
@@ -284,52 +285,52 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        unbindEvents: function() {
+        unbindEvents: function () {
             this.$select.off('change');
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
             this.$image.remove();
             this.$element.removeData();
         },
 
-        getId: function() {
+        getId: function () {
             return this.$element.data('id');
         },
 
-        getType: function() {
+        getType: function () {
             return this.$element.data('type');
         },
 
-        hasOption: function() {
+        hasOption: function () {
             return !this.locked && !!this.$option;
         },
 
-        getPrice: function() {
+        getPrice: function () {
             return this.hasOption() ? roundPrice(this.option.price) : 0;
         },
 
-        getLabel: function() {
+        getLabel: function () {
             return this.hasOption() ? this.$option.text() : '';
         },
 
-        isLocked: function() {
+        isLocked: function () {
             return this.locked;
         },
 
-        lock: function() {
+        lock: function () {
             if (!this.locked) {
-                this.$select.attr('data-locked', "1").prop('disabled', true);
+                this.$select.attr('data-locked', "1");
                 this.locked = true;
             }
 
             return this;
         },
 
-        unlock: function() {
+        unlock: function () {
             if (this.locked) {
-                this.$select.attr('data-locked', "0").prop('disabled', false);
+                this.$select.attr('data-locked', "0");
                 this.locked = false;
             }
 
@@ -337,14 +338,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         }
     });
 
-    $.fn.optionGroup = function(optionGroups) {
-        return this.each(function() {
+    $.fn.optionGroup = function (optionGroups) {
+        return this.each(function () {
             if (undefined === $(this).data('optionGroup')) {
                 $(this).data('optionGroup', new OptionGroup($(this), optionGroups));
             }
         });
     };
-
 
 
     // -------------------------------- OPTION GROUPS --------------------------------
@@ -361,32 +361,32 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     }
 
     $.extend(OptionGroups.prototype, {
-        init: function() {
+        init: function () {
             this.name = this.$element.attr('name');
 
             this.loadGroups();
             this.bindEvents();
         },
 
-        loadGroups: function() {
+        loadGroups: function () {
             var that = this;
             this.$groups = [];
             this.groups = [];
 
-            this.$element.find(' > .form-group').each(function() {
+            this.$element.find(' > .form-group').each(function () {
                 var $group = $(this).optionGroup(that);
                 that.$groups.push($group);
                 that.groups.push($group.data('optionGroup'))
             });
         },
 
-        getGroups: function() {
+        getGroups: function () {
             return this.groups;
         },
 
-        hasOptions: function() {
+        hasOptions: function () {
             var hasOptions = false;
-            $.each(this.groups, function() {
+            $.each(this.groups, function () {
                 hasOptions = this.hasOption();
                 if (hasOptions) {
                     return false;
@@ -395,32 +395,32 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return hasOptions;
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
 
         },
 
-        unbindEvents: function() {
+        unbindEvents: function () {
 
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
 
-            $.each(this.groups, function() {
+            $.each(this.groups, function () {
                 this.destroy();
             });
 
             this.$element.removeData();
         },
 
-        hasGroups: function() {
+        hasGroups: function () {
             return 0 < this.groups.length;
         },
 
-        getPrice: function() {
+        getPrice: function () {
             var price = 0;
 
-            $.each(this.groups, function() {
+            $.each(this.groups, function () {
                 if (!this.isLocked()) {
                     price += this.getPrice();
                 }
@@ -429,12 +429,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return price;
         },
 
-        create: function(data) {
+        create: function (data) {
             if (!data.hasOwnProperty('id')) {
                 return;
             }
 
-            var $group = this.$element.find('> .form-group[data-id="' +  data.id + '"]');
+            var $group = this.$element.find('> .form-group[data-id="' + data.id + '"]');
             if (1 === $group.size()) {
                 $group.data('optionGroup').unlock().updateDisplay();
                 return;
@@ -451,9 +451,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             //this.loadGroups();
         },
 
-        lockByType: function(type) {
-            this.$element.find('> .form-group[data-type="' +  type + '"]')
-                .each(function() {
+        lockByType: function (type) {
+            this.$element.find('> .form-group[data-type="' + type + '"]')
+                .each(function () {
                     $(this).data('optionGroup').lock().updateDisplay();
                 });
 
@@ -461,14 +461,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         }
     });
 
-    $.fn.optionGroups = function(item) {
-        return this.each(function() {
+    $.fn.optionGroups = function (item) {
+        return this.each(function () {
             if (undefined === $(this).data('optionGroups')) {
                 $(this).data('optionGroups', new OptionGroups($(this), item));
             }
         });
     };
-
 
 
     // -------------------------------- VARIANT --------------------------------
@@ -485,7 +484,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     }
 
     $.extend(Variant.prototype, {
-        init: function() {
+        init: function () {
             // Image
             this.$image = this.item.$gallery.find('> a');
             if (1 === this.$image.size()) {
@@ -504,23 +503,23 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.bindEvents();
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
             var that = this;
-            this.$element.on('change', function() {
+            this.$element.on('change', function () {
                 that.selectVariant();
             });
         },
 
-        unbindEvents: function() {
+        unbindEvents: function () {
             this.$element.off('change');
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
             this.$element.removeData();
         },
 
-        selectVariant: function() {
+        selectVariant: function () {
             this.$variant = undefined;
             this.variant = {
                 label: '',
@@ -545,7 +544,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 }
             }
 
-            if(this.$image) {
+            if (this.$image) {
                 this.$image
                     .attr('href', this.$image.data('href'))
                     .attr('title', this.$image.data('title'));
@@ -555,31 +554,30 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        hasVariant: function() {
+        hasVariant: function () {
             return undefined !== this.$variant;
         },
 
-        getPrice: function() {
+        getPrice: function () {
             return roundPrice(this.variant.price);
         },
 
-        getLabel: function() {
+        getLabel: function () {
             return this.variant.label;
         },
 
-        getOptionGroups: function() {
+        getOptionGroups: function () {
             return this.variant.groups;
         }
     });
 
-    $.fn.variant = function(item) {
-        return this.each(function() {
+    $.fn.variant = function (item) {
+        return this.each(function () {
             if (undefined === $(this).data('variant')) {
                 $(this).data('variant', new Variant($(this), item));
             }
         });
     };
-
 
 
     // -------------------------------- SALE ITEM --------------------------------
@@ -592,7 +590,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     }
 
     $.extend(SaleItem.prototype, {
-        init: function() {
+        init: function () {
             this.id = this.$element.attr('id');
 
             this.config = $.extend({
@@ -649,7 +647,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             var bundleSlots = [];
             this.$bundleSlots = this.$element.find('#' + this.id + '_configuration > .bundle-slot');
             if (0 < this.$bundleSlots.size()) {
-                this.$bundleSlots.bundleSlot(this).each(function() {
+                this.$bundleSlots.bundleSlot(this).each(function () {
                     bundleSlots.push($(this).data('bundleSlot'));
                 });
             }
@@ -659,29 +657,29 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.onChange();
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
             var that = this;
 
             if (this.$variant) {
-                this.$variant.on('change', function() {
+                this.$variant.on('change', function () {
                     that.onVariantChange();
                 });
             }
 
-            this.$bundleSlots.on('change', function() {
+            this.$bundleSlots.on('change', function () {
                 that.onChildChange();
             });
 
-            this.$optionGroups.on('change', function() {
+            this.$optionGroups.on('change', function () {
                 that.onChildChange();
             });
 
-            this.$quantity.on('keyup change mouseup', function() {
+            this.$quantity.on('keyup change mouseup', function () {
                 that.onQuantityChange();
             });
         },
 
-        unbindEvents: function() {
+        unbindEvents: function () {
             if (this.$variant) {
                 this.$variant.variant().off('change');
             }
@@ -693,14 +691,14 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$quantity.off('keyup change mouseup');
         },
 
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
 
             if (this.variant) {
                 this.variant.destroy();
             }
 
-            $.each(this.bundleSlots, function() {
+            $.each(this.bundleSlots, function () {
                 this.destroy();
             });
 
@@ -709,12 +707,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$element.removeData();
         },
 
-        onVariantChange: function() {
+        onVariantChange: function () {
             this.createVariantOptionGroups();
             this.onChildChange();
         },
 
-        createVariantOptionGroups: function() {
+        createVariantOptionGroups: function () {
             var that = this;
 
             // TODO we're losing initial selection T_T
@@ -729,12 +727,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        onChildChange: function() {
+        onChildChange: function () {
             this.calculatePrices();
             this.updatePricing();
         },
 
-        updateParentQuantity: function() {
+        updateParentQuantity: function () {
             if (this.parentItem) {
                 if (1 < this.parentItem.getQuantity()) {
                     this.$parentQuantity.html(this.parentItem.getQuantity() + 'x').show();
@@ -744,7 +742,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
-        onQuantityChange: function() {
+        onQuantityChange: function () {
             this.quantity = this.$quantity.val();
 
             $.each(this.bundleSlots, function () {
@@ -756,13 +754,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.onChange();
         },
 
-        onChange: function() {
+        onChange: function () {
             this.resolveActiveRule();
             this.calculatePrices();
             this.updatePricing();
         },
 
-        resolveActiveRule: function() {
+        resolveActiveRule: function () {
             if (0 < this.config.rules.length) {
                 var activeRule = undefined,
                     quantity = this.quantity;
@@ -771,7 +769,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                     quantity *= this.parentItem.getQuantity();
                 }
 
-                $.each(this.config.rules, function(i, rule) {
+                $.each(this.config.rules, function (i, rule) {
                     if (quantity >= parseFloat(rule.quantity)) {
                         activeRule = rule;
                         return false;
@@ -786,12 +784,14 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return false;
         },
 
-        calculatePrices: function() {
+        calculatePrices: function () {
             var basePrice = 0, unitPrice, totalPrice;
 
             if (0 < this.bundleSlots.length) {
-                $.each(this.bundleSlots, function() {
-                    basePrice += this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
+                $.each(this.bundleSlots, function () {
+                    if (this.hasChoice()) {
+                        basePrice += this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
+                    }
                 });
             } else {
                 if (this.variant) {
@@ -822,7 +822,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return changed;
         },
 
-        updatePricing: function() {
+        updatePricing: function () {
             if (0 === this.$pricing.size()) {
                 return;
             }
@@ -857,12 +857,14 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             data.rules = rules.reverse();
 
             // Lines
-            $.each(this.bundleSlots, function() {
-                var price = this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
-                lines.push({
-                    label: this.getLabel(),
-                    price: price.formatPrice(that.config.currency)
-                });
+            $.each(this.bundleSlots, function () {
+                if (this.hasChoice()) {
+                    var price = this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
+                    lines.push({
+                        label: this.getLabel(),
+                        price: price.formatPrice(that.config.currency)
+                    });
+                }
             });
             if (this.optionGroups.hasOptions()) {
                 if (0 === lines.length) {
@@ -908,32 +910,32 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$pricing.html(Templates['sale_item_pricing.html.twig'].render(data));
         },
 
-        getConfig: function() {
+        getConfig: function () {
             return this.config;
         },
 
-        getQuantity: function() {
+        getQuantity: function () {
             return this.quantity;
         },
 
-        getUnitPrice: function() {
+        getUnitPrice: function () {
             return this.unitPrice;
         },
 
-        getTotalPrice: function() {
+        getTotalPrice: function () {
             return this.totalPrice;
         }
     });
 
-    $.fn.saleItem = function(parentItem) {
-        return this.each(function() {
+    $.fn.saleItem = function (parentItem) {
+        return this.each(function () {
             if (undefined === $(this).data('saleItem')) {
                 $(this).data('saleItem', new SaleItem($(this), parentItem));
             }
         });
     };
 
-    $('.sale-item-configure .item-gallery').on('click', 'a', function(e) {
+    $('.sale-item-configure .item-gallery').on('click', 'a', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -950,10 +952,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     });
 
     return {
-        init: function($element) {
+        init: function ($element) {
             $element.saleItem();
         },
-        destroy: function($element) {
+        destroy: function ($element) {
             var saleItem = $element.data('saleItem');
             if (undefined !== saleItem) {
                 saleItem.destroy();

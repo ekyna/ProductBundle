@@ -5,8 +5,6 @@ ekyna_product:
         rules_should_be_empty: La liste des règles doit être vide.
     bundle_slot:
         too_many_choices: Un seul produit doit être configuré.
-    option_group:
-        unsupported_product_type: Les groupes d'options ne sont pas pris en charge pour ce type de produit.
     product:
         slot_attribute_is_mandatory: Veuillez sélectionner un attribut pour le groupe "%group_name%".
         slot_has_too_many_attributes: Le groupe "%group_name%" ne peut avoir plus d'un attribut sélectionné.

@@ -69,7 +69,6 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
                 }
             }
 
-            // TODO Use ItemBuilder initialize* method
             throw new LogicException(sprintf(
                 "Sale item was not found for bundle slot #%s.\n" .
                 "You must call ItemBuilder::initializeItem() first.",

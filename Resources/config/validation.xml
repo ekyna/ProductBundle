@@ -292,9 +292,14 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
         <group-sequence-provider />
         <property name="group">
-            <constraint name="NotNull"/>
+            <constraint name="NotNull">
+                <option name="groups">data</option>
+            </constraint>
         </property>
         <property name="product">
+            <constraint name="NotNull">
+                <option name="groups">product</option>
+            </constraint>
             <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
                 <option name="groups">product</option>
                 <option name="types">
@@ -329,7 +334,10 @@
             </constraint>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
-                <option name="groups">data</option>
+                <option name="groups">
+                    <value>data</value>
+                    <value>product</value>
+                </option>
             </constraint>
         </property>
         <property name="weight">
@@ -379,15 +387,6 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroup">
-        <!--<property name="product">
-            <constraint name="NotNull"/>
-            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
-                <option name="types">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
-        </property>-->
         <property name="name">
             <constraint name="NotBlank"/>
         </property>

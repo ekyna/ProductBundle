@@ -51,6 +51,13 @@ class ConfigurableSlotType extends Form\AbstractType
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
 
+        $required = false;
+        $constraints = [];
+        if ($bundleSlot->isRequired()) {
+            $constraints[] = new NotNull();
+            $required = true;
+        }
+
         $bundleChoices = $this->itemBuilder->getFilter()->getSlotChoices($bundleSlot);
 
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
@@ -64,7 +71,8 @@ class ConfigurableSlotType extends Form\AbstractType
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::BUNDLE_CHOICE_ID . ']',
                 'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
-                'constraints'   => [new NotNull()],
+                'required'      => $required,
+                'constraints'   => $constraints,
                 'select2'       => false,
                 'expanded'      => true,
                 'attr'          => ['class' => 'sale-item-bundle-choice'],
@@ -101,12 +109,17 @@ class ConfigurableSlotType extends Form\AbstractType
         // Add image to each subject choice radio buttons vars
         foreach ($view->children['choice']->children as $subjectChoiceView) {
             /** @var Model\BundleChoiceInterface $bundleChoice */
-            $bundleChoice = $transformer->transform($subjectChoiceView->vars['value']);
-            $product = $bundleChoice->getProduct();
-            $path = $this->formBuilder->getProductImagePath($product, 'slot_choice_btn');
-            $subjectChoiceView->vars['choice_image'] = $path;
-            $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
-            $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
+            if (null !== $bundleChoice = $transformer->transform($subjectChoiceView->vars['value'])) {
+                $product = $bundleChoice->getProduct();
+                $path = $this->formBuilder->getProductImagePath($product, 'slot_choice_btn');
+                $subjectChoiceView->vars['choice_image'] = $path;
+                $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
+                $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
+            } else {
+                $subjectChoiceView->vars['choice_image'] = $this->formBuilder->getNoImagePath();
+                $subjectChoiceView->vars['choice_brand'] = '';
+                $subjectChoiceView->vars['choice_product'] = 'Ignorer cet article';
+            }
         }
 
         // Builds each slot choice's form
@@ -119,7 +132,7 @@ class ConfigurableSlotType extends Form\AbstractType
             if ($bundleChoice->getId() == $choiceId) {
                 $this->addChoiceVars($view, $bundleChoice);
                 $this->addPricingVars($view, $item, !$options['admin_mode']);
-            } else {
+            } elseif ($bundleChoice) {
                 $choiceForm = $formFactory->createNamed('BUNDLE_CHOICE_NAME', BundleSlotChoiceType::class, null, [
                     'id'         => $view->vars['id'] . '_choice_' . $bundleChoice->getId(),
                     'data_class' => SaleItemInterface::class,
@@ -141,6 +154,31 @@ class ConfigurableSlotType extends Form\AbstractType
                 $item->removeChild($fakeItem);
 
                 $choicesForms[] = $choiceFormView;
+            }
+        }
+
+        if (!$bundleSlot->isRequired()) {
+            $noChoiceVars = [
+                'id'                 => $view->vars['id'] . '_choice_0',
+                'choice_id'          => 0,
+                'pricing'            => [],
+                'choice_brand'       => null,
+                'choice_product'     => $this->formBuilder->translate(
+                    'ekyna_product.sale_item_configure.no_choice.title'
+                ),
+                'choice_description' => $this->formBuilder->translate(
+                    'ekyna_product.sale_item_configure.no_choice.description'
+                ),
+                'choice_thumb'       => $this->formBuilder->getNoImagePath(),
+                'choice_image'       => $this->formBuilder->getNoImagePath(),
+            ];
+
+            if (0 < $choiceId) {
+                $choicesForms[] = [
+                    'vars' => $noChoiceVars,
+                ];
+            } else {
+                $view->vars = array_replace($view->vars, $noChoiceVars);
             }
         }
 

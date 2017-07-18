@@ -47,12 +47,12 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     /**
      * @var float
      */
-    protected $weight = 0;
+    protected $weight;
 
     /**
      * @var float
      */
-    protected $netPrice = 0;
+    protected $netPrice;
 
 
     /**
@@ -166,7 +166,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      */
     public function setWeight($weight)
     {
-        $this->weight = (float)$weight;
+        $this->weight = $weight;
 
         return $this;
     }
@@ -184,7 +184,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      */
     public function setNetPrice($netPrice)
     {
-        $this->netPrice = (float)$netPrice;
+        $this->netPrice = $netPrice;
 
         return $this;
     }

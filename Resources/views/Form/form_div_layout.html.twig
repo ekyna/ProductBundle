@@ -87,8 +87,11 @@
     <div class="ekyna-collection-item product-option">
         {{ form_errors(form) }}
         <div class="row form-group">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 {{ form_widget(form.mode) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_widget(form.netPrice) }}
             </div>
         </div>
         <div class="option-product option-wrapper">
@@ -100,7 +103,7 @@
                     {{ form_widget(form.designation) }}
                 </div>
             </div>
-            {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+            {{ form_widget(form.translations, {'label_col': 0, 'widget_col': 12}) }}
             <div class="row form-group">
                 <div class="col-md-6">
                     {{ form_widget(form.reference) }}
@@ -109,14 +112,7 @@
                     {{ form_widget(form.weight) }}
                 </div>
             </div>
-            <div class="row form-group">
-                <div class="col-md-6">
-                    {{ form_widget(form.netPrice) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_widget(form.taxGroup) }}
-                </div>
-            </div>
+            {{ form_widget(form.taxGroup) }}
         </div>
         {{ form_rest(form) }}
     </div>

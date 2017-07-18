@@ -300,18 +300,25 @@ class ItemBuilder
                             break;
                         }
                     }
-                }
 
-                // Build the item from the bundle choice's product
-                $this->buildFromBundleChoice($childItem, $bundleChoice);
+                    // Build the item from the bundle choice's product
+                    $this->buildFromBundleChoice($childItem, $bundleChoice);
+
+                } elseif (!$bundleSlot->isRequired()) {
+                    // No choice and not required : remove child item
+                    $item->removeChild($childItem);
+                }
 
                 continue 2;
             }
 
             $bundleSlotIds[] = $bundleSlot->getId();
 
-            // Not found : Create and build the item from the bundle choice's product
-            $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
+            // Not found
+            if ($bundleSlot->isRequired()) {
+                // Create and build the item from the bundle choice's product
+                $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
+            }
         }
 
         $this->cleanUpBundleSlots($item, $bundleSlotIds);
@@ -404,6 +411,7 @@ class ItemBuilder
 
                     if (!$found) {
                         if ($optionGroup->isRequired()) {
+                            //$this->buildFromOption($child, reset($options));
                             throw new RuntimeException("Option group is required.");
                         } else {
                             $item->removeChild($child);
@@ -439,7 +447,6 @@ class ItemBuilder
             $item
                 ->setDesignation($designation)
                 ->setReference($option->getReference())
-                ->setNetPrice($option->getNetPrice())
                 ->setWeight($option->getWeight())
                 ->setTaxGroup($option->getTaxGroup());
         }
@@ -447,6 +454,7 @@ class ItemBuilder
         $item
             ->setData(static::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setData(static::OPTION_ID, $option->getId())
+            ->setNetPrice($option->getNetPrice())
             ->setQuantity(1)
             ->setImmutable(true);
     }
@@ -616,7 +624,11 @@ class ItemBuilder
             /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
-            $this->initializeFromBundleChoice($child, $defaultChoice);
+            if ($bundleSlot->isRequired()) {
+                $this->initializeFromBundleChoice($child, $defaultChoice);
+            } else {
+                $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
+            }
         }
     }
 
