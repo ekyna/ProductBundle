@@ -118,7 +118,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         destroy: function () {
             this.unbindEvents();
             this.$element.removeData();
-            if (this.$choice) {
+            if (this.$choice && this.$choice.data('saleItem')) {
                 this.$choice.data('saleItem').destroy();
             }
         },
@@ -133,6 +133,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             var that = this,
                 $current = that.$choice,
+                current = that.choice,
                 choiceId = this.$radio.filter(':checked').val() || 0,
                 $selected = this.$element.find('.slot-choice-form[data-id="' + choiceId + '"]');
 
@@ -159,8 +160,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             if ($current) {
                 $current
                     .fadeOut(250, function () {
-                        if ($current.data('saleItem')) {
-                            $current.data('saleItem').destroy();
+                        if (current) {
+                            current.destroy();
                         }
                         toggleDisabled($current, true);
                         showChoice();
