@@ -126,6 +126,20 @@ class ProductController extends ResourceController
             }
 
             $data['variants'] = $table->createView();
+        } elseif (ProductTypes::isChildType($product->getType())) {
+            $type = $this->get('ekyna_commerce.supplier_product.configuration')->getTableType();
+
+            $table = $this
+                ->getTableFactory()
+                ->createTable('supplierProducts', $type, [
+                    'subject' => $product,
+                ]);
+
+            if (null !== $response = $table->handleRequest($context->getRequest())) {
+                return $response;
+            }
+
+            $data['supplierProducts'] = $table->createView();
         }
 
         return null;

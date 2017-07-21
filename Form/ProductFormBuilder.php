@@ -7,6 +7,7 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -451,6 +452,45 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('seo', SeoType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the stock mode field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addStockMode(array $options = [])
+    {
+        $options = array_replace([
+            'label'   => 'ekyna_commerce.stock_subject.field.mode',
+            'choices' => StockSubjectModes::getChoices(),
+        ], $options);
+
+        $this->form->add('stockMode', SF\ChoiceType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the stock floor field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addStockFloor(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_commerce.stock_subject.field.floor',
+            'scale'    => 3,
+            'required' => false,
+        ], $options);
+
+        $this->form->add('stockFloor', SF\NumberType::class, $options);
 
         return $this;
     }

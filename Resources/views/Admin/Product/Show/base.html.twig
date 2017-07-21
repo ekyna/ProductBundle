@@ -22,6 +22,13 @@
             </a>
         </li>
         {% endblock stock_tab %}
+        {% if supplierProducts is defined %}
+        <li>
+            <a href="#product-suppliers" id="toggle-product-suppliers" data-toggle="tab">
+                {{ 'ekyna_commerce.supplier.label.plural'|trans }}
+            </a>
+        </li>
+        {% endif %}
         {% block seo_tab %}
         <li>
             <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
@@ -70,6 +77,18 @@
                 {% endblock stock_content %}
                 </div>
             {% endblock stock_pane %}
+
+            {% if supplierProducts is defined %}
+            <div class="tab-pane" id="product-suppliers">
+                {#<div class="actions">
+                    {{ admin_resource_btn('ekyna_commerce.supplier_product', 'new', {
+                        'label': 'ekyna_commerce.supplier_product.button.new',
+                        'path': path('ekyna_commerce_supplier_product_admin_new')
+                    }) }}
+                </div>#}
+                {{ ekyna_table_render(supplierProducts) }}
+            </div>
+            {% endif %}
 
             {% block seo_pane %}
                 <div class="tab-pane" id="product-seo">

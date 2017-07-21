@@ -92,6 +92,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addStockMode()
+            ->addStockFloor()
             ->addDeliveryTimeField()
             ->addTagsField()
             ->addReferencesField()
@@ -120,6 +122,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled' => true,
             ])
             ->addGeocodeField([
+                'disabled' => true,
+            ])
+            ->addStockMode([
+                'disabled' => true,
+            ])
+            ->addStockFloor([
                 'disabled' => true,
             ])
             ->addTranslationsField()
@@ -154,6 +162,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReferenceField()
             ->addWeightField()
             ->addGeocodeField()
+            ->addStockMode()
+            ->addStockFloor()
             ->addDeliveryTimeField()
             ->addTagsField()
             ->addTranslationsField([
@@ -195,6 +205,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addGeocodeField([
                 'disabled' => true,
             ])
+            ->addStockMode([
+                'disabled' => true,
+            ])
+            ->addStockFloor([
+                'disabled' => true,
+            ])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
@@ -228,6 +244,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled' => true,
             ])
             ->addGeocodeField([
+                'disabled' => true,
+            ])
+            ->addStockMode([
+                'disabled' => true,
+            ])
+            ->addStockFloor([
                 'disabled' => true,
             ])
             ->addTranslationsField()
