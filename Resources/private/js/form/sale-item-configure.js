@@ -225,21 +225,19 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 this.$image.appendTo(this.optionGroups.item.$gallery.find('.item-gallery-children'));
             }
 
-            this.updateDisplay();
+            this.updateState();
             this.selectOption();
             this.bindEvents();
         },
 
-        updateDisplay: function () {
-            return;
-
-            // Hide if locked or disabled
+        updateState: function () {
+            // Disable if locked
             if (this.locked) {
                 this.$select.prop('disabled', true);
                 return;
             }
 
-            // Hide if Placeholder + Single option
+            // Disable if Placeholder + Single option
             if (this.$element.find('label').hasClass('required') && 1 >= this.$select.children().length) {
                 this.$select.prop('disabled', true);
                 return;
@@ -437,7 +435,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             var $group = this.$element.find('> .form-group[data-id="' + data.id + '"]');
             if (1 === $group.size()) {
-                $group.data('optionGroup').unlock().updateDisplay();
+                $group.show().data('optionGroup').unlock().updateState();
                 return;
             }
 
@@ -448,17 +446,21 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.$groups.push($group);
             this.groups.push($group.data('optionGroup'));
-
-            //this.loadGroups();
         },
 
         lockByType: function (type) {
             this.$element.find('> .form-group[data-type="' + type + '"]')
                 .each(function () {
-                    $(this).data('optionGroup').lock().updateDisplay();
+                    $(this).data('optionGroup').lock().updateState();
                 });
 
-            //this.loadGroups();
+            return this;
+        },
+
+        hideByType: function (type) {
+            this.$element.find('> .form-group[data-type="' + type + '"]').hide();
+
+            return this;
         }
     });
 
@@ -717,7 +719,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             var that = this;
 
             // TODO we're losing initial selection T_T
-            this.optionGroups.lockByType('variant');
+            this.optionGroups.lockByType('variant').hideByType('variant');
 
             // Lock by type (to prevent enable on show choice)
 
