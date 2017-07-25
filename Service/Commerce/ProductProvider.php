@@ -57,6 +57,11 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function assign(SubjectRelativeInterface $relative, $subject)
     {
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $subject */
+        if ($subject->getType() === ProductTypes::TYPE_VARIABLE) {
+            $subject = $subject->getVariants()->first();
+        }
+
         return $this->transform($subject, $relative->getSubjectIdentity());
     }
 

@@ -431,11 +431,13 @@ class FormBuilder
         $repository = $this->productProvider->getProductRepository();
 
         // Variable : add variant choice form
-        if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-            $repository->loadVariants($product);
+        if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT], true)) {
+            $variable = $product->getType() === Model\ProductTypes::TYPE_VARIANT ? $product->getParent() : $product;
+
+            $repository->loadVariants($variable);
 
             $form->add('variant', Pr\SaleItem\VariantChoiceType::class, [
-                'variable' => $product,
+                'variable' => $variable,
             ]);
 
             // Configurable : add configuration form

@@ -101,7 +101,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         $adjustmentsData = $this
             ->priceResolver
-            ->resolve($product, $item->getQuantity(), $sale->getCustomerGroup(), $country);
+            ->resolve($product, $item->getTotalQuantity(), $sale->getCustomerGroup(), $country);
 
         if ($adjustmentsData) {
             $event->addAdjustmentData($adjustmentsData);

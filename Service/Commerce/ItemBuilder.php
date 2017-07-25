@@ -172,16 +172,9 @@ class ItemBuilder
     {
         ProductTypes::assertVariant($variant);
 
-        // Assigns the parent's variable
-        $this->provider->assign($item, $variant->getParent());
+        $this->buildFromSimple($item, $variant);
 
-        $item
-            ->setDesignation((string)$variant)
-            ->setReference($variant->getReference())
-            ->setNetPrice($variant->getNetPrice())
-            ->setWeight($variant->getWeight())
-            ->setTaxGroup($variant->getTaxGroup())
-            ->setData(static::VARIANT_ID, $variant->getId());
+        $item->setData(static::VARIANT_ID, $variant->getId());
     }
 
     /**
