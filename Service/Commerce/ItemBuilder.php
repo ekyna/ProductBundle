@@ -351,6 +351,7 @@ class ItemBuilder
 
         if (empty($optionGroups)) {
             $this->cleanUpOptionGroups($item);
+
             return;
         }
 
@@ -518,28 +519,7 @@ class ItemBuilder
     {
         ProductTypes::assertVariable($product);
 
-        $variants = $this->filter->getVariants($product);
-
-        if (empty($variants)) {
-            throw new InvalidArgumentException("Variable product must have at least one variant.");
-        }
-
-        $variant = null;
-        if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
-            foreach ($variants as $v) {
-                if ($variantId == $v->getId()) {
-                    $variant = $v;
-                    break;
-                }
-            }
-        }
-
-        if (null === $variant) {
-            /** @var ProductInterface $variant */
-            $variant = reset($variants);
-        }
-
-        $this->initializeFromVariant($item, $variant);
+        $this->initializeFromVariant($item, $this->fallbackVariableToVariant($product));
     }
 
     /**
@@ -578,7 +558,15 @@ class ItemBuilder
 
             // Valid and default slot product(s)
             foreach ($bundlesChoices as $choice) {
-                $choiceProducts[] = $choice->getProduct();
+                $choiceProduct = $choice->getProduct();
+                if ($choiceProduct->getType() === ProductTypes::TYPE_VARIABLE) {
+                    // Variable product can't be assigned, so use variants
+                    foreach ($choiceProduct->getVariants() as $variant) {
+                        $choiceProducts[] = $variant;
+                    }
+                } else {
+                    $choiceProducts[] = $choiceProduct;
+                }
             }
 
             // Find slot matching item
@@ -633,7 +621,10 @@ class ItemBuilder
      */
     public function initializeFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $bundleChoice)
     {
-        $this->provider->assign($item, $bundleChoice->getProduct());
+        //if (!$item->hasSubjectIdentity()) {
+            $product = $this->fallbackVariableToVariant($bundleChoice->getProduct());
+            $this->provider->assign($item, $product);
+        //}
 
         $this->initialize($item);
 
@@ -807,5 +798,36 @@ class ItemBuilder
         }
 
         return $groups;
+    }
+
+    /**
+     * Returns the relevant variant if the given product is a variable one.
+     *
+     * @param ProductInterface  $product
+     * @param SaleItemInterface $item
+     *
+     * @return ProductInterface
+     */
+    private function fallbackVariableToVariant(ProductInterface $product, SaleItemInterface $item = null)
+    {
+        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
+            $variants = $this->filter->getVariants($product);
+
+            if (empty($variants)) {
+                throw new InvalidArgumentException("Variable product must have at least one variant.");
+            }
+
+            if ($item && 0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
+                foreach ($variants as $v) {
+                    if ($variantId == $v->getId()) {
+                        return $v;
+                    }
+                }
+            }
+
+            return reset($variants);
+        }
+
+        return $product;
     }
 }

@@ -334,6 +334,24 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
 
             return this;
+        },
+
+        hide: function() {
+            this.$element.hide();
+            if (this.$image.size()) {
+                this.$image.hide();
+            }
+
+            return this;
+        },
+
+        show: function() {
+            this.$element.show();
+            if (this.$image.size()) {
+                this.$image.show();
+            }
+
+            return this;
         }
     });
 
@@ -435,7 +453,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             var $group = this.$element.find('> .form-group[data-id="' + data.id + '"]');
             if (1 === $group.size()) {
-                $group.show().data('optionGroup').unlock().updateState();
+                $group.data('optionGroup').show().unlock().updateState();
                 return;
             }
 
@@ -451,14 +469,17 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         lockByType: function (type) {
             this.$element.find('> .form-group[data-type="' + type + '"]')
                 .each(function () {
-                    $(this).data('optionGroup').lock().updateState();
+                    $(this).data('optionGroup').lock().hide().updateState();
                 });
 
             return this;
         },
 
         hideByType: function (type) {
-            this.$element.find('> .form-group[data-type="' + type + '"]').hide();
+            this.$element.find('> .form-group[data-type="' + type + '"]')
+                .each(function() {
+                    $(this).data('optionGroup').hide();
+                });
 
             return this;
         }

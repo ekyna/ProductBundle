@@ -143,7 +143,7 @@ class ConfigurableSlotType extends Form\AbstractType
                 // Create a fake item
                 $fakeItem = $item->createChild();
 
-                $this->formBuilder->getProvider()->assign($fakeItem, $bundleChoice->getProduct());
+                $this->itemBuilder->initializeFromBundleChoice($fakeItem, $bundleChoice);
                 $choiceForm->setData($fakeItem);
 
                 $choiceFormView = $choiceForm->createView();
