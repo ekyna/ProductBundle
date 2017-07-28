@@ -8,6 +8,7 @@ use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
+use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -26,7 +27,8 @@ interface ProductInterface extends
     RM\TaggedEntityInterface,
     AdjustableInterface,
     TaxableInterface,
-    StockSubjectInterface
+    StockSubjectInterface,
+    SubjectInterface
 {
     /**
      * Sets the id.

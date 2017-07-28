@@ -1,34 +1,32 @@
-define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], function($, Router, Templates, BootstrapDialog) {
+define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function($, Router, Templates, Modal) {
 
     var $list = $('#inventory_list'),
         $wait = $('#inventory_wait'),
         $none = $('#inventory_none'),
         $sort = $('#inventory_sort'),
-        $form = $('form[name="inventory_search"]'),
-        dialog = new BootstrapDialog({
-            buttons: [
-                {
-                    label: 'Close',
-                    action: function(dialog){
-                        dialog.close();
-                    }
-                }
-            ]
-        });
+        $form = $('form[name="inventory"]'),
+        busy = false,
+        productsXhr;
 
-    var productsXhr, stockUnitsXhr;
-
-    function getParameters() {
+    /**
+     * Returns the context form data.
+     *
+     * @returns object
+     */
+    function getContext() {
         var array = $form.serializeArray();
 
-        var data = {};
+        var context = {};
         for (var i = 0; i < array.length; i++){
-            data[array[i]['name']] = array[i]['value'];
+            context[array[i]['name']] = array[i]['value'];
         }
 
-        return data;
+        return context;
     }
 
+    /**
+     * Updates the inventory list.
+     */
     function updateList() {
         if (productsXhr) {
             productsXhr.abort();
@@ -42,7 +40,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], fun
             url: Router.generate('ekyna_product_inventory_admin_products'),
             method: 'GET',
             dataType: 'json',
-            data: getParameters()
+            data: getContext()
         })
         .done(function (data) {
             $wait.hide();
@@ -57,6 +55,9 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], fun
         });
     }
 
+    /**
+     * Context form submit.
+     */
     $form.on('submit', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -66,17 +67,26 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], fun
         return false;
     });
 
+    /**
+     * Context form reset.
+     */
     $form.on('reset', function() {
         updateList();
     });
 
+
+    /**
+     * Line's stock unit buttons click handler
+     */
     $list.on('click', 'a.stock-units', function(e) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (stockUnitsXhr) {
-            stockUnitsXhr.abort();
+        if (busy) {
+            return false;
         }
+
+        busy = true;
 
         var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
         if (!productId) {
@@ -84,20 +94,71 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], fun
             return false;
         }
 
-        stockUnitsXhr = $.ajax({
-            url: Router.generate('ekyna_product_inventory_admin_stock_units', {productId: productId}),
-            method: 'GET',
-            dataType: 'html'
-        })
-        .done(function(html) {
-            dialog.setMessage($(html));
-            dialog.setSize(BootstrapDialog.SIZE_WIDE);
-            dialog.open();
-        });
+        try {
+            var modal = new Modal();
+            modal.load({
+                url: Router.generate('ekyna_product_inventory_admin_stock_units', {productId: productId}),
+                method: 'GET'
+            });
+            $(modal).on('ekyna.modal.response', function () {
+                busy = false;
+            });
+        } catch(e) {
+            console.log(e);
+            busy = false;
+        }
 
         return false;
     });
 
+
+    /**
+     * Line's resupply buttons click handler
+     */
+    $list.on('click', 'a.resupply', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (busy) {
+            return false;
+        }
+
+        busy = true;
+
+        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
+        if (!productId) {
+            console.log('Undefined product id.');
+            return false;
+        }
+
+        try {
+            var modal = new Modal();
+            modal.load({
+                url: Router.generate('ekyna_product_inventory_admin_resupply', {productId: productId}),
+                method: 'GET'
+            });
+            $(modal).on('ekyna.modal.response', function (e) {
+                busy = false;
+
+                if (e.contentType === 'json') {
+                    e.preventDefault();
+
+                    if (e.content.success) {
+                        updateList();
+                    }
+                }
+            });
+        } catch(e) {
+            console.log(e);
+            busy = false;
+        }
+
+        return false;
+    });
+
+    /**
+     * List sort headers click handler
+     */
     $sort.on('click', 'th.sort a', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -129,3 +190,4 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'bootstrap/dialog'], fun
 
     updateList();
 });
+

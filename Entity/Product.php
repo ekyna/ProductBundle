@@ -7,6 +7,7 @@ use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
@@ -1114,5 +1115,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public static function getEntityTagPrefix()
     {
         return 'ekyna_product.product';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    static public function getProviderName()
+    {
+        return ProductProvider::NAME;
     }
 }

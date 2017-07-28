@@ -3,11 +3,11 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 /**
- * Class InventorySearch
+ * Class InventoryContext
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class InventorySearch
+class InventoryContext
 {
     /**
      * @var int
@@ -47,6 +47,11 @@ class InventorySearch
     /**
      * @var string
      */
+    private $profile;
+
+    /**
+     * @var string
+     */
     private $sortBy;
 
     /**
@@ -54,6 +59,14 @@ class InventorySearch
      */
     private $sortDir;
 
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->profile = InventoryProfiles::NONE;
+    }
 
     /**
      * Returns the brand.
@@ -70,7 +83,7 @@ class InventorySearch
      *
      * @param int $brand
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setBrand($brand)
     {
@@ -94,7 +107,7 @@ class InventorySearch
      *
      * @param int $supplier
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setSupplier($supplier)
     {
@@ -118,7 +131,7 @@ class InventorySearch
      *
      * @param string $reference
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setReference($reference)
     {
@@ -142,7 +155,7 @@ class InventorySearch
      *
      * @param string $designation
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setDesignation($designation)
     {
@@ -166,7 +179,7 @@ class InventorySearch
      *
      * @param string $geocode
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setGeocode($geocode)
     {
@@ -190,7 +203,7 @@ class InventorySearch
      *
      * @param string $mode
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setMode($mode)
     {
@@ -214,11 +227,35 @@ class InventorySearch
      *
      * @param string $state
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setState($state)
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * Returns the profile.
+     *
+     * @return string
+     */
+    public function getProfile()
+    {
+        return $this->profile;
+    }
+
+    /**
+     * Sets the profile.
+     *
+     * @param string $profile
+     *
+     * @return InventoryContext
+     */
+    public function setProfile($profile)
+    {
+        $this->profile = $profile;
 
         return $this;
     }
@@ -238,7 +275,7 @@ class InventorySearch
      *
      * @param string $sortBy
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setSortBy($sortBy)
     {
@@ -262,7 +299,7 @@ class InventorySearch
      *
      * @param string $sortDir
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
     public function setSortDir($sortDir)
     {
@@ -278,7 +315,7 @@ class InventorySearch
      */
     public function fromArray(array $array)
     {
-        if (9 === count($array)) {
+        if (10 === count($array)) {
             list(
                 $this->brand,
                 $this->supplier,
@@ -287,6 +324,7 @@ class InventorySearch
                 $this->geocode,
                 $this->mode,
                 $this->state,
+                $this->profile,
                 $this->sortBy,
                 $this->sortDir
             ) = $array;
@@ -308,8 +346,9 @@ class InventorySearch
             $this->geocode,
             $this->mode,
             $this->state,
+            $this->profile,
             $this->sortBy,
-            $this->sortDir
+            $this->sortDir,
         ];
     }
 }

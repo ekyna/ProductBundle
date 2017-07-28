@@ -13,8 +13,10 @@
     <td class="text-right{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
     <td class="text-right">{{ shipped }}</td>
     <td class="text-right">
-        <a href="javascript: void(0)" class="btn btn-xs btn-default stock-units">
-            <span class="fa fa-info"></span>
-        </a>
+        <div class="btn-group btn-group-xs">
+            <a href="javascript: void(0)" class="btn btn-default stock-units">SU</a>
+            <a href="javascript: void(0)" class="btn btn-default treatment">CO</a>
+            <a href="javascript: void(0)" class="btn btn-default resupply">SO</a>
+        </div>
     </td>
 </tr>

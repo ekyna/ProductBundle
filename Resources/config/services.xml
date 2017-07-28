@@ -32,10 +32,21 @@
             <argument type="service" id="session"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
         </service>
-        <service id="ekyna_product.inventory_search.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\InventorySearchType">
+        <service id="ekyna_product.inventory.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">
             <argument type="service" id="ekyna_product.brand.repository"/>
             <argument type="service" id="ekyna_commerce.supplier.repository"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.inventory_resupply.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType">
+            <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
+            <tag name="form.type"/>
+            <tag name="form.js" selector="form[name=ekyna_product_inventory_resupply]" path="ekyna-product/form/resupply"/>
+        </service>
+        <service id="ekyna_product.inventory_resupply_product.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyProductType">
+            <argument type="service" id="ekyna_commerce.supplier_order.repository"/>
             <tag name="form.type"/>
         </service>
 

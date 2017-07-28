@@ -135,7 +135,12 @@ ekyna_product:
 
     inventory:
         title: Inventaire
-
+        field:
+            profile: Profil
+        profile:
+            none: Aucun
+            treatment: Traitement
+            resupply: Réapprovisionnement
 
     option:
         label:

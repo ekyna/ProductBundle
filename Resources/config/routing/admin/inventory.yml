@@ -16,3 +16,10 @@ ekyna_product_inventory_admin_stock_units:
     methods: [GET]
     options:
         expose: true
+
+ekyna_product_inventory_admin_resupply:
+    path: /{productId}/resupply
+    defaults: { _controller: EkynaProductBundle:Admin/Inventory:resupply }
+    methods: [GET, POST]
+    options:
+        expose: true

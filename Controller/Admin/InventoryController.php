@@ -3,6 +3,8 @@
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
+use Ekyna\Bundle\CoreBundle\Modal\Modal;
+use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +34,11 @@ class InventoryController extends Controller
 
         $inventory = $this->get('ekyna_product.inventory');
 
-        $form = $inventory->getSearchForm();
-        $data = $inventory->getSearchData();
+        $form = $inventory->getForm([
+            'action' => $this->generateUrl('ekyna_product_inventory_admin_products')
+        ]);
+
+        $data = $inventory->getContext();
 
         return $this->render('EkynaProductBundle:Admin/Inventory:index.html.twig', [
             'data' => $data,
@@ -62,21 +67,104 @@ class InventoryController extends Controller
     /**
      * Inventory stock units action.
      *
-     * @param $productId
+     * @param Request $request
      *
      * @return string
      */
-    public function stockUnitsAction($productId)
+    public function stockUnitsAction(Request $request)
     {
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
-        $product = $this
-            ->get('ekyna_product.product.repository')
-            ->find($productId);
+        $product = $this->findProductByRequest($request);
 
         $list = $this->get('ekyna_commerce.stock.stock_renderer')->renderSubjectStockUnitList($product, [
             'class' => 'table-condensed',
         ]);
 
-        return new Response($list);
+        $modal = new Modal('Unités de stock', $list, [
+            [
+                'id'       => 'close',
+                'label'    => 'ekyna_core.button.close',
+                'icon'     => 'glyphicon glyphicon-remove',
+                'cssClass' => 'btn-default',
+            ]
+        ]);
+
+        return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
+     * Resupply action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function resupplyAction(Request $request)
+    {
+        /*if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
+        }*/
+
+        $product = $this->findProductByRequest($request);
+
+        $form = $this->createForm(ResupplyType::class, [], [
+            'action' => $this->generateUrl('ekyna_product_inventory_admin_resupply', [
+                'productId' => $product->getId(),
+            ]),
+            'product' => $product,
+            'attr' => [
+                'class' => 'form-horizontal',
+            ]
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $stop = true; // TODO
+
+            return new JsonResponse([
+                'success' => true,
+            ]);
+        }
+
+        $modal = new Modal('Réassort', $form->createView(), [
+            [
+                'id'       => 'submit',
+                'label'    => 'ekyna_core.button.save',
+                'icon'     => 'glyphicon glyphicon-ok',
+                'cssClass' => 'btn-success',
+                'autospin' => true,
+            ],
+            [
+                'id'       => 'close',
+                'label'    => 'ekyna_core.button.cancel',
+                'icon'     => 'glyphicon glyphicon-remove',
+                'cssClass' => 'btn-default',
+            ]
+        ]);
+
+        return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
+     * Finds the product by request.
+     *
+     * @param Request $request
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface
+     */
+    private function findProductByRequest(Request $request)
+    {
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $this
+            ->get('ekyna_product.product.repository')
+            ->find($request->attributes->get('productId'));
+
+        if (null === $product) {
+            throw $this->createNotFoundException('Product not found.');
+        }
+
+        return $product;
     }
 }

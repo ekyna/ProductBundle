@@ -1,12 +1,13 @@
 <?php
 
-namespace Ekyna\Bundle\ProductBundle\Form\Type;
+namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Supplier\SupplierChoiceType;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
 use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
-use Ekyna\Bundle\ProductBundle\Model\InventorySearch;
+use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
+use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Repository\BrandRepository;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Form\IdToObjectTransformer;
@@ -16,11 +17,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class InventorySearchType
+ * Class InventoryType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class InventorySearchType extends AbstractType
+class InventoryType extends AbstractType
 {
     /**
      * @var BrandRepository
@@ -91,10 +92,15 @@ class InventorySearchType extends AbstractType
                 'required' => false,
                 'select2'  => false,
             ])
+            ->add('profile', Type\ChoiceType::class, [
+                'label'    => 'ekyna_product.inventory.field.profile',
+                'choices'  => InventoryProfiles::getChoices(),
+                'select2'  => false,
+            ])
             ->add('sortBy', Type\HiddenType::class)
             ->add('sortDir', Type\HiddenType::class)
             ->add('submit', Type\SubmitType::class, [
-                'label' => 'ekyna_core.button.filter',
+                'label' => 'ekyna_core.button.apply',
                 'attr'  => [
                     'class' => 'btn-sm',
                 ],
@@ -112,6 +118,6 @@ class InventorySearchType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class', InventorySearch::class);
+        $resolver->setDefault('data_class', InventoryContext::class);
     }
 }

@@ -5,8 +5,9 @@ namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
-use Ekyna\Bundle\ProductBundle\Form\Type\InventorySearchType;
-use Ekyna\Bundle\ProductBundle\Model\InventorySearch;
+use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType;
+use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
+use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository;
@@ -75,14 +76,14 @@ class Inventory
     private $config;
 
     /**
-     * @var InventorySearch
+     * @var InventoryContext
      */
-    private $searchData;
+    private $context;
 
     /**
      * @var FormInterface
      */
-    private $searchForm;
+    private $form;
 
 
     /**
@@ -122,51 +123,53 @@ class Inventory
     }
 
     /**
-     * Returns the search form.
+     * Returns the form.
+     *
+     * @param array $options
      *
      * @return FormInterface
      */
-    public function getSearchForm()
+    public function getForm(array $options = [])
     {
-        if ($this->searchForm) {
-            return $this->searchForm;
+        if ($this->form) {
+            return $this->form;
         }
 
-        return $this->searchForm = $this
+        return $this->form = $this
             ->formFactory
             ->create(
-                InventorySearchType::class,
-                $this->getSearchData(),
-                ['method' => 'GET']
+                InventoryType::class,
+                $this->getContext(),
+                array_replace(['method' => 'GET'], $options)
             );
     }
 
     /**
-     * Returns the search data.
+     * Returns the context.
      *
-     * @return InventorySearch
+     * @return InventoryContext
      */
-    public function getSearchData()
+    public function getContext()
     {
-        if ($this->searchData) {
-            return $this->searchData;
+        if ($this->context) {
+            return $this->context;
         }
 
-        $this->searchData = new InventorySearch();
+        $this->context = new InventoryContext();
 
         if ($this->session->has(static::SESSION_KEY)) {
-            $this->searchData->fromArray(json_decode($this->session->get(static::SESSION_KEY)));
+            $this->context->fromArray(json_decode($this->session->get(static::SESSION_KEY)));
         }
 
-        return $this->searchData;
+        return $this->context;
     }
 
     /**
-     * Saves the search data.
+     * Saves the context.
      */
-    public function saveSearchData()
+    public function saveContext()
     {
-        $this->session->set(static::SESSION_KEY, json_encode($this->getSearchData()->toArray()));
+        $this->session->set(static::SESSION_KEY, json_encode($this->getContext()->toArray()));
     }
 
     /**
@@ -180,24 +183,22 @@ class Inventory
     {
         $this->loadConfig();
 
-        // Search form
-        $form = $this->getSearchForm();
+        // Form
+        $form = $this->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->saveSearchData();
+            $this->saveContext();
         }
 
-        // Search parameters
-        $search = $this->getSearchData();
+        // Context
+        $context = $this->getContext();
+        $this->saveContext();
 
         // Products
         $pQb = $this->getProductsQueryBuilder();
-        $this->applySearchData($pQb, $search);
+        $this->applyContextToQueryBuilder($pQb, $context);
 
         $products = $pQb->getQuery()->setMaxResults(30)->getScalarResult();
-
-        // Stock
-        $sQb = $this->getStockDataQueryBuilder()->getQuery();
 
         foreach ($products as &$product) {
             // Designation (for variant)
@@ -226,16 +227,11 @@ class Inventory
                 $product['eda'] = $eda->format('d/m/Y'); // TODO localized format
             }
 
-            // Query stock data
-            $stock = $sQb
-                ->setParameter('product', $product['id'])
-                ->getScalarResult()[0];
-
             // Stock sums
-            $product['ordered'] = $this->formatter->format($stock['ordered']);
-            $product['received'] = $this->formatter->format($stock['received']);
-            $product['sold'] = $this->formatter->format($stock['sold']);
-            $product['shipped'] = $this->formatter->format($stock['shipped']);
+            $product['ordered'] = $this->formatter->format($product['ordered']);
+            $product['received'] = $this->formatter->format($product['received']);
+            $product['sold'] = $this->formatter->format($product['sold']);
+            $product['shipped'] = $this->formatter->format($product['shipped']);
 
             // Stock themes
             $product['sold_theme'] = '';
@@ -286,6 +282,10 @@ class Inventory
                 'p.estimatedDateOfArrival as eda',
                 'parent.designation as parent_designation',
             ])
+            ->addSelect($this->buildStockSubQuery('orderedQuantity', 'ordered', 'su1'))
+            ->addSelect($this->buildStockSubQuery('receivedQuantity', 'received', 'su2'))
+            ->addSelect($this->buildStockSubQuery('soldQuantity', 'sold', 'su3'))
+            ->addSelect($this->buildStockSubQuery('shippedQuantity', 'shipped', 'su4'))
             ->leftJoin('p.brand', 'b')
             ->leftJoin('p.parent', 'parent')
             ->andWhere($pQb->expr()->in('p.type', ':types'))
@@ -295,31 +295,31 @@ class Inventory
     }
 
     /**
-     * Applies the search data to the query builder.
+     * Applies the context to the query builder.
      *
-     * @param QueryBuilder    $qb
-     * @param InventorySearch $search
+     * @param QueryBuilder     $qb
+     * @param InventoryContext $context
      */
-    private function applySearchData(QueryBuilder $qb, InventorySearch $search)
+    private function applyContextToQueryBuilder(QueryBuilder $qb, InventoryContext $context)
     {
         $expr = $qb->expr();
 
         // Brand filter
-        if (0 < $brand = $search->getBrand()) {
+        if (0 < $brand = $context->getBrand()) {
             $qb
                 ->andWhere($expr->eq('p.brand', ':brand'))
                 ->setParameter('brand', $brand);
         }
 
         // Supplier filter
-        if (0 < $supplier = $search->getSupplier()) {
+        if (0 < $supplier = $context->getSupplier()) {
             $qb
-                ->andWhere($expr->exists($this->getSupplierSubQuery()))
+                ->andWhere($expr->exists($this->buildSupplierSubQuery()))
                 ->setParameter('supplier', $supplier);
         }
 
         // Designation filter
-        if (0 < strlen($designation = $search->getDesignation())) {
+        if (0 < strlen($designation = $context->getDesignation())) {
             $qb
                 ->andWhere($expr->orX(
                     $expr->andX($expr->isNull('p.parent'), $expr->like('p.designation', ':designation')),
@@ -329,36 +329,43 @@ class Inventory
         }
 
         // Reference filter
-        if (0 < strlen($reference = $search->getReference())) {
+        if (0 < strlen($reference = $context->getReference())) {
             $qb
                 ->andWhere($expr->like('p.reference', ':reference'))
                 ->setParameter('reference', '%' . $reference . '%');
         }
 
         // Geocode filter
-        if (0 < strlen($geocode = $search->getGeocode())) {
+        if (0 < strlen($geocode = $context->getGeocode())) {
             $qb
                 ->andWhere($expr->like('p.geocode', ':geocode'))
                 ->setParameter('geocode', '%' . $geocode . '%');
         }
 
         // Mode filter
-        if (0 < strlen($mode = $search->getMode())) {
+        if (0 < strlen($mode = $context->getMode())) {
             $qb
                 ->andWhere($expr->like('p.stockMode', ':mode'))
                 ->setParameter('mode', '%' . $mode . '%');
         }
 
         // State filter
-        if (0 < strlen($state = $search->getState())) {
+        if (0 < strlen($state = $context->getState())) {
             $qb
                 ->andWhere($expr->like('p.stockState', ':state'))
                 ->setParameter('state', '%' . $state . '%');
         }
 
+        // Profile
+        if (InventoryProfiles::TREATMENT === $context->getProfile()) {
+            $qb->andHaving($expr->lt('shipped', 'sold'));
+        } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
+            $qb->andHaving($expr->lt('ordered', 'sold'));
+        }
+
         // Sorting
-        $by = $search->getSortBy();
-        $dir = strtoupper($search->getSortDir());
+        $by = $context->getSortBy();
+        $dir = strtoupper($context->getSortDir());
         if (0 < strlen($by) && in_array($dir, ['ASC', 'DESC'])) {
             if ($by === 'brand') {
                 $by = 'b.name';
@@ -370,11 +377,38 @@ class Inventory
     }
 
     /**
-     * Returns the supplier sub query's DQL.
+     * Builds the stock sub query.
+     *
+     * @param string $field
+     * @param string $fieldAlias
+     * @param string $tableAlias
      *
      * @return string
      */
-    private function getSupplierSubQuery()
+    private function buildStockSubQuery($field, $fieldAlias, $tableAlias)
+    {
+        $class = $this->stockUnitRepository->getClassName();
+
+        return strtr('('.
+            'SELECT SUM(_table_._field_) '.
+            'FROM _class_ _table_ '.
+            'WHERE _table_.state <> \'_state_\' '.
+            'AND _table_.product = p.id'.
+            ') AS _alias_', [
+            '_field_' => $field,
+            '_class_' => $class,
+            '_table_' => $tableAlias,
+            '_state_' => StockUnitStates::STATE_CLOSED,
+            '_alias_' => $fieldAlias
+        ]);
+    }
+
+    /**
+     * Builds the supplier sub query.
+     *
+     * @return string
+     */
+    private function buildSupplierSubQuery()
     {
         $sQb = $this->supplierProductRepository->createQueryBuilder('sp');
         $sQb
@@ -383,29 +417,6 @@ class Inventory
             ->andWhere($sQb->expr()->eq('sp.supplier', ':supplier'));
 
         return $sQb->getDQL();
-    }
-
-    /**
-     * Returns the stock units query builder.
-     *
-     * @return QueryBuilder
-     */
-    private function getStockDataQueryBuilder()
-    {
-        $qb = $this->stockUnitRepository->createQueryBuilder('s');
-
-        $expr = $qb->expr();
-
-        return $qb
-            ->select([
-                'SUM(s.orderedQuantity) AS ordered',
-                'SUM(s.receivedQuantity) AS received',
-                'SUM(s.soldQuantity) AS sold',
-                'SUM(s.shippedQuantity) AS shipped',
-            ])
-            ->andWhere($expr->neq('s.state', ':state'))
-            ->andWhere($expr->eq('s.product', ':product'))
-            ->setParameter('state', StockUnitStates::STATE_CLOSED);
     }
 
     /**

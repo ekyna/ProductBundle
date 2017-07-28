@@ -174,3 +174,141 @@
 {% endspaceless %}
 {% endblock ekyna_product_reference_widget %}
 
+
+{% block ekyna_product_inventory_resupply_widget %}
+{% spaceless %}
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ form_errors(form) }}
+    {{ form_widget(form.supplierProduct, {'widget_col': 12}) }}
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.netPrice, {'label_col': 6, 'widget_col': 6}) }}
+        </div>
+    </div>
+    {{ form_rest(form) }}
+{% endspaceless %}
+{% endblock ekyna_product_inventory_resupply_widget %}
+
+
+{% block ekyna_product_inventory_resupply_products_widget %}
+{% spaceless %}
+    <table class="table table-condensed supplier-products">
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>{{ 'ekyna_commerce.supplier.label.singular'|trans }}</th>
+            <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+            <th>{{ 'ekyna_core.field.reference'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_product.field.net_price'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_product.field.available'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_product.field.ordered'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_product.field.eda'|trans }}</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for child in form.children -%}
+            {{- form_widget(child) -}}
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endspaceless %}
+{% endblock ekyna_product_inventory_resupply_products_widget %}
+
+
+{% block ekyna_product_inventory_resupply_product_widget %}
+{% spaceless %}
+    <tr>
+        <td>{{ form_widget(form.choice) }}</td>
+        <td>
+            <a href="{{ admin_resource_path(supplierProduct.supplier) }}" target="_blank">
+                {{- supplierProduct.supplier.name -}}
+            </a>
+        </td>
+        <td>
+            <a href="{{ admin_resource_path(supplierProduct) }}" target="_blank">
+                {{- supplierProduct.designation -}}
+            </a>
+        </td>
+        <td>{{ supplierProduct.reference }}</td>
+        <td>{{ supplierProduct.netPrice|localizedcurrency(supplierProduct.supplier.currency.code) }}</td>
+        <td>{{ supplierProduct.availableStock|localizednumber() }}</td>
+        <td>{{ supplierProduct.orderedStock|localizednumber() }}</td>
+        <td>
+            {%- if supplierProduct.estimatedDateOfArrival is not same as(null) -%}
+                {{- supplierProduct.estimatedDateOfArrival|localizeddate('short', 'none') -}}
+            {%- endif -%}
+        </td>
+    </tr>
+    <tr id="supplier_product_{{ supplierProduct.id }}_details" class="supplier-product-details" style="display:none;">
+        <td>&nbsp;</td>
+        <td colspan="6">
+            {{ form_widget(form.supplierOrder, {'widget_col': 12}) }}
+        </td>
+    </tr>
+{% endspaceless %}
+{% endblock ekyna_product_inventory_resupply_product_widget %}
+
+
+{% block ekyna_product_inventory_resupply_orders_widget %}
+{% spaceless %}
+    <table class="table table-condensed supplier-orders">
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>{{ 'ekyna_core.field.number'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_order.field.shipping_cost'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_order.field.payment_total'|trans }}</th>
+            <th>{{ 'ekyna_commerce.supplier_product.field.eda'|trans }}</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for child in form.children -%}
+            {{- form_widget(child) -}}
+        {%- endfor -%}
+        </tbody>
+    </table>
+{% endspaceless %}
+{% endblock ekyna_product_inventory_resupply_orders_widget %}
+
+
+{% block ekyna_product_inventory_resupply_order_widget %}
+{% spaceless %}
+    <tr>
+        <td>{{ form_widget(form) }}</td>
+        {%- if supplierOrder is not same as(null) -%}
+        <td>
+            <a href="{{ admin_resource_path(supplierOrder) }}" target="_blank">
+                {{- supplierOrder.number -}}
+            </a>
+        </td>
+        <td>{{ supplierOrder.shippingCost|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
+        <td>{{ supplierOrder.paymentTotal|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
+        <td>
+            {%- if supplierOrder.estimatedDateOfArrival is not same as(null) -%}
+                {{- supplierOrder.estimatedDateOfArrival|localizeddate('short', 'none') -}}
+            {%- endif -%}
+        </td>
+        <td>
+            <a href="javascript:void(0)" data-toggle-details="supplier_order_{{ supplierOrder.id }}_details">
+                <i class="fa fa-info-circle"></i>
+            </a>
+        </td>
+        {%- else -%}
+        <td colspan="5">{{ 'ekyna_commerce.supplier_order.button.new'|trans }}</td>
+        {%- endif -%}
+    </tr>
+    {%- if supplierOrder is not same as(null) -%}
+    <tr id="supplier_order_{{ supplierOrder.id }}_details" class="supplier-order-details" style="display:none;">
+        <td>&nbsp;</td>
+        <td colspan="5">{% include "EkynaCommerceBundle:Admin/SupplierOrder/Show:items.html.twig" %}</td>
+    </tr>
+    {%- endif -%}
+{% endspaceless %}
+{% endblock ekyna_product_inventory_resupply_order_widget %}
+
