@@ -223,7 +223,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
             ProductEvents::UPDATE             => ['onUpdate', 0],
             ProductEvents::DELETE             => ['onDelete', 0],
             ProductEvents::STOCK_UNIT_CHANGE  => ['onStockUnitChange', 0],
-            ProductEvents::STOCK_UNIT_REMOVAL => ['onStockUnitRemoval', 0],
+            ProductEvents::STOCK_UNIT_REMOVE  => ['onStockUnitRemoval', 0],
             ProductEvents::CHILD_DATA_CHANGE  => ['onChildDataChange', 0],
             ProductEvents::CHILD_STOCK_CHANGE => ['onChildStockChange', 0],
         ];

@@ -10,8 +10,9 @@ use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
-use Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
+use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Form\FormFactory;
@@ -41,11 +42,6 @@ class Inventory
     private $supplierProductRepository;
 
     /**
-     * @var ProductStockUnitRepository
-     */
-    private $stockUnitRepository;
-
-    /**
      * @var UrlGeneratorInterface
      */
     private $urlGenerator;
@@ -64,6 +60,16 @@ class Inventory
      * @var SessionInterface
      */
     private $session;
+
+    /**
+     * @var string
+     */
+    private $supplierOrderItemClass;
+
+    /**
+     * @var string
+     */
+    private $stockUnitClass;
 
     /**
      * @var \NumberFormatter
@@ -89,32 +95,36 @@ class Inventory
     /**
      * Constructor.
      *
-     * @param ProductRepository          $productRepository
-     * @param ResourceRepository         $supplierProductRepository
-     * @param ProductStockUnitRepository $stockUnitRepository
-     * @param UrlGeneratorInterface      $urlGenerator
-     * @param TranslatorInterface        $translator
-     * @param FormFactory                $formFactory
-     * @param SessionInterface           $session
-     * @param LocaleProviderInterface    $localeProvider
+     * @param ProductRepository       $productRepository
+     * @param ResourceRepository      $supplierProductRepository
+     * @param UrlGeneratorInterface   $urlGenerator
+     * @param TranslatorInterface     $translator
+     * @param FormFactory             $formFactory
+     * @param SessionInterface        $session
+     * @param LocaleProviderInterface $localeProvider
+     * @param string                  $supplierOrderItemClass
+     * @param string                  $stockUnitClass
      */
     public function __construct(
         ProductRepository $productRepository,
         ResourceRepository $supplierProductRepository,
-        ProductStockUnitRepository $stockUnitRepository,
         UrlGeneratorInterface $urlGenerator,
         TranslatorInterface $translator,
         FormFactory $formFactory,
         SessionInterface $session,
-        LocaleProviderInterface $localeProvider
+        LocaleProviderInterface $localeProvider,
+        $supplierOrderItemClass,
+        $stockUnitClass
     ) {
         $this->productRepository = $productRepository;
         $this->supplierProductRepository = $supplierProductRepository;
-        $this->stockUnitRepository = $stockUnitRepository;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
         $this->formFactory = $formFactory;
         $this->session = $session;
+
+        $this->supplierOrderItemClass = $supplierOrderItemClass;
+        $this->stockUnitClass = $stockUnitClass;
 
         $this->formatter = \NumberFormatter::create(
             $localeProvider->getCurrentLocale(),
@@ -219,6 +229,7 @@ class Inventory
 
             // Format stock
             $product['in_stock'] = $this->formatter->format($product['in_stock']);
+            $product['available_stock'] = $this->formatter->format($product['available_stock']);
             $product['virtual_stock'] = $this->formatter->format($product['virtual_stock']);
 
             // Eda
@@ -228,6 +239,7 @@ class Inventory
             }
 
             // Stock sums
+            $product['pending'] = $this->formatter->format($product['pending']);
             $product['ordered'] = $this->formatter->format($product['ordered']);
             $product['received'] = $this->formatter->format($product['received']);
             $product['sold'] = $this->formatter->format($product['sold']);
@@ -278,10 +290,12 @@ class Inventory
                 'p.stockMode as stock_mode',
                 'p.stockState as stock_state',
                 'p.inStock as in_stock',
+                'p.availableStock as available_stock',
                 'p.virtualStock as virtual_stock',
                 'p.estimatedDateOfArrival as eda',
                 'parent.designation as parent_designation',
             ])
+            ->addSelect($this->getPendingSubQuery())
             ->addSelect($this->buildStockSubQuery('orderedQuantity', 'ordered', 'su1'))
             ->addSelect($this->buildStockSubQuery('receivedQuantity', 'received', 'su2'))
             ->addSelect($this->buildStockSubQuery('soldQuantity', 'sold', 'su3'))
@@ -289,7 +303,10 @@ class Inventory
             ->leftJoin('p.brand', 'b')
             ->leftJoin('p.parent', 'parent')
             ->andWhere($pQb->expr()->in('p.type', ':types'))
-            ->setParameter('types', [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT]);
+            ->setParameters([
+                'types'    => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
+                'provider' => ProductProvider::NAME,
+            ]);
 
         return $pQb;
     }
@@ -377,6 +394,30 @@ class Inventory
     }
 
     /**
+     * Builds the pending stock sub query.
+     *
+     * i.e. Ordered quantity of 'new' supplier orders.
+     *
+     * @return string
+     */
+    private function getPendingSubQuery()
+    {
+        $state = SupplierOrderStates::STATE_NEW;
+
+        return <<<DQL
+(
+  SELECT SUM(nsoi.quantity) 
+  FROM $this->supplierOrderItemClass nsoi
+  JOIN nsoi.product nsp
+  JOIN nsoi.order nso
+  WHERE nsp.subjectIdentity.provider = :provider
+    AND nsp.subjectIdentity.identifier = p.id
+    AND nso.state = '$state'
+) AS pending
+DQL;
+    }
+
+    /**
      * Builds the stock sub query.
      *
      * @param string $field
@@ -387,19 +428,17 @@ class Inventory
      */
     private function buildStockSubQuery($field, $fieldAlias, $tableAlias)
     {
-        $class = $this->stockUnitRepository->getClassName();
-
-        return strtr('('.
-            'SELECT SUM(_table_._field_) '.
-            'FROM _class_ _table_ '.
-            'WHERE _table_.state <> \'_state_\' '.
-            'AND _table_.product = p.id'.
+        return strtr('(' .
+            'SELECT SUM(_table_._field_) ' .
+            'FROM _class_ _table_ ' .
+            'WHERE _table_.state <> \'_state_\' ' .
+            'AND _table_.product = p.id' .
             ') AS _alias_', [
             '_field_' => $field,
-            '_class_' => $class,
+            '_class_' => $this->stockUnitClass,
             '_table_' => $tableAlias,
             '_state_' => StockUnitStates::STATE_CLOSED,
-            '_alias_' => $fieldAlias
+            '_alias_' => $fieldAlias,
         ]);
     }
 

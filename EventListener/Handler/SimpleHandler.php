@@ -81,12 +81,13 @@ class SimpleHandler extends AbstractHandler
         $changed = false;
         $childEvents = [];
 
-        if ($this->persistenceHelper->isChanged($product, ['inStock', 'virtualStock', 'estimatedDateOfArrival'])) {
+        $properties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
+        if ($this->persistenceHelper->isChanged($product, $properties)) {
             if ($this->stockUpdater->updateStockState($product)) {
-                $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
-
                 $changed = true;
             }
+
+            $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         }
 
         if ($this->persistenceHelper->isChanged($product, ['netPrice', 'weight'])) {
@@ -107,11 +108,7 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if (null !== $stockUnit = $event->getStockUnit()) {
-            $changed = $this->stockUpdater->updateFromStockUnitChange($product, $stockUnit);
-        } else {
-            $changed = $this->updateStock($product);
-        }
+        $changed = $this->stockUpdater->update($product);
 
         if ($changed) {
             $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
@@ -127,11 +124,7 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        if (null !== $stockUnit = $event->getStockUnit()) {
-            $changed = $this->stockUpdater->updateFromStockUnitRemoval($product, $stockUnit);
-        } else {
-            $changed = $this->updateStock($product);
-        }
+        $changed = $this->stockUpdater->update($product);
 
         if ($changed) {
             $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
@@ -146,31 +139,6 @@ class SimpleHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return in_array($product->getType(), ProductTypes::getChildTypes());
-    }
-
-    /**
-     * Updates the stock data.
-     *
-     * @param ProductInterface $product
-     *
-     * @return bool
-     */
-    private function updateStock(ProductInterface $product)
-    {
-        // In stock update
-        $changed = $this->stockUpdater->updateInStock($product);
-
-        // Virtual stock update
-        $changed |= $this->stockUpdater->updateVirtualStock($product);
-
-        // Estimated date of arrival update
-        $changed |= $this->stockUpdater->updateEstimatedDateOfArrival($product);
-
-        return $changed;
-
-        // TODO Check that stock state update is ALWAYS done by the handleUpdate method.
-        // Stock state
-        //return $this->stockUpdater->updateStockState($product) || $changed;
     }
 
     /**

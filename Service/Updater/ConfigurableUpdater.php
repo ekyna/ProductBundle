@@ -25,7 +25,7 @@ class ConfigurableUpdater
         Model\ProductTypes::assertConfigurable($bundle);
 
         $justInTime = true;
-        $inStock = $virtualStock = $eda = null;
+        $inStock = $virtualStock = $availableStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
@@ -48,9 +48,19 @@ class ConfigurableUpdater
                     $bestProduct = $bestChoice->getProduct();
 
                     // In stock
-                    if (0 < $inStock = $product->getInStock() / $choice->getMinQuantity()) {
+                    // In stock can't be used to resolve best slot choice
+                    /*if (0 < $inStock = $product->getInStock() / $choice->getMinQuantity()) {
                         $bestInStock = $bestProduct->getInStock() / $bestChoice->getMinQuantity();
                         if ($bestInStock < $inStock) {
+                            $bestChoice = $choice;
+                            continue;
+                        }
+                    }*/
+
+                    // Available stock (TODO check)
+                    if (0 < $availableStock = $product->getAvailableStock() / $choice->getMinQuantity()) {
+                        $bestAvailableStock = $bestProduct->getAvailableStock() / $bestChoice->getMinQuantity();
+                        if ($bestAvailableStock < $availableStock) {
                             $bestChoice = $choice;
                             continue;
                         }
@@ -96,6 +106,12 @@ class ConfigurableUpdater
                     $inStock = $slotInStock;
                 }
 
+                // Available stock
+                $slotAvailableStock = $product->getAvailableStock() / $choice->getMinQuantity();
+                if (null === $availableStock || $slotAvailableStock < $availableStock) {
+                    $availableStock = $slotAvailableStock;
+                }
+
                 // Virtual stock
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
                 if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
@@ -124,6 +140,10 @@ class ConfigurableUpdater
         }
         if ($inStock != $bundle->getInStock()) {
             $bundle->setInStock($inStock);
+            $changed = true;
+        }
+        if ($availableStock != $bundle->getAvailableStock()) {
+            $bundle->setAvailableStock($availableStock);
             $changed = true;
         }
         if ($virtualStock != $bundle->getVirtualStock()) {

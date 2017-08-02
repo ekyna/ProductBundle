@@ -5,10 +5,13 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class ResupplyType
@@ -45,13 +48,26 @@ class ResupplyType extends AbstractType
 
         $builder
             ->add('supplierProduct', ResupplyProductsType::class, [
-                'supplier_products' => $supplierProducts
+                'supplier_products' => $supplierProducts,
             ])
             ->add('quantity', NumberType::class, [
-                'label' => 'ekyna_core.field.quantity',
+                'label'       => 'ekyna_core.field.quantity',
+                'constraints' => [
+                    new NotBlank(),
+                    new GreaterThanOrEqual(0),
+                ],
             ])
             ->add('netPrice', NumberType::class, [
-                'label' => 'ekyna_commerce.supplier_product.field.net_price',
+                'label'       => 'ekyna_commerce.supplier_product.field.net_price',
+                'constraints' => [
+                    new NotBlank(),
+                    new GreaterThanOrEqual(0),
+                ],
+            ])
+            ->add('estimatedDateOfArrival', DateTimeType::class, [
+                'label'    => 'ekyna_commerce.supplier_order.field.estimated_date_of_arrival',
+                'format'   => 'dd/MM/yyyy',
+                'required' => false,
             ]);
     }
 

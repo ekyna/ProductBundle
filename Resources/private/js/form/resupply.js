@@ -17,17 +17,16 @@ define(['jquery'], function($) {
                 var value = $(e.currentTarget).val();
                 $('#supplier_product_' + value + '_details')
                     .show()
-                    .find('input[name="supplierOrder"]').first().prop('checked', true);
+                    .find('input[name="supplierOrder"]')
+                    .first().prop('checked', true).trigger('change');
             });
 
-            /*$form.on('change', 'input[name="supplierOrder"]', function(e) {
-                $(e.currentTarget)
-                    .closest('table.supplier-orders')
-                    .find('.supplier-order-details').hide();
+            $form.on('change', 'input[name="supplierOrder"]', function(e) {
+                $form.find('.supplier-order-details').hide();
 
                 var value = $(e.currentTarget).val();
                 $('#supplier_order_' + value + '_details').show();
-            });*/
+            });
         });
 
         return this;

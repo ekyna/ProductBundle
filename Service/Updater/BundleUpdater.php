@@ -25,7 +25,7 @@ class BundleUpdater
         Model\ProductTypes::assertBundle($bundle);
 
         $justInTime = true;
-        $inStock = $virtualStock = $eda = null;
+        $inStock = $virtualStock = $availableStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
@@ -49,6 +49,12 @@ class BundleUpdater
                     $inStock = $slotInStock;
                 }
 
+                // Available stock
+                $slotAvailableStock = $product->getAvailableStock() / $choice->getMinQuantity();
+                if (null === $availableStock || $slotAvailableStock < $availableStock) {
+                    $availableStock = $slotAvailableStock;
+                }
+
                 // Virtual stock
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
                 if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
@@ -65,7 +71,7 @@ class BundleUpdater
         $changed = false;
 
         $state = StockSubjectStates::STATE_OUT_OF_STOCK;
-        if ($justInTime || 0 < $inStock) {
+        if ($justInTime || 0 < $availableStock) {
             $state = StockSubjectStates::STATE_IN_STOCK;
         } elseif (0 < $virtualStock) {
             $state = StockSubjectStates::STATE_PRE_ORDER;
@@ -77,6 +83,10 @@ class BundleUpdater
         }
         if ($inStock != $bundle->getInStock()) {
             $bundle->setInStock($inStock);
+            $changed = true;
+        }
+        if ($availableStock != $bundle->getAvailableStock()) {
+            $bundle->setAvailableStock($availableStock);
             $changed = true;
         }
         if ($virtualStock != $bundle->getVirtualStock()) {

@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -119,13 +120,43 @@ class InventoryController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
+            /** @var \Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface $supplierProduct */
+            $supplierProduct = $this
+                ->get('ekyna_commerce.supplier_product.repository')
+                ->find($request->request->get('supplierProduct'));
+            if (null !== $supplierProduct) {
+                /** @var \Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface $supplierOrder */
+                $supplierOrder = null;
+                if (0 < $supplierOrderId = intval($request->request->get('supplierOrder'))) {
+                    $supplierOrder = $this->get('ekyna_commerce.supplier_order.repository')->find($supplierOrderId);
+                }
 
-            $stop = true; // TODO
+                $quantity = $form->get('quantity')->getData();
+                $netPrice = $form->get('netPrice')->getData();
+                $estimatedDateOfArrival = $form->get('estimatedDateOfArrival')->getData();
 
-            return new JsonResponse([
-                'success' => true,
-            ]);
+                $resupply = $this->get('ekyna_product.resupply');
+
+                $event = $resupply->resupply(
+                    $supplierProduct,
+                    $quantity,
+                    $netPrice,
+                    $supplierOrder,
+                    $estimatedDateOfArrival
+                );
+
+                if ($event->hasErrors()) {
+                    foreach ($event->getErrors() as $error) {
+                        $form->addError(new FormError($error->getMessage()));
+                    }
+                } else {
+                    return new JsonResponse([
+                        'success' => true,
+                    ]);
+                }
+            } else {
+                $form->addError(new FormError('Veuillez choisir une référence fournisseur.'));
+            }
         }
 
         $modal = new Modal('Réassort', $form->createView(), [

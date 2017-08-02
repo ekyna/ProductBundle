@@ -87,6 +87,30 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     }
 
     /**
+     * @inheritdoc
+     */
+    public function findLinkableBySubject(StockSubjectInterface $subject)
+    {
+        if (!$subject instanceof ProductInterface) {
+            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
+        }
+
+        if (!$subject->getId()) {
+            return null;
+        }
+
+        $alias = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+            ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem')) // Not yet linked to a supplier order
+            ->setParameter('product', $subject)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Finds stock units by subject and states.
      *
      * @param StockSubjectInterface $subject

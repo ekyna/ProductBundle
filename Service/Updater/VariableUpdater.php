@@ -63,12 +63,14 @@ class VariableUpdater
         Model\ProductTypes::assertVariable($variable);
 
         $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
-        $inStock = $virtualStock = null;
+        $inStock = $availableStock = $virtualStock = null;
         $variants = $variable->getVariants()->getIterator();
+
+        // TODO This is wrong
+        // -> Resolve best variants and copy its data
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-
             if ($variant->getStockMode() == Stock\StockSubjectModes::MODE_DISABLED) {
                 continue;
             } elseif ($variant->getStockMode() == Stock\StockSubjectModes::MODE_JUST_IN_TIME) {
@@ -77,16 +79,24 @@ class VariableUpdater
                 break;
             }
 
+            // TODO NO ! Resolve state regarding to stocks
             if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $state)) {
                 $state = $variant->getStockState();
             }
 
-            if (null === $inStock || $inStock > $variant->getInStock()) {
-                $inStock = $variant->getInStock();
+            $variantInStock = $variant->getInStock();
+            if (null === $inStock || (0 < $variantInStock && $inStock > $variantInStock)) {
+                $inStock = $variantInStock;
             }
 
-            if (null === $virtualStock || $virtualStock > $variant->getVirtualStock()) {
-                $virtualStock = $variant->getVirtualStock();
+            $variantAvailableStock = $variant->getAvailableStock();
+            if (null === $availableStock || (0 < $variantAvailableStock && $availableStock > $variantAvailableStock)) {
+                $inStock = $variantAvailableStock;
+            }
+
+            $variantVirtualStock = $variant->getVirtualStock();
+            if (null === $virtualStock || (0 < $variantVirtualStock && $virtualStock > $variantVirtualStock)) {
+                $virtualStock = $variantVirtualStock;
             }
         }
 

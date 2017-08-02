@@ -23,7 +23,7 @@ final class ProductEvents
     const POST_DELETE        = 'ekyna_product.product.post_delete';
 
     const STOCK_UNIT_CHANGE  = 'ekyna_product.product.stock_unit_change';
-    const STOCK_UNIT_REMOVAL = 'ekyna_product.product.stock_unit_removal';
+    const STOCK_UNIT_REMOVE  = 'ekyna_product.product.stock_unit_remove';
 
     const CHILD_DATA_CHANGE  = 'ekyna_product.product.child_data_change';
     const CHILD_STOCK_CHANGE = 'ekyna_product.product.child_stock_change';

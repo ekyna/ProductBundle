@@ -1070,6 +1070,16 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getAvailableStock()
+    {
+        // TODO if bundled or variable, resolve stock
+
+        return $this->availableStock;
+    }
+
+    /**
      * Returns the ordered stock.
      *
      * @return float
