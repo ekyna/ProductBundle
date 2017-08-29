@@ -27,7 +27,7 @@ class ProductTranslationType extends AbstractType
         if ($options['variant_mode']) {
             $titleOptions['required'] = false;
             $titleOptions['attr'] = [
-                'help_text' => 'ekyna_product.variant.help.leave_blank_to_auto_generate',
+                'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
             ];
         }
 

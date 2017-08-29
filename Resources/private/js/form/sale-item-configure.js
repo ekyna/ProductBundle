@@ -219,10 +219,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.locked = !!this.$select.attr('data-locked');
 
             // Image
-            this.$image = this.optionGroups.item.$gallery.find('a[data-option-id="' + this.$element.data('id') + '"]');
-            if (0 === this.$image.size()) {
-                this.$image = $('<a data-option-id="' + this.$element.data('id') + '"><img></a>');
-                this.$image.appendTo(this.optionGroups.item.$gallery.find('.item-gallery-children'));
+            this.$image = undefined;
+            if (this.optionGroups.item.$gallery) {
+                this.$image = this.optionGroups.item.$gallery.find('a[data-option-id="' + this.$element.data('id') + '"]');
+                if (0 === this.$image.size()) {
+                    this.$image = $('<a data-option-id="' + this.$element.data('id') + '"><img></a>');
+                    this.$image.appendTo(this.optionGroups.item.$gallery.find('.item-gallery-children'));
+                }
             }
 
             this.updateState();
@@ -269,17 +272,19 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 this.$option = $option;
                 this.option = $option.data('config');
 
-                if (this.option.thumb) {
-                    this.$image
-                        .show()
-                        .attr('href', this.option.image)
-                        .attr('title', this.$option.text())
-                        .find('img')
-                        .attr('src', this.option.thumb);
-                } else {
-                    this.$image.hide();
+                if (this.$image) {
+                    if (this.option.thumb) {
+                        this.$image
+                            .show()
+                            .attr('href', this.option.image)
+                            .attr('title', this.$option.text())
+                            .find('img')
+                            .attr('src', this.option.thumb);
+                    } else {
+                        this.$image.hide();
+                    }
                 }
-            } else {
+            } else if (this.$image) {
                 this.$image.hide();
             }
         },
@@ -290,7 +295,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         destroy: function () {
             this.unbindEvents();
-            this.$image.remove();
+            if (this.$image) {
+                this.$image.remove();
+            }
             this.$element.removeData();
         },
 
@@ -338,7 +345,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         hide: function() {
             this.$element.hide();
-            if (this.$image.size()) {
+            if (this.$image && this.$image.size()) {
                 this.$image.hide();
             }
 
@@ -347,7 +354,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         show: function() {
             this.$element.show();
-            if (this.$image.size()) {
+            if (this.$image && this.$image.size()) {
                 this.$image.show();
             }
 
