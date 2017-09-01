@@ -120,8 +120,8 @@ class ProductProvider implements SubjectProviderInterface
     public function supportsSubject($subject)
     {
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $subject */
-        return $subject instanceof $this->productClass
-            && $subject->getType() !== ProductTypes::TYPE_VARIABLE;
+        return $subject instanceof $this->productClass;
+            //&& $subject->getType() !== ProductTypes::TYPE_VARIABLE;
     }
 
     /**

@@ -781,20 +781,17 @@ class ItemBuilder
         $product = $this->provider->resolve($item);
 
         // Filter product option groups
-        $groups = $this->filter->getOptionGroups($product);
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variable */
+            $variable = $product->getParent();
 
-        if ($product->getType() === ProductTypes::TYPE_VARIABLE && $item->hasData(ItemBuilder::VARIANT_ID)) {
-            if (0 < $variantId = intval($item->getData(ItemBuilder::VARIANT_ID))) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
-                $variant = $this->provider->getProductRepository()->find($variantId);
-
-                // Filter variant option groups
-                $variantGroups = $this->filter->getOptionGroups($variant);
-
-                foreach ($variantGroups as $optionGroup) {
-                    array_push($groups, $optionGroup);
-                }
-            };
+            // Filter variant option groups
+            $groups = array_merge(
+                $this->filter->getOptionGroups($variable),
+                $this->filter->getOptionGroups($product)
+            );
+        } else {
+            $groups = $this->filter->getOptionGroups($product);
         }
 
         return $groups;
