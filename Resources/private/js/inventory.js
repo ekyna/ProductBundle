@@ -111,6 +111,41 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         return false;
     });
 
+    /**
+     * Line's stock unit buttons click handler
+     */
+    $list.on('click', 'a.treatment', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (busy) {
+            return false;
+        }
+
+        busy = true;
+
+        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
+        if (!productId) {
+            console.log('Undefined product id.');
+            return false;
+        }
+
+        try {
+            var modal = new Modal();
+            modal.load({
+                url: Router.generate('ekyna_product_inventory_admin_customer_orders', {productId: productId}),
+                method: 'GET'
+            });
+            $(modal).on('ekyna.modal.response', function () {
+                busy = false;
+            });
+        } catch(e) {
+            console.log(e);
+            busy = false;
+        }
+
+        return false;
+    });
 
     /**
      * Line's resupply buttons click handler

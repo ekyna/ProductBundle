@@ -14,10 +14,17 @@
     <td class="text-right{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
     <td class="text-right">{{ shipped }}</td>
     <td class="text-right">
+        {# TODO translations #}
         <div class="btn-group btn-group-xs">
-            <a href="javascript: void(0)" class="btn btn-default stock-units">SU</a>
-            <a href="javascript: void(0)" class="btn btn-default treatment">CO</a>
-            <a href="javascript: void(0)" class="btn btn-default resupply">SO</a>
+            <a href="javascript: void(0)" class="btn btn-default stock-units" title="Unités de stock">
+                <i class="fa fa-tasks"></i>
+            </a>
+            <a href="javascript: void(0)" class="btn btn-default treatment" title="Commandes client">
+                <i class="fa fa-user"></i>
+            </a>
+            <a href="javascript: void(0)" class="btn btn-default resupply" title="Commandes fournisseur">
+                <i class="fa fa-truck"></i>
+            </a>
         </div>
     </td>
 </tr>

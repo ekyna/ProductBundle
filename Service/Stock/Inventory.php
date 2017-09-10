@@ -235,7 +235,7 @@ class Inventory
             // Eda
             /** @var \DateTime $eda */
             if (null !== $eda = $product['eda']) {
-                $product['eda'] = $eda->format('d/m/Y'); // TODO localized format
+                $product['eda'] = (new \DateTime($product['eda']))->format('d/m/Y'); // TODO localized format
             }
 
             // Stock sums

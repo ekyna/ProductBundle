@@ -56,7 +56,9 @@ class InventoryController extends Controller
      */
     public function productsAction(Request $request)
     {
-        $products = $this->get('ekyna_product.inventory')->listProducts($request);
+        $products = $this
+            ->get('ekyna_product.inventory')
+            ->listProducts($request);
 
         $data = [
             'products' => $products,
@@ -74,13 +76,59 @@ class InventoryController extends Controller
      */
     public function stockUnitsAction(Request $request)
     {
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Only XHR is supported.');
+        }
+
         $product = $this->findProductByRequest($request);
 
-        $list = $this->get('ekyna_commerce.stock.stock_renderer')->renderSubjectStockUnitList($product, [
-            'class' => 'table-condensed',
-        ]);
+        $list = $this
+            ->get('ekyna_commerce.stock.stock_renderer')
+            ->renderSubjectStockUnitList($product, [
+                'class' => 'table-condensed',
+            ]);
 
         $modal = new Modal('Unités de stock', $list, [
+            [
+                'id'       => 'close',
+                'label'    => 'ekyna_core.button.close',
+                'icon'     => 'glyphicon glyphicon-remove',
+                'cssClass' => 'btn-default',
+            ]
+        ]);
+
+        return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
+     * Inventory customer orders action.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    public function customerOrdersAction(Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Only XHR is supported.');
+        }
+
+        $product = $this->findProductByRequest($request);
+
+        $orderConfig = $this->get('ekyna_commerce.order.configuration');
+
+        $table = $this
+            ->get('table.factory')
+            ->createTable($orderConfig->getResourceName(), $orderConfig->getTableType(), [
+                'subject' => $product,
+                // TODO 'states' => [ ... ],
+            ]);
+
+        if (null !== $response = $table->handleRequest($request)) {
+            return $response;
+        }
+
+        $modal = new Modal('Commandes client', $table->createView(), [
             [
                 'id'       => 'close',
                 'label'    => 'ekyna_core.button.close',

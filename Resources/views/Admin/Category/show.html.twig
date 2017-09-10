@@ -1,12 +1,8 @@
-{% extends "EkynaAdminBundle:Entity:sided.html.twig" %}
-
-{% block title %}
-<h1>{{ 'ekyna_product.category.header.show'|trans({'%name%': category})|raw }}</h1>
-{% endblock %}
+{% extends "EkynaAdminBundle:Entity/Default:show.html.twig" %}
 
 {% block actions %}
     {{ admin_resource_btn(category, 'list') }}
-    {#{{ admin_resource_btn(category, 'new') }}#}
+    {{ admin_resource_btn(category, 'new') }}
 {% endblock %}
 
 {% block main %}
