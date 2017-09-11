@@ -1,10 +1,5 @@
 {% extends "EkynaAdminBundle:Entity/Default:show.html.twig" %}
 
-{% block actions %}
-    {{ admin_resource_btn(category, 'list') }}
-    {{ admin_resource_btn(category, 'new') }}
-{% endblock %}
-
 {% block main %}
 <div class="actions">
     {{ admin_resource_btn(category, 'edit') }}

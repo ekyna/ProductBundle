@@ -193,6 +193,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->variableNode('templates')->defaultValue([
                                     '_form.html'     => 'EkynaProductBundle:Admin/Category:_form.html',
+                                    'list.html'      => 'EkynaProductBundle:Admin/Category:list.html',
                                     'new_child.html' => 'EkynaProductBundle:Admin/Category:new_child.html',
                                     'show.html'      => 'EkynaProductBundle:Admin/Category:show.html',
                                 ])->end()

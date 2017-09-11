@@ -1,13 +1,4 @@
-{% extends "EkynaAdminBundle:Entity:sided.html.twig" %}
-
-{% block title %}
-<h1>{{ 'ekyna_product.pricing.header.show'|trans({'%name%': pricing})|raw }}</h1>
-{% endblock %}
-
-{% block actions %}
-    {{ admin_resource_btn(pricing, 'list') }}
-    {{ admin_resource_btn(pricing, 'new') }}
-{% endblock %}
+{% extends "EkynaAdminBundle:Entity/Default:show.html.twig" %}
 
 {% block main %}
 <div class="actions">
