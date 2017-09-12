@@ -20,8 +20,13 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->ensureDisabledStockMode($variable)
-            || $this->getVariableUpdater()->updateMinPrice($variable);
+        $changed = $this->ensureDisabledStockMode($variable);
+
+        $changed |= $this->checkVisibility($variable);
+
+        $changed |= $this->getVariableUpdater()->updateMinPrice($variable);
+
+        return $changed;
     }
 
     /**
@@ -46,7 +51,11 @@ class VariableHandler extends AbstractVariantHandler
             }
         }
 
-        return $this->ensureDisabledStockMode($variable);
+        $changed = $this->ensureDisabledStockMode($variable);
+
+        $changed |= $this->checkVisibility($variable);
+
+        return $changed;
     }
 
     /**

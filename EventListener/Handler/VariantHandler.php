@@ -63,6 +63,23 @@ class VariantHandler extends AbstractVariantHandler
     }
 
     /**
+     * @inheritDoc
+     */
+    public function handleDelete(ResourceEventInterface $event)
+    {
+        $variant = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIANT);
+
+        if (null !== $variable = $variant->getParent()) {
+            if (!$this->persistenceHelper->isScheduledForRemove($variable) && $this->checkVisibility($variable)) {
+                $this->persistenceHelper->persistAndRecompute($variable);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @inheritdoc
      */
     public function supports(ProductInterface $product)

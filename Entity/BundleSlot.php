@@ -58,6 +58,9 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     public function __clone()
     {
         if ($this->id) {
+            $this->id = null;
+            $this->bundle = null;
+
             $choices = $this->choices;
             $this->choices = new ArrayCollection();
             foreach ($choices as $choice) {

@@ -29,6 +29,17 @@ class ProductMedia implements ProductMediaInterface
     /**
      * @inheritdoc
      */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->product = null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getId()
     {
         return $this->id;

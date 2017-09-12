@@ -203,6 +203,7 @@ ekyna_product:
             list: Produits <small>Liste des produits</small>
             show: Détail du produit <small>%name%</small>
             new: Créer un nouveau produit
+            duplicate: Dupliquer le produit <small>%name%</small>
             edit: Modifier le produit <small>%name%</small>
             remove: Supprimer le produit <small>%name%</small>
             convert: Convertir le produit <small>%name%</small>
@@ -211,6 +212,7 @@ ekyna_product:
             show: Détail du produit
             new: Nouveau produit
             edit: Modifier le produit
+            duplicate: Dupliquer le produit
             remove: Supprimer le produit
             convert: Convertir
         type:

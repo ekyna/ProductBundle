@@ -375,6 +375,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         return $this;
     }
 
+    // TODO joinMedias
+
     /**
      * Returns whether the collection has been initialized or not.
      *

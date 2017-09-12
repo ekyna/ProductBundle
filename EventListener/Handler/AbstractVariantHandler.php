@@ -2,6 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -75,5 +77,25 @@ abstract class AbstractVariantHandler extends AbstractHandler
         }
 
         return $this->variableUpdater = new VariableUpdater();
+    }
+
+    /**
+     * Sets a variable product as not visible if it does not have variants.
+     *
+     * @param ProductInterface $product
+     *
+     * @return bool
+     */
+    protected function checkVisibility(ProductInterface $product)
+    {
+        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
+            if ($product->isVisible() && (0 === $product->getVariants()->count())) {
+                $product->setVisible(false);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

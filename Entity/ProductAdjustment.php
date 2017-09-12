@@ -21,6 +21,17 @@ class ProductAdjustment extends AbstractAdjustment implements Model\ProductAdjus
     /**
      * @inheritdoc
      */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->product = null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getProduct()
     {
         return $this->product;

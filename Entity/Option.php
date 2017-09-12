@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model as RM;
@@ -54,6 +55,23 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      */
     protected $netPrice;
 
+
+    /**
+     * Clones the option.
+     */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->group = null;
+
+            $translations = $this->translations;
+            $this->translations = new ArrayCollection();
+            foreach ($translations as $translation) {
+                $this->addTranslation(clone $translation);
+            }
+        }
+    }
 
     /**
      * Returns the string representation.

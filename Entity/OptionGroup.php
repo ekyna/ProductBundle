@@ -60,10 +60,19 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     public function __clone()
     {
         if ($this->id) {
+            $this->id = null;
+            $this->product = null;
+
             $options = $this->options;
             $this->options = new ArrayCollection();
             foreach ($options as $option) {
                 $this->addOption(clone $option);
+            }
+
+            $translations = $this->translations;
+            $this->translations = new ArrayCollection();
+            foreach ($translations as $translation) {
+                $this->addTranslation(clone $translation);
             }
         }
     }

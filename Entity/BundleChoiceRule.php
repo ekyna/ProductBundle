@@ -38,6 +38,17 @@ class BundleChoiceRule implements Model\BundleChoiceRuleInterface
 
 
     /**
+     * Clones the bundle choice rule.
+     */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->choice = null;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function getId()

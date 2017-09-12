@@ -151,21 +151,20 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         parent::__construct();
 
-        $this->categories = new ArrayCollection();
-        $this->variants = new ArrayCollection();
         $this->attributes = new ArrayCollection();
-        $this->optionGroups = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
+        $this->categories = new ArrayCollection();
         $this->medias = new ArrayCollection();
+        $this->optionGroups = new ArrayCollection();
         $this->references = new ArrayCollection();
         $this->tags = new ArrayCollection();
-
-        $this->visible = true;
+        $this->variants = new ArrayCollection();
 
         $this->initializeAdjustments();
         $this->initializeStock();
 
         $this->stockMode = StockSubjectModes::MODE_ENABLED;
+        $this->visible = true;
     }
 
     /**
@@ -174,37 +173,116 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function __clone()
     {
         if ($this->id) {
-            $variants = $this->variants;
-            $this->variants = new ArrayCollection();
-            foreach ($variants as $variant) {
-                $this->addVariant(clone $variant);
+
+            // ---- ONE TO MANY ----
+
+            // Adjustments
+            $adjustments = $this->adjustments;
+            $this->adjustments = new ArrayCollection();
+            foreach ($adjustments as $adjustment) {
+                $this->addAdjustment(clone $adjustment);
             }
 
-            $attributes = $this->attributes;
-            $this->attributes = new ArrayCollection();
-            foreach ($attributes as $attribute) {
-                $this->addAttribute(clone $attribute);
-            }
-
-            $optionGroups = $this->optionGroups;
-            $this->optionGroups = new ArrayCollection();
-            foreach ($optionGroups as $optionGroup) {
-                $this->addOptionGroup(clone $optionGroup);
-            }
-
+            // Bundle slots
             $bundleSlots = $this->bundleSlots;
             $this->bundleSlots = new ArrayCollection();
             foreach ($bundleSlots as $bundleSlot) {
                 $this->addBundleSlot(clone $bundleSlot);
             }
 
-            $this->seo = clone $this->seo;
+            // Medias
+            $medias = $this->medias;
+            $this->medias = new ArrayCollection();
+            foreach ($medias as $media) {
+                $this->addMedia(clone $media);
+            }
 
-            // TODO medias ?
-            // TODO adjustment ?
+            // Option groups
+            $optionGroups = $this->optionGroups;
+            $this->optionGroups = new ArrayCollection();
+            foreach ($optionGroups as $optionGroup) {
+                $this->addOptionGroup(clone $optionGroup);
+            }
 
-            // TODO Disable stock
-            // TODO Disable visible
+            // References
+            $this->references = new ArrayCollection();
+
+            // Translations
+            $translations = $this->getTranslations();
+            $this->translations = new ArrayCollection();
+            foreach ($translations as $translation) {
+                $this->addTranslation(clone $translation);
+            }
+
+            // Variants
+            $variants = $this->variants;
+            $this->variants = new ArrayCollection();
+            foreach ($variants as $variant) {
+                $this->addVariant(clone $variant);
+            }
+
+            // ---- MANY TO MANY ----
+
+            // Attributes
+            $attributes = $this->attributes;
+            $this->attributes = new ArrayCollection();
+            foreach ($attributes as $attribute) {
+                $this->addAttribute($attribute);
+            }
+
+            // Categories
+            $categories = $this->categories;
+            $this->categories = new ArrayCollection();
+            foreach ($categories as $category) {
+                $this->addCategory($category);
+            }
+
+            // Customer groups
+            $customerGroups = $this->customerGroups;
+            $this->customerGroups = new ArrayCollection();
+            foreach ($customerGroups as $customerGroup) {
+                $this->addCustomerGroup($customerGroup);
+            }
+
+            // Tags
+            $tags = $this->tags;
+            $this->tags = new ArrayCollection();
+            foreach ($tags as $tag) {
+                $this->addTag($tag);
+            }
+
+            // ---- MANY TO ONE ----
+
+            // Brand is ok
+            // Parent is ok
+            // Tax group is ok
+
+            // ---- BASICS ----
+
+            // Seo
+            if ($this->seo) {
+                $this->seo = clone $this->seo;
+            }
+            // Content
+            $this->content = null;
+
+            // ---- BASICS ----
+
+            // Reset stock data (but preserve mode)
+            $stockMode = $this->stockMode;
+            $this->initializeStock();
+            $this->stockMode = $stockMode;
+
+            // Clear critical fields
+            $this->id = null;
+            $this->designation = null;
+            $this->reference = null;
+            $this->geocode = null;
+            $this->references = new ArrayCollection();
+            $this->visible = false;
+            //$this->netPrice = 0;
+            //$this->weight = 0;
+            //$this->releasedAt = null;
         }
     }
 

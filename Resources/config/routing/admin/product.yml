@@ -29,6 +29,13 @@ ekyna_product_product_admin_edit:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_duplicate:
+    path: /{productId}/duplicate
+    defaults: { _controller: "ekyna_product.product.controller:duplicateAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+
 ekyna_product_product_admin_convert:
     path: /{productId}/convert/{type}
     defaults: { _controller: "ekyna_product.product.controller:convertAction" }

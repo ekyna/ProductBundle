@@ -8,9 +8,10 @@ use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ProductController
@@ -55,11 +56,118 @@ class ProductController extends ResourceController
         return $response;
     }
 
+    /**
+     * Product duplicate action.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function duplicateAction(Request $request)
+    {
+        $this->isGranted('CREATE');
+
+        if ($isXhr = $request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Not yet implemented.');
+        }
+
+        $context = $this->loadContext($request);
+        $resourceName = $this->config->getResourceName();
+
+        // Source
+        /** @var ProductInterface $source */
+        $source = $context->getResource($resourceName);
+        $context->addResource('source', $source);
+
+        // TODO Temporary lock
+        if ($source->getType() !== ProductTypes::TYPE_SIMPLE) {
+            throw $this->createNotFoundException('Not yet implemented.');
+        }
+
+        $target = clone $source;
+        $context->addResource($resourceName, $target);
+
+        $form = $this->createNewResourceForm($context, !$isXhr, [
+            'action' => $this->generateResourcePath($source, 'duplicate'),
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // TODO use ResourceManager
+            $event = $this->getOperator()->create($target);
+            if (!$isXhr) {
+                $event->toFlashes($this->getFlashBag());
+            }
+
+            if (!$event->hasErrors()) {
+                if ($isXhr) {
+                    // TODO use resource serializer
+                    return JsonResponse::create([
+                        'id'   => $target->getId(),
+                        'name' => (string)$target,
+                    ]);
+                }
+
+                $redirectPath = null;
+                /** @noinspection PhpUndefinedMethodInspection */
+                if ($form->get('actions')->has('saveAndList') && $form->get('actions')->get('saveAndList')->isClicked()) {
+                    $redirectPath = $this->generateResourcePath($target, 'list');
+                } elseif (null === $redirectPath = $form->get('_redirect')->getData()) {
+                    if ($this->hasParent() && null !== $parentResource = $this->getParentResource($context)) {
+                        $redirectPath = $this->generateResourcePath($parentResource, 'show');
+                    } else {
+                        $redirectPath = $this->generateResourcePath($target, 'show');
+                    }
+                }
+
+                return $this->redirect($redirectPath);
+            } elseif ($isXhr) {
+                // TODO all event messages should be bound to XHR response
+                foreach ($event->getErrors() as $error) {
+                    $form->addError(new FormError($error->getMessage()));
+                }
+            }
+        }
+
+        if ($isXhr) {
+            $modal = $this->createModal('duplicate');
+            $modal
+                ->setContent($form->createView())
+                ->setVars($context->getTemplateVars());
+
+            return $this->get('ekyna_core.modal')->render($modal);
+        }
+
+        $this->appendBreadcrumb(
+            sprintf('%s_duplicate', $resourceName),
+            'ekyna_core.button.duplicate'
+        );
+
+        return $this->render(
+            $this->config->getTemplate('duplicate.html'),
+            $context->getTemplateVars([
+                'form' => $form->createView(),
+            ])
+        );
+    }
+
+    /**
+     * Product convert action.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function convertAction(Request $request)
     {
-        // TODO
+        $this->isGranted('CREATE');
 
-         throw new NotFoundHttpException('Not yet implemented.');
+        $context = $this->loadContext($request);
+
+        $resourceName = $this->config->getResourceName();
+        $resource = $context->getResource($resourceName);
+
+        throw $this->createNotFoundException('Not yet implemented.');
     }
 
     /**

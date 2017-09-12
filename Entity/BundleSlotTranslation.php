@@ -29,6 +29,17 @@ class BundleSlotTranslation extends AbstractTranslation implements BundleSlotTra
 
 
     /**
+     * Clones the bundle slot translation.
+     */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->translatable = null;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function getId()

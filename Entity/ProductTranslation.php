@@ -41,6 +41,18 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     /**
      * @inheritdoc
      */
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->slug = null;
+            $this->attributesTitle = null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getId()
     {
         return $this->id;

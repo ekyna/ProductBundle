@@ -281,7 +281,15 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('product')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->variableNode('templates')->defaultValue('EkynaProductBundle:Admin/Product')->end()
+                                ->variableNode('templates')->defaultValue([
+                                    '_form.html'     => 'EkynaProductBundle:Admin/Product:_form.html',
+                                    'list.html'      => 'EkynaProductBundle:Admin/Product:list.html',
+                                    'new.html'       => 'EkynaProductBundle:Admin/Product:new.html',
+                                    'show.html'      => 'EkynaProductBundle:Admin/Product:show.html',
+                                    'edit.html'      => 'EkynaProductBundle:Admin/Product:edit.html',
+                                    'duplicate.html' => 'EkynaProductBundle:Admin/Product:duplicate.html',
+                                    'remove.html'    => 'EkynaProductBundle:Admin/Product:remove.html',
+                                ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Product')->end()
                                 ->scalarNode('controller')->defaultValue('Ekyna\Bundle\ProductBundle\Controller\Admin\ProductController')->end()
                                 ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\ProductRepository')->end()

@@ -1,0 +1,61 @@
+{% extends "EkynaAdminBundle:Entity/Default:edit.html.twig" %}
+
+{% import "EkynaProductBundle:Admin/Product:_macro.html.twig" as macros %}
+
+{% block title %}
+    <h1>{{ 'ekyna_product.product.header.duplicate'|trans({'%name%': source})|raw }}</h1>
+    {{ product|product_type_badge }}
+{% endblock title %}
+
+{% block actions %}
+    {{ admin_resource_btn(product, 'list') }}
+    {{ macros.new_product_button() }}
+{% endblock actions %}
+
+
+{% block main %}
+    <div class="alert alert-warning">
+        {% set fields = [
+            'ekyna_core.field.designation',
+            'ekyna_product.product.field.visible',
+            'ekyna_product.product.field.net_price',
+            'ekyna_core.field.weight',
+            'ekyna_product.product.field.geocode',
+            'ekyna_product.product_reference.label.plural'
+        ] %}
+        <p>
+            Veuillez vérifier les valeurs des champs :
+            {% for field in fields %}{% if not loop.first %}{% if loop.last %} et {% else %}, {% endif %}{% endif %}<strong>{{ field|trans }}</strong>{% endfor -%}
+        </p>
+    </div>
+    {{ parent() }}
+{% endblock main %}
+
+
+{% block side %}
+    {{ parent() }}
+    <h3>{{ source }}</h3>
+    <hr>
+    <dl class="dl-horizontal">
+        <dt>{{ 'ekyna_core.field.designation'|trans }}</dt>
+        <dd>{{ source.designation }}</dd>
+        <dt>{{ 'ekyna_product.product.field.visible'|trans }}</dt>
+        <dd>{% if source.visible %}{{ 'ekyna_core.value.yes'|trans }}{% else %}{{ 'ekyna_core.value.no'|trans }}{% endif %}</dd>
+        <dt>{{ 'ekyna_product.product.field.net_price'|trans }}</dt>
+        <dd>{{ source.netPrice|localizedcurrency('EUR') }}</dd>{# TODO default currency #}
+        <dt>{{ 'ekyna_core.field.weight'|trans }}</dt>
+        <dd>{{ source.weight|localizednumber }} kg</dd> {# TODO packagin format #}
+        <dt>{{ 'ekyna_product.product.field.geocode'|trans }}</dt>
+        <dd>{{ source.geocode }}</dd>
+        <dt>{{ 'ekyna_product.product_reference.label.plural'|trans }}</dt>
+        <dd>
+            {% if source.references is not empty %}
+                {% for reference in source.references %}
+                    <em>{{ reference|product_reference_type_label }}</em> : {{ reference.number }}<br>
+                {% endfor %}
+            {% else %}
+                <em>{{ 'ekyna_core.value.none'|trans }}</em>
+            {% endif %}
+        </dd>
+    </dl>
+{% endblock side %}
