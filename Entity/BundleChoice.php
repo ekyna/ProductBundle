@@ -79,7 +79,7 @@ class BundleChoice implements Model\BundleChoiceInterface
             $this->id = null;
             $this->slot = null;
 
-            $rules = $this->rules;
+            $rules = $this->rules->toArray();
             $this->rules = new ArrayCollection();
             foreach ($rules as $rule) {
                 $this->addRule(clone $rule);

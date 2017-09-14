@@ -65,7 +65,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
             $this->id = null;
             $this->group = null;
 
-            $translations = $this->translations;
+            $translations = $this->translations->toArray();
             $this->translations = new ArrayCollection();
             foreach ($translations as $translation) {
                 $this->addTranslation(clone $translation);

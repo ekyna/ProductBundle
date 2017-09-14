@@ -63,13 +63,13 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
             $this->id = null;
             $this->product = null;
 
-            $options = $this->options;
+            $options = $this->options->toArray();
             $this->options = new ArrayCollection();
             foreach ($options as $option) {
                 $this->addOption(clone $option);
             }
 
-            $translations = $this->translations;
+            $translations = $this->translations->toArray();
             $this->translations = new ArrayCollection();
             foreach ($translations as $translation) {
                 $this->addTranslation(clone $translation);

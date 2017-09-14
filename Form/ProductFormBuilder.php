@@ -37,11 +37,6 @@ class ProductFormBuilder
     private $mediaClass;
 
     /**
-     * @var string
-     */
-    private $attributeSetClass;
-
-    /**
      * @var FormInterface
      */
     private $form;
@@ -57,13 +52,11 @@ class ProductFormBuilder
      *
      * @param string $productClass
      * @param string $mediaClass
-     * @param string $attributeSetClass
      */
-    public function __construct($productClass, $mediaClass, $attributeSetClass)
+    public function __construct($productClass, $mediaClass)
     {
         $this->productClass = $productClass;
         $this->mediaClass = $mediaClass;
-        $this->attributeSetClass = $attributeSetClass;
     }
 
     /**
@@ -135,12 +128,10 @@ class ProductFormBuilder
         ProductTypes::assertVariable($this->product);
 
         $options = array_replace([
-            'label'     => 'ekyna_product.attribute_set.label.singular',
-            'class'     => $this->attributeSetClass,
             'allow_new' => true,
         ], $options);
 
-        $this->form->add('attributeSet', ResourceType::class, $options);
+        $this->form->add('attributeSet', PR\Attribute\AttributeSetChoiceType::class, $options);
 
         return $this;
     }

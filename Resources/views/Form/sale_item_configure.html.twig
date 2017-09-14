@@ -66,6 +66,15 @@
     {# TODO form_errors(form) #}
     <div class="bundle-slot">
         <div class="slot-info">
+            {%- if form.vars.slot_media is not same as(null) -%}
+                <span class="slot-thumb">
+                {% if form.vars.slot_media is media_svg %}
+                    {{ form.vars.slot_media|media_svg }}
+                {% else %}
+                    {{ form.vars.slot_media|media_image({'filter': 'slot_thumb'}) }}
+                {% endif %}
+                </span>
+            {%- endif -%}
             {%- if 1 < form.choice.children|length -%}
             <ul class="slot-buttons">
                 {%- for child in form.choice -%}

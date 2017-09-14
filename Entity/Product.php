@@ -177,28 +177,28 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             // ---- ONE TO MANY ----
 
             // Adjustments
-            $adjustments = $this->adjustments;
+            $adjustments = $this->adjustments->toArray();
             $this->adjustments = new ArrayCollection();
             foreach ($adjustments as $adjustment) {
                 $this->addAdjustment(clone $adjustment);
             }
 
             // Bundle slots
-            $bundleSlots = $this->bundleSlots;
+            $bundleSlots = $this->bundleSlots->toArray();
             $this->bundleSlots = new ArrayCollection();
             foreach ($bundleSlots as $bundleSlot) {
                 $this->addBundleSlot(clone $bundleSlot);
             }
 
             // Medias
-            $medias = $this->medias;
+            $medias = $this->medias->toArray();
             $this->medias = new ArrayCollection();
             foreach ($medias as $media) {
                 $this->addMedia(clone $media);
             }
 
             // Option groups
-            $optionGroups = $this->optionGroups;
+            $optionGroups = $this->optionGroups->toArray();
             $this->optionGroups = new ArrayCollection();
             foreach ($optionGroups as $optionGroup) {
                 $this->addOptionGroup(clone $optionGroup);
@@ -208,14 +208,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $this->references = new ArrayCollection();
 
             // Translations
-            $translations = $this->getTranslations();
+            $translations = $this->translations->toArray();
             $this->translations = new ArrayCollection();
             foreach ($translations as $translation) {
                 $this->addTranslation(clone $translation);
             }
 
             // Variants
-            $variants = $this->variants;
+            $variants = $this->variants->toArray();
             $this->variants = new ArrayCollection();
             foreach ($variants as $variant) {
                 $this->addVariant(clone $variant);
@@ -224,28 +224,28 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             // ---- MANY TO MANY ----
 
             // Attributes
-            $attributes = $this->attributes;
+            $attributes = $this->attributes->toArray();
             $this->attributes = new ArrayCollection();
             foreach ($attributes as $attribute) {
                 $this->addAttribute($attribute);
             }
 
             // Categories
-            $categories = $this->categories;
+            $categories = $this->categories->toArray();
             $this->categories = new ArrayCollection();
             foreach ($categories as $category) {
                 $this->addCategory($category);
             }
 
             // Customer groups
-            $customerGroups = $this->customerGroups;
+            $customerGroups = $this->customerGroups->toArray();
             $this->customerGroups = new ArrayCollection();
             foreach ($customerGroups as $customerGroup) {
                 $this->addCustomerGroup($customerGroup);
             }
 
             // Tags
-            $tags = $this->tags;
+            $tags = $this->tags->toArray();
             $this->tags = new ArrayCollection();
             foreach ($tags as $tag) {
                 $this->addTag($tag);

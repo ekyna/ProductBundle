@@ -432,9 +432,22 @@
                             'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
                         }
                     }) }}
-                    {{ show_row(slot.required, 'checkbox', 'ekyna_core.field.required', {
-                        'id': slotId ~ 'required'
-                    }|merge(options)) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ show_row(slot.media, 'media', 'ekyna_core.field.image', {
+                                'id': slotId ~ 'image',
+                                'label_nb_col': 4,
+                                'widget_nb_col': 8,
+                            }) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ show_row(slot.required, 'checkbox', 'ekyna_core.field.required', {
+                                'id': slotId ~ 'required',
+                                'label_nb_col': 4,
+                                'widget_nb_col': 8,
+                            }) }}
+                        </div>
+                    </div>
                     <table class="table table-stripped table-condensed">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>

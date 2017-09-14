@@ -129,4 +129,17 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
 
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function clear()
+    {
+        $this->title = null;
+        $this->attributesTitle = null;
+        $this->description = null;
+        $this->slug = null;
+
+        return $this;
+    }
 }

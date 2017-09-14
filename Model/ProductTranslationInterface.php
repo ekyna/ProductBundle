@@ -74,4 +74,11 @@ interface ProductTranslationInterface extends RM\TranslationInterface
      * @return $this|ProductTranslationInterface
      */
     public function setSlug($slug);
+
+    /**
+     * Clears the translation data.
+     *
+     * @return $this|ProductTranslationInterface
+     */
+    public function clear();
 }

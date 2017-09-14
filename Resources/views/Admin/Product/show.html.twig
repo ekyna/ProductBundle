@@ -26,12 +26,11 @@
             {{ product|cms_tags({'text': false}) }}
         </div>
         <div class="actions">
-            {#{{ macros.convert_product_button(product) }}#}
+            {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}{# TODO temp lock #}
                 {{ ui_button('ekyna_product.product.button.duplicate', {
                     'type': 'link',
                     'icon': 'duplicate',
-                    'theme': 'warning',
                     'path': admin_resource_path(product, 'duplicate')
                 }) }}
             {%- endif -%}

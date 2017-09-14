@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -165,9 +166,42 @@ class ProductController extends ResourceController
         $context = $this->loadContext($request);
 
         $resourceName = $this->config->getResourceName();
+        /** @var ProductInterface $resource */
         $resource = $context->getResource($resourceName);
 
-        throw $this->createNotFoundException('Not yet implemented.');
+        $converter = $this->get('ekyna_product.product.product_converter');
+
+        $type = $request->attributes->get('type');
+
+        if (!$converter->can($resource, $type)) {
+            throw $this->createNotFoundException('Not yet implemented.');
+        }
+
+        $result = $converter->convert($resource, $type);
+        if ($result instanceof FormInterface) {
+            $formTemplate = sprintf('EkynaProductBundle:Admin/Product/Convert:_%s_form.html.twig', $type);
+
+            return $this->render(
+                $this->config->getTemplate('convert.html'),
+                $context->getTemplateVars([
+                    'form'          => $result->createView(),
+                    'form_template' => $formTemplate,
+                ])
+            );
+        } elseif ($result instanceof ProductInterface) {
+            $event = $this->getOperator()->create($result);
+            $event->toFlashes($this->getFlashBag());
+
+            if ($event->hasErrors()) {
+                return $this->redirect($this->generateResourcePath($resource));
+            }
+
+            $this->addFlash('ekyna_product.convert.variable_success', 'warning');
+
+            return $this->redirect($this->generateResourcePath($result));
+        }
+
+        throw new \LogicException("Unexpected result.");
     }
 
     /**
@@ -226,7 +260,7 @@ class ProductController extends ResourceController
                 ->getTableFactory()
                 ->createTable('variants', $this->config->getTableType(), [
                     'variant_mode' => true,
-                    'source' => $product->getVariants()->toArray(),
+                    'source'       => $product->getVariants()->toArray(),
                 ]);
 
             if (null !== $response = $table->handleRequest($context->getRequest())) {

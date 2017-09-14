@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
 use Ekyna\Component\Resource\Model\TranslatableInterface;
 
 /**
@@ -12,7 +13,7 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  *
  * @method BundleSlotTranslationInterface translate($locale = null, $create = false)
  */
-interface BundleSlotInterface extends TranslatableInterface
+interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterface
 {
     /**
      * Returns the bundle.

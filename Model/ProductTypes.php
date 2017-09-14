@@ -26,12 +26,12 @@ class ProductTypes extends AbstractConstants
     const CONVERSION_MAP = [
         ProductTypes::TYPE_SIMPLE       => [
             ProductTypes::TYPE_VARIABLE,
-            ProductTypes::TYPE_BUNDLE,
+            //ProductTypes::TYPE_BUNDLE,
         ],
         ProductTypes::TYPE_VARIABLE     => [],
         ProductTypes::TYPE_VARIANT      => [],
         ProductTypes::TYPE_BUNDLE       => [
-            ProductTypes::TYPE_CONFIGURABLE,
+            //ProductTypes::TYPE_CONFIGURABLE,
         ],
         ProductTypes::TYPE_CONFIGURABLE => [],
     ];

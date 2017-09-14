@@ -133,6 +133,22 @@ ekyna_product:
         alert:
             no_item: Aucune catégorie configuré
 
+    convert:
+        help:
+            tag_choice: |
+                Sélectionnez les tags à destination du produit <strong>variable</strong>.
+                Les tags non sélectionnés seront transférés à la <strong>variante</strong> créée.
+            option_group_choice: |
+                Sélectionnez les groupes d'options à destination du produit <strong>variable</strong>.
+                Les groupes non sélectionnés seront transférés à la <strong>variante</strong> créée.
+            media_choice: |
+                Sélectionnez les médias à destination du produit <strong>variable</strong>.
+                Les médias non sélectionnés seront transférés à la <strong>variante</strong> créée.
+        variable_success: |
+            Conversion réussie. Veuillez vérifier les informations du produit variable
+            <strong>ET</strong> de la variante créée.
+
+
     inventory:
         title: Inventaire
         field:
@@ -204,6 +220,7 @@ ekyna_product:
             show: Détail du produit <small>%name%</small>
             new: Créer un nouveau produit
             duplicate: Dupliquer le produit <small>%name%</small>
+            convert: Convertir le produit <small>%name%</small>
             edit: Modifier le produit <small>%name%</small>
             remove: Supprimer le produit <small>%name%</small>
             convert: Convertir le produit <small>%name%</small>
@@ -213,6 +230,7 @@ ekyna_product:
             new: Nouveau produit
             edit: Modifier le produit
             duplicate: Dupliquer le produit
+            convert: Convertir le produit
             remove: Supprimer le produit
             convert: Convertir
         type:

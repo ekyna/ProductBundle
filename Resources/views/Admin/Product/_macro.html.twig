@@ -21,7 +21,7 @@
 </div>
 {% endmacro %}
 
-{#{% macro convert_product_button(product) %}
+{% macro convert_product_button(product) %}
     {% set types = product_convert_types(product) %}
     {% if types is not empty %}
     <div class="btn-group btn-group-sm">
@@ -44,4 +44,4 @@
         </ul>
     </div>
     {% endif %}
-{% endmacro %}#}
+{% endmacro %}

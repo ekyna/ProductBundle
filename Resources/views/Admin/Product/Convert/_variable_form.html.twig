@@ -1,0 +1,31 @@
+<div class="form-body">
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+
+    {{ form_errors(form) }}
+
+    {% if form.variant is defined %}
+        <h3>{{ 'ekyna_product.product.type.variant'|trans }}</h3>
+        {{ form_row(form.variant.attributes) }}
+
+        {% if form.option_group_selection is defined %}
+            {{ form_row(form.option_group_selection) }}
+        {% endif %}
+        {% if form.media_selection is defined %}
+            {{ form_row(form.media_selection) }}
+        {% endif %}
+        {% if form.tag_selection is defined %}
+            {{ form_row(form.tag_selection) }}
+        {% endif %}
+        <hr>
+    {% endif %}
+
+    <h3>{{ 'ekyna_product.product.type.variable'|trans }}</h3>
+    {{ form_row(form.attributeSet) }}
+    {{ form_row(form.designation) }}
+    {{ form_row(form.translations) }}
+    {{ form_row(form.seo) }}
+
+    {{ form_rest(form) }}
+
+</div>

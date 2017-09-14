@@ -5,6 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
+use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
+use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -74,6 +76,11 @@ class BundleSlotType extends ResourceFormType
                     'form_type'      => BundleSlotTranslationType::class,
                     'label'          => false,
                     'error_bubbling' => false,
+                ])
+                ->add('media', MediaChoiceType::class, [
+                    'label'    => 'ekyna_core.field.image',
+                    'required' => false,
+                    'types'    => [MediaTypes::IMAGE, MediaTypes::SVG],
                 ])
                 ->add('required', CheckboxType::class, [
                     'label'    => 'ekyna_core.field.required',

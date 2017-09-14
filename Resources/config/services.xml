@@ -109,6 +109,11 @@
             <argument>%ekyna_product.attribute_group.class%</argument>
             <tag name="form.type"/>
         </service>
+        <service id="ekyna_product.attribute_set_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType">
+            <argument>%ekyna_product.attribute_set.class%</argument>
+            <tag name="form.type"/>
+        </service>
 
         <!-- Brand choice form type -->
         <service id="ekyna_product.brand_choice.form_type"
@@ -217,7 +222,6 @@
                  class="%ekyna_product.product.form_type.builder.class%">
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
-            <argument>%ekyna_product.attribute_set.class%</argument>
         </service>
         <service id="ekyna_product.product.form_type.event_subscriber"
                  class="%ekyna_product.product.form_type.event_subscriber.class%">
@@ -386,6 +390,23 @@
             <argument>ym</argument>
             <argument>8</argument>
         </service>
+
+        <!-- Product converter -->
+        <service id="ekyna_product.product.product_converter"
+                 class="Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="request_stack"/>
+        </service>
+
+        <!-- Product convert form type -->
+        <service id="ekyna_product.convert_variable.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType">
+            <argument type="service" id="ekyna_admin.helper.resource_helper"/>
+            <argument type="service" id="ekyna_product.attribute_set.repository"/>
+            <tag name="form.type"/>
+        </service>
+
 
         <!-- Search -->
         <!-- TODO Handle wide_search tag in \Ekyna\Bundle\ResourceBundle\Elastica\RepositoryManager

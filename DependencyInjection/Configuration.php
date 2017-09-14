@@ -288,6 +288,7 @@ class Configuration implements ConfigurationInterface
                                     'show.html'      => 'EkynaProductBundle:Admin/Product:show.html',
                                     'edit.html'      => 'EkynaProductBundle:Admin/Product:edit.html',
                                     'duplicate.html' => 'EkynaProductBundle:Admin/Product:duplicate.html',
+                                    'convert.html'   => 'EkynaProductBundle:Admin/Product:convert.html',
                                     'remove.html'    => 'EkynaProductBundle:Admin/Product:remove.html',
                                 ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Product')->end()

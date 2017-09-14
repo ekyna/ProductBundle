@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\AbstractTranslatable;
 
@@ -15,6 +16,8 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  */
 class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterface
 {
+    use MediaSubjectTrait;
+
     /**
      * @var integer
      */
@@ -61,7 +64,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
             $this->id = null;
             $this->bundle = null;
 
-            $choices = $this->choices;
+            $choices = $this->choices->toArray();
             $this->choices = new ArrayCollection();
             foreach ($choices as $choice) {
                 $this->addChoice(clone $choice);
