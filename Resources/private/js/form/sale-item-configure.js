@@ -241,10 +241,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
 
             // Disable if Placeholder + Single option
-            if (this.$element.find('label').hasClass('required') && 1 >= this.$select.children().length) {
+            /*if (this.$element.find('label').hasClass('required') && 1 >= this.$select.children().length) {
                 this.$select.prop('disabled', true);
                 return;
-            }
+            }*/
 
             this.$select.prop('disabled', false);
         },

@@ -374,7 +374,7 @@ class ItemBuilder
                         continue;
                     }
 
-                    // Remove bundle slot duplicates
+                    // Remove option group duplicates
                     if (in_array($optionGroupId, $optionGroupIds)) {
                         $item->removeChild($child);
                         continue;
