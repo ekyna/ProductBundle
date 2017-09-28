@@ -13,6 +13,8 @@ final class ProductEvents
     const UPDATE             = 'ekyna_product.product.update';
     const DELETE             = 'ekyna_product.product.delete';
 
+    const INITIALIZE         = 'ekyna_product.product.initialize';
+
     const PRE_CREATE         = 'ekyna_product.product.pre_create';
     const POST_CREATE        = 'ekyna_product.product.post_create';
 

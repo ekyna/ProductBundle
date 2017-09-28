@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
+use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
@@ -24,6 +25,50 @@ class ProductController extends ResourceController
     use RC\TinymceTrait,
         RC\ToggleableTrait;
 
+
+    /**
+     * Create supplier product action.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function newSupplierProductAction(Request $request)
+    {
+        if ($isXhr = $request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Not yet implemented.');
+        }
+
+        $context = $this->loadContext($request);
+        $resourceName = $this->config->getResourceName();
+        /** @var ProductInterface $product */
+        $product = $context->getResource($resourceName);
+
+        $form = $this->createNewSupplierProductForm($product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var \Ekyna\Component\Commerce\Supplier\Model\SupplierInterface $supplier */
+            $supplier = $form->get('supplier')->getData();
+
+            $supplierProduct = $this
+                ->get('ekyna_commerce.supplier_product.repository')
+                ->findBySubjectAndSupplier($product, $supplier);
+
+            if (null === $supplierProduct) {
+                return $this->redirectToRoute('ekyna_commerce_supplier_product_admin_new', [
+                    'supplierId' => $supplier->getId(),
+                    'productId'  => $product->getId(),
+                ]);
+            }
+
+            $this->addFlash($this->getTranslator()->trans('ekyna_product.product.alert.supplier_product_exists', [
+                '%name%' => $supplier->getName(),
+            ]), 'warning');
+        }
+
+        return $this->redirect($this->generateResourcePath($product));
+    }
 
     /**
      * {@inheritdoc}
@@ -236,20 +281,6 @@ class ProductController extends ResourceController
     /**
      * @inheritdoc
      */
-    protected function createNewResourceForm(Context $context, $footer = true, array $options = [])
-    {
-        if (!array_key_exists('action', $options)) {
-            $resource = $context->getResource();
-            $parentId = $context->getRequest()->query->get('parent');
-            $options['action'] = $this->generateResourcePath($resource, 'new', ['parent' => $parentId]);
-        }
-
-        return parent::createNewResourceForm($context, $footer, $options);
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function buildShowData(array &$data, Context $context)
     {
         /** @var ProductInterface $product */
@@ -282,9 +313,29 @@ class ProductController extends ResourceController
             }
 
             $data['supplierProducts'] = $table->createView();
+
+            $data['newSupplierProductForm'] = $this
+                ->createNewSupplierProductForm($product)
+                ->createView();
         }
 
         return null;
+    }
+
+    /**
+     * Creates the "new supplier product" form.
+     *
+     * @param ProductInterface $product
+     *
+     * @return \Symfony\Component\Form\Form
+     */
+    protected function createNewSupplierProductForm(ProductInterface $product)
+    {
+        return $this->createForm(NewSupplierProductType::class, null, [
+            'action' => $this->generateUrl('ekyna_product_product_admin_new_supplier_product', [
+                'productId' => $product->getId(),
+            ]),
+        ]);
     }
 
     /**

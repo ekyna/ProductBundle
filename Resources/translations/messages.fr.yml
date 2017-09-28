@@ -252,6 +252,8 @@ ekyna_product:
             delivery_time: Délai de livraison
         alert:
             no_item: Aucun produit configuré
+            supplier_product_exists: >
+                Une référence fournisseur existe déjà pour le fournisseur <strong>%name%</strong>.
 
     product_media:
         label:

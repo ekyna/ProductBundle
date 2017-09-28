@@ -44,6 +44,13 @@ ekyna_product_product_admin_convert:
         productId: \d+
         type: '^[a-z]+$'
 
+ekyna_product_product_admin_new_supplier_product:
+    path: /{productId}/new-supplier-product
+    defaults: { _controller: "ekyna_product.product.controller:newSupplierProductAction" }
+    methods: [POST]
+    requirements:
+        productId: \d+
+
 ekyna_product_product_admin_tinymce:
     path: /{productId}/tinymce
     defaults: { _controller: "ekyna_product.product.controller:tinymceAction", field: description }

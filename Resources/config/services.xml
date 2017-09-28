@@ -376,6 +376,14 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Supplier product event listener -->
+        <service id="ekyna_product.supplier_product.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\SupplierProductEventSubscriber">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Variant constraint validator -->
         <service id="ekyna_product.validator.variant_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
