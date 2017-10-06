@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGeneratorInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
@@ -50,6 +51,51 @@ class ProductEventSubscriber implements EventSubscriberInterface
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
         $this->referenceGenerator = $referenceGenerator;
+    }
+
+    /**
+     * Pre create event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function preCreate(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            // Pre load the variants for position indexation
+            $product->getParent()->getVariants()->toArray();
+        }
+    }
+
+    /**
+     * Pre update event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function preUpdate(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            // Pre load the variants for position indexation
+            $product->getParent()->getVariants()->toArray();
+        }
+    }
+
+    /**
+     * Pre delete event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function preDelete(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            // Pre load the variants for position indexation
+            $product->getParent()->getVariants()->toArray();
+        }
     }
 
     /**
@@ -219,6 +265,9 @@ class ProductEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            ProductEvents::PRE_CREATE         => ['preCreate', 0],
+            ProductEvents::PRE_UPDATE         => ['preUpdate', 0],
+            ProductEvents::PRE_DELETE         => ['preDelete', 0],
             ProductEvents::INSERT             => ['onInsert', 0],
             ProductEvents::UPDATE             => ['onUpdate', 0],
             ProductEvents::DELETE             => ['onDelete', 0],

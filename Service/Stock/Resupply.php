@@ -87,10 +87,12 @@ class Resupply
                     'product' => $supplierProduct,
                 ]);
         } else {
+            $supplier = $supplierProduct->getSupplier();
             $supplierOrder = $this->supplierOrderRepository->createNew();
             $supplierOrder
                 ->setCurrency($this->currencyRepository->findDefault())
-                ->setSupplier($supplierProduct->getSupplier());
+                ->setSupplier($supplier)
+                ->setCarrier($supplier->getCarrier());
         }
 
         if (null === $supplierOrderItem) {

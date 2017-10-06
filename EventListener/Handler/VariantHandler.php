@@ -24,18 +24,19 @@ class VariantHandler extends AbstractVariantHandler
         $changed = false;
 
         // Generate attributes designation and title if needed
-        if ($this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant)) {
-            $changed = true;
-        }
+        $changed |= $this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant);
 
         // Set tax group regarding to parent/variable if needed
-        if ($this->getVariantUpdater()->updateTaxGroup($variant)) {
-            $changed = true;
-        }
+        $changed |= $this->getVariantUpdater()->updateTaxGroup($variant);
 
         // Set brand regarding to parent/variable if needed
-        if ($this->getVariantUpdater()->updateBrand($variant)) {
-            $changed = true;
+        $changed |= $this->getVariantUpdater()->updateBrand($variant);
+
+        if (null !== $variable = $variant->getParent()) {
+            if (null === $variant->getPosition()) {
+                $variant->setPosition(9999);
+            }
+            $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
         }
 
         return $changed;
@@ -55,8 +56,12 @@ class VariantHandler extends AbstractVariantHandler
         $changed = false;
 
         // Generate attributes designation and title if needed
-        if ($this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant)) {
-            $changed = true;
+        $changed |= $this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant);
+
+        if (null !== $variable = $variant->getParent()) {
+            if ($this->persistenceHelper->isChanged($variant, 'position')) {
+                $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
+            }
         }
 
         return $changed;
@@ -70,9 +75,12 @@ class VariantHandler extends AbstractVariantHandler
         $variant = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIANT);
 
         if (null !== $variable = $variant->getParent()) {
-            if (!$this->persistenceHelper->isScheduledForRemove($variable) && $this->checkVisibility($variable)) {
-                $this->persistenceHelper->persistAndRecompute($variable);
-                return true;
+            if (!$this->persistenceHelper->isScheduledForRemove($variable)) {
+                $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
+
+                if ($this->checkVisibility($variable)) {
+                    $this->persistenceHelper->persistAndRecompute($variable);
+                }
             }
         }
 

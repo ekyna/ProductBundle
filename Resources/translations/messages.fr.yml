@@ -153,6 +153,9 @@ ekyna_product:
         title: Inventaire
         field:
             profile: Profil
+        modal:
+            orders: Commandes clients
+            resupply: Réassort
         profile:
             none: Aucun
             treatment: Traitement

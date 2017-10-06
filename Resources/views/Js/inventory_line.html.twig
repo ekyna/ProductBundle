@@ -2,9 +2,12 @@
     <td>{{ brand }}</td>
     <td><a href="{{ url }}">{{ designation }}</a></td>
     <td>{{ reference }}</td>
+    <td class="text-right">{{ net_price }}</td>
+    <td class="text-right">{{ weight }}</td>
     <td>{{ geocode }}</td>
     <td><span class="label label-{{ stock_mode_theme }}">{{ stock_mode_label }}</span></td>
     <td><span class="label label-{{ stock_state_theme }}">{{ stock_state_label }}</span></td>
+    <td class="text-right">{{ stock_floor }}</td>
     <td class="text-right">{{ in_stock }}</td>
     <td class="text-right">{{ available_stock }}</td>
     <td class="text-right">{{ virtual_stock }}</td>
@@ -16,6 +19,9 @@
     <td class="text-right">
         {# TODO translations #}
         <div class="btn-group btn-group-xs">
+            <a href="javascript: void(0)" class="btn btn-default quick-edit" title="Modifier">
+                <i class="fa fa-pencil"></i>
+            </a>
             <a href="javascript: void(0)" class="btn btn-default stock-units" title="Unités de stock">
                 <i class="fa fa-tasks"></i>
             </a>

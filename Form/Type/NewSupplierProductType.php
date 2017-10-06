@@ -22,9 +22,9 @@ class NewSupplierProductType extends AbstractType
     {
         $builder
             ->add('supplier', SupplierChoiceType::class, [
-                'constraints' => [
+                /*'constraints' => [
                     new NotNull(),
-                ],
+                ],*/
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'ekyna_commerce.supplier_product.button.new',

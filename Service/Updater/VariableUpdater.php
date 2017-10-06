@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
+use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
  * Class VariableUpdater
@@ -12,6 +13,51 @@ use Ekyna\Component\Commerce\Stock\Model as Stock;
  */
 class VariableUpdater
 {
+    /**
+     * Indexes the variable's variants position.
+     *
+     * @param Model\ProductInterface     $variable
+     * @param PersistenceHelperInterface $helper
+     *
+     * @return bool
+     */
+    public function indexVariantsPositions(Model\ProductInterface $variable, PersistenceHelperInterface $helper = null)
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $variants = $variable->getVariants()->getIterator();
+
+        $changed = false;
+
+        // Sort with current position
+        $variants->uasort(function (Model\ProductInterface $vA, Model\ProductInterface $vB) {
+            if ($vA->getPosition() === $vB->getPosition()) {
+                return 0;
+            }
+
+            return $vA->getPosition() > $vB->getPosition() ? 1 : -1;
+        });
+
+        // Update positions if needed
+        $position = 0;
+        /** @var Model\ProductInterface $variant */
+        foreach ($variants as $variant) {
+            if ($variant->getPosition() != $position || (null === $variant->getPosition() && $position === 0)) {
+                $variant->setPosition($position);
+
+                if ($helper) {
+                    $helper->persistAndRecompute($variant);
+                }
+
+                $changed = true;
+            }
+
+            $position++;
+        }
+
+        return $changed;
+    }
+
     /**
      * Updates the variable minimum price regarding to its variants.
      *
@@ -31,6 +77,7 @@ class VariableUpdater
 
                 return true;
             }
+
             return false;
         }
 

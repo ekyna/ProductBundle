@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
+use Braincrafted\Bundle\BootstrapBundle\Form\Type\MoneyType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
@@ -46,17 +47,24 @@ class ProductFormBuilder
      */
     private $product;
 
+    /**
+     * @var string
+     */
+    private $defaultCurrency;
+
 
     /**
      * Constructor.
      *
      * @param string $productClass
      * @param string $mediaClass
+     * @param string $defaultCurrency
      */
-    public function __construct($productClass, $mediaClass)
+    public function __construct($productClass, $mediaClass, $defaultCurrency)
     {
         $this->productClass = $productClass;
         $this->mediaClass = $mediaClass;
+        $this->defaultCurrency = $defaultCurrency;
     }
 
     /**
@@ -332,14 +340,11 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'    => 'ekyna_product.product.field.net_price',
-            'scale'    => 5,
-            'attr'     => [
-                'input_group' => ['append' => '€'],
-            ],
+            'currency' => $this->defaultCurrency,
             'required' => false,
         ], $options);
 
-        $this->form->add('netPrice', SF\NumberType::class, $options);
+        $this->form->add('netPrice', MoneyType::class, $options);
 
         return $this;
     }

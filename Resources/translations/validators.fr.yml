@@ -3,6 +3,7 @@ ekyna_product:
     bundle_choice:
         invalid_quantity_range: La quantité maximum doit être supérieure à la quantité minimum.
         rules_should_be_empty: La liste des règles doit être vide.
+        recursive_choice: Vous ne pouvez pas composer un produit avec lui-même.
     bundle_slot:
         too_many_choices: Un seul produit doit être configuré.
     product:
@@ -12,3 +13,5 @@ ekyna_product:
         variant_is_not_unique: Une autre variante existe déjà avec cette configuration d'attributs.
         designation_needed: La désignation ne peut être générée automatiquement sans attributs, veuillez la saisir.
         translation_title_needed: Le titre ne peut être généré automatiquement sans attributs, veuillez le saisir.
+    option:
+        recursive_choice: Un produit ne peut pas être une option de lui-même.

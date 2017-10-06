@@ -20,21 +20,28 @@ class BundleChoiceValidator extends ConstraintValidator
     public function validate($bundleChoice, Constraint $constraint)
     {
         if (!$bundleChoice instanceof Model\BundleChoiceInterface) {
-            throw new InvalidArgumentException("Expected instance of BundleChoiceInterface");
+            throw new InvalidArgumentException("Expected instance of " . Model\BundleChoiceInterface::class);
         }
         if (!$constraint instanceof BundleChoice) {
-            throw new InvalidArgumentException("Expected instance of BundleChoice (validation constraint)");
+            throw new InvalidArgumentException("Expected instance of " . BundleChoice::class);
         }
 
         /* @var Model\BundleChoiceInterface $bundleChoice */
         /* @var BundleChoice $constraint */
+
+        if ($bundleChoice->getProduct() === $bundleChoice->getSlot()->getBundle()) {
+            $this->context
+                ->buildViolation($constraint->recursive_choice)
+                ->atPath('product')
+                ->addViolation();
+        }
 
         // Only for 'configurable' product type
         if ($bundleChoice->getProduct()->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             // Asserts that the maximum quantity is greater than the minimum quantity
             if ($bundleChoice->getMinQuantity() > $bundleChoice->getMaxQuantity()) {
                 $this->context
-                    ->buildViolation($constraint->invalidQuantityRange)
+                    ->buildViolation($constraint->invalid_quantity_range)
                     ->atPath('maxQuantity')
                     ->addViolation();
             }
@@ -47,7 +54,7 @@ class BundleChoiceValidator extends ConstraintValidator
         // Asserts that no rule is configured
         if (0 < $bundleChoice->getRules()->count()) {
             $this->context
-                ->buildViolation($constraint->rulesShouldBeEmpty)
+                ->buildViolation($constraint->rules_should_be_empty)
                 ->atPath('rules')
                 ->addViolation();
         }

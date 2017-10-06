@@ -244,7 +244,7 @@
                             <td>{{ adjustment.designation }}</td>
                             <td>{{ adjustment.type|adjustment_type_label }}</td>
                             <td>{{ adjustment.mode|adjustment_mode_label }}</td>
-                            <td>{{ adjustment.amount|localizedcurrency('EUR') }}</td>{# TODO currency #}
+                            <td>{{ adjustment.amount|localizedcurrency(commerce_default_currency) }}</td>
                         </tr>
                         {# TODO translations ? #}
                     {% else %}
@@ -330,7 +330,11 @@
                                             {{- data.weight|localizednumber }} kg
                                         </td>
                                         <td id="{{ optionId ~ 'netPrice' }}">
-                                            {{- option.netPrice|localizedcurrency('EUR') -}}{# TODO currency #}
+                                        {%- if option.product and option.netPrice is same as(null) -%}
+                                            {{- option.product.netPrice|localizedcurrency(commerce_default_currency) -}}
+                                        {%- else -%}
+                                            {{- option.netPrice|localizedcurrency(commerce_default_currency) -}}
+                                        {%- endif -%}
                                         </td>
                                         <td id="{{ optionId ~ 'taxGroup' }}">
                                             {{- data.taxGroup -}}
@@ -392,7 +396,7 @@
                             {{ choice.minQuantity }}
                         </td>
                         <td id="{{ slotId ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {{ choice.product.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                            {{ choice.product.netPrice|localizedcurrency(commerce_default_currency) }}
                         </td>
                     </tr>
                     {% endfor %}

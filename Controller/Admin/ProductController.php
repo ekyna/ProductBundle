@@ -65,6 +65,12 @@ class ProductController extends ResourceController
             $this->addFlash($this->getTranslator()->trans('ekyna_product.product.alert.supplier_product_exists', [
                 '%name%' => $supplier->getName(),
             ]), 'warning');
+        } else {
+            $errors = '';
+            foreach ($form->getErrors(true) as $error) {
+                $errors .= $error->getMessage() . '<br>';
+            }
+            $this->addFlash($errors, 'danger');
         }
 
         return $this->redirect($this->generateResourcePath($product));
@@ -247,6 +253,93 @@ class ProductController extends ResourceController
         }
 
         throw new \LogicException("Unexpected result.");
+    }
+
+    /**
+     * Move (variant) up.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function moveUpAction(Request $request)
+    {
+        $context = $this->loadContext($request);
+
+        $resourceName = $this->config->getResourceName();
+        /** @var ProductInterface $variant */
+        $variant = $context->getResource($resourceName);
+
+        $this->isGranted('EDIT', $variant);
+
+        if ($variant->getType() !== ProductTypes::TYPE_VARIANT) {
+            return $this->redirect($this->generateResourcePath($variant));
+        }
+
+        $manager = $this->getManager();
+
+        $variable = $variant->getParent();
+        $variants = $variable->getVariants();
+
+        $swapPosition = $variant->getPosition() - 1;
+        foreach ($variants as $swap) {
+            if ($swap->getPosition() === $swapPosition) {
+                $swap->setPosition($swap->getPosition() + 1);
+                $manager->persist($swap);
+
+                $variant->setPosition($variant->getPosition() - 1);
+                $manager->persist($variant);
+
+                $manager->flush();
+                break;
+            }
+        }
+
+
+        return $this->redirect($this->generateResourcePath($variable));
+    }
+
+    /**
+     * Move (variant) down.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function moveDownAction(Request $request)
+    {
+        $context = $this->loadContext($request);
+
+        $resourceName = $this->config->getResourceName();
+        /** @var ProductInterface $variant */
+        $variant = $context->getResource($resourceName);
+
+        $this->isGranted('EDIT', $variant);
+
+        if ($variant->getType() !== ProductTypes::TYPE_VARIANT) {
+            return $this->redirect($this->generateResourcePath($variant));
+        }
+
+        $manager = $this->getManager();
+
+        $variable = $variant->getParent();
+        $variants = $variable->getVariants();
+
+        $swapPosition = $variant->getPosition() + 1;
+        foreach ($variants as $swap) {
+            if ($swap->getPosition() === $swapPosition) {
+                $swap->setPosition($swap->getPosition() - 1);
+                $manager->persist($swap);
+
+                $variant->setPosition($variant->getPosition() + 1);
+                $manager->persist($variant);
+
+                $manager->flush();
+                break;
+            }
+        }
+
+        return $this->redirect($this->generateResourcePath($variable));
     }
 
     /**

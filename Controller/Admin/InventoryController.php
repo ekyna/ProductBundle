@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
+use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,7 +37,7 @@ class InventoryController extends Controller
         $inventory = $this->get('ekyna_product.inventory');
 
         $form = $inventory->getForm([
-            'action' => $this->generateUrl('ekyna_product_inventory_admin_products')
+            'action' => $this->generateUrl('ekyna_product_inventory_admin_products'),
         ]);
 
         $data = $inventory->getContext();
@@ -68,6 +69,74 @@ class InventoryController extends Controller
     }
 
     /**
+     * Quick edit action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function quickEditAction(Request $request)
+    {
+        /*if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
+        }*/
+
+        $product = $this->findProductByRequest($request);
+
+        $form = $this->createForm(QuickEditType::class, $product, [
+            'action' => $this->generateUrl('ekyna_product_inventory_admin_quick_edit', [
+                'productId' => $product->getId(),
+            ]),
+            'attr'   => [
+                'class' => 'form-horizontal',
+            ],
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $event = $this->get('ekyna_product.product.operator')->update($product);
+
+            if ($event->hasErrors()) {
+                foreach ($event->getErrors() as $error) {
+                    $form->addError(new FormError($error->getMessage()));
+                }
+            } else {
+                return new JsonResponse([
+                    'success' => true,
+                ]);
+            }
+        }
+
+        $title = sprintf(
+            '%s <small style="font-style:italic">%s</small>',
+            $this->getTranslator()->trans('ekyna_product.product.button.edit'),
+            $product->getFullTitle()
+        );
+
+        $modal = new Modal($title, $form->createView(), [
+            [
+                'id'       => 'submit',
+                'label'    => 'ekyna_core.button.save',
+                'icon'     => 'glyphicon glyphicon-ok',
+                'cssClass' => 'btn-success',
+                'autospin' => true,
+            ],
+            [
+                'id'       => 'close',
+                'label'    => 'ekyna_core.button.cancel',
+                'icon'     => 'glyphicon glyphicon-remove',
+                'cssClass' => 'btn-default',
+            ],
+        ]);
+        $modal->setVars([
+            'form_template' => 'EkynaProductBundle:Admin/Inventory:_quick_edit_form.html.twig',
+        ]);
+
+        return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
      * Inventory stock units action.
      *
      * @param Request $request
@@ -88,13 +157,19 @@ class InventoryController extends Controller
                 'class' => 'table-condensed',
             ]);
 
-        $modal = new Modal('Unités de stock', $list, [
+        $title = sprintf(
+            '%s <small style="font-style:italic">%s</small>',
+            $this->getTranslator()->trans('ekyna_commerce.stock_unit.label.plural'),
+            $product->getFullTitle()
+        );
+
+        $modal = new Modal($title, $list, [
             [
                 'id'       => 'close',
                 'label'    => 'ekyna_core.button.close',
                 'icon'     => 'glyphicon glyphicon-remove',
                 'cssClass' => 'btn-default',
-            ]
+            ],
         ]);
 
         return $this->get('ekyna_core.modal')->render($modal);
@@ -128,13 +203,19 @@ class InventoryController extends Controller
             return $response;
         }
 
-        $modal = new Modal('Commandes client', $table->createView(), [
+        $title = sprintf(
+            '%s <small style="font-style:italic">%s</small>',
+            $this->getTranslator()->trans('ekyna_product.inventory.modal.orders'),
+            $product->getFullTitle()
+        );
+
+        $modal = new Modal($title, $table->createView(), [
             [
                 'id'       => 'close',
                 'label'    => 'ekyna_core.button.close',
                 'icon'     => 'glyphicon glyphicon-remove',
                 'cssClass' => 'btn-default',
-            ]
+            ],
         ]);
 
         return $this->get('ekyna_core.modal')->render($modal);
@@ -156,13 +237,13 @@ class InventoryController extends Controller
         $product = $this->findProductByRequest($request);
 
         $form = $this->createForm(ResupplyType::class, [], [
-            'action' => $this->generateUrl('ekyna_product_inventory_admin_resupply', [
+            'action'  => $this->generateUrl('ekyna_product_inventory_admin_resupply', [
                 'productId' => $product->getId(),
             ]),
             'product' => $product,
-            'attr' => [
+            'attr'    => [
                 'class' => 'form-horizontal',
-            ]
+            ],
         ]);
 
         $form->handleRequest($request);
@@ -207,7 +288,13 @@ class InventoryController extends Controller
             }
         }
 
-        $modal = new Modal('Réassort', $form->createView(), [
+        $title = sprintf(
+            '%s <small style="font-style:italic">%s</small>',
+            $this->getTranslator()->trans('ekyna_product.inventory.modal.resupply'),
+            $product->getFullTitle()
+        );
+
+        $modal = new Modal($title, $form->createView(), [
             [
                 'id'       => 'submit',
                 'label'    => 'ekyna_core.button.save',
@@ -220,7 +307,7 @@ class InventoryController extends Controller
                 'label'    => 'ekyna_core.button.cancel',
                 'icon'     => 'glyphicon glyphicon-remove',
                 'cssClass' => 'btn-default',
-            ]
+            ],
         ]);
 
         return $this->get('ekyna_core.modal')->render($modal);

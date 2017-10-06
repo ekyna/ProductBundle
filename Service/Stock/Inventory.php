@@ -74,7 +74,17 @@ class Inventory
     /**
      * @var \NumberFormatter
      */
-    private $formatter;
+    private $numberFormatter;
+
+    /**
+     * @var \NumberFormatter
+     */
+    private $currencyFormatter;
+
+    /**
+     * @var string
+     */
+    private $defaultCurrency;
 
     /**
      * @var array
@@ -104,6 +114,7 @@ class Inventory
      * @param LocaleProviderInterface $localeProvider
      * @param string                  $supplierOrderItemClass
      * @param string                  $stockUnitClass
+     * @param string                  $defaultCurrency
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -114,7 +125,8 @@ class Inventory
         SessionInterface $session,
         LocaleProviderInterface $localeProvider,
         $supplierOrderItemClass,
-        $stockUnitClass
+        $stockUnitClass,
+        $defaultCurrency
     ) {
         $this->productRepository = $productRepository;
         $this->supplierProductRepository = $supplierProductRepository;
@@ -125,10 +137,15 @@ class Inventory
 
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
+        $this->defaultCurrency = $defaultCurrency;
 
-        $this->formatter = \NumberFormatter::create(
+        $this->numberFormatter = \NumberFormatter::create(
             $localeProvider->getCurrentLocale(),
-            \NumberFormatter::TYPE_DEFAULT
+            \NumberFormatter::DECIMAL
+        );
+        $this->currencyFormatter = \NumberFormatter::create(
+            $localeProvider->getCurrentLocale(),
+            \NumberFormatter::CURRENCY
         );
     }
 
@@ -227,10 +244,19 @@ class Inventory
                 'productId' => $product['id'],
             ]);
 
+            // Format price
+            $product['net_price'] = $this
+                ->currencyFormatter
+                ->formatCurrency($product['net_price'], $this->defaultCurrency);
+
+            // Format weight
+            $product['weight'] = $this->numberFormatter->format($product['weight']) . '&nbsp;Kg'; // TODO packaging format
+
             // Format stock
-            $product['in_stock'] = $this->formatter->format($product['in_stock']);
-            $product['available_stock'] = $this->formatter->format($product['available_stock']);
-            $product['virtual_stock'] = $this->formatter->format($product['virtual_stock']);
+            $product['stock_floor'] = $this->numberFormatter->format($product['stock_floor']);
+            $product['in_stock'] = $this->numberFormatter->format($product['in_stock']);
+            $product['available_stock'] = $this->numberFormatter->format($product['available_stock']);
+            $product['virtual_stock'] = $this->numberFormatter->format($product['virtual_stock']);
 
             // Eda
             /** @var \DateTime $eda */
@@ -239,11 +265,11 @@ class Inventory
             }
 
             // Stock sums
-            $product['pending'] = $this->formatter->format($product['pending']);
-            $product['ordered'] = $this->formatter->format($product['ordered']);
-            $product['received'] = $this->formatter->format($product['received']);
-            $product['sold'] = $this->formatter->format($product['sold']);
-            $product['shipped'] = $this->formatter->format($product['shipped']);
+            $product['pending'] = $this->numberFormatter->format($product['pending']);
+            $product['ordered'] = $this->numberFormatter->format($product['ordered']);
+            $product['received'] = $this->numberFormatter->format($product['received']);
+            $product['sold'] = $this->numberFormatter->format($product['sold']);
+            $product['shipped'] = $this->numberFormatter->format($product['shipped']);
 
             // Stock themes
             $product['sold_theme'] = '';
@@ -283,12 +309,15 @@ class Inventory
                 'p.id',
                 'p.type',
                 'b.name as brand',
+                'p.netPrice as net_price',
+                'p.weight',
                 'p.reference',
                 'p.designation',
                 'p.attributesDesignation as attributes_designation',
                 'p.geocode',
                 'p.stockMode as stock_mode',
                 'p.stockState as stock_state',
+                'p.stockFloor as stock_floor',
                 'p.inStock as in_stock',
                 'p.availableStock as available_stock',
                 'p.virtualStock as virtual_stock',

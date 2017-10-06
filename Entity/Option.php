@@ -200,7 +200,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     /**
      * @inheritdoc
      */
-    public function setNetPrice($netPrice)
+    public function setNetPrice($netPrice = null)
     {
         $this->netPrice = $netPrice;
 

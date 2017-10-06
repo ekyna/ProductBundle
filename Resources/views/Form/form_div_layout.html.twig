@@ -7,6 +7,7 @@
     <div class="row">
         <div class="col-md-6">
             {{ form_widget(form.group) }}
+            {{ form_errors(form.group) }}
         </div>
         <div class="col-md-3">
             {{ form_row(form.multiple) }}
@@ -75,9 +76,11 @@
     <div class="row">
         <div class="col-md-3">
             {{ form_widget(form.type, {'sizing': 'sm'}) }}
+            {{ form_errors(form.type, {'sizing': 'sm'}) }}
         </div>
         <div class="col-md-9">
             {{ form_widget(form.expression, {'sizing': 'sm'}) }}
+            {{ form_errors(form.expression, {'sizing': 'sm'}) }}
         </div>
     </div>
     {{ form_rest(form) }}
@@ -94,30 +97,37 @@
         <div class="row form-group">
             <div class="col-md-6">
                 {{ form_widget(form.mode) }}
+                {{ form_errors(form.mode) }}
             </div>
             <div class="col-md-6">
                 {{ form_widget(form.netPrice) }}
+                {{ form_errors(form.netPrice) }}
             </div>
         </div>
         <div class="option-product option-wrapper">
             {{ form_widget(form.product) }}
+            {{ form_errors(form.product) }}
         </div>
         <div class="option-data option-wrapper">
             <div class="row form-group">
                 <div class="col-md-12">
                     {{ form_widget(form.designation) }}
+                    {{ form_errors(form.designation) }}
                 </div>
             </div>
             {{ form_widget(form.translations, {'label_col': 0, 'widget_col': 12}) }}
             <div class="row form-group">
                 <div class="col-md-6">
                     {{ form_widget(form.reference) }}
+                    {{ form_errors(form.reference) }}
                 </div>
                 <div class="col-md-6">
                     {{ form_widget(form.weight) }}
+                    {{ form_errors(form.weight) }}
                 </div>
             </div>
             {{ form_widget(form.taxGroup) }}
+            {{ form_errors(form.taxGroup) }}
         </div>
         {{ form_rest(form) }}
     </div>
@@ -170,9 +180,11 @@
     <div class="row">
         <div class="col-md-6">
             {{ form_widget(form.type, {'sizing': 'sm'}) }}
+            {{ form_errors(form.type) }}
         </div>
         <div class="col-md-6">
             {{ form_widget(form.number, {'sizing': 'sm'}) }}
+            {{ form_errors(form.number) }}
         </div>
     </div>
     {{ form_rest(form) }}
@@ -186,6 +198,7 @@
     {{ bootstrap_set_col_size('md') }}
     {{ form_errors(form) }}
     {{ form_widget(form.supplierProduct, {'widget_col': 12}) }}
+    {{ form_errors(form.supplierProduct) }}
     <div class="row">
         <div class="col-md-4">
             {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) }}
@@ -231,7 +244,10 @@
 {% block ekyna_product_inventory_resupply_product_widget %}
 {% spaceless %}
     <tr>
-        <td>{{ form_widget(form.choice) }}</td>
+        <td>
+            {{ form_widget(form.choice) }}
+            {{ form_errors(form.choice) }}
+        </td>
         <td>
             <a href="{{ admin_resource_path(supplierProduct.supplier) }}" target="_blank">
                 {{- supplierProduct.supplier.name -}}
@@ -256,6 +272,7 @@
         <td>&nbsp;</td>
         <td colspan="6">
             {{ form_widget(form.supplierOrder, {'widget_col': 12}) }}
+            {{ form_errors(form.supplierOrder) }}
         </td>
     </tr>
 {% endspaceless %}

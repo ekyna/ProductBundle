@@ -29,6 +29,20 @@ ekyna_product_product_admin_edit:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_move_up:
+    path: /{productId}/move-up
+    defaults: { _controller: "ekyna_product.product.controller:moveUpAction" }
+    methods: [GET]
+    requirements:
+        productId: \d+
+
+ekyna_product_product_admin_move_down:
+    path: /{productId}/move-down
+    defaults: { _controller: "ekyna_product.product.controller:moveDownAction" }
+    methods: [GET]
+    requirements:
+        productId: \d+
+
 ekyna_product_product_admin_duplicate:
     path: /{productId}/duplicate
     defaults: { _controller: "ekyna_product.product.controller:duplicateAction" }

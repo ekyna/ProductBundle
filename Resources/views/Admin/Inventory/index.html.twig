@@ -12,6 +12,10 @@
 
 {% import _self as macro %}
 
+{% block page_title %}
+    {{ 'ekyna_product.inventory.title'|trans }} - {{ parent() }}
+{% endblock page_title %}
+
 {% block title %}
     <h1>{{ 'ekyna_product.inventory.title'|trans }}</h1>
 {% endblock title %}
@@ -23,28 +27,6 @@
 {% block main %}
 {% spaceless %}
     <div id="inventory">
-
-        {#<div class="inventory-suppliers">
-            <h4>Commandes fournisseurs</h4>
-            <div>
-                {% for i in 1..9 %}
-                <div class="input-group input-group-sm">
-                    <a class="input-group-addon">S0000000{{ i }} - TechData</a>
-                    <div class="input-group-btn">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li>
-                                <p>Lorem ipsum</p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>#}
-
 
         {{ form_start(form) }}
         {{ bootstrap_set_col_size('md') }}
@@ -95,6 +77,16 @@
                             </a>
                         </th>
                         <th class="sort">
+                            <a {{ macro.sortLinkAttribute(data, 'netPrice') }}>
+                                {{- 'ekyna_product.product.field.net_price'|trans -}}
+                            </a>
+                        </th>
+                        <th class="sort">
+                            <a {{ macro.sortLinkAttribute(data, 'weight') }}>
+                                {{- 'ekyna_core.field.weight'|trans -}}
+                            </a>
+                        </th>
+                        <th class="sort">
                             <a {{ macro.sortLinkAttribute(data, 'geocode') }}>
                                 {{- 'ekyna_product.product.field.geocode'|trans -}}
                             </a>
@@ -104,6 +96,9 @@
                         </th>
                         <th>
                             {{- 'ekyna_core.field.status'|trans -}}
+                        </th>
+                        <th>
+                            {{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}
                         </th>
                         <th>
                             {{- 'ekyna_commerce.stock_subject.field.in_stock'|trans -}}

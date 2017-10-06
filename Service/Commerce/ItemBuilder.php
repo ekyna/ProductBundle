@@ -4,8 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
-use Ekyna\Component\Commerce\Exception\RuntimeException;
+use Ekyna\Component\Commerce\Exception;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 
@@ -82,6 +81,8 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     *
+     * @throws Exception\InvalidArgumentException If product type is not supported
      */
     public function buildFromProduct(SaleItemInterface $item, ProductInterface $product)
     {
@@ -102,7 +103,7 @@ class ItemBuilder
                 $this->buildFromConfigurable($item, $product);
                 break;
             default:
-                throw new InvalidArgumentException('Unexpected product type');
+                throw new Exception\InvalidArgumentException('Unexpected product type');
         }
 
         $this->buildOptions($item);
@@ -133,6 +134,8 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     *
+     * @throws Exception\LogicException If the product has no variant
      */
     public function buildFromVariable(SaleItemInterface $item, ProductInterface $product)
     {
@@ -142,7 +145,7 @@ class ItemBuilder
         $variants = $this->filter->getVariants($product);
 
         if (empty($variants)) {
-            throw new InvalidArgumentException("Variable product must have at least one variant.");
+            throw new Exception\LogicException("Variable product must have at least one variant.");
         }
 
         if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
@@ -344,6 +347,8 @@ class ItemBuilder
      * Builds the item's options.
      *
      * @param SaleItemInterface $item
+     *
+     * @throws Exception\LogicException If an option group is required but no option is selected
      */
     public function buildOptions(SaleItemInterface $item)
     {
@@ -406,7 +411,7 @@ class ItemBuilder
                     if (!$found) {
                         if ($optionGroup->isRequired()) {
                             //$this->buildFromOption($child, reset($options));
-                            throw new RuntimeException("Option group is required.");
+                            throw new Exception\LogicException("Option group is required.");
                         } else {
                             $item->removeChild($child);
                         }
@@ -429,6 +434,9 @@ class ItemBuilder
      */
     public function buildFromOption(SaleItemInterface $item, Model\OptionInterface $option)
     {
+        // Reset net price
+        $item->setNetPrice(0);
+
         if (null !== $product = $option->getProduct()) {
             $this->buildFromProduct($item, $product);
         } else {
@@ -445,10 +453,14 @@ class ItemBuilder
                 ->setTaxGroup($option->getTaxGroup());
         }
 
+        // Override item net price (from product) with option's net price if set
+        if (null !== $option->getNetPrice()) {
+            $item->setNetPrice($option->getNetPrice());
+        }
+
         $item
             ->setData(static::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setData(static::OPTION_ID, $option->getId())
-            ->setNetPrice($option->getNetPrice())
             ->setQuantity(1)
             ->setImmutable(true);
     }
@@ -803,7 +815,7 @@ class ItemBuilder
      * @param ProductInterface  $product
      * @param SaleItemInterface $item
      *
-     * @return ProductInterface
+     * @return ProductInterface If product has no variant
      */
     private function fallbackVariableToVariant(ProductInterface $product, SaleItemInterface $item = null)
     {
@@ -811,7 +823,7 @@ class ItemBuilder
             $variants = $this->filter->getVariants($product);
 
             if (empty($variants)) {
-                throw new InvalidArgumentException("Variable product must have at least one variant.");
+                throw new Exception\InvalidArgumentException("Variable product must have at least one variant.");
             }
 
             if ($item && 0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {

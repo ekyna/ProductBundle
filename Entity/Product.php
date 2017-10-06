@@ -139,6 +139,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $weight = 0;
 
     /**
+     * (Variant ordering)
+     *
+     * @var int
+     */
+    protected $position;
+
+    /**
      * @var \DateTime
      */
     protected $releasedAt;
@@ -1043,6 +1050,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setWeight($weight)
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPosition($position)
+    {
+        $this->position = (int)$position;
 
         return $this;
     }

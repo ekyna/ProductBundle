@@ -274,6 +274,7 @@ class FormBuilder
     public function optionChoiceLabel(Model\OptionInterface $option = null)
     {
         if (null !== $option) {
+            $netPrice = 0;
             if (null !== $product = $option->getProduct()) {
                 if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
                     if (0 == strlen($label = $product->getTitle())) {
@@ -285,6 +286,10 @@ class FormBuilder
                 $netPrice = $product->getNetPrice();
             } else {
                 $label = $option->getTitle();
+            }
+
+            // Override net price with option's net price if set
+            if (null !== $option->getNetPrice()) {
                 $netPrice = $option->getNetPrice();
             }
 
@@ -328,11 +333,16 @@ class FormBuilder
     {
         $config = [];
 
+        $netPrice = 0;
+
         if (null !== $product = $option->getProduct()) {
             $netPrice = $product->getNetPrice();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
-        } else {
+        }
+
+        // Override net price with option's net price if set
+        if (null !== $option->getNetPrice()) {
             $netPrice = $option->getNetPrice();
         }
 

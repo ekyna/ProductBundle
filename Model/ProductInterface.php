@@ -606,14 +606,30 @@ interface ProductInterface extends
     public function setWeight($weight);
 
     /**
-     * Returns the releasedAt.
+     * Returns the position (variant ordering).
+     *
+     * @return int
+     */
+    public function getPosition();
+
+    /**
+     * Sets the position (variant ordering).
+     *
+     * @param int $position
+     *
+     * @return $this|ProductInterface
+     */
+    public function setPosition($position);
+
+    /**
+     * Returns the "released at" date.
      *
      * @return \DateTime
      */
     public function getReleasedAt();
 
     /**
-     * Sets the releasedAt.
+     * Sets the "released at" date.
      *
      * @param \DateTime $releasedAt
      *

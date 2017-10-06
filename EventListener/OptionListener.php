@@ -72,11 +72,6 @@ class OptionListener implements EventSubscriberInterface
         $changed = false;
 
         if (null !== $product = $option->getProduct()) {
-            if (null === $option->getNetPrice()) {
-                $option->setNetPrice($product->getNetPrice());
-                $changed = true;
-            }
-
             if (null !== $option->getDesignation()) {
                 $option->setDesignation(null);
                 $changed = true;

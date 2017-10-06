@@ -378,6 +378,7 @@
             </option>
             <option name="groups">data</option>
         </constraint>-->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Option"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionTranslation">

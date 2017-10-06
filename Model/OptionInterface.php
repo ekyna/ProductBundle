@@ -104,7 +104,7 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
     /**
      * Returns the net price.
      *
-     * @return float
+     * @return float|null
      */
     public function getNetPrice();
 
@@ -115,5 +115,5 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
      *
      * @return $this|OptionInterface
      */
-    public function setNetPrice($netPrice);
+    public function setNetPrice($netPrice = null);
 }

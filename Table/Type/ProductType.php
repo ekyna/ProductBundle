@@ -17,6 +17,7 @@ use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
 use Ekyna\Component\Table\Exception\InvalidArgumentException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Ekyna\Component\Table\Util\ColumnSort;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -75,10 +76,12 @@ class ProductType extends ResourceTableType
                 ->setProfileable(true)
                 ->addColumn('type', ProductTypeType::class, [
                     'label'    => 'ekyna_core.field.type',
-                    'position' => 5,
+                    'position' => 10,
                 ]);
         } else {
-            $builder->setSortable(false);
+            $builder
+                ->setSortable(false)
+                ->addDefaultSort('position', ColumnSort::ASC);
         }
 
         $builder
@@ -90,32 +93,38 @@ class ProductType extends ResourceTableType
                 'route_parameters_map' => [
                     'productId' => 'id',
                 ],
-                'position'             => 10,
+                'position'             => 20,
             ])
             ->addColumn('visible', CType\Column\BooleanType::class, [
                 'label'                => 'ekyna_product.product.field.visible',
                 'route_name'           => 'ekyna_product_product_admin_toggle',
                 'route_parameters'     => ['field' => 'visible'],
                 'route_parameters_map' => ['productId' => 'id'],
-                'position'             => 20,
+                'position'             => 30,
             ])
             ->addColumn('reference', CType\Column\TextType::class, [
                 'label'    => 'ekyna_core.field.reference',
-                'position' => 30,
+                'position' => 40,
             ])
             ->addColumn('netPrice', BType\Column\PriceType::class, [
                 'label'    => 'ekyna_product.product.field.net_price',
                 'currency' => 'EUR', // TODO
-                'position' => 40,
-            ])
-            ->addColumn('stockMode', StockSubjectModeType::class, [
                 'position' => 50,
             ])
+            ->addColumn('weight', CType\Column\NumberType::class, [
+                'label'     => 'ekyna_core.field.weight',
+                'precision' => 3,
+                'append'    => 'Kg',
+                'position'  => 60,
+            ])
+            ->addColumn('stockMode', StockSubjectModeType::class, [
+                'position' => 70,
+            ])
             ->addColumn('stockState', StockSubjectStateType::class, [
-                'position' => 60,
+                'position' => 80,
             ])
             ->addColumn('tags', TagsType::class, [
-                'position' => 100,
+                'position' => 998,
             ]);
 
         if (!$variantMode) {
@@ -125,41 +134,62 @@ class ProductType extends ResourceTableType
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_product_category_admin_show',
                     'route_parameters_map' => ['categoryId' => 'id'],
-                    'position'             => 70,
+                    'position'             => 90,
                 ])
                 ->addColumn('brand', DType\Column\EntityType::class, [
                     'label'                => 'ekyna_product.brand.label.singular',
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_product_brand_admin_show',
                     'route_parameters_map' => ['brandId' => 'id'],
-                    'position'             => 80,
+                    'position'             => 100,
                 ])
                 ->addColumn('taxGroup', DType\Column\EntityType::class, [
                     'label'                => 'ekyna_commerce.tax_group.label.singular',
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_commerce_tax_group_admin_show',
                     'route_parameters_map' => ['taxGroupId' => 'id'],
-                    'position'             => 90,
+                    'position'             => 110,
                 ]);
         }
 
-        $builder->addColumn('actions', BType\Column\ActionsType::class, [
-            'buttons' => [
+        $buttons = [];
+        if ($variantMode) {
+            $buttons = [
                 [
-                    'label'                => 'ekyna_core.button.edit',
-                    'class'                => 'warning',
-                    'route_name'           => 'ekyna_product_product_admin_edit',
+                    'label'                => 'ekyna_core.button.move_up',
+                    'icon'                 => 'arrow-up',
+                    'class'                => 'primary',
+                    'route_name'           => 'ekyna_product_product_admin_move_up',
                     'route_parameters_map' => ['productId' => 'id'],
                     'permission'           => 'edit',
                 ],
                 [
-                    'label'                => 'ekyna_core.button.remove',
-                    'class'                => 'danger',
-                    'route_name'           => 'ekyna_product_product_admin_remove',
+                    'label'                => 'ekyna_core.button.move_down',
+                    'icon'                 => 'arrow-down',
+                    'class'                => 'primary',
+                    'route_name'           => 'ekyna_product_product_admin_move_down',
                     'route_parameters_map' => ['productId' => 'id'],
-                    'permission'           => 'delete',
+                    'permission'           => 'edit',
                 ],
-            ],
+            ];
+        }
+        $buttons[] = [
+            'label'                => 'ekyna_core.button.edit',
+            'class'                => 'warning',
+            'route_name'           => 'ekyna_product_product_admin_edit',
+            'route_parameters_map' => ['productId' => 'id'],
+            'permission'           => 'edit',
+        ];
+        $buttons[] = [
+            'label'                => 'ekyna_core.button.remove',
+            'class'                => 'danger',
+            'route_name'           => 'ekyna_product_product_admin_remove',
+            'route_parameters_map' => ['productId' => 'id'],
+            'permission'           => 'delete',
+        ];
+
+        $builder->addColumn('actions', BType\Column\ActionsType::class, [
+            'buttons' => $buttons,
         ]);
 
         if (!$variantMode) {
@@ -185,39 +215,43 @@ class ProductType extends ResourceTableType
                     'label'    => 'ekyna_product.product.field.net_price',
                     'position' => 50,
                 ])
+                ->addFilter('weight', CType\Filter\NumberType::class, [
+                    'label'    => 'ekyna_core.field.weight',
+                    'position' => 60,
+                ])
                 ->addFilter('stockMode', CType\Filter\ChoiceType::class, [
                     'label'    => 'ekyna_commerce.stock_subject.field.mode',
                     'choices'  => StockSubjectModes::getChoices(),
-                    'position' => 60,
+                    'position' => 70,
                 ])
                 ->addFilter('stockState', CType\Filter\ChoiceType::class, [
                     'label'    => 'ekyna_commerce.stock_subject.field.state',
                     'choices'  => StockSubjectStates::getChoices(),
-                    'position' => 70,
+                    'position' => 80,
                 ])
                 ->addFilter('categories', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_product.category.label.plural',
                     'class'        => $this->categoryClass,
                     'entity_label' => 'name',
-                    'position'     => 80,
+                    'position'     => 90,
                 ])
                 ->addFilter('brand', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_product.brand.label.singular',
                     'class'        => $this->brandClass,
                     'entity_label' => 'name',
-                    'position'     => 90,
+                    'position'     => 100,
                 ])
                 ->addFilter('taxGroup', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_commerce.tax_group.label.singular',
                     'class'        => $this->taxGroupClass,
                     'entity_label' => 'name',
-                    'position'     => 100,
+                    'position'     => 110,
                 ])
                 ->addFilter('tags', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_cms.tag.label.plural',
                     'class'        => $this->tagClass,
                     'entity_label' => 'name',
-                    'position'     => 100,
+                    'position'     => 998,
                 ]);
         }
     }

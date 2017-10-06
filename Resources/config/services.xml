@@ -32,6 +32,7 @@
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument>%ekyna_commerce.supplier_order_item.class%</argument>
             <argument>%ekyna_product.product_stock_unit.class%</argument>
+            <argument>%ekyna_commerce.default.currency%</argument>
         </service>
         <service id="ekyna_product.resupply"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Resupply">
@@ -44,6 +45,11 @@
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">
             <argument type="service" id="ekyna_product.brand.repository"/>
             <argument type="service" id="ekyna_commerce.supplier.repository"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.inventory_quick_edit.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
+            <argument type="service" id="ekyna_product.product.form_type.builder"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.inventory_resupply.form_type"
@@ -222,6 +228,7 @@
                  class="%ekyna_product.product.form_type.builder.class%">
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
+            <argument>%ekyna_commerce.default.currency%</argument>
         </service>
         <service id="ekyna_product.product.form_type.event_subscriber"
                  class="%ekyna_product.product.form_type.event_subscriber.class%">

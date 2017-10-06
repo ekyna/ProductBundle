@@ -75,12 +75,9 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
     });
 
 
-    /**
-     * Line's stock unit buttons click handler
-     */
-    $list.on('click', 'a.stock-units', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+    function request(event, route) {
+        event.preventDefault();
+        event.stopPropagation();
 
         if (busy) {
             return false;
@@ -88,7 +85,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
 
         busy = true;
 
-        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
+        var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
         if (!productId) {
             console.log('Undefined product id.');
             return false;
@@ -97,79 +94,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         try {
             var modal = new Modal();
             modal.load({
-                url: Router.generate('ekyna_product_inventory_admin_stock_units', {productId: productId}),
-                method: 'GET'
-            });
-            $(modal).on('ekyna.modal.response', function () {
-                busy = false;
-            });
-        } catch(e) {
-            console.log(e);
-            busy = false;
-        }
-
-        return false;
-    });
-
-    /**
-     * Line's stock unit buttons click handler
-     */
-    $list.on('click', 'a.treatment', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (busy) {
-            return false;
-        }
-
-        busy = true;
-
-        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
-        if (!productId) {
-            console.log('Undefined product id.');
-            return false;
-        }
-
-        try {
-            var modal = new Modal();
-            modal.load({
-                url: Router.generate('ekyna_product_inventory_admin_customer_orders', {productId: productId}),
-                method: 'GET'
-            });
-            $(modal).on('ekyna.modal.response', function () {
-                busy = false;
-            });
-        } catch(e) {
-            console.log(e);
-            busy = false;
-        }
-
-        return false;
-    });
-
-    /**
-     * Line's resupply buttons click handler
-     */
-    $list.on('click', 'a.resupply', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (busy) {
-            return false;
-        }
-
-        busy = true;
-
-        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
-        if (!productId) {
-            console.log('Undefined product id.');
-            return false;
-        }
-
-        try {
-            var modal = new Modal();
-            modal.load({
-                url: Router.generate('ekyna_product_inventory_admin_resupply', {productId: productId}),
+                url: Router.generate(route, {productId: productId}),
                 method: 'GET'
             });
             $(modal).on('ekyna.modal.response', function (e) {
@@ -183,12 +108,41 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
                     }
                 }
             });
-        } catch(e) {
-            console.log(e);
+        } catch(exception) {
+            console.log(exception);
             busy = false;
         }
 
         return false;
+    }
+
+
+    /**
+     * Line's quick edit buttons click handler
+     */
+    $list.on('click', 'a.quick-edit', function(e) {
+        return request(e, 'ekyna_product_inventory_admin_quick_edit');
+    });
+
+    /**
+     * Line's stock unit buttons click handler
+     */
+    $list.on('click', 'a.stock-units', function(e) {
+        return request(e, 'ekyna_product_inventory_admin_stock_units');
+    });
+
+    /**
+     * Line's stock unit buttons click handler
+     */
+    $list.on('click', 'a.treatment', function(e) {
+        return request(e, 'ekyna_product_inventory_admin_customer_orders');
+    });
+
+    /**
+     * Line's resupply buttons click handler
+     */
+    $list.on('click', 'a.resupply', function(e) {
+        return request(e, 'ekyna_product_inventory_admin_resupply');
     });
 
     /**
