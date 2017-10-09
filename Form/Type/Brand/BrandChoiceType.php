@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Brand;
 
+use Doctrine\ORM\EntityRepository;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,6 +38,10 @@ class BrandChoiceType extends AbstractType
         $resolver->setDefaults([
             'label' => 'ekyna_product.brand.label.singular',
             'class' => $this->brandClass,
+            'query_builder' => function(EntityRepository $er) {
+                $qb = $er->createQueryBuilder('b');
+                return $qb->addOrderBy('b.name', 'ASC');
+            }
         ]);
     }
 

@@ -225,7 +225,13 @@ class Inventory
         $pQb = $this->getProductsQueryBuilder();
         $this->applyContextToQueryBuilder($pQb, $context);
 
-        $products = $pQb->getQuery()->setMaxResults(30)->getScalarResult();
+        $page = intval($request->query->get('page', 0));
+
+        $products = $pQb
+            ->getQuery()
+            ->setFirstResult(30 * $page)
+            ->setMaxResults(30)
+            ->getScalarResult();
 
         foreach ($products as &$product) {
             // Designation (for variant)
