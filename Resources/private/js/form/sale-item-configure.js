@@ -325,6 +325,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return this.locked;
         },
 
+        isRequired: function () {
+            return this.$select.prop('required');
+        },
+
         lock: function () {
             if (!this.locked) {
                 this.$select.attr('data-locked', "1");
@@ -756,6 +760,31 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                     that.optionGroups.create(data);
                 });
             }
+
+            // Sort option groups
+            // -> required/variable first
+            var $groups = this.optionGroups.$element.find('.form-group');
+            $groups.sort(function(a, b) {
+                var aGroup = $(a).data('optionGroup'),
+                    bGroup = $(b).data('optionGroup'),
+                    aRequired = aGroup.isRequired(),
+                    bRequired = bGroup.isRequired();
+
+                if (aRequired && bRequired) {
+                    var aType = aGroup.getType(),
+                        bType = bGroup.getType();
+                    if (aType === 'variant' && bType === 'variant') {
+                        return 0;
+                    } else if (aType === 'variant' && bType !== 'variant') {
+                        return 1;
+                    }
+                } else if (!aRequired && bRequired) {
+                    return 1;
+                }
+
+                return -1;
+            });
+            $groups.detach().appendTo(this.optionGroups.$element);
         },
 
         onChildChange: function () {
