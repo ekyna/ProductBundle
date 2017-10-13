@@ -55,6 +55,8 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->getConfigurableUpdater()->updateStock($bundle);
 
+        $changed |= $this->updatePrice($bundle);
+
         $changed |= $this->ensureDisabledStockMode($bundle);
 
         return $changed;
@@ -67,7 +69,13 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        return $this->ensureDisabledStockMode($bundle);
+        $changed = $this->getConfigurableUpdater()->updateStock($bundle);
+
+        $changed |= $this->ensureDisabledStockMode($bundle);
+
+        $changed |= $this->updatePrice($bundle);
+
+        return $changed;
     }
 
     /**
@@ -77,17 +85,9 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        $netPrice = $this->priceCalculator->calculateConfigurableTotalPrice($bundle);
-
-        if ($netPrice !== $bundle->getNetPrice()) {
-            $bundle->setNetPrice($netPrice);
-
-            return true;
-        }
-
         // TODO weight ?
 
-        return false;
+        return $this->updatePrice($bundle);
     }
 
     /**
@@ -106,6 +106,28 @@ class ConfigurableHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return $product->getType() === ProductTypes::TYPE_CONFIGURABLE;
+    }
+
+    /**
+     * Updates the bundle price.
+     *
+     * @param ProductInterface $bundle
+     *
+     * @return bool
+     */
+    protected function updatePrice(ProductInterface $bundle)
+    {
+        ProductTypes::assertConfigurable($bundle);
+
+        $netPrice = $this->priceCalculator->calculateConfigurableTotalPrice($bundle);
+
+        if ($netPrice !== $bundle->getNetPrice()) {
+            $bundle->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

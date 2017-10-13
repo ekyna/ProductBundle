@@ -29,15 +29,18 @@ class BundleChoiceValidator extends ConstraintValidator
         /* @var Model\BundleChoiceInterface $bundleChoice */
         /* @var BundleChoice $constraint */
 
-        if ($bundleChoice->getProduct() === $bundleChoice->getSlot()->getBundle()) {
+        $parent = $bundleChoice->getSlot()->getBundle();
+        $product = $bundleChoice->getProduct();
+
+        if ($product && $product === $parent) {
             $this->context
                 ->buildViolation($constraint->recursive_choice)
                 ->atPath('product')
                 ->addViolation();
         }
 
-        // Only for 'configurable' product type
-        if ($bundleChoice->getProduct()->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+        // Only for 'configurable' parent
+        if ($parent->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             // Asserts that the maximum quantity is greater than the minimum quantity
             if ($bundleChoice->getMinQuantity() > $bundleChoice->getMaxQuantity()) {
                 $this->context

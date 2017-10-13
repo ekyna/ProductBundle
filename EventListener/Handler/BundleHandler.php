@@ -53,7 +53,11 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
+        $this->checkQuantities($bundle);
+
         $changed = $this->getBundleUpdater()->updateStock($bundle);
+
+        $changed |= $this->updatePrice($bundle);
 
         $changed |= $this->ensureDisabledStockMode($bundle);
 
@@ -67,7 +71,15 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        return $this->ensureDisabledStockMode($bundle);
+        $this->checkQuantities($bundle);
+
+        $changed = $this->getBundleUpdater()->updateStock($bundle);
+
+        $changed |= $this->updatePrice($bundle);
+
+        $changed |= $this->ensureDisabledStockMode($bundle);
+
+        return $changed;
     }
 
     /**
@@ -77,17 +89,9 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
-
-        if ($netPrice !== $bundle->getNetPrice()) {
-            $bundle->setNetPrice($netPrice);
-
-            return true;
-        }
-
         // TODO weight ?
 
-        return false;
+        return $this->updatePrice($bundle);
     }
 
     /**
@@ -106,6 +110,49 @@ class BundleHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return $product->getType() === ProductTypes::TYPE_BUNDLE;
+    }
+
+    /**
+     * Updates the bundle price.
+     *
+     * @param ProductInterface $bundle
+     *
+     * @return bool
+     */
+    protected function updatePrice(ProductInterface $bundle)
+    {
+        ProductTypes::assertBundle($bundle);
+
+        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
+
+        if ($netPrice !== $bundle->getNetPrice()) {
+            $bundle->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check the bundle slots choices quantities.
+     *
+     * @param ProductInterface $bundle
+     */
+    protected function checkQuantities(ProductInterface $bundle)
+    {
+        ProductTypes::assertBundle($bundle);
+
+        foreach ($bundle->getBundleSlots() as $slot) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
+
+            if ($choice->getMaxQuantity() !== $choice->getMinQuantity()) {
+                $choice->setMaxQuantity($choice->getMinQuantity());
+
+                $this->persistenceHelper->persistAndRecompute($choice, false);
+            }
+        }
     }
 
     /**

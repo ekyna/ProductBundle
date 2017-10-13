@@ -95,6 +95,8 @@ class PriceCalculator
             $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
 
             // TODO required options ?
+
+            // TODO Recurse if parent type
         }
 
         return $total;
@@ -123,6 +125,8 @@ class PriceCalculator
                 $childPrice = $childProduct->getNetPrice() * $choice->getMinQuantity();
 
                 // TODO required options ?
+
+                // TODO Recurse if parent type
 
                 if (null === $lowerPrice || $childPrice < $lowerPrice) {
                     $lowerPrice = $childPrice;

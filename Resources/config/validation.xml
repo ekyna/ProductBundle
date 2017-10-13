@@ -139,7 +139,11 @@
             <constraint name="NotNull"/>
         </property>
         <property name="product">
-            <constraint name="NotNull"/>
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>bundle</value>
+                </option>
+            </constraint>
             <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
                 <option name="groups">
                     <value>bundle</value>
@@ -169,21 +173,9 @@
             </constraint>
         </property>
         <property name="maxQuantity">
-            <constraint name="IsNull">
-                <option name="groups">
-                    <value>bundle</value>
-                </option>
-            </constraint>
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>configurable</value>
-                </option>
-            </constraint>
+            <constraint name="NotNull"/>
             <constraint name="GreaterThan">
                 <option name="value">0</option>
-                <option name="groups">
-                    <value>configurable</value>
-                </option>
             </constraint>
         </property>
         <property name="rules">
