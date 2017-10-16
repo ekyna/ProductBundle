@@ -95,7 +95,10 @@ class ConfigurableUpdater
                 // State
                 if ($product->getStockMode() != StockSubjectModes::MODE_JUST_IN_TIME) {
                     $justInTime = false;
-                    if ($product->getStockMode() == StockSubjectModes::MODE_DISABLED) {
+                    if (
+                        !Model\ProductTypes::isBundled($product->getType()) &&
+                        $product->getStockMode() === StockSubjectModes::MODE_DISABLED
+                    ) {
                         continue;
                     }
                 }

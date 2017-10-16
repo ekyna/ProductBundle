@@ -2,8 +2,10 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -27,6 +29,11 @@ class BundleHandler extends AbstractHandler
     private $priceCalculator;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
+
+    /**
      * @var BundleUpdater
      */
     private $bundleUpdater;
@@ -37,13 +44,16 @@ class BundleHandler extends AbstractHandler
      *
      * @param PersistenceHelperInterface $persistenceHelper
      * @param PriceCalculator            $priceCalculator
+     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        PriceCalculator $priceCalculator
+        PriceCalculator $priceCalculator,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->priceCalculator = $priceCalculator;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -73,11 +83,25 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
-        $changed = $this->getBundleUpdater()->updateStock($bundle);
+        $changed = $this->ensureDisabledStockMode($bundle);
 
-        $changed |= $this->updatePrice($bundle);
+        $events = [];
 
-        $changed |= $this->ensureDisabledStockMode($bundle);
+        // TODO Weight
+
+        if ($this->updatePrice($bundle)) {
+            $events[] = ProductEvents::CHILD_DATA_CHANGE;
+            $changed = true;
+        }
+
+        if ($this->getBundleUpdater()->updateStock($bundle)) {
+            $events[] = ProductEvents::CHILD_STOCK_CHANGE;
+            $changed = true;
+        }
+
+        if (!empty($events)) {
+            $this->scheduleChildChangeEvents($bundle, $events);
+        }
 
         return $changed;
     }
@@ -89,9 +113,15 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        // TODO weight ?
+        // TODO Weight
 
-        return $this->updatePrice($bundle);
+        if ($this->updatePrice($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_DATA_CHANGE]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -101,7 +131,13 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        return $this->getBundleUpdater()->updateStock($bundle);
+        if ($this->getBundleUpdater()->updateStock($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_STOCK_CHANGE]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -167,5 +203,23 @@ class BundleHandler extends AbstractHandler
         }
 
         return $this->bundleUpdater = new BundleUpdater();
+    }
+
+    /**
+     * Dispatches the child change events.
+     *
+     * @param ProductInterface $bundle
+     * @param array            $events
+     */
+    protected function scheduleChildChangeEvents(ProductInterface $bundle, array $events)
+    {
+        ProductTypes::assertBundle($bundle);
+
+        $parents = $this->productRepository->findParentsByBundled($bundle);
+        foreach ($parents as $parent) {
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $parent);
+            }
+        }
     }
 }

@@ -147,6 +147,19 @@
             <tag name="form.type"/>
         </service>
 
+        <!-- Bundle choice event listener -->
+        <service id="ekyna_product.bundle_choice.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\BundleChoiceListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+        <!-- Bundle slot event listener -->
+        <service id="ekyna_product.bundle_slot.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\BundleSlotListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Category choice form type -->
         <service id="ekyna_product.category_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Category\CategoryChoiceType">
@@ -352,6 +365,7 @@
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->

@@ -118,7 +118,7 @@ class VariableUpdater
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-            if ($variant->getStockMode() == Stock\StockSubjectModes::MODE_DISABLED) {
+            if ($variant->getStockMode() === Stock\StockSubjectModes::MODE_DISABLED) {
                 continue;
             } elseif ($variant->getStockMode() == Stock\StockSubjectModes::MODE_JUST_IN_TIME) {
                 $state = Stock\StockSubjectStates::STATE_IN_STOCK;
