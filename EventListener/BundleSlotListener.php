@@ -42,9 +42,9 @@ class BundleSlotListener implements EventSubscriberInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
-        $bundleSlot = $this->getBundleSlotFromEvent($event);
+        $slot = $this->getBundleSlotFromEvent($event);
 
-        $this->scheduleChildDataChangeEvent($bundleSlot->getBundle());
+        $this->scheduleChildDataChangeEvent($slot->getBundle());
     }
 
     /**
@@ -54,10 +54,10 @@ class BundleSlotListener implements EventSubscriberInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
-        $bundleSlot = $this->getBundleSlotFromEvent($event);
+        $slot = $this->getBundleSlotFromEvent($event);
 
-        if ($this->persistenceHelper->isChanged($bundleSlot, ['required'])) {
-            $this->scheduleChildDataChangeEvent($bundleSlot->getBundle());
+        if ($this->persistenceHelper->isChanged($slot, ['required'])) {
+            $this->scheduleChildDataChangeEvent($slot->getBundle());
         }
     }
 
@@ -68,11 +68,14 @@ class BundleSlotListener implements EventSubscriberInterface
      */
     public function onDelete(ResourceEventInterface $event)
     {
-        $bundleSlot = $this->getBundleSlotFromEvent($event);
+        $slot = $this->getBundleSlotFromEvent($event);
 
-        // TODO Get bundle from change set (in case it is null)
+        // Get bundle from change set if null
+        if (null === $bundle = $slot->getBundle()) {
+            $bundle = $this->persistenceHelper->getChangeSet($slot, 'bundle')[0];
+        }
 
-        $this->scheduleChildDataChangeEvent($bundleSlot->getBundle());
+        $this->scheduleChildDataChangeEvent($bundle);
     }
 
     /**

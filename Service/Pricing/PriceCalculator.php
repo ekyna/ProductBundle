@@ -172,7 +172,7 @@ class PriceCalculator
             $customer = $sale->getCustomer();
             if (!$country && $customer) {
                 // Customer default invoice country
-                if (null !== $address = $customer->getDefaultInvoiceAddress()) {
+                if (null !== $address = $customer->getDefaultInvoiceAddress(true)) {
                     $country = $address->getCountry();
                 }
             }
@@ -251,7 +251,7 @@ class PriceCalculator
                 $this->customerGroup = $customer->getCustomerGroup();
             }
             if (!$this->country) {
-                if (null !== $address = $customer->getDefaultInvoiceAddress()) {
+                if (null !== $address = $customer->getDefaultInvoiceAddress(true)) {
                     $this->country = $address->getCountry();
                 }
             }

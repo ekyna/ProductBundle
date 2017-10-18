@@ -42,9 +42,9 @@ class BundleChoiceListener implements EventSubscriberInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
-        $bundleChoice = $this->getBundleChoiceFromEvent($event);
+        $choice = $this->getBundleChoiceFromEvent($event);
 
-        $this->scheduleChildDataChangeEvent($bundleChoice->getSlot()->getBundle());
+        $this->scheduleChildDataChangeEvent($choice->getSlot()->getBundle());
     }
 
     /**
@@ -54,10 +54,10 @@ class BundleChoiceListener implements EventSubscriberInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
-        $bundleChoice = $this->getBundleChoiceFromEvent($event);
+        $choice = $this->getBundleChoiceFromEvent($event);
 
-        if ($this->persistenceHelper->isChanged($bundleChoice, ['product', 'minQuantity'])) {
-            $this->scheduleChildDataChangeEvent($bundleChoice->getSlot()->getBundle());
+        if ($this->persistenceHelper->isChanged($choice, ['product', 'minQuantity'])) {
+            $this->scheduleChildDataChangeEvent($choice->getSlot()->getBundle());
         }
     }
 
@@ -68,11 +68,17 @@ class BundleChoiceListener implements EventSubscriberInterface
      */
     public function onDelete(ResourceEventInterface $event)
     {
-        $bundleChoice = $this->getBundleChoiceFromEvent($event);
+        $choice = $this->getBundleChoiceFromEvent($event);
 
-        // TODO Get bundle from change set (in case it is null)
+        // Get bundle from change set if null
+        if (null === $slot = $choice->getSlot()) {
+            $slot = $this->persistenceHelper->getChangeSet($choice, 'slot')[0];
+        }
+        if (null === $bundle = $slot->getBundle()) {
+            $bundle = $this->persistenceHelper->getChangeSet($slot, 'bundle')[0];
+        }
 
-        $this->scheduleChildDataChangeEvent($bundleChoice->getSlot()->getBundle());
+        $this->scheduleChildDataChangeEvent($bundle);
     }
 
     /**
