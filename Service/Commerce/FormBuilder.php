@@ -438,7 +438,7 @@ class FormBuilder
      */
     private function buildProductForm(FormInterface $form, Model\ProductInterface $product)
     {
-        $repository = $this->productProvider->getProductRepository();
+        $repository = $this->productProvider->getRepository();
 
         // Variable : add variant choice form
         if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT], true)) {

@@ -135,7 +135,7 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * @inheritdoc
      */
-    public function getProductRepository()
+    public function getRepository()
     {
         return $this->productRepository;
     }
