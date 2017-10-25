@@ -143,15 +143,17 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
                 url: Router.generate(route, {productId: productId}),
                 method: 'GET'
             });
-            $(modal).on('ekyna.modal.response', function (e) {
+            $(modal).on('ekyna.modal.response', function (modalEvent) {
                 busy = false;
 
-                if (e.contentType === 'json') {
-                    e.preventDefault();
+                if (modalEvent.contentType === 'json') {
+                    modalEvent.preventDefault();
 
-                    if (e.content.success) {
+                    if (modalEvent.content.success) {
                         refreshList();
                     }
+
+                    modalEvent.close();
                 }
             });
         } catch(exception) {
