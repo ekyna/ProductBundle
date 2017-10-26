@@ -28,6 +28,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             'designation' => $product->getFullDesignation(),
             'type'        => $product->getType(),
             'reference'   => $product->getReference(),
+            'visible'     => $product->isVisible(),
         ], $data);
 
         if (in_array('Default', $groups)) {
@@ -105,7 +106,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $resource = parent::denormalize($data, $class, $format, $context);
+        //$resource = parent::denormalize($data, $class, $format, $context);
 
         throw new \Exception('Not yet implemented');
     }

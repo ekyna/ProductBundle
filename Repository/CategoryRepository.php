@@ -30,9 +30,10 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
         $qb = $this->getQueryBuilder();
 
         return $qb
-            ->leftJoin($as.'.seo', 's')
+            ->leftJoin($as . '.seo', 's')
             ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
             ->addSelect('s', 's_t')
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
             ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
             ->setMaxResults(1)
@@ -40,8 +41,9 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->useQueryCache(true)
             // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
-                'slug' => $slug,
-                'locale' => $this->localeProvider->getCurrentLocale(),
+                'visible' => true,
+                'slug'    => $slug,
+                'locale'  => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
     }
@@ -57,6 +59,7 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
         $qb = $this->getCollectionQueryBuilder();
 
         return $qb
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq($as . '.level', ':level'))
             ->addOrderBy($as . '.left', 'ASC')
             ->addOrderBy($as . '.id', 'ASC')
@@ -64,7 +67,8 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->useQueryCache(true)
             // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '.menu')
             ->setParameters([
-                'level' => 0,
+                'visible' => true,
+                'level'   => 0,
             ])
             ->getResult();
     }

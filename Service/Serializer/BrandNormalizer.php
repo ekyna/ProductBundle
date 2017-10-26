@@ -23,6 +23,7 @@ class BrandNormalizer extends AbstractTranslatableNormalizer
         $groups = isset($context['groups']) ? (array)$context['groups'] : [];
 
         $data['name'] = $brand->getName();
+        $data['visible'] = $brand->isVisible();
 
         if (in_array('Default', $groups)) {
             // Seo
@@ -44,7 +45,7 @@ class BrandNormalizer extends AbstractTranslatableNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $object = parent::denormalize($data, $class, $format, $context);
+        //$object = parent::denormalize($data, $class, $format, $context);
 
         throw new \Exception('Not yet implemented');
     }

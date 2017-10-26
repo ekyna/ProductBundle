@@ -15,6 +15,8 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
  */
 class ProductRepository extends TranslatableResourceRepository implements ProductRepositoryInterface
 {
+    // TODO Store queries in private properties
+
     /**
      * @inheritdoc
      */
@@ -28,14 +30,19 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findOneBySlug($slug)
     {
+        $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
         $this
+            ->joinCategories($qb)
             ->joinBrand($qb)
             ->joinSeo($qb);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
             ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
             ->setMaxResults(1)
@@ -43,8 +50,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->useQueryCache(true)
             // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
-                'slug'   => $slug,
-                'locale' => $this->localeProvider->getCurrentLocale(),
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+                'slug'             => $slug,
+                'locale'           => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
 
@@ -61,9 +71,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $as = $this->getAlias();
         $qb = $this->getCollectionQueryBuilder();
 
-        $this->joinBrand($qb);
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb);
 
         $query = $qb
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->eq($as . '.brand', ':brand'))
             ->andWhere($qb->expr()->in($as . '.type', ':types'))
             ->getQuery()
@@ -71,6 +86,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         return $query
             ->setParameters([
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
                 'brand' => $brand,
                 'types' => [
                     Model\ProductTypes::TYPE_SIMPLE,
@@ -90,9 +108,14 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $as = $this->getAlias();
         $qb = $this->getCollectionQueryBuilder();
 
-        $this->joinBrand($qb);
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb);
 
         $query = $qb
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->isMemberOf(':categories', $as . '.categories'))
             ->andWhere($qb->expr()->in($as . '.type', ':types'))
             ->getQuery()
@@ -105,6 +128,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         return $query
             ->setParameters([
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
                 'categories' => $categories,
                 'types'      => [
                     Model\ProductTypes::TYPE_SIMPLE,
@@ -121,8 +147,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findParentsByBundled(Model\ProductInterface $bundled, $requiredSlots = false)
     {
-        // TODO cache queries in properties
-
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
@@ -147,8 +171,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false)
     {
-        // TODO cache queries in properties
-
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
@@ -317,7 +339,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     protected function loadAssociations(Model\ProductInterface $product = null)
     {
-
         if (null !== $product) {
             // Medias
             $this->loadMedias($product);
@@ -356,6 +377,50 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * Adds the join parts for categories to the query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param string       $alias
+     * @param bool         $withTranslations
+     *
+     * @return ProductRepository
+     */
+    protected function joinCategories(QueryBuilder $qb, $alias = null, $withTranslations = false)
+    {
+        $alias = $alias ?: $this->getAlias();
+
+        $qb->leftJoin($alias . '.categories', 'c');
+        if ($withTranslations) {
+            $qb
+                ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
+                ->addSelect('b', 'b_t');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds the join parts for medias to the query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param string       $alias
+     *
+     * @return ProductRepository
+     */
+    protected function joinMedias(QueryBuilder $qb, $alias = null)
+    {
+        $alias = $alias ?: $this->getAlias();
+
+        $qb
+            ->leftJoin($alias . '.medias', 'pm')
+            ->leftJoin('pm.media', 'm')
+            ->leftJoin('m.translations', 'm_t', Expr\Join::WITH, $this->getLocaleCondition('m_t'))
+            ->addSelect('pm', 'm', 'm_t');
+
+        return $this;
+    }
+
+    /**
      * Adds the join parts for seo to the query builder.
      *
      * @param QueryBuilder $qb
@@ -374,8 +439,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         return $this;
     }
-
-    // TODO joinMedias
 
     /**
      * Returns whether the collection has been initialized or not.
