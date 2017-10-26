@@ -9,7 +9,7 @@
 
 {% macro show_visible(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.visible, 'checkbox', 'ekyna_product.product.field.visible', {
+    {{ show_row(product.visible, 'checkbox', 'ekyna_core.field.visible', {
         'id': 'product_visible'
     }|merge(options)) }}
 {% endspaceless %}

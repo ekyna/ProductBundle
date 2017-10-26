@@ -96,7 +96,7 @@ class ProductType extends ResourceTableType
                 'position'             => 20,
             ])
             ->addColumn('visible', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_product.product.field.visible',
+                'label'                => 'ekyna_core.field.visible',
                 'route_name'           => 'ekyna_product_product_admin_toggle',
                 'route_parameters'     => ['field' => 'visible'],
                 'route_parameters_map' => ['productId' => 'id'],
@@ -204,7 +204,7 @@ class ProductType extends ResourceTableType
                     'position' => 20,
                 ])
                 ->addFilter('visible', CType\Filter\BooleanType::class, [
-                    'label'    => 'ekyna_product.product.field.visible',
+                    'label'    => 'ekyna_core.field.visible',
                     'position' => 30,
                 ])
                 ->addFilter('reference', CType\Filter\TextType::class, [

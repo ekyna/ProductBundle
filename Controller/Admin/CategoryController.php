@@ -13,5 +13,6 @@ use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 class CategoryController extends ResourceController
 {
     use RC\NestedTrait,
-        RC\TinymceTrait;
+        RC\TinymceTrait,
+        RC\ToggleableTrait;
 }

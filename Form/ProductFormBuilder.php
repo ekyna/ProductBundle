@@ -586,7 +586,7 @@ class ProductFormBuilder
     public function addVisibleField(array $options = [])
     {
         $options = array_replace([
-            'label'    => 'ekyna_product.product.field.visible',
+            'label'    => 'ekyna_core.field.visible',
             'required' => false,
             'attr'     => [
                 'align_with_widget' => true,

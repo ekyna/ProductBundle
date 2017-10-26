@@ -41,27 +41,6 @@ interface CategoryInterface extends
     public function getName();
 
     /**
-     * Returns the (translated) title.
-     *
-     * @return string
-     */
-    public function getTitle();
-
-    /**
-     * Returns the (translated) description.
-     *
-     * @return string
-     */
-    public function getDescription();
-
-    /**
-     * Returns the (translated) slug.
-     *
-     * @return string
-     */
-    public function getSlug();
-
-    /**
      * Returns whether or not the category has the given child.
      *
      * @param CategoryInterface $child
@@ -110,4 +89,41 @@ interface CategoryInterface extends
      * @return CategoryInterface
      */
     public function getParent();
+
+    /**
+     * Returns the visible.
+     *
+     * @return bool
+     */
+    public function isVisible();
+
+    /**
+     * Sets the visible.
+     *
+     * @param bool $visible
+     *
+     * @return $this|CategoryInterface
+     */
+    public function setVisible($visible);
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @return string
+     */
+    public function getTitle();
+
+    /**
+     * Returns the (translated) description.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
+     * Returns the (translated) slug.
+     *
+     * @return string
+     */
+    public function getSlug();
 }

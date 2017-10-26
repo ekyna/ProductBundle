@@ -45,6 +45,11 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
      */
     protected $parent;
 
+    /**
+     * @var boolean
+     */
+    protected $visible;
+
 
     /**
      * Constructor
@@ -53,6 +58,7 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     {
         parent::__construct();
 
+        $this->visible = true;
         $this->children = new ArrayCollection();
     }
 
@@ -90,30 +96,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTitle()
-    {
-        return $this->translate()->getTitle();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDescription()
-    {
-        return $this->translate()->getDescription();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSlug()
-    {
-        return $this->translate()->getSlug();
     }
 
     /**
@@ -174,6 +156,48 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTitle()
+    {
+        return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription()
+    {
+        return $this->translate()->getDescription();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSlug()
+    {
+        return $this->translate()->getSlug();
     }
 
     /**

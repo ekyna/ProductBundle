@@ -33,9 +33,16 @@ class CategoryType extends ResourceTableType
                 ],
                 'position'             => 10,
             ])
+            ->addColumn('visible', CType\Column\BooleanType::class, [
+                'label'                => 'ekyna_core.field.visible',
+                'route_name'           => 'ekyna_product_category_admin_toggle',
+                'route_parameters'     => ['field' => 'visible'],
+                'route_parameters_map' => ['categoryId' => 'id'],
+                'position'             => 20,
+            ])
             ->addColumn('createdAt', CType\Column\DateTimeType::class, [
                 'label'    => 'ekyna_core.field.created_at',
-                'position' => 20,
+                'position' => 30,
             ])
             ->addColumn('actions', BType\Column\NestedActionsType::class, [
                 'new_child_route'       => 'ekyna_product_category_admin_new_child',

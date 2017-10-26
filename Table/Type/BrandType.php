@@ -32,6 +32,13 @@ class BrandType extends ResourceTableType
                 ],
                 'position'             => 10,
             ])
+            ->addColumn('visible', CType\Column\BooleanType::class, [
+                'label'                => 'ekyna_core.field.visible',
+                'route_name'           => 'ekyna_product_brand_admin_toggle',
+                'route_parameters'     => ['field' => 'visible'],
+                'route_parameters_map' => ['brandId' => 'id'],
+                'position'             => 20,
+            ])
             ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
                     [
@@ -69,6 +76,10 @@ class BrandType extends ResourceTableType
             ->addFilter('name', CType\Filter\TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'position' => 10,
+            ])
+            ->addFilter('visible', CType\Filter\BooleanType::class, [
+                'label'    => 'ekyna_core.field.visible',
+                'position' => 20,
             ]);
     }
 }

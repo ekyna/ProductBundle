@@ -49,6 +49,14 @@ ekyna_product_brand_admin_move_down:
     requirements:
         brandId: \d+
 
+ekyna_product_brand_admin_toggle:
+    path: /{brandId}/toggle/{field}
+    defaults: { _controller: "ekyna_product.brand.controller:toggleAction", field: visible }
+    methods: [GET]
+    requirements:
+        brandId: \d+
+        field: \w+
+
 ekyna_product_brand_admin_remove:
     path: /{brandId}/remove
     defaults: { _controller: "ekyna_product.brand.controller:removeAction" }

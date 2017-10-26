@@ -56,6 +56,14 @@ ekyna_product_category_admin_move_down:
     requirements:
         categoryId: \d+
 
+ekyna_product_category_admin_toggle:
+    path: /{categoryId}/toggle/{field}
+    defaults: { _controller: "ekyna_product.category.controller:toggleAction", field: visible }
+    methods: [GET]
+    requirements:
+        categoryId: \d+
+        field: \w+
+
 ekyna_product_category_admin_remove:
     path: /{categoryId}/remove
     defaults: { _controller: "ekyna_product.category.controller:removeAction" }

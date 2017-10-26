@@ -33,6 +33,21 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
      */
     protected $name;
 
+    /**
+     * @var boolean
+     */
+    protected $visible;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->visible = true;
+    }
 
     /**
      * Returns the string representation
@@ -66,6 +81,24 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }

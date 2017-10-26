@@ -64,6 +64,13 @@
             <tag name="form.type"/>
         </service>
 
+        <!-- Category event listener -->
+        <service id="ekyna_product.category.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\CategoryListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Product subject provider -->
         <service id="ekyna_product.commerce.subject_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">

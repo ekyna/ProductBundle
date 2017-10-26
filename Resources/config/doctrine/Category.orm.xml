@@ -28,6 +28,7 @@
         </field>
 
         <field name="name" column="name" type="string" length="64" />
+        <field name="visible" column="visible" type="boolean" nullable="false"/>
 
         <field name="createdAt" column="created_at" type="datetime">
             <gedmo:timestampable on="create" />

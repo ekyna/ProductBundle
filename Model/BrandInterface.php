@@ -31,11 +31,28 @@ interface BrandInterface
 
     /**
      * Sets the name.
+     *
      * @param string $name
      *
      * @return $this|BrandInterface
      */
     public function setName($name);
+
+    /**
+     * Returns the visible.
+     *
+     * @return bool
+     */
+    public function isVisible();
+
+    /**
+     * Sets the visible.
+     *
+     * @param bool $visible
+     *
+     * @return $this|BrandInterface
+     */
+    public function setVisible($visible);
 
     /**
      * Returns the (translated) title.

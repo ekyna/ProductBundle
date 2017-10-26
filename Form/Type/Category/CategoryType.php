@@ -9,6 +9,7 @@ use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -28,6 +29,13 @@ class CategoryType extends ResourceFormType
             ->add('name', TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'required' => true,
+            ])
+            ->add('visible', CheckboxType::class, [
+                'label'    => 'ekyna_core.field.visible',
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
             ])
             ->add('parent', EntityType::class, [
                 'label'         => 'ekyna_core.field.parent',

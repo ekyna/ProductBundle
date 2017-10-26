@@ -2,6 +2,8 @@ ekyna_product:
     catalog: Catalogue
     leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
 
+    #common: TODO group translations (like visible)
+
     attribute:
         label:
             singular: Attribut
@@ -250,7 +252,6 @@ ekyna_product:
             stock: Stocks
             composition: Composition
             geocode: Geocode
-            visible: Visible
             released_at: Date de sortie
             delivery_time: Délai de livraison
         alert:

@@ -13,5 +13,6 @@ use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
 class BrandController extends ResourceController
 {
     use RC\SortableTrait,
-        RC\TinymceTrait;
+        RC\TinymceTrait,
+        RC\ToggleableTrait;
 }
