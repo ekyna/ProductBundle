@@ -23,17 +23,17 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     /**
      * @var ItemBuilder
      */
-    private $itemBuilder;
+    protected $itemBuilder;
 
     /**
      * @var FormBuilder
      */
-    private $formBuilder;
+    protected $formBuilder;
 
     /**
      * @var PriceResolver
      */
-    private $priceResolver;
+    protected $priceResolver;
 
 
     /**
@@ -143,7 +143,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      *
      * @return null|ProductInterface
      */
-    private function getProductFromEvent(SaleItemEvent $event)
+    protected function getProductFromEvent(SaleItemEvent $event)
     {
         $item = $event->getItem();
 

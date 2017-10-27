@@ -22,12 +22,12 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * @var ProductRepositoryInterface
      */
-    private $productRepository;
+    protected $productRepository;
 
     /**
      * @var PriceResolver
      */
-    private $priceResolver;
+    protected $priceResolver;
 
     /**
      * @var string
@@ -121,7 +121,6 @@ class ProductProvider implements SubjectProviderInterface
     {
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $subject */
         return $subject instanceof $this->productClass;
-            //&& $subject->getType() !== ProductTypes::TYPE_VARIABLE;
     }
 
     /**

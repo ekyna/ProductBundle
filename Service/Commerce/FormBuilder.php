@@ -27,37 +27,37 @@ class FormBuilder
     /**
      * @var ProductProvider
      */
-    private $productProvider;
+    protected $productProvider;
 
     /**
      * @var ProductFilter
      */
-    private $productFilter;
+    protected $productFilter;
 
     /**
      * @var PriceCalculator
      */
-    private $priceCalculator;
+    protected $priceCalculator;
 
     /**
      * @var LocaleProviderInterface
      */
-    private $localeProvider;
+    protected $localeProvider;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    protected $translator;
 
     /**
      * @var string
      */
-    private $noImagePath;
+    protected $noImagePath;
 
     /**
      * @var \NumberFormatter
      */
-    private $formatter;
+    protected $formatter;
 
 
     /**
@@ -329,7 +329,7 @@ class FormBuilder
      *
      * @return array
      */
-    private function buildOptionConfig(Model\OptionInterface $option)
+    protected function buildOptionConfig(Model\OptionInterface $option)
     {
         $config = [];
 
@@ -436,7 +436,7 @@ class FormBuilder
      * @param FormInterface          $form
      * @param Model\ProductInterface $product
      */
-    private function buildProductForm(FormInterface $form, Model\ProductInterface $product)
+    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product)
     {
         $repository = $this->productProvider->getRepository();
 

@@ -58,8 +58,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             // Brand
             if (null !== $brand = $product->getBrand()) {
                 $data['brand'] = [
-                    'id'   => $brand->getId(),
-                    'name' => $brand->getName(),
+                    'id'      => $brand->getId(),
+                    'name'    => $brand->getName(),
+                    'visible' => $brand->isVisible(),
                 ];
             }
 
@@ -71,8 +72,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
                 return [
-                    'id'   => $c->getId(),
-                    'name' => $c->getName(),
+                    'id'      => $c->getId(),
+                    'name'    => $c->getName(),
+                    'visible' => $c->isVisible(),
                 ];
             }, $product->getCategories()->toArray());
 

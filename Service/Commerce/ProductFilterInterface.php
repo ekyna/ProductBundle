@@ -13,13 +13,6 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 interface ProductFilterInterface
 {
     /**
-     * Sets the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     */
-    public function setCustomerGroup(CustomerGroupInterface $group = null);
-
-    /**
      * Returns whether the product is available.
      *
      * @param Model\ProductInterface $product
@@ -72,4 +65,13 @@ interface ProductFilterInterface
      * @return Model\OptionInterface[] The options
      */
     public function getGroupOptions(Model\OptionGroupInterface $group);
+
+    /**
+     * Sets the customer group.
+     *
+     * @param CustomerGroupInterface $group
+     *
+     * @return ProductFilterInterface
+     */
+    public function setCustomerGroup(CustomerGroupInterface $group = null);
 }

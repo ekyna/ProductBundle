@@ -4,7 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\CommerceBundle\Service\AbstractViewType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Component\Commerce\Cart\Model as Cart;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Common\View;
 

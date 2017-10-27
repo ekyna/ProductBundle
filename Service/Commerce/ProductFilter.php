@@ -26,32 +26,32 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @var array
      */
-    private $productCache = [];
+    private $productCache;
 
     /**
      * @var array
      */
-    private $variantCache = [];
+    private $variantCache;
 
     /**
      * @var array
      */
-    private $slotCache = [];
+    private $slotCache;
 
     /**
      * @var array
      */
-    private $choiceCache = [];
+    private $choiceCache;
 
     /**
      * @var array
      */
-    private $groupCache = [];
+    private $groupCache;
 
     /**
      * @var array
      */
-    private $optionCache = [];
+    private $optionCache;
 
 
     /**
@@ -62,6 +62,8 @@ class ProductFilter implements ProductFilterInterface
     public function __construct(CustomerProviderInterface $customerProvider)
     {
         $this->customerProvider = $customerProvider;
+
+        $this->clearCache();
     }
 
     /**
@@ -205,13 +207,17 @@ class ProductFilter implements ProductFilterInterface
     }
 
     /**
-     * Sets the customer group.
-     *
-     * @param CustomerGroupInterface $group
+     * @inheritdoc
      */
     public function setCustomerGroup(CustomerGroupInterface $group = null)
     {
+        if ($this->customerGroup !== $group) {
+            $this->clearCache();
+        }
+
         $this->customerGroup = $group;
+
+        return $this;
     }
 
     /**
@@ -222,7 +228,7 @@ class ProductFilter implements ProductFilterInterface
     protected function getCustomerGroup()
     {
         if (null === $this->customerGroup) {
-            $this->customerGroup = $this->customerProvider->getCustomerGroup();
+            $this->setCustomerGroup($this->customerProvider->getCustomerGroup());
         }
 
         return $this->customerGroup;
@@ -254,6 +260,19 @@ class ProductFilter implements ProductFilterInterface
         }
 
         return $this->isProductAvailable($product);
+    }
+
+    /**
+     * Clears the results cache.
+     */
+    protected function clearCache()
+    {
+        $this->productCache = [];
+        $this->variantCache = [];
+        $this->slotCache = [];
+        $this->choiceCache = [];
+        $this->groupCache = [];
+        $this->optionCache = [];
     }
 }
 

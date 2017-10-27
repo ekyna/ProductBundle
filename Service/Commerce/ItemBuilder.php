@@ -24,12 +24,12 @@ class ItemBuilder
     /**
      * @var ProductProvider
      */
-    private $provider;
+    protected $provider;
 
     /**
      * @var ProductFilterInterface
      */
-    private $filter;
+    protected $filter;
 
 
     /**
