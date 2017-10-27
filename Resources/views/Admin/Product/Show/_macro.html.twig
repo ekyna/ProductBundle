@@ -69,16 +69,6 @@
 {% endmacro show_geocode %}
 
 
-{% macro show_delivery_time(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.deliveryTime, 'number', 'ekyna_product.product.field.delivery_time', {
-        'id': 'product_deliveryTime',
-        'precision': 0
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_delivery_time %}
-
-
 {% macro show_reference(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {

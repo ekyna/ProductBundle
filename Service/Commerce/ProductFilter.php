@@ -71,8 +71,8 @@ class ProductFilter implements ProductFilterInterface
      */
     public function isProductAvailable(Model\ProductInterface $product)
     {
-        if (isset($this->productCache[$product->getId()])) {
-            return $this->productCache[$product->getId()];
+        if ($this->hasProductAvailability($product)) {
+            return $this->getProductAvailability($product);
         }
 
         $available = true;
@@ -104,7 +104,7 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        return $this->productCache[$product->getId()] = $available;
+        return $this->setProductAvailability($product, $available);
     }
 
     /**
@@ -136,7 +136,7 @@ class ProductFilter implements ProductFilterInterface
         Model\ProductTypes::assertBundled($product);
 
         if (isset($this->slotCache[$product->getId()])) {
-            $this->slotCache[$product->getId()];
+            return $this->slotCache[$product->getId()];
         }
 
         $slots = [];
@@ -155,7 +155,7 @@ class ProductFilter implements ProductFilterInterface
     public function getSlotChoices(Model\BundleSlotInterface $slot)
     {
         if (isset($this->choiceCache[$slot->getId()])) {
-            $this->choiceCache[$slot->getId()];
+            return $this->choiceCache[$slot->getId()];
         }
 
         $choices = [];
@@ -174,7 +174,7 @@ class ProductFilter implements ProductFilterInterface
     public function getOptionGroups(Model\ProductInterface $product)
     {
         if (isset($this->groupCache[$product->getId()])) {
-            $this->groupCache[$product->getId()];
+            return $this->groupCache[$product->getId()];
         }
 
         $groups = [];
@@ -193,7 +193,7 @@ class ProductFilter implements ProductFilterInterface
     public function getGroupOptions(Model\OptionGroupInterface $group)
     {
         if (isset($this->optionCache[$group->getId()])) {
-            $this->optionCache[$group->getId()];
+            return $this->optionCache[$group->getId()];
         }
 
         $options = [];
@@ -260,6 +260,43 @@ class ProductFilter implements ProductFilterInterface
         }
 
         return $this->isProductAvailable($product);
+    }
+
+    /**
+     * Returns whether the product availability is cached.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return bool
+     */
+    protected function hasProductAvailability(Model\ProductInterface $product)
+    {
+        return isset($this->productCache[$product->getId()]);
+    }
+
+    /**
+     * Returns the cached product availability.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return bool
+     */
+    protected function getProductAvailability(Model\ProductInterface $product)
+    {
+        return $this->productCache[$product->getId()];
+    }
+
+    /**
+     * Sets the cached product availability.
+     *
+     * @param Model\ProductInterface $product   The product
+     * @param bool                   $available Whether the product is available
+     *
+     * @return bool                  The defined availability
+     */
+    protected function setProductAvailability(Model\ProductInterface $product, $available)
+    {
+        return $this->productCache[$product->getId()] = (bool)$available;
     }
 
     /**

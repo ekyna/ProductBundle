@@ -109,48 +109,53 @@ class VariableUpdater
     {
         Model\ProductTypes::assertVariable($variable);
 
-        $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
-        $inStock = $availableStock = $virtualStock = null;
+        // Resolve best variants and copy its data
+
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $bestVariant */
+        $bestVariant = null;
+
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface[] $variants */
         $variants = $variable->getVariants()->getIterator();
-
-        // TODO This is wrong
-        // -> Resolve best variants and copy its data
-
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-            if ($variant->getStockMode() === Stock\StockSubjectModes::MODE_DISABLED) {
+            if (null === $bestVariant) {
+                $bestVariant = $variant;
                 continue;
-            } elseif ($variant->getStockMode() == Stock\StockSubjectModes::MODE_JUST_IN_TIME) {
-                $state = Stock\StockSubjectStates::STATE_IN_STOCK;
-                $inStock = $virtualStock = 0;
-                break;
             }
 
-            // TODO NO ! Resolve state regarding to stocks
-            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $state)) {
-                $state = $variant->getStockState();
+            if ($bestVariant->getAvailableStock() < $variant->getAvailableStock()) {
+                $bestVariant = $variant;
+                continue;
             }
 
-            $variantInStock = $variant->getInStock();
-            if (null === $inStock || (0 < $variantInStock && $inStock > $variantInStock)) {
-                $inStock = $variantInStock;
+            if ($bestVariant->getVirtualStock() < $variant->getVirtualStock()) {
+                $bestVariant = $variant;
+                continue;
             }
 
-            $variantAvailableStock = $variant->getAvailableStock();
-            if (null === $availableStock || (0 < $variantAvailableStock && $availableStock > $variantAvailableStock)) {
-                $inStock = $variantAvailableStock;
+            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $bestVariant->getStockState())) {
+                $bestVariant = $variant;
             }
+        }
 
-            $variantVirtualStock = $variant->getVirtualStock();
-            if (null === $virtualStock || (0 < $variantVirtualStock && $virtualStock > $variantVirtualStock)) {
-                $virtualStock = $variantVirtualStock;
-            }
+        $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
+        $inStock = $availableStock = $virtualStock = 0;
+
+        if ($bestVariant) {
+            $inStock = $bestVariant->getInStock();
+            $availableStock = $bestVariant->getAvailableStock();
+            $virtualStock = $bestVariant->getVirtualStock();
+            $state = $bestVariant->getStockState();
         }
 
         $changed = false;
 
         if ($variable->getInStock() !== $inStock) {
             $variable->setInStock($inStock);
+            $changed = true;
+        }
+
+        if ($variable->getAvailableStock() !== $availableStock) {
+            $variable->setAvailableStock($availableStock);
             $changed = true;
         }
 

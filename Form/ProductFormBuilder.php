@@ -8,7 +8,7 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -17,6 +17,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormInterface;
 
@@ -265,25 +266,6 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the delivery time field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addDeliveryTimeField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_product.product.field.delivery_time',
-            'required' => false,
-        ], $options);
-
-        $this->form->add('deliveryTime', SF\IntegerType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the geocode field.
      *
      * @param array $options
@@ -325,6 +307,26 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('medias', MediaCollectionType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the minimum order quantity field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addMinimumOrderQuantity(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_commerce.stock_subject.field.minimum_order_quantity',
+            'scale'    => 3,
+            'required' => true,
+        ], $options);
+
+        $this->form->add('minimumOrderQuantity', SF\NumberType::class, $options);
 
         return $this;
     }
@@ -434,6 +436,25 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the stock replenishment time field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addReplenishmentTime(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_commerce.stock_subject.field.replenishment_time',
+            'required' => true,
+        ], $options);
+
+        $this->form->add('replenishmentTime', SF\IntegerType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the seo field.
      *
      * @param array $options
@@ -463,7 +484,7 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'   => 'ekyna_commerce.stock_subject.field.mode',
-            'choices' => StockSubjectModes::getChoices(),
+            'choices' => BStockModes::getChoices([CStockModes::MODE_INHERITED]),
         ], $options);
 
         $this->form->add('stockMode', SF\ChoiceType::class, $options);

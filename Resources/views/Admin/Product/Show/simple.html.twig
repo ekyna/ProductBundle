@@ -31,14 +31,7 @@
 {% block pricing_content %}
     {{ _cms.show_tags(product) }}
     {{ parent() }}
-    <div class="row">
-        <div class="col-md-8">
-            {{ macros.show_customer_groups(product, {'label_nb_col': 3, 'widget_nb_col': 8}) }}
-        </div>
-        <div class="col-md-4">
-            {{ macros.show_delivery_time(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
-        </div>
-    </div>
+    {{ macros.show_customer_groups(product) }}
     {{ macros.show_references(product) }}
     {{ macros.show_adjustments(product) }}
 {% endblock pricing_content %}

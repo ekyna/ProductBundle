@@ -69,7 +69,7 @@ class BundleHandler extends AbstractHandler
 
         $changed |= $this->updatePrice($bundle);
 
-        $changed |= $this->ensureDisabledStockMode($bundle);
+        $changed |= $this->ensureInheritedStockMode($bundle);
 
         return $changed;
     }
@@ -83,7 +83,7 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
-        $changed = $this->ensureDisabledStockMode($bundle);
+        $changed = $this->ensureInheritedStockMode($bundle);
 
         $events = [];
 

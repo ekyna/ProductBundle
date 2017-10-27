@@ -94,7 +94,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addGeocodeField()
             ->addStockMode()
             ->addStockFloor()
-            ->addDeliveryTimeField()
+            ->addReplenishmentTime()
+            ->addMinimumOrderQuantity()
             ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
@@ -128,6 +129,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled' => true,
             ])
             ->addStockFloor([
+                'disabled' => true,
+            ])
+            ->addReplenishmentTime([
+                'disabled' => true,
+            ])
+            ->addMinimumOrderQuantity([
                 'disabled' => true,
             ])
             ->addTranslationsField()
@@ -164,7 +171,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addGeocodeField()
             ->addStockMode()
             ->addStockFloor()
-            ->addDeliveryTimeField()
+            ->addReplenishmentTime()
+            ->addMinimumOrderQuantity()
             ->addTagsField()
             ->addTranslationsField([
                 'required'     => false,
@@ -211,6 +219,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addStockFloor([
                 'disabled' => true,
             ])
+            ->addReplenishmentTime([
+                'disabled' => true,
+            ])
+            ->addMinimumOrderQuantity([
+                'disabled' => true,
+            ])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
@@ -250,6 +264,12 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled' => true,
             ])
             ->addStockFloor([
+                'disabled' => true,
+            ])
+            ->addReplenishmentTime([
+                'disabled' => true,
+            ])
+            ->addMinimumOrderQuantity([
                 'disabled' => true,
             ])
             ->addTranslationsField()

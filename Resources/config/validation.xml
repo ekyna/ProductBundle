@@ -732,6 +732,17 @@
             <option name="groups">variant</option>
         </constraint>
 
+        <!-- Stock subject validation -->
+        <constraint name="Ekyna\Component\Commerce\Bridge\Symfony\Validator\Constraints\StockSubject">
+            <option name="groups">
+                <value>simple</value>
+                <value>variant</value>
+                <value>variable</value>
+                <value>bundle</value>
+                <value>configurable</value>
+            </option>
+        </constraint>
+
         <!-- Unique constraints -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">reference</option>

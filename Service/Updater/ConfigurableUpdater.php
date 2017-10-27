@@ -97,7 +97,7 @@ class ConfigurableUpdater
                     $justInTime = false;
                     if (
                         !Model\ProductTypes::isBundled($product->getType()) &&
-                        $product->getStockMode() === StockSubjectModes::MODE_DISABLED
+                        $product->getStockMode() === StockSubjectModes::MODE_INHERITED
                     ) {
                         continue;
                     }

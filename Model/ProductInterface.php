@@ -526,22 +526,6 @@ interface ProductInterface extends
     public function setVisible($visible);
 
     /**
-     * Returns the delivery time in days.
-     *
-     * @return int
-     */
-    public function getDeliveryTime();
-
-    /**
-     * Sets the delivery time in days.
-     *
-     * @param int $days
-     *
-     * @return $this|ProductInterface
-     */
-    public function setDeliveryTime($days);
-
-    /**
      * Returns the reference.
      *
      * @return string

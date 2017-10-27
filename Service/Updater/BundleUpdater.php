@@ -40,7 +40,7 @@ class BundleUpdater
                     $justInTime = false;
                     if (
                         !Model\ProductTypes::isBundled($product->getType()) &&
-                        $product->getStockMode() === StockSubjectModes::MODE_DISABLED
+                        $product->getStockMode() === StockSubjectModes::MODE_INHERITED
 
                     ) {
                         continue;
@@ -75,9 +75,9 @@ class BundleUpdater
         $changed = false;
 
         $state = StockSubjectStates::STATE_OUT_OF_STOCK;
-        if ($justInTime || 0 < $availableStock) {
+        if (0 < $availableStock) {
             $state = StockSubjectStates::STATE_IN_STOCK;
-        } elseif (0 < $virtualStock) {
+        } elseif (0 < $virtualStock || $justInTime) {
             $state = StockSubjectStates::STATE_PRE_ORDER;
         }
 

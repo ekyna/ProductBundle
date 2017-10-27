@@ -114,11 +114,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $visible;
 
     /**
-     * @var int
-     */
-    protected $deliveryTime;
-
-    /**
      * @var string
      */
     protected $reference;
@@ -170,7 +165,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->initializeAdjustments();
         $this->initializeStock();
 
-        $this->stockMode = StockSubjectModes::MODE_ENABLED;
+        $this->stockMode = StockSubjectModes::MODE_AUTO;
         $this->visible = true;
     }
 
@@ -967,24 +962,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getDeliveryTime()
-    {
-        return $this->deliveryTime;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDeliveryTime($days)
-    {
-        $this->deliveryTime = $days;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getReference()
     {
         return $this->reference;
@@ -1150,60 +1127,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         sort($ids);
 
         return implode('-', $ids);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStockState()
-    {
-        // TODO if bundled or variable, resolve stock state
-
-        return $this->stockState;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getInStock()
-    {
-        // TODO if bundled or variable, resolve stock
-
-        return $this->inStock;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAvailableStock()
-    {
-        // TODO if bundled or variable, resolve stock
-
-        return $this->availableStock;
-    }
-
-    /**
-     * Returns the ordered stock.
-     *
-     * @return float
-     */
-    public function getVirtualStock()
-    {
-        // TODO if bundled or variable, resolve stock
-
-        return $this->virtualStock;
-    }
-
-    /**
-     * Returns the estimated date of arrival.
-     *
-     * @return \DateTime
-     */
-    public function getEstimatedDateOfArrival()
-    {
-        // TODO if bundled or variable, resolve eda
-
-        return $this->estimatedDateOfArrival;
     }
 
     /**

@@ -72,16 +72,16 @@ abstract class AbstractHandler implements HandlerInterface
     }
 
     /**
-     * Check that the product stock mode is disabled.
+     * Check that the product stock mode is "inherited".
      *
      * @param ProductInterface $parent
      *
      * @return bool Whether or not the product has been changed.
      */
-    protected function ensureDisabledStockMode(ProductInterface $parent)
+    protected function ensureInheritedStockMode(ProductInterface $parent)
     {
-        if ($parent->getStockMode() != StockSubjectModes::MODE_DISABLED) {
-            $parent->setStockMode(StockSubjectModes::MODE_DISABLED);
+        if ($parent->getStockMode() != StockSubjectModes::MODE_INHERITED) {
+            $parent->setStockMode(StockSubjectModes::MODE_INHERITED);
 
             return true;
         }
