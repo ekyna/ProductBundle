@@ -17,10 +17,6 @@ define(['jquery'], function($) {
 
                 $form.find('.option-wrapper').hide();
                 $form.find('.option-' + mode).show();
-
-                if (mode === 'data') {
-                    $product.val(undefined).find('option:selected').prop('checked', false);
-                }
             }
 
             $mode.on('change', onChange);
@@ -34,6 +30,18 @@ define(['jquery'], function($) {
     return {
         init: function($element) {
             $element.optionWidget();
+        },
+        save: function($element) {
+            $element.each(function() {
+                var $form = $(this),
+                    $mode = $form.find('div.option-mode input[type="radio"]'),
+                    $product = $form.find('select.entity-search');
+
+                var mode = $mode.filter(':checked').val();
+                if (mode === 'data') {
+                    $product.val(undefined).find('option:selected').prop('selected', false);
+                }
+            });
         }
     };
 });

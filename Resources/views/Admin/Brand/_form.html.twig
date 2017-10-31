@@ -1,9 +1,14 @@
-<ul class="nav nav-tabs">
+{% spaceless %}
+<ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
     <li class="active">
-        <a href="#brand-general" data-toggle="tab">{{ 'ekyna_core.field.general'|trans }}</a>
+        <a href="#brand-general" id="toggle-general" data-toggle="tab">
+            {{ 'ekyna_core.field.general'|trans }}
+        </a>
     </li>
     <li>
-        <a href="#brand-seo" data-toggle="tab">{{ 'ekyna_core.field.seo'|trans }}</a>
+        <a href="#brand-seo" id="toggle-seo" data-toggle="tab">
+            {{ 'ekyna_core.field.seo'|trans }}
+        </a>
     </li>
 </ul>
 <div class="panel-body form-body">
@@ -29,3 +34,4 @@
     </div>
     {{ form_rest(form) }}
 </div>
+{% endspaceless %}
