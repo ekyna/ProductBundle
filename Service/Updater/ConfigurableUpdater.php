@@ -24,7 +24,7 @@ class ConfigurableUpdater
     {
         Model\ProductTypes::assertConfigurable($bundle);
 
-        $justInTime = true;
+        $disabled = true; $justInTime = true; $supplierPreOrder = true;
         $inStock = $virtualStock = $availableStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
@@ -40,24 +40,19 @@ class ConfigurableUpdater
                 foreach ($slot->getChoices() as $choice) {
                     $product = $choice->getProduct();
 
-                    if (null === $bestChoice || $product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                    // Skip disabled product
+                    if ($product->getStockMode() === StockSubjectModes::MODE_DISABLED) {
+                        continue;
+                    }
+
+                    if (null === $bestChoice) {
                         $bestChoice = $choice;
                         continue;
                     }
 
                     $bestProduct = $bestChoice->getProduct();
 
-                    // In stock
-                    // In stock can't be used to resolve best slot choice
-                    /*if (0 < $inStock = $product->getInStock() / $choice->getMinQuantity()) {
-                        $bestInStock = $bestProduct->getInStock() / $bestChoice->getMinQuantity();
-                        if ($bestInStock < $inStock) {
-                            $bestChoice = $choice;
-                            continue;
-                        }
-                    }*/
-
-                    // Available stock (TODO check)
+                    // Available stock
                     if (0 < $availableStock = $product->getAvailableStock() / $choice->getMinQuantity()) {
                         $bestAvailableStock = $bestProduct->getAvailableStock() / $bestChoice->getMinQuantity();
                         if ($bestAvailableStock < $availableStock) {
@@ -90,17 +85,16 @@ class ConfigurableUpdater
             // For each slot's best choice
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
             foreach ($slotsBestChoices as $choice) {
+                if (null === $choice) { // All slot choices have disabled stock mode.
+                    continue;
+                }
+
                 $product = $choice->getProduct();
 
                 // State
-                if ($product->getStockMode() != StockSubjectModes::MODE_JUST_IN_TIME) {
+                $disabled = false;
+                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
                     $justInTime = false;
-                    if (
-                        !Model\ProductTypes::isBundled($product->getType()) &&
-                        $product->getStockMode() === StockSubjectModes::MODE_INHERITED
-                    ) {
-                        continue;
-                    }
                 }
 
                 // In stock
@@ -119,25 +113,64 @@ class ConfigurableUpdater
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
                 if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
                     $virtualStock = $slotVirtualStock;
-                }
-                if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
-                    if (null === $eda || $slotEda > $eda) {
-                        $eda = $slotEda;
+
+                    if (null !== $slotEda = $product->getEstimatedDateOfArrival()) {
+                        if (null === $eda || $slotEda > $eda) {
+                            $eda = $slotEda;
+                        }
                     }
+                }
+
+                // Supplier pre order
+                if (
+                    0 >= $slotAvailableStock &&
+                    0 >= $slotVirtualStock &&
+                    $product->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK
+                ) {
+                    $supplierPreOrder = false;
+                }
+            }
+        }
+
+        if (null === $inStock) $inStock = 0;
+        if (null === $availableStock) $availableStock = 0;
+        if (null === $virtualStock) $virtualStock = 0;
+
+        if ($disabled) {
+            $mode = StockSubjectModes::MODE_DISABLED;
+            $state = StockSubjectStates::STATE_IN_STOCK;
+        } else {
+            $mode = $justInTime ? StockSubjectModes::MODE_JUST_IN_TIME : StockSubjectModes::MODE_AUTO;
+
+            $state = StockSubjectStates::STATE_OUT_OF_STOCK;
+            if (0 < $availableStock) {
+                $state = StockSubjectStates::STATE_IN_STOCK;
+            } elseif ((0 < $virtualStock && null !== $eda) || $supplierPreOrder) {
+                $state = StockSubjectStates::STATE_PRE_ORDER;
+            }
+
+            // If "Just in time" mode
+            if ($mode === StockSubjectModes::MODE_JUST_IN_TIME) {
+                // If "out of stock" state
+                if ($state === StockSubjectStates::STATE_OUT_OF_STOCK) {
+                    // Fallback to "Pre order" state
+                    $state = StockSubjectStates::STATE_PRE_ORDER;
+                }
+                // Else if "pre order" state
+                elseif($state === StockSubjectStates::STATE_PRE_ORDER) {
+                    // Fallback to "In stock" state
+                    $state = StockSubjectStates::STATE_IN_STOCK;
                 }
             }
         }
 
         $changed = false;
 
-        $state = StockSubjectStates::STATE_OUT_OF_STOCK;
-        if ($justInTime || 0 < $inStock) {
-            $state = StockSubjectStates::STATE_IN_STOCK;
-        } elseif (0 < $virtualStock) {
-            $state = StockSubjectStates::STATE_PRE_ORDER;
+        if ($mode !== $bundle->getStockMode()) {
+            $bundle->setStockMode($mode);
+            $changed = true;
         }
-
-        if ($state != $bundle->getStockState()) {
+        if ($state !== $bundle->getStockState()) {
             $bundle->setStockState($state);
             $changed = true;
         }
@@ -153,7 +186,7 @@ class ConfigurableUpdater
             $bundle->setVirtualStock($virtualStock);
             $changed = true;
         }
-        if ($eda != $bundle->getEstimatedDateOfArrival()) {
+        if ($eda !== $bundle->getEstimatedDateOfArrival()) {
             $bundle->setEstimatedDateOfArrival($eda);
             $changed = true;
         }

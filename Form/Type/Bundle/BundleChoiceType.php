@@ -70,15 +70,18 @@ class BundleChoiceType extends ResourceFormType
                 ])
                 ->add('minQuantity', Type\NumberType::class, [
                     'label' => 'ekyna_product.bundle_choice.field.min_quantity',
+                    'scale' => 3, // TODO Packaging
                 ])
                 ->add('maxQuantity', Type\NumberType::class, [
                     'label' => 'ekyna_product.bundle_choice.field.max_quantity',
+                    'scale' => 3, // TODO Packaging
                 ])
                 ->add('position', CollectionPositionType::class);
         } else {
             $builder->add('quantity', Type\NumberType::class, [
                 'label'         => 'ekyna_core.field.quantity',
                 'property_path' => 'minQuantity',
+                'scale'         => 3, // TODO Packaging
             ]);
         }
     }

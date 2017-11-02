@@ -57,8 +57,6 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed |= $this->updatePrice($bundle);
 
-        $changed |= $this->ensureInheritedStockMode($bundle);
-
         return $changed;
     }
 
@@ -70,8 +68,6 @@ class ConfigurableHandler extends AbstractHandler
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
         $changed = $this->getConfigurableUpdater()->updateStock($bundle);
-
-        $changed |= $this->ensureInheritedStockMode($bundle);
 
         $changed |= $this->updatePrice($bundle);
 

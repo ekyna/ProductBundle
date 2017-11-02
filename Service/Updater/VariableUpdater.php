@@ -122,6 +122,18 @@ class VariableUpdater
                 continue;
             }
 
+            if (Stock\StockSubjectModes::isBetterMode($variant->getStockMode(), $bestVariant->getStockMode())) {
+                $bestVariant = $variant;
+                continue;
+            }
+
+            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $bestVariant->getStockState())) {
+                $bestVariant = $variant;
+                continue;
+            }
+
+            // TODO deal with min order quantity
+
             if ($bestVariant->getAvailableStock() < $variant->getAvailableStock()) {
                 $bestVariant = $variant;
                 continue;
@@ -131,20 +143,18 @@ class VariableUpdater
                 $bestVariant = $variant;
                 continue;
             }
-
-            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $bestVariant->getStockState())) {
-                $bestVariant = $variant;
-            }
         }
 
+        $mode = Stock\StockSubjectModes::MODE_AUTO;
         $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
         $inStock = $availableStock = $virtualStock = 0;
 
         if ($bestVariant) {
+            $mode = $bestVariant->getStockMode();
+            $state = $bestVariant->getStockState();
             $inStock = $bestVariant->getInStock();
             $availableStock = $bestVariant->getAvailableStock();
             $virtualStock = $bestVariant->getVirtualStock();
-            $state = $bestVariant->getStockState();
         }
 
         $changed = false;
@@ -161,6 +171,11 @@ class VariableUpdater
 
         if ($variable->getVirtualStock() !== $virtualStock) {
             $variable->setVirtualStock($virtualStock);
+            $changed = true;
+        }
+
+        if ($variable->getStockMode() !== $mode) {
+            $variable->setStockMode($mode);
             $changed = true;
         }
 

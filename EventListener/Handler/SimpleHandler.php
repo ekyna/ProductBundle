@@ -61,6 +61,8 @@ class SimpleHandler extends AbstractHandler
         $this->productRepository = $productRepository;
     }
 
+    // TODO Deal with required option group stocks ?
+
     /**
      * @inheritdoc
      */
@@ -82,7 +84,14 @@ class SimpleHandler extends AbstractHandler
         $childEvents = [];
 
         $properties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
-        if ($this->persistenceHelper->isChanged($product, $properties)) {
+
+        if ($this->persistenceHelper->isChanged($product, 'stockMode')) {
+            if ($this->stockUpdater->update($product)) {
+                $changed = true;
+            }
+
+            $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
+        } elseif ($this->persistenceHelper->isChanged($product, $properties)) {
             if ($this->stockUpdater->updateStockState($product)) {
                 $changed = true;
             }

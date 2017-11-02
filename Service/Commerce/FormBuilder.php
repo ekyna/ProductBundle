@@ -106,23 +106,24 @@ class FormBuilder
      *
      * @param FormInterface     $form
      * @param SaleItemInterface $item
+     * @param bool              $root
      */
-    public function buildItemForm(FormInterface $form, SaleItemInterface $item)
+    public function buildItemForm(FormInterface $form, SaleItemInterface $item, $root = false)
     {
         /** @var Model\ProductInterface $product */
         $product = $this->productProvider->resolve($item);
 
-        $this->buildProductForm($form, $product);
+        $this->buildProductForm($form, $product, $root = false);
 
         // Quantity
-        $form->add('quantity', Sf\IntegerType::class, [
+        $form->add('quantity', Sf\IntegerType::class, [ // TODO packaging
             'label'       => 'ekyna_core.field.quantity',
             'constraints' => [
                 new Assert\GreaterThanOrEqual(1),
             ],
             'attr'        => [
                 'class' => 'sale-item-quantity',
-                'min'   => 1,
+                'min'   => $product->getMinimumOrderQuantity(),
             ],
         ]);
     }
@@ -254,6 +255,7 @@ class FormBuilder
                 'groups' => $groups,
                 'thumb'  => $this->getProductImagePath($variant),
                 'image'  => $this->getProductImagePath($variant, 'media_front'),
+                'min'    => $variant->getMinimumOrderQuantity(),
             ];
 
             return [
@@ -435,8 +437,9 @@ class FormBuilder
      *
      * @param FormInterface          $form
      * @param Model\ProductInterface $product
+     * @param bool                   $root
      */
-    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product)
+    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product, $root = false)
     {
         $repository = $this->productProvider->getRepository();
 

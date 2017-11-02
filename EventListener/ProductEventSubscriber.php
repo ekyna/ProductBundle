@@ -153,6 +153,10 @@ class ProductEventSubscriber implements EventSubscriberInterface
     {
         $product = $this->getProductFromEvent($event);
 
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
+
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_CHANGE)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
@@ -166,6 +170,10 @@ class ProductEventSubscriber implements EventSubscriberInterface
     public function onStockUnitRemoval(SubjectStockUnitEvent $event)
     {
         $product = $this->getProductFromEvent($event);
+
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
 
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_REMOVAL)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
@@ -181,6 +189,10 @@ class ProductEventSubscriber implements EventSubscriberInterface
     {
         $product = $this->getProductFromEvent($event);
 
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
+
         if ($this->executeHandlers($event, HandlerInterface::CHILD_DATA_CHANGE)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
@@ -194,6 +206,10 @@ class ProductEventSubscriber implements EventSubscriberInterface
     public function onChildStockChange(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event);
+
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
 
         if ($this->executeHandlers($event, HandlerInterface::CHILD_STOCK_CHANGE)) {
             $this->persistenceHelper->persistAndRecompute($product, true);

@@ -11,7 +11,6 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -162,11 +161,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
 
+        $this->visible = true;
+
         $this->initializeAdjustments();
         $this->initializeStock();
-
-        $this->stockMode = StockSubjectModes::MODE_AUTO;
-        $this->visible = true;
     }
 
     /**
@@ -1111,6 +1109,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isStockCompound()
+    {
+        return Model\ProductTypes::isParentType($this->type);
     }
 
     /**

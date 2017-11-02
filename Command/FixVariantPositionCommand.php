@@ -23,7 +23,7 @@ class FixVariantPositionCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('ekyna_product.fix_variant_position')
+            ->setName('ekyna:product:fix_variant_position')
             ->setDescription('Fixes the variants positions')
             ->addArgument('variableId', InputArgument::OPTIONAL, 'The variable product identifier which variants will be fixed.');
     }

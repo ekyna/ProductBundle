@@ -5,7 +5,6 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
 /**
@@ -68,24 +67,6 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function handleChildStockChange(ResourceEventInterface $event)
     {
-        return false;
-    }
-
-    /**
-     * Check that the product stock mode is "inherited".
-     *
-     * @param ProductInterface $parent
-     *
-     * @return bool Whether or not the product has been changed.
-     */
-    protected function ensureInheritedStockMode(ProductInterface $parent)
-    {
-        if ($parent->getStockMode() != StockSubjectModes::MODE_INHERITED) {
-            $parent->setStockMode(StockSubjectModes::MODE_INHERITED);
-
-            return true;
-        }
-
         return false;
     }
 

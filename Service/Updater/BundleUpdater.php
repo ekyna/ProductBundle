@@ -24,7 +24,7 @@ class BundleUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        $justInTime = true;
+        $justInTime = true; $disabled = true; $supplierPreOrder = true;
         $inStock = $virtualStock = $availableStock = $eda = null;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
@@ -35,16 +35,14 @@ class BundleUpdater
                 $choice = $slot->getChoices()->first();
                 $product = $choice->getProduct();
 
-                // State
-                if ($product->getStockMode() != StockSubjectModes::MODE_JUST_IN_TIME) {
-                    $justInTime = false;
-                    if (
-                        !Model\ProductTypes::isBundled($product->getType()) &&
-                        $product->getStockMode() === StockSubjectModes::MODE_INHERITED
+                if ($product->getStockMode() === StockSubjectModes::MODE_DISABLED) {
+                    continue;
+                }
 
-                    ) {
-                        continue;
-                    }
+                // State
+                $disabled = false;
+                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                    $justInTime = false;
                 }
 
                 // In stock
@@ -63,24 +61,63 @@ class BundleUpdater
                 $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
                 if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
                     $virtualStock = $slotVirtualStock;
-                }
-                if (0 < $slotVirtualStock && null !== $slotEda = $product->getEstimatedDateOfArrival()) {
-                    if (null === $eda || $slotEda > $eda) {
-                        $eda = $slotEda;
+
+                    if (null !== $slotEda = $product->getEstimatedDateOfArrival()) {
+                        if (null === $eda || $slotEda > $eda) {
+                            $eda = $slotEda;
+                        }
                     }
+                }
+
+                // Supplier pre order
+                if (
+                    0 >= $slotAvailableStock &&
+                    0 >= $slotVirtualStock &&
+                    $product->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK
+                ) {
+                    $supplierPreOrder = false;
+                }
+            }
+        }
+
+        if (null === $inStock) $inStock = 0;
+        if (null === $availableStock) $availableStock = 0;
+        if (null === $virtualStock) $virtualStock = 0;
+
+        if ($disabled) {
+            $mode = StockSubjectModes::MODE_DISABLED;
+            $state = StockSubjectStates::STATE_IN_STOCK;
+        } else {
+            $mode = $justInTime ? StockSubjectModes::MODE_JUST_IN_TIME : StockSubjectModes::MODE_AUTO;
+
+            $state = StockSubjectStates::STATE_OUT_OF_STOCK;
+            if (0 < $availableStock) {
+                $state = StockSubjectStates::STATE_IN_STOCK;
+            } elseif ((0 < $virtualStock && null !== $eda) || $supplierPreOrder) {
+                $state = StockSubjectStates::STATE_PRE_ORDER;
+            }
+
+            // If "Just in time" mode
+            if ($mode === StockSubjectModes::MODE_JUST_IN_TIME) {
+                // If "out of stock" state
+                if ($state === StockSubjectStates::STATE_OUT_OF_STOCK) {
+                    // Fallback to "Pre order" state
+                    $state = StockSubjectStates::STATE_PRE_ORDER;
+                }
+                // Else if "pre order" state
+                elseif($state === StockSubjectStates::STATE_PRE_ORDER) {
+                    // Fallback to "In stock" state
+                    $state = StockSubjectStates::STATE_IN_STOCK;
                 }
             }
         }
 
         $changed = false;
 
-        $state = StockSubjectStates::STATE_OUT_OF_STOCK;
-        if (0 < $availableStock) {
-            $state = StockSubjectStates::STATE_IN_STOCK;
-        } elseif (0 < $virtualStock || $justInTime) {
-            $state = StockSubjectStates::STATE_PRE_ORDER;
+        if ($mode !== $bundle->getStockMode()) {
+            $bundle->setStockMode($mode);
+            $changed = true;
         }
-
         if ($state != $bundle->getStockState()) {
             $bundle->setStockState($state);
             $changed = true;

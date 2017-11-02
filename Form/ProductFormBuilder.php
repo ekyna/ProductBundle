@@ -8,7 +8,7 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -17,7 +17,6 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormInterface;
 
@@ -484,7 +483,7 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'   => 'ekyna_commerce.stock_subject.field.mode',
-            'choices' => BStockModes::getChoices([CStockModes::MODE_INHERITED]),
+            'choices' => StockSubjectModes::getChoices(),
         ], $options);
 
         $this->form->add('stockMode', SF\ChoiceType::class, $options);
