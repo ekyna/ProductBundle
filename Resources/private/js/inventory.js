@@ -153,7 +153,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
                         refreshList();
                     }
 
-                    modalEvent.close();
+                    modalEvent.modal.close();
                 }
             });
         } catch(exception) {

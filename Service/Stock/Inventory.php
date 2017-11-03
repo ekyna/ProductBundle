@@ -29,6 +29,27 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class Inventory
 {
+    const PENDING_DQL = <<<DQL
+(
+  SELECT SUM(nsoi.quantity) 
+  FROM _class_ nsoi
+  JOIN nsoi.product nsp
+  JOIN nsoi.order nso
+  WHERE nsp.subjectIdentity.provider = :provider
+    AND nsp.subjectIdentity.identifier = p.id
+    AND nso.state = '_state_'
+) AS pending
+DQL;
+
+    const STOCK_SUB_DQL = <<<DQL
+(
+    SELECT SUM(_table_._field_)
+    FROM _class_ _table_
+    WHERE _table_.state <> '_state_'
+    AND _table_.product = p.id
+) AS _alias_
+DQL;
+
     const SESSION_KEY = 'inventory_context';
 
     /**
@@ -437,19 +458,10 @@ class Inventory
      */
     private function getPendingSubQuery()
     {
-        $state = SupplierOrderStates::STATE_NEW;
-
-        return <<<DQL
-(
-  SELECT SUM(nsoi.quantity) 
-  FROM $this->supplierOrderItemClass nsoi
-  JOIN nsoi.product nsp
-  JOIN nsoi.order nso
-  WHERE nsp.subjectIdentity.provider = :provider
-    AND nsp.subjectIdentity.identifier = p.id
-    AND nso.state = '$state'
-) AS pending
-DQL;
+        return strtr(static::PENDING_DQL, [
+            '_class_' => $this->supplierOrderItemClass,
+            '_state_' => SupplierOrderStates::STATE_NEW,
+        ]);
     }
 
     /**
@@ -463,12 +475,7 @@ DQL;
      */
     private function buildStockSubQuery($field, $fieldAlias, $tableAlias)
     {
-        return strtr('(' .
-            'SELECT SUM(_table_._field_) ' .
-            'FROM _class_ _table_ ' .
-            'WHERE _table_.state <> \'_state_\' ' .
-            'AND _table_.product = p.id' .
-            ') AS _alias_', [
+        return strtr(static::STOCK_SUB_DQL, [
             '_field_' => $field,
             '_class_' => $this->stockUnitClass,
             '_table_' => $tableAlias,

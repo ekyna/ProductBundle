@@ -194,6 +194,8 @@
 
 {% block ekyna_product_inventory_resupply_widget %}
 {% spaceless %}
+    {{ render_subjects_stock([product]) }}
+    <hr>
     {{ bootstrap_set_style('horizontal') }}
     {{ bootstrap_set_col_size('md') }}
     {{ form_errors(form) }}

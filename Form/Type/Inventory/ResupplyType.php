@@ -7,8 +7,9 @@ use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterf
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -65,10 +66,21 @@ class ResupplyType extends AbstractType
                 ],
             ])
             ->add('estimatedDateOfArrival', DateTimeType::class, [
-                'label'    => 'ekyna_commerce.supplier_order.field.estimated_date_of_arrival',
+                'label'    => 'ekyna_commerce.field.eta',
                 'format'   => 'dd/MM/yyyy',
                 'required' => false,
             ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var ProductInterface $product */
+        $product = $options['product'];
+
+        $view->vars['product'] = $product;
     }
 
     /**

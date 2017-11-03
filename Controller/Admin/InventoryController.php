@@ -153,7 +153,7 @@ class InventoryController extends Controller
 
         $list = $this
             ->get('ekyna_commerce.stock.stock_renderer')
-            ->renderSubjectStockUnitList($product, [
+            ->renderSubjectStockUnits($product, [
                 'class' => 'table-condensed',
             ]);
 
@@ -253,6 +253,7 @@ class InventoryController extends Controller
             $supplierProduct = $this
                 ->get('ekyna_commerce.supplier_product.repository')
                 ->find($request->request->get('supplierProduct'));
+
             if (null !== $supplierProduct) {
                 /** @var \Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface $supplierOrder */
                 $supplierOrder = null;
