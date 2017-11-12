@@ -27,6 +27,8 @@ class BundleUpdater
         $justInTime = true; $disabled = true; $supplierPreOrder = true;
         $inStock = $virtualStock = $availableStock = $eda = null;
 
+        // TODO Use packaging format
+
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
         if (0 < $bundleSlots->count()) {

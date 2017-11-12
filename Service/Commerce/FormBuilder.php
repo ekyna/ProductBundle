@@ -159,6 +159,8 @@ class FormBuilder
         // TODO Disable fields for non selected bundle choices.
         $this->buildProductForm($form, $bundleChoice->getProduct());
 
+        // TODO Use packaging format (+ integer/number field type)
+
         $min = $bundleChoice->getMinQuantity();
         $max = $bundleChoice->getMaxQuantity();
 

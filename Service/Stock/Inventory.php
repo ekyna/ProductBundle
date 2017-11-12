@@ -431,7 +431,7 @@ DQL;
 
         // Profile
         if (InventoryProfiles::TREATMENT === $context->getProfile()) {
-            $qb->andHaving($expr->lt('shipped', 'sold'));
+            $qb->andHaving($expr->lt('shipped', 'received'));
         } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
             $qb->andHaving($expr->lt('ordered', 'sold'));
         }

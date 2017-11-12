@@ -22,9 +22,9 @@
         <dt>{{ 'ekyna_core.field.visible'|trans }}</dt>
         <dd>{% if source.visible %}{{ 'ekyna_core.value.yes'|trans }}{% else %}{{ 'ekyna_core.value.no'|trans }}{% endif %}</dd>
         <dt>{{ 'ekyna_product.product.field.net_price'|trans }}</dt>
-        <dd>{{ source.netPrice|localizedcurrency('EUR') }}</dd>#}{# TODO default currency #}{#
+        <dd>{{ source.netPrice|localizedcurrency(commerce_default_currency) }}</dd>
         <dt>{{ 'ekyna_core.field.weight'|trans }}</dt>
-        <dd>{{ source.weight|localizednumber }} kg</dd> #}{# TODO packagin format #}{#
+        <dd>{{ source.weight|localizednumber }}&nbsp;kg</dd>
         <dt>{{ 'ekyna_product.product.field.geocode'|trans }}</dt>
         <dd>{{ source.geocode }}</dd>
         <dt>{{ 'ekyna_product.product_reference.label.plural'|trans }}</dt>

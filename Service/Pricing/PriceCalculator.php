@@ -92,6 +92,8 @@ class PriceCalculator
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
 
+            // TODO Use packaging format
+
             $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
 
             // TODO required options ?
@@ -122,6 +124,9 @@ class PriceCalculator
 
             foreach ($slot->getChoices() as $choice) {
                 $childProduct = $choice->getProduct();
+
+                // TODO Use packaging format
+
                 $childPrice = $childProduct->getNetPrice() * $choice->getMinQuantity();
 
                 // TODO required options ?

@@ -47,14 +47,14 @@ interface BundleChoiceInterface extends ResourceInterface
     /**
      * Returns the minimum quantity.
      *
-     * @return int
+     * @return float
      */
     public function getMinQuantity();
 
     /**
      * Sets the minimum quantity.
      *
-     * @param int $quantity
+     * @param float $quantity
      *
      * @return $this|BundleChoiceInterface
      */
@@ -63,14 +63,14 @@ interface BundleChoiceInterface extends ResourceInterface
     /**
      * Returns the maximum quantity.
      *
-     * @return int
+     * @return float
      */
     public function getMaxQuantity();
 
     /**
      * Sets the maximum quantity.
      *
-     * @param int $quantity
+     * @param float $quantity
      *
      * @return $this|BundleChoiceInterface
      */

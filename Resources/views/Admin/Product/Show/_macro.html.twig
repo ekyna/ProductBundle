@@ -80,7 +80,6 @@
 
 {% macro show_weight(product, options = {}) %}
 {% spaceless %}
-    {# TODO use IntlNumberFormatter #}
     {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
         'id': 'product_weight',
         'append': ' kg'
@@ -140,10 +139,8 @@
 
 {% macro show_net_price(product, options = {}) %}
 {% spaceless %}
-    {# TODO use IntlNumberFormatter #}
-    {{ show_row(product.netPrice, 'number', 'ekyna_product.product.field.net_price', {
+    {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', 'ekyna_product.product.field.net_price', {
         'id': 'product_netPrice',
-        'append': ' €'
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_net_price %}
@@ -361,14 +358,6 @@
             {% if product is bundle_product %}
                 <table class="table table-stripped table-condensed">
                     <tr>
-                        <td colspan="2" class="text-right">
-                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
-                        </td>
-                        <td class="text-right">
-                            {{ product|product_bundle_total_price|localizedcurrency('EUR') }}
-                        </td>
-                    </tr>
-                    <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
                         <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
                         <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
@@ -383,13 +372,21 @@
                             </a>
                         </td>
                         <td id="{{ slotId ~ 'minQuantity' }}" class="text-right">
-                            {{ choice.minQuantity }}
+                            {{ choice.minQuantity|localizednumber }}
                         </td>
                         <td id="{{ slotId ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {{ choice.product.netPrice|localizedcurrency(commerce_default_currency) }}
+                            {{ (choice.product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) }}
                         </td>
                     </tr>
                     {% endfor %}
+                    <tr>
+                        <td colspan="2" class="text-right">
+                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                        </td>
+                        <td class="text-right">
+                            {{ product|product_bundle_total_price|localizedcurrency(commerce_default_currency) }}
+                        </td>
+                    </tr>
                 </table>
             {% else %}
                 <p>
@@ -414,7 +411,7 @@
             {% if product is configurable_product %}
                 <p class="total">
                     <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
-                    <span>{{ product|product_configurable_total_price|localizedcurrency('EUR') }}</span>
+                    <span>{{ product|product_configurable_total_price|localizedcurrency(commerce_default_currency) }}</span>
                 </p>
                 {% for slot in product.bundleSlots %}
                 {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
@@ -464,7 +461,7 @@
                                 {{ choice.maxQuantity }}
                             </td>
                             <td id="{{ choiceId ~ 'product_netPrice' }}" class="text-right">
-                                {{ choice.product.netPrice|localizedcurrency('EUR') }}{# TODO currency #}
+                                {{ choice.product.netPrice|localizedcurrency(commerce_default_currency) }}
                             </td>
                         </tr>
                         <tr>

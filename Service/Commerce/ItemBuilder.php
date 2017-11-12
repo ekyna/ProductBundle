@@ -330,6 +330,8 @@ class ItemBuilder
     {
         $this->buildFromProduct($item, $bundleChoice->getProduct());
 
+        // TODO Use packaging format
+
         // Normalize quantity
         if ($item->getQuantity() < $bundleChoice->getMinQuantity()) {
             $item->setQuantity($bundleChoice->getMinQuantity());

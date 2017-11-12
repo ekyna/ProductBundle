@@ -28,12 +28,12 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $product;
 
     /**
-     * @var integer
+     * @var float
      */
     protected $minQuantity;
 
     /**
-     * @var integer
+     * @var float
      */
     protected $maxQuantity;
 
