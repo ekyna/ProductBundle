@@ -2,59 +2,52 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
-use Ekyna\Component\Commerce\Common\Repository\CurrencyRepositoryInterface;
 use Ekyna\Component\Commerce\Supplier\Model;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierOrderRepositoryInterface;
-use Ekyna\Component\Resource\Doctrine\ORM\Operator\ResourceOperator;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
+use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
 
 /**
  * Class Resupply
  * @package Ekyna\Bundle\ProductBundle\Service\Stock
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @TODO Move to commerce component
  */
 class Resupply
 {
     /**
      * @var SupplierOrderRepositoryInterface
      */
-    private $supplierOrderRepository;
+    private $orderRepository;
 
     /**
      * @var ResourceRepositoryInterface
      */
-    private $supplierOrderItemRepository;
+    private $itemRepository;
 
     /**
-     * @var CurrencyRepositoryInterface
+     * @var ResourceOperatorInterface
      */
-    private $currencyRepository;
-
-    /**
-     * @var ResourceOperator
-     */
-    private $supplierOrderManager;
+    private $orderOperator;
 
 
     /**
      * Constructor.
      *
-     * @param SupplierOrderRepositoryInterface $supplierOrderRepository
-     * @param ResourceRepositoryInterface      $supplierOrderItemRepository
-     * @param CurrencyRepositoryInterface      $currencyRepository
-     * @param ResourceOperator                 $supplierOrderManager
+     * @param SupplierOrderRepositoryInterface $orderRepository
+     * @param ResourceRepositoryInterface      $itemRepository
+     * @param ResourceOperatorInterface        $orderOperator
      */
     public function __construct(
-        SupplierOrderRepositoryInterface $supplierOrderRepository,
-        ResourceRepositoryInterface $supplierOrderItemRepository,
-        CurrencyRepositoryInterface      $currencyRepository,
-        ResourceOperator $supplierOrderManager
+        SupplierOrderRepositoryInterface $orderRepository,
+        ResourceRepositoryInterface $itemRepository,
+        ResourceOperatorInterface $orderOperator
     ) {
-        $this->supplierOrderRepository = $supplierOrderRepository;
-        $this->supplierOrderItemRepository = $supplierOrderItemRepository;
-        $this->currencyRepository = $currencyRepository;
-        $this->supplierOrderManager = $supplierOrderManager;
+        $this->orderRepository = $orderRepository;
+        $this->itemRepository = $itemRepository;
+        $this->orderOperator = $orderOperator;
     }
 
     /**
@@ -81,22 +74,21 @@ class Resupply
 
         if (null !== $supplierOrder) {
             $supplierOrderItem = $this
-                ->supplierOrderItemRepository
+                ->itemRepository
                 ->findOneBy([
                     'order'   => $supplierOrder,
                     'product' => $supplierProduct,
                 ]);
         } else {
             $supplier = $supplierProduct->getSupplier();
-            $supplierOrder = $this->supplierOrderRepository->createNew();
-            $supplierOrder
-                ->setCurrency($this->currencyRepository->findDefault())
-                ->setSupplier($supplier)
-                ->setCarrier($supplier->getCarrier());
+            $supplierOrder = $this->orderRepository->createNew();
+            $supplierOrder->setSupplier($supplier);
+
+            $this->orderOperator->initialize($supplierOrder);
         }
 
         if (null === $supplierOrderItem) {
-            $supplierOrderItem = $this->supplierOrderItemRepository->createNew();
+            $supplierOrderItem = $this->itemRepository->createNew();
             $supplierOrderItem
                 ->setProduct($supplierProduct)
                 ->setNetPrice($netPrice)
@@ -115,6 +107,6 @@ class Resupply
             }
         }
 
-        return $this->supplierOrderManager->persist($supplierOrder);
+        return $this->orderOperator->persist($supplierOrder);
     }
 }

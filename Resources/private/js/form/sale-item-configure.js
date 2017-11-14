@@ -887,21 +887,23 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 return;
             }
 
-            var that = this, lines = [], rules = [], trans = this.config.trans;
+            var that = this, quantity = this.quantity, lines = [], rules = [], trans = this.config.trans;
             if (this.parentItem) {
+                quantity *= this.parentItem.getQuantity();
                 trans = $.extend(trans, this.parentItem.getConfig().trans);
             }
 
             var data = {
                 detailed: false,
                 trans: trans,
+                quantity: quantity,
                 basePrice: this.basePrice.formatPrice(that.config.currency),
                 unitPrice: this.unitPrice.formatPrice(that.config.currency),
                 totalPrice: this.totalPrice.formatPrice(that.config.currency)
             };
 
             // Rules
-            if (that.activeRule) {
+            if (0 < this.config.rules.length) {
                 data.detailed = true;
                 $(this.config.rules).each(function (i, rule) {
                     var percent = parseFloat(rule.percent),
@@ -910,7 +912,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                         label: rule.label,
                         f_percent: rule.percent.toLocaleString() + '%',
                         f_price: price.formatPrice(that.config.currency),
-                        active: that.activeRule.id === rule.id
+                        active: that.activeRule && that.activeRule.id === rule.id
                     });
                 });
             }

@@ -38,7 +38,6 @@
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Resupply">
             <argument type="service" id="ekyna_commerce.supplier_order.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_order_item.repository"/>
-            <argument type="service" id="ekyna_commerce.currency.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_order.operator"/>
         </service>
         <service id="ekyna_product.inventory.form_type"

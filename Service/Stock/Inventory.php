@@ -26,6 +26,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * Class Inventory
  * @package Ekyna\Bundle\ProductBundle\Service\Stock
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @TODO Move to commerce component
  */
 class Inventory
 {
@@ -431,7 +433,10 @@ DQL;
 
         // Profile
         if (InventoryProfiles::TREATMENT === $context->getProfile()) {
-            $qb->andHaving($expr->lt('shipped', 'received'));
+            $qb->andHaving($expr->andX(
+                $expr->lt('shipped', 'received'),
+                $expr->lt('shipped', 'sold')
+            ));
         } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
             $qb->andHaving($expr->lt('ordered', 'sold'));
         }
