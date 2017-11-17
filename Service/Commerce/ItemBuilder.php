@@ -126,7 +126,12 @@ class ItemBuilder
             ->setReference($product->getReference())
             ->setNetPrice($product->getNetPrice())
             ->setWeight($product->getWeight())
-            ->setTaxGroup($product->getTaxGroup());
+            ->setTaxGroup($product->getTaxGroup())
+            ->setCompound(false)
+            ->setConfigurable(false)
+            ->setPrivate(!$product->isVisible());
+
+        $this->cleanUpBundleSlots($item, []);
     }
 
     /**
@@ -196,7 +201,10 @@ class ItemBuilder
         $item
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference())
-            ->setCompound(true);
+            ->setTaxGroup($product->getTaxGroup())
+            ->setCompound(true)
+            ->setConfigurable(false)
+            ->setPrivate(!$product->isVisible());
 
         // Filter bundle slots
         $bundlesSlots = $this->filter->getBundleSlots($product);
@@ -257,8 +265,10 @@ class ItemBuilder
         $item
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference())
+            ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
-            ->setConfigurable(true);
+            ->setConfigurable(true)
+            ->setPrivate(!$product->isVisible());
 
         // Filter bundle slots
         $bundlesSlots = $this->filter->getBundleSlots($product);
@@ -452,7 +462,8 @@ class ItemBuilder
                 ->setDesignation($designation)
                 ->setReference($option->getReference())
                 ->setWeight($option->getWeight())
-                ->setTaxGroup($option->getTaxGroup());
+                ->setTaxGroup($option->getTaxGroup())
+                /* TODO ->setPrivate(?)*/;
         }
 
         // Override item net price (from product) with option's net price if set
@@ -510,17 +521,41 @@ class ItemBuilder
     {
         $product = $this->provider->resolve($item);
 
-        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            $this->initializeFromVariant($item, $product);
-
-        } elseif ($product->getType() === ProductTypes::TYPE_VARIABLE) {
-            $this->initializeFromVariable($item, $product);
-
-        } elseif (in_array($product->getType(), [ProductTypes::TYPE_BUNDLE, ProductTypes::TYPE_CONFIGURABLE])) {
-            $this->initializeFromBundle($item, $product);
+        switch ($product->getType()) {
+            case ProductTypes::TYPE_SIMPLE:
+                $this->initializeFromSimple($item, $product);
+                break;
+            case ProductTypes::TYPE_VARIANT:
+                $this->initializeFromVariant($item, $product);
+                break;
+            case ProductTypes::TYPE_VARIABLE:
+                $this->initializeFromVariable($item, $product);
+                break;
+            case ProductTypes::TYPE_BUNDLE:
+            case ProductTypes::TYPE_CONFIGURABLE:
+                $this->initializeFromBundle($item, $product);
+                break;
+            default:
+                throw new Exception\InvalidArgumentException('Unexpected product type');
         }
 
         $this->initializeOptions($item);
+    }
+
+    /**
+     * Initializes the sale item from the given variable item.
+     *
+     * @param SaleItemInterface $item
+     * @param ProductInterface  $product
+     */
+    public function initializeFromSimple(SaleItemInterface $item, ProductInterface $product)
+    {
+        ProductTypes::assertChildType($product);
+
+        $item
+            ->setCompound(false)
+            ->setConfigurable(false)
+            ->setPrivate(!$product->isVisible());
     }
 
     /**
@@ -547,6 +582,8 @@ class ItemBuilder
         ProductTypes::assertVariant($product);
 
         $item->setData(static::VARIANT_ID, $product->getId());
+
+        $this->initializeFromSimple($item, $product);
     }
 
     /**
@@ -557,6 +594,13 @@ class ItemBuilder
      */
     public function initializeFromBundle(SaleItemInterface $item, ProductInterface $product)
     {
+        ProductTypes::assertBundled($product);
+
+        $item
+            ->setCompound(true)
+            ->setConfigurable($product->getType() === ProductTypes::TYPE_CONFIGURABLE)
+            ->setPrivate(!$product->isVisible());
+
         // Filter bundle slots
         $bundlesSlots = $this->filter->getBundleSlots($product);
 

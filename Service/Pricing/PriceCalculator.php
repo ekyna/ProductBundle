@@ -193,15 +193,23 @@ class PriceCalculator
             'rules'    => [],
         ];
 
-        if (!Model\ProductTypes::isBundled($product->getType())) {
-            if ($customer && $country) {
-                $pricing = $this->priceResolver->findPricing($product, $customer->getCustomerGroup(), $country);
-                if (isset($pricing['rules'])) {
-                    $data['rules'] = $pricing['rules'];
-                }
-            } elseif ($fallback) {
-                $data['rules'] = $this->getProductPricingRules($product);
+        /** @see \Ekyna\Component\Commerce\Common\Builder\AdjustmentBuilder::getSaleItemAdjustmentData() */
+        // Don't apply discounts to private items (they will inherit from parents)
+        if ($item->isPrivate()) {
+            return $data;
+        }
+        // Don't apply discount to parent with only public children
+        if ($item->isCompound() && !$item->hasPrivateChildren()) {
+            return $data;
+        }
+
+        if ($customer && $country) {
+            $pricing = $this->priceResolver->findPricing($product, $customer->getCustomerGroup(), $country);
+            if (isset($pricing['rules'])) {
+                $data['rules'] = $pricing['rules'];
             }
+        } elseif ($fallback) {
+            $data['rules'] = $this->getProductPricingRules($product);
         }
 
         return $data;

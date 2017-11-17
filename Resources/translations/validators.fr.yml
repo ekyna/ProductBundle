@@ -3,10 +3,20 @@ ekyna_product:
     bundle_choice:
         invalid_quantity_range: La quantité maximum doit être supérieure à la quantité minimum.
         rules_should_be_empty: La liste des règles doit être vide.
+        must_be_visible: Veuillez un choisir un produit 'visible'.
+        visibility_integrity: Ce produit est visible et ne peut pas composer un produit invisible.
+        tax_group_integrity: Le produit choisi doit avoir le même groupe de taxe.
         recursive_choice: Vous ne pouvez pas composer un produit avec lui-même.
     bundle_slot:
         too_many_choices: Un seul produit doit être configuré.
     product:
+        configurable_must_be_visible: Un pack configurable doit être visible.
+        bundle_must_be_visible: Un pack doit être visible s'il contient au moins un produit visible.
+        child_must_not_be_visible: >
+            Ce produit compose un pack (ou configurable) non visible et ne peut donc pas être visible.
+        parent_tax_group_integrity: >
+            Ce produit compose un pack (ou configurable) et doit utiliser
+            le même groupe de taxation ({{group}}) pour être non visible.
         slot_attribute_is_mandatory: Veuillez sélectionner un attribut pour le groupe "%group_name%".
         slot_has_too_many_attributes: Le groupe "%group_name%" ne peut avoir plus d'un attribut sélectionné.
         unexpected_attribute: L'attribut "%attribute_name%" ne correspond à aucun groupe du modèle d'attributs.

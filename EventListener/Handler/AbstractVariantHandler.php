@@ -82,18 +82,38 @@ abstract class AbstractVariantHandler extends AbstractHandler
     /**
      * Sets a variable product as not visible if it does not have variants.
      *
-     * @param ProductInterface $product
+     * @param ProductInterface $variable
      *
      * @return bool
      */
-    protected function checkVisibility(ProductInterface $product)
+    protected function checkVariableVisibility(ProductInterface $variable)
     {
-        if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
-            if ($product->isVisible() && (0 === $product->getVariants()->count())) {
-                $product->setVisible(false);
+        ProductTypes::assertVariable($variable);
 
-                return true;
-            }
+        if ($variable->isVisible() && (0 === $variable->getVariants()->count())) {
+            $variable->setVisible(false);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets a variant product as not visible its variable parent is not visible.
+     *
+     * @param ProductInterface $variant
+     *
+     * @return bool
+     */
+    protected function checkVariantVisibility(ProductInterface $variant)
+    {
+        ProductTypes::assertVariant($variant);
+
+        if (!$variant->getParent()->isVisible() && $variant->isVisible()) {
+            $variant->setVisible(false);
+
+            return true;
         }
 
         return false;

@@ -20,7 +20,7 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        $changed = $this->checkVisibility($variable);
+        $changed = $this->checkVariableVisibility($variable);
 
         $changed |= $this->getVariableUpdater()->updateMinPrice($variable);
 
@@ -48,8 +48,17 @@ class VariableHandler extends AbstractVariantHandler
                 }
             }
         }
+        if ($this->persistenceHelper->isChanged($variable, 'visible')) {
+            if (!$variable->isVisible()) {
+                foreach ($variable->getVariants() as $variant) {
+                    if ($this->checkVariantVisibility($variant)) {
+                        $this->persistenceHelper->persistAndRecompute($variant);
+                    }
+                }
+            }
+        }
 
-        return $this->checkVisibility($variable);
+        return $this->checkVariableVisibility($variable);
     }
 
     /**

@@ -57,6 +57,9 @@ class ResupplyType extends AbstractType
                     new NotBlank(),
                     new GreaterThanOrEqual(0),
                 ],
+                'attr' => [
+                    'class' => 'resupply-quantity',
+                ]
             ])
             ->add('netPrice', NumberType::class, [
                 'label'       => 'ekyna_commerce.supplier_product.field.net_price',
@@ -64,11 +67,17 @@ class ResupplyType extends AbstractType
                     new NotBlank(),
                     new GreaterThanOrEqual(0),
                 ],
+                'attr' => [
+                    'class' => 'resupply-net-price',
+                ]
             ])
             ->add('estimatedDateOfArrival', DateTimeType::class, [
                 'label'    => 'ekyna_commerce.field.eta',
                 'format'   => 'dd/MM/yyyy',
                 'required' => false,
+                'attr' => [
+                    'class' => 'resupply-eda',
+                ]
             ]);
     }
 

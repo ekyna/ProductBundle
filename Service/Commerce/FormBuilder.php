@@ -106,14 +106,13 @@ class FormBuilder
      *
      * @param FormInterface     $form
      * @param SaleItemInterface $item
-     * @param bool              $root
      */
-    public function buildItemForm(FormInterface $form, SaleItemInterface $item, $root = false)
+    public function buildItemForm(FormInterface $form, SaleItemInterface $item)
     {
         /** @var Model\ProductInterface $product */
         $product = $this->productProvider->resolve($item);
 
-        $this->buildProductForm($form, $product, $root = false);
+        $this->buildProductForm($form, $product);
 
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [ // TODO packaging
@@ -439,9 +438,8 @@ class FormBuilder
      *
      * @param FormInterface          $form
      * @param Model\ProductInterface $product
-     * @param bool                   $root
      */
-    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product, $root = false)
+    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product)
     {
         $repository = $this->productProvider->getRepository();
 

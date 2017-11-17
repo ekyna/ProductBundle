@@ -7,7 +7,6 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
-use Ekyna\Component\Commerce\Common\Event\SaleItemAdjustmentEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
 use Ekyna\Component\Commerce\Exception\SubjectException;
@@ -87,9 +86,9 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     /**
      * Sale item build event handler.
      *
-     * @param SaleItemAdjustmentEvent $event
+     * @param SaleItemEvent $event
      */
-    public function onSaleItemAdjustments(SaleItemAdjustmentEvent $event)
+    public function onSaleItemAdjustments(SaleItemEvent $event)
     {
         if (!$product = $this->getProductFromEvent($event)) {
             return;
@@ -167,7 +166,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         return [
             SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],
             SaleItemEvents::BUILD         => ['onSaleItemBuild'],
-            SaleItemEvents::ADJUSTMENTS   => ['onSaleItemAdjustments'],
+            SaleItemEvents::DISCOUNT      => ['onSaleItemAdjustments'],
             SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
             SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];

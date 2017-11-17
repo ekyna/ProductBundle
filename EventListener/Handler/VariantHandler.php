@@ -32,6 +32,9 @@ class VariantHandler extends AbstractVariantHandler
         // Set brand regarding to parent/variable if needed
         $changed |= $this->getVariantUpdater()->updateBrand($variant);
 
+        // Check variant visibility
+        $changed |= $this->checkVariantVisibility($variant);
+
         if (null !== $variable = $variant->getParent()) {
             if (null === $variant->getPosition()) {
                 $variant->setPosition(9999);
@@ -58,6 +61,9 @@ class VariantHandler extends AbstractVariantHandler
         // Generate attributes designation and title if needed
         $changed |= $this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant);
 
+        // Check variant visibility
+        $changed |= $this->checkVariantVisibility($variant);
+
         if (null !== $variable = $variant->getParent()) {
             if ($this->persistenceHelper->isChanged($variant, 'position')) {
                 $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
@@ -78,7 +84,7 @@ class VariantHandler extends AbstractVariantHandler
             if (!$this->persistenceHelper->isScheduledForRemove($variable)) {
                 $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
 
-                if ($this->checkVisibility($variable)) {
+                if ($this->checkVariableVisibility($variable)) {
                     $this->persistenceHelper->persistAndRecompute($variable);
                 }
             }

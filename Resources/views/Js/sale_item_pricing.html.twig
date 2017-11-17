@@ -54,10 +54,10 @@
         <span class="form-control">{{ totalPrice }}</span>
     {% endif %}
     </div>
-    {% if 1 < quantity or basePrice > unitPrice %}
+    {% if 1 < quantity or base > unit %}
     <div class="col-xs-12 sale-item-pricing-unit">
         Prix unit. HT
-        {% if basePrice > unitPrice %}
+        {% if base > unit %}
             <em style="text-decoration: line-through">{{ basePrice }}</em>
         {% endif %}
         {{ unitPrice }}

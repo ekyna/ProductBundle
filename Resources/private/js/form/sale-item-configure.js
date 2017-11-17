@@ -863,6 +863,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             basePrice += this.optionGroups.getPrice();
 
+
             unitPrice = basePrice;
             if (this.activeRule) {
                 unitPrice *= 1 - parseFloat(this.activeRule.percent) / 100;
@@ -897,6 +898,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 detailed: false,
                 trans: trans,
                 quantity: quantity,
+                base: this.basePrice,
+                unit: this.unitPrice,
                 basePrice: this.basePrice.formatPrice(that.config.currency),
                 unitPrice: this.unitPrice.formatPrice(that.config.currency),
                 totalPrice: this.totalPrice.formatPrice(that.config.currency)

@@ -49,6 +49,9 @@ class ResupplyProductType extends AbstractType
                 'label'    => $supplierProduct->getDesignation(),
                 'value'    => $supplierProduct->getId(),
                 'required' => true,
+                'attr' => [
+                    'data-price' => $supplierProduct->getNetPrice(),
+                ],
             ])
             ->add('supplierOrder', ResupplyOrdersType::class, [
                 'supplier_orders' => $supplierOrders,

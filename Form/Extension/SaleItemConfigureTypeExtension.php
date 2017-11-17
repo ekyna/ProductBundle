@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 
 /**
@@ -22,9 +23,9 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
     private $formBuilder;
 
     /**
-     * @var \Twig_Environment
+     * @var FormRendererInterface
      */
-    private $twig;
+    private $formRenderer;
 
     /**
      * @var string
@@ -35,17 +36,17 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
     /**
      * Constructor.
      *
-     * @param FormBuilder         $formBuilder
-     * @param \Twig_Environment   $twig
-     * @param string              $theme
+     * @param FormBuilder           $formBuilder
+     * @param FormRendererInterface $formRenderer
+     * @param string                $theme
      */
     public function __construct(
         FormBuilder $formBuilder,
-        \Twig_Environment $twig,
+        FormRendererInterface $formRenderer,
         $theme = 'EkynaProductBundle:Form:sale_item_configure.html.twig'
     ) {
         $this->formBuilder = $formBuilder;
-        $this->twig = $twig;
+        $this->formRenderer = $formRenderer;
         $this->theme = $theme;
     }
 
@@ -66,9 +67,7 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         }
 
         // Set the form theme
-        /** @var \Symfony\Bridge\Twig\Extension\FormExtension $extension */
-        $extension = $this->twig->getExtension('form');
-        $extension->renderer->setTheme($view, $this->theme);
+        $this->formRenderer->setTheme($view, $this->theme);
 
         $config = $this->formBuilder->getPricingConfig($item, !$options['admin_mode']);
 

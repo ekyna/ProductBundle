@@ -536,10 +536,6 @@
                 <option name="groups">
                     <value>simple</value>
                     <value>variable</value>
-                </option>
-            </constraint>
-            <constraint name="IsNull">
-                <option name="groups">
                     <!--
                     Set by persistence events handlers
                     <value>variant</value>
@@ -733,6 +729,17 @@
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
+        </constraint>
+
+        <!-- Product validation -->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Product">
+            <option name="groups">
+                <value>simple</value>
+                <value>variant</value>
+                <value>variable</value>
+                <value>bundle</value>
+                <value>configurable</value>
+            </option>
         </constraint>
 
         <!-- Bundle (or configurable) validation -->

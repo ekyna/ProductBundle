@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
@@ -120,18 +119,16 @@ class PriceResolver
         CustomerGroupInterface $group = null,
         CountryInterface $country = null
     ) {
-        if (!ProductTypes::isBundled($product->getType())) {
-            $pricing = $this->findPricing($product, $group, $country);
+        $pricing = $this->findPricing($product, $group, $country);
 
-            if (!empty($pricing)) {
-                foreach ($pricing['rules'] as $rule) {
-                    if ($rule['quantity'] <= $quantity) {
-                        return new AdjustmentData(
-                            AdjustmentModes::MODE_PERCENT,
-                            sprintf('%s %s%%', $pricing['designation'], $rule['percent']), // TODO translation / number_format
-                            $rule['percent']
-                        );
-                    }
+        if (!empty($pricing)) {
+            foreach ($pricing['rules'] as $rule) {
+                if ($rule['quantity'] <= $quantity) {
+                    return new AdjustmentData(
+                        AdjustmentModes::MODE_PERCENT,
+                        sprintf('%s %s%%', $pricing['designation'], $rule['percent']), // TODO translation / number_format
+                        $rule['percent']
+                    );
                 }
             }
         }

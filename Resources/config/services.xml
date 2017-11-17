@@ -209,7 +209,7 @@
         <service id="ekyna_product.sale_item_configure.type_extension"
                  class="Ekyna\Bundle\ProductBundle\Form\Extension\SaleItemConfigureTypeExtension">
             <argument type="service" id="ekyna_product.commerce.form_builder"/>
-            <argument type="service" id="twig"/>
+            <argument type="service" id="twig.form.renderer"/>
             <argument>%ekyna_product.default.sale_item_form_theme%</argument>
             <tag name="form.type_extension"
                  extended-type="Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemConfigureType"/>
@@ -409,6 +409,13 @@
             <argument type="service" id="request_stack"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="resource.event_subscriber"/>
+        </service>
+
+        <!-- Product constraint validator -->
+        <service id="ekyna_product.validator.product_validator"
+                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <tag name="validator.constraint_validator"/>
         </service>
 
         <!-- Variant constraint validator -->

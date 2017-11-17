@@ -44,6 +44,7 @@ class BundleChoiceType extends ResourceFormType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO only visible products for configurable
         $builder->add('product', ProductSearchType::class, [
             'types' => $options['configurable'] ? [
                 ProductTypes::TYPE_SIMPLE,

@@ -291,7 +291,7 @@ class ProductTypes extends AbstractConstants
      */
     static private function assertType(ProductInterface $product, $type)
     {
-        if (!($product->getType() === $type)) {
+        if ($product->getType() !== $type) {
             throw new InvalidArgumentException("Expected product of type '$type'.");
         }
     }
