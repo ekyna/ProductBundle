@@ -12,7 +12,7 @@
     <td class="text-right">{{ available_stock }}</td>
     <td class="text-right">{{ virtual_stock }}</td>
     <td class="text-right">{{ eda }}</td>
-    <td class="text-right">{{ ordered }}{% if 0 < pending %} (+{{ pending }}){% endif %}</td>
+    <td class="text-right">{{ ordered }}{% if pending is not empty %} (+{{ pending }}){% endif %}</td>
     <td class="text-right">{{ received }}</td>
     <td class="text-right{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
     <td class="text-right">{{ shipped }}</td>

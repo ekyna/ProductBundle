@@ -86,6 +86,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addCustomerGroupsField()
             ->addReleasedAtField()
@@ -117,6 +118,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
@@ -164,6 +166,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 ],
             ])
             ->addVisibleField()
+            ->addQuoteOnlyField()
             ->addCustomerGroupsField()
             ->addReleasedAtField()
             ->addReferenceField()
@@ -205,6 +208,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([
@@ -248,6 +252,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField([

@@ -254,6 +254,7 @@ ekyna_product:
             geocode: Geocode
             released_at: Date de sortie
             delivery_time: Délai de livraison
+            quote_only: Sur devis uniquement
         alert:
             no_item: Aucun produit configuré
             supplier_product_exists: >

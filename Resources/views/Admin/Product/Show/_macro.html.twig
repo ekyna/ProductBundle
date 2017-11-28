@@ -16,6 +16,15 @@
 {% endmacro show_visible %}
 
 
+{% macro show_quoteOnly(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.quoteOnly, 'checkbox', 'ekyna_product.product.field.quote_only', {
+        'id': 'product_quoteOnly'
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_quoteOnly %}
+
+
 {% macro show_brand(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
@@ -351,48 +360,56 @@
 {% spaceless %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_product.bundle_slot.label.plural'|trans }}
+            {{- 'ekyna_product.bundle_slot.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-sm">
-            {% if product is bundle_product %}
+            {%- if product is bundle_product -%}
                 <table class="table table-stripped table-condensed">
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.visible'|trans }}</th>
                         <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
                         <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                     </tr>
-                    {% for slot in product.bundleSlots %}
-                    {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
+                    {%- for slot in product.bundleSlots -%}
+                    {%- set slotId = 'product_slots_' ~ loop.index0 ~ '_' -%}
                     <tr>
                         <td id="{{ slotId ~ 'choice_0_product' }}">
-                            {% set choice = (slot.choices|first) %}
+                            {%- set choice = (slot.choices|first) -%}
                             <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
-                                {{ choice.product }}
+                                {{- choice.product -}}
                             </a>
                         </td>
+                        <td id="{{ slotId ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                            {%- if choice.product.visible -%}
+                                <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- endif -%}
+                        </td>
                         <td id="{{ slotId ~ 'minQuantity' }}" class="text-right">
-                            {{ choice.minQuantity|localizednumber }}
+                            {{- choice.minQuantity|localizednumber -}}
                         </td>
                         <td id="{{ slotId ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {{ (choice.product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) }}
+                            {{- (choice.product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
                     {% endfor %}
                     <tr>
-                        <td colspan="2" class="text-right">
+                        <td colspan="3" class="text-right">
                             <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
                         </td>
                         <td class="text-right">
-                            {{ product|product_bundle_total_price|localizedcurrency(commerce_default_currency) }}
+                            {{- product|product_bundle_total_price|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
                 </table>
-            {% else %}
+            {%- else -%}
                 <p>
                     <em>Wrong product type</em>
                 </p>
-            {% endif %}
+            {%- endif -%}
             </div>
         </div>
     </div>
@@ -442,6 +459,7 @@
                     <table class="table table-stripped table-condensed">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                            <th>{{ 'ekyna_core.field.visible'|trans }}</th>
                             <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
                             <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
                             <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
@@ -454,6 +472,13 @@
                                     {{ choice.product }}
                                 </a>
                             </td>
+                            <td id="{{ choiceId ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                                {%- if choice.product.visible -%}
+                                    <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                                {%- else -%}
+                                    <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                                {%- endif -%}
+                            </td>
                             <td id="{{ choiceId ~ 'minQuantity' }}" class="text-right">
                                 {{ choice.minQuantity }}
                             </td>
@@ -465,7 +490,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="4" class="choice-rules">
+                            <td colspan="5" class="choice-rules">
                                 <em>[TODO] Choice rules</em> {# TODO rules #}
                             </td>
                         </tr>

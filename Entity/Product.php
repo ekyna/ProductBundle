@@ -113,6 +113,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $visible;
 
     /**
+     * @var bool
+     */
+    protected $quoteOnly;
+
+    /**
      * @var string
      */
     protected $reference;
@@ -133,7 +138,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $weight = 0;
 
     /**
-     * (Variant ordering)
+     * (Variant sorting)
      *
      * @var int
      */
@@ -934,9 +939,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
-     * Returns the visible.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isVisible()
     {
@@ -944,15 +947,29 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return Product
+     * @inheritdoc
      */
     public function setVisible($visible)
     {
         $this->visible = (bool)$visible;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isQuoteOnly()
+    {
+        return $this->quoteOnly;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setQuoteOnly($quoteOnly)
+    {
+        $this->quoteOnly = (bool)$quoteOnly;
 
         return $this;
     }

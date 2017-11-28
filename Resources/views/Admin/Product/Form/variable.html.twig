@@ -3,16 +3,17 @@
 
 {% block general_content %}
     {{ parent() }}
+    {{ form_row(form.categories) }}
+    {{ form_row(form.brand) }}
     <div class="row">
-        <div class="col-md-8">
-            {{ form_row(form.brand, {'label_col': 3, 'widget_col': 9}) }}
+        <div class="col-md-6">
+            {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
         </div>
-        <div class="col-md-4">
-            {{ form_row(form.visible, {'label_col': 6, 'widget_col': 6}) }}
+        <div class="col-md-6">
+            {{ form_row(form.quoteOnly, {'label_col': 4, 'widget_col': 8}) }}
         </div>
     </div>
-    {{ form_row(form.categories) }}
-    {{ form_row(form.translations) }}
     {{ form_row(form.attributeSet) }}
+    {{ form_row(form.translations) }}
     {{ form_row(form.medias) }}
 {% endblock general_content %}

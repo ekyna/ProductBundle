@@ -6,17 +6,14 @@
 
 
 {% block general_content %}
+    {{ parent() }}
+    {{ macros.show_variable(product) }}
     <div class="row">
-        <div class="col-md-8">
-            {{ macros.show_designation(product, {'label_nb_col': 3, 'widget_nb_col': 9}) }}
-        </div>
         <div class="col-md-4">
             {{ macros.show_visible(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-8">
-            {{ macros.show_variable(product, {'label_nb_col': 3, 'widget_nb_col': 9}) }}
+        <div class="col-md-4">
+            {{ macros.show_quoteOnly(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}
         </div>
         <div class="col-md-4">
             {{ macros.show_released_at(product, {'label_nb_col': 6, 'widget_nb_col': 6}) }}

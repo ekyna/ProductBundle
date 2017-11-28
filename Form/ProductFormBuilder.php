@@ -376,6 +376,28 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the quote only field.
+     *
+     * @param array $options
+     *
+     * @return ProductFormBuilder
+     */
+    public function addQuoteOnlyField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.quote_only',
+            'required' => false,
+            'attr'     => [
+                'align_with_widget' => true,
+            ],
+        ], $options);
+
+        $this->form->add('quoteOnly', SF\CheckboxType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the reference field.
      *
      * @param array $options

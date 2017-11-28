@@ -3,15 +3,17 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use Doctrine\ORM\QueryBuilder;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates as BStockStates;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType;
 use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Component\Commerce\Common\View\Formatter;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -95,19 +97,9 @@ DQL;
     private $stockUnitClass;
 
     /**
-     * @var \NumberFormatter
+     * @var Formatter
      */
-    private $numberFormatter;
-
-    /**
-     * @var \NumberFormatter
-     */
-    private $currencyFormatter;
-
-    /**
-     * @var string
-     */
-    private $defaultCurrency;
+    private $formatter;
 
     /**
      * @var array
@@ -160,16 +152,8 @@ DQL;
 
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
-        $this->defaultCurrency = $defaultCurrency;
 
-        $this->numberFormatter = \NumberFormatter::create(
-            $localeProvider->getCurrentLocale(),
-            \NumberFormatter::DECIMAL
-        );
-        $this->currencyFormatter = \NumberFormatter::create(
-            $localeProvider->getCurrentLocale(),
-            \NumberFormatter::CURRENCY
-        );
+        $this->formatter = new Formatter($localeProvider->getCurrentLocale(), $defaultCurrency);
     }
 
     /**
@@ -274,18 +258,16 @@ DQL;
             ]);
 
             // Format price
-            $product['net_price'] = $this
-                ->currencyFormatter
-                ->formatCurrency($product['net_price'], $this->defaultCurrency);
+            $product['net_price'] = $this->formatter->currency($product['net_price']);
 
             // Format weight
-            $product['weight'] = $this->numberFormatter->format($product['weight']) . '&nbsp;Kg'; // TODO packaging format
+            $product['weight'] = $this->formatter->number($product['weight']) . '&nbsp;Kg'; // TODO packaging format
 
             // Format stock
-            $product['stock_floor'] = $this->numberFormatter->format($product['stock_floor']);
-            $product['in_stock'] = $this->numberFormatter->format($product['in_stock']);
-            $product['available_stock'] = $this->numberFormatter->format($product['available_stock']);
-            $product['virtual_stock'] = $this->numberFormatter->format($product['virtual_stock']);
+            $product['stock_floor'] = $this->formatter->number($product['stock_floor']);
+            $product['in_stock'] = $this->formatter->number($product['in_stock']);
+            $product['available_stock'] = $this->formatter->number($product['available_stock']);
+            $product['virtual_stock'] = $this->formatter->number($product['virtual_stock']);
 
             // Eda
             /** @var \DateTime $eda */
@@ -294,11 +276,11 @@ DQL;
             }
 
             // Stock sums
-            $product['pending'] = $this->numberFormatter->format($product['pending']);
-            $product['ordered'] = $this->numberFormatter->format($product['ordered']);
-            $product['received'] = $this->numberFormatter->format($product['received']);
-            $product['sold'] = $this->numberFormatter->format($product['sold']);
-            $product['shipped'] = $this->numberFormatter->format($product['shipped']);
+            $product['pending'] = 0 < $product['pending'] ? $this->formatter->number($product['pending']) : '';
+            $product['ordered'] = $this->formatter->number($product['ordered']);
+            $product['received'] = $this->formatter->number($product['received']);
+            $product['sold'] = $this->formatter->number($product['sold']);
+            $product['shipped'] = $this->formatter->number($product['shipped']);
 
             // Stock themes
             $product['sold_theme'] = '';
@@ -324,6 +306,8 @@ DQL;
 
         return $products;
     }
+
+
 
     /**
      * Returns the products query builder.
@@ -420,15 +404,15 @@ DQL;
         // Mode filter
         if (0 < strlen($mode = $context->getMode())) {
             $qb
-                ->andWhere($expr->like('p.stockMode', ':mode'))
-                ->setParameter('mode', '%' . $mode . '%');
+                ->andWhere($expr->eq('p.stockMode', ':mode'))
+                ->setParameter('mode', $mode);
         }
 
         // State filter
         if (0 < strlen($state = $context->getState())) {
             $qb
-                ->andWhere($expr->like('p.stockState', ':state'))
-                ->setParameter('state', '%' . $state . '%');
+                ->andWhere($expr->eq('p.stockState', ':state'))
+                ->setParameter('state', $state);
         }
 
         // Profile
@@ -438,7 +422,10 @@ DQL;
                 $expr->lt('shipped', 'sold')
             ));
         } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
-            $qb->andHaving($expr->lt('ordered', 'sold'));
+            $qb
+                ->andWhere($expr->neq('p.stockMode', ':not_mode'))
+                ->setParameter('not_mode', CStockModes::MODE_DISABLED)
+                ->andHaving($expr->lt('ordered', 'sold'));
         }
 
         // Sorting
@@ -519,14 +506,14 @@ DQL;
             'stock_states' => [],
         ];
 
-        foreach (StockSubjectModes::getConfig() as $mode => $c) {
+        foreach (BStockModes::getConfig() as $mode => $c) {
             $config['stock_modes'][$mode] = [
                 'label' => $this->translator->trans($c[0]),
                 'theme' => $c[1],
             ];
         }
 
-        foreach (StockSubjectStates::getConfig() as $state => $c) {
+        foreach (BStockStates::getConfig() as $state => $c) {
             $config['stock_states'][$state] = [
                 'label' => $this->translator->trans($c[0]),
                 'theme' => $c[1],
