@@ -258,16 +258,16 @@ DQL;
             ]);
 
             // Format price
-            $product['net_price'] = $this->formatter->currency($product['net_price']);
+            $product['net_price'] = $this->formatter->currency((float)$product['net_price']);
 
             // Format weight
-            $product['weight'] = $this->formatter->number($product['weight']) . '&nbsp;Kg'; // TODO packaging format
+            $product['weight'] = $this->formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
 
             // Format stock
-            $product['stock_floor'] = $this->formatter->number($product['stock_floor']);
-            $product['in_stock'] = $this->formatter->number($product['in_stock']);
-            $product['available_stock'] = $this->formatter->number($product['available_stock']);
-            $product['virtual_stock'] = $this->formatter->number($product['virtual_stock']);
+            $product['stock_floor'] = $this->formatter->number((float)$product['stock_floor']);
+            $product['in_stock'] = $this->formatter->number((float)$product['in_stock']);
+            $product['available_stock'] = $this->formatter->number((float)$product['available_stock']);
+            $product['virtual_stock'] = $this->formatter->number((float)$product['virtual_stock']);
 
             // Eda
             /** @var \DateTime $eda */
@@ -276,11 +276,11 @@ DQL;
             }
 
             // Stock sums
-            $product['pending'] = 0 < $product['pending'] ? $this->formatter->number($product['pending']) : '';
-            $product['ordered'] = $this->formatter->number($product['ordered']);
-            $product['received'] = $this->formatter->number($product['received']);
-            $product['sold'] = $this->formatter->number($product['sold']);
-            $product['shipped'] = $this->formatter->number($product['shipped']);
+            $product['pending'] = 0 < $product['pending'] ? $this->formatter->number((float)$product['pending']) : '';
+            $product['ordered'] = $this->formatter->number((float)$product['ordered']);
+            $product['received'] = $this->formatter->number((float)$product['received']);
+            $product['sold'] = $this->formatter->number((float)$product['sold']);
+            $product['shipped'] = $this->formatter->number((float)$product['shipped']);
 
             // Stock themes
             $product['sold_theme'] = '';

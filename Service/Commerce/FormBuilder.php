@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
@@ -116,13 +117,13 @@ class FormBuilder
 
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [ // TODO packaging
-            'label'       => 'ekyna_core.field.quantity',
-            'constraints' => [
-                new Assert\GreaterThanOrEqual(1),
-            ],
-            'attr'        => [
+            'label' => 'ekyna_core.field.quantity',
+            /*'constraints' => [
+                new Assert\GreaterThanOrEqual($product->getMinimumOrderQuantity()),
+            ],*/
+            'attr'  => [
                 'class' => 'sale-item-quantity',
-                'min'   => $product->getMinimumOrderQuantity(),
+                //'min'   => $product->getMinimumOrderQuantity(),
             ],
         ]);
     }
@@ -258,6 +259,11 @@ class FormBuilder
                 'image'  => $this->getProductImagePath($variant, 'media_front'),
                 'min'    => $variant->getMinimumOrderQuantity(),
             ];
+
+            // TODO if root item
+            $config['quote_only'] = $variant->isQuoteOnly();
+            $config['out_of_stock'] = $variant->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK;
+            $config['min_order_quantity'] = $variant->getMinimumOrderQuantity();
 
             return [
                 'data-config' => json_encode($config),
@@ -492,12 +498,15 @@ class FormBuilder
     public function getTranslations()
     {
         return [
-            'quantity'    => $this->translate('ekyna_core.field.quantity'),
-            'discount'    => $this->translate('ekyna_product.sale_item_configure.discount'),
-            'unit_price'  => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
-            'total'       => $this->translate('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'  => $this->translate('ekyna_product.sale_item_configure.rule_table'),
-            'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
+            'quantity'           => $this->translate('ekyna_core.field.quantity'),
+            'discount'           => $this->translate('ekyna_product.sale_item_configure.discount'),
+            'unit_price'         => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
+            'total'              => $this->translate('ekyna_product.sale_item_configure.total_price'),
+            'rule_table'         => $this->translate('ekyna_product.sale_item_configure.rule_table'),
+            'price_table'        => $this->translate('ekyna_product.sale_item_configure.price_table'),
+            'quote_only'         => $this->translate('ekyna_product.sale_item_configure.error.quote_only'),
+            'out_of_stock'       => $this->translate('ekyna_product.sale_item_configure.error.out_of_stock'),
+            'min_order_quantity' => $this->translate('ekyna_product.sale_item_configure.error.min_order_quantity'),
         ];
     }
 

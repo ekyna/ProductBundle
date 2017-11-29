@@ -293,7 +293,10 @@ ekyna_product:
             title: Ignorer cet article
             description: >
                 <p>Je ne souhaite pas sélectionner d'article.</p>
-
+        error:
+            quote_only: Cet article n'est disponible que sur devis.
+            out_of_stock: Cet article est en rupture de stock.
+            min_order_quantity: "La quantité minimum d'achat est de {{min}}."
     variant:
         label:
             singular: Variante

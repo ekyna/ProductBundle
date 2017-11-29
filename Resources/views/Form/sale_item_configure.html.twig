@@ -192,11 +192,17 @@
         </div>{# End .row #}
         {%- endif -%}
 
+        {{- form_errors(form) -}}
+
+        <div class="submit-message text-center"></div>
+
         {%- if form.submit is defined -%}
         <p class="text-center">
             {{- form_widget(form.submit) -}}
         </p>
         {%- endif %}
     </div>{# End .sale-item-inner #}
+
+    {{- form_rest(form) -}}
 {% endspaceless %}
 {% endblock sale_item_configure_widget %}

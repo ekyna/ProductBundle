@@ -521,17 +521,18 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
     $.extend(Variant.prototype, {
         init: function () {
             // Image
-            this.$image = this.item.$gallery.find('> a');
-            if (1 === this.$image.size()) {
-                // Default href and title
-                this.$image
-                    .data('href', this.$image.attr('href'))
-                    .data('title', this.$image.attr('title'));
-                // Default src
-                var $img = this.$image.find('img');
-                $img.data('src', $img.attr('src'));
-            } else {
-                this.$image = undefined;
+            this.$image = undefined;
+            if (this.item.$gallery) {
+                this.$image = this.item.$gallery.find('> a');
+                if (1 === this.$image.size()) {
+                    // Default href and title
+                    this.$image
+                        .data('href', this.$image.attr('href'))
+                        .data('title', this.$image.attr('title'));
+                    // Default src
+                    var $img = this.$image.find('img');
+                    $img.data('src', $img.attr('src'));
+                }
             }
 
             this.selectVariant();
@@ -556,8 +557,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         selectVariant: function () {
             this.$variant = undefined;
-            this.variant = {
-                label: '',
+            this.config = {
+                label: null,
+                thumb: null,
+                out_of_stock: false,
+                quote_only: false,
+                min_order_quantity: 1,
                 price: 0,
                 groups: []
             };
@@ -565,15 +570,15 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             var $variant = this.$element.find('option[value="' + this.$element.val() + '"]');
             if (1 === $variant.size() && $variant.data('config')) {
                 this.$variant = $variant;
-                this.variant = $.extend(this.variant, $variant.data('config'), {
+                this.config = $.extend(this.config, $variant.data('config'), {
                     label: $variant.text()
                 });
-                if (this.$image && this.variant.thumb) {
+                if (this.$image && this.config.thumb) {
                     this.$image
-                        .attr('href', this.variant.image)
-                        .attr('title', this.variant.label)
+                        .attr('href', this.config.image)
+                        .attr('title', this.config.label)
                         .find('img')
-                        .attr('src', this.variant.thumb);
+                        .attr('src', this.config.thumb);
 
                     return;
                 }
@@ -593,16 +598,20 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return undefined !== this.$variant;
         },
 
+        getConfig: function () {
+            return this.config;
+        },
+
         getPrice: function () {
-            return roundPrice(this.variant.price);
+            return roundPrice(this.config.price);
         },
 
         getLabel: function () {
-            return this.variant.label;
+            return this.config.label;
         },
 
         getOptionGroups: function () {
-            return this.variant.groups;
+            return this.config.groups;
         }
     });
 
@@ -629,12 +638,14 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.id = this.$element.attr('id');
 
             this.config = $.extend({
+                out_of_stock: false,
+                quote_only: false,
+                min_order_quantity: 1,
                 price: 0,
                 currency: 'EUR',
                 rules: [],
                 trans: {}
             }, this.$element.data('config'));
-
 
             // Images
             this.$gallery = undefined;
@@ -687,6 +698,20 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 });
             }
             this.bundleSlots = bundleSlots;
+
+            // Submit button
+            this.$submitButton = this.$submitMessage = undefined;
+            if (!this.parentItem) {
+                this.$submitButton = this.$element.find('button[type=submit]');
+                if (0 === this.$submitButton.size()) {
+                    this.$submitButton = this.$element.closest('.modal-content').find('.bootstrap-dialog-footer button#submit');
+                }
+                if (0 === this.$submitButton.size()) {
+                    throw 'Submit button not found';
+                } else {
+                    this.$submitMessage = this.$element.find('.submit-message');
+                }
+            }
 
             this.bindEvents();
             this.onChange();
@@ -790,6 +815,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         onChildChange: function () {
             this.calculatePrices();
             this.updatePricing();
+            this.updateControls();
         },
 
         updateParentQuantity: function () {
@@ -818,6 +844,43 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.resolveActiveRule();
             this.calculatePrices();
             this.updatePricing();
+            this.updateControls();
+        },
+
+        updateControls: function () {
+            if (!this.$submitButton) {
+                return;
+            }
+
+            var config = this.config;
+            if (this.variant && this.variant.hasVariant()) {
+                config = this.variant.getConfig();
+            }
+
+            var disableQuantity = false,
+                disableSubmit = false,
+                message = '';
+
+            this.$quantity.closest('.form-group').removeClass('has-error');
+            if (config.quote_only) {
+                disableSubmit = disableQuantity = true;
+                message = this.config.trans.quote_only;
+            } else if (config.out_of_stock) {
+                disableSubmit = disableQuantity = true;
+                message = this.config.trans.out_of_stock;
+            } else if (this.quantity < parseFloat(config.min_order_quantity)) {
+                this.$quantity.closest('.form-group').addClass('has-error');
+                disableSubmit = true;
+                message = this.config.trans.min_order_quantity.replace('{{min}}', config.min_order_quantity);
+            }
+
+            this.$quantity.prop('disabled', disableQuantity);
+            this.$submitButton.prop('disabled', disableSubmit);
+
+            this.$submitMessage.empty();
+            if (0 < message.length) {
+                this.$submitMessage.append($('<div class="alert alert-warning"></div>').html(message));
+            }
         },
 
         resolveActiveRule: function () {
@@ -1000,7 +1063,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         });
     };
 
-    $('.sale-item-configure .item-gallery').on('click', 'a', function (e) {
+    $(document).on('click', '.sale-item-configure .item-gallery a', function (e) {
         e.preventDefault();
         e.stopPropagation();
 

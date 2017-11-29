@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Extension;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Sale\SaleItemConfigureType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRendererInterface;
@@ -70,6 +71,13 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         $this->formRenderer->setTheme($view, $this->theme);
 
         $config = $this->formBuilder->getPricingConfig($item, !$options['admin_mode']);
+
+        // Root item
+        if (!$options['admin_mode'] && null === $item->getParent()) {
+            $config['quote_only'] = $subject->isQuoteOnly();
+            $config['out_of_stock'] = $subject->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK;
+            $config['min_order_quantity'] = $subject->getMinimumOrderQuantity();
+        }
 
         $config['trans'] = $this->formBuilder->getTranslations();
 

@@ -74,7 +74,7 @@ class ProductValidator extends ConstraintValidator
             }
         }
 
-        if ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+        if (null === $product->getId() || $product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             return;
         }
 
