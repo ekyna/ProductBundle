@@ -73,10 +73,11 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         $config = $this->formBuilder->getPricingConfig($item, !$options['admin_mode']);
 
         // Root item
-        if (!$options['admin_mode'] && null === $item->getParent()) {
+        if (null === $item->getParent()) {
             $config['quote_only'] = $subject->isQuoteOnly();
             $config['out_of_stock'] = $subject->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK;
             $config['min_order_quantity'] = $subject->getMinimumOrderQuantity();
+            $config['privileged'] = $options['admin_mode'];
         }
 
         $config['trans'] = $this->formBuilder->getTranslations();

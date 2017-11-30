@@ -118,12 +118,8 @@ class FormBuilder
         // Quantity
         $form->add('quantity', Sf\IntegerType::class, [ // TODO packaging
             'label' => 'ekyna_core.field.quantity',
-            /*'constraints' => [
-                new Assert\GreaterThanOrEqual($product->getMinimumOrderQuantity()),
-            ],*/
             'attr'  => [
                 'class' => 'sale-item-quantity',
-                //'min'   => $product->getMinimumOrderQuantity(),
             ],
         ]);
     }

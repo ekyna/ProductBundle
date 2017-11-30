@@ -641,6 +641,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 out_of_stock: false,
                 quote_only: false,
                 min_order_quantity: 1,
+                privileged: false,
                 price: 0,
                 currency: 'EUR',
                 rules: [],
@@ -874,8 +875,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 message = this.config.trans.min_order_quantity.replace('{{min}}', config.min_order_quantity);
             }
 
-            this.$quantity.prop('disabled', disableQuantity);
-            this.$submitButton.prop('disabled', disableSubmit);
+            if (!this.config.privileged) {
+                this.$quantity.prop('disabled', disableQuantity);
+                this.$submitButton.prop('disabled', disableSubmit);
+            }
 
             this.$submitMessage.empty();
             if (0 < message.length) {
