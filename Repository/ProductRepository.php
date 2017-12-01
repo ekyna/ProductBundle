@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
@@ -187,6 +188,25 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getQuery()
             //->useQueryCache(true)
             ->setParameter('product', $product)
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findOutOfStockProducts($mode)
+    {
+        StockSubjectModes::isValid($mode, true);
+
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->andWhere($qb->expr()->in('p.type', ':types'))
+            ->andWhere($qb->expr()->eq('p.stockMode', ':mode'))
+            ->andWhere($qb->expr()->lt('p.virtualStock', 'p.stockFloor'))
+            ->getQuery()
+            ->setParameter('mode', $mode)
+            ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
             ->getResult();
     }
 

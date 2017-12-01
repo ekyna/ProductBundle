@@ -4,6 +4,10 @@ ekyna_product:
 
     #common: TODO group translations (like visible)
 
+    email:
+        stock_report:
+            title: Rapport de stock [%mode%]
+
     attribute:
         label:
             singular: Attribut

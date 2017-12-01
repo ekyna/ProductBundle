@@ -71,6 +71,15 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false);
 
     /**
+     * Finds the "out of stock" products for the given mode.
+     *
+     * @param string $mode
+     *
+     * @return array|Model\ProductInterface[]
+     */
+    public function findOutOfStockProducts($mode);
+
+    /**
      * Loads the product's medias.
      *
      * @param Model\ProductInterface $product

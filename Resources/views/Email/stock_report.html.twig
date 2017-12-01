@@ -1,0 +1,87 @@
+{% extends "email.html.twig" %}
+
+{% block stylesheets %}
+<style type="text/css">
+    table { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    td, th { font-size: 13px; padding: 2px 4px; border-top: 1px solid #ddd; border-left: 1px solid #ddd; }
+</style>
+{% endblock stylesheets %}
+
+{% block width %}1200{% endblock %}
+
+{% block subject %}{{ title }}{% endblock subject %}
+
+{% block body %}
+{% spaceless %}
+<table border="0" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                {{- 'ekyna_core.field.designation'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_core.field.reference'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_product.product.field.geocode'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_core.field.status'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_commerce.stock_subject.field.in_stock'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_commerce.stock_subject.field.available_stock'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_commerce.stock_subject.field.virtual_stock'|trans -}}
+            </th>
+            <th>
+                {{- 'ekyna_commerce.stock_subject.field.estimated_date_of_arrival'|trans -}}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products -%}
+        <tr>
+            <td>
+                <a href="{{ path('ekyna_product_product_admin_show', {'productId': product.id}) }}">
+                    {{- product.getFullTitle(true) -}}
+                </a>
+            </td>
+            <td>
+                {{- product.reference -}}
+            </td>
+            <td>
+                {{- product.geocode -}}
+            </td>
+            <td>
+                {{- product|stock_subject_state_label -}}
+            </td>
+            <td>
+                {{- product.stockFloor|localizednumber -}}
+            </td>
+            <td>
+                {{- product.inStock|localizednumber -}}
+            </td>
+            <td>
+                {{- product.availableStock|localizednumber -}}
+            </td>
+            <td>
+                {{- product.virtualStock|localizednumber -}}
+            </td>
+            <td>
+                {%- if product.estimatedDateOfArrival is not empty -%}
+                    {{ product.estimatedDateOfArrival|localizeddate('short', 'none') }}
+                {%- endif -%}
+            </td>
+        </tr>
+        {%- endfor %}
+    </tbody>
+</table>
+{% endspaceless %}
+{% endblock %}

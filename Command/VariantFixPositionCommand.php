@@ -11,11 +11,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class FixVariantPositionCommand
+ * Class VariantFixPositionCommand
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class FixVariantPositionCommand extends ContainerAwareCommand
+class VariantFixPositionCommand extends ContainerAwareCommand
 {
     /**
      * @inheritDoc
@@ -23,7 +23,7 @@ class FixVariantPositionCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:fix_variant_position')
+            ->setName('ekyna:product:variant:fix__position')
             ->setDescription('Fixes the variants positions')
             ->addArgument('variableId', InputArgument::OPTIONAL, 'The variable product identifier which variants will be fixed.');
     }

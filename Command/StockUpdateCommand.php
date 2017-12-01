@@ -7,11 +7,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class UpdateStockCommand
+ * Class StockUpdateCommand
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class UpdateStockCommand extends AbstractStockCommand
+class StockUpdateCommand extends AbstractStockCommand
 {
     /**
      * @inheritDoc
@@ -19,7 +19,7 @@ class UpdateStockCommand extends AbstractStockCommand
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:update_stock')
+            ->setName('ekyna:product:stock:update')
             ->setDescription("Updates the product stock.")
             ->addArgument('id', InputArgument::REQUIRED, "The product's id to update.");
     }
