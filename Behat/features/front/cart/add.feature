@@ -17,6 +17,7 @@ Feature: Add product to cart
         Given The following products:
             | type | designation | reference | netPrice | weight |
             | simple | Dummy A   | DUM-001   | 33.325   | 0.150  |
+        And The product with reference "DUM-001" is in stock for "100" quantity
         When I go to "ekyna_product_front_product_detail" route with "productId:1"
         And I press "sale_item_configure[submit]"
         Then I should see "Cet article a bien été ajouté à votre panier"

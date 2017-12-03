@@ -64,6 +64,7 @@ class ProductContext implements Context, KernelAwareContext
                 ->setBrand($brand)
                 ->addCategory($category)
                 ->setTaxGroup($taxGroup)
+                ->setVisible(true)
                 ->translate()
                     ->setTitle($hash['designation']);
 
@@ -71,5 +72,22 @@ class ProductContext implements Context, KernelAwareContext
         }
 
         return $products;
+    }
+
+    /**
+     * @Given /^The product with reference "(?P<reference>[^"]+)" is in stock for "(?P<quantity>[^"]+)" quantity$/
+     *
+     * @param string    $reference
+     * @param int $quantity
+     */
+    public function productIsInStock($reference, $quantity)
+    {
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $this
+            ->getContainer()
+            ->get('ekyna_product.product.repository')
+            ->findOneBy(['reference' => $reference]);
+
+        // TODO Create supplier order and delivery ...
     }
 }

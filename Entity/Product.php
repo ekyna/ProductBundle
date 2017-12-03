@@ -110,12 +110,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var bool
      */
-    protected $visible;
+    protected $visible = false;
 
     /**
      * @var bool
      */
-    protected $quoteOnly;
+    protected $quoteOnly = false;
 
     /**
      * @var string
@@ -165,8 +165,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->references = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
-
-        $this->visible = true;
 
         $this->initializeAdjustments();
         $this->initializeStock();
