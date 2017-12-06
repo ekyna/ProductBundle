@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener;
 
+use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,29 +17,46 @@ use Symfony\Component\Form\FormEvents;
 class ProductTypeSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var string
+     * @var ProductFormBuilder
      */
-    private $builder;
+    private $productBuilder;
+
+    /**
+     * @var StockSubjectFormBuilder
+     */
+    private $stockBuilder;
 
 
     /**
      * Constructor.
      *
-     * @param ProductFormBuilder $builder
+     * @param ProductFormBuilder      $productBuilder
+     * @param StockSubjectFormBuilder $stockBuilder
      */
-    public function __construct(ProductFormBuilder $builder)
+    public function __construct(ProductFormBuilder $productBuilder, StockSubjectFormBuilder $stockBuilder)
     {
-        $this->builder = $builder;
+        $this->productBuilder = $productBuilder;
+        $this->stockBuilder = $stockBuilder;
     }
 
     /**
      * Returns the product form builder.
      *
-     * @return ProductFormBuilder|string
+     * @return ProductFormBuilder
      */
-    protected function getBuilder()
+    protected function getProductBuilder()
     {
-        return $this->builder;
+        return $this->productBuilder;
+    }
+
+    /**
+     * Returns the stock form builder.
+     *
+     * @return StockSubjectFormBuilder
+     */
+    protected function getStockBuilder()
+    {
+        return $this->stockBuilder;
     }
 
     /**
@@ -48,7 +66,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     public function onPreSetData(FormEvent $event)
     {
-        $this->builder->initialize($product = $event->getData(), $event->getForm());
+        $this->productBuilder->initialize($product = $event->getData(), $event->getForm());
+        $this->stockBuilder->initialize($event->getForm());
 
         $type = $product->getType();
         if (!ProductTypes::isValid($type)) {
@@ -82,21 +101,15 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildSimpleProductForm()
     {
-        $this->builder
+        $this->productBuilder
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
-            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addCustomerGroupsField()
             ->addReleasedAtField()
             ->addReferenceField()
             ->addWeightField()
-            ->addGeocodeField()
-            ->addStockMode()
-            ->addStockFloor()
-            ->addReplenishmentTime()
-            ->addMinimumOrderQuantity()
             ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
@@ -106,6 +119,15 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addAdjustmentsField()
             ->addOptionGroupsField()
             ->addSeoField();
+
+        $this->stockBuilder
+            ->addStockMode()
+            ->addGeocodeField()
+            ->addStockFloor()
+            ->addReplenishmentTime()
+            ->addMinimumOrderQuantity()
+            ->addQuoteOnlyField()
+            ->addEndOfLifeField();
     }
 
     /**
@@ -113,43 +135,32 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildVariableProductForm()
     {
-        $this->builder
+        $this->productBuilder
             // General
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
-            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField([
-                'disabled' => true,
-            ])
-            ->addGeocodeField([
-                'disabled' => true,
-            ])
-            ->addStockMode([
-                'disabled' => true,
-            ])
-            ->addStockFloor([
-                'disabled' => true,
-            ])
-            ->addReplenishmentTime([
-                'disabled' => true,
-            ])
-            ->addMinimumOrderQuantity([
-                'disabled' => true,
-            ])
+            ->addWeightField(['disabled' => true])
             ->addTranslationsField()
             ->addAttributeSetField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField([
-                'disabled' => true,
-            ])
+            ->addNetPriceField(['disabled' => true])
             ->addTaxGroupField()
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
+
+        $this->stockBuilder
+            ->addStockMode(['disabled' => true])
+            ->addGeocodeField(['disabled' => true])
+            ->addStockFloor(['disabled' => true])
+            ->addReplenishmentTime(['disabled' => true])
+            ->addMinimumOrderQuantity(['disabled' => true])
+            ->addQuoteOnlyField()
+            ->addEndOfLifeField();
     }
 
     /**
@@ -157,7 +168,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildVariantProductForm()
     {
-        $this->builder
+        $this->productBuilder
             // General
             ->addDesignationField([
                 'required' => false,
@@ -166,16 +177,10 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 ],
             ])
             ->addVisibleField()
-            ->addQuoteOnlyField()
             ->addCustomerGroupsField()
             ->addReleasedAtField()
             ->addReferenceField()
             ->addWeightField()
-            ->addGeocodeField()
-            ->addStockMode()
-            ->addStockFloor()
-            ->addReplenishmentTime()
-            ->addMinimumOrderQuantity()
             ->addTagsField()
             ->addTranslationsField([
                 'required'     => false,
@@ -196,6 +201,15 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addAdjustmentsField()
             ->addOptionGroupsField();
+
+        $this->stockBuilder
+            ->addStockMode()
+            ->addGeocodeField()
+            ->addStockFloor()
+            ->addReplenishmentTime()
+            ->addMinimumOrderQuantity()
+            ->addQuoteOnlyField()
+            ->addEndOfLifeField();
     }
 
     /**
@@ -203,43 +217,32 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildBundleProductForm()
     {
-        $this->builder
+        $this->productBuilder
             // General
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
-            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField([
-                'disabled' => true,
-            ])
-            ->addGeocodeField([
-                'disabled' => true,
-            ])
-            ->addStockMode([
-                'disabled' => true,
-            ])
-            ->addStockFloor([
-                'disabled' => true,
-            ])
-            ->addReplenishmentTime([
-                'disabled' => true,
-            ])
-            ->addMinimumOrderQuantity([
-                'disabled' => true,
-            ])
+            ->addWeightField(['disabled' => true])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField([
-                'disabled' => true,
-            ])
+            ->addNetPriceField(['disabled' => true])
             ->addTaxGroupField()
             ->addBundleSlotsField()
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
+
+        $this->stockBuilder
+            ->addStockMode(['disabled' => true])
+            ->addGeocodeField(['disabled' => true])
+            ->addStockFloor(['disabled' => true])
+            ->addReplenishmentTime(['disabled' => true])
+            ->addMinimumOrderQuantity(['disabled' => true])
+            ->addQuoteOnlyField(['disabled' => true])
+            ->addEndOfLifeField(['disabled' => true]);
     }
 
     /**
@@ -247,45 +250,32 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildConfigurableProductForm()
     {
-        $this->builder
+        $this->productBuilder
             // General
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
-            ->addQuoteOnlyField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField([
-                'disabled' => true,
-            ])
-            ->addGeocodeField([
-                'disabled' => true,
-            ])
-            ->addStockMode([
-                'disabled' => true,
-            ])
-            ->addStockFloor([
-                'disabled' => true,
-            ])
-            ->addReplenishmentTime([
-                'disabled' => true,
-            ])
-            ->addMinimumOrderQuantity([
-                'disabled' => true,
-            ])
+            ->addWeightField(['disabled' => true])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField([
-                'disabled' => true,
-            ])
+            ->addNetPriceField(['disabled' => true])
             ->addTaxGroupField()
-            ->addBundleSlotsField([
-                'configurable' => true,
-            ])
+            ->addBundleSlotsField(['configurable' => true])
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
+
+        $this->stockBuilder
+            ->addStockMode(['disabled' => true])
+            ->addGeocodeField(['disabled' => true])
+            ->addStockFloor(['disabled' => true])
+            ->addReplenishmentTime(['disabled' => true])
+            ->addMinimumOrderQuantity(['disabled' => true])
+            ->addQuoteOnlyField(['disabled' => true])
+            ->addEndOfLifeField(['disabled' => true]);
     }
 
     /**

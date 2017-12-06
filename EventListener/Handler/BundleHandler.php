@@ -24,14 +24,14 @@ class BundleHandler extends AbstractHandler
     private $persistenceHelper;
 
     /**
-     * @var PriceCalculator
-     */
-    private $priceCalculator;
-
-    /**
      * @var ProductRepositoryInterface
      */
     private $productRepository;
+
+    /**
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
 
     /**
      * @var BundleUpdater
@@ -43,17 +43,17 @@ class BundleHandler extends AbstractHandler
      * Constructor.
      *
      * @param PersistenceHelperInterface $persistenceHelper
-     * @param PriceCalculator            $priceCalculator
      * @param ProductRepositoryInterface $productRepository
+     * @param PriceCalculator            $priceCalculator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        PriceCalculator $priceCalculator,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        PriceCalculator $priceCalculator
     ) {
         $this->persistenceHelper = $persistenceHelper;
-        $this->priceCalculator = $priceCalculator;
         $this->productRepository = $productRepository;
+        $this->priceCalculator = $priceCalculator;
     }
 
     /**
@@ -65,9 +65,13 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
-        $changed = $this->getBundleUpdater()->updateStock($bundle);
+        $updater = $this->getBundleUpdater();
 
-        $changed |= $this->updatePrice($bundle);
+        $changed = $updater->updateStock($bundle);
+
+        $changed |= $updater->updateAvailability($bundle);
+
+        $changed |= $updater->updatePrice($bundle);
 
         return $changed;
     }
@@ -81,18 +85,21 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
+        $updater = $this->getBundleUpdater();
+
         $events = [];
         $changed = false;
 
-        // TODO Weight
-
-        if ($this->updatePrice($bundle)) {
-            $events[] = ProductEvents::CHILD_DATA_CHANGE;
+        if ($updater->updateStock($bundle)) {
+            $events[] = ProductEvents::CHILD_STOCK_CHANGE;
             $changed = true;
         }
-
-        if ($this->getBundleUpdater()->updateStock($bundle)) {
-            $events[] = ProductEvents::CHILD_STOCK_CHANGE;
+        if ($updater->updateAvailability($bundle)) {
+            $events[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
+            $changed = true;
+        }
+        if ($updater->updatePrice($bundle)) {
+            $events[] = ProductEvents::CHILD_PRICE_CHANGE;
             $changed = true;
         }
 
@@ -106,14 +113,28 @@ class BundleHandler extends AbstractHandler
     /**
      * @inheritdoc
      */
-    public function handleChildDataChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event)
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        // TODO Weight
+        if ($this->getBundleUpdater()->updatePrice($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_PRICE_CHANGE]);
 
-        if ($this->updatePrice($bundle)) {
-            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_DATA_CHANGE]);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function handleChildAvailabilityChange(ResourceEventInterface $event)
+    {
+        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
+
+        if ($this->getBundleUpdater()->updateAvailability($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
 
             return true;
         }
@@ -143,28 +164,6 @@ class BundleHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return $product->getType() === ProductTypes::TYPE_BUNDLE;
-    }
-
-    /**
-     * Updates the bundle price.
-     *
-     * @param ProductInterface $bundle
-     *
-     * @return bool
-     */
-    protected function updatePrice(ProductInterface $bundle)
-    {
-        ProductTypes::assertBundle($bundle);
-
-        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
-
-        if ($netPrice !== $bundle->getNetPrice()) {
-            $bundle->setNetPrice($netPrice);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -199,7 +198,7 @@ class BundleHandler extends AbstractHandler
             return $this->bundleUpdater;
         }
 
-        return $this->bundleUpdater = new BundleUpdater();
+        return $this->bundleUpdater = new BundleUpdater($this->priceCalculator);
     }
 
     /**

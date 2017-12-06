@@ -29,9 +29,20 @@ class OptionValidator extends ConstraintValidator
         /* @var Model\OptionInterface $option */
         /* @var Option $constraint */
 
-        if ($option->getProduct() === $option->getGroup()->getProduct()) {
+        $product = $option->getProduct();
+
+        if ($product === $option->getGroup()->getProduct()) {
             $this->context
                 ->buildViolation($constraint->recursive_choice)
+                ->atPath('product')
+                ->addViolation();
+
+            return;
+        }
+
+        if (null !== $product && !$product->isVisible()) {
+            $this->context
+                ->buildViolation($constraint->product_must_be_visible)
                 ->atPath('product')
                 ->addViolation();
         }

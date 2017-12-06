@@ -92,6 +92,7 @@
             <argument type="service" id="ekyna_product.commerce.subject_provider"/>
             <argument type="service" id="ekyna_product.commerce.product_filter"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_commerce.availability_helper"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument type="service" id="translator"/>
             <argument>%ekyna_product.default.no_image%</argument>
@@ -242,16 +243,19 @@
             <tag name="form.type"/>
         </service>
 
-        <!-- Product form types -->
+        <!-- Product form type builder -->
         <service id="ekyna_product.product.form_type.builder"
                  class="%ekyna_product.product.form_type.builder.class%">
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
             <argument>%ekyna_commerce.default.currency%</argument>
         </service>
+
+        <!-- Product form types -->
         <service id="ekyna_product.product.form_type.event_subscriber"
                  class="%ekyna_product.product.form_type.event_subscriber.class%">
             <argument type="service" id="ekyna_product.product.form_type.builder"/>
+            <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
         </service>
         <service id="ekyna_product.product.form_type"
                  class="%ekyna_product.product.form_type.class%">
@@ -370,8 +374,8 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\BundleHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->

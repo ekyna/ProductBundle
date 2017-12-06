@@ -53,9 +53,13 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        $changed = $this->getConfigurableUpdater()->updateStock($bundle);
+        $updater = $this->getConfigurableUpdater();
 
-        $changed |= $this->updatePrice($bundle);
+        $changed = $updater->updateStock($bundle);
+
+        $changed |= $updater->updateAvailability($bundle);
+
+        $changed |= $updater->updatePrice($bundle);
 
         return $changed;
     }
@@ -67,9 +71,13 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        $changed = $this->getConfigurableUpdater()->updateStock($bundle);
+        $updater = $this->getConfigurableUpdater();
 
-        $changed |= $this->updatePrice($bundle);
+        $changed = $updater->updateStock($bundle);
+
+        $changed |= $updater->updateAvailability($bundle);
+
+        $changed |= $updater->updatePrice($bundle);
 
         return $changed;
     }
@@ -77,13 +85,21 @@ class ConfigurableHandler extends AbstractHandler
     /**
      * @inheritdoc
      */
-    public function handleChildDataChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event)
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        // TODO weight ?
+        return $this->getConfigurableUpdater()->updatePrice($bundle);
+    }
 
-        return $this->updatePrice($bundle);
+    /**
+     * @inheritDoc
+     */
+    public function handleChildAvailabilityChange(ResourceEventInterface $event)
+    {
+        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
+
+        return $this->getConfigurableUpdater()->updateAvailability($bundle);
     }
 
     /**
@@ -105,28 +121,6 @@ class ConfigurableHandler extends AbstractHandler
     }
 
     /**
-     * Updates the bundle price.
-     *
-     * @param ProductInterface $bundle
-     *
-     * @return bool
-     */
-    protected function updatePrice(ProductInterface $bundle)
-    {
-        ProductTypes::assertConfigurable($bundle);
-
-        $netPrice = $this->priceCalculator->calculateConfigurableTotalPrice($bundle);
-
-        if ($netPrice !== $bundle->getNetPrice()) {
-            $bundle->setNetPrice($netPrice);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Returns the configurable updater.
      *
      * @return ConfigurableUpdater
@@ -137,6 +131,6 @@ class ConfigurableHandler extends AbstractHandler
             return $this->configurableUpdater;
         }
 
-        return $this->configurableUpdater = new ConfigurableUpdater();
+        return $this->configurableUpdater = new ConfigurableUpdater($this->priceCalculator);
     }
 }

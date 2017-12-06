@@ -65,7 +65,7 @@ class Resupply
     public function resupply(
         Model\SupplierProductInterface $supplierProduct,
         $quantity,
-        $netPrice,
+        $netPrice = null,
         Model\SupplierOrderInterface $supplierOrder = null,
         \DateTime $eda = null
     ) {
@@ -85,6 +85,10 @@ class Resupply
             $supplierOrder->setSupplier($supplier);
 
             $this->orderOperator->initialize($supplierOrder);
+        }
+
+        if (null === $netPrice) {
+            $netPrice = $supplierProduct->getNetPrice();
         }
 
         if (null === $supplierOrderItem) {

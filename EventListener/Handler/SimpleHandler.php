@@ -83,15 +83,14 @@ class SimpleHandler extends AbstractHandler
         $changed = false;
         $childEvents = [];
 
-        $properties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
-
+        $stockProperties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
         if ($this->persistenceHelper->isChanged($product, 'stockMode')) {
             if ($this->stockUpdater->update($product)) {
                 $changed = true;
             }
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
-        } elseif ($this->persistenceHelper->isChanged($product, $properties)) {
+        } elseif ($this->persistenceHelper->isChanged($product, $stockProperties)) {
             if ($this->stockUpdater->updateStockState($product)) {
                 $changed = true;
             }
@@ -99,8 +98,13 @@ class SimpleHandler extends AbstractHandler
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         }
 
-        if ($this->persistenceHelper->isChanged($product, ['netPrice', 'weight'])) {
-            $childEvents[] = ProductEvents::CHILD_DATA_CHANGE;
+        if ($this->persistenceHelper->isChanged($product, 'netPrice')) {
+            $childEvents[] = ProductEvents::CHILD_PRICE_CHANGE;
+        }
+
+        $availabilityProperties = ['visible', 'quoteOnly', 'endOfLife'];
+        if ($this->persistenceHelper->isChanged($product, $availabilityProperties)) {
+            $childEvents[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
         }
 
         if (!empty($childEvents)) {

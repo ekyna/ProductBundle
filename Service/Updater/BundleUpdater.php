@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
@@ -13,6 +14,22 @@ use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
  */
 class BundleUpdater
 {
+    /**
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param PriceCalculator $priceCalculator
+     */
+    public function __construct(PriceCalculator $priceCalculator)
+    {
+        $this->priceCalculator = $priceCalculator;
+    }
+
     /**
      * Updates the bundle stock data.
      *
@@ -142,5 +159,75 @@ class BundleUpdater
         }
 
         return $changed;
+    }
+
+    /**
+     * Updates the bundle availability.
+     *
+     * @param Model\ProductInterface $bundle
+     *
+     * @return bool
+     */
+    public function updateAvailability(Model\ProductInterface $bundle)
+    {
+        Model\ProductTypes::assertBundle($bundle);
+
+        $changed = false;
+
+        $quoteOnly = $endOfLife = true;
+
+        $bundleSlots = $bundle->getBundleSlots()->getIterator();
+        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
+        if (0 < $bundleSlots->count()) {
+            foreach ($bundleSlots as $slot) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
+                $product = $choice->getProduct();
+
+                // Quote only
+                if (!$product->isQuoteOnly()) {
+                    $quoteOnly = false;
+                }
+                // End of life
+                if (!$product->isEndOfLife()) {
+                    $endOfLife = false;
+                }
+                // Break if both false
+                if (!$quoteOnly && !$endOfLife) {
+                    break;
+                }
+            }
+        }
+        if ($quoteOnly != $bundle->isQuoteOnly()) {
+            $bundle->setQuoteOnly($quoteOnly);
+            $changed = true;
+        }
+        if ($endOfLife != $bundle->isEndOfLife()) {
+            $bundle->setEndOfLife($endOfLife);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Updates the bundle price.
+     *
+     * @param Model\ProductInterface $bundle
+     *
+     * @return bool
+     */
+    public function updatePrice(Model\ProductInterface $bundle)
+    {
+        Model\ProductTypes::assertBundle($bundle);
+
+        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
+        if ($netPrice !== $bundle->getNetPrice()) {
+            $bundle->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        return false;
     }
 }

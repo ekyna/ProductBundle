@@ -20,9 +20,11 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        $changed = $this->checkVariableVisibility($variable);
+        $updater = $this->getVariableUpdater();
 
-        $changed |= $this->getVariableUpdater()->updateMinPrice($variable);
+        $changed = $updater->updateAvailability($variable);
+
+        $changed |= $updater->updateMinPrice($variable);
 
         return $changed;
     }
@@ -34,41 +36,84 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        if ($this->persistenceHelper->isChanged($variable, 'taxGroup')) {
+        $variantIds = [];
+        $variants = [];
+
+        $addVariant = function(ProductInterface $variant) use (&$variants, &$variantIds) {
+            if (!in_array($variant->getId(), $variantIds)) {
+                $variantIds[] = $variant->getId();
+                $variants[] = $variant;
+            }
+        };
+
+        $variantUpdater = $this->getVariantUpdater();
+
+        $changeSet = $this->persistenceHelper->getChangeSet($variable);
+
+        if (isset($changeSet['taxGroup'])) {
             foreach ($variable->getVariants() as $variant) {
-                if ($this->getVariantUpdater()->updateTaxGroup($variant)) {
-                    $this->persistenceHelper->persistAndRecompute($variant);
+                if ($variantUpdater->updateTaxGroup($variant)) {
+                    $addVariant($variant);
                 }
             }
         }
-        if ($this->persistenceHelper->isChanged($variable, 'brand')) {
+        if (isset($changeSet['brand'])) {
             foreach ($variable->getVariants() as $variant) {
-                if ($this->getVariantUpdater()->updateBrand($variant)) {
-                    $this->persistenceHelper->persistAndRecompute($variant);
+                if ($variantUpdater->updateBrand($variant)) {
+                    $addVariant($variant);
                 }
             }
         }
-        if ($this->persistenceHelper->isChanged($variable, 'visible')) {
-            if (!$variable->isVisible()) {
-                foreach ($variable->getVariants() as $variant) {
-                    if ($this->checkVariantVisibility($variant)) {
-                        $this->persistenceHelper->persistAndRecompute($variant);
-                    }
+        if (isset($changeSet['visible']) && !$variable->isVisible()) {
+            foreach ($variable->getVariants() as $variant) {
+                if ($variant->isVisible()) {
+                    $variant->setVisible(false);
+                    $addVariant($variant);
+                }
+            }
+        }
+        if (isset($changeSet['quoteOnly']) && $variable->isQuoteOnly()) {
+            foreach ($variable->getVariants() as $variant) {
+                if (!$variant->isQuoteOnly()) {
+                    $variant->setQuoteOnly(true);
+                    $addVariant($variant);
+                }
+            }
+        }
+        if (isset($changeSet['endOfLife']) && $variable->isEndOfLife()) {
+            foreach ($variable->getVariants() as $variant) {
+                if (!$variant->isEndOfLife()) {
+                    $variant->setEndOfLife(true);
+                    $addVariant($variant);
                 }
             }
         }
 
-        return $this->checkVariableVisibility($variable);
+        foreach ($variants as $variant) {
+            $this->persistenceHelper->persistAndRecompute($variant);
+        }
+
+        return $this->getVariableUpdater()->updateAvailability($variable);
     }
 
     /**
      * @inheritdoc
      */
-    public function handleChildDataChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event)
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
         return $this->getVariableUpdater()->updateMinPrice($variable);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function handleChildAvailabilityChange(ResourceEventInterface $event)
+    {
+        $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
+
+        return $this->getVariableUpdater()->updateAvailability($variable);
     }
 
     /**

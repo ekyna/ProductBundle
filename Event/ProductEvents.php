@@ -27,6 +27,7 @@ final class ProductEvents
     const STOCK_UNIT_CHANGE  = 'ekyna_product.product.stock_unit_change';
     const STOCK_UNIT_REMOVE  = 'ekyna_product.product.stock_unit_remove';
 
-    const CHILD_DATA_CHANGE  = 'ekyna_product.product.child_data_change';
-    const CHILD_STOCK_CHANGE = 'ekyna_product.product.child_stock_change';
+    const CHILD_PRICE_CHANGE        = 'ekyna_product.product.child_price_change';
+    const CHILD_AVAILABILITY_CHANGE = 'ekyna_product.product.child_availability_change';
+    const CHILD_STOCK_CHANGE        = 'ekyna_product.product.child_stock_change';
 }

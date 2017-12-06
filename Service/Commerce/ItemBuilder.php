@@ -81,10 +81,11 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     * @param bool              $options
      *
      * @throws Exception\InvalidArgumentException If product type is not supported
      */
-    public function buildFromProduct(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromProduct(SaleItemInterface $item, ProductInterface $product, $options = true)
     {
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -97,16 +98,18 @@ class ItemBuilder
                 $this->buildFromVariable($item, $product);
                 break;
             case ProductTypes::TYPE_BUNDLE:
-                $this->buildFromBundle($item, $product);
+                $this->buildFromBundle($item, $product, $options);
                 break;
             case ProductTypes::TYPE_CONFIGURABLE:
-                $this->buildFromConfigurable($item, $product);
+                $this->buildFromConfigurable($item, $product, $options);
                 break;
             default:
                 throw new Exception\InvalidArgumentException('Unexpected product type');
         }
 
-        $this->buildOptions($item);
+        if ($options) {
+            $this->buildOptions($item);
+        }
     }
 
     /**
@@ -190,8 +193,9 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     * @param bool              $options
      */
-    public function buildFromBundle(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromBundle(SaleItemInterface $item, ProductInterface $product, $options)
     {
         ProductTypes::assertBundle($product);
 
@@ -235,7 +239,7 @@ class ItemBuilder
                 $bundleSlotIds[] = $bundleSlotId;
 
                 // Build the item from the bundle choice's product
-                $this->buildFromBundleChoice($childItem, $bundleChoice);
+                $this->buildFromBundleChoice($childItem, $bundleChoice, $options);
 
                 continue 2;
             }
@@ -243,7 +247,7 @@ class ItemBuilder
             $bundleSlotIds[] = $bundleSlot->getId();
 
             // Not found : Create and build the item from the bundle choice's product
-            $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
+            $this->buildFromBundleChoice($item->createChild(), $bundleChoice, $options);
         }
 
         $this->cleanUpBundleSlots($item, $bundleSlotIds);
@@ -254,8 +258,9 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     * @param bool              $options
      */
-    public function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product)
+    public function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product, $options)
     {
         ProductTypes::assertConfigurable($product);
 
@@ -308,7 +313,7 @@ class ItemBuilder
                     }
 
                     // Build the item from the bundle choice's product
-                    $this->buildFromBundleChoice($childItem, $bundleChoice);
+                    $this->buildFromBundleChoice($childItem, $bundleChoice, $options);
 
                 } elseif (!$bundleSlot->isRequired()) {
                     // No choice and not required : remove child item
@@ -323,7 +328,7 @@ class ItemBuilder
             // Not found
             if ($bundleSlot->isRequired()) {
                 // Create and build the item from the bundle choice's product
-                $this->buildFromBundleChoice($item->createChild(), $bundleChoice);
+                $this->buildFromBundleChoice($item->createChild(), $bundleChoice, $options);
             }
         }
 
@@ -334,24 +339,25 @@ class ItemBuilder
      * Builds the sale item from the given bundle choice.
      *
      * @param SaleItemInterface           $item
-     * @param Model\BundleChoiceInterface $bundleChoice
+     * @param Model\BundleChoiceInterface $choice
+     * @param bool                        $options
      */
-    public function buildFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $bundleChoice)
+    public function buildFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $choice, $options)
     {
-        $this->buildFromProduct($item, $bundleChoice->getProduct());
+        $this->buildFromProduct($item, $choice->getProduct(), $options && $choice->isUseOptions());
 
         // TODO Use packaging format
 
         // Normalize quantity
-        if ($item->getQuantity() < $bundleChoice->getMinQuantity()) {
-            $item->setQuantity($bundleChoice->getMinQuantity());
-        } elseif ($item->getQuantity() > $bundleChoice->getMaxQuantity()) {
-            $item->setQuantity($bundleChoice->getMaxQuantity());
+        if ($item->getQuantity() < $choice->getMinQuantity()) {
+            $item->setQuantity($choice->getMinQuantity());
+        } elseif ($item->getQuantity() > $choice->getMaxQuantity()) {
+            $item->setQuantity($choice->getMaxQuantity());
         }
 
         $item
-            ->setData(static::BUNDLE_SLOT_ID, $bundleChoice->getSlot()->getId())
-            ->setData(static::BUNDLE_CHOICE_ID, $bundleChoice->getId())
+            ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setData(static::BUNDLE_CHOICE_ID, $choice->getId())
             ->setImmutable(true);
     }
 
@@ -462,8 +468,8 @@ class ItemBuilder
                 ->setDesignation($designation)
                 ->setReference($option->getReference())
                 ->setWeight($option->getWeight())
-                ->setTaxGroup($option->getTaxGroup())
-                /* TODO ->setPrivate(?)*/;
+                ->setTaxGroup($option->getTaxGroup())/* TODO ->setPrivate(?)*/
+            ;
         }
 
         // Override item net price (from product) with option's net price if set
@@ -516,8 +522,9 @@ class ItemBuilder
      * Initializes the sale item (subject must be assigned).
      *
      * @param SaleItemInterface $item
+     * @param bool              $options
      */
-    public function initialize(SaleItemInterface $item)
+    public function initialize(SaleItemInterface $item, $options = true)
     {
         $product = $this->provider->resolve($item);
 
@@ -533,13 +540,15 @@ class ItemBuilder
                 break;
             case ProductTypes::TYPE_BUNDLE:
             case ProductTypes::TYPE_CONFIGURABLE:
-                $this->initializeFromBundle($item, $product);
+                $this->initializeFromBundle($item, $product, $options);
                 break;
             default:
                 throw new Exception\InvalidArgumentException('Unexpected product type');
         }
 
-        $this->initializeOptions($item);
+        if ($options) {
+            $this->initializeOptions($item);
+        }
     }
 
     /**
@@ -591,8 +600,9 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
+     * @param bool              $options
      */
-    public function initializeFromBundle(SaleItemInterface $item, ProductInterface $product)
+    public function initializeFromBundle(SaleItemInterface $item, ProductInterface $product, $options)
     {
         ProductTypes::assertBundled($product);
 
@@ -651,7 +661,7 @@ class ItemBuilder
                         $child->getSubjectIdentity()->clear();
 
                         // Initialize default choice
-                        $this->initializeFromBundleChoice($child, $defaultChoice);
+                        $this->initializeFromBundleChoice($child, $defaultChoice, $options);
                     }
 
                     // Next bundle slot
@@ -664,7 +674,7 @@ class ItemBuilder
             $child = $item->createChild();
 
             if ($bundleSlot->isRequired()) {
-                $this->initializeFromBundleChoice($child, $defaultChoice);
+                $this->initializeFromBundleChoice($child, $defaultChoice, $options);
             } else {
                 $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
             }
@@ -675,22 +685,21 @@ class ItemBuilder
      * Initializes the sale item from the given bundle choice.
      *
      * @param SaleItemInterface           $item
-     * @param Model\BundleChoiceInterface $bundleChoice
+     * @param Model\BundleChoiceInterface $choice
+     * @param bool                        $options
      */
-    public function initializeFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $bundleChoice)
+    public function initializeFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $choice, $options = true)
     {
-        //if (!$item->hasSubjectIdentity()) {
-            $product = $this->fallbackVariableToVariant($bundleChoice->getProduct());
-            $this->provider->assign($item, $product);
-        //}
+        $product = $this->fallbackVariableToVariant($choice->getProduct());
+        $this->provider->assign($item, $product);
 
-        $this->initialize($item);
+        $this->initialize($item, $options && $choice->isUseOptions());
 
         $item
-            ->setQuantity($bundleChoice->getMinQuantity())
-            ->setPosition($bundleChoice->getSlot()->getPosition())
-            ->setData(static::BUNDLE_SLOT_ID, $bundleChoice->getSlot()->getId())
-            ->setData(static::BUNDLE_CHOICE_ID, $bundleChoice->getId());
+            ->setQuantity($choice->getMinQuantity())
+            ->setPosition($choice->getSlot()->getPosition())
+            ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setData(static::BUNDLE_CHOICE_ID, $choice->getId());
     }
 
     /**
@@ -838,18 +847,15 @@ class ItemBuilder
     {
         $product = $this->provider->resolve($item);
 
+        $groups = $this->filter->getOptionGroups($product);
+
         // Filter product option groups
         if ($product->getType() === ProductTypes::TYPE_VARIANT) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variable */
             $variable = $product->getParent();
 
             // Filter variant option groups
-            $groups = array_merge(
-                $this->filter->getOptionGroups($variable),
-                $this->filter->getOptionGroups($product)
-            );
-        } else {
-            $groups = $this->filter->getOptionGroups($product);
+            $groups = array_merge($this->filter->getOptionGroups($variable), $groups);
         }
 
         return $groups;

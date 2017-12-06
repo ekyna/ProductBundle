@@ -153,11 +153,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($this->persistenceHelper->isScheduledForRemove($product)) {
-            return;
-        }
-
-        if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_CHANGE)) {
+        if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
@@ -171,29 +167,35 @@ class ProductEventSubscriber implements EventSubscriberInterface
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($this->persistenceHelper->isScheduledForRemove($product)) {
-            return;
-        }
-
-        if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_REMOVAL)) {
+        if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_REMOVAL, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
 
     /**
-     * Child data change event handler.
+     * Child price change event handler.
      *
      * @param ResourceEventInterface $event
      */
-    public function onChildDataChange(ResourceEventInterface $event)
+    public function onChildPriceChange(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($this->persistenceHelper->isScheduledForRemove($product)) {
-            return;
+        if ($this->executeHandlers($event, HandlerInterface::CHILD_PRICE_CHANGE, true)) {
+            $this->persistenceHelper->persistAndRecompute($product, true);
         }
+    }
 
-        if ($this->executeHandlers($event, HandlerInterface::CHILD_DATA_CHANGE)) {
+    /**
+     * Child availability change event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function onChildAvailabilityChange(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if ($this->executeHandlers($event, HandlerInterface::CHILD_AVAILABILITY_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
@@ -207,11 +209,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($this->persistenceHelper->isScheduledForRemove($product)) {
-            return;
-        }
-
-        if ($this->executeHandlers($event, HandlerInterface::CHILD_STOCK_CHANGE)) {
+        if ($this->executeHandlers($event, HandlerInterface::CHILD_STOCK_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
     }
@@ -222,12 +220,17 @@ class ProductEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      * @param string                 $method
+     * @param bool                   $skipDeleted
      *
      * @return bool
      */
-    protected function executeHandlers(ResourceEventInterface $event, $method)
+    protected function executeHandlers(ResourceEventInterface $event, $method, $skipDeleted = false)
     {
         $product = $this->getProductFromEvent($event);
+
+        if ($skipDeleted && $this->persistenceHelper->isScheduledForRemove($product)) {
+            return false;
+        }
 
         $changed = false;
 
@@ -289,7 +292,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
             ProductEvents::DELETE             => ['onDelete', 0],
             ProductEvents::STOCK_UNIT_CHANGE  => ['onStockUnitChange', 0],
             ProductEvents::STOCK_UNIT_REMOVE  => ['onStockUnitRemoval', 0],
-            ProductEvents::CHILD_DATA_CHANGE  => ['onChildDataChange', 0],
+            ProductEvents::CHILD_PRICE_CHANGE => ['onChildPriceChange', 0],
             ProductEvents::CHILD_STOCK_CHANGE => ['onChildStockChange', 0],
         ];
     }

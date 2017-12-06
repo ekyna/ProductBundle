@@ -46,7 +46,8 @@ class BundleChoiceType extends ResourceFormType
     {
         // TODO only visible products for configurable
         $builder->add('product', ProductSearchType::class, [
-            'types' => $options['configurable'] ? [
+            'visible' => $options['configurable'],
+            'types'   => $options['configurable'] ? [
                 ProductTypes::TYPE_SIMPLE,
                 ProductTypes::TYPE_VARIABLE,
                 ProductTypes::TYPE_VARIANT,
@@ -79,11 +80,19 @@ class BundleChoiceType extends ResourceFormType
                 ])
                 ->add('position', CollectionPositionType::class);
         } else {
-            $builder->add('quantity', Type\NumberType::class, [
-                'label'         => 'ekyna_core.field.quantity',
-                'property_path' => 'minQuantity',
-                'scale'         => 3, // TODO Packaging
-            ]);
+            $builder
+                ->add('quantity', Type\NumberType::class, [
+                    'label'         => 'ekyna_core.field.quantity',
+                    'property_path' => 'minQuantity',
+                    'scale'         => 3, // TODO Packaging
+                ])
+                ->add('useOptions', Type\CheckboxType::class, [
+                    'label'    => 'ekyna_product.bundle_choice.field.use_options',
+                    'required' => false,
+                    'attr'     => [
+                        'align_with_widget' => true,
+                    ],
+                ]);
         }
     }
 

@@ -77,22 +77,20 @@ interface BundleChoiceInterface extends ResourceInterface
     public function setMaxQuantity($quantity);
 
     /**
-     * Returns the userOption.
+     * Returns whether the choice's product options should be used.
      *
      * @return boolean
-     * @todo
      */
-    public function isUserOption();
+    public function isUseOptions();
 
     /**
-     * Sets the user option.
+     * Sets whether the choice's product options should be used.
      *
-     * @param boolean $userOption
+     * @param boolean $use
      *
      * @return $this|BundleChoiceInterface
-     * @todo
      */
-    public function setUserOption($userOption);
+    public function setUseOptions($use);
 
     /**
      * Returns the rules.

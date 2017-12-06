@@ -71,9 +71,9 @@ class VariantUpdater
                             if (0 < strlen($title = $aTrans->getTitle())) {
                                 $titles[] = $title;
                             }
-                        } else {
-                            // TODO missing trans ?
-                        }
+                        }/* else {
+                            TODO missing trans ?
+                        }*/
                         $found = true;
                         if (!$slot->isMultiple()) {
                             continue 2;
@@ -138,28 +138,6 @@ class VariantUpdater
     }
 
     /**
-     * Persists and recomputes the translation.
-     *
-     * @param $translation
-     */
-    protected function persistTranslation($translation)
-    {
-        $manager = $this->persistenceHelper->getManager();
-        $uow = $manager->getUnitOfWork();
-
-        if (!($uow->isScheduledForInsert($translation) || $uow->isScheduledForUpdate($translation))) {
-            $manager->persist($translation);
-        }
-
-        $metadata = $manager->getClassMetadata(get_class($translation));
-        if ($uow->getEntityChangeSet($translation)) {
-            $uow->recomputeSingleEntityChangeSet($metadata, $translation);
-        } else {
-            $uow->computeChangeSet($metadata, $translation);
-        }
-    }
-
-    /**
      * Updates the tax group regarding to his parent/variable product.
      *
      * @param Model\ProductInterface $variant
@@ -201,6 +179,59 @@ class VariantUpdater
         }
 
         return false;
+    }
+
+    /**
+     * Updates the given variant availability regarding to its parent.
+     *
+     * @param Model\ProductInterface $variant
+     *
+     * @return bool
+     */
+    public function updateAvailability(Model\ProductInterface $variant)
+    {
+        Model\ProductTypes::assertVariant($variant);
+
+        $changed = false;
+
+        $variable = $variant->getParent();
+
+        if (!$variable->isVisible() && $variant->isVisible()) {
+            $variant->setVisible(false);
+            $changed = true;
+        }
+        if ($variable->isQuoteOnly() && !$variant->isQuoteOnly()) {
+            $variant->setQuoteOnly(true);
+            $changed = true;
+        }
+        if ($variable->isEndOfLife() && !$variant->isEndOfLife()) {
+            $variant->setEndOfLife(true);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Persists and recomputes the translation.
+     *
+     * @param $translation
+     */
+    protected function persistTranslation($translation)
+    {
+        $manager = $this->persistenceHelper->getManager();
+        $uow = $manager->getUnitOfWork();
+
+        if (!($uow->isScheduledForInsert($translation) || $uow->isScheduledForUpdate($translation))) {
+            $manager->persist($translation);
+        }
+
+        $metadata = $manager->getClassMetadata(get_class($translation));
+        if ($uow->getEntityChangeSet($translation)) {
+            $uow->recomputeSingleEntityChangeSet($metadata, $translation);
+        } else {
+            $uow->computeChangeSet($metadata, $translation);
+        }
     }
 
     /**

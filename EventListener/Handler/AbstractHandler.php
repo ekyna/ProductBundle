@@ -57,7 +57,15 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @inheritdoc
      */
-    public function handleChildDataChange(ResourceEventInterface $event)
+    public function handleChildPriceChange(ResourceEventInterface $event)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handleChildAvailabilityChange(ResourceEventInterface $event)
     {
         return false;
     }

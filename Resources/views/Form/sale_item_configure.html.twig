@@ -14,6 +14,9 @@
                 {{ itemForm.vars.choice_product -}}
             </h3>
             <div class="product-description">
+                {% if itemForm.vars.choice_reference is not empty -%}
+                <strong>SKU:&nbsp;{{ itemForm.vars.choice_reference }}</strong>
+                {%- endif %}
                 {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
             </div>
 
@@ -39,6 +42,7 @@
                                 </div>
                             </div>
                             {{- bootstrap_restore_form_settings() -}}
+                            <div class="col-xs-12 sale-item-availability"></div>
                         </div>
                     </div>
                     <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
@@ -102,13 +106,13 @@
             </a>
             {%- endif -%}
             <fieldset id="{{ form.vars.id }}" class="slot-choice-form"
-                      data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.pricing|json_encode|raw }}'>
+                      data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.config|json_encode|raw }}'>
                 {%- set itemForm = form -%}
                 {{- block('sale_item_configurable_slot') -}}
             </fieldset>
             {%- for itemForm in form.vars.choices_forms -%}
             <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" style="display:none;" disabled="disabled"
-                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.pricing|json_encode|raw }}'>
+                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.config|json_encode|raw }}'>
                 {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
             </fieldset>
             {%- endfor %}
@@ -173,7 +177,15 @@
 
         <div class="row">
             <div class="col-xs-6">
-                {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
+                <div class="form-group form-group-sm">
+                    {{- bootstrap_set_label_col(6) -}}
+                    {{- form_label(form.quantity) -}}
+                    <div class="col-sm-6">
+                        {{- form_widget(form.quantity) -}}
+                    </div>
+                    <div class="col-xs-12 sale-item-availability"></div>
+                    {{- bootstrap_set_label_col(3) -}}
+                </div>
             </div>
             <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
         </div>

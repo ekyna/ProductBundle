@@ -46,6 +46,10 @@ class ProductValidator extends ConstraintValidator
         /* @var Model\ProductInterface $product */
         /* @var Product $constraint */
 
+        // TODO unique option groups by name
+
+        // TODO unique variants by designation (if not null)
+
         if (!$product->isVisible()) {
             // Configurable product MUST be visible
             if ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
@@ -78,11 +82,11 @@ class ProductValidator extends ConstraintValidator
             return;
         }
 
-        $parents = $this->productRepository->findParentsByBundled($product);
+        $bundleParents = $this->productRepository->findParentsByBundled($product);
 
         if ($product->isVisible()) {
             // Visible products can't compose invisible products
-            foreach ($parents as $parent) {
+            foreach ($bundleParents as $parent) {
                 if (!$parent->isVisible()) {
                     $this->context
                         ->buildViolation($constraint->child_must_not_be_visible)
@@ -93,8 +97,19 @@ class ProductValidator extends ConstraintValidator
                 }
             }
         } else {
+            $optionParents = $this->productRepository->findParentsByOptionProduct($product);
+            if (!empty($optionParents)) {
+                // Non visible products can't bet set as another product option
+                $this->context
+                    ->buildViolation($constraint->child_must_be_visible)
+                    ->atPath('visible')
+                    ->addViolation();
+
+                return;
+            }
+
             // Non visible product must have the same tax group as its parent's one
-            foreach ($parents as $parent) {
+            foreach ($bundleParents as $parent) {
                 if ($product->getTaxGroup() !== $parent->getTaxGroup()) {
                     $this->context
                         ->buildViolation($constraint->parent_tax_group_integrity, [

@@ -2,12 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\CommerceBundle\Service\Stock\AvailabilityHelper;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
 use Symfony\Component\Form\Extension\Core\Type as Sf;
@@ -41,6 +41,11 @@ class FormBuilder
     protected $priceCalculator;
 
     /**
+     * @var AvailabilityHelper
+     */
+    protected $availabilityHelper;
+
+    /**
      * @var LocaleProviderInterface
      */
     protected $localeProvider;
@@ -67,6 +72,7 @@ class FormBuilder
      * @param ProductProvider         $productProvider
      * @param ProductFilter           $productFilter
      * @param PriceCalculator         $priceCalculator
+     * @param AvailabilityHelper      $availabilityHelper
      * @param LocaleProviderInterface $localeProvider
      * @param TranslatorInterface     $translator
      * @param string                  $noImagePath
@@ -75,6 +81,7 @@ class FormBuilder
         ProductProvider $productProvider,
         ProductFilter $productFilter,
         PriceCalculator $priceCalculator,
+        AvailabilityHelper $availabilityHelper,
         LocaleProviderInterface $localeProvider,
         TranslatorInterface $translator,
         $noImagePath = '/bundles/ekynaproduct/img/no-image.gif'
@@ -82,6 +89,7 @@ class FormBuilder
         $this->productProvider = $productProvider;
         $this->productFilter = $productFilter;
         $this->priceCalculator = $priceCalculator;
+        $this->availabilityHelper = $availabilityHelper;
         $this->localeProvider = $localeProvider;
         $this->translator = $translator;
         $this->noImagePath = $noImagePath;
@@ -100,6 +108,16 @@ class FormBuilder
     public function getProvider()
     {
         return $this->productProvider;
+    }
+
+    /**
+     * Returns the availability helper.
+     *
+     * @return AvailabilityHelper
+     */
+    public function getAvailabilityHelper()
+    {
+        return $this->availabilityHelper;
     }
 
     /**
@@ -249,17 +267,16 @@ class FormBuilder
             }
 
             $config = [
-                'price'  => floatval($variant->getNetPrice()),
-                'groups' => $groups,
-                'thumb'  => $this->getProductImagePath($variant),
-                'image'  => $this->getProductImagePath($variant, 'media_front'),
-                'min'    => $variant->getMinimumOrderQuantity(),
+                'price'        => floatval($variant->getNetPrice()),
+                'groups'       => $groups,
+                'thumb'        => $this->getProductImagePath($variant),
+                'image'        => $this->getProductImagePath($variant, 'media_front'),
+                'availability' => [
+                    'min'     => $variant->getMinimumOrderQuantity(),
+                    'max'     => $this->availabilityHelper->getAvailableQuantity($variant),
+                    'message' => $this->availabilityHelper->getAvailabilityMessage($variant),
+                ],
             ];
-
-            // TODO if root item
-            $config['quote_only'] = $variant->isQuoteOnly();
-            $config['out_of_stock'] = $variant->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK;
-            $config['min_order_quantity'] = $variant->getMinimumOrderQuantity();
 
             return [
                 'data-config' => json_encode($config),
@@ -404,7 +421,7 @@ class FormBuilder
      *
      * @return array
      */
-    public function getPricingConfig(SaleItemInterface $item, $fallback = true)
+    public function getFormConfig(SaleItemInterface $item, $fallback = true)
     {
         // Set pricing data
         $config = $this->priceCalculator->getSaleItemPricingData($item, $fallback);
@@ -430,6 +447,17 @@ class FormBuilder
             }
 
             $config['rules'] = $rules;
+        }
+
+        if (null !== $subject = $item->getSubjectIdentity()->getSubject()) {
+            $skippedTypes = [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_CONFIGURABLE];
+            if (!in_array($subject->getType(), $skippedTypes, true)) {
+                $config['availability'] = [
+                    'min'     => $subject->getMinimumOrderQuantity(),
+                    'max'     => $this->availabilityHelper->getAvailableQuantity($subject),
+                    'message' => $this->availabilityHelper->getAvailabilityMessage($subject),
+                ];
+            }
         }
 
         return $config;
@@ -494,15 +522,14 @@ class FormBuilder
     public function getTranslations()
     {
         return [
-            'quantity'           => $this->translate('ekyna_core.field.quantity'),
-            'discount'           => $this->translate('ekyna_product.sale_item_configure.discount'),
-            'unit_price'         => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
-            'total'              => $this->translate('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'         => $this->translate('ekyna_product.sale_item_configure.rule_table'),
-            'price_table'        => $this->translate('ekyna_product.sale_item_configure.price_table'),
-            'quote_only'         => $this->translate('ekyna_product.sale_item_configure.error.quote_only'),
-            'out_of_stock'       => $this->translate('ekyna_product.sale_item_configure.error.out_of_stock'),
-            'min_order_quantity' => $this->translate('ekyna_product.sale_item_configure.error.min_order_quantity'),
+            'quantity'     => $this->translate('ekyna_core.field.quantity'),
+            'discount'     => $this->translate('ekyna_product.sale_item_configure.discount'),
+            'unit_price'   => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
+            'total'        => $this->translate('ekyna_product.sale_item_configure.total_price'),
+            'rule_table'   => $this->translate('ekyna_product.sale_item_configure.rule_table'),
+            'price_table'  => $this->translate('ekyna_product.sale_item_configure.price_table'),
+            'min_quantity' => $this->translate('ekyna_product.sale_item_configure.error.min_quantity'),
+            'max_quantity' => $this->translate('ekyna_product.sale_item_configure.error.max_quantity'),
         ];
     }
 

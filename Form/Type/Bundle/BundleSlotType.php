@@ -9,7 +9,6 @@ use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;

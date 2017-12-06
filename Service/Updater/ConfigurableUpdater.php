@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
@@ -13,6 +14,22 @@ use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
  */
 class ConfigurableUpdater
 {
+    /**
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param PriceCalculator $priceCalculator
+     */
+    public function __construct(PriceCalculator $priceCalculator)
+    {
+        $this->priceCalculator = $priceCalculator;
+    }
+
     /**
      * Updates the configurable stock data.
      *
@@ -194,5 +211,88 @@ class ConfigurableUpdater
         }
 
         return $changed;
+    }
+
+    /**
+     * Updates the configurable availability.
+     *
+     * @param Model\ProductInterface $bundle
+     *
+     * @return bool
+     */
+    public function updateAvailability(Model\ProductInterface $bundle)
+    {
+        Model\ProductTypes::assertConfigurable($bundle);
+
+        $changed = false;
+
+        $slotQuoteOnly = [];
+        $slotEndOfLife = [];
+
+        $bundleSlots = $bundle->getBundleSlots()->getIterator();
+        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
+        if (0 < $bundleSlots->count()) {
+            foreach ($bundleSlots as $slot) {
+                // Per slot quote only / end of life
+                $quoteOnly = $endOfLife = true;
+
+                foreach ($slot->getChoices() as $choice) {
+                    $product = $choice->getProduct();
+
+                    // Quote only
+                    if (!$product->isQuoteOnly()) {
+                        $quoteOnly = false;
+                    }
+                    // End of life
+                    if ($product->isEndOfLife()) {
+                        $endOfLife = false;
+                    }
+                    // Break if both false
+                    if (!$quoteOnly && !$endOfLife) {
+                        break;
+                    }
+                }
+
+                $slotQuoteOnly[] = $quoteOnly;
+                $slotEndOfLife[] = $endOfLife;
+            }
+        }
+
+        // Is all slots "quote only" ?
+        $quoteOnly = array_product($slotQuoteOnly);
+        // Is all slots "end of life" ?
+        $endOfLife = array_product($slotEndOfLife);
+
+        if ($quoteOnly != $bundle->isQuoteOnly()) {
+            $bundle->setQuoteOnly($quoteOnly);
+            $changed = true;
+        }
+        if ($endOfLife != $bundle->isEndOfLife()) {
+            $bundle->setEndOfLife($endOfLife);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Updates the configurable price.
+     *
+     * @param Model\ProductInterface $bundle
+     *
+     * @return bool
+     */
+    public function updatePrice(Model\ProductInterface $bundle)
+    {
+        Model\ProductTypes::assertConfigurable($bundle);
+
+        $netPrice = $this->priceCalculator->calculateConfigurableTotalPrice($bundle);
+        if ($netPrice !== $bundle->getNetPrice()) {
+            $bundle->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        return false;
     }
 }

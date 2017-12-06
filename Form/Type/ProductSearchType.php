@@ -42,6 +42,7 @@ class ProductSearchType extends AbstractType
                 'class'    => $this->productClass,
                 'route'    => 'ekyna_product_product_admin_search',
                 'required' => true,
+                'visible'  => false,
                 'types'    => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIABLE,
@@ -49,10 +50,14 @@ class ProductSearchType extends AbstractType
                     ProductTypes::TYPE_CONFIGURABLE,
                 ],
             ])
+            ->setAllowedTypes('visible', 'bool')
             ->setAllowedTypes('types', 'array')
             ->setNormalizer('route_params', function (Options $options, $value) {
                 if (!isset($value['types'])) {
                     $value['types'] = $options['types'];
+                }
+                if (!isset($value['visible']) && $options['visible']) {
+                    $value['visible'] = 1;
                 }
 
                 return $value;

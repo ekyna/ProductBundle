@@ -113,19 +113,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $visible = false;
 
     /**
-     * @var bool
-     */
-    protected $quoteOnly = false;
-
-    /**
      * @var string
      */
     protected $reference;
-
-    /**
-     * @var string
-     */
-    protected $geocode;
 
     /**
      * @var float
@@ -273,8 +263,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
             // Reset stock data (but preserve mode)
             $stockMode = $this->stockMode;
+            $quoteOnly = $this->quoteOnly;
             $this->initializeStock();
             $this->stockMode = $stockMode;
+            $this->quoteOnly = $quoteOnly;
 
             // Clear critical fields
             $this->id = null;
@@ -957,24 +949,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function isQuoteOnly()
-    {
-        return $this->quoteOnly;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setQuoteOnly($quoteOnly)
-    {
-        $this->quoteOnly = (bool)$quoteOnly;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getReference()
     {
         return $this->reference;
@@ -986,24 +960,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setReference($reference)
     {
         $this->reference = $reference;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getGeocode()
-    {
-        return $this->geocode;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setGeocode($code)
-    {
-        $this->geocode = $code;
 
         return $this;
     }

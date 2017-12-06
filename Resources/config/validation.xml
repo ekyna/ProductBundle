@@ -184,7 +184,6 @@
         <property name="rules">
             <constraint name="Valid"/>
         </property>
-        <!-- TODO options -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleChoice"/>
     </class>
 
@@ -300,7 +299,6 @@
                 <option name="types">
                     <value>simple</value>
                     <value>variant</value>
-                    <value>bundle</value>
                 </option>
             </constraint>
         </property>
@@ -355,24 +353,6 @@
                 <option name="groups">data</option>
             </constraint>
         </property>
-        <!-- Unique reference -->
-        <!-- TODO bug because option group may not have an identifier ...
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>group</value>
-                <value>reference</value>
-            </option>
-            <option name="groups">data</option>
-        </constraint>-->
-        <!-- Unique designation per group -->
-        <!-- TODO bug because option group may not have an identifier ...
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>group</value>
-                <value>designation</value>
-            </option>
-            <option name="groups">data</option>
-        </constraint>-->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Option"/>
     </class>
 
@@ -397,14 +377,7 @@
                 <option name="min">1</option>
             </constraint>
         </property>
-        <!-- Unique name per product -->
-        <!-- TODO bug because product may not have an identifier ...
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>product</value>
-                <value>name</value>
-            </option>
-        </constraint>-->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\OptionGroup"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation">
@@ -769,14 +742,6 @@
                 <value>configurable</value>
             </option>
         </constraint>
-        <!-- TODO bug because parent may not have an identifier ...
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>parent</value>
-                <value>designation</value>
-            </option>
-            <option name="groups">variant</option>
-        </constraint>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAdjustment">

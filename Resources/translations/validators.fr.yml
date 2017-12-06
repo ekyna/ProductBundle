@@ -14,6 +14,8 @@ ekyna_product:
         bundle_must_be_visible: Un pack doit être visible s'il contient au moins un produit visible.
         child_must_not_be_visible: >
             Ce produit compose un pack (ou configurable) non visible et ne peut donc pas être visible.
+        child_must_be_visible: >
+            Ce produit est utilisé comme option d'un autre produit et doit donc être visible.
         parent_tax_group_integrity: >
             Ce produit compose un pack (ou configurable) et doit utiliser
             le même groupe de taxation ({{group}}) pour être non visible.
@@ -25,3 +27,4 @@ ekyna_product:
         translation_title_needed: Le titre ne peut être généré automatiquement sans attributs, veuillez le saisir.
     option:
         recursive_choice: Un produit ne peut pas être une option de lui-même.
+        product_must_be_visible: Ce produit doit être visible.

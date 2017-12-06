@@ -131,7 +131,7 @@ class ConfigurableSlotType extends Form\AbstractType
         foreach ($bundleChoices as $bundleChoice) {
             if ($bundleChoice->getId() == $choiceId) {
                 $this->addChoiceVars($view, $bundleChoice);
-                $this->addPricingVars($view, $item, !$options['admin_mode']);
+                $this->addConfigVars($view, $item, !$options['admin_mode']);
             } elseif ($bundleChoice) {
                 $choiceForm = $formFactory->createNamed('BUNDLE_CHOICE_NAME', BundleSlotChoiceType::class, null, [
                     'id'         => $view->vars['id'] . '_choice_' . $bundleChoice->getId(),
@@ -148,7 +148,7 @@ class ConfigurableSlotType extends Form\AbstractType
 
                 $choiceFormView = $choiceForm->createView();
                 $this->addChoiceVars($choiceFormView, $bundleChoice);
-                $this->addPricingVars($choiceFormView, $fakeItem, !$options['admin_mode']);
+                $this->addConfigVars($choiceFormView, $fakeItem, !$options['admin_mode']);
 
                 // Remove the fake item
                 $item->removeChild($fakeItem);
@@ -161,7 +161,7 @@ class ConfigurableSlotType extends Form\AbstractType
             $noChoiceVars = [
                 'id'                 => $view->vars['id'] . '_choice_0',
                 'choice_id'          => 0,
-                'pricing'            => [],
+                'config'             => [],
                 'choice_brand'       => null,
                 'choice_product'     => $this->formBuilder->translate(
                     'ekyna_product.sale_item_configure.no_choice.title'
@@ -202,6 +202,7 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['choice_brand'] = $product->getBrand()->getTitle();
         $view->vars['choice_product'] = $product->getFullTitle();
         $view->vars['choice_description'] = $product->getDescription();
+        $view->vars['choice_reference'] = $product->getReference();
         $view->vars['choice_thumb'] = $this->formBuilder->getProductImagePath($product);
         $view->vars['choice_image'] = $this->formBuilder->getProductImagePath($product, 'media_front');
     }
@@ -213,11 +214,9 @@ class ConfigurableSlotType extends Form\AbstractType
      * @param SaleItemInterface $item
      * @param bool              $fallback
      */
-    private function addPricingVars(Form\FormView $view, SaleItemInterface $item, $fallback)
+    private function addConfigVars(Form\FormView $view, SaleItemInterface $item, $fallback)
     {
-        $config = $this->formBuilder->getPricingConfig($item, $fallback);
-
-        $view->vars['pricing'] = $config;
+        $view->vars['config'] = $this->formBuilder->getFormConfig($item, $fallback);
     }
 
     /**

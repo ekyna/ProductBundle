@@ -101,6 +101,7 @@ ekyna_product:
         field:
             min_quantity: Qte. min.
             max_quantity: Qte. max.
+            use_options: Options
         button:
             add: Ajouter un choix
 
@@ -254,11 +255,8 @@ ekyna_product:
             total_net_price: Prix total HT
             pricing: Tarifs
             stock: Stocks
-            composition: Composition
-            geocode: Geocode
             released_at: Date de sortie
-            delivery_time: Délai de livraison
-            quote_only: Sur devis uniquement
+            composition: Composition
         alert:
             no_item: Aucun produit configuré
             supplier_product_exists: >
@@ -298,9 +296,8 @@ ekyna_product:
             description: >
                 <p>Je ne souhaite pas sélectionner d'article.</p>
         error:
-            quote_only: Cet article n'est disponible que sur devis.
-            out_of_stock: Cet article est en rupture de stock.
-            min_order_quantity: "La quantité minimum d'achat est de {{min}}."
+            min_quantity: La quantité minimum d'achat est de %min%.
+            max_quantity: La quantité maximum disponible est de %max%.
     variant:
         label:
             singular: Variante

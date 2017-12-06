@@ -116,13 +116,31 @@ class ProductType extends ResourceTableType
                 'precision' => 3,
                 'append'    => 'Kg',
                 'position'  => 60,
+                //'visible'   => false,
             ])
             ->addColumn('stockMode', StockSubjectModeType::class, [
                 'position' => 70,
+                //'visible'  => false,
             ])
             ->addColumn('stockState', StockSubjectStateType::class, [
                 'position' => 80,
             ])
+            /*->addColumn('quoteOnly', CType\Column\BooleanType::class, [
+                'label'                => 'ekyna_commerce.stock_subject.field.quote_only',
+                'route_name'           => 'ekyna_product_product_admin_toggle',
+                'route_parameters'     => ['field' => 'quoteOnly'],
+                'route_parameters_map' => ['productId' => 'id'],
+                'position'             => 90,
+                'visible'              => false,
+            ])
+            ->addColumn('endOfLife', CType\Column\BooleanType::class, [
+                'label'                => 'ekyna_commerce.stock_subject.field.end_of_life',
+                'route_name'           => 'ekyna_product_product_admin_toggle',
+                'route_parameters'     => ['field' => 'endOfLife'],
+                'route_parameters_map' => ['productId' => 'id'],
+                'position'             => 100,
+                'visible'              => false,
+            ])*/
             ->addColumn('tags', TagsType::class, [
                 'position' => 998,
             ]);
@@ -134,21 +152,24 @@ class ProductType extends ResourceTableType
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_product_category_admin_show',
                     'route_parameters_map' => ['categoryId' => 'id'],
-                    'position'             => 90,
+                    'position'             => 200,
+                    //'visible'              => false,
                 ])
                 ->addColumn('brand', DType\Column\EntityType::class, [
                     'label'                => 'ekyna_product.brand.label.singular',
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_product_brand_admin_show',
                     'route_parameters_map' => ['brandId' => 'id'],
-                    'position'             => 100,
+                    'position'             => 210,
+                    //'visible'              => false,
                 ])
                 ->addColumn('taxGroup', DType\Column\EntityType::class, [
                     'label'                => 'ekyna_commerce.tax_group.label.singular',
                     'entity_label'         => 'name',
                     'route_name'           => 'ekyna_commerce_tax_group_admin_show',
                     'route_parameters_map' => ['taxGroupId' => 'id'],
-                    'position'             => 110,
+                    'position'             => 220,
+                    //'visible'              => false,
                 ]);
         }
 
@@ -229,23 +250,31 @@ class ProductType extends ResourceTableType
                     'choices'  => StockSubjectStates::getChoices(),
                     'position' => 80,
                 ])
+                ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
+                    'label'    => 'ekyna_commerce.stock_subject.field.quote_only',
+                    'position' => 90,
+                ])
+                ->addFilter('endOfLife', CType\Filter\BooleanType::class, [
+                    'label'    => 'ekyna_commerce.stock_subject.field.end_of_life',
+                    'position' => 100,
+                ])
                 ->addFilter('categories', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_product.category.label.plural',
                     'class'        => $this->categoryClass,
                     'entity_label' => 'name',
-                    'position'     => 90,
+                    'position'     => 200,
                 ])
                 ->addFilter('brand', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_product.brand.label.singular',
                     'class'        => $this->brandClass,
                     'entity_label' => 'name',
-                    'position'     => 100,
+                    'position'     => 210,
                 ])
                 ->addFilter('taxGroup', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_commerce.tax_group.label.singular',
                     'class'        => $this->taxGroupClass,
                     'entity_label' => 'name',
-                    'position'     => 110,
+                    'position'     => 220,
                 ])
                 ->addFilter('tags', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_cms.tag.label.plural',

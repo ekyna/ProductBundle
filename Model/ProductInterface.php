@@ -526,22 +526,6 @@ interface ProductInterface extends
     public function setVisible($visible);
 
     /**
-     * Returns whether or not this product is available only through quotes.
-     *
-     * @return bool
-     */
-    public function isQuoteOnly();
-
-    /**
-     * Sets the whether or not this product is available only through quotes.
-     *
-     * @param bool $quoteOnly
-     *
-     * @return $this|ProductInterface
-     */
-    public function setQuoteOnly($quoteOnly);
-
-    /**
      * Returns the reference.
      *
      * @return string
@@ -556,22 +540,6 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setReference($reference);
-
-    /**
-     * Returns the geocode.
-     *
-     * @return string
-     */
-    public function getGeocode();
-
-    /**
-     * Sets the geocode.
-     *
-     * @param string $code
-     *
-     * @return $this|ProductInterface
-     */
-    public function setGeocode($code);
 
     /**
      * Returns the net price.

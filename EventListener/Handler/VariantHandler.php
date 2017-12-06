@@ -21,19 +21,21 @@ class VariantHandler extends AbstractVariantHandler
     {
         $variant = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIANT);
 
+        $updater = $this->getVariantUpdater();
+
         $changed = false;
 
         // Generate attributes designation and title if needed
-        $changed |= $this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant);
+        $changed |= $updater->updateAttributesDesignationAndTitle($variant);
 
         // Set tax group regarding to parent/variable if needed
-        $changed |= $this->getVariantUpdater()->updateTaxGroup($variant);
+        $changed |= $updater->updateTaxGroup($variant);
 
         // Set brand regarding to parent/variable if needed
-        $changed |= $this->getVariantUpdater()->updateBrand($variant);
+        $changed |= $updater->updateBrand($variant);
 
-        // Check variant visibility
-        $changed |= $this->checkVariantVisibility($variant);
+        // Updates variant availability
+        //$changed |= $updater->updateAvailability($variant); // TODO Variable may block availability fields update
 
         if (null !== $variable = $variant->getParent()) {
             if (null === $variant->getPosition()) {
@@ -56,13 +58,15 @@ class VariantHandler extends AbstractVariantHandler
             throw new RuntimeException("Variant's parent must be defined.");
         }
 
+        $updater = $this->getVariantUpdater();
+
         $changed = false;
 
         // Generate attributes designation and title if needed
-        $changed |= $this->getVariantUpdater()->updateAttributesDesignationAndTitle($variant);
+        $changed |= $updater->updateAttributesDesignationAndTitle($variant);
 
-        // Check variant visibility
-        $changed |= $this->checkVariantVisibility($variant);
+        // Updates variant availability
+        //$changed |= $updater->updateAvailability($variant); // TODO Variable may block availability fields update
 
         if (null !== $variable = $variant->getParent()) {
             if ($this->persistenceHelper->isChanged($variant, 'position')) {
@@ -80,11 +84,16 @@ class VariantHandler extends AbstractVariantHandler
     {
         $variant = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIANT);
 
-        if (null !== $variable = $variant->getParent()) {
-            if (!$this->persistenceHelper->isScheduledForRemove($variable)) {
-                $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
+        if (null === $variable = $variant->getParent()) {
+            $variable = $this->persistenceHelper->getChangeSet($variant, 'parent')[0];
+        }
+        if (null !== $variable) {
+            $variableUpdater = $this->getVariableUpdater();
 
-                if ($this->checkVariableVisibility($variable)) {
+            if (!$this->persistenceHelper->isScheduledForRemove($variable)) {
+                $variableUpdater->indexVariantsPositions($variable, $this->persistenceHelper);
+
+                if ($variableUpdater->updateAvailability($variable)) {
                     $this->persistenceHelper->persistAndRecompute($variable);
                 }
             }

@@ -44,7 +44,7 @@ class BundleSlotListener implements EventSubscriberInterface
     {
         $slot = $this->getBundleSlotFromEvent($event);
 
-        $this->scheduleChildDataChangeEvent($slot->getBundle());
+        $this->scheduleChildPriceChangeEvent($slot->getBundle());
     }
 
     /**
@@ -57,7 +57,7 @@ class BundleSlotListener implements EventSubscriberInterface
         $slot = $this->getBundleSlotFromEvent($event);
 
         if ($this->persistenceHelper->isChanged($slot, ['required'])) {
-            $this->scheduleChildDataChangeEvent($slot->getBundle());
+            $this->scheduleChildPriceChangeEvent($slot->getBundle());
         }
     }
 
@@ -75,19 +75,19 @@ class BundleSlotListener implements EventSubscriberInterface
             $bundle = $this->persistenceHelper->getChangeSet($slot, 'bundle')[0];
         }
 
-        $this->scheduleChildDataChangeEvent($bundle);
+        $this->scheduleChildPriceChangeEvent($bundle);
     }
 
     /**
-     * Dispatches the child data change events.
+     * Dispatches the child price change events.
      *
      * @param ProductInterface $bundle
      */
-    private function scheduleChildDataChangeEvent(ProductInterface $bundle)
+    private function scheduleChildPriceChangeEvent(ProductInterface $bundle)
     {
         ProductTypes::assertBundled($bundle);
 
-        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_DATA_CHANGE, $bundle);
+        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $bundle);
     }
 
     /**

@@ -72,7 +72,6 @@
             {% block stock_pane %}
                 <div class="tab-pane" id="product-stock">
                 {% block stock_content %}
-                    {{ macros.show_geocode(product) }}
                     {{ stock_macros.show_stock_view(product, 'product') }}
                 {% endblock stock_content %}
                 </div>

@@ -38,15 +38,9 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $maxQuantity;
 
     /**
-     * @var Model\OptionInterface
-     */
-    /* TODO option per group */
-    // protected $option;
-
-    /**
      * @var bool
      */
-    protected $userOption;
+    protected $useOptions;
 
     /**
      * @var ArrayCollection|Model\BundleChoiceRuleInterface[]
@@ -64,9 +58,9 @@ class BundleChoice implements Model\BundleChoiceInterface
      */
     public function __construct()
     {
-        $this->userOption = false;
         $this->minQuantity = 1;
         $this->maxQuantity = 1;
+        $this->useOptions = true;
         $this->rules = new ArrayCollection();
     }
 
@@ -170,17 +164,17 @@ class BundleChoice implements Model\BundleChoiceInterface
     /**
      * @inheritdoc
      */
-    public function isUserOption()
+    public function isUseOptions()
     {
-        return $this->userOption;
+        return $this->useOptions;
     }
 
     /**
      * @inheritdoc
      */
-    public function setUserOption($userOption)
+    public function setUseOptions($use)
     {
-        $this->userOption = $userOption;
+        $this->useOptions = (bool)$use;
 
         return $this;
     }

@@ -39,10 +39,10 @@ class OptionType extends ResourceFormType
             ])
             ->add('product', ProductSearchType::class, [
                 'required' => false,
+                'visible'  => true,
                 'types'    => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIANT,
-                    ProductTypes::TYPE_BUNDLE,
                 ],
             ])
             ->add('designation', Type\TextType::class, [

@@ -132,22 +132,28 @@ class VariableUpdater
                 continue;
             }
 
-            // TODO deal with min order quantity
-
             if ($bestVariant->getAvailableStock() < $variant->getAvailableStock()) {
                 $bestVariant = $variant;
                 continue;
             }
 
-            if ($bestVariant->getVirtualStock() < $variant->getVirtualStock()) {
-                $bestVariant = $variant;
-                continue;
+            if (0 < $virtualStock = $variant->getVirtualStock()) {
+                if (null !== $eda = $variant->getEstimatedDateOfArrival()) {
+                    $bestEda = $bestVariant->getEstimatedDateOfArrival();
+                    if ((null === $bestVariant) || $bestEda > $eda) {
+                        $bestVariant = $variant;
+                    }
+                } elseif ($bestVariant->getVirtualStock() < $virtualStock) {
+                    $bestVariant = $variant;
+                    continue;
+                }
             }
         }
 
         $mode = Stock\StockSubjectModes::MODE_AUTO;
         $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
         $inStock = $availableStock = $virtualStock = 0;
+        $eda = null;
 
         if ($bestVariant) {
             $mode = $bestVariant->getStockMode();
@@ -155,6 +161,7 @@ class VariableUpdater
             $inStock = $bestVariant->getInStock();
             $availableStock = $bestVariant->getAvailableStock();
             $virtualStock = $bestVariant->getVirtualStock();
+            $eda = $bestVariant->getEstimatedDateOfArrival();
         }
 
         $changed = false;
@@ -174,6 +181,11 @@ class VariableUpdater
             $changed = true;
         }
 
+        if ($variable->getEstimatedDateOfArrival() !== $eda) {
+            $variable->setEstimatedDateOfArrival($eda);
+            $changed = true;
+        }
+
         if ($variable->getStockMode() !== $mode) {
             $variable->setStockMode($mode);
             $changed = true;
@@ -181,6 +193,54 @@ class VariableUpdater
 
         if ($variable->getStockState() !== $state) {
             $variable->setStockState($state);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Updates the given variable availability regarding to its variants.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return bool
+     */
+    public function updateAvailability(Model\ProductInterface $variable)
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $changed = false;
+
+        if (0 === $variable->getVariants()->count()) {
+            $quoteOnly = $endOfLife = false;
+
+            if ($variable->isVisible()) {
+                $variable->setVisible(false);
+                $changed = true;
+            }
+        } else {
+            $quoteOnly = $endOfLife = true;
+
+            foreach ($variable->getVariants() as $variant) {
+                if (!$variant->isQuoteOnly()) {
+                    $quoteOnly = false;
+                }
+                if (!$variant->isEndOfLife()) {
+                    $endOfLife = false;
+                }
+                if (!$quoteOnly && !$endOfLife) {
+                    break;
+                }
+            }
+        }
+
+        if ($quoteOnly != $variable->isQuoteOnly()) {
+            $variable->setQuoteOnly($quoteOnly);
+            $changed = true;
+        }
+        if ($endOfLife != $variable->isEndOfLife()) {
+            $variable->setEndOfLife($endOfLife);
             $changed = true;
         }
 

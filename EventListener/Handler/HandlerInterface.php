@@ -13,13 +13,14 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 interface HandlerInterface
 {
-    const INSERT             = 'handleInsert';
-    const UPDATE             = 'handleUpdate';
-    const DELETE             = 'handleDelete';
-    const STOCK_UNIT_CHANGE  = 'handleStockUnitChange';
-    const STOCK_UNIT_REMOVAL = 'handleStockUnitRemoval';
-    const CHILD_DATA_CHANGE  = 'handleChildDataChange';
-    const CHILD_STOCK_CHANGE = 'handleChildStockChange';
+    const INSERT                    = 'handleInsert';
+    const UPDATE                    = 'handleUpdate';
+    const DELETE                    = 'handleDelete';
+    const STOCK_UNIT_CHANGE         = 'handleStockUnitChange';
+    const STOCK_UNIT_REMOVAL        = 'handleStockUnitRemoval';
+    const CHILD_PRICE_CHANGE        = 'handleChildPriceChange';
+    const CHILD_AVAILABILITY_CHANGE = 'handleChildAvailabilityChange';
+    const CHILD_STOCK_CHANGE        = 'handleChildStockChange';
 
 
     /**
@@ -66,13 +67,22 @@ interface HandlerInterface
     public function handleStockUnitRemoval(SubjectStockUnitEvent $event);
 
     /**
-     * Handles the child data (price/weight) change event.
+     * Handles the child price change event.
      *
      * @param ResourceEventInterface $event
      *
      * @return bool Whether or not the product has been changed.
      */
-    public function handleChildDataChange(ResourceEventInterface $event);
+    public function handleChildPriceChange(ResourceEventInterface $event);
+
+    /**
+     * Handles the child availability (visible, quote only, end of life) change event.
+     *
+     * @param ResourceEventInterface $event
+     *
+     * @return bool Whether or not the product has been changed.
+     */
+    public function handleChildAvailabilityChange(ResourceEventInterface $event);
 
     /**
      * Handles the child stock change event.

@@ -8,7 +8,6 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -104,7 +103,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addAdjustmentsField(array $options = [])
     {
@@ -129,7 +128,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addAttributeSetField(array $options = [])
     {
@@ -149,7 +148,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addAttributesField(array $options = [])
     {
@@ -173,7 +172,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addBrandField(array $options = [])
     {
@@ -192,7 +191,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addBundleSlotsField(array $options = [])
     {
@@ -210,7 +209,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addCategoriesField(array $options = [])
     {
@@ -231,7 +230,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addCustomerGroupsField(array $options = [])
     {
@@ -251,7 +250,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addDesignationField(array $options = [])
     {
@@ -265,30 +264,11 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the geocode field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addGeocodeField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_product.product.field.geocode',
-            'required' => false,
-        ], $options);
-
-        $this->form->add('geocode', SF\TextType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the medias field.
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addMediasField(array $options = [])
     {
@@ -311,31 +291,11 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the minimum order quantity field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addMinimumOrderQuantity(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.stock_subject.field.minimum_order_quantity',
-            'scale'    => 3,
-            'required' => true,
-        ], $options);
-
-        $this->form->add('minimumOrderQuantity', SF\NumberType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the net price field.
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addNetPriceField(array $options = [])
     {
@@ -355,7 +315,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addOptionGroupsField(array $options = [])
     {
@@ -376,33 +336,11 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the quote only field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addQuoteOnlyField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_product.product.field.quote_only',
-            'required' => false,
-            'attr'     => [
-                'align_with_widget' => true,
-            ],
-        ], $options);
-
-        $this->form->add('quoteOnly', SF\CheckboxType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the reference field.
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addReferenceField(array $options = [])
     {
@@ -421,7 +359,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addReferencesField(array $options = [])
     {
@@ -441,7 +379,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addReleasedAtField(array $options = [])
     {
@@ -457,30 +395,11 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the stock replenishment time field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addReplenishmentTime(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.stock_subject.field.replenishment_time',
-            'required' => true,
-        ], $options);
-
-        $this->form->add('replenishmentTime', SF\IntegerType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the seo field.
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addSeoField(array $options = [])
     {
@@ -495,50 +414,11 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the stock mode field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addStockMode(array $options = [])
-    {
-        $options = array_replace([
-            'label'   => 'ekyna_commerce.stock_subject.field.mode',
-            'choices' => StockSubjectModes::getChoices(),
-        ], $options);
-
-        $this->form->add('stockMode', SF\ChoiceType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the stock floor field.
-     *
-     * @param array $options
-     *
-     * @return ProductFormBuilder
-     */
-    public function addStockFloor(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.stock_subject.field.floor',
-            'scale'    => 3,
-            'required' => false,
-        ], $options);
-
-        $this->form->add('stockFloor', SF\NumberType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the tags field.
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addTagsField(array $options = [])
     {
@@ -557,7 +437,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addTaxGroupField(array $options = [])
     {
@@ -575,7 +455,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addTranslationsField(array $options = [])
     {
@@ -599,7 +479,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addVariableField(array $options = [])
     {
@@ -623,7 +503,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addVisibleField(array $options = [])
     {
@@ -645,7 +525,7 @@ class ProductFormBuilder
      *
      * @param array $options
      *
-     * @return ProductFormBuilder
+     * @return self
      */
     public function addWeightField(array $options = [])
     {

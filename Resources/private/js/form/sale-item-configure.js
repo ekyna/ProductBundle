@@ -560,11 +560,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.config = {
                 label: null,
                 thumb: null,
-                out_of_stock: false,
-                quote_only: false,
-                min_order_quantity: 1,
                 price: 0,
-                groups: []
+                groups: [],
+                availability: null
             };
 
             var $variant = this.$element.find('option[value="' + this.$element.val() + '"]');
@@ -638,13 +636,11 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.id = this.$element.attr('id');
 
             this.config = $.extend({
-                out_of_stock: false,
-                quote_only: false,
-                min_order_quantity: 1,
-                privileged: false,
                 price: 0,
                 currency: 'EUR',
                 rules: [],
+                availability: null,
+                privileged: false,
                 trans: {}
             }, this.$element.data('config'));
 
@@ -700,8 +696,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
             this.bundleSlots = bundleSlots;
 
+            this.$availabilityMessage = this.parentItem
+                ? this.$element.find('.sale-item-availability')
+                : this.$element.find('.sale-item-inner .sale-item-availability');
+
             // Submit button
-            this.$submitButton = this.$submitMessage = undefined;
+            this.$submitButton = undefined;
             if (!this.parentItem) {
                 this.$submitButton = this.$element.find('button[type=submit]');
                 if (0 === this.$submitButton.size()) {
@@ -709,8 +709,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 }
                 if (0 === this.$submitButton.size()) {
                     throw 'Submit button not found';
-                } else {
-                    this.$submitMessage = this.$element.find('.submit-message');
                 }
             }
 
@@ -816,7 +814,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         onChildChange: function () {
             this.calculatePrices();
             this.updatePricing();
-            this.updateControls();
+            this.updateAvailability();
         },
 
         updateParentQuantity: function () {
@@ -845,45 +843,66 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.resolveActiveRule();
             this.calculatePrices();
             this.updatePricing();
-            this.updateControls();
+            this.updateAvailability();
         },
 
-        updateControls: function () {
-            if (!this.$submitButton) {
+        updateAvailability: function () {
+            /*if (0 === this.$availabilityMessage.size()) {
                 return;
-            }
+            }*/
 
             var config = this.config;
             if (this.variant && this.variant.hasVariant()) {
                 config = this.variant.getConfig();
             }
 
-            var disableQuantity = false,
-                disableSubmit = false,
-                message = '';
+            if (null === config.availability) {
+                return;
+            }
+
+            config = $.extend({
+                min: 0,
+                max: 0,
+                message: null
+            }, config.availability);
+
+            var min = parseFloat(config.min),
+                max = parseFloat(config.max),
+                message = null;
 
             this.$quantity.closest('.form-group').removeClass('has-error');
-            if (config.quote_only) {
-                disableSubmit = disableQuantity = true;
-                message = this.config.trans.quote_only;
-            } else if (config.out_of_stock) {
-                disableSubmit = disableQuantity = true;
-                message = this.config.trans.out_of_stock;
-            } else if (this.quantity < parseFloat(config.min_order_quantity)) {
-                this.$quantity.closest('.form-group').addClass('has-error');
-                disableSubmit = true;
-                message = this.config.trans.min_order_quantity.replace('{{min}}', config.min_order_quantity);
+            if (!this.parentItem) {
+                var disableQuantity = false,
+                    disableSubmit = false;
+
+                if (0 < max && this.quantity > max) {
+                    this.$quantity.closest('.form-group').addClass('has-error');
+                    disableSubmit = true;
+                    message = this.config.trans.max_quantity.replace('%max%', config.max);
+                } else if (0 < min && this.quantity < min) {
+                    this.$quantity.closest('.form-group').addClass('has-error');
+                    disableSubmit = true;
+                    message = this.config.trans.min_quantity.replace('%min%', config.min);
+                } else {
+                    if (0 === max) {
+                        this.$quantity.closest('.form-group').addClass('has-error');
+                        disableSubmit = disableQuantity = true;
+                    }
+                    message = config.message;
+                }
+
+                if (this.$submitButton && !this.config.privileged) {
+                    this.$quantity.prop('disabled', disableQuantity);
+                    this.$submitButton.prop('disabled', disableSubmit);
+                }
+            } else {
+                if (0 === max) {
+                    this.$quantity.closest('.form-group').addClass('has-error');
+                }
+                message = config.message;
             }
 
-            if (!this.config.privileged) {
-                this.$quantity.prop('disabled', disableQuantity);
-                this.$submitButton.prop('disabled', disableSubmit);
-            }
-
-            this.$submitMessage.empty();
-            if (0 < message.length) {
-                this.$submitMessage.append($('<div class="alert alert-warning"></div>').html(message));
-            }
+            this.$availabilityMessage.html(message);
         },
 
         resolveActiveRule: function () {
