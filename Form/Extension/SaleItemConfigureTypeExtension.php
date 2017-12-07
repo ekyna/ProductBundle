@@ -70,12 +70,11 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         $this->formRenderer->setTheme($view, $this->theme);
 
         $config = $this->formBuilder->getFormConfig($item, !$options['admin_mode']);
-
         $config['privileged'] = $options['admin_mode'];
-
-        $config['trans'] = $this->formBuilder->getTranslations();
-
         $view->vars['attr']['data-config'] = json_encode($config);
+
+        $trans = $this->formBuilder->getTranslations();
+        $view->vars['attr']['data-trans'] = json_encode($trans);
     }
 
     /**

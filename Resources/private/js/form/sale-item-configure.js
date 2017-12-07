@@ -228,6 +228,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 }
             }
 
+            this.$availability = this.$element.find('.sale-item-option-availability');
+
             this.updateState();
             this.selectOption();
             this.bindEvents();
@@ -287,6 +289,43 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             } else if (this.$image) {
                 this.$image.hide();
             }
+
+            this.updateAvailability();
+        },
+
+        updateAvailability: function () {
+            this.$availability.empty();
+            this.$element.removeClass('has-error');
+
+            if (!(this.option && this.option.availability)) {
+                return;
+            }
+
+            var quantity = this.optionGroups.item.getTotalQuantity(),
+                config = {
+                    min: '0',
+                    max: '0',
+                    message: null
+                };
+
+            $.extend(config, this.option.availability);
+
+            var min = parseFloat(config.min),
+                max = config.max === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max),
+                message = null;
+
+            if (0 === max) {
+                message = config.message;
+            } else if (0 < max && quantity > max) {
+                message = SaleItem.trans.max_quantity.replace('%max%', max.toLocaleString());
+            } else if (0 < min && quantity < min) {
+                message = SaleItem.trans.min_quantity.replace('%min%', min.toLocaleString());
+            } else {
+                return;
+            }
+
+            this.$element.addClass('has-error');
+            this.$availability.html(message);
         },
 
         unbindEvents: function () {
@@ -347,7 +386,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return this;
         },
 
-        hide: function() {
+        hide: function () {
             this.$element.hide();
             if (this.$image && this.$image.size()) {
                 this.$image.hide();
@@ -356,7 +395,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return this;
         },
 
-        show: function() {
+        show: function () {
             this.$element.show();
             if (this.$image && this.$image.size()) {
                 this.$image.show();
@@ -488,11 +527,17 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         hideByType: function (type) {
             this.$element.find('> .form-group[data-type="' + type + '"]')
-                .each(function() {
+                .each(function () {
                     $(this).data('optionGroup').hide();
                 });
 
             return this;
+        },
+
+        updateAvailability: function() {
+            $.each(this.groups, function () {
+                this.updateAvailability();
+            });
         }
     });
 
@@ -631,6 +676,17 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         this.init();
     }
 
+    SaleItem.trans = {
+        quantity: 'Quantity',
+        discount: 'Discount',
+        unit_price: 'Unit price',
+        total: 'Net total',
+        rule_table: 'Your prices',
+        price_table: 'Detailed unit price',
+        min_quantity: 'Minimum quantity is %min%',
+        max_quantity: 'Maximum quantity is %max%'
+    };
+
     $.extend(SaleItem.prototype, {
         init: function () {
             this.id = this.$element.attr('id');
@@ -640,9 +696,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 currency: 'EUR',
                 rules: [],
                 availability: null,
-                privileged: false,
-                trans: {}
+                privileged: false
             }, this.$element.data('config'));
+
+            var trans = this.$element.data('trans');
+            if (trans) {
+                SaleItem.trans = trans;
+            }
 
             // Images
             this.$gallery = undefined;
@@ -654,13 +714,15 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             // Quantity
             this.$quantity = this.$element.find('#' + this.id + '_quantity');
             this.quantity = this.$quantity.val();
+            this.totalQuantity = this.quantity;
             if (this.parentItem) {
+                this.totalQuantity = this.quantity * this.parentItem.getTotalQuantity();
+
                 this.$parentQuantity = this.$quantity.parent().find('.sale-item-parent-qty');
                 if (this.$parentQuantity.size() === 0) {
                     this.$parentQuantity = $('<span class="input-group-addon sale-item-parent-qty"></span>');
                     this.$parentQuantity.insertBefore(this.$quantity);
                 }
-
                 this.updateParentQuantity();
             }
 
@@ -696,7 +758,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
             this.bundleSlots = bundleSlots;
 
-            this.$availabilityMessage = this.parentItem
+            this.$availability = this.parentItem
                 ? this.$element.find('.sale-item-availability')
                 : this.$element.find('.sale-item-inner .sale-item-availability');
 
@@ -788,7 +850,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             // Sort option groups
             // -> required/variable first
             var $groups = this.optionGroups.$element.find('.form-group');
-            $groups.sort(function(a, b) {
+            $groups.sort(function (a, b) {
                 var aGroup = $(a).data('optionGroup'),
                     bGroup = $(b).data('optionGroup'),
                     aRequired = aGroup.isRequired(),
@@ -829,13 +891,17 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         onQuantityChange: function () {
             this.quantity = this.$quantity.val();
+            this.totalQuantity = this.quantity;
+
+            if (this.parentItem) {
+                this.totalQuantity = this.quantity * this.parentItem.getTotalQuantity();
+            }
 
             $.each(this.bundleSlots, function () {
                 this.updateQuantity();
             });
 
             this.updateParentQuantity();
-
             this.onChange();
         },
 
@@ -850,6 +916,16 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             /*if (0 === this.$availabilityMessage.size()) {
                 return;
             }*/
+
+            this.optionGroups.updateAvailability();
+
+            this.$availability.empty();
+            this.$quantity.closest('.form-group').removeClass('has-error');
+
+            if (!this.parentItem && this.$submitButton && !this.config.privileged) {
+                this.$quantity.prop('disabled', false);
+                this.$submitButton.prop('disabled', false);
+            }
 
             var config = this.config;
             if (this.variant && this.variant.hasVariant()) {
@@ -867,52 +943,39 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }, config.availability);
 
             var min = parseFloat(config.min),
-                max = parseFloat(config.max),
+                max = config.max === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max),
+                disableQuantity = false,
+                disableSubmit = true,
                 message = null;
 
-            this.$quantity.closest('.form-group').removeClass('has-error');
-            if (!this.parentItem) {
-                var disableQuantity = false,
-                    disableSubmit = false;
+            if (0 === max) {
+                message = config.message;
+                disableQuantity = true;
+            } else if (0 < max && this.totalQuantity > max) {
+                message = SaleItem.trans.max_quantity.replace('%max%', max.toLocaleString());
+            } else if (0 < min && this.totalQuantity < min) {
+                message = SaleItem.trans.min_quantity.replace('%min%', min.toLocaleString());
+            } else {
+                disableSubmit = false;
+                if (this.parentItem) return;
+            }
 
-                if (0 < max && this.quantity > max) {
-                    this.$quantity.closest('.form-group').addClass('has-error');
-                    disableSubmit = true;
-                    message = this.config.trans.max_quantity.replace('%max%', config.max);
-                } else if (0 < min && this.quantity < min) {
-                    this.$quantity.closest('.form-group').addClass('has-error');
-                    disableSubmit = true;
-                    message = this.config.trans.min_quantity.replace('%min%', config.min);
-                } else {
-                    if (0 === max) {
-                        this.$quantity.closest('.form-group').addClass('has-error');
-                        disableSubmit = disableQuantity = true;
-                    }
-                    message = config.message;
-                }
-
-                if (this.$submitButton && !this.config.privileged) {
+            if (disableQuantity || disableSubmit) {
+                if (!this.parentItem && this.$submitButton && !this.config.privileged) {
                     this.$quantity.prop('disabled', disableQuantity);
                     this.$submitButton.prop('disabled', disableSubmit);
                 }
-            } else {
-                if (0 === max) {
-                    this.$quantity.closest('.form-group').addClass('has-error');
-                }
-                message = config.message;
+
+                this.$quantity.closest('.form-group').addClass('has-error');
             }
 
-            this.$availabilityMessage.html(message);
+            this.$availability.html(message);
         },
 
         resolveActiveRule: function () {
             if (0 < this.config.rules.length) {
                 var activeRule = undefined,
-                    quantity = this.quantity;
-
-                if (this.parentItem) {
-                    quantity *= this.parentItem.getQuantity();
-                }
+                    quantity = this.totalQuantity;
 
                 $.each(this.config.rules, function (i, rule) {
                     if (quantity >= parseFloat(rule.quantity)) {
@@ -954,10 +1017,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 unitPrice *= 1 - parseFloat(this.activeRule.percent) / 100;
             }
 
-            totalPrice = unitPrice * this.quantity;
-            if (this.parentItem) {
-                totalPrice *= this.parentItem.getQuantity();
-            }
+            totalPrice = unitPrice * this.totalQuantity;
 
             var changed = (basePrice !== this.basePrice || unitPrice !== this.unitPrice || totalPrice !== this.totalPrice);
 
@@ -973,15 +1033,11 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 return;
             }
 
-            var that = this, quantity = this.quantity, lines = [], rules = [], trans = this.config.trans;
-            if (this.parentItem) {
-                quantity *= this.parentItem.getQuantity();
-                trans = $.extend(trans, this.parentItem.getConfig().trans);
-            }
+            var that = this, quantity = this.totalQuantity, lines = [], rules = [];
 
             var data = {
                 detailed: false,
-                trans: trans,
+                trans: SaleItem.trans,
                 quantity: quantity,
                 base: this.basePrice,
                 unit: this.unitPrice,
@@ -1045,12 +1101,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                     var percent = parseFloat(this.activeRule.percent),
                         price = that.basePrice * percent / 100;
                     lines.push({
-                        label: this.config.trans.discount + ' ' + percent.toLocaleString() + '%',
+                        label: SaleItem.trans.discount + ' ' + percent.toLocaleString() + '%',
                         price: '-' + price.formatPrice(that.config.currency)
                     });
                 }
                 lines.push({
-                    label: this.config.trans.unit_price,
+                    label: SaleItem.trans.unit_price,
                     price: this.unitPrice.formatPrice(that.config.currency),
                     class: 'info'
                 });
@@ -1066,6 +1122,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         getQuantity: function () {
             return this.quantity;
+        },
+
+        getTotalQuantity: function () {
+            return this.totalQuantity;
         },
 
         getUnitPrice: function () {

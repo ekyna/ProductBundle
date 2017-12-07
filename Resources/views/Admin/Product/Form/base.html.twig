@@ -1,3 +1,4 @@
+{% spaceless %}
 <ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
     <li class="active">
         <a href="#product-general" id="toggle-product-general" data-toggle="tab">
@@ -40,59 +41,59 @@
         {% block pricing_pane %}
         <div class="tab-pane" id="product-pricing">
             {% block pricing_content %}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.weight, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
+                <div class="col-md-6">
+                    {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.weight, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+            </div>
             {% endblock pricing_content %}
             {{ form_row(form.optionGroups) }}
         </div>
         {% endblock pricing_pane %}
 
         {% block stock_pane %}
-            <div class="tab-pane" id="product-stock">
+        <div class="tab-pane" id="product-stock">
             {% block stock_content %}
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.stockMode, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.geocode, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.stockMode, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ form_row(form.stockFloor, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(form.replenishmentTime, {'label_col': 4, 'widget_col': 8}) }}
-                    </div>
+                <div class="col-md-6">
+                    {{ form_row(form.geocode, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        {{ form_row(form.minimumOrderQuantity, {'label_col': 6, 'widget_col': 6}) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.quoteOnly, {'label_col': 6, 'widget_col': 6}) }}
-                    </div>
-                    <div class="col-md-4">
-                        {{ form_row(form.endOfLife, {'label_col': 6, 'widget_col': 6}) }}
-                    </div>
-                </div>
-            {% endblock stock_content %}
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.stockFloor, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.replenishmentTime, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.minimumOrderQuantity, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.quoteOnly, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.endOfLife, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+            </div>
+            {% endblock stock_content %}
+        </div>
         {% endblock stock_pane %}
 
         {% block seo_pane %}
@@ -105,3 +106,4 @@
     </div>
     {{ form_rest(form) }}
 </div>
+{% endspaceless %}

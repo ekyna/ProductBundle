@@ -134,6 +134,7 @@
                 {{- form_widget(child.choice, {'label_col': 0, 'widget_col': 12}) -}}
                 {{- form_errors(child.choice) -}}
             </div>
+            <div class="col-xs-12 sale-item-option-availability"></div>
         </div>
         {% endfor %}
         {{- form_rest(form) -}}
@@ -205,8 +206,6 @@
         {%- endif -%}
 
         {{- form_errors(form) -}}
-
-        <div class="submit-message text-center"></div>
 
         {%- if form.submit is defined -%}
         <p class="text-center">

@@ -1,6 +1,6 @@
 {% import "EkynaProductBundle:Admin/Product/Show:_macro.html.twig" as macros %}
 {% import "EkynaCommerceBundle:Admin/Stock:_subject_macros.html.twig" as stock_macros %}
-
+{% spaceless %}
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
         <li class="active">
@@ -105,4 +105,4 @@
     </div>
 </div>
 {% block children_content %}{% endblock children_content %}
-
+{% endspaceless %}

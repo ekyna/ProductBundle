@@ -377,7 +377,7 @@
                 <option name="min">1</option>
             </constraint>
         </property>
-        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\OptionGroup"/>
+        <!--<constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\OptionGroup"/>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation">

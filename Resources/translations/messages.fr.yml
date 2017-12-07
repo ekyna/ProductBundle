@@ -284,8 +284,8 @@ ekyna_product:
     sale_item_configure:
         variant: Version
         choose_option: Choisissez une option
-        from: "à partir de {{min}}"
-        range: "{{min}} à {{max}}"
+        from: à partir de %min%
+        range: de %min% à %max%
         discount: Remise
         unit_net_price: Prix unit. HT
         total_price: Total HT
@@ -295,9 +295,6 @@ ekyna_product:
             title: Ignorer cet article
             description: >
                 <p>Je ne souhaite pas sélectionner d'article.</p>
-        error:
-            min_quantity: La quantité minimum d'achat est de %min%.
-            max_quantity: La quantité maximum disponible est de %max%.
     variant:
         label:
             singular: Variante

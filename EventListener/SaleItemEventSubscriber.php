@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
-use Ekyna\Bundle\CommerceBundle\Event\SaleItemValidationEvent;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
@@ -11,7 +10,6 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
 use Ekyna\Component\Commerce\Exception\SubjectException;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -138,43 +136,6 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Sale item validation event.
-     *
-     * @param SaleItemValidationEvent $event
-     */
-    public function onSaleItemValidate(SaleItemValidationEvent $event)
-    {
-        if (!$product = $this->getProductFromEvent($event)) {
-            return;
-        }
-
-        $item = $event->getItem();
-        $context = $event->getContext();
-
-        if ($product->isQuoteOnly()) {
-            $context
-                ->buildViolation($this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.error.quote_only'
-                ))
-                ->addViolation();
-        } elseif ($product->getStockState() === StockSubjectStates::STATE_OUT_OF_STOCK) {
-            $context
-                ->buildViolation($this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.error.out_of_stock'
-                ))
-                ->addViolation();
-        } elseif ($item->getQuantity() < $product->getMinimumOrderQuantity()) { // TODO Use packaging format
-            $context
-                ->buildViolation($this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.error.min_order_quantity',
-                    ['{{min}}' => $product->getMinimumOrderQuantity()]
-                ))
-                ->atPath('quantity')
-                ->addViolation();
-        }
-    }
-
-    /**
      * Returns the product from the given event.
      *
      * @param SaleItemEvent $event
@@ -208,7 +169,6 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             SaleItemEvents::DISCOUNT          => ['onSaleItemAdjustments'],
             SaleItemFormEvent::BUILD_FORM     => ['onSaleItemBuildForm'],
             SaleItemFormEvent::BUILD_VIEW     => ['onSaleItemBuildFormView'],
-            SaleItemValidationEvent::VALIDATE => ['onSaleItemValidate'],
         ];
     }
 }
