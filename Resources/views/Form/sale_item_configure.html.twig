@@ -14,10 +14,14 @@
                 {{ itemForm.vars.choice_product -}}
             </h3>
             <div class="product-description">
-                {% if itemForm.vars.choice_reference is not empty -%}
+                {%- if itemForm.vars.choice_reference is not empty -%}
                 <strong>SKU:&nbsp;{{ itemForm.vars.choice_reference }}</strong>
-                {%- endif %}
-                {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
+                {%- endif -%}
+                {%- if itemForm.vars.choice_description is empty -%}
+                    &nbsp;
+                {%- else -%}
+                    {{- itemForm.vars.choice_description|truncate_html(128)|raw -}}
+                {%- endif -%}
             </div>
 
             {%- if itemForm.quantity is defined -%}

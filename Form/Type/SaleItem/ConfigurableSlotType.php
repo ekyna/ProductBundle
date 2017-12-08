@@ -106,6 +106,12 @@ class ConfigurableSlotType extends Form\AbstractType
 
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
 
+        if (!$bundleSlot->isRequired()) {
+            // Make empty choice last
+            $first = array_shift($view->children['choice']->children);
+            array_push($view->children['choice']->children, $first);
+        }
+
         // Add image to each subject choice radio buttons vars
         foreach ($view->children['choice']->children as $subjectChoiceView) {
             /** @var Model\BundleChoiceInterface $bundleChoice */
@@ -116,7 +122,7 @@ class ConfigurableSlotType extends Form\AbstractType
                 $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
                 $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
             } else {
-                $subjectChoiceView->vars['choice_image'] = $this->formBuilder->getNoImagePath();
+                $subjectChoiceView->vars['choice_image'] = '/bundles/ekynaproduct/img/no-slot-choice.gif';
                 $subjectChoiceView->vars['choice_brand'] = '';
                 $subjectChoiceView->vars['choice_product'] = 'Ignorer cet article';
             }
@@ -166,6 +172,7 @@ class ConfigurableSlotType extends Form\AbstractType
                 'choice_product'     => $this->formBuilder->translate(
                     'ekyna_product.sale_item_configure.no_choice.title'
                 ),
+                'choice_reference'   => '',
                 'choice_description' => $this->formBuilder->translate(
                     'ekyna_product.sale_item_configure.no_choice.description'
                 ),

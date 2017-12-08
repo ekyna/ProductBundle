@@ -673,11 +673,11 @@ class ItemBuilder
             /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
-            if ($bundleSlot->isRequired()) {
+            //if ($bundleSlot->isRequired()) {
                 $this->initializeFromBundleChoice($child, $defaultChoice, $options);
-            } else {
-                $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
-            }
+            //} else {
+            //    $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
+            //}
         }
     }
 
