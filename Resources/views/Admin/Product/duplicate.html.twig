@@ -20,7 +20,7 @@
             'ekyna_core.field.visible',
             'ekyna_product.product.field.net_price',
             'ekyna_core.field.weight',
-            'ekyna_product.product.field.geocode',
+            'ekyna_commerce.stock_subject.field.geocode',
             'ekyna_product.product_reference.label.plural'
         ] %}
         <p>
@@ -45,7 +45,7 @@
         <dd>{{ source.netPrice|localizedcurrency(commerce_default_currency) }}</dd>
         <dt>{{ 'ekyna_core.field.weight'|trans }}</dt>
         <dd>{{ source.weight|localizednumber }}&nbsp;kg</dd>
-        <dt>{{ 'ekyna_product.product.field.geocode'|trans }}</dt>
+        <dt>{{ 'ekyna_commerce.stock_subject.field.geocode'|trans }}</dt>
         <dd>{{ source.geocode }}</dd>
         <dt>{{ 'ekyna_product.product_reference.label.plural'|trans }}</dt>
         <dd>

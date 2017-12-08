@@ -105,8 +105,11 @@ class Resupply
             if ($netPrice > $supplierOrderItem->getNetPrice()) {
                 $supplierOrderItem->setNetPrice($netPrice);
             }
+        }
 
-            if (null === $eda || $eda > $supplierOrder->getEstimatedDateOfArrival()) {
+        if (null !== $eda) {
+            $orderEda = $supplierOrder->getEstimatedDateOfArrival();
+            if (null === $orderEda || $eda > $orderEda) {
                 $supplierOrder->setEstimatedDateOfArrival($eda);
             }
         }
