@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
+use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\Form\AbstractType;
@@ -21,16 +22,24 @@ class QuickEditType extends AbstractType
     /**
      * @var ProductFormBuilder
      */
-    private $builder;
+    private $productBuilder;
+
+    /**
+     * @var StockSubjectFormBuilder
+     */
+    private $stockBuilder;
+
 
     /**
      * Constructor.
      *
-     * @param ProductFormBuilder $builder
+     * @param ProductFormBuilder $productBuilder
+     * @param StockSubjectFormBuilder $stockBuilder
      */
-    public function __construct(ProductFormBuilder $builder)
+    public function __construct(ProductFormBuilder $productBuilder, StockSubjectFormBuilder $stockBuilder)
     {
-        $this->builder = $builder;
+        $this->productBuilder = $productBuilder;
+        $this->stockBuilder = $stockBuilder;
     }
 
     /**
@@ -43,11 +52,14 @@ class QuickEditType extends AbstractType
             $product = $event->getData();
             $form = $event->getForm();
 
-            $this->builder->initialize($product, $form);
+            $this->productBuilder->initialize($product, $form);
+            $this->stockBuilder->initialize($form);
 
-            $this->builder
+            $this->productBuilder
                 ->addNetPriceField()
-                ->addWeightField()
+                ->addWeightField();
+
+            $this->stockBuilder
                 ->addGeocodeField()
                 ->addStockFloor();
         });

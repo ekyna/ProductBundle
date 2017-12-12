@@ -49,6 +49,7 @@
         <service id="ekyna_product.inventory_quick_edit.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
             <argument type="service" id="ekyna_product.product.form_type.builder"/>
+            <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.inventory_resupply.form_type"
