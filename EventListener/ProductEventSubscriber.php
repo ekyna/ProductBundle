@@ -284,16 +284,16 @@ class ProductEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ProductEvents::PRE_CREATE         => ['preCreate', 0],
-            ProductEvents::PRE_UPDATE         => ['preUpdate', 0],
-            ProductEvents::PRE_DELETE         => ['preDelete', 0],
-            ProductEvents::INSERT             => ['onInsert', 0],
-            ProductEvents::UPDATE             => ['onUpdate', 0],
-            ProductEvents::DELETE             => ['onDelete', 0],
-            ProductEvents::STOCK_UNIT_CHANGE  => ['onStockUnitChange', 0],
-            ProductEvents::STOCK_UNIT_REMOVE  => ['onStockUnitRemoval', 0],
-            ProductEvents::CHILD_PRICE_CHANGE => ['onChildPriceChange', 0],
-            ProductEvents::CHILD_STOCK_CHANGE => ['onChildStockChange', 0],
+            ProductEvents::PRE_CREATE                => ['preCreate', 0],
+            ProductEvents::PRE_UPDATE                => ['preUpdate', 0],
+            ProductEvents::PRE_DELETE                => ['preDelete', 0],
+            ProductEvents::INSERT                    => ['onInsert', 0],
+            ProductEvents::UPDATE                    => ['onUpdate', 0],
+            ProductEvents::DELETE                    => ['onDelete', 0],
+            ProductEvents::STOCK_UNIT_CHANGE         => ['onStockUnitChange', 0],
+            ProductEvents::STOCK_UNIT_REMOVE         => ['onStockUnitRemoval', 0],
+            ProductEvents::CHILD_PRICE_CHANGE        => ['onChildPriceChange', 0],
+            ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
         ];
     }
 }

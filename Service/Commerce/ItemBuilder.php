@@ -239,7 +239,7 @@ class ItemBuilder
                 $bundleSlotIds[] = $bundleSlotId;
 
                 // Build the item from the bundle choice's product
-                $this->buildFromBundleChoice($childItem, $bundleChoice, $options);
+                $this->buildFromBundleChoice($childItem, $bundleChoice, $options && $bundleChoice->isUseOptions());
 
                 continue 2;
             }
@@ -247,7 +247,7 @@ class ItemBuilder
             $bundleSlotIds[] = $bundleSlot->getId();
 
             // Not found : Create and build the item from the bundle choice's product
-            $this->buildFromBundleChoice($item->createChild(), $bundleChoice, $options);
+            $this->buildFromBundleChoice($item->createChild(), $bundleChoice, $options && $bundleChoice->isUseOptions());
         }
 
         $this->cleanUpBundleSlots($item, $bundleSlotIds);
@@ -344,7 +344,7 @@ class ItemBuilder
      */
     public function buildFromBundleChoice(SaleItemInterface $item, Model\BundleChoiceInterface $choice, $options)
     {
-        $this->buildFromProduct($item, $choice->getProduct(), $options && $choice->isUseOptions());
+        $this->buildFromProduct($item, $choice->getProduct(), $options);
 
         // TODO Use packaging format
 

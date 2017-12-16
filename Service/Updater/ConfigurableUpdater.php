@@ -244,7 +244,7 @@ class ConfigurableUpdater
                         $quoteOnly = false;
                     }
                     // End of life
-                    if ($product->isEndOfLife()) {
+                    if (!$product->isEndOfLife()) {
                         $endOfLife = false;
                     }
                     // Break if both false
