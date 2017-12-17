@@ -243,6 +243,7 @@ ekyna_product:
             convert: Convertir le produit
             remove: Supprimer le produit
             convert: Convertir
+            label: Étiquette
         type:
             simple: Simple
             variable: Variable

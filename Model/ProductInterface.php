@@ -416,6 +416,15 @@ interface ProductInterface extends
     public function getReferences();
 
     /**
+     * Returns the reference for the given type.
+     *
+     * @param string $type
+     *
+     * @return null|string
+     */
+    public function getReferenceByType($type);
+
+    /**
      * Returns the type.
      *
      * @return string

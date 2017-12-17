@@ -799,6 +799,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getReferenceByType($type)
+    {
+        Model\ProductReferenceTypes::isValid($type, true);
+
+        foreach ($this->references as $reference) {
+            if ($reference->getType() === $type) {
+                return $reference->getNumber();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getType()
     {
         return $this->type;

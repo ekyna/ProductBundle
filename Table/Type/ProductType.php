@@ -195,7 +195,17 @@ class ProductType extends ResourceTableType
             ];
         }
         $buttons[] = [
+            'label'                => 'ekyna_product.product.button.label',
+            'icon'                 => 'barcode',
+            'class'                => 'primary',
+            'route_name'           => 'ekyna_product_product_admin_label',
+            'route_parameters'     => ['format' => 'large'],
+            'route_parameters_map' => ['id' => 'id'],
+            'permission'           => 'edit',
+        ];
+        $buttons[] = [
             'label'                => 'ekyna_core.button.edit',
+            'icon'                 => 'pencil',
             'class'                => 'warning',
             'route_name'           => 'ekyna_product_product_admin_edit',
             'route_parameters_map' => ['productId' => 'id'],
@@ -203,6 +213,7 @@ class ProductType extends ResourceTableType
         ];
         $buttons[] = [
             'label'                => 'ekyna_core.button.remove',
+            'icon'                 => 'remove',
             'class'                => 'danger',
             'route_name'           => 'ekyna_product_product_admin_remove',
             'route_parameters_map' => ['productId' => 'id'],

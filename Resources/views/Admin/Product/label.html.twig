@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <style type="text/css">
+        .label {
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            padding: 3mm;
+            page-break-after: always;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 18pt;
+            text-align: center;
+        }
+
+        .label:last-child {
+            page-break-after: avoid;
+        }
+
+        .designation {
+            font-size: 18pt;
+            line-height: 1.6em;
+        }
+
+        .designation > strong {
+            font-size: 22pt;
+        }
+
+        .reference {
+            font-size: 24pt;
+        }
+
+        .label > img {
+            width: 100%;
+            height: auto;
+        }
+
+        .label > p {
+            margin-bottom: 10px;
+        }
+
+        .label > p:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    {% for product in products %}
+    <div class="label">
+        <p class="designation">
+            <strong>{{ product.brand.title }}</strong><br>
+            {{ product.fullDesignation }}
+        </p>
+        <p class="reference">{{ product.reference }}</p>
+        <p class="geocode">{{ product.geocode|default('&nbsp')|raw }}</p>
+        {% set ean13 = product.referenceByType('ean13') %}
+        {% if ean13 is not null %}
+        <p class="barcode">
+            <img src="data:image/png;base64,{{ ean13|barcode_128(256, 60) }}">
+        </p>
+        <p class="gtin">{{ ean13 }}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</body>
+</html>
