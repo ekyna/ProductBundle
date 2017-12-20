@@ -795,6 +795,7 @@
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">
         <property name="type">
+            <constraint name="NotBlank"/>
             <constraint name="Callback">
                 <value>Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes</value>
                 <value>isValid</value>

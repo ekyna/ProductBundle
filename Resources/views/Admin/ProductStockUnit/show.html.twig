@@ -37,7 +37,7 @@
                         }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.geocode, 'text', 'ekyna_commerce.stock_unit.field.geocode', {
+                        {{ show_row(productStockUnit.geocodes|join(', '), 'text', 'ekyna_commerce.stock_unit.field.geocode', {
                             'label_nb_col': 4,
                             'widget_nb_col': 8,
                         }) }}
