@@ -66,7 +66,9 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             $this->itemBuilder->getFilter()->setCustomerGroup($sale->getCustomerGroup());
         }
 
-        $this->itemBuilder->initialize($event->getItem());
+        $this->itemBuilder->initialize($item);
+
+        $item->setPrivate(false); // Root items can't be private.
     }
 
     /**
@@ -80,7 +82,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->itemBuilder->build($event->getItem());
+        $item = $event->getItem();
+
+        $this->itemBuilder->build($item);
+
+        $item->setPrivate(false); // Root items can't be private.
     }
 
     /**

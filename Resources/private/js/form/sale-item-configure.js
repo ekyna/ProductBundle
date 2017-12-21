@@ -961,10 +961,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
 
             if (disableQuantity || disableSubmit) {
-                if (!this.parentItem && this.$submitButton && !this.config.privileged) {
+                /* TODO if (!this.parentItem && this.$submitButton && !this.config.privileged) {
                     this.$quantity.prop('disabled', disableQuantity);
                     this.$submitButton.prop('disabled', disableSubmit);
-                }
+                }*/
 
                 this.$quantity.closest('.form-group').addClass('has-error');
             }
