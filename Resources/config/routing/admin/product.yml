@@ -97,8 +97,10 @@ ekyna_product_product_admin_search:
 
 ekyna_product_product_admin_label:
     path: /label/{format}.pdf
-    defaults: { _controller: "ekyna_product.product.controller:labelAction" }
+    defaults: { _controller: "ekyna_product.product.controller:labelAction", format: large }
     methods: [GET]
+    options:
+        expose: true
 
 ekyna_product_product_admin_find:
     path: /find

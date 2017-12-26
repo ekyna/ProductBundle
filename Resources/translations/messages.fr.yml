@@ -240,7 +240,6 @@ ekyna_product:
             new: Nouveau produit
             edit: Modifier le produit
             duplicate: Dupliquer le produit
-            convert: Convertir le produit
             remove: Supprimer le produit
             convert: Convertir
             label: Étiquette

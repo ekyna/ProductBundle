@@ -26,16 +26,26 @@
             {{ product|cms_tags({'text': false}) }}
         </div>
         <div class="actions">
+            {% if product is simple_product or product is variant_product %}
+                {{ ui_button('ekyna_commerce.button.print_label', {
+                    'type': 'link',
+                    'icon': 'barcode',
+                    'path': path('ekyna_product_product_admin_label', {
+                        'format': 'large',
+                        'id': [product.id],
+                    }),
+                }, {'target': '_blank'}) }}
+            {% endif %}
             {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}{# TODO temp lock #}
-                {{ ui_button('ekyna_product.product.button.duplicate', {
+                {{ ui_button('ekyna_core.button.duplicate', {
                     'type': 'link',
                     'icon': 'duplicate',
-                    'path': admin_resource_path(product, 'duplicate')
+                    'path': admin_resource_path(product, 'duplicate'),
                 }) }}
             {%- endif -%}
-            {{ admin_resource_btn(product, 'edit') }}
-            {{ admin_resource_btn(product, 'remove') }}
+            {{ admin_resource_btn(product, 'edit', {'short': true}) }}
+            {{ admin_resource_btn(product, 'remove', {'short': true}) }}
         </div>
     </div>
     {% if product is simple_product %}

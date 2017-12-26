@@ -9,7 +9,6 @@ use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
-use Knp\Snappy\Pdf;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -352,7 +351,7 @@ class ProductController extends ResourceController
      */
     public function labelAction(Request $request)
     {
-        //$format = $request->attributes->get('format');
+        $format = $request->attributes->get('format');
         $ids = (array)$request->query->get('id', []);
 
         $ids = array_map(function ($id) {
@@ -366,20 +365,11 @@ class ProductController extends ResourceController
         /** @var ProductInterface[] $products */
         $products = (array)$this->getRepository()->findBy(['id' => $ids]);
 
-        $content = $this->renderView('EkynaProductBundle:Admin/Product:label.html.twig', [
-            'products' => $products,
-        ]);
+        $renderer = $this->get('ekyna_commerce.subject.label_renderer');
 
-        $generator = new Pdf($this->container->getParameter('knp_snappy.pdf.binary'));
-        $pdf = $generator->getOutputFromHtml($content, [
-            'dpi'           => 300,
-            'page-width'    => 62,
-            'page-height'   => 100,
-            'margin-bottom' => 0,
-            'margin-left'   => 0,
-            'margin-right'  => 0,
-            'margin-top'    => 0,
-        ]);
+        $labels = $renderer->buildLabels($products);
+
+        $pdf = $renderer->render($labels, $format);
 
         return new Response($pdf, Response::HTTP_OK, [
             'Content-Type' => 'application/pdf',

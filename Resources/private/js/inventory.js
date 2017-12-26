@@ -1,4 +1,4 @@
-define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function($, Router, Templates, Modal) {
+define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function ($, Router, Templates, Modal) {
 
     var $window = $(window),
         $list = $('#inventory_list'),
@@ -18,7 +18,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         var array = $form.serializeArray();
 
         var context = {};
-        for (var i = 0; i < array.length; i++){
+        for (var i = 0; i < array.length; i++) {
             context[array[i]['name']] = array[i]['value'];
         }
 
@@ -39,7 +39,8 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         $wait.show();
         $none.hide();
 
-        eol = false; page = -1;
+        eol = false;
+        page = -1;
 
         nextList();
     }
@@ -66,30 +67,30 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
             dataType: 'json',
             data: getContext()
         })
-        .done(function (data) {
-            if (data.products === undefined || 0 === data.products.length) {
-                if (page === 0) {
-                    $none.show();
-                }
-                $wait.hide();
-                eol = true;
-            } else {
-                // TODO Ugly. Need data.count value.
-                if (30 > data.products.length) {
+            .done(function (data) {
+                if (data.products === undefined || 0 === data.products.length) {
+                    if (page === 0) {
+                        $none.show();
+                    }
                     $wait.hide();
                     eol = true;
+                } else {
+                    // TODO Ugly. Need data.count value.
+                    if (30 > data.products.length) {
+                        $wait.hide();
+                        eol = true;
+                    }
+                    $.each(data.products, function (index, product) {
+                        $(Templates['inventory_line.html.twig'].render(product)).appendTo($list);
+                    });
                 }
-                $.each(data.products, function (index, product) {
-                    $(Templates['inventory_line.html.twig'].render(product)).appendTo($list);
-                });
-            }
-        })
-        .always(function() {
-            busy = false;
-        });
+            })
+            .always(function () {
+                busy = false;
+            });
     }
 
-    $window.on('scroll', function() {
+    $window.on('scroll', function () {
         if (busy || eol) {
             return;
         }
@@ -104,7 +105,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
     /**
      * Context form submit.
      */
-    $form.on('submit', function(e) {
+    $form.on('submit', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -116,7 +117,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
     /**
      * Context form reset.
      */
-    $form.on('reset', function() {
+    $form.on('reset', function () {
         refreshList();
     });
 
@@ -156,7 +157,7 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
                     modalEvent.modal.close();
                 }
             });
-        } catch(exception) {
+        } catch (exception) {
             console.log(exception);
             busy = false;
         }
@@ -166,37 +167,57 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
 
 
     /**
+     * Line's print label buttons click handler
+     */
+    $list.on('click', 'a.print-label', function (e) {
+        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
+        if (!productId) {
+            console.log('Undefined product id.');
+            return false;
+        }
+
+        var url = Router.generate('ekyna_product_product_admin_label', {
+            'format': 'large',
+            'id': [productId]
+        });
+
+        var win = window.open(url, '_blank');
+        win.focus();
+    });
+
+
+    /**
      * Line's quick edit buttons click handler
      */
-    $list.on('click', 'a.quick-edit', function(e) {
+    $list.on('click', 'a.quick-edit', function (e) {
         return request(e, 'ekyna_product_inventory_admin_quick_edit');
     });
 
     /**
      * Line's stock unit buttons click handler
      */
-    $list.on('click', 'a.stock-units', function(e) {
+    $list.on('click', 'a.stock-units', function (e) {
         return request(e, 'ekyna_product_inventory_admin_stock_units');
     });
 
     /**
      * Line's stock unit buttons click handler
      */
-    $list.on('click', 'a.treatment', function(e) {
+    $list.on('click', 'a.treatment', function (e) {
         return request(e, 'ekyna_product_inventory_admin_customer_orders');
     });
 
     /**
      * Line's resupply buttons click handler
      */
-    $list.on('click', 'a.resupply', function(e) {
+    $list.on('click', 'a.resupply', function (e) {
         return request(e, 'ekyna_product_inventory_admin_resupply');
     });
 
     /**
      * List sort headers click handler
      */
-    $sort.on('click', 'th.sort a', function(e) {
+    $sort.on('click', 'th.sort a', function (e) {
         e.preventDefault();
         e.stopPropagation();
 

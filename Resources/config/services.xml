@@ -416,6 +416,12 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Product label event listener -->
+        <service id="ekyna_product.product.label_event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\LabelEventSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Product constraint validator -->
         <service id="ekyna_product.validator.product_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator">
