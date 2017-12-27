@@ -1,1 +1,1 @@
-define(["jquery"],function(a){});
+define(["jquery","ekyna-ui"],function(a){console.log("test");var b=a("#stock-view-refresh"),c=a("#stock-view"),d=null;console.log(b.size(),c.size()),b.on("click",function(e){return e.preventDefault(),c.loadingSpinner(),null!==d&&(d.abort(),d=null),d=a.ajax({url:b.attr("href"),dataType:"xml"}),d.done(function(b){var d=a(b).find("stockView");1===d.size()&&c.html(d.text())}),!1})});

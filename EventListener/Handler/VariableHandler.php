@@ -123,7 +123,7 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->getVariableUpdater()->updateStockState($variable);
+        return $this->getVariableUpdater()->updateStock($variable);
     }
 
     /**

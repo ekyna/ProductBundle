@@ -72,7 +72,19 @@
             {% block stock_pane %}
                 <div class="tab-pane" id="product-stock">
                 {% block stock_content %}
-                    {{ stock_macros.show_stock_view(product, 'product') }}
+                    <p class="actions">
+                        {{ ui_button('ekyna_core.button.reload', {
+                            'type': 'link',
+                            'icon': 'refresh',
+                            'path': admin_resource_path(product, 'refresh_stock'),
+                            'size': 'xs'
+                        }, {
+                            'id': 'stock-view-refresh'
+                        }) }}
+                    </p>
+                    <div id="stock-view">
+                        {{ stock_macros.show_stock_view(product, 'product') }}
+                    </div>
                 {% endblock stock_content %}
                 </div>
             {% endblock stock_pane %}

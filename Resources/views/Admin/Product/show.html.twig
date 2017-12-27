@@ -69,3 +69,8 @@
     {{ parent() }}
     <link href="{{ asset('bundles/ekynaproduct/css/show.css') }}" rel="stylesheet" type="text/css"/>
 {% endblock stylesheets %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">require(['bundles/ekynaproduct/js/product']);</script>
+{% endblock javascripts %}

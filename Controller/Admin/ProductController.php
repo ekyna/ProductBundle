@@ -5,10 +5,12 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
+use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
+use Ekyna\Bundle\ProductBundle\Service\Updater;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -253,6 +255,66 @@ class ProductController extends ResourceController
         }
 
         throw new \LogicException("Unexpected result.");
+    }
+
+    /**
+     * Refresh stock action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function refreshStockAction(Request $request)
+    {
+        $context = $this->loadContext($request);
+        $resourceName = $this->config->getResourceName();
+        /** @var ProductInterface $product */
+        $product = $context->getResource($resourceName);
+
+        $this->isGranted('EDIT', $product);
+
+        // TODO Update
+        switch ($product->getType()) {
+            case ProductTypes::TYPE_CONFIGURABLE:
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\ConfigurableUpdater($calculator);
+                $changed = $updater->updateStock($product);
+                $changed |= $updater->updateAvailability($product);
+                break;
+
+            case ProductTypes::TYPE_BUNDLE:
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\BundleUpdater($calculator);
+                $changed = $updater->updateStock($product);
+                $changed |= $updater->updateAvailability($product);
+                break;
+
+            case ProductTypes::TYPE_VARIABLE:
+                $updater = new Updater\VariableUpdater();
+                $changed = $updater->updateStock($product);
+                $changed |= $updater->updateAvailability($product);
+                break;
+
+            default:
+                $updater = $this->get('ekyna_commerce.stock_subject_updater');
+                $changed = $updater->update($product);
+        }
+
+        if ($changed) {
+            $event = $this->getOperator()->update($product);
+            if ($event->hasErrors()) {
+                throw new RuntimeException("Failed to update product stock and availability.");
+            }
+        }
+
+        $response = $this->render('EkynaProductBundle:Admin/Product:response.xml.twig', [
+            'product'    => $product,
+            'stock_view' => true,
+        ]);
+
+        $response->headers->add(['Content-Type' => 'application/xml']);
+
+        return $response;
     }
 
     /**

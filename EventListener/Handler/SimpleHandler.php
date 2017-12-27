@@ -96,6 +96,8 @@ class SimpleHandler extends AbstractHandler
             }
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
+        } elseif ($this->persistenceHelper->isChanged($product, 'stockState')) {
+            $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         }
 
         if ($this->persistenceHelper->isChanged($product, 'netPrice')) {
@@ -165,12 +167,19 @@ class SimpleHandler extends AbstractHandler
         ProductTypes::assertChildType($child);
 
         if ($child->getType() === ProductTypes::TYPE_VARIANT) {
-            if (!$variable = $child->getParent()) {
+            if (null === $variable = $child->getParent()) {
                 throw new RuntimeException("Variant's parent must be set.");
             }
 
             foreach ($events as $event) {
                 $this->persistenceHelper->scheduleEvent($event, $variable);
+            }
+        }
+
+        $parents = $this->productRepository->findParentsByOptionProduct($child, true);
+        foreach ($parents as $parent) {
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $parent);
             }
         }
 

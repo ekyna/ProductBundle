@@ -99,13 +99,13 @@ class VariableUpdater
     }
 
     /**
-     * Updates the variable stock state.
+     * Updates the variable stock.
      *
      * @param Model\ProductInterface $variable
      *
      * @return bool Whether the variable has been changed or not.
      */
-    public function updateStockState(Model\ProductInterface $variable)
+    public function updateStock(Model\ProductInterface $variable)
     {
         Model\ProductTypes::assertVariable($variable);
 
