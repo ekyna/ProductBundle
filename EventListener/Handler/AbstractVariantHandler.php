@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -25,6 +26,11 @@ abstract class AbstractVariantHandler extends AbstractHandler
     protected $localeProvider;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * @var VariantUpdater
      */
     private $variantUpdater;
@@ -40,13 +46,16 @@ abstract class AbstractVariantHandler extends AbstractHandler
      *
      * @param PersistenceHelperInterface $persistenceHelper
      * @param LocaleProviderInterface    $localeProvider
+     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider
+        LocaleProviderInterface $localeProvider,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->localeProvider = $localeProvider;
+        $this->productRepository = $productRepository;
     }
 
     /**

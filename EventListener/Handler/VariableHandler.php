@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -93,7 +94,26 @@ class VariableHandler extends AbstractVariantHandler
             $this->persistenceHelper->persistAndRecompute($variant);
         }
 
-        return $this->getVariableUpdater()->updateAvailability($variable);
+        $changed = false;
+        $childEvents = [];
+
+        if ($this->getVariableUpdater()->updateAvailability($variable)) {
+            $changed = true;
+            $childEvents[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
+        }
+
+        $stockProperties = [
+            'inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival', 'stockMode', 'stockState'
+        ];
+        if ($this->persistenceHelper->isChanged($variable, $stockProperties)) {
+            $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
+        }
+
+        if (!empty($childEvents)) {
+            $this->scheduleChildChangeEvents($variable, $childEvents);
+        }
+
+        return $changed;
     }
 
     /**
@@ -103,17 +123,29 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->getVariableUpdater()->updateMinPrice($variable);
+        if ($this->getVariableUpdater()->updateMinPrice($variable)) {
+            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_PRICE_CHANGE]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function handleChildAvailabilityChange(ResourceEventInterface $event)
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->getVariableUpdater()->updateAvailability($variable);
+        if ($this->getVariableUpdater()->updateAvailability($variable)) {
+            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -123,7 +155,34 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        return $this->getVariableUpdater()->updateStock($variable);
+        if ($this->getVariableUpdater()->updateStock($variable)) {
+            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_STOCK_CHANGE]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Dispatches the child change events.
+     *
+     * @param ProductInterface $variable
+     * @param array            $events
+     */
+    protected function scheduleChildChangeEvents(ProductInterface $variable, array $events)
+    {
+        ProductTypes::assertVariable($variable);
+
+        $parents = $this->productRepository->findParentsByBundled($variable);
+
+        $stop = true;
+
+        foreach ($parents as $parent) {
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $parent);
+            }
+        }
     }
 
     /**

@@ -73,10 +73,9 @@ class ConfigurableHandler extends AbstractHandler
 
         $updater = $this->getConfigurableUpdater();
 
+        // TODO remove : stock should only change from children
         $changed = $updater->updateStock($bundle);
-
         $changed |= $updater->updateAvailability($bundle);
-
         $changed |= $updater->updatePrice($bundle);
 
         return $changed;

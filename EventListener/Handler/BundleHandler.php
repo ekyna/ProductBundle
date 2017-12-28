@@ -90,6 +90,7 @@ class BundleHandler extends AbstractHandler
         $events = [];
         $changed = false;
 
+        // TODO remove : stock should only change from children
         if ($updater->updateStock($bundle)) {
             $events[] = ProductEvents::CHILD_STOCK_CHANGE;
             $changed = true;

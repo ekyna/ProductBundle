@@ -360,6 +360,7 @@
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variable product event handler -->
@@ -368,6 +369,7 @@
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
