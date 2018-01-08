@@ -66,28 +66,30 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
             method: 'GET',
             dataType: 'json',
             data: getContext()
-        })
-            .done(function (data) {
-                if (data.products === undefined || 0 === data.products.length) {
-                    if (page === 0) {
-                        $none.show();
-                    }
+        });
+
+        productsXhr.done(function (data) {
+            if (data.products === undefined || 0 === data.products.length) {
+                if (page === 0) {
+                    $none.show();
+                }
+                $wait.hide();
+                eol = true;
+            } else {
+                // TODO Ugly. Need data.count value.
+                if (30 > data.products.length) {
                     $wait.hide();
                     eol = true;
-                } else {
-                    // TODO Ugly. Need data.count value.
-                    if (30 > data.products.length) {
-                        $wait.hide();
-                        eol = true;
-                    }
-                    $.each(data.products, function (index, product) {
-                        $(Templates['inventory_line.html.twig'].render(product)).appendTo($list);
-                    });
                 }
-            })
-            .always(function () {
-                busy = false;
-            });
+                $.each(data.products, function (index, product) {
+                    $(Templates['inventory_line.html.twig'].render(product)).appendTo($list);
+                });
+            }
+        });
+
+        productsXhr.always(function () {
+            busy = false;
+        });
     }
 
     $window.on('scroll', function () {
@@ -234,11 +236,11 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
 
         if (sortDir !== 'none') {
             $a.removeClass('none').addClass(sortDir);
-            $form.find('input[name="inventory_search[sortBy]"]').val($a.data('by'));
-            $form.find('input[name="inventory_search[sortDir]"]').val(sortDir);
+            $form.find('input[name="inventory[sortBy]"]').val($a.data('by'));
+            $form.find('input[name="inventory[sortDir]"]').val(sortDir);
         } else {
-            $form.find('input[name="inventory_search[sortBy]"]').val(null);
-            $form.find('input[name="inventory_search[sortDir]"]').val(null);
+            $form.find('input[name="inventory[sortBy]"]').val(null);
+            $form.find('input[name="inventory[sortDir]"]').val(null);
         }
 
         $form.trigger('submit');

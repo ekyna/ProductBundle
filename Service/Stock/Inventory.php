@@ -226,7 +226,6 @@ DQL;
 
         // Context
         $context = $this->getContext();
-        $this->saveContext();
 
         // Products
         $pQb = $this->getProductsQueryBuilder();
