@@ -21,7 +21,11 @@
 {% endblock title %}
 
 {% block actions %}
-
+    {{ ui_button('ekyna_core.button.export', {
+        'path': path('ekyna_product_inventory_admin_export'),
+        'type': 'link',
+        'icon': 'download'
+    }) }}
 {% endblock actions %}
 
 {% block main %}

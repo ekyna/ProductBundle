@@ -10,6 +10,8 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class InventoryController
@@ -312,6 +314,48 @@ class InventoryController extends Controller
         ]);
 
         return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
+     * Inventory export action.
+     *
+     * @return StreamedResponse
+     */
+    public function exportAction()
+    {
+        $repository = $this->get('ekyna_product.product_stock_unit.repository');
+
+        $response = new StreamedResponse();
+
+        $response->setCallback(function() use ($repository) {
+            if (false === $handle = fopen('php://output', 'w+')) {
+                throw new \RuntimeException("Failed to open output stream.");
+            }
+
+            $stockUnits = $repository->findInStock();
+
+            /** @var \Ekyna\Component\Commerce\Stock\Model\StockUnitInterface $stockUnit */
+            foreach ($stockUnits as $stockUnit) {
+                $data = [
+                    $stockUnit->getSubject()->getId(),
+                    (string) $stockUnit->getSubject(),
+                    $stockUnit->getReceivedQuantity() - $stockUnit->getShippedQuantity(),
+                    $stockUnit->getNetPrice(),
+                    implode(', ', $stockUnit->getGeocodes())
+                ];
+
+                fputcsv($handle, $data, ';', '"');
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'inventory.csv'
+        ));
+
+        return $response;
     }
 
     /**
