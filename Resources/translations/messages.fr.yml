@@ -101,6 +101,7 @@ ekyna_product:
         field:
             min_quantity: Qte. min.
             max_quantity: Qte. max.
+            hidden: Masqué
             use_options: Options
         button:
             add: Ajouter un choix

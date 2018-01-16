@@ -11,12 +11,11 @@ use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Component\Commerce\Common\View\Formatter;
+use Ekyna\Component\Commerce\Common\Util\Formatter;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @package Ekyna\Bundle\ProductBundle\Service\Stock
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @TODO Move to commerce component
+ * @TODO    Move to commerce component
  */
 class Inventory
 {
@@ -120,16 +119,15 @@ DQL;
     /**
      * Constructor.
      *
-     * @param ProductRepository       $productRepository
-     * @param ResourceRepository      $supplierProductRepository
-     * @param UrlGeneratorInterface   $urlGenerator
-     * @param TranslatorInterface     $translator
-     * @param FormFactory             $formFactory
-     * @param SessionInterface        $session
-     * @param LocaleProviderInterface $localeProvider
-     * @param string                  $supplierOrderItemClass
-     * @param string                  $stockUnitClass
-     * @param string                  $defaultCurrency
+     * @param ProductRepository     $productRepository
+     * @param ResourceRepository    $supplierProductRepository
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param TranslatorInterface   $translator
+     * @param FormFactory           $formFactory
+     * @param SessionInterface      $session
+     * @param Formatter             $formatter
+     * @param string                $supplierOrderItemClass
+     * @param string                $stockUnitClass
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -138,10 +136,9 @@ DQL;
         TranslatorInterface $translator,
         FormFactory $formFactory,
         SessionInterface $session,
-        LocaleProviderInterface $localeProvider,
+        Formatter $formatter,
         $supplierOrderItemClass,
-        $stockUnitClass,
-        $defaultCurrency
+        $stockUnitClass
     ) {
         $this->productRepository = $productRepository;
         $this->supplierProductRepository = $supplierProductRepository;
@@ -149,11 +146,10 @@ DQL;
         $this->translator = $translator;
         $this->formFactory = $formFactory;
         $this->session = $session;
+        $this->formatter = $formatter;
 
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
-
-        $this->formatter = new Formatter($localeProvider->getCurrentLocale(), $defaultCurrency);
     }
 
     /**
@@ -278,12 +274,13 @@ DQL;
             $product['pending'] = 0 < $product['pending'] ? $this->formatter->number((float)$product['pending']) : '';
             $product['ordered'] = $this->formatter->number((float)$product['ordered']);
             $product['received'] = $this->formatter->number((float)$product['received']);
+            $product['adjusted'] = $this->formatter->number((float)$product['adjusted']);
             $product['sold'] = $this->formatter->number((float)$product['sold']);
             $product['shipped'] = $this->formatter->number((float)$product['shipped']);
 
             // Stock themes
             $product['sold_theme'] = '';
-            if ($product['sold'] > $product['ordered']) {
+            if ($product['sold'] > $product['ordered'] + $product['adjusted']) {
                 $product['sold_theme'] = 'danger';
             }
 
@@ -305,7 +302,6 @@ DQL;
 
         return $products;
     }
-
 
 
     /**
@@ -339,8 +335,9 @@ DQL;
             ->addSelect($this->getPendingSubQuery())
             ->addSelect($this->buildStockSubQuery('orderedQuantity', 'ordered', 'su1'))
             ->addSelect($this->buildStockSubQuery('receivedQuantity', 'received', 'su2'))
-            ->addSelect($this->buildStockSubQuery('soldQuantity', 'sold', 'su3'))
-            ->addSelect($this->buildStockSubQuery('shippedQuantity', 'shipped', 'su4'))
+            ->addSelect($this->buildStockSubQuery('adjustedQuantity', 'adjusted', 'su3'))
+            ->addSelect($this->buildStockSubQuery('soldQuantity', 'sold', 'su4'))
+            ->addSelect($this->buildStockSubQuery('shippedQuantity', 'shipped', 'su5'))
             ->leftJoin('p.brand', 'b')
             ->leftJoin('p.parent', 'parent')
             ->andWhere($pQb->expr()->in('p.type', ':types'))
@@ -417,14 +414,17 @@ DQL;
         // Profile
         if (InventoryProfiles::TREATMENT === $context->getProfile()) {
             $qb->andHaving($expr->andX(
-                $expr->lt('shipped', 'received'),
+                $expr->lt('shipped', $expr->sum('adjusted', 'received')),
                 $expr->lt('shipped', 'sold')
             ));
         } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
                 ->setParameter('not_mode', CStockModes::MODE_DISABLED)
-                ->andHaving($expr->lt('ordered', 'sold'));
+                ->andHaving($expr->orX(
+                    $expr->lt($expr->sum('adjusted', 'ordered'), 'sold'),
+                    $expr->lt('virtual_stock', 'stock_floor')
+                ));
         }
 
         // Sorting

@@ -1,3 +1,10 @@
+#ekyna_product_product_stock_unit_admin_list:
+#    path: /list
+#    defaults: { _controller: "ekyna_product.product_stock_unit.controller:listAction" }
+#    methods: [GET]
+#    requirements:
+#        productId: \d+
+
 ekyna_product_product_stock_unit_admin_new:
     path: /new
     defaults: { _controller: "ekyna_product.product_stock_unit.controller:newAction" }
@@ -5,26 +12,44 @@ ekyna_product_product_stock_unit_admin_new:
     requirements:
         productId: \d+
 
-#ekyna_product_product_stock_unit_admin_show:
-#    path: /{productStockUnitId}/show
-#    defaults: { _controller: "ekyna_product.product_stock_unit.controller:showAction" }
-#    methods: [GET]
+#ekyna_product_product_stock_unit_admin_edit:
+#    path: /{productStockUnitId}/edit
+#    defaults: { _controller: "ekyna_product.product_stock_unit.controller:editAction" }
+#    methods: [GET|POST]
+#    requirements:
+#        productId: \d+
+#        productStockUnitId: \d+
+#
+#ekyna_product_product_stock_unit_admin_remove:
+#    path: /{productStockUnitId}/remove
+#    defaults: { _controller: "ekyna_product.product_stock_unit.controller:removeAction" }
+#    methods: [GET|POST]
 #    requirements:
 #        productId: \d+
 #        productStockUnitId: \d+
 
-ekyna_product_product_stock_unit_admin_edit:
-    path: /{productStockUnitId}/edit
-    defaults: { _controller: "ekyna_product.product_stock_unit.controller:editAction" }
+ekyna_product_product_stock_unit_admin_adjustment_new:
+    path: /{productStockUnitId}/adjustments/new
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:adjustmentNewAction" }
     methods: [GET|POST]
     requirements:
         productId: \d+
         productStockUnitId: \d+
 
-ekyna_product_product_stock_unit_admin_remove:
-    path: /{productStockUnitId}/remove
-    defaults: { _controller: "ekyna_product.product_stock_unit.controller:removeAction" }
+ekyna_product_product_stock_unit_admin_adjustment_edit:
+    path: /{productStockUnitId}/adjustments/{stockAdjustmentId}/edit
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:adjustmentEditAction" }
     methods: [GET|POST]
     requirements:
         productId: \d+
         productStockUnitId: \d+
+        stockAdjustmentId: \d+
+
+ekyna_product_product_stock_unit_admin_adjustment_remove:
+    path: /{productStockUnitId}/adjustments/{stockAdjustmentId}/remove
+    defaults: { _controller: "ekyna_product.product_stock_unit.controller:adjustmentRemoveAction" }
+    methods: [GET|POST]
+    requirements:
+        productId: \d+
+        productStockUnitId: \d+
+        stockAdjustmentId: \d+

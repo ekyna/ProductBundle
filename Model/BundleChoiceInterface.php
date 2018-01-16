@@ -93,6 +93,22 @@ interface BundleChoiceInterface extends ResourceInterface
     public function setUseOptions($use);
 
     /**
+     * Returns whether the choice is hidden or not.
+     *
+     * @return bool
+     */
+    public function isHidden();
+
+    /**
+     * Sets whether the choice is hidden or not.
+     *
+     * @param bool $hidden
+     *
+     * @return $this|BundleChoiceInterface
+     */
+    public function setHidden($hidden);
+
+    /**
      * Returns the rules.
      *
      * @return ArrayCollection|BundleChoiceRuleInterface[]

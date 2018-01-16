@@ -25,7 +25,6 @@ final class ProductEvents
     const POST_DELETE        = 'ekyna_product.product.post_delete';
 
     const STOCK_UNIT_CHANGE  = 'ekyna_product.product.stock_unit_change';
-    const STOCK_UNIT_REMOVE  = 'ekyna_product.product.stock_unit_remove';
 
     const CHILD_PRICE_CHANGE        = 'ekyna_product.product.child_price_change';
     const CHILD_AVAILABILITY_CHANGE = 'ekyna_product.product.child_availability_change';

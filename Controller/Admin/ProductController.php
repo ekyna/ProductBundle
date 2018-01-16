@@ -4,13 +4,14 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
-use Ekyna\Bundle\AdminBundle\Controller\ResourceController;
+use Ekyna\Bundle\CommerceBundle\Controller\Admin\AbstractSubjectController;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Updater;
+use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @package Ekyna\Bundle\ProductBundle\Controller\Admin
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductController extends ResourceController
+class ProductController extends AbstractSubjectController
 {
     use RC\TinymceTrait,
         RC\ToggleableTrait;
@@ -258,63 +259,40 @@ class ProductController extends ResourceController
     }
 
     /**
-     * Refresh stock action.
-     *
-     * @param Request $request
-     *
-     * @return Response
+     * @inheritDoc
      */
-    public function refreshStockAction(Request $request)
+    protected function updateStock(SubjectInterface $subject)
     {
-        $context = $this->loadContext($request);
-        $resourceName = $this->config->getResourceName();
-        /** @var ProductInterface $product */
-        $product = $context->getResource($resourceName);
+        if (!$subject instanceof ProductInterface) {
+            return parent::updateStock($subject);
+        }
 
-        $this->isGranted('EDIT', $product);
-
-        // TODO Update
-        switch ($product->getType()) {
+        switch ($subject->getType()) {
             case ProductTypes::TYPE_CONFIGURABLE:
                 $calculator = $this->get('ekyna_product.pricing.calculator');
                 $updater = new Updater\ConfigurableUpdater($calculator);
-                $changed = $updater->updateStock($product);
-                $changed |= $updater->updateAvailability($product);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
                 break;
 
             case ProductTypes::TYPE_BUNDLE:
                 $calculator = $this->get('ekyna_product.pricing.calculator');
                 $updater = new Updater\BundleUpdater($calculator);
-                $changed = $updater->updateStock($product);
-                $changed |= $updater->updateAvailability($product);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
                 break;
 
             case ProductTypes::TYPE_VARIABLE:
                 $updater = new Updater\VariableUpdater();
-                $changed = $updater->updateStock($product);
-                $changed |= $updater->updateAvailability($product);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
                 break;
 
             default:
-                $updater = $this->get('ekyna_commerce.stock_subject_updater');
-                $changed = $updater->update($product);
+                $changed = parent::updateStock($subject);
         }
 
-        if ($changed) {
-            $event = $this->getOperator()->update($product);
-            if ($event->hasErrors()) {
-                throw new RuntimeException("Failed to update product stock and availability.");
-            }
-        }
-
-        $response = $this->render('EkynaProductBundle:Admin/Product:response.xml.twig', [
-            'product'    => $product,
-            'stock_view' => true,
-        ]);
-
-        $response->headers->add(['Content-Type' => 'application/xml']);
-
-        return $response;
+        return $changed;
     }
 
     /**
@@ -402,40 +380,6 @@ class ProductController extends ResourceController
         }
 
         return $this->redirect($this->generateResourcePath($variable));
-    }
-
-    /**
-     * Label action.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function labelAction(Request $request)
-    {
-        $format = $request->attributes->get('format');
-        $ids = (array)$request->query->get('id', []);
-
-        $ids = array_map(function ($id) {
-            return intval($id);
-        }, $ids);
-
-        $ids = array_filter($ids, function ($id) {
-            return 0 < $id;
-        });
-
-        /** @var ProductInterface[] $products */
-        $products = (array)$this->getRepository()->findBy(['id' => $ids]);
-
-        $renderer = $this->get('ekyna_commerce.subject.label_renderer');
-
-        $labels = $renderer->buildLabels($products);
-
-        $pdf = $renderer->render($labels, $format);
-
-        return new Response($pdf, Response::HTTP_OK, [
-            'Content-Type' => 'application/pdf',
-        ]);
     }
 
     /**

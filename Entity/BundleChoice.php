@@ -43,6 +43,11 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $useOptions;
 
     /**
+     * @var bool
+     */
+    protected $hidden;
+
+    /**
      * @var ArrayCollection|Model\BundleChoiceRuleInterface[]
      */
     protected $rules;
@@ -61,6 +66,7 @@ class BundleChoice implements Model\BundleChoiceInterface
         $this->minQuantity = 1;
         $this->maxQuantity = 1;
         $this->useOptions = true;
+        $this->hidden = false;
         $this->rules = new ArrayCollection();
     }
 
@@ -175,6 +181,24 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function setUseOptions($use)
     {
         $this->useOptions = (bool)$use;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setHidden($hidden)
+    {
+        $this->hidden = (bool)$hidden;
 
         return $this;
     }

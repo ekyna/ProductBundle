@@ -39,6 +39,16 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     /**
      * @inheritdoc
      */
+    public function findReadyBySubject(StockSubjectInterface $subject)
+    {
+        return $this->findBySubjectAndStates($subject, [
+            StockUnitStates::STATE_READY,
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function findPendingOrReadyBySubject(StockSubjectInterface $subject)
     {
         return $this->findBySubjectAndStates($subject, [
@@ -79,7 +89,10 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
             ->andWhere($qb->expr()->orX(
                 $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not yet linked to a supplier order
-                $qb->expr()->lt($alias . '.soldQuantity', $alias . '.orderedQuantity')   // Sold lower than ordered
+                $qb->expr()->lt(                                    // Sold lower than ordered + adjusted
+                    $alias . '.soldQuantity',
+                    $qb->expr()->sum($alias . '.orderedQuantity', $alias . '.adjustedQuantity')
+                )
             ))
             ->setParameter('product', $subject)
             ->getQuery()
@@ -104,7 +117,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
-            ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem')) // Not yet linked to a supplier order
+            ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem'))// Not yet linked to a supplier order
             ->setParameter('product', $subject)
             ->getQuery()
             ->getResult();
@@ -115,10 +128,11 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
      *
      * @param StockSubjectInterface $subject
      * @param array                 $states
+     * @param string                $sort
      *
      * @return array
      */
-    private function findBySubjectAndStates(StockSubjectInterface $subject, array $states)
+    private function findBySubjectAndStates(StockSubjectInterface $subject, array $states, $sort = 'ASC')
     {
         if (!$subject instanceof ProductInterface) {
             throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
@@ -147,6 +161,7 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->addOrderBy($alias . '.createdAt', $sort)
             ->setParameter('product', $subject)
             ->getQuery()
             ->getResult();
@@ -159,11 +174,44 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     {
         $qb = $this->getQueryBuilder('psu');
 
+        $inStock = $qb->expr()->diff(
+            $qb->expr()->sum('psu.receivedQuantity', 'psu.adjustedQuantity'),
+            'psu.shippedQuantity'
+        );
+
         return $qb
             ->join('psu.product', 'p')
-            ->andWhere($qb->expr()->gt('psu.receivedQuantity', 0))
-            ->andWhere($qb->expr()->gt('psu.receivedQuantity', 'psu.shippedQuantity'))
+            ->andWhere($qb->expr()->gt($inStock, 0))
             ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findLatestClosedBySubject(StockSubjectInterface $subject, $limit = 3)
+    {
+        if (!$subject instanceof ProductInterface) {
+            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
+        }
+
+        if (!$subject->getId()) {
+            return [];
+        }
+
+        $alias = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+            ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->eq($alias . '.state', ':state'))
+            ->addOrderBy($alias . '.closedAt', 'DESC')
+            ->setParameters([
+                'product' => $subject,
+                'state'   => StockUnitStates::STATE_CLOSED,
+            ])
+            ->getQuery()
+            ->setMaxResults($limit)
             ->getResult();
     }
 

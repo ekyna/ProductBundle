@@ -355,6 +355,10 @@ class ItemBuilder
             $item->setQuantity($choice->getMaxQuantity());
         }
 
+        if ($choice->isHidden()) {
+            $item->setPrivate(true);
+        }
+
         $item
             ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
             ->setData(static::BUNDLE_CHOICE_ID, $choice->getId())

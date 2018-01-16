@@ -156,7 +156,8 @@ class InventoryController extends Controller
         $list = $this
             ->get('ekyna_commerce.stock.stock_renderer')
             ->renderSubjectStockUnits($product, [
-                'class' => 'table-condensed',
+                'class'  => 'table-condensed',
+                'script' => true,
             ]);
 
         $title = sprintf(
@@ -327,7 +328,7 @@ class InventoryController extends Controller
 
         $response = new StreamedResponse();
 
-        $response->setCallback(function() use ($repository) {
+        $response->setCallback(function () use ($repository) {
             if (false === $handle = fopen('php://output', 'w+')) {
                 throw new \RuntimeException("Failed to open output stream.");
             }
@@ -336,12 +337,16 @@ class InventoryController extends Controller
 
             /** @var \Ekyna\Component\Commerce\Stock\Model\StockUnitInterface $stockUnit */
             foreach ($stockUnits as $stockUnit) {
+                $inStock = $stockUnit->getReceivedQuantity()
+                    + $stockUnit->getAdjustedQuantity()
+                    - $stockUnit->getShippedQuantity();
+
                 $data = [
                     $stockUnit->getSubject()->getId(),
-                    (string) $stockUnit->getSubject(),
-                    $stockUnit->getReceivedQuantity() - $stockUnit->getShippedQuantity(),
+                    (string)$stockUnit->getSubject(),
+                    $inStock,
                     $stockUnit->getNetPrice(),
-                    implode(', ', $stockUnit->getGeocodes())
+                    implode(', ', $stockUnit->getGeocodes()),
                 ];
 
                 fputcsv($handle, $data, ';', '"');

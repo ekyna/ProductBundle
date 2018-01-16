@@ -369,17 +369,17 @@
                             {{- choice.product|stock_subject_state_badge -}}
                         </td>
                         <td id="{{ slotId ~ 'visible' }}" class="text-right" style="font-size: 11px">
-                            {%- if choice.product.visible -%}
-                                <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
-                            {%- else -%}
+                            {%- if (not choice.product.visible) or choice.hidden -%}
                                 <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- endif -%}
                         </td>
                         <td id="{{ slotId ~ 'useOptions' }}" class="text-right" style="font-size: 11px">
                             {%- if choice.useOptions -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
-                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                                <span class="label label-warning">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
                         <td id="{{ slotId ~ 'minQuantity' }}" class="text-right">
@@ -498,7 +498,7 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <p>
+                <p class="alert alert-danger">
                     <em>Wrong product type</em>
                 </p>
             {% endif %}
@@ -524,16 +524,19 @@
         <hr>
         {%- if product.stockMode is stock_mode_manual -%}
         <div class="actions">
-            {{ admin_resource_btn('ekyna_product.product_stock_unit', 'new', {
+            {{- admin_resource_btn('ekyna_product.product_stock_unit', 'new', {
                 'label': 'ekyna_commerce.stock_unit.button.new',
                 'size': 'xs',
                 'path': path('ekyna_product_product_stock_unit_admin_new', {
                     'productId': product.id,
                 })
-            }) }}
+            }) -}}
         </div>
         {%- endif -%}
-        {{- render_subject_stock_units(product, {'id': 'product_stockUnit'}) -}}
+        {{- render_subject_stock_units(product, {
+            'prefix': 'product_stockUnit',
+            'id': 'stock-units-view'
+        }) -}}
     {%- endif -%}
 {% endspaceless %}
 {% endmacro show_stock_units %}

@@ -1,16 +1,10 @@
-define(['jquery', 'ekyna-ui'], function($) {
-
-    console.log('test');
+define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-ui'], function($, Dispatcher, StockUnits) {
 
     var $stockRefreshBtn = $('#stock-view-refresh'),
         $stockView = $('#stock-view'),
         stockXhr = null;
 
-    console.log($stockRefreshBtn.size(), $stockView.size());
-
-    $stockRefreshBtn.on('click', function(e) {
-        e.preventDefault();
-
+    function refreshStock(skipUpdate) {
         $stockView.loadingSpinner();
 
         if (null !== stockXhr) {
@@ -18,8 +12,14 @@ define(['jquery', 'ekyna-ui'], function($) {
             stockXhr = null;
         }
 
+        var url = $stockRefreshBtn.attr('href');
+
+        if (!!skipUpdate) {
+            url += '?no-update=1'
+        }
+
         stockXhr = $.ajax({
-            url: $stockRefreshBtn.attr('href'),
+            url: url,
             dataType: 'xml'
         });
 
@@ -29,8 +29,19 @@ define(['jquery', 'ekyna-ui'], function($) {
                 $stockView.html($view.text());
             }
         });
+    }
+
+    $stockRefreshBtn.on('click', function(e) {
+        e.preventDefault();
+
+        refreshStock();
 
         return false;
     });
 
+    Dispatcher.on('ekyna_commerce.stock_units.change', function() {
+        refreshStock(true);
+    });
+
+    new StockUnits('stock-units-view');
 });

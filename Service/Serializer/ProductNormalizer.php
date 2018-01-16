@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
 use Ekyna\Component\Resource\Model\TranslationInterface;
 use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
 
@@ -14,15 +15,35 @@ use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
 class ProductNormalizer extends AbstractTranslatableNormalizer
 {
     /**
+     * @var SubjectNormalizerHelper
+     */
+    protected $helper;
+
+
+    /**
+     * Sets the helper.
+     *
+     * @param SubjectNormalizerHelper $helper
+     */
+    public function setSubjectNormalizerHelper(SubjectNormalizerHelper $helper)
+    {
+        $this->helper = $helper;
+    }
+
+    /**
      * @inheritdoc
+     *
+     * @param Model\ProductInterface $product
      */
     public function normalize($product, $format = null, array $context = [])
     {
-        $data = parent::normalize($product, $format, $context);
-
-        /** @var Model\ProductInterface $product */
-
         $groups = isset($context['groups']) ? (array)$context['groups'] : [];
+
+        if (in_array('StockView', $groups)) {
+            return $this->helper->normalizeStock($product, $format, $context);
+        }
+
+        $data = parent::normalize($product, $format, $context);
 
         $data = array_replace([
             'designation' => $product->getFullDesignation(),

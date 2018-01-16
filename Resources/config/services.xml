@@ -29,10 +29,9 @@
             <argument type="service" id="translator"/>
             <argument type="service" id="form.factory"/>
             <argument type="service" id="session"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_commerce.util.formatter.default"/>
             <argument>%ekyna_commerce.supplier_order_item.class%</argument>
             <argument>%ekyna_product.product_stock_unit.class%</argument>
-            <argument>%ekyna_commerce.default.currency%</argument>
         </service>
         <service id="ekyna_product.resupply"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Resupply">
@@ -487,24 +486,31 @@
         <!-- Serialization -->
         <service id="ekyna_product.product.normalizer"
                  class="Ekyna\Bundle\ProductBundle\Service\Serializer\ProductNormalizer"
-                 parent="ekyna_resource.serializer.resource_normalizer">
+                 parent="ekyna_resource.serializer.resource_normalizer"
+                 public="false">
+            <call method="setSubjectNormalizerHelper">
+                <argument type="service" id="ekyna_commerce.subject.normalizer_helper"/>
+            </call>
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>
         <service id="ekyna_product.product_reference.normalizer"
-                 class="Ekyna\Bundle\ProductBundle\Service\Serializer\ProductReferenceNormalizer">
+                 class="Ekyna\Bundle\ProductBundle\Service\Serializer\ProductReferenceNormalizer"
+                 public="false">
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>
         <service id="ekyna_product.brand.normalizer"
                  class="Ekyna\Bundle\ProductBundle\Service\Serializer\BrandNormalizer"
-                 parent="ekyna_resource.serializer.resource_normalizer">
+                 parent="ekyna_resource.serializer.resource_normalizer"
+                 public="false">
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>
         <service id="ekyna_product.category.normalizer"
                  class="Ekyna\Bundle\ProductBundle\Service\Serializer\CategoryNormalizer"
-                 parent="ekyna_resource.serializer.resource_normalizer">
+                 parent="ekyna_resource.serializer.resource_normalizer"
+                 public="false">
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>

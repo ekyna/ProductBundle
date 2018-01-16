@@ -86,6 +86,13 @@ class BundleChoiceType extends ResourceFormType
                     'property_path' => 'minQuantity',
                     'scale'         => 3, // TODO Packaging
                 ])
+                ->add('hidden', Type\CheckboxType::class, [
+                    'label'    => 'ekyna_product.bundle_choice.field.hidden',
+                    'required' => false,
+                    'attr'     => [
+                        'align_with_widget' => true,
+                    ],
+                ])
                 ->add('useOptions', Type\CheckboxType::class, [
                     'label'    => 'ekyna_product.bundle_choice.field.use_options',
                     'required' => false,

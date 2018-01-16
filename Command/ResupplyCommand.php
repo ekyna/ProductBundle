@@ -189,7 +189,8 @@ class ResupplyCommand extends ContainerAwareCommand
 
                 $deliveryItem
                     ->setOrderItem($orderItem)
-                    ->setQuantity($orderItem->getQuantity());
+                    ->setQuantity($orderItem->getQuantity())
+                    ->setGeocode('TEST');
 
                 $delivery->addItem($deliveryItem);
             }

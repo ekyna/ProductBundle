@@ -344,6 +344,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->variableNode('templates')->defaultValue('EkynaProductBundle:Admin/ProductStockUnit')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\ProductStockUnit')->end()
+                                ->scalarNode('controller')->defaultValue('Ekyna\Bundle\CommerceBundle\Controller\Admin\StockUnitController')->end()
                                 ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository')->end()
                                 ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\ProductStockUnitType')->end()
                                 ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()

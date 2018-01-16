@@ -123,6 +123,9 @@
                             {{- 'ekyna_commerce.stock_unit.field.received_quantity'|trans -}}
                         </th>
                         <th>
+                            {{- 'ekyna_commerce.stock_unit.field.adjusted_quantity'|trans -}}
+                        </th>
+                        <th>
                             {{- 'ekyna_commerce.stock_unit.field.sold_quantity'|trans -}}
                         </th>
                         <th>
@@ -136,14 +139,14 @@
                 <tbody id="inventory_list"></tbody>
                 <tbody>
                     <tr id="inventory_wait">
-                        <td colspan="18">
+                        <td colspan="19">
                             <p class="text-center">
                                 Please wait&hellip;
                             </p>
                         </td>
                     </tr>
                     <tr id="inventory_none" style="display:none">
-                        <td colspan="18">
+                        <td colspan="19">
                             <p class="text-center">
                                 Aucun résultat.
                             </p>

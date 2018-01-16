@@ -1,4 +1,4 @@
-define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function ($, Router, Templates, Modal) {
+define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal'], function ($, Router, Dispatcher, Templates, Modal) {
 
     var $window = $(window),
         $list = $('#inventory_list'),
@@ -96,8 +96,6 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         if (busy || eol) {
             return;
         }
-
-        console.log($window.scrollTop(), $wait.offset().top);
 
         if (($window.scrollTop() + $window.height()) > $wait.offset().top) {
             nextList();
@@ -246,6 +244,10 @@ define(['jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal'], function
         $form.trigger('submit');
 
         return false;
+    });
+
+    Dispatcher.on('ekyna_commerce.stock_units.change', function() {
+        refreshList();
     });
 
     refreshList();

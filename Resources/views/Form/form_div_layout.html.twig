@@ -62,11 +62,14 @@
             {{ form_row(form.rules, {'label_col': 2, 'widget_col': 10}) }}
         {% else %}
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.quantity, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-6">
-                    {{ form_row(form.useOptions, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.useOptions, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.hidden, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
             </div>
         {% endif %}
