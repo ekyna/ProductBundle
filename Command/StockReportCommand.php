@@ -135,7 +135,6 @@ class StockReportCommand extends Command
         $fromName = $this->settings->getParameter('notification.from_name');
         $toEmail = $this->settings->getParameter('notification.to_emails');
 
-
         $message = new \Swift_Message();
         $message
             ->setSubject($title)

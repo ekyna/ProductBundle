@@ -351,7 +351,9 @@
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
                         <th>{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.type'|trans }}</th>
                         <th>{{ 'ekyna_core.field.visible'|trans }}</th>
+                        <th>{{ 'ekyna_product.bundle_choice.field.hidden'|trans }}</th>
                         <th>{{ 'ekyna_product.bundle_choice.field.use_options'|trans }}</th>
                         <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
                         <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
@@ -368,11 +370,21 @@
                         <td id="{{ slotId ~ 'stockState' }}" class="text-right" style="font-size: 11px">
                             {{- choice.product|stock_subject_state_badge -}}
                         </td>
+                        <td id="{{ slotId ~ 'type' }}" class="text-right" style="font-size: 11px">
+                            {{- choice.product|product_type_badge -}}
+                        </td>
                         <td id="{{ slotId ~ 'visible' }}" class="text-right" style="font-size: 11px">
-                            {%- if (not choice.product.visible) or choice.hidden -%}
-                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
-                            {%- else -%}
+                            {%- if choice.product.visible -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- endif -%}
+                        </td>
+                        <td id="{{ slotId ~ 'hidden' }}" class="text-right" style="font-size: 11px">
+                            {%- if choice.hidden -%}
+                                <span class="label label-warning">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-default">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
                         <td id="{{ slotId ~ 'useOptions' }}" class="text-right" style="font-size: 11px">

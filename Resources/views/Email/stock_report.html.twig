@@ -49,7 +49,7 @@
         {% for product in products -%}
         <tr>
             <td>
-                <a href="{{ path('ekyna_product_product_admin_show', {'productId': product.id}) }}">
+                <a href="{{ url('ekyna_product_product_admin_show', {'productId': product.id}) }}">
                     {{- product.getFullTitle(true) -}}
                 </a>
             </td>
