@@ -6,6 +6,7 @@ use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
+use Ekyna\Component\Commerce\Order\Model\OrderStates;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -199,7 +200,9 @@ class InventoryController extends Controller
             ->get('table.factory')
             ->createTable($orderConfig->getResourceName(), $orderConfig->getTableType(), [
                 'subject' => $product,
-                // TODO 'states' => [ ... ],
+                'states'  => [OrderStates::STATE_ACCEPTED],
+                // TODO limit => 100 (no paggging)
+                // TODO summary
             ]);
 
         if (null !== $response = $table->handleRequest($request)) {
