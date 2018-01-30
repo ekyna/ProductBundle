@@ -421,10 +421,12 @@ DQL;
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
                 ->setParameter('not_mode', CStockModes::MODE_DISABLED)
-                ->andHaving($expr->orX(
-                    $expr->lt($expr->sum('adjusted', 'ordered'), 'sold'),
-                    $expr->lt('virtual_stock', 'stock_floor')
-                ));
+                ->andHaving($expr->lt($expr->sum('adjusted', 'ordered'), 'sold'));
+        } elseif (InventoryProfiles::OUT_OF_STOCK === $context->getProfile()) {
+            $qb
+                ->andWhere($expr->neq('p.stockMode', ':not_mode'))
+                ->setParameter('not_mode', CStockModes::MODE_DISABLED)
+                ->andHaving($expr->lt('virtual_stock', 'stock_floor'));
         }
 
         // Sorting

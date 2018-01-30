@@ -7,6 +7,7 @@ use Ekyna\Bundle\CoreBundle\Modal\Modal;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Ekyna\Component\Commerce\Order\Model\OrderStates;
+use Ekyna\Component\Commerce\Shipment\Model\ShipmentStates;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,9 +81,9 @@ class InventoryController extends Controller
      */
     public function quickEditAction(Request $request)
     {
-        /*if (!$request->isXmlHttpRequest()) {
+        if (!$request->isXmlHttpRequest() && !$this->getParameter('kernel.debug')) {
             throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
-        }*/
+        }
 
         $product = $this->findProductByRequest($request);
 
@@ -148,7 +149,7 @@ class InventoryController extends Controller
      */
     public function stockUnitsAction(Request $request)
     {
-        if (!$request->isXmlHttpRequest()) {
+        if (!$request->isXmlHttpRequest() && !$this->getParameter('kernel.debug')) {
             throw $this->createNotFoundException('Only XHR is supported.');
         }
 
@@ -188,7 +189,7 @@ class InventoryController extends Controller
      */
     public function customerOrdersAction(Request $request)
     {
-        if (!$request->isXmlHttpRequest()) {
+        if (!$request->isXmlHttpRequest() && !$this->getParameter('kernel.debug')) {
             throw $this->createNotFoundException('Only XHR is supported.');
         }
 
@@ -199,8 +200,9 @@ class InventoryController extends Controller
         $table = $this
             ->get('table.factory')
             ->createTable($orderConfig->getResourceName(), $orderConfig->getTableType(), [
-                'subject' => $product,
-                'states'  => [OrderStates::STATE_ACCEPTED],
+                'subject'       => $product,
+                'state'         => [OrderStates::STATE_ACCEPTED],
+                'shipmentState' => [ShipmentStates::STATE_NEW, ShipmentStates::STATE_PENDING, ShipmentStates::STATE_PARTIAL],
                 // TODO limit => 100 (no paggging)
                 // TODO summary
             ]);

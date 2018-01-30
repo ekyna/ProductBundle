@@ -11,9 +11,10 @@ use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
  */
 class InventoryProfiles extends AbstractConstants
 {
-    const NONE      = 'none';
-    const TREATMENT = 'treatment';
-    const RESUPPLY  = 'resupply';
+    const NONE         = 'none';
+    const TREATMENT    = 'treatment';
+    const RESUPPLY     = 'resupply';
+    const OUT_OF_STOCK = 'out_of_stock';
 
 
     /**
@@ -24,9 +25,10 @@ class InventoryProfiles extends AbstractConstants
         $prefix = 'ekyna_product.inventory.profile.';
 
         return [
-            static::NONE      => [$prefix . static::NONE],
-            static::TREATMENT => [$prefix . static::TREATMENT],
-            static::RESUPPLY  => [$prefix . static::RESUPPLY],
+            static::NONE         => [$prefix . static::NONE],
+            static::TREATMENT    => [$prefix . static::TREATMENT],
+            static::RESUPPLY     => [$prefix . static::RESUPPLY],
+            static::OUT_OF_STOCK => [$prefix . static::OUT_OF_STOCK],
         ];
     }
 }
