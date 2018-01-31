@@ -8,6 +8,7 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Ekyna\Component\Commerce\Order\Model\OrderStates;
 use Ekyna\Component\Commerce\Shipment\Model\ShipmentStates;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -343,6 +344,7 @@ class InventoryController extends Controller
             fputcsv($handle, [
                 'id',
                 'designation',
+                'reference',
                 'stock',
                 'buy price',
                 'geocode',
@@ -354,9 +356,13 @@ class InventoryController extends Controller
                     + $stockUnit->getAdjustedQuantity()
                     - $stockUnit->getShippedQuantity();
 
+                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+                $product = $stockUnit->getSubject();
+
                 $data = [
-                    $stockUnit->getSubject()->getId(),
-                    (string)$stockUnit->getSubject(),
+                    $product->getId(),
+                    (string)$product,
+                    $product->getReference(),
                     $inStock,
                     $stockUnit->getNetPrice(),
                     implode(', ', $stockUnit->getGeocodes()),
@@ -397,6 +403,7 @@ class InventoryController extends Controller
             fputcsv($handle, [
                 'id',
                 'designation',
+                'reference',
                 'stock',
                 'geocode',
             ], ';', '"');
@@ -406,6 +413,7 @@ class InventoryController extends Controller
                 $data = [
                     $product->getId(),
                     $product->getFullDesignation(true),
+                    $product->getReference(),
                     $product->getInStock(),
                     $product->getGeocode(),
                 ];
