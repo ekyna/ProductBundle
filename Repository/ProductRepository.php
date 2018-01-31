@@ -5,8 +5,9 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
+use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
 /**
@@ -196,7 +197,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findOutOfStockProducts($mode)
     {
-        StockSubjectModes::isValid($mode, true);
+        BStockModes::isValid($mode, true);
 
         $qb = $this->createQueryBuilder('p');
 
@@ -206,6 +207,22 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->lt('p.virtualStock', 'p.stockFloor'))
             ->getQuery()
             ->setParameter('mode', $mode)
+            ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findForInventoryExport()
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->andWhere($qb->expr()->in('p.type', ':types'))
+            ->andWhere($qb->expr()->neq('p.stockMode', ':mode'))
+            ->getQuery()
+            ->setParameter('mode', [CStockModes::MODE_DISABLED])
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
             ->getResult();
     }

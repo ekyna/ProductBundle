@@ -21,8 +21,13 @@
 {% endblock title %}
 
 {% block actions %}
-    {{ ui_button('ekyna_core.button.export', {
-        'path': path('ekyna_product_inventory_admin_export'),
+    {{ ui_button('ekyna_product.inventory.button.export_products', {
+        'path': path('ekyna_product_inventory_admin_export_products'),
+        'type': 'link',
+        'icon': 'download'
+    }) }}
+    {{ ui_button('ekyna_product.inventory.button.export_units', {
+        'path': path('ekyna_product_inventory_admin_export_units'),
         'type': 'link',
         'icon': 'download'
     }) }}

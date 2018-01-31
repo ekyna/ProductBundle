@@ -323,11 +323,11 @@ class InventoryController extends Controller
     }
 
     /**
-     * Inventory export action.
+     * Inventory units export action.
      *
      * @return StreamedResponse
      */
-    public function exportAction()
+    public function exportUnitsAction()
     {
         $repository = $this->get('ekyna_product.product_stock_unit.repository');
 
@@ -339,6 +339,14 @@ class InventoryController extends Controller
             }
 
             $stockUnits = $repository->findInStock();
+
+            fputcsv($handle, [
+                'id',
+                'designation',
+                'stock',
+                'buy price',
+                'geocode',
+            ], ';', '"');
 
             /** @var \Ekyna\Component\Commerce\Stock\Model\StockUnitInterface $stockUnit */
             foreach ($stockUnits as $stockUnit) {
@@ -362,7 +370,55 @@ class InventoryController extends Controller
 
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'inventory.csv'
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'inventory-units.csv'
+        ));
+
+        return $response;
+    }
+
+    /**
+     * Inventory products export action.
+     *
+     * @return StreamedResponse
+     */
+    public function exportProductsAction()
+    {
+        $repository = $this->get('ekyna_product.product.repository');
+
+        $response = new StreamedResponse();
+
+        $response->setCallback(function () use ($repository) {
+            if (false === $handle = fopen('php://output', 'w+')) {
+                throw new \RuntimeException("Failed to open output stream.");
+            }
+
+            $products = $repository->findForInventoryExport();
+
+            fputcsv($handle, [
+                'id',
+                'designation',
+                'stock',
+                'geocode',
+            ], ';', '"');
+
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+            foreach ($products as $product) {
+                $data = [
+                    $product->getId(),
+                    $product->getFullDesignation(true),
+                    $product->getInStock(),
+                    $product->getGeocode(),
+                ];
+
+                fputcsv($handle, $data, ';', '"');
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'inventory-products.csv'
         ));
 
         return $response;

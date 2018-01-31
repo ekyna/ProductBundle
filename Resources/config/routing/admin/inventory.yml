@@ -38,7 +38,12 @@ ekyna_product_inventory_admin_resupply:
     options:
         expose: true
 
-ekyna_product_inventory_admin_export:
-    path: /export
-    defaults: { _controller: EkynaProductBundle:Admin/Inventory:export }
+ekyna_product_inventory_admin_export_products:
+    path: /export-products
+    defaults: { _controller: EkynaProductBundle:Admin/Inventory:exportProducts }
+    methods: [GET]
+
+ekyna_product_inventory_admin_export_units:
+    path: /export-units
+    defaults: { _controller: EkynaProductBundle:Admin/Inventory:exportUnits }
     methods: [GET]

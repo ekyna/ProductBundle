@@ -161,6 +161,9 @@ ekyna_product:
         title: Inventaire
         field:
             profile: Profil
+        button:
+            export_units: Exporter les unités de stock
+            export_products: Exporter les produits
         modal:
             orders: Commandes clients
             resupply: Réassort

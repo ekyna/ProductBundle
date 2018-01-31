@@ -80,6 +80,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findOutOfStockProducts($mode);
 
     /**
+     * Finds the products for inventory export.
+     *
+     * @return array|Model\ProductInterface[]
+     */
+    public function findForInventoryExport();
+
+    /**
      * Loads the product's medias.
      *
      * @param Model\ProductInterface $product
