@@ -49,6 +49,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             'designation' => $product->getFullDesignation(),
             'type'        => $product->getType(),
             'reference'   => $product->getReference(),
+            'net_price'   => $product->getNetPrice(),
+            'stock_state' => $product->getStockState(),
             'visible'     => $product->isVisible(),
         ], $data);
 
