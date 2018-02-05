@@ -30,44 +30,44 @@
                 {# TODO status #}
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.netPrice, 'number', 'ekyna_commerce.stock_unit.field.net_price', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.netPrice, 'number', {
+                            'label': 'ekyna_commerce.stock_unit.field.net_price',
+                            'label_col': 4
                             'append': ' €'
                         }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.geocodes|join(', '), 'text', 'ekyna_commerce.stock_unit.field.geocode', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.geocodes|join(', '), 'text', {
+                            'label': 'ekyna_commerce.stock_unit.field.geocode',
+                            'label_col': 4
                         }) }}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.estimatedDateOfArrival, 'datetime', 'ekyna_commerce.stock_unit.field.estimated_date_of_arrival', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.estimatedDateOfArrival, 'datetime', {
+                            'label': 'ekyna_commerce.stock_unit.field.estimated_date_of_arrival',
+                            'label_col': 4
                         }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.orderedQuantity, 'number', 'ekyna_commerce.stock_unit.field.ordered_quantity', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.orderedQuantity, 'number', {
+                            'label': 'ekyna_commerce.stock_unit.field.ordered_quantity',
+                            'label_col': 4
                         }) }}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.receivedQuantity, 'number', 'ekyna_commerce.stock_unit.field.received_quantity', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.receivedQuantity, 'number', {
+                            'label': 'ekyna_commerce.stock_unit.field.received_quantity',
+                            'label_col': 4
                         }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(productStockUnit.shippedQuantity, 'number', 'ekyna_commerce.stock_unit.field.shipped_quantity', {
-                            'label_nb_col': 4,
-                            'widget_nb_col': 8,
+                        {{ show_row(productStockUnit.shippedQuantity, 'number', {
+                            'label': 'ekyna_commerce.stock_unit.field.shipped_quantity',
+                            'label_col': 4
                         }) }}
                     </div>
                 </div>

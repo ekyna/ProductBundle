@@ -23,28 +23,37 @@
             <div class="tab-pane active" id="category-general">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(category.name, 'text', 'ekyna_core.field.name', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(category.name, 'text', {
+                            'label': 'ekyna_core.field.name',
+                            'label_col': 4
+                        }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(category.visible, 'checkbox', 'ekyna_core.field.visible', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(category.visible, 'boolean', {
+                            'label': 'ekyna_core.field.visible',
+                            'label_col': 4
+                        }) }}
                     </div>
                 </div>
-                {{ show_row(category.parent, 'entity', 'ekyna_core.field.parent', {
+                {{ show_row(category.parent, 'entity', {
+                    'label': 'ekyna_core.field.parent',
                     'route': 'ekyna_product_category_admin_show',
-                    'route_params_map': {'categoryId': 'id'}
+                    'route_parameters_map': {'categoryId': 'id'}
                 }) }}
-                {{ show_translations_row(category.translations, {
+                {{ show_row(category.translations, 'translations', {
                     'fields': {
                         'title': {'label': 'ekyna_core.field.title'},
                         'description': {
                             'label': 'ekyna_core.field.description',
                             'type': 'tinymce',
-                            'content': path('ekyna_product_category_admin_tinymce', {'categoryId': category.id}),
-                            'options': {'height': 100}
+                            'value': path('ekyna_product_category_admin_tinymce', {'categoryId': category.id}),
+                            'options': {'height': 150}
                         }
                     }
                 }) }}
-                {{ show_row(category.media, 'media', 'ekyna_core.field.image') }}
+                {{ show_row(category.media, 'media', {
+                    'label': 'ekyna_core.field.image'
+                }) }}
             </div>
             <div class="tab-pane" id="category-seo">
                 {{ show_row(category.seo, 'seo') }}

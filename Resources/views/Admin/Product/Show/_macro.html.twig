@@ -1,6 +1,7 @@
 {% macro show_designation(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.designation, 'text', 'ekyna_core.field.designation', {
+    {{ show_row(product.designation, 'text', {
+        'label': 'ekyna_core.field.designation',
         'id': 'product_designation'
     }|merge(options)) }}
 {% endspaceless %}
@@ -9,7 +10,8 @@
 
 {% macro show_visible(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.visible, 'checkbox', 'ekyna_core.field.visible', {
+    {{ show_row(product.visible, 'boolean', {
+        'label': 'ekyna_core.field.visible',
         'id': 'product_visible'
     }|merge(options)) }}
 {% endspaceless %}
@@ -18,9 +20,10 @@
 
 {% macro show_brand(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.brand, 'entity', 'ekyna_product.brand.label.singular', {
+    {{ show_row(product.brand, 'entity', {
+        'label': 'ekyna_product.brand.label.singular',
         'route': 'ekyna_product_brand_admin_show',
-        'route_params_map': {'brandId': 'id'},
+        'route_parameters_map': {'brandId': 'id'},
         'id': 'product_brand'
     }|merge(options)) }}
 {% endspaceless %}
@@ -29,9 +32,10 @@
 
 {% macro show_categories(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.categories, 'entity', 'ekyna_product.category.label.plural', {
+    {{ show_row(product.categories, 'entity', {
+        'label': 'ekyna_product.category.label.plural',
         'route': 'ekyna_product_category_admin_show',
-        'route_params_map': {'categoryId': 'id'},
+        'route_parameters_map': {'categoryId': 'id'},
         'id': 'product_categories'
     }|merge(options)) }}
 {% endspaceless %}
@@ -40,9 +44,10 @@
 
 {% macro show_customer_groups(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.customerGroups, 'entity', 'ekyna_commerce.customer_group.label.plural', {
+    {{ show_row(product.customerGroups, 'entity', {
+        'label': 'ekyna_commerce.customer_group.label.plural',
         'route': 'ekyna_commerce_customer_group_admin_show',
-        'route_params_map': {'customerGroupId': 'id'},
+        'route_parameters_map': {'customerGroupId': 'id'},
         'id': 'product_customerGroups'
     }|merge(options)) }}
 {% endspaceless %}
@@ -51,7 +56,8 @@
 
 {% macro show_released_at(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.releasedAt, 'datetime', 'ekyna_product.product.field.released_at', {
+    {{ show_row(product.releasedAt, 'datetime', {
+        'label': 'ekyna_product.product.field.released_at',
         'date_format': 'short',
         'time_format': 'none',
         'id': 'product_releasedAt'
@@ -62,7 +68,8 @@
 
 {% macro show_reference(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.reference, 'text', 'ekyna_core.field.reference', {
+    {{ show_row(product.reference, 'text', {
+        'label': 'ekyna_core.field.reference',
         'id': 'product_reference'
     }|merge(options)) }}
 {% endspaceless %}
@@ -71,7 +78,8 @@
 
 {% macro show_weight(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.weight, 'number', 'ekyna_core.field.weight', {
+    {{ show_row(product.weight, 'number', {
+        'label': 'ekyna_core.field.weight',
         'id': 'product_weight',
         'append': ' kg'
     }|merge(options)) }}
@@ -81,14 +89,14 @@
 
 {% macro show_translations(product, options = {}) %}
 {% spaceless %}
-    {{ show_translations_row(product.translations, {
+    {{ show_row(product.translations, 'translations', {
         'id': 'product_translations',
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},
             'description': {
                 'label': 'ekyna_core.field.description',
                 'type': 'tinymce',
-                'content': path('ekyna_product_product_admin_tinymce', {'productId': product.id}),
+                'value': path('ekyna_product_product_admin_tinymce', {'productId': product.id}),
                 'options': {'height': 150}
             }
         }
@@ -99,10 +107,11 @@
 
 {% macro show_attribute_set(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.attributeSet, 'entity', 'ekyna_product.attribute_set.label.singular', {
+    {{ show_row(product.attributeSet, 'entity', {
+        'label': 'ekyna_product.attribute_set.label.singular',
         'id': 'product_attributeSet',
         'route': 'ekyna_product_attribute_set_admin_show',
-        'route_params_map': {'attributeSetId': 'id'}
+        'route_parameters_map': {'attributeSetId': 'id'}
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_attribute_set %}
@@ -110,10 +119,11 @@
 
 {% macro show_variable(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.parent, 'entity', 'ekyna_product.product.field.parent', {
+    {{ show_row(product.parent, 'entity', {
+        'label': 'ekyna_product.product.field.parent',
         'id': 'product_parent',
         'route': 'ekyna_product_product_admin_show',
-        'route_params_map': {'productId': 'id'},
+        'route_parameters_map': {'productId': 'id'},
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_variable %}
@@ -121,7 +131,8 @@
 
 {% macro show_medias(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.medias, 'medias', 'ekyna_core.field.medias', {
+    {{ show_row(product.medias, 'medias', {
+        'label': 'ekyna_core.field.medias',
         'id': 'product_medias'
     }|merge(options)) }}
 {% endspaceless %}
@@ -130,7 +141,8 @@
 
 {% macro show_net_price(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', 'ekyna_product.product.field.net_price', {
+    {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', {
+        'label': 'ekyna_product.product.field.net_price',
         'id': 'product_netPrice',
     }|merge(options)) }}
 {% endspaceless %}
@@ -139,10 +151,11 @@
 
 {% macro show_tax_group(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.taxGroup, 'entity', 'ekyna_commerce.tax_group.label.singular', {
+    {{ show_row(product.taxGroup, 'entity', {
+        'label': 'ekyna_commerce.tax_group.label.singular',
         'id': 'product_taxGroup',
         'route': 'ekyna_commerce_tax_group_admin_show',
-        'route_params_map': {'taxGroupId': 'id'},
+        'route_parameters_map': {'taxGroupId': 'id'},
     }|merge(options)) }}
 {% endspaceless %}
 {% endmacro show_tax_group %}
@@ -254,21 +267,21 @@
                     {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
                     <div class="row">
                         <div class="col-md-6">
-                            {{- show_row(group.name, 'text', 'ekyna_core.field.name', {
+                            {{- show_row(group.name, 'text', {
+                                'label': 'ekyna_core.field.name',
                                 'id': groupId ~ 'name',
-                                'label_nb_col': 4,
-                                'widget_nb_col': 8
+                                'label_col': 4
                             }) -}}
                         </div>
                         <div class="col-md-6">
-                            {{- show_row(group.required, 'checkbox', 'ekyna_core.field.required', {
+                            {{- show_row(group.required, 'boolean', {
+                                'label': 'ekyna_core.field.required',
                                 'id': groupId ~ 'required',
-                                'label_nb_col': 4,
-                                'widget_nb_col': 8
+                                'label_col': 4
                             }) -}}
                         </div>
                     </div>
-                    {{- show_translations_row(group.translations, {
+                    {{- show_row(group.translations, 'translations', {
                         'id': groupId ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
@@ -439,26 +452,30 @@
                 {% for slot in product.bundleSlots %}
                 {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
                 <div class="slot collection-item">
-                    {{ show_translations_row(slot.translations, {
+                    {{ show_row(slot.translations, 'translations', {
                         'id': slotId ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
-                            'description': {'label': 'ekyna_core.field.description', 'style': 'block'},
+                            'description': {
+                                'label': 'ekyna_core.field.description',
+                                'type': 'textarea',
+                                'options': {'html': true},
+                            },
                         }
                     }) }}
                     <div class="row">
                         <div class="col-md-6">
-                            {{ show_row(slot.media, 'media', 'ekyna_core.field.image', {
+                            {{ show_row(slot.media, 'media', {
+                                'label': 'ekyna_core.field.image',
                                 'id': slotId ~ 'image',
-                                'label_nb_col': 4,
-                                'widget_nb_col': 8,
+                                'label_col': 4
                             }) }}
                         </div>
                         <div class="col-md-6">
-                            {{ show_row(slot.required, 'checkbox', 'ekyna_core.field.required', {
+                            {{ show_row(slot.required, 'boolean', {
+                                'label': 'ekyna_core.field.required',
                                 'id': slotId ~ 'required',
-                                'label_nb_col': 4,
-                                'widget_nb_col': 8,
+                                'label_col': 4
                             }) }}
                         </div>
                     </div>
@@ -523,7 +540,7 @@
 
 {% macro show_seo(product, options = {}) %}
 {% spaceless %}
-    {{ show_row(product.seo, 'seo', null, {
+    {{ show_row(product.seo, 'seo', {
         'id': 'product_seo'
     }|merge(options)) }}
 {% endspaceless %}

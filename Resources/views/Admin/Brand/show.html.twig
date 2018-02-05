@@ -22,24 +22,32 @@
             <div class="tab-pane active" id="brand-general">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(brand.name, 'text', 'ekyna_core.field.name', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(brand.name, 'text', {
+                            'label': 'ekyna_core.field.name',
+                            'label_col': 4
+                        }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(brand.visible, 'checkbox', 'ekyna_core.field.visible', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(brand.visible, 'boolean', {
+                            'label': 'ekyna_core.field.visible',
+                            'label_col': 4
+                        }) }}
                     </div>
                 </div>
-                {{ show_translations_row(brand.translations, {
+                {{ show_row(brand.translations, 'translations', {
                     'fields': {
                         'title': {'label': 'ekyna_core.field.title'},
                         'description': {
                             'label': 'ekyna_core.field.description',
                             'type': 'tinymce',
-                            'content': path('ekyna_product_brand_admin_tinymce', {'brandId': brand.id}),
-                            'options': {'height': 100}
+                            'value': path('ekyna_product_brand_admin_tinymce', {'brandId': brand.id}),
+                            'options': {'height': 150}
                         }
                     }
                 }) }}
-                {{ show_row(brand.media, 'media', 'ekyna_core.field.image') }}
+                {{ show_row(brand.media, 'media', {
+                    'label': 'ekyna_core.field.image'
+                }) }}
             </div>
             <div class="tab-pane" id="brand-seo">
                 {{ show_row(brand.seo, 'seo') }}

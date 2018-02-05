@@ -23,22 +23,31 @@
     <div class="show-body">
         <div class="tab-content">
             <div class="tab-pane active" id="attribute-general">
-                {{ show_row(attribute.group, 'entity', 'ekyna_product.attribute_group.label.singular', {
+                {{ show_row(attribute.group, 'entity', {
+                    'label': 'ekyna_product.attribute_group.label.singular',
                     'route': 'ekyna_product_attribute_group_admin_show',
-                    'route_params_map': {'attributeGroupId': 'id'}
+                    'route_parameters_map': {'attributeGroupId': 'id'}
                 }) }}
-                {{ show_row(attribute.name, 'text', 'ekyna_core.field.name') }}
-                {{ show_translations_row(attribute.translations, {
+                {{ show_row(attribute.name, 'text', {
+                    'label': 'ekyna_core.field.name'
+                }) }}
+                {{ show_row(attribute.translations, 'translations', {
                     'fields': {
                         'title': {'label': 'ekyna_core.field.title'},
                     }
                 }) }}
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(attribute.media, 'media', 'ekyna_core.field.image', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(attribute.media, 'media', {
+                            'label': 'ekyna_core.field.image',
+                            'label_col': 4
+                        }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(attribute.color, 'color', 'ekyna_core.field.color', {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                        {{ show_row(attribute.color, 'color', {
+                            'label': 'ekyna_core.field.color',
+                            'label_col': 4
+                        }) }}
                     </div>
                 </div>
             </div>

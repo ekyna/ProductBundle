@@ -16,8 +16,10 @@
         <div class="show-body">
             <div class="tab-content">
                 <div class="tab-pane active" id="attribute-group-general">
-                    {{ show_row(attributeGroup.name, 'text', 'ekyna_core.field.name') }}
-                    {{ show_translations_row(attributeGroup.translations, {
+                    {{ show_row(attributeGroup.name, 'text', {
+                        'label': 'ekyna_core.field.name'
+                    }) }}
+                    {{ show_row(attributeGroup.translations, 'translations', {
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
                         }

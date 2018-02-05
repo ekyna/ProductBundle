@@ -14,7 +14,9 @@
     <div class="show-body">
         <div class="tab-content">
             <div class="tab-pane active" id="attribute-set-general">
-                {{ show_row(attributeSet.name, 'text', 'ekyna_core.field.email') }}
+                {{ show_row(attributeSet.name, 'text', {
+                    'label': 'ekyna_core.field.email'
+                }) }}
                 <div class="row show-row">
                     <div class="col-md-2 show-label">
                         {{ 'ekyna_product.attribute_group.label.plural'|trans }}

@@ -16,21 +16,27 @@
     <div class="show-body">
         <div class="tab-content">
             <div class="tab-pane active" id="pricing-general">
-                {{ show_row(pricing.name, 'text', 'ekyna_core.field.name') }}
-                {{ show_row(pricing.designation, 'text', 'ekyna_core.field.designation') }}
-                {{ show_row(pricing.groups, 'entity', 'ekyna_commerce.customer_group.label.plural', {
+                {{ show_row(pricing.name, 'text', {
+                    'label': 'ekyna_core.field.name'
+                }) }}
+                {{ show_row(pricing.designation, 'text', {
+                    'label': 'ekyna_core.field.designation'
+                }) }}
+                {{ show_row(pricing.groups, 'entity', {
+                    'label': 'ekyna_commerce.customer_group.label.plural',
                     'route': 'ekyna_commerce_customer_group_admin_show',
-                    'route_params_map': {'customerGroupId': 'id'}
+                    'route_parameters_map': {'customerGroupId': 'id'}
                 }) }}
-                {{ show_row(pricing.countries, 'entity', 'ekyna_product.pricing.field.countries', {
+                {{ show_row(pricing.countries, 'entity', {
+                    'label': 'ekyna_product.pricing.field.countries',
                     'route': 'ekyna_commerce_country_admin_show',
-                    'route_params_map': {'countryId': 'id'}
+                    'route_parameters_map': {'countryId': 'id'}
                 }) }}
-                {{ show_row(pricing.brands, 'entity', 'ekyna_product.brand.label.plural', {
+                {{ show_row(pricing.brands, 'entity', {
+                    'label': 'ekyna_product.brand.label.plural',
                     'route': 'ekyna_product_brand_admin_show',
-                    'route_params_map': {'brandId': 'id'}
+                    'route_parameters_map': {'brandId': 'id'}
                 }) }}
-
                 <div class="row show-row">
                     <div class="col-md-2 show-label">
                         {{ 'ekyna_product.pricing.field.rules'|trans }}

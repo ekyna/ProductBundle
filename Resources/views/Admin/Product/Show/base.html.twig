@@ -50,18 +50,18 @@
                 {% block pricing_content %}
                     <div class="row">
                         <div class="col-md-6">
-                            {{ macros.show_net_price(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                            {{ macros.show_net_price(product, {'label_col': 4}) }}
                         </div>
                         <div class="col-md-6">
-                            {{ macros.show_tax_group(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                            {{ macros.show_tax_group(product, {'label_col': 4}) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {{ macros.show_reference(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                            {{ macros.show_reference(product, {'label_col': 4}) }}
                         </div>
                         <div class="col-md-6">
-                            {{ macros.show_weight(product, {'label_nb_col': 4, 'widget_nb_col': 8}) }}
+                            {{ macros.show_weight(product, {'label_col': 4}) }}
                         </div>
                     </div>
                 {% endblock pricing_content %}
