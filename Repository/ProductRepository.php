@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
@@ -18,6 +19,85 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 class ProductRepository extends TranslatableResourceRepository implements ProductRepositoryInterface
 {
     // TODO Store queries in private properties
+
+    /**
+     * Returns the product update date by it's id.
+     *
+     * @param int $id
+     *
+     * @return \DateTime|null
+     */
+    public function getUpdateDateById($id)
+    {
+        $qb = $this->getQueryBuilder('p');
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb);
+
+        $query = $qb
+            ->select('p.updatedAt')
+            ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
+            ->andWhere($qb->expr()->eq('id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+                'id'               => $id,
+            ])
+            ->setMaxResults(1);
+
+        if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
+            return new \DateTime($date);
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the product update date by it's slug.
+     *
+     * @param string $slug
+     *
+     * @return \DateTime|null
+     */
+    public function getUpdateDateBySlug($slug)
+    {
+        $qb = $this->getQueryBuilder('p');
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb);
+
+        $query = $qb
+            ->select('p.updatedAt')
+            ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+                'slug'             => $slug,
+                'locale'           => $this->localeProvider->getCurrentLocale(),
+            ])
+            ->setMaxResults(1);
+
+        if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
+            return new \DateTime($date);
+        }
+
+        return null;
+    }
 
     /**
      * @inheritdoc
@@ -91,8 +171,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
                 'visible'          => true,
                 'brand_visible'    => true,
                 'category_visible' => true,
-                'brand' => $brand,
-                'types' => [
+                'brand'            => $brand,
+                'types'            => [
                     Model\ProductTypes::TYPE_SIMPLE,
                     Model\ProductTypes::TYPE_VARIABLE,
                     Model\ProductTypes::TYPE_BUNDLE,
@@ -133,8 +213,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
                 'visible'          => true,
                 'brand_visible'    => true,
                 'category_visible' => true,
-                'categories' => $categories,
-                'types'      => [
+                'categories'       => $categories,
+                'types'            => [
                     Model\ProductTypes::TYPE_SIMPLE,
                     Model\ProductTypes::TYPE_VARIABLE,
                     Model\ProductTypes::TYPE_BUNDLE,

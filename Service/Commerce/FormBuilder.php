@@ -271,15 +271,15 @@ class FormBuilder
                 'groups'       => $groups,
                 'thumb'        => $this->getProductImagePath($variant),
                 'image'        => $this->getProductImagePath($variant, 'media_front'),
-                'availability' => [
-                    'min'     => $variant->getMinimumOrderQuantity(),
-                    'max'     => $this->availabilityHelper->getAvailableQuantity($variant),
-                    'message' => $this->availabilityHelper->getAvailabilityMessage($variant),
-                ],
+                'availability' => $this->availabilityHelper->getAvailability($variant)->toArray(),
             ];
 
+            if (false === $json = json_encode($config)) {
+                throw new \RuntimeException(json_last_error_msg());
+            }
+
             return [
-                'data-config' => json_encode($config),
+                'data-config' => $json,
             ];
         }
 
@@ -361,11 +361,7 @@ class FormBuilder
             $netPrice = $product->getNetPrice();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
-            $config['availability'] = [
-                'min'     => $product->getMinimumOrderQuantity(),
-                'max'     => $this->availabilityHelper->getAvailableQuantity($product),
-                'message' => $this->availabilityHelper->getAvailabilityMessage($product),
-            ];
+            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
         }
 
         // Override net price with option's net price if set
@@ -457,11 +453,7 @@ class FormBuilder
         if (null !== $subject = $item->getSubjectIdentity()->getSubject()) {
             $skippedTypes = [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_CONFIGURABLE];
             if (!in_array($subject->getType(), $skippedTypes, true)) {
-                $config['availability'] = [
-                    'min'     => $subject->getMinimumOrderQuantity(),
-                    'max'     => $this->availabilityHelper->getAvailableQuantity($subject),
-                    'message' => $this->availabilityHelper->getAvailabilityMessage($subject),
-                ];
+                $config['availability'] = $this->availabilityHelper->getAvailability($subject)->toArray();
             }
         }
 
@@ -533,8 +525,8 @@ class FormBuilder
             'total'        => $this->translate('ekyna_product.sale_item_configure.total_price'),
             'rule_table'   => $this->translate('ekyna_product.sale_item_configure.rule_table'),
             'price_table'  => $this->translate('ekyna_product.sale_item_configure.price_table'),
-            'min_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.min_quantity'),
-            'max_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.max_quantity'),
+//            'min_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.min_quantity'),
+//            'max_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.max_quantity'),
         ];
     }
 

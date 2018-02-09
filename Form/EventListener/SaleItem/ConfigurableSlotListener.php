@@ -83,9 +83,17 @@ class ConfigurableSlotListener implements EventSubscriberInterface
         $form = $event->getForm();
         $item = $form->getData();
 
+        $this->formBuilder->clearBundleChoiceForm($form);
+
+        $oldChoiceId = $form->get('choice')->getData();
+
         // Choice field's data is not ready (pre submit has not been yet called on the child form)
         // So we fetch the choice id from this form's event data.
         $choiceId = $event->getData()['choice'];
+
+        if ($oldChoiceId && ($oldChoiceId != $choiceId)) {
+            $this->formBuilder->clearBundleChoiceForm($form);
+        }
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
         if (null !== $choice = $this->transformer->transform($choiceId)) {

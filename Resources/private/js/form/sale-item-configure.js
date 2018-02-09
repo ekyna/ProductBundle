@@ -302,29 +302,45 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
 
             var quantity = this.optionGroups.item.getTotalQuantity(),
-                config = {
-                    min: '0',
-                    max: '0',
-                    message: null
-                };
+                config = $.extend({
+                    o_msg: null,
+                    min_qty: 0,
+                    min_msg: null,
+                    max_qty: 0,
+                    max_msg: null,
+                    a_qty: 0,
+                    a_msg: null,
+                    r_qty: 0,
+                    r_msg: null
+                }, this.option.availability);
 
-            $.extend(config, this.option.availability);
-
-            var min = parseFloat(config.min),
-                max = config.max === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max),
+            var min = parseFloat(config.min_qty),
+                max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
+                error = false,
                 message = null;
 
-            if (0 === max) {
-                message = config.message;
-            } else if (0 < max && quantity > max) {
-                message = SaleItem.trans.max_quantity.replace('%max%', max.toLocaleString());
-            } else if (0 < min && quantity < min) {
-                message = SaleItem.trans.min_quantity.replace('%min%', min.toLocaleString());
-            } else {
-                return;
+            if (quantity < min) {
+                message = config.min_msg;
+                error = true;
+            } else if (quantity > max) {
+                message = config.max_msg;
+                error = true;
+            } else if (quantity > config.a_qty) {
+                if (config.r_msg) {
+                    if (this.totalQuantity > config.a_qty + config.r_qty) {
+                        message = config.o_msg;
+                    } else {
+                        message = config.r_msg;
+                    }
+                } else {
+                    message = config.o_msg;
+                }
             }
 
-            this.$element.addClass('has-error');
+            if (error) {
+                this.$element.addClass('has-error');
+            }
+
             this.$availability.html(message);
         },
 
@@ -682,9 +698,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         unit_price: 'Unit price',
         total: 'Net total',
         rule_table: 'Your prices',
-        price_table: 'Detailed unit price',
-        min_quantity: 'Minimum quantity is %min%',
-        max_quantity: 'Maximum quantity is %max%'
+        price_table: 'Detailed unit price'
     };
 
     $.extend(SaleItem.prototype, {
@@ -923,7 +937,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$quantity.closest('.form-group').removeClass('has-error');
 
             if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-                this.$quantity.prop('disabled', false);
                 this.$submitButton.prop('disabled', false);
             }
 
@@ -937,39 +950,61 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
 
             config = $.extend({
-                min: 0,
-                max: 0,
-                message: null
+                o_msg: null,
+                min_qty: 0,
+                min_msg: null,
+                max_qty: 0,
+                max_msg: null,
+                a_qty: 0,
+                a_msg: null,
+                r_qty: 0,
+                r_msg: null
             }, config.availability);
 
-            var min = parseFloat(config.min),
-                max = config.max === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max),
-                disableQuantity = false,
-                disableSubmit = true,
-                message = null;
+            var min = parseFloat(config.min_qty),
+                max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
+                error = false,
+                messages = [];
 
-            if (0 === max) {
-                message = config.message;
-                disableQuantity = true;
-            } else if (0 < max && this.totalQuantity > max) {
-                message = SaleItem.trans.max_quantity.replace('%max%', max.toLocaleString());
-            } else if (0 < min && this.totalQuantity < min) {
-                message = SaleItem.trans.min_quantity.replace('%min%', min.toLocaleString());
+            if (min > this.totalQuantity) {
+                messages.push(config.min_msg);
+                error = true;
+            } else if (max < this.totalQuantity) {
+                messages.push(config.max_msg);
+                error = true;
             } else {
-                disableSubmit = false;
+                // TODO If parent, display availability like for option
                 if (this.parentItem) return;
+
+                if (config.a_msg) {
+                    messages.push(config.a_msg);
+                }
+
+                if (this.totalQuantity > config.a_qty) {
+                    if (config.r_msg) {
+                        messages.push(config.r_msg);
+                        if (this.totalQuantity > config.a_qty + config.r_qty) {
+                            messages.push(config.o_msg);
+                        }
+                    } else {
+                        messages.push(config.o_msg);
+                    }
+                }
             }
 
-            if (disableQuantity || disableSubmit) {
-                /* TODO if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-                    this.$quantity.prop('disabled', disableQuantity);
-                    this.$submitButton.prop('disabled', disableSubmit);
-                }*/
+            if (0 === messages.length) {
+                messages.push(config.o_msg);
+            }
 
+            if (error) {
                 this.$quantity.closest('.form-group').addClass('has-error');
+
+                if (!this.parentItem && this.$submitButton && !this.config.privileged) {
+                    this.$submitButton.prop('disabled', true);
+                }
             }
 
-            this.$availability.html(message);
+            this.$availability.html(messages.join('<br>'));
         },
 
         resolveActiveRule: function () {

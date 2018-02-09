@@ -11,7 +11,7 @@
         <div class="col-sm-8 col-sm-push-4">
             <h3 class="product-title">
                 {%- if itemForm.vars.choice_brand is not empty %}<strong>{{ itemForm.vars.choice_brand }}</strong>{% endif %}
-                {{ itemForm.vars.choice_product -}}
+                {{ itemForm.vars.choice_product|raw -}}
             </h3>
             <div class="product-description">
                 {%- if itemForm.vars.choice_reference is not empty -%}

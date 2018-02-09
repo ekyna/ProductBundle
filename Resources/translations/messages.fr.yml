@@ -297,9 +297,10 @@ ekyna_product:
         rule_table: Vos tarifs
         price_table: Détail du prix unit. HT.
         no_choice:
-            title: Ignorer cet article
+            title: >
+                <strong>Sélectionnez un article&hellip;</strong>
             description: >
-                <p>Je ne souhaite pas sélectionner d'article.</p>
+                <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>
     variant:
         label:
             singular: Variante

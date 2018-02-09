@@ -14,6 +14,24 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterfac
 interface ProductRepositoryInterface extends TranslatableResourceRepositoryInterface, SubjectRepositoryInterface
 {
     /**
+     * Returns the product update date by it's id.
+     *
+     * @param int $id
+     *
+     * @return \DateTime|null
+     */
+    public function getUpdateDateById($id);
+
+    /**
+     * Returns the product update date by it's slug.
+     *
+     * @param string $slug
+     *
+     * @return \DateTime|null
+     */
+    public function getUpdateDateBySlug($slug);
+
+    /**
      * Finds the product by id.
      *
      * @param int $id

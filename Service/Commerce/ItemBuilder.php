@@ -532,6 +532,13 @@ class ItemBuilder
     {
         $product = $this->provider->resolve($item);
 
+        // Clear identifiers vars
+        $item->unsetData(static::VARIANT_ID);
+        $item->unsetData(static::BUNDLE_SLOT_ID);
+        $item->unsetData(static::BUNDLE_CHOICE_ID);
+        $item->unsetData(static::OPTION_GROUP_ID);
+        $item->unsetData(static::OPTION_ID);
+
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
                 $this->initializeFromSimple($item, $product);
@@ -626,7 +633,7 @@ class ItemBuilder
 
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
             $defaultChoice = current($bundlesChoices);
-            $choiceProducts = [];
+            $choiceProductIds = [];
 
             // Valid and default slot product(s)
             foreach ($bundlesChoices as $choice) {
@@ -634,10 +641,10 @@ class ItemBuilder
                 if ($choiceProduct->getType() === ProductTypes::TYPE_VARIABLE) {
                     // Variable product can't be assigned, so use variants
                     foreach ($choiceProduct->getVariants() as $variant) {
-                        $choiceProducts[] = $variant;
+                        $choiceProductIds[] = $variant->getId();
                     }
                 } else {
-                    $choiceProducts[] = $choiceProduct;
+                    $choiceProductIds[] = $choiceProduct->getId();
                 }
             }
 
@@ -661,7 +668,7 @@ class ItemBuilder
                     $childProduct = $this->provider->resolve($child);
 
                     // If invalid choice
-                    if (!in_array($childProduct, $choiceProducts)) {
+                    if (!in_array($childProduct->getId(), $choiceProductIds)) {
                         $child->getSubjectIdentity()->clear();
 
                         // Initialize default choice
@@ -677,11 +684,11 @@ class ItemBuilder
             /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
-            //if ($bundleSlot->isRequired()) {
+            if ($bundleSlot->isRequired()) {
                 $this->initializeFromBundleChoice($child, $defaultChoice, $options);
-            //} else {
-            //    $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
-            //}
+            } else {
+                $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
+            }
         }
     }
 

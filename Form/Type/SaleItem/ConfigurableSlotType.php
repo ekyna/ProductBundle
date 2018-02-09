@@ -170,7 +170,9 @@ class ConfigurableSlotType extends Form\AbstractType
                 'config'             => [],
                 'choice_brand'       => null,
                 'choice_product'     => $this->formBuilder->translate(
-                    'ekyna_product.sale_item_configure.no_choice.title'
+                    'ekyna_product.sale_item_configure.no_choice.title', [
+                        '%slot_title%' => $bundleSlot->getTitle(),
+                    ]
                 ),
                 'choice_reference'   => '',
                 'choice_description' => $this->formBuilder->translate(
