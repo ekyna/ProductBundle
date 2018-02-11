@@ -20,11 +20,10 @@ class CategoryType extends ResourceTableType
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
         $builder
-            ->addDefaultSort('root')
             ->addDefaultSort('left')
             ->setSortable(false)
             ->setFilterable(false)
-            ->setPerPageChoices([100])
+            ->setPerPageChoices([500])
             ->addColumn('name', BType\Column\NestedAnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
                 'route_name'           => 'ekyna_product_category_admin_show',
@@ -45,6 +44,7 @@ class CategoryType extends ResourceTableType
                 'position' => 30,
             ])
             ->addColumn('actions', BType\Column\NestedActionsType::class, [
+                'roots'                 => false,
                 'new_child_route'       => 'ekyna_product_category_admin_new_child',
                 'move_up_route'         => 'ekyna_product_category_admin_move_up',
                 'move_down_route'       => 'ekyna_product_category_admin_move_down',
