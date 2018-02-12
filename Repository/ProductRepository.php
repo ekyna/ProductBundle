@@ -21,34 +21,32 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     // TODO Store queries in private properties
 
     /**
-     * Returns the product update date by it's id.
-     *
-     * @param int $id
-     *
-     * @return \DateTime|null
+     * @inheritdoc
      */
-    public function getUpdateDateById($id)
+    public function getUpdateDateById($id, $visible = true, array $types = null)
     {
-        $qb = $this->getQueryBuilder('p');
+        $qb = $this->getUpdateDateQueryBuilder($visible, $types);
 
-        $this
-            ->joinCategories($qb)
-            ->joinBrand($qb);
+        $parameters = ['id' => $id];
 
-        $query = $qb
-            ->select('p.updatedAt')
-            ->andWhere($qb->expr()->eq('p.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
-            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
-            ->andWhere($qb->expr()->eq('id', ':id'))
-            ->getQuery()
-            ->useQueryCache(true)
-            ->setParameters([
+        if ($visible) {
+            $parameters = array_replace($parameters, [
                 'visible'          => true,
                 'brand_visible'    => true,
                 'category_visible' => true,
-                'id'               => $id,
-            ])
+            ]);
+        }
+
+        if (is_array($types) && !empty($types)) {
+            $parameters['types'] = $types;
+        }
+
+        $query = $qb
+            ->select('p.updatedAt')
+            ->andWhere($qb->expr()->eq('p.id', ':id'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters($parameters)
             ->setMaxResults(1);
 
         if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
@@ -59,37 +57,36 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
-     * Returns the product update date by it's slug.
-     *
-     * @param string $slug
-     *
-     * @return \DateTime|null
+     * @inheritdoc
      */
-    public function getUpdateDateBySlug($slug)
+    public function getUpdateDateBySlug($slug, $visible = true, array $types = null)
     {
-        $qb = $this->getQueryBuilder('p');
+        $qb = $this->getUpdateDateQueryBuilder($visible, $types);
 
-        $this
-            ->joinCategories($qb)
-            ->joinBrand($qb);
+        $parameters = [
+            'slug'   => $slug,
+            'locale' => $this->localeProvider->getCurrentLocale(),
+        ];
 
-        $query = $qb
-            ->select('p.updatedAt')
-            ->andWhere($qb->expr()->eq('p.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
-            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
-            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
-            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
-            ->setMaxResults(1)
-            ->getQuery()
-            ->useQueryCache(true)
-            ->setParameters([
+        if ($visible) {
+            $parameters = array_replace($parameters, [
                 'visible'          => true,
                 'brand_visible'    => true,
                 'category_visible' => true,
-                'slug'             => $slug,
-                'locale'           => $this->localeProvider->getCurrentLocale(),
-            ])
+            ]);
+        }
+
+        if (is_array($types) && !empty($types)) {
+            $parameters['types'] = $types;
+        }
+
+        $query = $qb
+            ->select('p.updatedAt')
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters($parameters)
             ->setMaxResults(1);
 
         if (null !== $date = $query->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR)) {
@@ -447,6 +444,36 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
                 ])
                 ->getResult();
         }
+    }
+
+    /**
+     * Returns the getUpdateDateBy* query builder.
+     *
+     * @param bool       $visible
+     * @param array|null $types
+     *
+     * @return QueryBuilder
+     */
+    private function getUpdateDateQueryBuilder($visible = true, array $types = null)
+    {
+        $qb = $this->getQueryBuilder('p');
+
+        if ($visible) {
+            $this
+                ->joinCategories($qb)
+                ->joinBrand($qb);
+
+            $qb
+                ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+                ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+                ->andWhere($qb->expr()->eq('c.visible', ':category_visible'));
+        }
+
+        if (is_array($types) && !empty($types)) {
+            $qb->andWhere($qb->expr()->in('p.type', ':types'));
+        }
+
+        return $qb;
     }
 
     /**

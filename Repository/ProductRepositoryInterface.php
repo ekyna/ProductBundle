@@ -16,20 +16,24 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     /**
      * Returns the product update date by it's id.
      *
-     * @param int $id
+     * @param int   $id
+     * @param bool  $visible
+     * @param array $types
      *
      * @return \DateTime|null
      */
-    public function getUpdateDateById($id);
+    public function getUpdateDateById($id, $visible = true, array $types = null);
 
     /**
      * Returns the product update date by it's slug.
      *
      * @param string $slug
+     * @param bool   $visible
+     * @param array  $types
      *
      * @return \DateTime|null
      */
-    public function getUpdateDateBySlug($slug);
+    public function getUpdateDateBySlug($slug, $visible = true, array $types = null);
 
     /**
      * Finds the product by id.
