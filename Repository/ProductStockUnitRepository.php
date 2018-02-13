@@ -117,8 +117,12 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->neq($alias . '.state', ':state'))// Not closed
             ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem'))// Not yet linked to a supplier order
-            ->setParameter('product', $subject)
+            ->setParameters([
+                'product' => $subject,
+                'state'   => StockUnitStates::STATE_CLOSED,
+            ])
             ->getQuery()
             ->getResult();
     }

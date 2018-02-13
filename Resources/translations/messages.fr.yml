@@ -283,8 +283,8 @@ ekyna_product:
 
     product_stock_unit:
         label:
-            singular: Unitée de stock
-            plural: Unitées de stock
+            singular: Unité de stock
+            plural: Unités de stock
 
     sale_item_configure:
         variant: Version
