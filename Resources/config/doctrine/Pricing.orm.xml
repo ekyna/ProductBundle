@@ -28,7 +28,7 @@
 
         <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                       field="groups">
-            <join-table name="product_pricing_group">
+            <join-table name="product_pricings_groups">
                 <join-columns>
                     <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
@@ -40,7 +40,7 @@
 
         <many-to-many target-entity="Ekyna\Component\Commerce\Common\Entity\Country"
                       field="countries">
-            <join-table name="product_pricing_country">
+            <join-table name="product_pricings_countries">
                 <join-columns>
                     <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
@@ -52,7 +52,7 @@
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\BrandInterface"
                       field="brands">
-            <join-table name="product_pricing_brand">
+            <join-table name="product_pricings_brands">
                 <join-columns>
                     <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>

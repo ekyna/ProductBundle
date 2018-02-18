@@ -114,7 +114,7 @@
         </many-to-one>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface" field="categories">
-            <join-table name="product_product_category">
+            <join-table name="product_products_categories">
                 <join-columns>
                     <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
@@ -126,7 +126,7 @@
 
         <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                       field="customerGroups">
-            <join-table name="product_product_customer_group">
+            <join-table name="product_products_customer_groups">
                 <join-columns>
                     <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
@@ -137,7 +137,7 @@
         </many-to-many>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attributes">
-            <join-table name="product_product_attribute">
+            <join-table name="product_products_attributes">
                 <join-columns>
                     <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
