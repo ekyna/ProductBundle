@@ -1,16 +1,25 @@
+ekyna_product_attribute_admin_home:
+    path: ""
+    defaults: { _controller: "ekyna_product.attribute.controller:homeAction" }
+    methods: [GET]
+
+ekyna_product_attribute_admin_list:
+    path: /list
+    defaults: { _controller: "ekyna_product.attribute.controller:listAction" }
+    methods: [GET|POST]
+
 ekyna_product_attribute_admin_new:
-    path: /new
+    path: /new/{type}
     defaults: { _controller: "ekyna_product.attribute.controller:newAction" }
     methods: [GET|POST]
     requirements:
-        attributeGroupId: \d+
+        type: '^[a-z]+$'
 
 ekyna_product_attribute_admin_show:
     path: /{attributeId}/show
     defaults: { _controller: "ekyna_product.attribute.controller:showAction" }
     methods: [GET]
     requirements:
-        attributeGroupId: \d+
         attributeId: \d+
 
 ekyna_product_attribute_admin_edit:
@@ -18,7 +27,6 @@ ekyna_product_attribute_admin_edit:
     defaults: { _controller: "ekyna_product.attribute.controller:editAction" }
     methods: [GET|POST]
     requirements:
-        attributeGroupId: \d+
         attributeId: \d+
 
 ekyna_product_attribute_admin_move_up:
@@ -26,7 +34,6 @@ ekyna_product_attribute_admin_move_up:
     defaults: { _controller: "ekyna_product.attribute.controller:moveUpAction" }
     methods: [GET]
     requirements:
-        attributeGroupId: \d+
         attributeId: \d+
 
 ekyna_product_attribute_admin_move_down:
@@ -34,7 +41,6 @@ ekyna_product_attribute_admin_move_down:
     defaults: { _controller: "ekyna_product.attribute.controller:moveDownAction" }
     methods: [GET]
     requirements:
-        attributeGroupId: \d+
         attributeId: \d+
 
 ekyna_product_attribute_admin_remove:
@@ -42,5 +48,8 @@ ekyna_product_attribute_admin_remove:
     defaults: { _controller: "ekyna_product.attribute.controller:removeAction" }
     methods: [GET|POST]
     requirements:
-        attributeGroupId: \d+
         attributeId: \d+
+
+ekyna_product_attribute_choice_admin:
+    resource: attribute_choice.yml
+    prefix: /{attributeId}/choices

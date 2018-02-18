@@ -4,7 +4,9 @@ namespace Ekyna\Bundle\ProductBundle\Form\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -26,37 +28,27 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     private $stockBuilder;
 
+    /**
+     * @var ResourceRepositoryInterface
+     */
+    private $attributeSetRepository;
+
 
     /**
      * Constructor.
      *
-     * @param ProductFormBuilder      $productBuilder
-     * @param StockSubjectFormBuilder $stockBuilder
+     * @param ProductFormBuilder          $productBuilder
+     * @param StockSubjectFormBuilder     $stockBuilder
+     * @param ResourceRepositoryInterface $attributeSetRepository
      */
-    public function __construct(ProductFormBuilder $productBuilder, StockSubjectFormBuilder $stockBuilder)
-    {
+    public function __construct(
+        ProductFormBuilder $productBuilder,
+        StockSubjectFormBuilder $stockBuilder,
+        ResourceRepositoryInterface $attributeSetRepository
+    ) {
         $this->productBuilder = $productBuilder;
         $this->stockBuilder = $stockBuilder;
-    }
-
-    /**
-     * Returns the product form builder.
-     *
-     * @return ProductFormBuilder
-     */
-    protected function getProductBuilder()
-    {
-        return $this->productBuilder;
-    }
-
-    /**
-     * Returns the stock form builder.
-     *
-     * @return StockSubjectFormBuilder
-     */
-    protected function getStockBuilder()
-    {
-        return $this->stockBuilder;
+        $this->attributeSetRepository = $attributeSetRepository;
     }
 
     /**
@@ -66,7 +58,10 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     public function onPreSetData(FormEvent $event)
     {
-        $this->productBuilder->initialize($product = $event->getData(), $event->getForm());
+        /** @var ProductInterface $product */
+        $product = $event->getData();
+
+        $this->productBuilder->initialize($product, $event->getForm());
         $this->stockBuilder->initialize($event->getForm());
 
         $type = $product->getType();
@@ -95,12 +90,45 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Form pre submit event handler.
+     *
+     * @param FormEvent $event
+     */
+    public function onPreSubmit(FormEvent $event)
+    {
+        $product = $this->productBuilder->getProduct();
+
+        if ($product->getType() !== ProductTypes::TYPE_SIMPLE) {
+            return;
+        }
+
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if (!isset($data['attributeSet'])) {
+            return;
+        }
+
+        $form->remove('attributes');
+
+        $attributeSet = null;
+        if (0 < $id = intval($data['attributeSet'])) {
+            $attributeSet = $this->attributeSetRepository->find($id);
+        }
+
+        $this
+            ->getProductBuilder()
+            ->addAttributesField($attributeSet);
+    }
 
     /**
      * Builds the simple product form.
      */
     protected function buildSimpleProductForm()
     {
+        $product = $this->getProductBuilder()->getProduct();
+
         $this->productBuilder
             ->addDesignationField()
             ->addBrandField()
@@ -113,6 +141,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
+            ->addAttributeSetField()
+            ->addAttributesField($product->getAttributeSet())
             ->addMediasField()
             ->addNetPriceField()
             ->addTaxGroupField()
@@ -129,6 +159,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addQuoteOnlyField()
             ->addEndOfLifeField();
     }
+
 
     /**
      * Builds the variable product form.
@@ -168,6 +199,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      */
     protected function buildVariantProductForm()
     {
+        $product = $this->getProductBuilder()->getProduct();
+
         $this->productBuilder
             // General
             ->addDesignationField([
@@ -190,7 +223,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ])
             ->addReferencesField()
             ->addVariableField()
-            ->addAttributesField()
+            ->addAttributesField($product->getParent()->getAttributeSet())
             ->addMediasField()
             // Pricing
             ->addNetPriceField()
@@ -279,12 +312,33 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Returns the product form builder.
+     *
+     * @return ProductFormBuilder
+     */
+    protected function getProductBuilder()
+    {
+        return $this->productBuilder;
+    }
+
+    /**
+     * Returns the stock form builder.
+     *
+     * @return StockSubjectFormBuilder
+     */
+    protected function getStockBuilder()
+    {
+        return $this->stockBuilder;
+    }
+
+    /**
      * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {
         return [
             FormEvents::PRE_SET_DATA => ['onPreSetData', 0],
+            FormEvents::PRE_SUBMIT   => ['onPreSubmit', 0],
         ];
     }
 }

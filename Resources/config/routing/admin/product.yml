@@ -8,6 +8,15 @@ ekyna_product_product_admin_list:
     defaults: { _controller: "ekyna_product.product.controller:listAction" }
     methods: [GET|POST]
 
+ekyna_product_product_admin_attributes_form:
+    path: /attributes-form/{attributeSetId}
+    defaults: { _controller: "ekyna_product.product.controller:attributesFormAction" }
+    methods: [GET]
+    requirements:
+        attributeSetId: \d+
+    options:
+        expose: true
+
 ekyna_product_product_admin_new:
     path: /new/{type}
     defaults: { _controller: "ekyna_product.product.controller:newAction" }

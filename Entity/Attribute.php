@@ -2,12 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Resource\Model as RM;
+use Ekyna\Component\Resource\Model AS RM;
 
 /**
- * Class Attribute
+ * Class AttributeGroup
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
@@ -15,18 +15,12 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterface
 {
-    use MediaSubjectTrait,
-        RM\SortableTrait;
+    use RM\SortableTrait;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
-
-    /**
-     * @var Model\AttributeGroupInterface
-     */
-    protected $group;
 
     /**
      * @var string
@@ -36,8 +30,28 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     /**
      * @var string
      */
-    protected $color;
+    protected $type;
 
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var ArrayCollection|Model\AttributeChoiceInterface[]
+     */
+    protected $choices;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->choices = new ArrayCollection();
+    }
 
     /**
      * @inheritdoc
@@ -53,25 +67,6 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setGroup(Model\AttributeGroupInterface $group)
-    {
-        $this->group = $group;
-        $group->addAttribute($this);
-
-        return $this;
     }
 
     /**
@@ -95,17 +90,35 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     /**
      * @inheritdoc
      */
-    public function getColor()
+    public function getType()
     {
-        return $this->color;
+        return $this->type;
     }
 
     /**
      * @inheritdoc
      */
-    public function setColor($color)
+    public function setType($type)
     {
-        $this->color = $color;
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
 
         return $this;
     }
@@ -116,6 +129,58 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     public function getTitle()
     {
         return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getChoices()
+    {
+        return $this->choices;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasChoice(Model\AttributeChoiceInterface $choice)
+    {
+        return $this->choices->contains($choice);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addChoice(Model\AttributeChoiceInterface $choice)
+    {
+        if (!$this->hasChoice($choice)) {
+            $this->choices->add($choice);
+            $choice->setAttribute($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeChoice(Model\AttributeChoiceInterface $choice)
+    {
+        if ($this->hasChoice($choice)) {
+            $this->choices->removeElement($choice);
+            $choice->setAttribute(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setChoices(ArrayCollection $choices)
+    {
+        $this->choices = $choices;
+
+        return $this;
     }
 
     /**

@@ -5,8 +5,8 @@
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
-    <entity name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroupTranslation"
-            table="product_attribute_group_translation">
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\AttributeChoiceTranslation"
+            table="product_attribute_choice_translation">
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO" />

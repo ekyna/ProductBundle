@@ -73,9 +73,16 @@ interface AttributeSetInterface extends ResourceInterface
     public function setSlots(ArrayCollection $slots);
 
     /**
-     * Returns whether the attribute has at least one required slot.
+     * Returns whether this attribute set has at least one required slot.
      *
      * @return bool
      */
     public function hasRequiredSlot();
+
+    /**
+     * Returns whether this attribute set has at least one naming slot.
+     *
+     * @return bool
+     */
+    public function hasNamingSlot();
 }

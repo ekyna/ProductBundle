@@ -2,18 +2,18 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 
-use Ekyna\Bundle\ProductBundle\Entity\AttributeGroupTranslation;
+use Ekyna\Bundle\ProductBundle\Entity\AttributeChoiceTranslation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class AttributeGroupTranslationType
+ * Class AttributeChoiceTranslationType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Attribute
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeGroupTranslationType extends AbstractType
+class AttributeChoiceTranslationType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -32,7 +32,7 @@ class AttributeGroupTranslationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => AttributeGroupTranslation::class,
+            'data_class' => AttributeChoiceTranslation::class,
         ]);
     }
 }

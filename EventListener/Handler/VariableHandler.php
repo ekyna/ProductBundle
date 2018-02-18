@@ -176,8 +176,6 @@ class VariableHandler extends AbstractVariantHandler
 
         $parents = $this->productRepository->findParentsByBundled($variable);
 
-        $stop = true;
-
         foreach ($parents as $parent) {
             foreach ($events as $event) {
                 $this->persistenceHelper->scheduleEvent($event, $parent);

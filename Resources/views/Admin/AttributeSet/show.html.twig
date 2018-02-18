@@ -19,7 +19,7 @@
                 }) }}
                 <div class="row show-row">
                     <div class="col-md-2 show-label">
-                        {{ 'ekyna_product.attribute_group.label.plural'|trans }}
+                        {{ 'ekyna_product.attribute.label.plural'|trans }}
                     </div>
                     <div class="col-md-10">
                         <div class="show-widget">
@@ -28,21 +28,21 @@
                                     <table class="table table-striped table-hover">
                                         <thead>
                                         <tr>
-                                            <th>{{ 'ekyna_core.field.group'|trans }}</th>
-                                            <th>{{ 'ekyna_product.attribute_set.field.multiple'|trans }}</th>
+                                            <th>{{ 'ekyna_product.attribute.label.singular'|trans }}</th>
                                             <th>{{ 'ekyna_core.field.required'|trans }}</th>
+                                            <th>{{ 'ekyna_product.attribute_slot.field.naming'|trans }}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {% for slot in attributeSet.slots %}
                                             <tr>
                                                 <td>
-                                                    <a href="{{ admin_resource_path(slot.group) }}" class="show-entity">
-                                                        {{ slot.group.name }}
+                                                    <a href="{{ admin_resource_path(slot.attribute) }}" class="show-entity">
+                                                        {{ slot.attribute.name }}
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    {% if slot.multiple %}
+                                                    {% if slot.required %}
                                                         <span class="label label-success">
                                                             {{ 'ekyna_core.value.yes'|trans }}
                                                         </span>
@@ -53,7 +53,7 @@
                                                     {% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if slot.required %}
+                                                    {% if slot.naming %}
                                                         <span class="label label-success">
                                                             {{ 'ekyna_core.value.yes'|trans }}
                                                         </span>

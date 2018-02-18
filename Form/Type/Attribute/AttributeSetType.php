@@ -24,7 +24,7 @@ class AttributeSetType extends ResourceFormType
                 'label' => 'ekyna_core.field.name',
             ])
             ->add('slots', CollectionType::class, [
-                'label'          => 'ekyna_product.attribute_group.label.plural',
+                'label'          => 'ekyna_product.attribute.label.plural',
                 'sub_widget_col' => 10,
                 'button_col'     => 2,
                 'allow_sort'     => true,

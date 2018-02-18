@@ -1,7 +1,7 @@
 {% spaceless %}
 <ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
     <li class="active">
-        <a href="#attribute-group-general" id="toggle-general" data-toggle="tab">
+        <a href="#attribute-general" id="toggle-general" data-toggle="tab">
             {{ 'ekyna_core.field.general'|trans }}
         </a>
     </li>
@@ -11,9 +11,18 @@
     {{ bootstrap_set_col_size('md') }}
     {{ form_errors(form) }}
     <div class="tab-content">
-        <div class="tab-pane active" id="attribute-group-general">
+        <div class="tab-pane active" id="attribute-general">
+            {{ form_row(form.attribute) }}
             {{ form_row(form.name) }}
             {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.media, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.color, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+            </div>
         </div>
     </div>
     {{ form_rest(form) }}

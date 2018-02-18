@@ -4,10 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

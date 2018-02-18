@@ -1,0 +1,7 @@
+{% extends "EkynaAdminBundle:Entity/Default:list.html.twig" %}
+
+{% import "EkynaProductBundle:Admin/Attribute:_macro.html.twig" as macros %}
+
+{% block actions %}
+    {{ macros.new_attribute_button() }}
+{% endblock actions %}

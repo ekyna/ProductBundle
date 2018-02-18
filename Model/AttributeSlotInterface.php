@@ -28,52 +28,52 @@ interface AttributeSlotInterface extends ResourceInterface
     public function setSet(AttributeSetInterface $set = null);
 
     /**
-     * Returns the group.
+     * Returns the attribute.
      *
-     * @return AttributeGroupInterface
+     * @return AttributeInterface
      */
-    public function getGroup();
+    public function getAttribute();
 
     /**
-     * Sets the group.
+     * Sets the attribute.
      *
-     * @param AttributeGroupInterface $group
+     * @param AttributeInterface $attribute
      *
      * @return $this|AttributeSlotInterface
      */
-    public function setGroup(AttributeGroupInterface $group);
+    public function setAttribute(AttributeInterface $attribute);
 
     /**
-     * Returns the multiple.
-     *
-     * @return boolean
-     */
-    public function isMultiple();
-
-    /**
-     * Sets the multiple.
-     *
-     * @param boolean $multiple
-     *
-     * @return $this|AttributeSlotInterface
-     */
-    public function setMultiple($multiple);
-
-    /**
-     * Returns the required.
+     * Returns whether this slot's attribute is required.
      *
      * @return boolean
      */
     public function isRequired();
 
     /**
-     * Sets the required.
+     * Sets whether this slot's attribute is required.
      *
      * @param boolean $required
      *
      * @return $this|AttributeSlotInterface
      */
     public function setRequired($required);
+
+    /**
+     * Returns whether this slot's attribute is used to generate variant names and designations.
+     *
+     * @return bool
+     */
+    public function isNaming();
+
+    /**
+     * Sets whether this slot's attribute is used to generate variant names and designations.
+     *
+     * @param bool $naming
+     *
+     * @return $this|AttributeSlotInterface
+     */
+    public function setNaming($naming);
 
     /**
      * Returns the position.

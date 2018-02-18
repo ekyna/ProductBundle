@@ -188,24 +188,18 @@
 
 {% macro show_attributes(product, options = {}) %}
 {% spaceless %}
-    {% if product is variant_product %}
+    {% if product is simple_product or product is variant_product %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{ 'ekyna_product.attribute.label.plural'|trans }}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_attributes">
-                {% set attributes = product|product_attributes %}
                 <dl class="dl-horizontal">
-                {% for data in attributes -%}
-                    <dt>{{ attribute(data, 'group').name }}</dt>
-                    <dd>
-                    {% for attribute in attribute(data, 'attributes') -%}
-                        {{ attribute.name }}
-                        {% if not loop.last %}, {% endif -%}
-                    {% endfor -%}
-                    </dd>
-                {%- endfor %}
+                    {% for attribute in product.attributes -%}
+                    <dt>{{ attribute.attributeSlot.attribute.name }}</dt>
+                    <dd>{{ attribute|product_attribute }}</dd>
+                    {%- endfor %}
                 </dl>
             </div>
         </div>

@@ -53,7 +53,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $attributeSet;
 
     /**
-     * @var ArrayCollection|Model\AttributeInterface[]
+     * @var ArrayCollection|Model\ProductAttributeInterface[]
      */
     protected $attributes;
 
@@ -176,6 +176,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 $this->addAdjustment(clone $adjustment);
             }
 
+            // Attributes
+            $attributes = $this->attributes->toArray();
+            $this->attributes = new ArrayCollection();
+            foreach ($attributes as $attribute) {
+                $this->addAttribute(clone $attribute);
+            }
+
             // Bundle slots
             $bundleSlots = $this->bundleSlots->toArray();
             $this->bundleSlots = new ArrayCollection();
@@ -215,13 +222,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             }
 
             // ---- MANY TO MANY ----
-
-            // Attributes
-            $attributes = $this->attributes->toArray();
-            $this->attributes = new ArrayCollection();
-            foreach ($attributes as $attribute) {
-                $this->addAttribute($attribute);
-            }
 
             // Categories
             $categories = $this->categories->toArray();
@@ -408,7 +408,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function hasAttribute(Model\AttributeInterface $attribute)
+    public function hasAttribute(Model\ProductAttributeInterface $attribute)
     {
         return $this->attributes->contains($attribute);
     }
@@ -416,10 +416,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function addAttribute(Model\AttributeInterface $attribute)
+    public function addAttribute(Model\ProductAttributeInterface $attribute)
     {
         if (!$this->hasAttribute($attribute)) {
             $this->attributes->add($attribute);
+            $attribute->setProduct($this);
         }
 
         return $this;
@@ -428,10 +429,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function removeAttribute(Model\AttributeInterface $attribute)
+    public function removeAttribute(Model\ProductAttributeInterface $attribute)
     {
         if ($this->hasAttribute($attribute)) {
             $this->attributes->removeElement($attribute);
+            $attribute->setProduct(null);
         }
 
         return $this;
@@ -440,12 +442,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setAttributes(ArrayCollection $attributes)
+    /*public function setAttributes(ArrayCollection $attributes)
     {
         $this->attributes = $attributes;
 
         return $this;
-    }
+    }*/
 
     /**
      * @inheritdoc
@@ -1113,13 +1115,28 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         Model\ProductTypes::assertVariant($this);
 
-        $ids = [];
-        foreach ($this->attributes as $attribute) {
-            $ids[] = $attribute->getId();
+        $values = [];
+        foreach ($this->attributes as $pr) {
+            $key = $pr->getAttributeSlot()->getAttribute()->getId();
+            if (!empty($v = $pr->getValue())) {
+                $values[$key] = $v;
+            } else {
+                $ids = [];
+                /** @var Model\AttributeChoiceInterface $c */
+                foreach ($pr->getChoices()->toArray() as $c) {
+                    $ids[] = $c->getId();
+                }
+                sort($ids);
+                $values[$key] = implode(',', $ids);
+            }
         }
-        sort($ids);
 
-        return implode('-', $ids);
+        ksort($values);
+        $couples = array_map(function($k, $v) {
+            return $k.':'.$v;
+        }, array_keys($values), $values);
+
+        return md5(implode('-', $couples));
     }
 
     /**

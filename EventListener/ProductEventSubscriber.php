@@ -272,7 +272,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
         $resource = $event->getResource();
 
         if (!$resource instanceof ProductInterface) {
-            throw new InvalidArgumentException('Expected ProductInterface');
+            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
         }
 
         return $resource;

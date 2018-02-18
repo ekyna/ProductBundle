@@ -108,45 +108,45 @@ interface ProductInterface extends
     /**
      * Returns the attributes.
      *
-     * @return ArrayCollection|AttributeInterface[]
+     * @return ArrayCollection|ProductAttributeInterface[]
      */
     public function getAttributes();
 
     /**
      * Returns whether the product has the given attribute or not.
      *
-     * @param AttributeInterface $attribute
+     * @param ProductAttributeInterface $attribute
      *
      * @return bool
      */
-    public function hasAttribute(AttributeInterface $attribute);
+    public function hasAttribute(ProductAttributeInterface $attribute);
 
     /**
      * Adds the attribute.
      *
-     * @param AttributeInterface $attribute
+     * @param ProductAttributeInterface $attribute
      *
      * @return $this|ProductInterface
      */
-    public function addAttribute(AttributeInterface $attribute);
+    public function addAttribute(ProductAttributeInterface $attribute);
 
     /**
      * Removes the attribute.
      *
-     * @param AttributeInterface $attribute
+     * @param ProductAttributeInterface $attribute
      *
      * @return $this|ProductInterface
      */
-    public function removeAttribute(AttributeInterface $attribute);
+    public function removeAttribute(ProductAttributeInterface $attribute);
 
     /**
      * Sets the attributes.
      *
-     * @param ArrayCollection|AttributeInterface[] $attributes
+     * @param ArrayCollection|ProductAttributeInterface[] $attributes
      *
      * @return $this|ProductInterface
      */
-    public function setAttributes(ArrayCollection $attributes);
+    //public function setAttributes(ArrayCollection $attributes);
 
     /**
      * Returns the option groups.

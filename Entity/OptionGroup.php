@@ -12,6 +12,8 @@ use Ekyna\Component\Resource\Model as RM;
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
  * @method Model\OptionGroupTranslationInterface translate($locale = null, $create = false)
+ *
+ * @TODO Rename to 'Option'
  */
 class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupInterface
 {

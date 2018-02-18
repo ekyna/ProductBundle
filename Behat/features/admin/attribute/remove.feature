@@ -14,7 +14,7 @@ Feature: Remove attributes
             | Blanc | Couleur |
 
     Scenario: Remove an attribute
-        When I go to "ekyna_product_attribute_admin_remove" route with "attributeGroupId:1,attributeId:1"
+        When I go to "ekyna_product_attribute_choice_admin_remove" route with "attributeGroupId:1,attributeChoiceId:1"
         And I check "form[confirm]"
         And I press "form[actions][remove]"
         Then I should see the resource removed confirmation message

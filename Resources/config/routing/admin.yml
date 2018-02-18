@@ -1,6 +1,6 @@
-ekyna_product_attribute_group_admin:
-    resource: admin/attribute_group.yml
-    prefix:   /attribute-groups
+ekyna_product_attribute_admin:
+    resource: admin/attribute.yml
+    prefix:   /attributes
 
 ekyna_product_attribute_set_admin:
     resource: admin/attribute_set.yml

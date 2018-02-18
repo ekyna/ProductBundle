@@ -4,39 +4,37 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
-use Ekyna\Bundle\CoreBundle\Form\Type\ColorPickerType;
-use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
-use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
+use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
  * Class AttributeType
- * @package Ekyna\Bundle\ProductBundle\Form\Type
+ * @package Ekyna\Bundle\ProductBundle\Form\Type\Attribute
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
 class AttributeType extends ResourceFormType
 {
     /**
-     * @var string
+     * @var AttributeTypeRegistryInterface
      */
-    protected $attributeGroupClass;
+    private $typeRegistry;
 
 
     /**
      * Constructor.
      *
-     * @param string $attributeClass
-     * @param string $attributeGroupClass
+     * @param string                         $class
+     * @param AttributeTypeRegistryInterface $typeRegistry
      */
-    public function __construct($attributeClass, $attributeGroupClass)
+    public function __construct($class, AttributeTypeRegistryInterface $typeRegistry)
     {
-        parent::__construct($attributeClass);
+        parent::__construct($class);
 
-        $this->attributeGroupClass = $attributeGroupClass;
+        $this->typeRegistry = $typeRegistry;
     }
 
     /**
@@ -45,37 +43,28 @@ class AttributeType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, [
+            ->add('name', Type\TextType::class, [
                 'label' => 'ekyna_core.field.name',
+            ])
+            ->add('type', Type\ChoiceType::class, [
+                'label'    => 'ekyna_core.field.type',
+                'choices'  => $this->typeRegistry->getChoices(),
+                'disabled' => true,
             ])
             ->add('translations', TranslationsFormsType::class, [
                 'form_type'      => AttributeTranslationType::class,
                 'label'          => false,
                 'error_bubbling' => false,
             ])
-            ->add('media', MediaChoiceType::class, [
-                'label'    => 'ekyna_core.field.image',
-                'types'    => [MediaTypes::IMAGE, MediaTypes::SVG],
-                'required' => false,
-            ])
-            ->add('color', ColorPickerType::class, [
-                'label'    => 'ekyna_core.field.color',
-                'required' => false,
-            ]);
+            ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
+                /** @var AttributeInterface $attribute */
+                $attribute = $event->getData();
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeInterface $attribute */
-            $attribute = $event->getData();
-            $form = $event->getForm();
+                $type = $this->typeRegistry->getType($attribute->getType());
 
-            $disabled = (null !== $attribute && $attribute->getId());
-
-            $form->add('group', ResourceType::class, [
-                'label'     => 'ekyna_product.attribute_group.label.singular',
-                'class'     => $this->attributeGroupClass,
-                'allow_new' => !$disabled,
-                'disabled'  => $disabled,
-            ]);
-        });
+                if (null !== $formType = $type->getConfigType()) {
+                    $event->getForm()->add('config', $formType);
+                }
+            });
     }
 }

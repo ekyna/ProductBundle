@@ -14,6 +14,8 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
  * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
+ *
+ * @TODO Rename to 'OptionValue' or 'OptionChoice'
  */
 class Option extends RM\AbstractTranslatable implements Model\OptionInterface, GroupSequenceProviderInterface
 {

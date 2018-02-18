@@ -2,9 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
+use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 
 /**
  * Class ProductExtension
@@ -24,6 +26,16 @@ class ProductExtension extends \Twig_Extension
     private $priceCalculator;
 
     /**
+     * @var AttributeTypeRegistryInterface
+     */
+    private $attributeTypeRegistry;
+
+    /**
+     * @var LocaleProviderInterface
+     */
+    private $localeProvider;
+
+    /**
      * @var string
      */
     private $defaultImage;
@@ -32,17 +44,23 @@ class ProductExtension extends \Twig_Extension
     /**
      * Constructor.
      *
-     * @param ConstantsHelper $constantHelper
-     * @param PriceCalculator $priceCalculator
-     * @param string          $defaultImage
+     * @param ConstantsHelper                $constantHelper
+     * @param PriceCalculator                $priceCalculator
+     * @param AttributeTypeRegistryInterface $attributeTypeRegistry
+     * @param LocaleProviderInterface        $localeProvider
+     * @param string                         $defaultImage
      */
     public function __construct(
         ConstantsHelper $constantHelper,
         PriceCalculator $priceCalculator,
+        AttributeTypeRegistryInterface $attributeTypeRegistry,
+        LocaleProviderInterface $localeProvider,
         $defaultImage = ''
     ) {
         $this->constantHelper = $constantHelper;
         $this->priceCalculator = $priceCalculator;
+        $this->attributeTypeRegistry = $attributeTypeRegistry;
+        $this->localeProvider = $localeProvider;
         $this->defaultImage = $defaultImage;
     }
 
@@ -68,6 +86,10 @@ class ProductExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
+                'product_attribute_type_label',
+                [$this->constantHelper, 'renderAttributeTypeLabel']
+            ),
+            new \Twig_SimpleFilter(
                 'product_bundle_total_price',
                 [$this->priceCalculator, 'calculateBundleTotalPrice']
             ),
@@ -76,8 +98,9 @@ class ProductExtension extends \Twig_Extension
                 [$this->priceCalculator, 'calculateConfigurableTotalPrice']
             ),
             new \Twig_SimpleFilter(
-                'product_attributes',
-                [$this, 'transformProductAttributes']
+                'product_attribute',
+                [$this, 'renderProductAttribute'],
+                ['is_safe' => ['html']]
             ),
         ];
     }
@@ -103,6 +126,10 @@ class ProductExtension extends \Twig_Extension
             new \Twig_SimpleFunction(
                 'product_convert_types',
                 [Model\ProductTypes::class, 'getConversionTypes']
+            ),
+            new \Twig_SimpleFunction(
+                'attribute_create_types',
+                [$this->attributeTypeRegistry, 'getChoices']
             ),
         ];
     }
@@ -142,36 +169,19 @@ class ProductExtension extends \Twig_Extension
     }
 
     /**
-     * Transforms the product attributes to an array of attribute slots.
+     * Renders the product attribute.
      *
-     * @param Model\ProductInterface $product
+     * @param Model\ProductAttributeInterface $productAttribute
      *
-     * @return array
+     * @return string
      */
-    public function transformProductAttributes(Model\ProductInterface $product)
+    public function renderProductAttribute(Model\ProductAttributeInterface $productAttribute)
     {
-        Model\ProductTypes::assertVariant($product);
+        $attribute = $productAttribute->getAttributeSlot()->getAttribute();
 
-        $attributes = [];
-        $slots = $product->getParent()->getAttributeSet()->getSlots();
+        $type = $this->attributeTypeRegistry->getType($attribute->getType());
 
-        foreach ($slots as $slot) {
-            $group = $slot->getGroup();
-
-            $groupAttributes = [];
-            foreach ($product->getAttributes() as $attribute) {
-                if ($group === $attribute->getGroup()) {
-                    $groupAttributes[] = $attribute;
-                }
-            }
-
-            $attributes[] = [
-                'group'      => $group,
-                'attributes' => $groupAttributes,
-            ];
-        }
-
-        return $attributes;
+        return $type->render($productAttribute, $this->localeProvider->getCurrentLocale());
     }
 
     /**

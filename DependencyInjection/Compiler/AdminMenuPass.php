@@ -70,10 +70,10 @@ class AdminMenuPass implements CompilerPassInterface
 
         // Attributes
         $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'attribute_groups',
-            'route'    => 'ekyna_product_attribute_group_admin_home',
-            'label'    => 'ekyna_product.attribute_group.label.plural',
-            'resource' => 'ekyna_product_attribute_group',
+            'name'     => 'attributes',
+            'route'    => 'ekyna_product_attribute_admin_home',
+            'label'    => 'ekyna_product.attribute.label.plural',
+            'resource' => 'ekyna_product_attribute',
             'position' => 11,
         ]]);
 

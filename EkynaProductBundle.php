@@ -21,6 +21,7 @@ class EkynaProductBundle extends AbstractBundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\RegisterProductEventHandlerPass());
+        $container->addCompilerPass(new Compiler\AttributeTypeRegistryPass());
         $container->addCompilerPass(new Compiler\AdminMenuPass());
     }
 
@@ -31,7 +32,7 @@ class EkynaProductBundle extends AbstractBundle
     {
         return [
             Model\AttributeInterface::class         => 'ekyna_product.attribute.class',
-            Model\AttributeGroupInterface::class    => 'ekyna_product.attribute_group.class',
+            Model\AttributeChoiceInterface::class   => 'ekyna_product.attribute_choice.class',
             Model\AttributeSetInterface::class      => 'ekyna_product.attribute_set.class',
             Model\AttributeSlotInterface::class     => 'ekyna_product.attribute_slot.class',
             Model\BrandInterface::class             => 'ekyna_product.brand.class',
@@ -45,6 +46,7 @@ class EkynaProductBundle extends AbstractBundle
             Model\PricingRuleInterface::class       => 'ekyna_product.pricing_rule.class',
             Model\ProductInterface::class           => 'ekyna_product.product.class',
             Model\ProductAdjustmentInterface::class => 'ekyna_product.product_adjustment.class',
+            Model\ProductAttributeInterface::class  => 'ekyna_product.product_attribute.class',
             Model\ProductMediaInterface::class      => 'ekyna_product.product_media.class',
             Model\ProductReferenceInterface::class  => 'ekyna_product.product_reference.class',
             Model\ProductStockUnitInterface::class  => 'ekyna_product.product_stock_unit.class',

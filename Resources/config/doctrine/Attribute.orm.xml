@@ -23,17 +23,19 @@
         </id>
 
         <field name="name" column="name" type="string" length="32" nullable="false" unique="true"/>
-        <field name="color" column="color" type="string" length="16" nullable="true" />
+        <field name="type" column="type" type="string" length="32" nullable="false"/>
+        <field name="config" column="config" type="json_array" nullable="true"/>
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position/>
         </field>
 
-        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface"
-                     field="group" inversed-by="attributes">
-            <join-column name="group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false"/>
-            <gedmo:sortable-group/>
-        </many-to-one>
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface"
+                     field="choices" mapped-by="attribute" orphan-removal="true">
+            <cascade>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
 
     </mapped-superclass>
 

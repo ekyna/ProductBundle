@@ -7,15 +7,15 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <mapped-superclass
-            name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroup"
-            table="product_attribute_group">
+            name="Ekyna\Bundle\ProductBundle\Entity\AttributeChoice"
+            table="product_attribute_choice">
 
         <indexes>
-            <index columns="name" name="idx_attribute_group_name" />
+            <index columns="name" name="idx_attribute_name" />
         </indexes>
 
         <unique-constraints>
-            <unique-constraint columns="name" name="unique_attribute_group_name" />
+            <unique-constraint columns="name,attribute_id" name="unique_attribute_choice_name" />
         </unique-constraints>
 
         <id name="id" type="integer" column="id">
@@ -23,17 +23,17 @@
         </id>
 
         <field name="name" column="name" type="string" length="32" nullable="false" unique="true"/>
+        <field name="color" column="color" type="string" length="16" nullable="true" />
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position/>
         </field>
 
-        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface"
-                     field="attributes" mapped-by="group" orphan-removal="true">
-            <cascade>
-                <cascade-remove/>
-            </cascade>
-        </one-to-many>
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface"
+                     field="attribute" inversed-by="choices">
+            <join-column name="attribute_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false"/>
+            <gedmo:sortable-group/>
+        </many-to-one>
 
     </mapped-superclass>
 

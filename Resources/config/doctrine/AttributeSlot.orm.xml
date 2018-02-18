@@ -22,8 +22,16 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="multiple" column="multiple" type="boolean" />
-        <field name="required" column="required" type="boolean" />
+        <field name="required" column="required" type="boolean">
+            <options>
+                <option name="default">1</option>
+            </options>
+        </field>
+        <field name="naming" column="naming" type="boolean">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />
         </field>
@@ -34,8 +42,8 @@
             <gedmo:sortable-group />
         </many-to-one>
 
-        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface" field="group">
-            <join-column name="group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attribute">
+            <join-column name="attribute_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
         </many-to-one>
 
     </mapped-superclass>

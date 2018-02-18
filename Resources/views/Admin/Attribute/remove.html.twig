@@ -1,3 +1,8 @@
 {% extends "EkynaAdminBundle:Entity/Default:remove.html.twig" %}
 
-{% block actions %}{% endblock actions %}
+{% import "EkynaProductBundle:Admin/Attribute:_macro.html.twig" as macros %}
+
+{% block actions %}
+    {{ admin_resource_btn(resource, 'list') }}
+    {{ macros.new_attribute_button() }}
+{% endblock actions %}

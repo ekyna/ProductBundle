@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -12,24 +12,8 @@ use Ekyna\Component\Resource\Model as RM;
  *
  * @method AttributeTranslationInterface translate($locale = null, $create = false)
  */
-interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface, RM\TranslatableInterface
+interface AttributeInterface extends RM\SortableInterface, RM\TranslatableInterface
 {
-    /**
-     * Returns the group.
-     *
-     * @return AttributeGroupInterface
-     */
-    public function getGroup();
-
-    /**
-     * Sets the group.
-     *
-     * @param AttributeGroupInterface $group
-     *
-     * @return $this|AttributeInterface
-     */
-    public function setGroup(AttributeGroupInterface $group);
-
     /**
      * Returns the name.
      *
@@ -47,20 +31,36 @@ interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface
     public function setName($name);
 
     /**
-     * Returns the color.
+     * Returns the type.
      *
      * @return string
      */
-    public function getColor();
+    public function getType();
 
     /**
-     * Sets the color.
+     * Sets the type.
      *
-     * @param string $color
+     * @param string $type
      *
      * @return $this|AttributeInterface
      */
-    public function setColor($color);
+    public function setType($type);
+
+    /**
+     * Returns the configuration.
+     *
+     * @return array
+     */
+    public function getConfig();
+
+    /**
+     * Sets the configuration.
+     *
+     * @param array $configuration
+     *
+     * @return $this|AttributeInterface
+     */
+    public function setConfig(array $configuration);
 
     /**
      * Returns the (translated) title.
@@ -68,4 +68,48 @@ interface AttributeInterface extends MediaSubjectInterface, RM\SortableInterface
      * @return string
      */
     public function getTitle();
+
+    /**
+     * Returns the attributes.
+     *
+     * @return ArrayCollection|AttributeChoiceInterface[]
+     */
+    public function getChoices();
+
+    /**
+     * Returns whether the group has the attribute or not.
+     *
+     * @param AttributeChoiceInterface $choice
+     *
+     * @return bool
+     */
+    public function hasChoice(AttributeChoiceInterface $choice);
+
+    /**
+     * Adds the attribute.
+     *
+     * @param AttributeChoiceInterface $choice
+     *
+     * @return $this|OptionGroupInterface
+     */
+    public function addChoice(AttributeChoiceInterface $choice);
+
+    /**
+     * Removes the attribute.
+     *
+     * @param AttributeChoiceInterface $choice
+     *
+     * @return $this|OptionGroupInterface
+     */
+    public function removeChoice(AttributeChoiceInterface $choice);
+
+    /**
+     * Sets the attributes.
+     *
+     * @param ArrayCollection|AttributeChoiceInterface[] $attributes
+     *
+     * @return $this|OptionGroupInterface
+     * @internal
+     */
+    public function setChoices(ArrayCollection $attributes);
 }

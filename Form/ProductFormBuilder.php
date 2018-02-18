@@ -11,7 +11,9 @@ use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
+use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
@@ -71,11 +73,15 @@ class ProductFormBuilder
      *
      * @param ProductInterface $product
      * @param FormInterface    $form
+     *
+     * @return ProductFormBuilder
      */
     public function initialize(ProductInterface $product, FormInterface $form)
     {
         $this->product = $product;
         $this->form = $form;
+
+        return $this;
     }
 
     /**
@@ -93,7 +99,7 @@ class ProductFormBuilder
      *
      * @return ProductInterface
      */
-    protected function getProduct()
+    public function getProduct()
     {
         return $this->product;
     }
@@ -116,6 +122,7 @@ class ProductFormBuilder
             'attr'                  => ['label_col' => 2, 'widget_col' => 10],
             'modes'                 => [AdjustmentModes::MODE_FLAT],
             'types'                 => [AdjustmentTypes::TYPE_INCLUDED],
+            'required'              => false,
         ], $options);
 
         $this->form->add('adjustments', CO\Common\AdjustmentsType::class, $options);
@@ -132,10 +139,27 @@ class ProductFormBuilder
      */
     public function addAttributeSetField(array $options = [])
     {
-        ProductTypes::assertVariable($this->product);
+        if (!in_array($this->product->getType(), [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIABLE])) {
+            throw new InvalidArgumentException("Expected 'simple' or 'variable' product.");
+        }
+
+        $required = true;
+        $disabled = false;
+        $attr = [];
+        if ($this->product->getType() === ProductTypes::TYPE_SIMPLE) {
+            $required = false;
+            if (null !== $this->product->getAttributeSet()) {
+                $disabled = true;
+            } else {
+                $attr['class'] = 'product-attribute-set';
+            }
+        }
 
         $options = array_replace([
+            'required'  => $required,
+            'disabled'  => $disabled,
             'allow_new' => true,
+            'attr'      => $attr,
         ], $options);
 
         $this->form->add('attributeSet', PR\Attribute\AttributeSetChoiceType::class, $options);
@@ -146,20 +170,26 @@ class ProductFormBuilder
     /**
      * Adds the attributes field.
      *
-     * @param array $options
+     * @param AttributeSetInterface $attributeSet
+     * @param array                 $options
      *
      * @return self
      */
-    public function addAttributesField(array $options = [])
+    public function addAttributesField(AttributeSetInterface $attributeSet = null, array $options = [])
     {
-        ProductTypes::assertVariant($this->product);
+        ProductTypes::assertChildType($this->product);
 
-        $attributeSet = $this->product->getParent()->getAttributeSet();
+        $attr = [];
+        if ($this->product->getType() === ProductTypes::TYPE_SIMPLE && null === $this->product->getAttributeSet()) {
+            $attr['class'] = 'product-attributes';
+            $attr['data-set-field'] = '.product-attribute-set';
+        }
 
         $options = array_replace([
             'label'         => 'ekyna_product.attribute.label.plural',
             'attribute_set' => $attributeSet,
-            'required'      => $attributeSet->hasRequiredSlot(),
+            'required'      => $attributeSet && $attributeSet->hasRequiredSlot(),
+            'attr'          => $attr,
         ], $options);
 
         $this->form->add('attributes', PR\ProductAttributesType::class, $options);

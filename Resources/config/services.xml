@@ -10,17 +10,45 @@
 
         <parameter key="ekyna_product.pricing.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\Pricing\PricingType</parameter>
 
-        <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
-        <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
-        <parameter key="ekyna_product.product.form_type.event_subscriber.class">Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber</parameter>
-
         <parameter key="ekyna_product.product.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository</parameter>
         <parameter key="ekyna_product.brand.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository</parameter>
         <parameter key="ekyna_product.category.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\CategoryRepository</parameter>
+
+        <!-- TODO Remove ? (can be overridden by compiler pass) -->
+        <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
+        <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
+        <parameter key="ekyna_product.product.form_type.event_subscriber.class">Ekyna\Bundle\ProductBundle\Form\EventListener\ProductTypeSubscriber</parameter>
     </parameters>
 
     <services>
 
+        <!-- Attribute types -->
+        <service id="ekyna_product.attribute.type_registry"
+                 class="Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistry"
+                 lazy="true">
+            <argument type="collection"/>
+        </service>
+        <service id="ekyna_product.attribute.type.select"
+                 class="Ekyna\Bundle\ProductBundle\Attribute\Type\SelectType">
+            <tag name="ekyna_product.attribute_type" alias="select"/>
+        </service>
+        <service id="ekyna_product.attribute.type.text"
+                 class="Ekyna\Bundle\ProductBundle\Attribute\Type\TextType">
+            <tag name="ekyna_product.attribute_type" alias="text"/>
+        </service>
+        <service id="ekyna_product.attribute.type.boolean"
+                 class="Ekyna\Bundle\ProductBundle\Attribute\Type\BooleanType">
+            <argument type="service" id="translator"/>
+            <argument>%locales%</argument>
+            <argument>%kernel.default_locale%</argument>
+            <tag name="ekyna_product.attribute_type" alias="boolean"/>
+        </service>
+        <service id="ekyna_product.attribute.type.unit"
+                 class="Ekyna\Bundle\ProductBundle\Attribute\Type\UnitType">
+            <tag name="ekyna_product.attribute_type" alias="unit"/>
+        </service>
+
+        <!-- Inventory -->
         <service id="ekyna_product.inventory"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Inventory">
             <argument type="service" id="ekyna_product.product.repository"/>
@@ -105,6 +133,7 @@
         <service id="ekyna_product.constants_helper"
                  class="Ekyna\Bundle\ProductBundle\Service\ConstantsHelper">
             <argument type="service" id="translator"/>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
         </service>
 
         <!-- TODO Remove resources form types definitions (see configuration), by using resource choice form types -->
@@ -113,13 +142,19 @@
         <service id="ekyna_product.attribute.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeType">
             <argument>%ekyna_product.attribute.class%</argument>
-            <argument>%ekyna_product.attribute_group.class%</argument>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.attribute_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeChoiceType">
+            <argument>%ekyna_product.attribute_choice.class%</argument>
+            <argument>%ekyna_product.attribute.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.attribute_slot.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSlotType">
             <argument>%ekyna_product.attribute_slot.class%</argument>
-            <argument>%ekyna_product.attribute_group.class%</argument>
+            <argument>%ekyna_product.attribute.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.attribute_set_choice.form_type"
@@ -256,11 +291,25 @@
                  class="%ekyna_product.product.form_type.event_subscriber.class%">
             <argument type="service" id="ekyna_product.product.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
+            <argument type="service" id="ekyna_product.attribute_set.repository"/>
         </service>
         <service id="ekyna_product.product.form_type"
                  class="%ekyna_product.product.form_type.class%">
             <argument type="service" id="ekyna_product.product.form_type.event_subscriber"/>
             <argument>%ekyna_product.product.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.product_attributes.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\ProductAttributesType">
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
+            <argument>%ekyna_product.product_attribute.class%</argument>
+            <tag name="form.js" selector=".product-attributes" path="ekyna-product/form/product-attributes"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.attribute.boolean_config.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Config\BooleanConfigType">
+            <argument>%locales%</argument>
+            <argument>%kernel.default_locale%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.product_search.form_type"
@@ -285,6 +334,13 @@
             <argument>%ekyna_commerce.tax_group.class%</argument>
             <argument>%ekyna_cms.tag.class%</argument>
             <tag name="table.type"/>
+        </service>
+
+        <!-- Show types -->
+        <service id="ekyna_product.show.attribute_config_type"
+                 class="Ekyna\Bundle\ProductBundle\Show\Type\AttributeConfigType">
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
+            <tag name="ekyna_admin.show.type" alias="attribute_config"/>
         </service>
 
         <!-- Price resolver -->
@@ -317,6 +373,8 @@
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
             <argument type="service" id="ekyna_product.constants_helper"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>
         </service>
@@ -360,6 +418,7 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variable product event handler -->
@@ -369,6 +428,7 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
@@ -434,6 +494,13 @@
         <service id="ekyna_product.validator.variant_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <tag name="validator.constraint_validator"/>
+        </service>
+
+        <!-- Product attribute constraint validator -->
+        <service id="ekyna_product.validator.product_attribute_validator"
+                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductAttributeValidator">
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <tag name="validator.constraint_validator"/>
         </service>
 

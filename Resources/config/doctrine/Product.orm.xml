@@ -100,6 +100,13 @@
             </order-by>
         </one-to-many>
 
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface"
+                     field="attributes" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+        </one-to-many>
+
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="parent" inversed-by="variants">
             <join-column name="parent_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
@@ -132,17 +139,6 @@
                 </join-columns>
                 <inverse-join-columns>
                     <join-column name="customer_group_id" referenced-column-name="id" on-delete="RESTRICT"/>
-                </inverse-join-columns>
-            </join-table>
-        </many-to-many>
-
-        <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\AttributeInterface" field="attributes">
-            <join-table name="product_products_attributes">
-                <join-columns>
-                    <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE"/>
-                </join-columns>
-                <inverse-join-columns>
-                    <join-column name="attribute_id" referenced-column-name="id" on-delete="RESTRICT"/>
                 </inverse-join-columns>
             </join-table>
         </many-to-many>

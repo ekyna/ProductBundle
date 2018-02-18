@@ -8,7 +8,7 @@ Feature: Create attribute groups
         Given I am logged in as an administrator
 
     Scenario: Create an attribute group
-        When I go to "ekyna_product_attribute_group_admin_new" route
+        When I go to "ekyna_product_attribute_admin_new" route
         And I fill in "attribute_group[name]" with "Couleur"
         And I fill in "attribute_group[translations][fr][title]" with "Couleur"
         And I press "attribute_group_actions_save"

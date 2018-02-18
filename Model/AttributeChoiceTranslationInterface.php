@@ -5,11 +5,11 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\TranslationInterface;
 
 /**
- * Interface AttributeGroupTranslationInterface
+ * Interface AttributeChoiceTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface AttributeGroupTranslationInterface extends TranslationInterface
+interface AttributeChoiceTranslationInterface extends TranslationInterface
 {
     /**
      * Returns the title.
@@ -23,7 +23,7 @@ interface AttributeGroupTranslationInterface extends TranslationInterface
      *
      * @param string $title
      *
-     * @return $this|AttributeTranslationInterface
+     * @return $this|AttributeChoiceTranslationInterface
      */
     public function setTitle($title);
 }

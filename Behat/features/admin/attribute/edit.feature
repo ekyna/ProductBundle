@@ -14,7 +14,7 @@ Feature: Edit attributes
             | Blanc | Couleur |
 
     Scenario: Edit the attribute
-        When I go to "ekyna_product_attribute_admin_edit" route with "attributeGroupId:1,attributeId:1"
+        When I go to "ekyna_product_attribute_choice_admin_edit" route with "attributeGroupId:1,attributeChoiceId:1"
         And I fill in "attribute[name]" with "Noir"
         And I fill in "attribute[translations][fr][title]" with "Noir"
         And I press "attribute_actions_save"

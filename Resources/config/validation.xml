@@ -6,13 +6,43 @@
                         http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Attribute">
-        <property name="group">
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="type">
+            <constraint name="NotBlank"/>
+            <!-- TODO Validate with registry -->
+        </property>
+        <property name="translations">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+        <!-- Unique name -->
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">name</option>
+        </constraint>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation">
+        <property name="title">
+            <constraint name="NotBlank"/>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeChoice">
+        <property name="attribute">
             <constraint name="NotNull"/>
         </property>
         <property name="name">
             <constraint name="NotBlank"/>
         </property>
+        <!-- TODO <property name="color">
+            <constraint name="Color"/>
+        </property>-->
         <property name="translations">
+            <constraint name="Valid"/>
             <constraint name="Count">
                 <option name="min">1</option>
             </constraint>
@@ -25,37 +55,16 @@
                 </option>
             </constraint>
         </property>
-        <!-- Unique name per group -->
-        <!--<constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+        <!-- Unique name per attribute -->
+        <!-- TODO <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
-                <value>group</value>
+                <value>attribute</value>
                 <value>name</value>
             </option>
         </constraint>-->
     </class>
 
-    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation">
-        <property name="title">
-            <constraint name="NotBlank"/>
-        </property>
-    </class>
-
-    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroup">
-        <property name="name">
-            <constraint name="NotBlank"/>
-        </property>
-        <property name="translations">
-            <constraint name="Count">
-                <option name="min">1</option>
-            </constraint>
-        </property>
-        <!-- Unique name -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">name</option>
-        </constraint>
-    </class>
-
-    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeGroupTranslation">
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AttributeChoiceTranslation">
         <property name="title">
             <constraint name="NotBlank"/>
         </property>
@@ -81,15 +90,17 @@
         <property name="set">
             <constraint name="NotNull"/>
         </property>
-        <property name="group">
+        <property name="attribute">
             <constraint name="NotNull"/>
         </property>
-        <!-- Unique group per set -->
+        <!-- Unique attribute per set -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
                 <value>set</value>
-                <value>group</value>
+                <value>attribute</value>
             </option>
+            <option name="errorPath">attribute</option>
+            <option name="message">ekyna_product.attribute_slot.duplicate_attribute</option>
         </constraint>
     </class>
 
@@ -558,7 +569,6 @@
             </constraint>
             <constraint name="IsNull">
                 <option name="groups">
-                    <value>simple</value>
                     <value>variant</value>
                     <value>bundle</value>
                     <value>configurable</value>
@@ -566,17 +576,17 @@
             </constraint>
         </property>
 
-        <!-- (Variant) Attributes -->
+        <!-- (Simple/Variant) Attributes -->
         <property name="attributes">
             <constraint name="Count">
                 <option name="max">0</option>
                 <option name="groups">
-                    <value>simple</value>
                     <value>variable</value>
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
             </constraint>
+            <constraint name="Valid"/>
             <!--
             Attribute slots can be optional
             <constraint name="Count">
@@ -699,6 +709,10 @@
             </constraint>
         </property>
 
+        <property name="adjustments">
+            <constraint name="Valid"/>
+        </property>
+
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
@@ -745,6 +759,9 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAdjustment">
+        <property name="designation">
+            <constraint name="NotBlank"/>
+        </property>
         <property name="type">
             <constraint name="Choice">
                 <option name="choices">
@@ -759,6 +776,16 @@
                 </option>
             </constraint>
         </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAttribute">
+        <property name="product">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="attributeSlot">
+            <constraint name="NotNull"/>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductAttribute"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductMedia">

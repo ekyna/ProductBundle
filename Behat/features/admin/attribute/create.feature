@@ -11,7 +11,7 @@ Feature: Create attributes
             | Couleur |
 
     Scenario: Create an attribute
-        When I go to "ekyna_product_attribute_admin_new" route with "attributeGroupId:1"
+        When I go to "ekyna_product_attribute_choice_admin_new" route with "attributeGroupId:1"
         And I fill in "attribute[name]" with "Blanc"
         And I fill in "attribute[translations][fr][title]" with "Blanc"
         And I select "Couleur" from "attribute[group]"

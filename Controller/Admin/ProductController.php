@@ -5,13 +5,13 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\CommerceBundle\Controller\Admin\AbstractSubjectController;
-use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Updater;
 use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -204,6 +204,56 @@ class ProductController extends AbstractSubjectController
                 'form' => $form->createView(),
             ])
         );
+    }
+
+
+    /**
+     * Product attributes form action.
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function attributesFormAction(Request $request)
+    {
+        $this->isGranted('CREATE');
+
+        // Assert XHR
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException();
+        }
+
+        // Product
+        $context = $this->loadContext($request);
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = parent::createNew($context);
+        $product->setType(ProductTypes::TYPE_SIMPLE);
+
+        // Attribute Set
+        $attributeSet = $this->get('ekyna_product.attribute_set.repository')->find(
+            $request->attributes->get('attributeSetId')
+        );
+        if (null === $attributeSet) {
+            throw $this->createNotFoundException();
+        }
+
+        // Form
+        $form = $this->get('form.factory')->createNamed('product', FormType::class, $product, [
+            'block_name' => 'product',
+        ]);
+
+        $builder = $this->get('ekyna_product.product.form_type.builder');
+        $builder
+            ->initialize($product, $form)
+            ->addAttributesField($attributeSet);
+
+        $response = $this->render('EkynaProductBundle:Admin/Product:attributes_form.xml.twig', [
+            'form' => $form->createView(),
+        ]);
+
+        $response->headers->add(['Content-Type' => 'application/xml']);
+
+        return $response;
     }
 
     /**

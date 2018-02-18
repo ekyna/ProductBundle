@@ -17,20 +17,20 @@ class AttributeSlotType extends ResourceFormType
     /**
      * @var string
      */
-    protected $attributeGroupClass;
+    protected $attributeClass;
 
 
     /**
      * Constructor.
      *
-     * @param string $attributeSlotClass
-     * @param string $attributeGroupClass
+     * @param string $slotClass
+     * @param string $attributeClass
      */
-    public function __construct($attributeSlotClass, $attributeGroupClass)
+    public function __construct($slotClass, $attributeClass)
     {
-        parent::__construct($attributeSlotClass);
+        parent::__construct($slotClass);
 
-        $this->attributeGroupClass = $attributeGroupClass;
+        $this->attributeClass = $attributeClass;
     }
 
     /**
@@ -39,21 +39,23 @@ class AttributeSlotType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('group', ResourceType::class, [
+            ->add('attribute', ResourceType::class, [
                 'label'     => false,
-                'class'     => $this->attributeGroupClass,
-                'allow_new' => true,
+                'class'     => $this->attributeClass,
                 'attr'      => [
                     'widget_col' => 12,
                 ],
             ])
-            ->add('multiple', Type\CheckboxType::class, [
-                'label'    => 'ekyna_product.attribute_set.field.multiple',
-                'required' => false,
-            ])
             ->add('required', Type\CheckboxType::class, [
                 'label'    => 'ekyna_core.field.required',
                 'required' => false,
+            ])
+            ->add('naming', Type\CheckboxType::class, [
+                'label'    => 'ekyna_product.attribute_slot.field.naming',
+                'required' => false,
+                'attr' => [
+                    'help_text' => 'ekyna_product.attribute_slot.help.naming',
+                ]
             ])
             ->add('position', Type\HiddenType::class, [
                 'attr' => [

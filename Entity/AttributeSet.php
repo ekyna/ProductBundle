@@ -139,4 +139,18 @@ class AttributeSet implements Model\AttributeSetInterface
 
         return false;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasNamingSlot()
+    {
+        foreach ($this->slots as $slot) {
+            if ($slot->isNaming()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

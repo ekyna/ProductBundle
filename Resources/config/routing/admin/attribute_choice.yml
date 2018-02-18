@@ -1,0 +1,46 @@
+ekyna_product_attribute_choice_admin_new:
+    path: /new
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:newAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeId: \d+
+
+ekyna_product_attribute_choice_admin_show:
+    path: /{attributeChoiceId}/show
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:showAction" }
+    methods: [GET]
+    requirements:
+        attributeId: \d+
+        attributeChoiceId: \d+
+
+ekyna_product_attribute_choice_admin_edit:
+    path: /{attributeChoiceId}/edit
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:editAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeId: \d+
+        attributeChoiceId: \d+
+
+ekyna_product_attribute_choice_admin_move_up:
+    path: /{attributeChoiceId}/moveup
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:moveUpAction" }
+    methods: [GET]
+    requirements:
+        attributeId: \d+
+        attributeChoiceId: \d+
+
+ekyna_product_attribute_choice_admin_move_down:
+    path: /{attributeChoiceId}/movedown
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:moveDownAction" }
+    methods: [GET]
+    requirements:
+        attributeId: \d+
+        attributeChoiceId: \d+
+
+ekyna_product_attribute_choice_admin_remove:
+    path: /{attributeChoiceId}/remove
+    defaults: { _controller: "ekyna_product.attribute_choice.controller:removeAction" }
+    methods: [GET|POST]
+    requirements:
+        attributeId: \d+
+        attributeChoiceId: \d+

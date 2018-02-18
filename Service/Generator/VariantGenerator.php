@@ -42,7 +42,7 @@ class VariantGenerator implements VariantGeneratorInterface
         $variants = [];
 
         foreach ($attributeSet->getSlots() as $slot) {
-            $attributes = $slot->getGroup()->getAttributes();
+            $attributes = $slot->getAttribute()->getChoices();
 
             // First pass : create initial variants
             if (empty($variants)) {

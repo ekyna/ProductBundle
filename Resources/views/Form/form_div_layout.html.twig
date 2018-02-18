@@ -5,20 +5,46 @@
 {% spaceless %}
     {{ form_errors(form) }}
     <div class="row">
-        <div class="col-md-6">
-            {{ form_widget(form.group) }}
-            {{ form_errors(form.group) }}
+        <div class="col-md-4">
+            {{ form_widget(form.attribute) }}
+            {{ form_errors(form.attribute) }}
         </div>
-        <div class="col-md-3">
-            {{ form_row(form.multiple) }}
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             {{ form_row(form.required) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.naming) }}
         </div>
     </div>
     {{ form_rest(form) }}
 {% endspaceless %}
 {% endblock ekyna_product_attribute_slot_widget %}
+
+
+{% block ekyna_product_product_attributes_widget %}
+{% spaceless %}
+    <div {{ block('widget_container_attributes') }}>
+        {% set attributesFrom = form %}
+        {{ form_errors(attributesFrom) }}
+        {% for child in attributesFrom %}
+        <div class="form-group">
+            {{ form_label(child) }}
+            <div class="col-md-10">
+                {% if child.choices is defined %}
+                    {{ form_widget(child.choices) }}
+                {% else %}
+                    {% set attr = child.value.vars.attr %}
+                    {% set form = child.value %}
+                    {{ block('form_input_group') }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {{ form_rest(attributesFrom) }}
+        {% set form = attributesFrom %}
+    </div>
+{% endspaceless %}
+{% endblock ekyna_product_product_attributes_widget %}
 
 
 {% block ekyna_product_bundle_slot_widget %}

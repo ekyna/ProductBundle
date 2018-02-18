@@ -2,15 +2,15 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Bundle\ProductBundle\Model\AttributeGroupTranslationInterface;
+use Ekyna\Bundle\ProductBundle\Model\AttributeChoiceTranslationInterface;
 use Ekyna\Component\Resource\Model\AbstractTranslation;
 
 /**
- * Class AttributeGroupTranslation
+ * Class AttributeChoiceTranslation
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeGroupTranslation extends AbstractTranslation implements AttributeGroupTranslationInterface
+class AttributeChoiceTranslation extends AbstractTranslation implements AttributeChoiceTranslationInterface
 {
     /**
      * @var integer

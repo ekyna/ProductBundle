@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Ekyna\Component\Commerce\Order\Model\OrderStates;
 use Ekyna\Component\Commerce\Shipment\Model\ShipmentStates;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -22,19 +22,19 @@ class AttributeSlot implements Model\AttributeSlotInterface
     protected $set;
 
     /**
-     * @var Model\AttributeGroupInterface
+     * @var Model\AttributeInterface
      */
-    protected $group;
+    protected $attribute;
 
     /**
      * @var bool
      */
-    protected $multiple = false;
+    protected $required = false;
 
     /**
      * @var bool
      */
-    protected $required = true;
+    protected $naming = false;
 
     /**
      * @var integer
@@ -63,8 +63,18 @@ class AttributeSlot implements Model\AttributeSlotInterface
      */
     public function setSet(Model\AttributeSetInterface $set = null)
     {
-        $this->set = $set;
-        $set->addSlot($this);
+        if ($this->set !== $set) {
+            $previous = $this->set;
+            $this->set = $set;
+
+            if ($previous) {
+                $previous->removeSlot($this);
+            }
+
+            if ($set) {
+                $set->addSlot($this);
+            }
+        }
 
         return $this;
     }
@@ -72,35 +82,17 @@ class AttributeSlot implements Model\AttributeSlotInterface
     /**
      * @inheritdoc
      */
-    public function getGroup()
+    public function getAttribute()
     {
-        return $this->group;
+        return $this->attribute;
     }
 
     /**
      * @inheritdoc
      */
-    public function setGroup(Model\AttributeGroupInterface $group)
+    public function setAttribute(Model\AttributeInterface $attribute)
     {
-        $this->group = $group;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isMultiple()
-    {
-        return $this->multiple;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setMultiple($multiple)
-    {
-        $this->multiple = (bool)$multiple;
+        $this->attribute = $attribute;
 
         return $this;
     }
@@ -119,6 +111,24 @@ class AttributeSlot implements Model\AttributeSlotInterface
     public function setRequired($required)
     {
         $this->required = (bool)$required;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isNaming()
+    {
+        return $this->naming;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNaming($naming)
+    {
+        $this->naming = (bool)$naming;
 
         return $this;
     }

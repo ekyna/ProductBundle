@@ -18,6 +18,16 @@ ekyna_product:
             new: Créer un nouvel attribut
             edit: Modifier l'attribut <small>%name%</small>
             remove: Supprimer l'attribut <small>%name%</small>
+        type:
+            select: Selection
+            text: Texte
+            boolean: Booléen
+            unit: Unité
+        config:
+            multiple: Choix multiple
+            suffix: Suffixe
+        help:
+            suffix: "Saisissez une valeur (ex: &laquo; sachet(s) &raquo;) si vous choisissez l'unité 'Pièce'"
         button:
             list: Liste des attributs
             show: Détail de l'attribut
@@ -27,45 +37,49 @@ ekyna_product:
         alert:
             no_item: Aucun attribut configuré
 
-    attribute_group:
+    attribute_choice:
         label:
-            singular: Groupe d'attributs
-            plural: Groupes d'attributs
+            singular: Choix d'attributs
+            plural: Choix d'attributs
         header:
-            list: Groupes d'attributs <small>Liste des groupes</small>
-            show: Détail du groupe <small>%name%</small>
-            new: Créer un nouveau groupe
-            edit: Modifier le groupe <small>%name%</small>
-            remove: Supprimer le groupe <small>%name%</small>
+            list: Choix d'attributs <small>Liste des choix</small>
+            show: Détail du choix <small>%name%</small>
+            new: Créer un nouveau choix
+            edit: Modifier le choix <small>%name%</small>
+            remove: Supprimer le choix <small>%name%</small>
         button:
-            list: Liste des groupes
-            show: Détail du groupe
-            new: Nouveau groupe
-            edit: Modifier le groupe
-            remove: Supprimer le groupe
+            list: Liste des choix
+            show: Détail du choix
+            new: Nouveau choix
+            edit: Modifier le choix
+            remove: Supprimer le choix
         alert:
-            no_item: Aucun groupe configuré
+            no_item: Aucun choix configuré
 
     attribute_set:
         label:
-            singular: Modèle d'attributs
-            plural: Modèles d'attributs
+            singular: Archétype
+            plural: Archétypes
         header:
-            list: Modèles d'attributs <small>Liste des modèles</small>
-            show: Détail du modèle <small>%name%</small>
-            new: Créer un nouveau modèle
-            edit: Modifier le modèle <small>%name%</small>
-            remove: Supprimer le modèle <small>%name%</small>
+            list: Archétypes <small>Liste des archétypes</small>
+            show: Détail de l'archétype <small>%name%</small>
+            new: Créer un nouvel archétype
+            edit: Modifier l'archétype <small>%name%</small>
+            remove: Supprimer l'archétype <small>%name%</small>
         button:
-            list: Liste des modèles
-            show: Détail du modèle
-            new: Nouveau modèle
-            edit: Modifier le modèle
-            remove: Supprimer le modèle
-        field:
-            multiple: Choix multiple
+            list: Liste des archétypes
+            show: Détail de l'archétype
+            new: Nouvel archétype
+            edit: Modifier l'archétype
+            remove: Supprimer l'archétype
         alert:
-            no_item: Aucun modèle configuré
+            no_item: Aucun archétype configuré
+
+    attribute_slot:
+        field:
+            naming: Nommage
+        help:
+            naming: Générer les désignations des variantes avec cet attribut.
 
     brand:
         label:

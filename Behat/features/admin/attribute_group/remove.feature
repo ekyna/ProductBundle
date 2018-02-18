@@ -11,7 +11,7 @@ Feature: Remove attribute groups
             | Couleur |
 
     Scenario: Remove an attribute group
-        When I go to "ekyna_product_attribute_group_admin_remove" route with "attributeGroupId:1"
+        When I go to "ekyna_product_attribute_admin_remove" route with "attributeGroupId:1"
         And I check "form[confirm]"
         And I press "form[actions][remove]"
         Then I should see the resource removed confirmation message

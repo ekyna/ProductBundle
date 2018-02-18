@@ -25,7 +25,7 @@ class AttributeGroupContext implements Context, KernelAwareContext
     {
         $attributeGroups = $this->castAttributeGroupsTable($table);
 
-        $manager = $this->getContainer()->get('ekyna_product.attribute_group.manager');
+        $manager = $this->getContainer()->get('ekyna_product.attribute.manager');
 
         foreach ($attributeGroups as $group) {
             $manager->persist($group);
@@ -42,11 +42,11 @@ class AttributeGroupContext implements Context, KernelAwareContext
      */
     private function castAttributeGroupsTable(TableNode $table)
     {
-        $repository = $this->getContainer()->get('ekyna_product.attribute_group.repository');
+        $repository = $this->getContainer()->get('ekyna_product.attribute.repository');
 
         $groups = [];
         foreach ($table->getHash() as $hash) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeGroupInterface $group */
+            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeInterface $group */
             $group = $repository->createNew();
             $group
                 ->setName($hash['name'])

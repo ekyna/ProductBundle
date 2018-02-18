@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
+use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
@@ -31,6 +32,11 @@ abstract class AbstractVariantHandler extends AbstractHandler
     protected $productRepository;
 
     /**
+     * @var AttributeTypeRegistryInterface
+     */
+    protected $typeRegistry;
+
+    /**
      * @var VariantUpdater
      */
     private $variantUpdater;
@@ -47,15 +53,18 @@ abstract class AbstractVariantHandler extends AbstractHandler
      * @param PersistenceHelperInterface $persistenceHelper
      * @param LocaleProviderInterface    $localeProvider
      * @param ProductRepositoryInterface $productRepository
+     * @param AttributeTypeRegistryInterface $typeRegistry
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         LocaleProviderInterface $localeProvider,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        AttributeTypeRegistryInterface $typeRegistry
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->localeProvider = $localeProvider;
         $this->productRepository = $productRepository;
+        $this->typeRegistry = $typeRegistry;
     }
 
     /**
@@ -69,7 +78,11 @@ abstract class AbstractVariantHandler extends AbstractHandler
             return $this->variantUpdater;
         }
 
-        return $this->variantUpdater = new VariantUpdater($this->persistenceHelper, $this->localeProvider);
+        return $this->variantUpdater = new VariantUpdater(
+            $this->persistenceHelper,
+            $this->localeProvider,
+            $this->typeRegistry
+        );
     }
 
     /**

@@ -25,7 +25,7 @@ class AttributeContext implements Context, KernelAwareContext
     {
         $attributes = $this->castAttributesTable($table);
 
-        $manager = $this->getContainer()->get('ekyna_product.attribute.manager');
+        $manager = $this->getContainer()->get('ekyna_product.attribute_choice.manager');
 
         foreach ($attributes as $attribute) {
             $manager->persist($attribute);
@@ -42,8 +42,8 @@ class AttributeContext implements Context, KernelAwareContext
      */
     private function castAttributesTable(TableNode $table)
     {
-        $groupRepository = $this->getContainer()->get('ekyna_product.attribute_group.repository');
-        $repository = $this->getContainer()->get('ekyna_product.attribute.repository');
+        $groupRepository = $this->getContainer()->get('ekyna_product.attribute.repository');
+        $repository = $this->getContainer()->get('ekyna_product.attribute_choice.repository');
 
         $attributes = [];
         foreach ($table->getHash() as $hash) {
@@ -51,11 +51,11 @@ class AttributeContext implements Context, KernelAwareContext
                 throw new \InvalidArgumentException("Failed to find the attribute group named '{$hash['group']}'.");
             }
 
-            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeInterface $attribute */
+            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface $attribute */
             $attribute = $repository->createNew();
             $attribute
                 ->setName($hash['name'])
-                ->setGroup($group)
+                ->setAttribute($group)
                 ->translate()
                     ->setTitle($hash['name']);
 

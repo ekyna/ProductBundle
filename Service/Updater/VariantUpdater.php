@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
+use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidProductException;
 use Ekyna\Bundle\ProductBundle\Model;
@@ -25,19 +26,27 @@ class VariantUpdater
      */
     private $localeProvider;
 
+    /**
+     * @var AttributeTypeRegistryInterface
+     */
+    private $typeRegistry;
+
 
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param LocaleProviderInterface    $localeProvider
+     * @param PersistenceHelperInterface     $persistenceHelper
+     * @param LocaleProviderInterface        $localeProvider
+     * @param AttributeTypeRegistryInterface $typeRegistry
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider
+        LocaleProviderInterface $localeProvider,
+        AttributeTypeRegistryInterface $typeRegistry
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->localeProvider = $localeProvider;
+        $this->typeRegistry = $typeRegistry;
     }
 
     /**
@@ -62,26 +71,24 @@ class VariantUpdater
         foreach ($this->localeProvider->getAvailableLocales() as $locale) {
             $titles = [];
             foreach ($attributeSet->getSlots() as $slot) {
-                $group = $slot->getGroup();
-                $found = false;
-                foreach ($variant->getAttributes() as $attribute) {
-                    if ($attribute->getGroup() === $group) {
-                        // Don't create attribute translation here
-                        if (null !== $aTrans = $attribute->getTranslations()->get($locale)) {
-                            if (0 < strlen($title = $aTrans->getTitle())) {
-                                $titles[] = $title;
-                            }
-                        }/* else {
-                            TODO missing trans ?
-                        }*/
-                        $found = true;
-                        if (!$slot->isMultiple()) {
-                            continue 2;
+                if (!$slot->isNaming()) {
+                    continue;
+                }
+
+                foreach ($variant->getAttributes() as $productAttribute) {
+                    if ($productAttribute->getAttributeSlot() === $slot) {
+                        $attributeType = $this->typeRegistry->getType($slot->getAttribute()->getType());
+
+                        if (!empty($title = $attributeType->render($productAttribute, $locale))) {
+                            $titles[] = $title;
                         }
+
+                        continue 2;
                     }
                 }
-                if ($slot->isRequired() && !$found) {
-                    throw new InvalidProductException("No attribute found for attribute group '$group'.'");
+
+                if ($slot->isRequired()) {
+                    throw new InvalidProductException("No attribute found for '{$slot->getAttribute()}'.'");
                 }
             }
 
@@ -109,20 +116,30 @@ class VariantUpdater
 
         // Attributes designation
         $names = [];
+        $locale = $this->localeProvider->getCurrentLocale(); // TODO Default locale
         foreach ($attributeSet->getSlots() as $slot) {
-            $group = $slot->getGroup();
-            $found = false;
-            foreach ($variant->getAttributes() as $attribute) {
-                if ($attribute->getGroup() === $group) {
-                    $names[] = $attribute->getName();
-                    $found = true;
-                    if (!$slot->isMultiple()) {
-                        continue 2;
+            if (!$slot->isNaming()) {
+                continue;
+            }
+
+            foreach ($variant->getAttributes() as $productAttribute) {
+                if ($productAttribute->getAttributeSlot() === $slot) {
+                    $attributeType = $this->typeRegistry->getType($slot->getAttribute()->getType());
+
+                    if ($attributeType->hasChoices()) {
+                        foreach ($productAttribute->getChoices() as $attributeChoice) {
+                            $names[] = $attributeChoice->getName();
+                        }
+                    } elseif(!empty($name = $attributeType->render($productAttribute, $locale))) {
+                        $names[] = $name;
                     }
+
+                    continue 2;
                 }
             }
-            if ($slot->isRequired() && !$found) {
-                throw new InvalidProductException("No attribute found for attribute group '$group'.'");
+
+            if ($slot->isRequired()) {
+                throw new InvalidProductException("No attribute found for '{$slot->getAttribute()}'.'");
             }
         }
 

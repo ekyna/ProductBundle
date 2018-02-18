@@ -17,6 +17,8 @@
             {{ macros.show_released_at(product, {'label_col': 4}) }}
         </div>
     </div>
+    {{ macros.show_attribute_set(product) }}
+    {{ macros.show_attributes(product) }}
     {{ _cms.show_tags(product) }}
     {{ macros.show_translations(product) }}
     {{ macros.show_medias(product) }}

@@ -9,8 +9,7 @@ define(['jquery'], function($) {
         this.each(function() {
 
             var $form = $(this),
-                $mode = $form.find('div.option-mode input[type="radio"]'),
-                $product = $form.find('select.entity-search');
+                $mode = $form.find('div.option-mode input[type="radio"]');
 
             function onChange() {
                 var mode = $mode.filter(':checked').val();

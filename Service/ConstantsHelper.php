@@ -2,8 +2,10 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service;
 
+use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ResourceBundle\Helper\AbstractConstantsHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ConstantsHelper
@@ -12,6 +14,22 @@ use Ekyna\Bundle\ResourceBundle\Helper\AbstractConstantsHelper;
  */
 class ConstantsHelper extends AbstractConstantsHelper
 {
+    /**
+     * @var AttributeTypeRegistryInterface
+     */
+    private $attributeTypeRegistry;
+
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct(TranslatorInterface $translator, AttributeTypeRegistryInterface $attributeTypeRegistry)
+    {
+        parent::__construct($translator);
+
+        $this->attributeTypeRegistry = $attributeTypeRegistry;
+    }
+
     /**
      * Renders the product type label.
      *
@@ -73,5 +91,23 @@ class ConstantsHelper extends AbstractConstantsHelper
         }
 
         return $this->renderLabel(Model\ProductReferenceTypes::getLabel($typeOrReference));
+    }
+
+    /**
+     * Renders the attribute type label.
+     *
+     * @param string|Model\AttributeInterface $typeOrAttribute
+     *
+     * @return string
+     */
+    public function renderAttributeTypeLabel($typeOrAttribute)
+    {
+        if ($typeOrAttribute instanceof Model\AttributeInterface) {
+            $typeOrAttribute = $typeOrAttribute->getType();
+        }
+
+        $type = $this->attributeTypeRegistry->getType($typeOrAttribute);
+
+        return $this->renderLabel($type->getLabel());
     }
 }

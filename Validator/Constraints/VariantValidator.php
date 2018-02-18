@@ -71,35 +71,9 @@ class VariantValidator extends ConstraintValidator
             throw new RuntimeException("Variant's parent attribute set must be defined.");
         }
 
-        $attributes = $variant->getAttributes();
-        $validGroups = [];
-        $slotsCounts = [];
-        $totalCount = 0;
-        $hasRequiredSlot = false;
-
-        // Gather attributes count per slot, and total attributes count.
-        foreach ($attributeSet->getSlots() as $slot) {
-            $count = 0;
-            $group = $slot->getGroup();
-
-            foreach ($attributes as $attribute) {
-                if ($attribute->getGroup() === $group) {
-                    $count++;
-                }
-            }
-
-            if ($slot->isRequired()) {
-                $hasRequiredSlot = true;
-            }
-
-            $validGroups[] = $group;
-            $slotsCounts[] = [$slot, $count];
-            $totalCount += $count;
-        }
-
         // If no attributes (and no required slots), attributesDesignation and attributesTitle (translations)
         // can't be auto-generated, so we need the user to provide them
-        if (!$hasRequiredSlot && 0 == $attributes->count()) {
+        if (!$attributeSet->hasRequiredSlot() && 0 == $variant->getAttributes()->count()) {
             // Designation
             if (0 == strlen($variant->getDesignation())) {
                 $this->context
@@ -123,51 +97,6 @@ class VariantValidator extends ConstraintValidator
                         ->buildViolation($constraint->translationTitleNeeded)
                         ->atPath('translations['. $locale . '].title')
                         ->addViolation();
-                }
-            }
-        }
-
-        foreach ($slotsCounts as $data) {
-            /**
-             * @var Model\AttributeSlotInterface $slot
-             * @var int                          $count
-             */
-            list($slot, $count) = $data;
-
-            // Asserts that each required slot has at least one assigned attribute
-            if ($slot->isRequired() && $count == 0) {
-                $this->context
-                    ->buildViolation($constraint->slotAttributeIsMandatory)
-                    ->setParameter('%group_name%', $slot->getGroup()->getName())
-                    ->atPath('attributes')
-                    ->addViolation();
-
-                return;
-            }
-
-            // Asserts that non multiple slots do not have more than one assigned attribute
-            if (!$slot->isMultiple() && 1 < $count) {
-                $this->context
-                    ->buildViolation($constraint->slotHasTooManyAttributes)
-                    ->setParameter('%group_name%', $slot->getGroup()->getName())
-                    ->atPath('attributes')
-                    ->addViolation();
-
-                return;
-            }
-        }
-
-        // Asserts that we gathered every attributes (ie all attributes belongs to a slot group)
-        if ($attributes->count() != $totalCount) {
-            foreach ($attributes as $attribute) {
-                if (!in_array($attribute->getGroup(), $validGroups)) {
-                    $this->context
-                        ->buildViolation($constraint->unexpectedAttribute)
-                        ->setParameter('%attribute_name%', $attribute->getName())
-                        ->atPath('attributes')
-                        ->addViolation();
-
-                    return;
                 }
             }
         }

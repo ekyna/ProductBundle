@@ -7,7 +7,6 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
-use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandTranslationType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
