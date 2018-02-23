@@ -274,12 +274,8 @@ class FormBuilder
                 'availability' => $this->availabilityHelper->getAvailability($variant)->toArray(),
             ];
 
-            if (false === $json = json_encode($config)) {
-                throw new \RuntimeException(json_last_error_msg());
-            }
-
             return [
-                'data-config' => $json,
+                'data-config' => $this->jsonEncode($config),
             ];
         }
 
@@ -337,7 +333,7 @@ class FormBuilder
     {
         if (null !== $option) {
             return [
-                'data-config' => json_encode($this->buildOptionConfig($option)),
+                'data-config' => $this->jsonEncode($this->buildOptionConfig($option)),
             ];
         }
 
@@ -458,6 +454,24 @@ class FormBuilder
         }
 
         return $config;
+    }
+
+    /**
+     * Json encodes the given data (for from html config attribute).
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    public function jsonEncode(array $data)
+    {
+        $opts = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION;
+
+        if (false === $json = json_encode($data, $opts)) {
+            throw new \RuntimeException(json_last_error_msg());
+        }
+
+        return $json;
     }
 
     /**

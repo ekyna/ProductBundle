@@ -167,7 +167,7 @@ class ConfigurableSlotType extends Form\AbstractType
             $noChoiceVars = [
                 'id'                 => $view->vars['id'] . '_choice_0',
                 'choice_id'          => 0,
-                'config'             => [],
+                'config'             => '{}',
                 'choice_brand'       => null,
                 'choice_product'     => $this->formBuilder->translate(
                     'ekyna_product.sale_item_configure.no_choice.title', [
@@ -225,7 +225,9 @@ class ConfigurableSlotType extends Form\AbstractType
      */
     private function addConfigVars(Form\FormView $view, SaleItemInterface $item, $fallback)
     {
-        $view->vars['config'] = $this->formBuilder->getFormConfig($item, $fallback);
+        $config = $this->formBuilder->getFormConfig($item, $fallback);
+
+        $view->vars['config'] = $this->formBuilder->jsonEncode($config);
     }
 
     /**

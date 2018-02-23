@@ -3,7 +3,7 @@
     <div class="col-sm-9">
         <select name="{{ parent }}[option_group_{{ id }}][choice]" class="sale-item-option form-control input-sm"{% if required %} required="required"{% endif %}">
             {% if not required %}<option selected="selected" value>{{ placeholder }}</option>{% endif %}
-            {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode }}'>{{ option.label }}</option>{% endfor %}
+            {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode|escape }}'>{{ option.label }}</option>{% endfor %}
         </select>
     </div>
     <div class="col-xs-12 sale-item-option-availability"></div>

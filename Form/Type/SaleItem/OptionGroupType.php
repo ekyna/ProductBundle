@@ -124,12 +124,4 @@ class OptionGroupType extends Form\AbstractType
             ->setRequired(['option_group'])
             ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function getBlockPrefix()
-    {
-        return 'sale_item_option_group';
-    }
 }

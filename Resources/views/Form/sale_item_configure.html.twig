@@ -110,13 +110,13 @@
             </a>
             {%- endif -%}
             <fieldset id="{{ form.vars.id }}" class="slot-choice-form"
-                      data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.config|json_encode|raw }}'>
+                      data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.config|raw }}'>
                 {%- set itemForm = form -%}
                 {{- block('sale_item_configurable_slot') -}}
             </fieldset>
             {%- for itemForm in form.vars.choices_forms -%}
             <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" style="display:none;" disabled="disabled"
-                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.config|json_encode|raw }}'>
+                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.config|raw }}'>
                 {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
             </fieldset>
             {%- endfor %}
