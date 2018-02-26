@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Ekyna\Component\Commerce\Common\Model\Units as CUnits;
 use NumberFormatter;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
@@ -20,6 +21,22 @@ use Symfony\Component\Validator\Constraints\Type;
  */
 class UnitType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * @inheritDoc
      */
@@ -33,11 +50,17 @@ class UnitType extends AbstractType
 
         $formatter = NumberFormatter::create($locale, NumberFormatter::DECIMAL);
 
-        return sprintf(
-            '%s %s',
-            $formatter->format($value, NumberFormatter::TYPE_DEFAULT),
-            $config['unit'] === CUnits::PIECE ? $config['suffix'] : CUnits::getSymbol($config['unit'])
-        );
+        if ($config['unit'] === CUnits::PIECE) {
+            return sprintf('%s %s', $formatter->format($value, NumberFormatter::TYPE_DEFAULT), $config['suffix']);
+        }
+
+        if (BUnits::hasTranslatableFormat($config['unit'])) {
+            $format = $this->translator->trans(BUnits::getFormat($config['unit']), [], null, $locale);
+        } else {
+            $format = BUnits::getFormat($config['unit']);
+        }
+
+        return sprintf($format, $formatter->format($value, NumberFormatter::TYPE_DEFAULT));
     }
 
     /**

@@ -2,10 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type;
 
+use Ekyna\Bundle\CommerceBundle\Model\Units as BUnits;
 use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
-use Ekyna\Component\Commerce\Common\Model\Units;
+use Ekyna\Component\Commerce\Common\Model\Units AS CUnits;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class UnitAttributeType
@@ -15,6 +17,22 @@ use Symfony\Component\Form\FormBuilderInterface;
 class UnitAttributeType extends AbstractType
 {
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
      * @inheritDoc
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -23,13 +41,19 @@ class UnitAttributeType extends AbstractType
         $attribute = $options['attribute'];
         $config = $attribute->getConfig();
 
+        if ($config['unit'] === CUnits::PIECE) {
+            $append = $config['suffix'];
+        } else {
+            $append = $this->translator->trans(BUnits::getLabel($config['unit']));
+        }
+
         $builder->add('value', NumberType::class, [
             'label' => false,
-            'scale' => Units::getPrecision($config['unit']),
+            'scale' => CUnits::getPrecision($config['unit']),
             'attr'  => [
                 'widget_col'  => 12,
                 'input_group' => [
-                    'append' => $config['unit'] === Units::PIECE ? $config['suffix'] : Units::getSymbol($config['unit']),
+                    'append' => $append,
                 ],
             ],
         ]);

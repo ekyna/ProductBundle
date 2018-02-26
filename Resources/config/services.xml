@@ -45,6 +45,7 @@
         </service>
         <service id="ekyna_product.attribute.type.unit"
                  class="Ekyna\Bundle\ProductBundle\Attribute\Type\UnitType">
+            <argument type="service" id="translator"/>
             <tag name="ekyna_product.attribute_type" alias="unit"/>
         </service>
 
@@ -160,6 +161,12 @@
         <service id="ekyna_product.attribute_set_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType">
             <argument>%ekyna_product.attribute_set.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <!-- Attribute type form types -->
+        <service id="ekyna_product.attribute.unit.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\Type\UnitAttributeType">
+            <argument type="service" id="translator"/>
             <tag name="form.type"/>
         </service>
 

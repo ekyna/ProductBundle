@@ -18,15 +18,17 @@ class BooleanAttributeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('value', ChoiceType::class, [
-            'label'   => false,
-            'choices' => [
+            'label'       => false,
+            'choices'     => [
                 'ekyna_core.value.yes' => '1',
                 'ekyna_core.value.no'  => '0',
             ],
-            'expanded' => true,
-            'attr' => [
+            'expanded'    => true,
+            'required'    => $options['required'],
+            'placeholder' => !$options['required'] ? 'ekyna_core.value.undefined' : null,
+            'attr'        => [
                 'class' => 'inline',
-            ]
+            ],
         ]);
     }
 }
