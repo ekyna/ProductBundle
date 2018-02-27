@@ -249,6 +249,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             // Brand is ok
             // Parent is ok
             // Tax group is ok
+            // Attribute set is ok
 
             // ---- BASICS ----
 

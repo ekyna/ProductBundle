@@ -8,6 +8,7 @@ use Ekyna\Bundle\AdminBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductTranslationType;
+use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
@@ -16,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -40,7 +42,7 @@ class VariableType extends AbstractType
     /**
      * Constructor.
      *
-     * @param ResourceHelper $resourceHelper
+     * @param ResourceHelper              $resourceHelper
      * @param ResourceRepositoryInterface $attributeSetRepository
      */
     public function __construct(ResourceHelper $resourceHelper, ResourceRepositoryInterface $attributeSetRepository)
@@ -69,6 +71,7 @@ class VariableType extends AbstractType
             ])
             ->add('seo', SeoType::class)
             ->add('attributeSet', AttributeSetChoiceType::class, [
+                'disabled'  => $options['lock_attribute_set'],
                 'allow_new' => true,
             ])
             ->add('actions', FormActionsType::class, [
@@ -97,44 +100,68 @@ class VariableType extends AbstractType
                 ],
             ]);
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $data = $event->getData();
-            $form = $event->getForm();
+        if ($options['lock_attribute_set']) {
+            // Pre set data
+            $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+                /** @var ProductInterface $data */
+                $data = $event->getData();
 
-            $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
-            if (null !== $attributeSet) {
-                $form->add('variant', VariantType::class, [
-                    'property_path' => 'variants[0]',
-                    'attribute_set' => $attributeSet,
-                    'constraints' => [
-                        new Valid()
-                    ]
-                ]);
+                $this->addVariantForm($event->getForm(), $data->getAttributeSet());
+            });
+        } else {
+            // Pre submit
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                $data = $event->getData();
 
-                /** @var ProductInterface $variable */
-                $variable = $form->getData();
-                /** @var ProductInterface $variant */
-                $variant = $variable->getVariants()->first();
+                $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
 
-                if (!empty($optionGroups = $variant->getOptionGroups()->toArray())) {
-                    $form->add('option_group_selection', OptionGroupChoiceType::class, [
-                        'optionGroups' => $optionGroups,
-                    ]);
-                }
+                $this->addVariantForm($event->getForm(), $attributeSet);
+            });
+        }
+    }
 
-                if (!empty($medias = $variant->getMedias()->toArray())) {
-                    $form->add('media_selection', MediaChoiceType::class, [
-                        'medias' => $medias,
-                    ]);
-                }
+    /**
+     * Adds the variant form.
+     *
+     * @param FormInterface              $form
+     * @param AttributeSetInterface|null $attributeSet
+     */
+    private function addVariantForm(FormInterface $form, AttributeSetInterface $attributeSet = null)
+    {
+        if (null === $attributeSet) {
+            return;
+        }
 
-                if (!empty($tags = $variant->getTags()->toArray())) {
-                    $form->add('tag_selection', TagChoiceType::class, [
-                        'tags' => $tags,
-                    ]);
-                }
-            }
-        });
+        $form->add('variant', VariantType::class, [
+            'property_path' => 'variants[0]',
+            'attribute_set' => $attributeSet,
+            'constraints'   => [
+                new Valid(),
+            ],
+        ]);
+
+        /** @var ProductInterface $variable */
+        $variable = $form->getData();
+        /** @var ProductInterface $variant */
+        $variant = $variable->getVariants()->first();
+
+        if (!empty($optionGroups = $variant->getOptionGroups()->toArray())) {
+            $form->add('option_group_selection', OptionGroupChoiceType::class, [
+                'optionGroups' => $optionGroups,
+            ]);
+        }
+
+        if (!empty($medias = $variant->getMedias()->toArray())) {
+            $form->add('media_selection', MediaChoiceType::class, [
+                'medias' => $medias,
+            ]);
+        }
+
+        if (!empty($tags = $variant->getTags()->toArray())) {
+            $form->add('tag_selection', TagChoiceType::class, [
+                'tags' => $tags,
+            ]);
+        }
     }
 
     /**
@@ -144,11 +171,13 @@ class VariableType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'data_class'        => ProductInterface::class,
-                'attr'              => [
+                'data_class'         => ProductInterface::class,
+                'lock_attribute_set' => false,
+                'attr'               => [
                     'class' => 'form-horizontal',
                 ],
-                'validation_groups' => ['Default', ProductTypes::TYPE_VARIABLE],
-            ]);
+                'validation_groups'  => ['Default', ProductTypes::TYPE_VARIABLE],
+            ])
+            ->setAllowedTypes('lock_attribute_set', 'bool');
     }
 }

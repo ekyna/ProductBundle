@@ -144,11 +144,26 @@ class ProductConverter
             $product->setContent(null);
         }
 
+        // Attribute Set
+        $lockAttributeSet = false;
+        if (null !== $attributeSet = $product->getAttributeSet()) {
+            $variable->setAttributeSet($attributeSet);
+            $product->setAttributeSet(null);
+            $lockAttributeSet = 0 < $product->getAttributes()->count();
+        }
+
+        // Pre load attributes choices
+        foreach ($product->getAttributes() as $attribute) {
+            $attribute->getChoices()->toArray();
+        }
+
         // Add variant to variable
         $variable->addVariant($product);
 
         // Form
-        $form = $this->formFactory->create(VariableType::class, $variable);
+        $form = $this->formFactory->create(VariableType::class, $variable, [
+            'lock_attribute_set' => $lockAttributeSet,
+        ]);
 
         $form->handleRequest($this->requestStack->getMasterRequest());
         if ($form->isSubmitted() && $form->isValid()) {

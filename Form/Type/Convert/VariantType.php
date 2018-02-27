@@ -27,7 +27,7 @@ class VariantType extends AbstractType
         $builder->add('attributes', ProductAttributesType::class, [
             'label'         => 'ekyna_product.attribute_choice.label.plural',
             'attribute_set' => $attributeSet,
-            'required'      => $attributeSet->hasRequiredSlot(),
+            'required'      => $attributeSet && $attributeSet->hasRequiredSlot(),
         ]);
     }
 
