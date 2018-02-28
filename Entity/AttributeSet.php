@@ -94,10 +94,8 @@ class AttributeSet implements Model\AttributeSetInterface
     public function addSlot(Model\AttributeSlotInterface $slot)
     {
         if (!$this->hasSlot($slot)) {
-            if ($slot->getSet() !== $this) {
-                $slot->setSet($this);
-            }
             $this->slots->add($slot);
+            $slot->setSet($this);
         }
 
         return $this;
@@ -109,8 +107,8 @@ class AttributeSet implements Model\AttributeSetInterface
     public function removeSlot(Model\AttributeSlotInterface $slot)
     {
         if ($this->hasSlot($slot)) {
-            $slot->setSet(null);
             $this->slots->removeElement($slot);
+            $slot->setSet(null);
         }
 
         return $this;

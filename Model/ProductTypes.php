@@ -44,11 +44,11 @@ class ProductTypes extends AbstractConstants
         $prefix = 'ekyna_product.product.type.';
 
         return [
-            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE, 'default'],
-            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE, 'primary'],
-            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT, 'success'],
-            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE, 'warning'],
-            static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'danger'],
+            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE,       'indigo'],
+            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'teal'],
+            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT,      'light-green'],
+            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE,       'purple'],
+            static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'red'],
         ];
     }
 
