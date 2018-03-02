@@ -328,7 +328,8 @@
                 <option name="groups">data</option>
             </constraint>
             <constraint name="Length">
-                <option name="max">16</option>
+                <option name="min">2</option>
+                <option name="max">32</option>
                 <option name="groups">data</option>
             </constraint>
         </property>
@@ -465,7 +466,8 @@
         <!-- Reference -->
         <property name="reference">
             <constraint name="Length">
-                <option name="max">16</option>
+                <option name="min">2</option>
+                <option name="max">32</option>
                 <option name="groups">
                     <value>simple</value>
                     <value>variant</value>
