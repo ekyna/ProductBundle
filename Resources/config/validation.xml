@@ -750,13 +750,17 @@
             <option name="fields">reference</option>
         </constraint>
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">designation</option>
+            <option name="fields">
+                <value>designation</value>
+                <value>brand</value>
+            </option>
             <option name="groups">
                 <value>simple</value>
                 <value>variable</value>
                 <value>bundle</value>
                 <value>configurable</value>
             </option>
+            <option name="message">ekyna_product.product.duplicate_designation</option>
         </constraint>
     </class>
 

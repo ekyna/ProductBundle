@@ -15,6 +15,7 @@ ekyna_product:
     bundle_slot:
         too_many_choices: Un seul produit doit être configuré.
     product:
+        duplicate_designation: Une autre produit existe déjà avec cette désignation pour la même marque.
         configurable_must_be_visible: Un pack configurable doit être visible.
         bundle_must_be_visible: Un pack doit être visible s'il contient au moins un produit visible.
         child_must_not_be_visible: >
