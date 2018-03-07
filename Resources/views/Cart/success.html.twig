@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col-md-3 text-center">
+        {% set media = product|product_image %}
+        {% if media is not null %}
+            <img alt="{{ media.title }}" height="60" src="{{ media.path|imagine_filter('slot_thumb') }}" width="60">
+        {% else %}
+            <img alt="{{ product.fullTitle() }}" height="60" src="{{ product_default_image() }}" width="60">
+        {% endif %}
+    </div>
+    <div class="col-md-9">
+        <p style="font-size:18px">
+            <strong style="color:#999">{{ product.brand }}</strong><br>
+            <span>{{ product.fullTitle() }}</span>
+        </p>
+        <p class="text-success">
+            {{ 'ekyna_product.cart.success'|trans }}
+        </p>
+    </div>
+</div>

@@ -31,15 +31,6 @@ interface ProductInterface extends
     SubjectInterface
 {
     /**
-     * Sets the id.
-     *
-     * @param int $id
-     *
-     * @return $this|ProductInterface
-     */
-    public function setId($id);
-
-    /**
      * Returns the parent.
      *
      * @return ProductInterface
@@ -198,6 +189,13 @@ interface ProductInterface extends
      * @internal
      */
     public function setOptionGroups(ArrayCollection $options);
+
+    /**
+     * Returns whether the product has at least one required option group.
+     *
+     * @return bool
+     */
+    public function hasRequiredOptionGroup();
 
     /**
      * Returns the bundle slots.
@@ -478,13 +476,6 @@ interface ProductInterface extends
     public function getSlug();
 
     /**
-     * Returns the designation.
-     *
-     * @return string
-     */
-    public function getDesignation();
-
-    /**
      * Sets the designation.
      *
      * @param string $designation
@@ -535,13 +526,6 @@ interface ProductInterface extends
     public function setVisible($visible);
 
     /**
-     * Returns the reference.
-     *
-     * @return string
-     */
-    public function getReference();
-
-    /**
      * Sets the reference.
      *
      * @param string $reference
@@ -551,13 +535,6 @@ interface ProductInterface extends
     public function setReference($reference);
 
     /**
-     * Returns the net price.
-     *
-     * @return float
-     */
-    public function getNetPrice();
-
-    /**
      * Sets the net price.
      *
      * @param float $netPrice
@@ -565,13 +542,6 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setNetPrice($netPrice);
-
-    /**
-     * Returns the weight (kilograms).
-     *
-     * @return float
-     */
-    public function getWeight();
 
     /**
      * Sets the weight (kilograms).

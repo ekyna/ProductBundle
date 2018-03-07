@@ -36,8 +36,8 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
 
         $matchQuery = new Query\MultiMatch();
         $matchQuery->setQuery($expression)->setFields([
-            'designation^5',
-            'reference',
+            'designation^6',
+            'reference^4',
             'translations.' . $locale . '.title',
             'brand.name',
         ]);
@@ -60,13 +60,13 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
         return [
             'designation^6',
             'reference^4',
-            'translations.' . $locale . '.title^2',
+            'translations.' . $locale . '.title',
             'references',
             'brand.name',
-            'categories.name',
-            'translations.' . $locale . '.description',
-            'seo.translations.' . $locale . '.title',
-            'seo.translations.' . $locale . '.description',
+            //'categories.name',
+            //'translations.' . $locale . '.description',
+            //'seo.translations.' . $locale . '.title',
+            //'seo.translations.' . $locale . '.description',
         ];
     }
 }

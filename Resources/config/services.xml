@@ -386,6 +386,14 @@
             <tag name="twig.extension"/>
         </service>
 
+        <!-- Add to cart event subscriber -->
+        <service id="ekyna_product.add_to_cart.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\AddToCartEventSubscriber">
+            <argument type="service" id="templating"/>
+            <argument type="string"/><!-- Replaced by DI extension -->
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Sale view vars builder -->
         <service id="ekyna_product.commerce.sale_view_type"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\SaleViewType"

@@ -301,13 +301,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function setId($id)
+    public function getIdentifier()
     {
-        $this->id = $id;
-
-        return $this;
+        return $this->getId();
     }
 
     /**
@@ -514,6 +512,20 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasRequiredOptionGroup()
+    {
+        foreach( $this->optionGroups as $optionGroup) {
+            if ($optionGroup->isRequired()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

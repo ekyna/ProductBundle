@@ -131,9 +131,9 @@ ekyna_product:
             expression: Expression
         button:
             add: Ajouter une règle
+
     cart:
-        message:
-            success: Cet article a bien été ajouté à votre panier
+        success: Cette article a bien été ajouté à votre panier.
 
     category:
         label:

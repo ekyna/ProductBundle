@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
+use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
@@ -102,6 +103,10 @@ class ProductExtension extends \Twig_Extension
                 [$this, 'renderProductAttribute'],
                 ['is_safe' => ['html']]
             ),
+            new \Twig_SimpleFilter(
+                'product_image',
+                [$this, 'getProductImagePath']
+            ),
         ];
     }
 
@@ -182,6 +187,35 @@ class ProductExtension extends \Twig_Extension
         $type = $this->attributeTypeRegistry->getType($attribute->getType());
 
         return $type->render($productAttribute, $this->localeProvider->getCurrentLocale());
+    }
+
+    /**
+     * Returns the main image for the given product.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return \Ekyna\Bundle\MediaBundle\Model\MediaInterface|null
+     *
+     * @TODO Refactor with FormBuilder::getProductImagePath()
+     */
+    public function getProductImagePath(Model\ProductInterface $product)
+    {
+        $images = $product->getMedias([MediaTypes::IMAGE]);
+
+        if (0 == $images->count() && $product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+            /** @var Model\ProductInterface $variant */
+            $variant = $product->getVariants()->first();
+            $images = $variant->getMedias([MediaTypes::IMAGE]);
+        }
+
+        if (0 < $images->count()) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface $image */
+            $image = $images->first();
+
+            return $image->getMedia();
+        }
+
+        return null;
     }
 
     /**

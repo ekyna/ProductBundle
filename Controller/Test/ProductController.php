@@ -36,18 +36,12 @@ class ProductController extends Controller
         $cartHelper = $this->get('ekyna_commerce.cart_helper');
         $form = $cartHelper
             ->createAddSubjectToCartForm($product, [
-                'extended' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Ajouter',
+                'extended'      => false,
+                'submit_button' => true,
             ]);
 
-        if (false !== $response = $cartHelper->handleAddSubjectToCartForm($form, $request)) {
-            if ($response instanceof Response) {
-                return $response->setPrivate();
-            }
-
-            $this->addFlash('ekyna_product.cart.message.success', 'success');
+        if (null !== $event = $cartHelper->handleAddSubjectToCartForm($form, $request)) {
+            $this->addFlash($event->getMessage(), 'info');
 
             return $this->redirectToRoute('app_product_detail', [
                 'productSlug' => $product->getSlug(),

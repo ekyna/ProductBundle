@@ -377,6 +377,8 @@ class FormBuilder
      * @param string                 $filter The imagine filter to apply
      *
      * @return string
+     *
+     * @TODO Refactor with (twig) ProductExtension::getProductImagePath()
      */
     public function getProductImagePath(Model\ProductInterface $product, $filter = 'slot_choice_thumb')
     {
