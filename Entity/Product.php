@@ -876,6 +876,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getSubTitle()
+    {
+        return $this->translate()->getSubTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAttributesTitle()
     {
         return $this->translate()->getAttributesTitle();

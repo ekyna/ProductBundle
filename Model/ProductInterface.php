@@ -446,6 +446,13 @@ interface ProductInterface extends
     public function getTitle();
 
     /**
+     * Returns the (translated) sub title.
+     *
+     * @return string
+     */
+    public function getSubTitle();
+
+    /**
      * Returns the (translated) attributes title.
      *
      * @return string
