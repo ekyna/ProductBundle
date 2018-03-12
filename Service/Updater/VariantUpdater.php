@@ -177,6 +177,28 @@ class VariantUpdater
     }
 
     /**
+     * Updates the quantity unit regarding to his parent/variable product.
+     *
+     * @param Model\ProductInterface $variant
+     *
+     * @return bool Whether the variant has been changed or not.
+     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     */
+    public function updateUnit(Model\ProductInterface $variant)
+    {
+        $this->assertVariantWithParent($variant);
+
+        $unit = $variant->getParent()->getUnit();
+        if ($variant->getUnit() !== $unit) {
+            $variant->setUnit($unit);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Updates the brand regarding to his parent/variable product.
      *
      * @param Model\ProductInterface $variant

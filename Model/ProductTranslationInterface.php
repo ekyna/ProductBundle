@@ -28,6 +28,22 @@ interface ProductTranslationInterface extends RM\TranslationInterface
     public function setTitle($title);
 
     /**
+     * Returns the subTitle.
+     *
+     * @return string
+     */
+    public function getSubTitle();
+
+    /**
+     * Sets the subTitle.
+     *
+     * @param string $subTitle
+     *
+     * @return $this|ProductTranslationInterface
+     */
+    public function setSubTitle($subTitle);
+
+    /**
      * Returns the attributes (auto-generated) title.
      *
      * @return string

@@ -164,11 +164,20 @@ class ProductProvider implements SubjectProviderInterface
                     ProductTypes::TYPE_VARIANT
                 ],
             ];
-        } else if ($context === static::CONTEXT_SALE) {
+        } else if ($context === static::CONTEXT_ITEM) {
             $result['parameters'] = [
                 'types' => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIABLE,
+                    ProductTypes::TYPE_BUNDLE,
+                    ProductTypes::TYPE_CONFIGURABLE,
+                ],
+            ];
+        } else if ($context === static::CONTEXT_SALE) {
+            $result['parameters'] = [
+                'types' => [
+                    ProductTypes::TYPE_SIMPLE,
+                    ProductTypes::TYPE_VARIANT,
                     ProductTypes::TYPE_BUNDLE,
                     ProductTypes::TYPE_CONFIGURABLE,
                 ],

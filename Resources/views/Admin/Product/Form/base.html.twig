@@ -5,6 +5,13 @@
             {{ 'ekyna_core.field.general'|trans }}
         </a>
     </li>
+    {% block content_tab %}
+        <li>
+            <a href="#product-content" id="toggle-product-content" data-toggle="tab">
+                {{- 'ekyna_core.field.content'|trans -}}
+            </a>
+        </li>
+    {% endblock content_tab %}
     {% block pricing_tab %}
     <li>
         <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
@@ -38,23 +45,46 @@
             {% endblock general_content %}
         </div>
 
+        {% block content_pane %}
+        <div class="tab-pane" id="product-content">
+            {% block content_content %}
+                {{ form_row(form.translations) }}
+                {{ form_row(form.medias) }}
+            {% endblock content_content %}
+        </div>
+        {% endblock content_pane %}
+
         {% block pricing_pane %}
         <div class="tab-pane" id="product-pricing">
             {% block pricing_content %}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
+                    {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
                 <div class="col-md-6">
                     {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.netPrice, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-6">
-                    {{ form_row(form.weight, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.weight, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.unit, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.width, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.height, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.depth, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
             </div>
             {% endblock pricing_content %}

@@ -496,6 +496,12 @@
 
         <!-- Net price -->
         <property name="netPrice">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">
@@ -507,10 +513,98 @@
 
         <!-- Weight -->
         <property name="weight">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
                 <option name="groups">
                     <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Height -->
+        <property name="height">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Width -->
+        <property name="width">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Depth -->
+        <property name="depth">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Unit -->
+        <property name="unit">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="IdenticalTo">
+                <option name="value">piece</option>
+                <option name="groups">
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Component\Commerce\Common\Model\Units</value>
+                    <value>getUnits</value>
+                </option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variable</value>
                     <value>variant</value>
                 </option>
             </constraint>

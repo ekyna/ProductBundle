@@ -29,6 +29,10 @@
         <field name="reference" column="reference" type="string" length="32" unique="true" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
         <field name="weight" column="weight" type="decimal" precision="7" scale="3" nullable="true"/>
+        <field name="unit" column="unit" type="string" length="16" nullable="true"/>
+        <field name="height" column="height" type="smallint" nullable="true"/>
+        <field name="width" column="width" type="smallint" nullable="true"/>
+        <field name="depth" column="depth" type="smallint" nullable="true"/>
         <field name="position" column="position" type="smallint" nullable="true"/>
 
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>

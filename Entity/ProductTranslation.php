@@ -25,6 +25,11 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     /**
      * @var string
      */
+    protected $subTitle;
+
+    /**
+     * @var string
+     */
     protected $attributesTitle;
 
     /**
@@ -72,6 +77,24 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubTitle()
+    {
+        return $this->subTitle;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSubTitle($subTitle)
+    {
+        $this->subTitle = $subTitle;
 
         return $this;
     }

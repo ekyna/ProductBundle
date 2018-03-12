@@ -553,6 +553,42 @@ interface ProductInterface extends
     public function setWeight($weight);
 
     /**
+     * Sets the height (millimeters).
+     *
+     * @param int $height
+     *
+     * @return $this|ProductInterface
+     */
+    public function setHeight($height);
+
+    /**
+     * Sets the width (millimeters).
+     *
+     * @param int $width
+     *
+     * @return $this|ProductInterface
+     */
+    public function setWidth($width);
+
+    /**
+     * Sets the depth (millimeters).
+     *
+     * @param int $depth
+     *
+     * @return $this|ProductInterface
+     */
+    public function setDepth($depth);
+
+    /**
+     * Sets the quantity unit.
+     *
+     * @param string $unit
+     *
+     * @return $this|ProductInterface
+     */
+    public function setUnit($unit);
+
+    /**
      * Returns the position (variant ordering).
      *
      * @return int

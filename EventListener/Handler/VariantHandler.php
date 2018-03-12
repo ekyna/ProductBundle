@@ -31,6 +31,9 @@ class VariantHandler extends AbstractVariantHandler
         // Set tax group regarding to parent/variable if needed
         $changed |= $updater->updateTaxGroup($variant);
 
+        // Set quantity unit regarding to parent/variable if needed
+        $changed |= $updater->updateUnit($variant);
+
         // Set brand regarding to parent/variable if needed
         $changed |= $updater->updateBrand($variant);
 

@@ -18,6 +18,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
+use Ekyna\Component\Commerce\Common\Model\Units;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormInterface;
 
@@ -143,21 +144,19 @@ class ProductFormBuilder
             throw new InvalidArgumentException("Expected 'simple' or 'variable' product.");
         }
 
-        $required = true;
-        $disabled = false;
+        $options['required'] = true;
+        $options['disabled'] = false;
         $attr = [];
         if ($this->product->getType() === ProductTypes::TYPE_SIMPLE) {
-            $required = false;
+            $options['required'] = false;
             if (null !== $this->product->getAttributeSet()) {
-                $disabled = true;
+                $options['disabled'] = true;;
             } else {
                 $attr['class'] = 'product-attribute-set';
             }
         }
 
         $options = array_replace([
-            'required'  => $required,
-            'disabled'  => $disabled,
             'allow_new' => true,
             'attr'      => $attr,
         ], $options);
@@ -564,12 +563,103 @@ class ProductFormBuilder
             'scale'    => 3,
             'attr'     => [
                 'placeholder' => 'ekyna_core.field.weight',
-                'input_group' => ['append' => 'kg'],
+                'input_group' => ['append' => Units::getSymbol(Units::KILOGRAM)],
             ],
-            'required' => false,
+            'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);
 
         $this->form->add('weight', SF\NumberType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the height field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addHeightField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_core.field.height',
+            'attr'     => [
+                'placeholder' => 'ekyna_core.field.height',
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+            ],
+            'required' => !(isset($options['disabled']) && $options['disabled']),
+        ], $options);
+
+        $this->form->add('height', SF\IntegerType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the width field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addWidthField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_core.field.width',
+            'attr'     => [
+                'placeholder' => 'ekyna_core.field.width',
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+            ],
+            'required' => !(isset($options['disabled']) && $options['disabled']),
+        ], $options);
+
+        $this->form->add('width', SF\IntegerType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the depth field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addDepthField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_core.field.depth',
+            'attr'     => [
+                'placeholder' => 'ekyna_core.field.depth',
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+            ],
+            'required' => !(isset($options['disabled']) && $options['disabled']),
+        ], $options);
+
+        $this->form->add('depth', SF\IntegerType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the quantity unit field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addUnitField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_commerce.unit.label',
+            'attr'     => [
+                'placeholder' => 'ekyna_commerce.unit.label',
+            ],
+            'required' => !(isset($options['disabled']) && $options['disabled']),
+        ], $options);
+
+        $this->form->add('unit', CO\Common\UnitChoiceType::class, $options);
 
         return $this;
     }

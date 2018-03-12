@@ -58,6 +58,13 @@ class VariableHandler extends AbstractVariantHandler
                 }
             }
         }
+        if (isset($changeSet['unit'])) {
+            foreach ($variable->getVariants() as $variant) {
+                if ($variantUpdater->updateUnit($variant)) {
+                    $addVariant($variant);
+                }
+            }
+        }
         if (isset($changeSet['brand'])) {
             foreach ($variable->getVariants() as $variant) {
                 if ($variantUpdater->updateBrand($variant)) {

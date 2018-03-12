@@ -45,10 +45,18 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
 
         $data = parent::normalize($product, $format, $context);
 
+        // Reference (include variant's)
+        $reference = [$product->getReference()];
+        if ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+            foreach ($product->getVariants() as $variant) {
+                $reference[] = $variant->getReference();
+            }
+        }
+
         $data = array_replace([
             'designation' => $product->getFullDesignation(),
             'type'        => $product->getType(),
-            'reference'   => $product->getReference(),
+            'reference'   => $reference,
             'net_price'   => $product->getNetPrice(),
             'stock_state' => $product->getStockState(),
             'visible'     => $product->isVisible(),
@@ -67,7 +75,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             }
 
             // Categories
-            $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
+            $data['categories'] = array_map(function (Model\CategoryInterface $c) {
                 return $c->getId();
             }, $product->getCategories()->toArray());
 
@@ -93,7 +101,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             }
 
             // Categories
-            $data['categories'] = array_map(function (Model\CategoryInterface $c) use ($format, $context) {
+            $data['categories'] = array_map(function (Model\CategoryInterface $c) {
                 return [
                     'id'      => $c->getId(),
                     'name'    => $c->getName(),
@@ -102,7 +110,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             }, $product->getCategories()->toArray());
 
             // References
-            $data['references'] = array_map(function (Model\ProductReferenceInterface $r) use ($format, $context) {
+            $data['references'] = array_map(function (Model\ProductReferenceInterface $r) {
                 return $r->getNumber();
             }, $product->getReferences()->toArray());
 

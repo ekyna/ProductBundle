@@ -33,6 +33,10 @@ class ProductTranslationType extends AbstractType
 
         $builder
             ->add('title', TextType::class, $titleOptions)
+            ->add('subTitle', TextType::class, [
+                'label'    => 'ekyna_core.field.subtitle',
+                'required' => false,
+            ])
             ->add('description', TinymceType::class, [
                 'label'    => 'ekyna_core.field.content',
                 'theme'    => 'front',

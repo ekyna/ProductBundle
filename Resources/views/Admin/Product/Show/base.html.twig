@@ -8,6 +8,13 @@
                 {{ 'ekyna_core.field.general'|trans }}
             </a>
         </li>
+        {% block content_tab %}
+        <li>
+            <a href="#product-content" id="toggle-product-content" data-toggle="tab">
+                {{- 'ekyna_core.field.content'|trans -}}
+            </a>
+        </li>
+        {% endblock content_tab %}
         {% block pricing_tab %}
         <li>
             <a href="#product-pricing" id="toggle-product-pricing" data-toggle="tab">
@@ -45,23 +52,46 @@
             {% endblock general_content %}
             </div>
 
+            {% block content_pane %}
+                <div class="tab-pane" id="product-content">
+                {% block content_content %}
+                    {{ macros.show_translations(product) }}
+                    {{ macros.show_medias(product) }}
+                {% endblock content_content %}
+                </div>
+            {% endblock content_pane %}
+
             {% block pricing_pane %}
                 <div class="tab-pane" id="product-pricing">
                 {% block pricing_content %}
                     <div class="row">
                         <div class="col-md-6">
-                            {{ macros.show_net_price(product, {'label_col': 4}) }}
+                            {{ macros.show_reference(product, {'label_col': 4}) }}
                         </div>
                         <div class="col-md-6">
                             {{ macros.show_tax_group(product, {'label_col': 4}) }}
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
-                            {{ macros.show_reference(product, {'label_col': 4}) }}
+                        <div class="col-md-4">
+                            {{ macros.show_net_price(product, {'label_col': 6}) }}
                         </div>
-                        <div class="col-md-6">
-                            {{ macros.show_weight(product, {'label_col': 4}) }}
+                        <div class="col-md-4">
+                            {{ macros.show_weight(product, {'label_col': 6}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ macros.show_unit(product, {'label_col': 6}) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ macros.show_width(product, {'label_col': 6}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ macros.show_height(product, {'label_col': 6}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ macros.show_depth(product, {'label_col': 6}) }}
                         </div>
                     </div>
                 {% endblock pricing_content %}

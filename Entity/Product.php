@@ -128,6 +128,26 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $weight = 0;
 
     /**
+     * @var int
+     */
+    protected $height = 0;
+
+    /**
+     * @var int
+     */
+    protected $width = 0;
+
+    /**
+     * @var int
+     */
+    protected $depth = 0;
+
+    /**
+     * @var string
+     */
+    protected $unit = Common\Units::PIECE;
+
+    /**
      * (Variant sorting)
      *
      * @var int
@@ -1027,6 +1047,78 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setWeight($weight)
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setWidth($width)
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDepth()
+    {
+        return $this->depth;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUnit()
+    {
+        return $this->unit;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUnit($unit)
+    {
+        $this->unit = $unit;
 
         return $this;
     }
