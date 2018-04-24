@@ -4,6 +4,6 @@ config:
             name: 'ekyna-product'
             location: 'bundles/ekynaproduct/js'
             main: 'product'
-build:
-    include:
-        - 'ekyna-product'
+#build:
+#    include:
+#        - 'ekyna-product'
