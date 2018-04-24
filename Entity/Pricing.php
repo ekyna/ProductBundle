@@ -262,8 +262,8 @@ class Pricing implements PricingInterface
     public function addRule(PricingRuleInterface $rule)
     {
         if (!$this->hasRule($rule)) {
-            $rule->setPricing($this);
             $this->rules->add($rule);
+            $rule->setPricing($this);
         }
 
         return $this;
@@ -275,8 +275,8 @@ class Pricing implements PricingInterface
     public function removeRule(PricingRuleInterface $rule)
     {
         if ($this->hasRule($rule)) {
-            $rule->setPricing(null);
             $this->rules->removeElement($rule);
+            $rule->setPricing(null);
         }
 
         return $this;

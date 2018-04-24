@@ -108,7 +108,16 @@ class BundleChoice implements Model\BundleChoiceInterface
      */
     public function setSlot(Model\BundleSlotInterface $slot = null)
     {
-        $this->slot = $slot;
+        if ($this->slot !== $slot) {
+            if ($previous = $this->slot) {
+                $this->slot = null;
+                $previous->removeChoice($this);
+            }
+
+            if ($this->slot = $slot) {
+               $this->slot->addChoice($this);
+            }
+        }
 
         return $this;
     }
@@ -225,8 +234,8 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function addRule(Model\BundleChoiceRuleInterface $rule)
     {
         if (!$this->hasRule($rule)) {
-            $rule->setChoice($this);
             $this->rules->add($rule);
+            $rule->setChoice($this);
         }
 
         return $this;
@@ -238,8 +247,8 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function removeRule(Model\BundleChoiceRuleInterface $rule)
     {
         if ($this->hasRule($rule)) {
-            $rule->setChoice(null);
             $this->rules->removeElement($rule);
+            $rule->setChoice(null);
         }
 
         return $this;

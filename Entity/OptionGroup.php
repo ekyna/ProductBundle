@@ -110,7 +110,16 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
      */
     public function setProduct(Model\ProductInterface $product = null)
     {
-        $this->product = $product;
+        if ($this->product !== $product) {
+            if ($previous = $this->product) {
+                $this->product = null;
+                $previous->removeOptionGroup($this);
+            }
+
+            if ($this->product = $product) {
+                $this->product->addOptionGroup($this);
+            }
+        }
 
         return $this;
     }
@@ -181,8 +190,8 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     public function addOption(Model\OptionInterface $option)
     {
         if (!$this->hasOption($option)) {
-            $option->setGroup($this);
             $this->options->add($option);
+            $option->setGroup($this);
         }
 
         return $this;
@@ -194,8 +203,8 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     public function removeOption(Model\OptionInterface $option)
     {
         if ($this->hasOption($option)) {
-            $option->setGroup(null);
             $this->options->removeElement($option);
+            $option->setGroup(null);
         }
 
         return $this;

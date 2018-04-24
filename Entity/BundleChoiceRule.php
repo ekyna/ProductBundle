@@ -69,7 +69,16 @@ class BundleChoiceRule implements Model\BundleChoiceRuleInterface
      */
     public function setChoice(Model\BundleChoiceInterface $choice = null)
     {
-        $this->choice = $choice;
+        if ($this->choice !== $choice) {
+            if ($previous = $this->choice) {
+                $this->choice = null;
+                $previous->removeRule($this);
+            }
+
+            if ($this->choice = $choice) {
+                $this->choice->addRule($this);
+            }
+        }
 
         return $this;
     }

@@ -213,7 +213,7 @@ class ProductType extends ResourceTableType
         ];
         $buttons[] = [
             'label'                => 'ekyna_core.button.remove',
-            'icon'                 => 'remove',
+            'icon'                 => 'trash',
             'class'                => 'danger',
             'route_name'           => 'ekyna_product_product_admin_remove',
             'route_parameters_map' => ['productId' => 'id'],

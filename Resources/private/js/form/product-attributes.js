@@ -1,4 +1,4 @@
-define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form) { // TODO spinner
+define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form) {
     "use strict";
 
     /**

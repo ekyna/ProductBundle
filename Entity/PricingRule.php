@@ -53,7 +53,16 @@ class PricingRule implements Model\PricingRuleInterface
      */
     public function setPricing(Model\PricingInterface $pricing = null)
     {
-        $this->pricing = $pricing;
+        if ($this->pricing !== $pricing) {
+            if ($previous = $this->pricing) {
+                $this->pricing = null;
+                $previous->removeRule($this);
+            }
+
+            if ($this->pricing = $pricing) {
+                $this->pricing->addRule($this);
+            }
+        }
 
         return $this;
     }

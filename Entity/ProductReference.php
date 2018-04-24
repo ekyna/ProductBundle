@@ -44,7 +44,6 @@ class ProductReference implements ProductReferenceInterface
         }
     }
 
-
     /**
      * @inheritdoc
      */
@@ -66,7 +65,16 @@ class ProductReference implements ProductReferenceInterface
      */
     public function setProduct(ProductInterface $product = null)
     {
-        $this->product = $product;
+        if ($this->product !== $product) {
+            if ($previous = $this->product) {
+                $this->product = null;
+                $previous->removeReference($this);
+            }
+
+            if ($this->product = $product) {
+                $this->product->addReference($this);
+            }
+        }
 
         return $this;
     }

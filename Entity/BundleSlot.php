@@ -93,7 +93,16 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
      */
     public function setBundle(Model\ProductInterface $bundle = null)
     {
-        $this->bundle = $bundle;
+        if ($this->bundle !== $bundle) {
+            if ($previous = $this->bundle) {
+                $this->bundle = null;
+                $previous->removeBundleSlot($this);
+            }
+
+            if ($this->bundle = $bundle) {
+                $this->bundle->addBundleSlot($this);
+            }
+        }
 
         return $this;
     }
@@ -156,8 +165,8 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     public function addChoice(Model\BundleChoiceInterface $choice)
     {
         if (!$this->hasChoice($choice)) {
-            $choice->setSlot($this);
             $this->choices->add($choice);
+            $choice->setSlot($this);
         }
 
         return $this;
@@ -169,8 +178,8 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     public function removeChoice(Model\BundleChoiceInterface $choice)
     {
         if ($this->hasChoice($choice)) {
-            $choice->setSlot(null);
             $this->choices->removeElement($choice);
+            $choice->setSlot(null);
         }
 
         return $this;

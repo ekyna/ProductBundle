@@ -71,14 +71,12 @@ class ProductAttribute implements ProductAttributeInterface
     public function setProduct(ProductInterface $product = null)
     {
         if ($this->product !== $product) {
-            $previous = $this->product;
-            $this->product = $product;
-
-            if ($previous) {
+            if ($previous = $this->product) {
+                $this->product = null;
                 $previous->removeAttribute($this);
             }
 
-            if ($this->product) {
+            if ($this->product = $product) {
                 $this->product->addAttribute($this);
             }
         }

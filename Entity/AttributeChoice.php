@@ -69,14 +69,12 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     public function setAttribute(Model\AttributeInterface $attribute = null)
     {
         if ($attribute !== $this->attribute) {
-            $previous = $this->attribute;
-            $this->attribute = $attribute;
-
-            if ($previous) {
+            if ($previous = $this->attribute) {
+                $this->attribute = null;
                 $previous->removeChoice($this);
             }
 
-            if ($attribute) {
+            if ($this->attribute = $attribute) {
                 $attribute->addChoice($this);
             }
         }

@@ -341,14 +341,15 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function setParent(Model\ProductInterface $parent = null)
     {
-        if (null !== $this->parent && $parent !== $this->parent) {
-            $this->parent->removeVariant($this);
-        }
+        if ($this->parent !== $parent) {
+            if ($previous = $this->parent) {
+                $this->parent = null;
+                $previous->removeVariant($this);
+            }
 
-        $this->parent = $parent;
-
-        if (null !== $parent) {
-            $parent->addVariant($this);
+            if ($this->parent = $parent) {
+                $this->parent->addVariant($this);
+            }
         }
 
         return $this;
@@ -377,9 +378,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         if (!$this->hasVariant($variant)) {
             $this->variants->add($variant);
-            if ($variant->getParent() !== $this) {
-                $variant->setParent($this);
-            }
+            $variant->setParent($this);
         }
 
         return $this;
@@ -498,8 +497,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function addOptionGroup(Model\OptionGroupInterface $group)
     {
         if (!$this->hasOptionGroup($group)) {
-            $group->setProduct($this);
             $this->optionGroups->add($group);
+            $group->setProduct($this);
         }
 
         return $this;
@@ -511,8 +510,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function removeOptionGroup(Model\OptionGroupInterface $group)
     {
         if ($this->hasOptionGroup($group)) {
-            $group->setProduct(null);
             $this->optionGroups->removeElement($group);
+            $group->setProduct(null);
         }
 
         return $this;
@@ -570,8 +569,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function addBundleSlot(Model\BundleSlotInterface $slot)
     {
         if (!$this->hasBundleSlot($slot)) {
-            $slot->setBundle($this);
             $this->bundleSlots->add($slot);
+            $slot->setBundle($this);
         }
 
         return $this;
@@ -583,8 +582,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function removeBundleSlot(Model\BundleSlotInterface $slot)
     {
         if ($this->hasBundleSlot($slot)) {
-            $slot->setBundle(null);
             $this->bundleSlots->removeElement($slot);
+            $slot->setBundle(null);
         }
 
         return $this;
@@ -749,8 +748,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function addMedia(Model\ProductMediaInterface $media)
     {
         if (!$this->hasMedia($media)) {
-            $media->setProduct($this);
             $this->medias->add($media);
+            $media->setProduct($this);
             // TODO ??? $this->setUpdatedAt(new \DateTime());
         }
 
@@ -763,8 +762,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function removeMedia(Model\ProductMediaInterface $media)
     {
         if ($this->hasMedia($media)) {
-            $media->setProduct(null);
             $this->medias->removeElement($media);
+            $media->setProduct(null);
             // TODO ??? $this->setUpdatedAt(new \DateTime());
         }
 
@@ -803,8 +802,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function addReference(Model\ProductReferenceInterface $reference)
     {
         if (!$this->hasReference($reference)) {
-            $reference->setProduct($this);
             $this->references->add($reference);
+            $reference->setProduct($this);
         }
 
         return $this;
@@ -816,8 +815,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function removeReference(Model\ProductReferenceInterface $reference)
     {
         if ($this->hasReference($reference)) {
-            $reference->setProduct(null);
             $this->references->removeElement($reference);
+            $reference->setProduct(null);
         }
 
         return $this;
@@ -1207,7 +1206,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         if ($this->hasAdjustment($adjustment)) {
             $this->adjustments->removeElement($adjustment);
-            //$adjustment->setProduct(null);
+            $adjustment->setProduct(null);
         }
 
         return $this;

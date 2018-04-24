@@ -50,7 +50,16 @@ class ProductMedia implements ProductMediaInterface
      */
     public function setProduct(ProductInterface $product = null)
     {
-        $this->product = $product;
+        if ($this->product !== $product) {
+            if ($previous = $this->product) {
+                $this->product = null;
+                $previous->removeMedia($this);
+            }
+
+            if ($this->product = $product) {
+                $this->product->addMedia($this);
+            }
+        }
 
         return $this;
     }

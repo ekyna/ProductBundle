@@ -106,7 +106,16 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      */
     public function setGroup(Model\OptionGroupInterface $group = null)
     {
-        $this->group = $group;
+        if ($this->group !== $group) {
+            if ($previous = $this->group) {
+                $this->group = null;
+                $previous->removeOption($this);
+            }
+
+            if ($this->group = $group) {
+                $this->group->addOption($this);
+            }
+        }
 
         return $this;
     }

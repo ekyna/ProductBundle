@@ -64,15 +64,13 @@ class AttributeSlot implements Model\AttributeSlotInterface
     public function setSet(Model\AttributeSetInterface $set = null)
     {
         if ($this->set !== $set) {
-            $previous = $this->set;
-            $this->set = $set;
-
-            if ($previous) {
+            if ($previous = $this->set) {
+                $this->set = null;
                 $previous->removeSlot($this);
             }
 
-            if ($set) {
-                $set->addSlot($this);
+            if ($this->set = $set) {
+                $this->set->addSlot($this);
             }
         }
 
