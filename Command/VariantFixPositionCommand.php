@@ -60,11 +60,11 @@ class VariantFixPositionCommand extends ContainerAwareCommand
                 str_pad('.', 64 - mb_strlen($name), '.', STR_PAD_LEFT)
             ));
             if (!$updater->indexVariantsPositions($variable)) {
-                $output->write('<comment>passed</comment>');
+                $output->writeln('<comment>passed</comment>');
                 continue;
             }
 
-            $output->write('<info>updated</info>');
+            $output->writeln('<info>updated</info>');
             $manager->persist($variable);
             $count++;
 

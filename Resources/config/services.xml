@@ -394,13 +394,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <!-- Sale view vars builder -->
-        <service id="ekyna_product.commerce.sale_view_type"
-                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\SaleViewType"
-                 parent="ekyna_commerce.abstract_view_type">
-            <tag name="ekyna_commerce.view_type"/>
-        </service>
-
         <!-- Sale item event listener -->
         <service id="ekyna_product.sale_item.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber">
