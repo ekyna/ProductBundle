@@ -1221,6 +1221,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function hasDimensions()
+    {
+        return !empty($this->width) && !empty($this->height) && !empty($this->depth);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getUniquenessSignature()

@@ -375,6 +375,17 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Schema.org providers -->
+        <service id="ekyna_product.product.schema_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\ProductProvider">
+            <argument>%ekyna_commerce.default.currency%</argument>
+            <tag name="ekyna_cms.schema_org_provider"/>
+        </service>
+        <service id="ekyna_product.brand.schema_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\BrandProvider">
+            <tag name="ekyna_cms.schema_org_provider"/>
+        </service>
+
         <!-- Twig extension -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
