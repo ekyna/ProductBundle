@@ -270,6 +270,12 @@ DQL;
                 $product['eda'] = (new \DateTime($product['eda']))->format('d/m/Y'); // TODO localized format
             }
 
+            // Stock themes
+            $product['sold_theme'] = '';
+            if ($product['sold'] > $product['ordered'] + $product['adjusted']) {
+                $product['sold_theme'] = 'danger';
+            }
+
             // Stock sums
             $product['pending'] = 0 < $product['pending'] ? $this->formatter->number((float)$product['pending']) : '';
             $product['ordered'] = $this->formatter->number((float)$product['ordered']);
@@ -277,12 +283,6 @@ DQL;
             $product['adjusted'] = $this->formatter->number((float)$product['adjusted']);
             $product['sold'] = $this->formatter->number((float)$product['sold']);
             $product['shipped'] = $this->formatter->number((float)$product['shipped']);
-
-            // Stock themes
-            $product['sold_theme'] = '';
-            if ($product['sold'] > $product['ordered'] + $product['adjusted']) {
-                $product['sold_theme'] = 'danger';
-            }
 
             // Stock mode badge
             $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
