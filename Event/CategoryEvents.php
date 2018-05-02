@@ -23,4 +23,6 @@ final class CategoryEvents
 
     const PRE_DELETE  = 'ekyna_product.category.pre_delete';
     const POST_DELETE = 'ekyna_product.category.post_delete';
+
+    const PUBLIC_URL  = 'ekyna_product.category.public_url';
 }
