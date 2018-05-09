@@ -1,5 +1,5 @@
 ekyna_product:
-    catalog: Catalogue
+    menu: Catalogue
     leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
 
     #common: TODO group translations (like visible)

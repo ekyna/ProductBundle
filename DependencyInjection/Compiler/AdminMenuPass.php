@@ -27,8 +27,8 @@ class AdminMenuPass implements CompilerPassInterface
 
         $pool->addMethodCall('createGroup', [[
             'name'     => 'catalog',
-            'label'    => 'ekyna_product.catalog',
-            'icon'     => 'file',
+            'label'    => 'ekyna_product.menu',
+            'icon'     => 'cube',
             'position' => 12,
         ]]);
 
@@ -83,7 +83,7 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_pricing_admin_home',
             'label'    => 'ekyna_product.pricing.label.plural',
             'resource' => 'ekyna_product_pricing',
-            'position' => 98,
+            'position' => 97,
         ]]);
 
         // Inventory
@@ -94,6 +94,5 @@ class AdminMenuPass implements CompilerPassInterface
             'resource' => 'ekyna_product_product',
             'position' => 99,
         ]]);
-
     }
 }
