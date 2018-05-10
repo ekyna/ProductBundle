@@ -172,6 +172,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->categories = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->optionGroups = new ArrayCollection();
+        $this->customerGroups = new ArrayCollection();
         $this->references = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
