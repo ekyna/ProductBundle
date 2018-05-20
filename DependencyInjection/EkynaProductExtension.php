@@ -24,5 +24,13 @@ class EkynaProductExtension extends AbstractExtension
 
         $cartSuccessListener = $container->getDefinition('ekyna_product.add_to_cart.event_subscriber');
         $cartSuccessListener->replaceArgument(1, $config['default']['cart_success_template']);
+
+        $twigExtension = $container->getDefinition('ekyna_product.twig.product_extension');
+        $twigExtension->replaceArgument(6, [
+            'default_image'         => $config['default']['no_image'],
+            'final_price_format'    => $config['default']['final_price_format'],
+            'original_price_format' => $config['default']['original_price_format'],
+            'price_with_from'       => $config['default']['price_with_from'],
+        ]);
     }
 }

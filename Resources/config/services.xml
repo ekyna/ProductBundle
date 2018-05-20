@@ -394,7 +394,7 @@
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
             <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
             <argument type="service" id="translator"/>
-            <argument>%ekyna_product.default.no_image%</argument>
+            <argument type="collection"/><!-- Replaced By DI extension -->
             <tag name="twig.extension"/>
         </service>
 

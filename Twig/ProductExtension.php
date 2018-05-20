@@ -51,9 +51,9 @@ class ProductExtension extends \Twig_Extension
     private $translator;
 
     /**
-     * @var string
+     * @var array
      */
-    private $defaultImage;
+    private $options;
 
     /**
      * @var Formatter
@@ -70,7 +70,7 @@ class ProductExtension extends \Twig_Extension
      * @param LocaleProviderInterface        $localeProvider
      * @param FormatterFactory               $formatterFactory
      * @param TranslatorInterface            $translator
-     * @param string                         $defaultImage
+     * @param array                          $options
      */
     public function __construct(
         ConstantsHelper $constantHelper,
@@ -79,7 +79,7 @@ class ProductExtension extends \Twig_Extension
         LocaleProviderInterface $localeProvider,
         FormatterFactory $formatterFactory,
         TranslatorInterface $translator,
-        $defaultImage = ''
+        array $options = []
     ) {
         $this->constantHelper = $constantHelper;
         $this->priceCalculator = $priceCalculator;
@@ -87,7 +87,13 @@ class ProductExtension extends \Twig_Extension
         $this->localeProvider = $localeProvider;
         $this->formatterFactory = $formatterFactory;
         $this->translator = $translator;
-        $this->defaultImage = $defaultImage;
+
+        $this->options = array_replace([
+            'default_image'         => '/bundles/ekynaproduct/img/no-image.gif',
+            'final_price_format'    => '%s&nbsp;<sup>%s</sup>',
+            'original_price_format' => '<del>%s</del>&nbsp;%s',
+            'price_with_from'       => false,
+        ], $options);
     }
 
     /**
@@ -199,7 +205,7 @@ class ProductExtension extends \Twig_Extension
      */
     public function getDefaultImage()
     {
-        return $this->defaultImage;
+        return $this->options['default_image'];
     }
 
     /**
@@ -269,7 +275,7 @@ class ProductExtension extends \Twig_Extension
         }
 
         $current = sprintf(
-            '%s&nbsp;%s',
+            $this->options['final_price_format'],
             $formatter->currency($price->getTotal(), $price->getCurrency()),
             $this->translator->trans(VatDisplayModes::getLabel($price->getMode()))
         );
@@ -285,12 +291,14 @@ class ProductExtension extends \Twig_Extension
             }
         }
 
-        $prefix = $from ? $this->translator->trans('ekyna_commerce.subject.price_from') . ' ' : '';
+        $prefix = $this->options['price_with_from'] && $from
+            ? $this->translator->trans('ekyna_commerce.subject.price_from') . ' '
+            : '';
 
         if ($price->hasDiscounts()) {
             $previous = $formatter->currency($price->getTotal(false), $price->getCurrency());
 
-            return $prefix . sprintf('<del>%s</del> %s', $previous, $current);
+            return $prefix . sprintf($this->options['original_price_format'], $previous, $current);
         }
 
         return $prefix . $current;
@@ -309,7 +317,7 @@ class ProductExtension extends \Twig_Extension
 
         return $this->formatter = $this->formatterFactory->create(
             $this->localeProvider->getCurrentLocale()
-            // TODO currency
+        // TODO currency
         );
     }
 }

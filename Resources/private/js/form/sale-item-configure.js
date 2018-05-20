@@ -78,7 +78,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         return prefix +
             '<strong>' + final.formatPrice(Pricing.currency) + '</strong>&nbsp;' +
-            (Pricing.mode === 'ati' ? SaleItem.trans.ati : SaleItem.trans.net);
+            '<sup>' + (Pricing.mode === 'ati' ? SaleItem.trans.ati : SaleItem.trans.net) + '</sup>';
     };
 
     /**
