@@ -306,10 +306,11 @@ ekyna_product:
         from: à partir de %min%
         range: de %min% à %max%
         discount: Remise
-        unit_net_price: Prix unit. HT
-        total_price: Total HT
+        unit_price: Prix unit.
+        unit_net_price: Prix unit. HT # TODO remove (used in SaleView)
+        total_price: Total
         rule_table: Vos tarifs
-        price_table: Détail du prix unit. HT.
+        price_table: Détail du prix unititaire
         no_choice:
             title: >
                 <strong>Sélectionnez un article&hellip;</strong>

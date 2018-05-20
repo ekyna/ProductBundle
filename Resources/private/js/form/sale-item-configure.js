@@ -10,13 +10,158 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             .prop('disabled', disabled);
     };
 
-    var roundPrice = function (price) {
-        return Math.round(parseFloat(price) * 100) / 100;
+    /**
+     * Pricing
+     */
+    var Pricing = {
+        price: 0,
+        discounts: [],
+        taxes: []
+    };
+
+    Pricing.currency = 'USD';
+    Pricing.mode = 'ati';
+
+    /**
+     * @param {number} [quantity = 1]
+     * @param {boolean} [discounted = true]
+     * @return {number}
+     */
+    Pricing.calculate = function (quantity, discounted) {
+        if (typeof this.price !== 'number' || 0 > this.price) {
+            return 0;
+        }
+
+        if (quantity === undefined || 1 > quantity) {
+            quantity = 1;
+        }
+        if (discounted === undefined) {
+            discounted = true;
+        }
+
+        var result = this.price,
+            discount = undefined;
+
+        if (discounted) {
+            if (Array.isArray(this.discounts)) {
+                discount = this.discounts.find(function (d) {
+                    return d.quantity < quantity;
+                });
+            }
+            if (discount) {
+                result -= this.price * discount.percent / 100;
+            }
+        }
+
+        if (Array.isArray(this.taxes) && Pricing.mode === 'ati') {
+            var base = result;
+            this.taxes.forEach(function (rate) {
+                result += base * rate / 100;
+            });
+        }
+
+        return result;
+    };
+
+    /**
+     * @param {number} [quantity = 1]
+     * @returns {string}
+     */
+    Pricing.display = function (quantity) {
+        var final = Pricing.calculate.call(this, quantity),
+            original = Pricing.calculate.call(this, quantity, false),
+            prefix = ''; //SaleItem.trans.unit_price + '&nbsp;';
+
+        if (original !== final) {
+            prefix = '<del>' + original.formatPrice(Pricing.currency) + '</del>&nbsp;';
+        }
+
+        return prefix +
+            '<strong>' + final.formatPrice(Pricing.currency) + '</strong>&nbsp;' +
+            (Pricing.mode === 'ati' ? SaleItem.trans.ati : SaleItem.trans.net);
+    };
+
+    /**
+     * Availability
+     */
+    var Availability = {
+        o_msg: '',
+        min_qty: 0,
+        min_msg: '',
+        max_qty: 0,
+        max_msg: '',
+        a_qty: 0,
+        a_msg: '',
+        r_qty: 0,
+        r_msg: '',
+        class: null
+    };
+
+    /**
+     * @param {number} [quantity = 1]
+     * @returns {string}
+     */
+    Availability.display = function (quantity) {
+        if (quantity === undefined) {
+            quantity = 1;
+        }
+
+        var min = parseFloat(this.min_qty),
+            max = this.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(this.max_qty),
+            message = '';
+
+        this.class = null;
+
+        if (quantity < min) {
+            this.class = 'error';
+            message = this.min_msg;
+        } else if (quantity > max) {
+            this.class = 'error';
+            message = this.max_msg;
+        } else if (quantity > this.a_qty) {
+            this.class = 'warning';
+            if (this.r_msg) {
+                if (this.quantity > this.a_qty + this.r_qty) {
+                    message = this.o_msg;
+                } else {
+                    message = this.r_msg;
+                }
+            } else {
+                message = this.o_msg;
+            }
+        } else {
+            message = this.a_msg;
+        }
+
+        if (message.length) {
+            return '<span>' + message + '</span>';
+        }
+
+        return '';
+    };
+
+    Availability.merge = function(data) {
+        if (null === data) {
+            return;
+        }
+        if (!this.hasOwnProperty('o_msg') && data.hasOwnProperty('o_msg')) {
+            this.o_msg = data.o_msg;
+        }
+        var that = this;
+        ['min', 'max', 'a', 'r'].forEach(function(key) {
+            if (!data.hasOwnProperty(key + '_qty')) {
+                return;
+            }
+            if (!that.hasOwnProperty(key + '_qty') || (data[key + '_qty'] !== 'INF' && that[key + '_qty'] > data[key + '_qty'])) {
+                that[key + '_qty'] = data[key + '_qty'];
+                that[key + '_msg'] = data[key + '_msg'];
+            }
+        });
     };
 
     // -------------------------------- BUNDLE SLOT --------------------------------
 
-    function BundleSlot($element, parentItem) {
+    function BundleSlot ($element, parentItem) {
         this.$element = $element;
 
         if (undefined === parentItem) {
@@ -183,10 +328,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         getChoice: function () {
             return this.choice;
-        },
-
-        getLabel: function () {
-            return this.$choice.find('.product-title').html();
         }
     });
 
@@ -201,7 +342,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
     // -------------------------------- OPTION GROUP --------------------------------
 
-    function OptionGroup($element, optionGroups) {
+    function OptionGroup ($element, optionGroups) {
         this.$element = $element;
 
         if (!optionGroups) {
@@ -228,7 +369,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 }
             }
 
-            this.$availability = this.$element.find('.sale-item-option-availability');
+            this.$info = this.$element.find('.sale-item-info');
 
             this.updateState();
             this.selectOption();
@@ -266,13 +407,24 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         },
 
         selectOption: function () {
-            this.$option = this.option = undefined;
+            this.$option = undefined;
+
+            this.option = {
+                label: null,
+                thumb: null,
+                image: null,
+                pricing: {
+                    price: 0,
+                    discounts: [],
+                    taxes: []
+                },
+                availability: null
+            };
 
             var $option = this.$select.find('option[value="' + this.$select.val() + '"]');
-
             if (1 === $option.length && $option.data('config')) {
                 this.$option = $option;
-                this.option = $option.data('config');
+                this.option = $.extend(this.option, $option.data('config'));
 
                 if (this.$image) {
                     if (this.option.thumb) {
@@ -290,58 +442,26 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 this.$image.hide();
             }
 
-            this.updateAvailability();
+            this.updatePricesAndAvailability();
         },
 
-        updateAvailability: function () {
-            this.$availability.empty();
-            this.$element.removeClass('has-error');
+        updatePricesAndAvailability: function () {
+            this.$info.empty();
+            this.$element.removeClass('has-error has-warning');
 
-            if (!(this.option && this.option.availability)) {
+            if (!(this.option && this.option.availability)) { // TODO we may have pricing without availability data
                 return;
             }
 
             var quantity = this.optionGroups.item.getTotalQuantity(),
-                config = $.extend({
-                    o_msg: null,
-                    min_qty: 0,
-                    min_msg: null,
-                    max_qty: 0,
-                    max_msg: null,
-                    a_qty: 0,
-                    a_msg: null,
-                    r_qty: 0,
-                    r_msg: null
-                }, this.option.availability);
+                availability = Availability.display.call(this.option.availability, quantity),
+                prices = Pricing.display.call(this.option.pricing, quantity);
 
-            var min = parseFloat(config.min_qty),
-                max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
-                error = false,
-                message = null;
-
-            if (quantity < min) {
-                message = config.min_msg;
-                error = true;
-            } else if (quantity > max) {
-                message = config.max_msg;
-                error = true;
-            } else if (quantity > config.a_qty) {
-                if (config.r_msg) {
-                    if (this.totalQuantity > config.a_qty + config.r_qty) {
-                        message = config.o_msg;
-                    } else {
-                        message = config.r_msg;
-                    }
-                } else {
-                    message = config.o_msg;
-                }
+            if (this.option.availability.class) {
+                this.$element.addClass('has-' + this.option.availability.class);
             }
 
-            if (error) {
-                this.$element.addClass('has-error');
-            }
-
-            this.$availability.html(message);
+            this.$info.html(availability + prices);
         },
 
         unbindEvents: function () {
@@ -368,12 +488,28 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return !this.locked && !!this.$option;
         },
 
-        getPrice: function () {
-            return this.hasOption() ? roundPrice(this.option.price) : 0;
+        getAvailability: function() {
+            if (this.hasOption()) {
+                return this.option.availability;
+            }
+
+            return null;
         },
 
-        getLabel: function () {
-            return this.hasOption() ? this.$option.text() : '';
+        getOriginalPrice: function() {
+            if (this.hasOption()) {
+                return Pricing.calculate.call(this.option.pricing, this.optionGroups.item.getTotalQuantity(), false);
+            }
+
+            return 0;
+        },
+
+        getFinalPrice: function() {
+            if (this.hasOption()) {
+                return Pricing.calculate.call(this.option.pricing, this.optionGroups.item.getTotalQuantity());
+            }
+
+            return 0;
         },
 
         isLocked: function () {
@@ -432,7 +568,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
     // -------------------------------- OPTION GROUPS --------------------------------
 
-    function OptionGroups($element, item) {
+    function OptionGroups ($element, item) {
         this.$element = $element;
 
         if (!item) {
@@ -459,7 +595,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$element.find(' > .form-group').each(function () {
                 var $group = $(this).optionGroup(that);
                 that.$groups.push($group);
-                that.groups.push($group.data('optionGroup'))
+                that.groups.push($group.data('optionGroup'));
             });
         },
 
@@ -500,6 +636,43 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return 0 < this.groups.length;
         },
 
+        getOriginalPrice: function() {
+            var price = 0;
+
+            $.each(this.groups, function () {
+                if (!this.isLocked()) {
+                    price += this.getOriginalPrice();
+                }
+            });
+
+            return price;
+        },
+
+        getFinalPrice: function() {
+            var price = 0;
+
+            $.each(this.groups, function () {
+                if (!this.isLocked()) {
+                    price += this.getFinalPrice();
+                }
+            });
+
+            return price;
+        },
+
+        buildAvailability: function() {
+            var availability = {};
+
+            $.each(this.groups, function () {
+                if (!this.isLocked() && this.hasOption()) {
+                    Availability.merge.call(availability, this.getAvailability());
+                }
+            });
+
+            return availability;
+        },
+
+        // TODO remove
         getPrice: function () {
             var price = 0;
 
@@ -550,9 +723,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return this;
         },
 
-        updateAvailability: function() {
+        updatePricesAndAvailability: function () {
             $.each(this.groups, function () {
-                this.updateAvailability();
+                this.updatePricesAndAvailability();
             });
         }
     });
@@ -568,7 +741,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
     // -------------------------------- VARIANT --------------------------------
 
-    function Variant($element, item) {
+    function Variant ($element, item) {
         this.$element = $element;
 
         if (!item) {
@@ -596,6 +769,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 }
             }
 
+            this.$info = this.$element.closest('.input-group').find('.sale-item-info');
+
             this.selectVariant();
             this.bindEvents();
         },
@@ -618,10 +793,15 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         selectVariant: function () {
             this.$variant = undefined;
-            this.config = {
+            this.variant = { // TODO rename config to variant (+getter)
                 label: null,
                 thumb: null,
-                price: 0,
+                image: null,
+                pricing: {
+                    price: 0,
+                    discounts: [],
+                    taxes: []
+                },
                 groups: [],
                 availability: null
             };
@@ -629,21 +809,25 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             var $variant = this.$element.find('option[value="' + this.$element.val() + '"]');
             if (1 === $variant.size() && $variant.data('config')) {
                 this.$variant = $variant;
-                this.config = $.extend(this.config, $variant.data('config'), {
+
+                $.extend(this.variant, $variant.data('config'), {
                     label: $variant.text()
                 });
-                if (this.$image && this.config.thumb) {
+            }
+
+            this.updatePricesAndAvailability();
+
+            if (this.$image) {
+                if (this.variant.thumb) {
                     this.$image
-                        .attr('href', this.config.image)
-                        .attr('title', this.config.label)
+                        .attr('href', this.variant.image)
+                        .attr('title', this.variant.label)
                         .find('img')
-                        .attr('src', this.config.thumb);
+                        .attr('src', this.variant.thumb);
 
                     return;
                 }
-            }
 
-            if (this.$image) {
                 this.$image
                     .attr('href', this.$image.data('href'))
                     .attr('title', this.$image.data('title'));
@@ -653,24 +837,35 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             }
         },
 
+        updatePricesAndAvailability: function () {
+            this.$info.empty();
+            this.$element.closest('.form-group').removeClass('has-error has-warning');
+
+            if (!(this.variant && this.variant.pricing && this.variant.availability)) {
+                return;
+            }
+
+            var quantity = this.item.getTotalQuantity(),
+                availability = Availability.display.call(this.variant.availability, quantity),
+                prices = Pricing.display.call(this.variant.pricing, quantity);
+
+            if (this.variant.availability.class) {
+                this.$element.closest('.form-group').addClass('has-' + this.variant.availability.class);
+            }
+
+            this.$info.html(availability + prices);
+        },
+
         hasVariant: function () {
             return undefined !== this.$variant;
         },
 
-        getConfig: function () {
-            return this.config;
-        },
-
-        getPrice: function () {
-            return roundPrice(this.config.price);
-        },
-
-        getLabel: function () {
-            return this.config.label;
+        getVariant: function () {
+            return this.variant;
         },
 
         getOptionGroups: function () {
-            return this.config.groups;
+            return this.variant.groups;
         }
     });
 
@@ -685,9 +880,13 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
     // -------------------------------- SALE ITEM --------------------------------
 
-    function SaleItem($element, parentItem) {
+    function SaleItem ($element, parentItem) {
         this.$element = $element;
         this.parentItem = parentItem;
+
+        this.availability = {};
+        this.originalPrice = 0;
+        this.finalPrice = 0;
 
         this.init();
     }
@@ -698,7 +897,9 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         unit_price: 'Unit price',
         total: 'Net total',
         rule_table: 'Your prices',
-        price_table: 'Detailed unit price'
+        price_table: 'Detailed unit price',
+        ati: 'ATI',
+        net: 'Net'
     };
 
     $.extend(SaleItem.prototype, {
@@ -707,11 +908,20 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.config = $.extend({
                 price: 0,
-                currency: 'EUR',
-                rules: [],
+                pricing: {
+                    price: 0,
+                    discounts: [],
+                    taxes: []
+                },
                 availability: null,
                 privileged: false
             }, this.$element.data('config'));
+
+            var globals = this.$element.data('globals');
+            if (globals) {
+                Pricing.mode = globals.mode;
+                Pricing.currency = globals.currency;
+            }
 
             var trans = this.$element.data('trans');
             if (trans) {
@@ -727,7 +937,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             // Quantity
             this.$quantity = this.$element.find('#' + this.id + '_quantity');
-            this.quantity = this.$quantity.val();
+            this.quantity = parseFloat(this.$quantity.val());
             this.totalQuantity = this.quantity;
             if (this.parentItem) {
                 this.totalQuantity = this.quantity * this.parentItem.getTotalQuantity();
@@ -742,10 +952,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             // Pricing
             this.$pricing = this.$element.find('#' + this.id + '_pricing');
-            this.activeRule = undefined;
-            this.basePrice = 0;
-            this.unitPrice = 0;
-            this.totalPrice = 0;
 
             // Option groups
             this.optionGroups = undefined;
@@ -797,7 +1003,8 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             if (this.$variant) {
                 this.$variant.on('change', function () {
-                    that.onVariantChange();
+                    that.createVariantOptionGroups();
+                    that.onChildChange();
                 });
             }
 
@@ -842,11 +1049,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$element.removeData();
         },
 
-        onVariantChange: function () {
-            this.createVariantOptionGroups();
-            this.onChildChange();
-        },
-
         createVariantOptionGroups: function () {
             var that = this;
 
@@ -887,269 +1089,191 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             $groups.detach().appendTo(this.optionGroups.$element);
         },
 
-        onChildChange: function () {
-            this.calculatePrices();
-            this.updatePricing();
-            this.updateAvailability();
-        },
-
         updateParentQuantity: function () {
-            if (this.parentItem) {
-                if (1 < this.parentItem.getQuantity()) {
-                    this.$parentQuantity.html(this.parentItem.getQuantity() + 'x').show();
-                } else {
-                    this.$parentQuantity.hide();
-                }
+            if (1 < this.parentItem.getQuantity()) {
+                this.$parentQuantity.show().html(this.parentItem.getQuantity() + 'x');
+            } else {
+                this.$parentQuantity.hide();
             }
         },
 
         onQuantityChange: function () {
-            this.quantity = this.$quantity.val();
+            this.quantity = parseFloat(this.$quantity.val());
             this.totalQuantity = this.quantity;
 
             if (this.parentItem) {
+                this.updateParentQuantity();
                 this.totalQuantity = this.quantity * this.parentItem.getTotalQuantity();
             }
+
+            if (this.variant) {
+                this.variant.updatePricesAndAvailability();
+            }
+
+            this.optionGroups.updatePricesAndAvailability();
 
             $.each(this.bundleSlots, function () {
                 this.updateQuantity();
             });
 
-            this.updateParentQuantity();
             this.onChange();
         },
 
-        onChange: function () {
-            this.resolveActiveRule();
-            this.calculatePrices();
-            this.updatePricing();
-            this.updateAvailability();
+        onChildChange: function () {
+            this.updatePricesAndAvailability();
         },
 
-        updateAvailability: function () {
-            /*if (0 === this.$availabilityMessage.size()) {
-                return;
-            }*/
+        onChange: function () {
+            this.updatePricesAndAvailability();
+        },
 
-            this.optionGroups.updateAvailability();
+        buildAvailability: function() {
+            var availability = {};
+
+            if (this.variant && this.variant.hasVariant()) {
+                Availability.merge.call(availability, this.variant.getVariant().availability);
+            } else {
+                Availability.merge.call(availability, this.config.availability);
+            }
+
+            Availability.merge.call(availability, this.optionGroups.buildAvailability());
+
+            return availability;
+        },
+
+        updatePricesAndAvailability: function() {
+            var that = this, display = '', availability = this.buildAvailability();
+            this.originalPrice = 0;
+            this.finalPrice = 0;
 
             this.$availability.empty();
-            this.$quantity.closest('.form-group').removeClass('has-error');
-
-            if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-                this.$submitButton.prop('disabled', false);
-            }
-
-            var config = this.config;
-            if (this.variant && this.variant.hasVariant()) {
-                config = this.variant.getConfig();
-            }
-
-            if (null === config.availability) {
-                return;
-            }
-
-            config = $.extend({
-                o_msg: null,
-                min_qty: 0,
-                min_msg: null,
-                max_qty: 0,
-                max_msg: null,
-                a_qty: 0,
-                a_msg: null,
-                r_qty: 0,
-                r_msg: null
-            }, config.availability);
-
-            var min = parseFloat(config.min_qty),
-                max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
-                error = false,
-                messages = [];
-
-            if (min > this.totalQuantity) {
-                messages.push(config.min_msg);
-                error = true;
-            } else if (max < this.totalQuantity) {
-                messages.push(config.max_msg);
-                error = true;
-            } else {
-                // TODO If parent, display availability like for option
-                if (this.parentItem) return;
-
-                if (config.a_msg) {
-                    messages.push(config.a_msg);
-                }
-
-                if (this.totalQuantity > config.a_qty) {
-                    if (config.r_msg) {
-                        messages.push(config.r_msg);
-                        if (this.totalQuantity > config.a_qty + config.r_qty) {
-                            messages.push(config.o_msg);
-                        }
-                    } else {
-                        messages.push(config.o_msg);
-                    }
-                }
-            }
-
-            if (0 === messages.length) {
-                messages.push(config.o_msg);
-            }
-
-            if (error) {
-                this.$quantity.closest('.form-group').addClass('has-error');
-
-                if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-                    this.$submitButton.prop('disabled', true);
-                }
-            }
-
-            this.$availability.html(messages.join('<br>'));
-        },
-
-        resolveActiveRule: function () {
-            if (0 < this.config.rules.length) {
-                var activeRule = undefined,
-                    quantity = this.totalQuantity;
-
-                $.each(this.config.rules, function (i, rule) {
-                    if (quantity >= parseFloat(rule.quantity)) {
-                        activeRule = rule;
-                        return false;
-                    }
-                });
-                if (activeRule !== this.activeRule) {
-                    this.activeRule = activeRule;
-                    return true;
-                }
-            }
-
-            return false;
-        },
-
-        calculatePrices: function () {
-            var basePrice = 0, unitPrice, totalPrice;
+            this.$quantity.closest('.form-group').removeClass('has-error has-warning');
 
             if (0 < this.bundleSlots.length) {
                 $.each(this.bundleSlots, function () {
                     if (this.hasChoice()) {
-                        basePrice += this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
+                        that.originalPrice += this.getChoice().getOriginalPrice();
+                        that.finalPrice  += this.getChoice().getFinalPrice();
+
+                        Availability.merge.call(availability, this.getChoice().buildAvailability());
                     }
                 });
             } else {
-                if (this.variant) {
-                    basePrice = this.variant.getPrice();
-                } else {
-                    basePrice = roundPrice(this.config.price);
+                var pricing = this.config.pricing;
+                if (this.variant && this.variant.hasVariant()) {
+                    pricing = this.variant.getVariant().pricing;
+                }
+
+                this.originalPrice = Pricing.calculate.call(pricing, this.totalQuantity, false) * this.totalQuantity;
+                this.finalPrice = Pricing.calculate.call(pricing, this.totalQuantity) * this.totalQuantity;
+            }
+
+            this.originalPrice += this.optionGroups.getOriginalPrice() * this.totalQuantity;
+            this.finalPrice += this.optionGroups.getFinalPrice() * this.totalQuantity;
+
+            if (this.originalPrice !== this.finalPrice) {
+                display = '<del>' + this.originalPrice.formatPrice(Pricing.currency) + '</del>&nbsp;';
+            }
+
+            display += this.finalPrice.formatPrice(Pricing.currency);
+
+            this.$pricing.html(Templates['sale_item_pricing.html.twig'].render({
+                label: SaleItem.trans.total + '&nbsp;' + SaleItem.trans[Pricing.mode],
+                price: display
+            }));
+
+            var availabilityMsg = Availability.display.call(availability, this.totalQuantity);
+
+            if (availability.class) {
+                this.$quantity.closest('.form-group').addClass('has-' + availability.class);
+
+                if (availability.class === 'error' && !this.parentItem && this.$submitButton && !this.config.privileged) {
+                    this.$submitButton.prop('disabled', true);
                 }
             }
 
-            basePrice += this.optionGroups.getPrice();
-
-
-            unitPrice = basePrice;
-            if (this.activeRule) {
-                unitPrice *= 1 - parseFloat(this.activeRule.percent) / 100;
-            }
-
-            totalPrice = unitPrice * this.totalQuantity;
-
-            var changed = (basePrice !== this.basePrice || unitPrice !== this.unitPrice || totalPrice !== this.totalPrice);
-
-            this.basePrice = basePrice;
-            this.unitPrice = unitPrice;
-            this.totalPrice = totalPrice;
-
-            return changed;
+            this.$availability.html(availabilityMsg);
         },
 
-        updatePricing: function () {
-            if (0 === this.$pricing.size()) {
-                return;
-            }
-
-            var that = this, quantity = this.totalQuantity, lines = [], rules = [];
-
-            var data = {
-                detailed: false,
-                trans: SaleItem.trans,
-                quantity: quantity,
-                base: this.basePrice,
-                unit: this.unitPrice,
-                basePrice: this.basePrice.formatPrice(that.config.currency),
-                unitPrice: this.unitPrice.formatPrice(that.config.currency),
-                totalPrice: this.totalPrice.formatPrice(that.config.currency)
-            };
-
-            // Rules
-            if (0 < this.config.rules.length) {
-                data.detailed = true;
-                $(this.config.rules).each(function (i, rule) {
-                    var percent = parseFloat(rule.percent),
-                        price = that.basePrice * (1 - percent / 100);
-                    rules.push({
-                        label: rule.label,
-                        f_percent: rule.percent.toLocaleString() + '%',
-                        f_price: price.formatPrice(that.config.currency),
-                        active: that.activeRule && that.activeRule.id === rule.id
-                    });
-                });
-            }
-            data.rules = rules.reverse();
-
-            // Lines
-            $.each(this.bundleSlots, function () {
-                if (this.hasChoice()) {
-                    var price = this.getChoice().getUnitPrice() * this.getChoice().getQuantity();
-                    lines.push({
-                        label: this.getLabel(),
-                        price: price.formatPrice(that.config.currency)
-                    });
-                }
-            });
-            if (this.optionGroups.hasOptions()) {
-                if (0 === lines.length) {
-                    if (this.variant) {
-                        lines.push({
-                            label: this.variant.getLabel(),
-                            price: this.variant.getPrice().formatPrice(that.config.currency)
-                        });
-                    } else {
-                        lines.push({
-                            label: 'Base price', // TODO
-                            price: this.config.price.formatPrice(that.config.currency)
-                        });
-                    }
-                }
-                $.each(this.optionGroups.getGroups(), function () {
-                    if (this.hasOption()) {
-                        lines.push({
-                            label: this.getLabel(),
-                            price: this.getPrice().formatPrice(that.config.currency)
-                        });
-                    }
-                });
-            }
-            if (lines.length > 0) {
-                data.detailed = true;
-                if (this.activeRule) {
-                    var percent = parseFloat(this.activeRule.percent),
-                        price = that.basePrice * percent / 100;
-                    lines.push({
-                        label: SaleItem.trans.discount + ' ' + percent.toLocaleString() + '%',
-                        price: '-' + price.formatPrice(that.config.currency)
-                    });
-                }
-                lines.push({
-                    label: SaleItem.trans.unit_price,
-                    price: this.unitPrice.formatPrice(that.config.currency),
-                    class: 'info'
-                });
-            }
-            data.lines = lines;
-
-            this.$pricing.html(Templates['sale_item_pricing.html.twig'].render(data));
-        },
+        // updateAvailability: function () {
+        //     /*if (0 === this.$availabilityMessage.size()) {
+        //         return;
+        //     }*/
+        //
+        //     this.$availability.empty();
+        //     this.$quantity.closest('.form-group').removeClass('has-error');
+        //
+        //     if (!this.parentItem && this.$submitButton && !this.config.privileged) {
+        //         this.$submitButton.prop('disabled', false);
+        //     }
+        //
+        //     // TODO let variant display is own availabitily
+        //     var config = this.config;
+        //     if (this.variant && this.variant.hasVariant()) {
+        //         config = this.variant.getVariant();
+        //     }
+        //
+        //     if (null === config.availability) {
+        //         return;
+        //     }
+        //
+        //     config = $.extend({
+        //         o_msg: null,
+        //         min_qty: 0,
+        //         min_msg: null,
+        //         max_qty: 0,
+        //         max_msg: null,
+        //         a_qty: 0,
+        //         a_msg: null,
+        //         r_qty: 0,
+        //         r_msg: null
+        //     }, config.availability);
+        //
+        //     var min = parseFloat(config.min_qty),
+        //         max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
+        //         error = false,
+        //         messages = [];
+        //
+        //     if (min > this.totalQuantity) {
+        //         messages.push(config.min_msg);
+        //         error = true;
+        //     } else if (max < this.totalQuantity) {
+        //         messages.push(config.max_msg);
+        //         error = true;
+        //     } else {
+        //         // TODO If parent, display availability like for option
+        //         if (this.parentItem) return;
+        //
+        //         if (config.a_msg) {
+        //             messages.push(config.a_msg);
+        //         }
+        //
+        //         if (this.totalQuantity > config.a_qty) {
+        //             if (config.r_msg) {
+        //                 messages.push(config.r_msg);
+        //                 if (this.totalQuantity > config.a_qty + config.r_qty) {
+        //                     messages.push(config.o_msg);
+        //                 }
+        //             } else {
+        //                 messages.push(config.o_msg);
+        //             }
+        //         }
+        //     }
+        //
+        //     if (0 === messages.length) {
+        //         messages.push(config.o_msg);
+        //     }
+        //
+        //     if (error) {
+        //         this.$quantity.closest('.form-group').addClass('has-error');
+        //
+        //         if (!this.parentItem && this.$submitButton && !this.config.privileged) {
+        //             this.$submitButton.prop('disabled', true);
+        //         }
+        //     }
+        //
+        //     this.$availability.html(messages.join('<br>'));
+        // },
 
         getConfig: function () {
             return this.config;
@@ -1163,12 +1287,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             return this.totalQuantity;
         },
 
-        getUnitPrice: function () {
-            return this.unitPrice;
+        getOriginalPrice: function () {
+            return this.originalPrice;
         },
 
-        getTotalPrice: function () {
-            return this.totalPrice;
+        getFinalPrice: function () {
+            return this.finalPrice;
         }
     });
 

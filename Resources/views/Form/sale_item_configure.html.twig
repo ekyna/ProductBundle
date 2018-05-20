@@ -35,14 +35,14 @@
                 {%- endif -%}
                 <div class="row">
                     <div class="col-xs-6">
-                        <div class="form-group form-group-sm">
+                        <div class="form-group{# form-group-sm#}">
                             {{- bootstrap_backup_form_settings() -}}
                             {{- bootstrap_set_label_col(6) -}}
                             {{- bootstrap_set_widget_col(6) -}}
                             {{- form_label(itemForm.quantity) -}}
                             <div class="col-sm-6">
-                                <div class="input-group input-group-sm">
-                                    {{- form_widget(itemForm.quantity, {'attr': {'class': 'sale-item-quantity input-sm'}}) -}}
+                                <div class="input-group{# input-group-sm#}">
+                                    {{- form_widget(itemForm.quantity, {'attr': {'class': 'sale-item-quantity'}}) -}} {# input-sm #}
                                 </div>
                             </div>
                             {{- bootstrap_restore_form_settings() -}}
@@ -109,14 +109,14 @@
                 <span class="fa fa-chevron-right"></span>
             </a>
             {%- endif -%}
-            <fieldset id="{{ form.vars.id }}" class="slot-choice-form"
-                      data-id="{{ form.vars.choice_id }}" data-config='{{ form.vars.config|raw }}'>
+            <fieldset id="{{ form.vars.id }}" class="slot-choice-form" data-id="{{ form.vars.choice_id }}"
+                      data-config='{{ form.vars.config|json_encode_data|raw }}'>
                 {%- set itemForm = form -%}
                 {{- block('sale_item_configurable_slot') -}}
             </fieldset>
             {%- for itemForm in form.vars.choices_forms -%}
             <fieldset id="{{ itemForm.vars.id }}" class="slot-choice-form" style="display:none;" disabled="disabled"
-                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.config|raw }}'>
+                      data-id="{{ itemForm.vars.choice_id }}" data-config='{{ itemForm.vars.config|json_encode_data|raw }}'>
                 {{- block('sale_item_configurable_slot')|replace({'BUNDLE_CHOICE_NAME': form.vars.full_name})|raw -}}
             </fieldset>
             {%- endfor %}
@@ -131,14 +131,16 @@
     <div {{ block('widget_container_attributes') }}>
         {% set sizing = sizing|default(bootstrap_get_sizing()) %}
         {% for child in form %}
-            <div class="form-group{% if sizing in ['sm', 'lg'] %} form-group-{{ sizing }}{% endif %}"
-                 data-id="{{ child.vars.group_id }}" data-type="{{ child.vars.group_type }}">
+        <div class="form-group{% if sizing in ['sm', 'lg'] %} form-group-{{ sizing }}{% endif %}"
+             data-id="{{ child.vars.group_id }}" data-type="{{ child.vars.group_type }}">
             {{- form_label(child) -}}
             <div class="col-sm-9">
-                {{- form_widget(child.choice, {'label_col': 0, 'widget_col': 12}) -}}
+                <div class="input-group">
+                    {{- form_widget(child.choice, {'label_col': 0, 'widget_col': 12}) -}}
+                    <span class="input-group-addon sale-item-info">&nbsp;</span>
+                </div>
                 {{- form_errors(child.choice) -}}
             </div>
-            <div class="col-xs-12 sale-item-option-availability"></div>
         </div>
         {% endfor %}
         {{- form_rest(form) -}}
@@ -147,10 +149,20 @@
 {% endblock sale_item_option_groups_widget %}
 
 
+{% block sale_item_variant_widget %}
+{% spaceless %}
+    <div class="input-group">
+        {{- block('choice_widget') -}}
+        <span class="input-group-addon sale-item-info">&nbsp;</span>
+    </div>
+{% endspaceless %}
+{% endblock sale_item_variant_widget %}
+
+
 {% block sale_item_configure_widget %}
 {% spaceless %}
     {{- bootstrap_backup_form_settings() -}}
-    {{- bootstrap_set_sizing('sm') -}}
+    {#{{- bootstrap_set_sizing('sm') -}}#}
     {{- bootstrap_set_style('horizontal') -}}
     {{- bootstrap_set_col_size('sm') -}}
     {{- bootstrap_set_label_col(3) -}}
@@ -182,13 +194,13 @@
 
         <div class="row">
             <div class="col-xs-6">
-                <div class="form-group form-group-sm">
+                <div class="form-group{# form-group-sm#}">
                     {{- bootstrap_set_label_col(6) -}}
                     {{- form_label(form.quantity) -}}
                     <div class="col-sm-6">
                         {{- form_widget(form.quantity) -}}
+                        <div class="sale-item-availability"></div>
                     </div>
-                    <div class="col-xs-12 sale-item-availability"></div>
                     {{- bootstrap_set_label_col(3) -}}
                 </div>
             </div>

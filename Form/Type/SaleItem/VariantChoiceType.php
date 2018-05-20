@@ -116,6 +116,14 @@ class VariantChoiceType extends AbstractType
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getBlockPrefix()
+    {
+        return 'sale_item_variant';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getParent()

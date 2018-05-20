@@ -2,12 +2,16 @@
 
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
+use Ekyna\Bundle\CommerceBundle\Model\VatDisplayModes;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Component\Commerce\Common\Util\Formatter;
+use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ProductExtension
@@ -37,9 +41,24 @@ class ProductExtension extends \Twig_Extension
     private $localeProvider;
 
     /**
+     * @var FormatterFactory
+     */
+    private $formatterFactory;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var string
      */
     private $defaultImage;
+
+    /**
+     * @var Formatter
+     */
+    private $formatter;
 
 
     /**
@@ -49,6 +68,8 @@ class ProductExtension extends \Twig_Extension
      * @param PriceCalculator                $priceCalculator
      * @param AttributeTypeRegistryInterface $attributeTypeRegistry
      * @param LocaleProviderInterface        $localeProvider
+     * @param FormatterFactory               $formatterFactory
+     * @param TranslatorInterface            $translator
      * @param string                         $defaultImage
      */
     public function __construct(
@@ -56,12 +77,16 @@ class ProductExtension extends \Twig_Extension
         PriceCalculator $priceCalculator,
         AttributeTypeRegistryInterface $attributeTypeRegistry,
         LocaleProviderInterface $localeProvider,
+        FormatterFactory $formatterFactory,
+        TranslatorInterface $translator,
         $defaultImage = ''
     ) {
         $this->constantHelper = $constantHelper;
         $this->priceCalculator = $priceCalculator;
         $this->attributeTypeRegistry = $attributeTypeRegistry;
         $this->localeProvider = $localeProvider;
+        $this->formatterFactory = $formatterFactory;
+        $this->translator = $translator;
         $this->defaultImage = $defaultImage;
     }
 
@@ -106,6 +131,10 @@ class ProductExtension extends \Twig_Extension
             new \Twig_SimpleFilter(
                 'product_image',
                 [$this, 'getProductImagePath']
+            ),
+            new \Twig_SimpleFilter(
+                'product_price',
+                [$this, 'getProductPrice']
             ),
         ];
     }
@@ -219,10 +248,68 @@ class ProductExtension extends \Twig_Extension
     }
 
     /**
-     * {inheritdoc}
+     * Renders the product price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return string
      */
-    public function getName()
+    public function getProductPrice(Model\ProductInterface $product)
     {
-        return 'ekyna_product';
+        // TODO user locale and currency
+
+        $price = $this->priceCalculator->getPrice($product);
+
+        $formatter = $this->getFormatter();
+        if ($formatter->getCurrency() !== $price->getCurrency()) {
+            $formatter = $this->formatterFactory->create(
+                $this->localeProvider->getCurrentLocale(),
+                $price->getCurrency()
+            );
+        }
+
+        $current = sprintf(
+            '%s&nbsp;%s',
+            $formatter->currency($price->getTotal(), $price->getCurrency()),
+            $this->translator->trans(VatDisplayModes::getLabel($price->getMode()))
+        );
+
+        $from = false;
+        if (!in_array($product->getType(), [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT], true)) {
+            $from = true;
+        } else {
+            foreach ($product->getOptionGroups() as $optionGroup) {
+                if ($optionGroup->isRequired()) {
+                    $from = true;
+                }
+            }
+        }
+
+        $prefix = $from ? $this->translator->trans('ekyna_commerce.subject.price_from') . ' ' : '';
+
+        if ($price->hasDiscounts()) {
+            $previous = $formatter->currency($price->getTotal(false), $price->getCurrency());
+
+            return $prefix . sprintf('<del>%s</del> %s', $previous, $current);
+        }
+
+        return $prefix . $current;
+    }
+
+    /**
+     * Returns the formatter.
+     *
+     * @return Formatter
+     */
+    protected function getFormatter()
+    {
+        if (null !== $this->formatter) {
+            return $this->formatter;
+        }
+
+        return $this->formatter = $this->formatterFactory->create(
+            $this->localeProvider->getCurrentLocale()
+            // TODO currency
+        );
     }
 }

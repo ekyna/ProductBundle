@@ -4,12 +4,11 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
 
 /**
  * Class PriceResolver
@@ -22,16 +21,6 @@ class PriceResolver
      * @var PricingRepositoryInterface
      */
     protected $pricingRepository;
-
-    /**
-     * @var CustomerGroupRepositoryInterface
-     */
-    protected $customerGroupRepository;
-
-    /**
-     * @var CountryRepositoryInterface
-     */
-    protected $countryRepository;
 
     /**
      * @var array
@@ -55,32 +44,15 @@ class PriceResolver
      */
     protected $grid;
 
-    /**
-     * @var CustomerGroupInterface
-     */
-    protected $defaultCustomerGroup;
-
-    /**
-     * @var CountryInterface
-     */
-    protected $defaultCountry;
-
 
     /**
      * Constructor.
      *
      * @param PricingRepositoryInterface       $pricingRepository
-     * @param CustomerGroupRepositoryInterface $customerGroupRepository
-     * @param CountryRepositoryInterface       $countryRepository
      */
-    public function __construct(
-        PricingRepositoryInterface $pricingRepository,
-        CustomerGroupRepositoryInterface $customerGroupRepository,
-        CountryRepositoryInterface $countryRepository
-    ) {
+    public function __construct(PricingRepositoryInterface $pricingRepository)
+    {
         $this->pricingRepository = $pricingRepository;
-        $this->customerGroupRepository = $customerGroupRepository;
-        $this->countryRepository = $countryRepository;
 
         $this->initialize();
     }
@@ -106,20 +78,18 @@ class PriceResolver
     /**
      * Resolves the product price.
      *
-     * @param ProductInterface            $product
-     * @param int                         $quantity
-     * @param CustomerGroupInterface|null $group
-     * @param CountryInterface|null       $country
+     * @param ProductInterface $product
+     * @param ContextInterface $context
+     * @param int              $quantity
      *
      * @return \Ekyna\Component\Commerce\Common\Model\AdjustmentData|null
      */
     public function resolve(
         ProductInterface $product,
-        $quantity,
-        CustomerGroupInterface $group = null,
-        CountryInterface $country = null
+        ContextInterface $context,
+        $quantity
     ) {
-        $pricing = $this->findPricing($product, $group, $country);
+        $pricing = $this->findPricing($product, $context);
 
         if (!empty($pricing)) {
             foreach ($pricing['rules'] as $rule) {
@@ -133,6 +103,8 @@ class PriceResolver
             }
         }
 
+        // TODO Promotions (search using date, return if better)
+
         return null;
     }
 
@@ -145,53 +117,14 @@ class PriceResolver
      *
      * @return array
      */
-    public function findPricing(
-        ProductInterface $product,
-        CustomerGroupInterface $group = null,
-        CountryInterface $country = null
-    ) {
-        if (null === $group) {
-            $group = $this->getDefaultCustomerGroup();
-        }
-
-        if (null === $country) {
-            $country = $this->getDefaultCountry();
-        }
-
+    public function findPricing(ProductInterface $product, ContextInterface $context)
+    {
         $hash = implode('-', [
-            $group->getId(),
-            $country->getId(),
+            $context->getCustomerGroup()->getId(),
+            $context->getInvoiceCountry()->getId(),
             $product->getBrand()->getId(),
         ]);
 
         return isset($this->grid[$hash]) ? $this->grid[$hash] : [];
-    }
-
-    /**
-     * Returns the default customer group.
-     *
-     * @return CustomerGroupInterface
-     */
-    protected function getDefaultCustomerGroup()
-    {
-        if (null !== $this->defaultCustomerGroup) {
-            return $this->defaultCustomerGroup;
-        }
-
-        return $this->defaultCustomerGroup = $this->customerGroupRepository->findDefault();
-    }
-
-    /**
-     * Returns the default country.
-     *
-     * @return CountryInterface
-     */
-    protected function getDefaultCountry()
-    {
-        if (null !== $this->defaultCountry) {
-            return $this->defaultCountry;
-        }
-
-        return $this->defaultCountry = $this->countryRepository->findDefault();
     }
 }

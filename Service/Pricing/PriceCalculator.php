@@ -3,12 +3,14 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Component\Commerce\Cart\Provider\CartProviderInterface;
-use Ekyna\Component\Commerce\Common\Model\CountryInterface;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
+use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
+use Ekyna\Component\Commerce\Common\Converter\CurrencyConverterInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Commerce\Customer\Provider\CustomerProviderInterface;
+use Ekyna\Component\Commerce\Pricing\Model\Price;
+use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
+use Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes;
+use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 
 /**
  * Class PriceCalculator
@@ -18,59 +20,96 @@ use Ekyna\Component\Commerce\Customer\Provider\CustomerProviderInterface;
 class PriceCalculator
 {
     /**
-     * @var ProductProvider
-     */
-    private $productProvider;
-
-    /**
      * @var PriceResolver
      */
     private $priceResolver;
 
     /**
-     * @var CustomerProviderInterface
+     * @var TaxResolverInterface
      */
-    private $customerProvider;
+    private $taxResolver;
 
     /**
-     * @var CartProviderInterface
+     * @var CurrencyConverterInterface
      */
-    private $cartProvider;
+    private $currencyConverter;
 
     /**
-     * @var CustomerGroupInterface
+     * @var ContextProviderInterface
      */
-    private $customerGroup;
+    private $contextProvider;
 
     /**
-     * @var CountryInterface
+     * @var string
      */
-    private $country;
-
-    /**
-     * @var bool
-     */
-    private $initialized;
+    private $defaultCurrency;
 
 
     /**
      * Constructor.
      *
-     * @param ProductProvider           $productProvider
-     * @param PriceResolver             $priceResolver
-     * @param CustomerProviderInterface $customerProvider
-     * @param CartProviderInterface     $cartProvider
+     * @param PriceResolver              $priceResolver
+     * @param TaxResolverInterface       $taxResolver
+     * @param CurrencyConverterInterface $currencyConverter
+     * @param ContextProviderInterface   $contextProvider
+     * @param string                     $defaultCurrency
      */
     public function __construct(
-        ProductProvider $productProvider,
         PriceResolver $priceResolver,
-        CustomerProviderInterface $customerProvider,
-        CartProviderInterface $cartProvider
+        TaxResolverInterface $taxResolver,
+        CurrencyConverterInterface $currencyConverter,
+        ContextProviderInterface $contextProvider,
+        $defaultCurrency
     ) {
-        $this->productProvider = $productProvider;
         $this->priceResolver = $priceResolver;
-        $this->customerProvider = $customerProvider;
-        $this->cartProvider = $cartProvider;
+        $this->taxResolver = $taxResolver;
+        $this->currencyConverter = $currencyConverter;
+        $this->contextProvider = $contextProvider;
+        $this->defaultCurrency = $defaultCurrency;
+    }
+
+    /**
+     * Returns the product price for one quantity.
+     *
+     * @param Model\ProductInterface $product
+     * @param ContextInterface       $context
+     *
+     * @return Price
+     */
+    public function getPrice(Model\ProductInterface $product, ContextInterface $context = null)
+    {
+        if (null === $context) {
+            $context = $this->contextProvider->getContext();
+        }
+
+        $amount = $product->getNetPrice();
+
+        // Vat display mode and Currency
+        $mode = $context->getVatDisplayMode();
+        $currency = $context->getCurrency()->getCode();
+
+        // Currency conversion
+        if ($currency !== $this->defaultCurrency) {
+            $amount = $this->currencyConverter->convert($amount, $this->defaultCurrency, $currency);
+        }
+
+        // Price
+        $price = new Price($amount, $currency, $mode);
+
+        // Discount adjustment
+        if (null !== $discount = $this->priceResolver->resolve($product, $context, 1)) {
+            $price->addDiscount($discount);
+        }
+
+        // Taxation adjustments
+        if ($mode === VatDisplayModes::MODE_ATI) {
+            $taxes = $this->taxResolver->resolveTaxes($product, $context->getDeliveryCountry());
+            foreach ($taxes as $tax) {
+                $price->addTax($tax);
+            }
+        }
+
+        return $price;
     }
 
     /**
@@ -152,7 +191,7 @@ class PriceCalculator
      *
      * @return array The rules (array with quantities as keys and percentages as values)
      */
-    public function getSaleItemPricingData(SaleItemInterface $item, $fallback = true)
+    /*public function getSaleItemPricingData(SaleItemInterface $item, $fallback = true)
     {
         if (!$this->productProvider->supportsRelative($item)) {
             return [];
@@ -162,114 +201,125 @@ class PriceCalculator
             return [];
         }
 
-        // Resolves customer and country from the item's sale
-        $customer = $country = $currency = null;
-        if (null !== $sale = $item->getSale()) {
-            // Sale currency
-            $currency = $sale->getCurrency()->getCode();
+        $context = $this->contextProvider->getContext($item->getSale(), $fallback);
 
-            // Sale invoice address country
-            if (null !== $address = $sale->getInvoiceAddress()) {
-                $country = $address->getCountry();
-            }
-
-            // Sale customer
-            $customer = $sale->getCustomer();
-            if (!$country && $customer) {
-                // Customer default invoice country
-                if (null !== $address = $customer->getDefaultInvoiceAddress(true)) {
-                    $country = $address->getCountry();
-                }
-            }
-        }
-
-        if (!$currency) {
-            $currency = 'EUR'; // TODO default currency
-        }
-
-        $data = [
-            'price'    => floatval($product->getNetPrice()),
-            'currency' => $currency,
-            'rules'    => [],
-        ];
-
-        /** @see \Ekyna\Component\Commerce\Common\Builder\AdjustmentBuilder::getSaleItemAdjustmentData() */
-        // Don't apply discounts to private items (they will inherit from parents)
-        if ($item->isPrivate()) {
-            return $data;
-        }
-        // Don't apply discount to parent with only public children
-        if ($item->isCompound() && !$item->hasPrivateChildren()) {
-            return $data;
-        }
-
-        if ($customer && $country) {
-            $pricing = $this->priceResolver->findPricing($product, $customer->getCustomerGroup(), $country);
-            if (isset($pricing['rules'])) {
-                $data['rules'] = $pricing['rules'];
-            }
-        } elseif ($fallback) {
-            $data['rules'] = $this->getProductPricingRules($product);
-        }
-
-        return $data;
-    }
+        return $this->buildProductPricing($product, $context);
+    }*/
 
     /**
-     * Returns the pricing rules for the given product.
+     * Returns the pricing data for the given product and context.
      *
      * @param Model\ProductInterface $product
+     * @param ContextInterface       $context
+     * @param bool                   $discounts
+     * @param bool                   $taxes
      *
-     * @return array The rules (array with quantities as keys and percentages as values)
+     * @return array
      */
-    public function getProductPricingRules(Model\ProductInterface $product)
-    {
-        $this->initialize();
+    public function buildProductPricing(
+        Model\ProductInterface $product,
+        ContextInterface $context,
+        bool $discounts = true,
+        bool $taxes = true
+    ) {
+        // Net price
+        $amount = $product->getNetPrice();
 
-        $pricing = $this->priceResolver->findPricing($product, $this->customerGroup, $this->country);
-        if (isset($pricing['rules'])) {
-            return $pricing['rules'];
+        // Currency
+        $currency = $context->getCurrency()->getCode();
+        if ($currency !== $this->defaultCurrency) {
+            // Currency conversion
+            $amount = $this->currencyConverter->convert($amount, $this->defaultCurrency, $currency);
         }
 
-        return [];
+        $pricing = [
+            'price'     => (float)$amount,
+            'discounts' => null,
+            'taxes'     => null,
+        ];
+
+        // Discount rules
+        if ($discounts) {
+            $config = $this->priceResolver->findPricing($product, $context);
+            $pricing['discounts'] = isset($config['rules']) ? $config['rules'] : []; // TODO unset rules id
+        }
+
+        /** @see \Ekyna\Component\Commerce\Common\Resolver\DiscountResolver::resolveSaleItem() */
+        // Don't apply discounts/taxes to private items (they will inherit from parents)
+        /*if ($item->isPrivate()) {
+            return $data;
+        }*/
+
+        // Taxes
+        if ($taxes) {
+            $pricing['taxes'] = $this->getTaxesRates($product, $context);
+        }
+
+        // Don't apply discount to parent with only public children
+        /*if ($item->isCompound() && !$item->hasPrivateChildren()) {
+            return $data;
+        }*/
+
+        return $pricing;
     }
 
     /**
-     * Initializes the calculator by resolving the customer and the country.
+     * Returns the pricing data for the given option and context.
+     *
+     * @param Model\OptionInterface $option
+     * @param ContextInterface      $context
+     * @param bool                  $discounts
+     * @param bool                  $taxes
+     *
+     * @return array
      */
-    private function initialize()
-    {
-        if ($this->initialized) {
-            return;
-        }
+    public function buildOptionPricing(
+        Model\OptionInterface $option,
+        ContextInterface $context,
+        bool $discounts = true,
+        bool $taxes = true
+    ) {
+        // Currency
+        $currency = $context->getCurrency()->getCode();
 
-        $customer = null;
-        if ($this->cartProvider->hasCart()) {
-            // Cart customer group
-            $cart = $this->cartProvider->getCart();
-            if (null !== $customer = $cart->getCustomer()) {
-                $this->customerGroup = $cart->getCustomer()->getCustomerGroup();
-            }
+        if (null !== $product = $option->getProduct()) {
+            $pricing = $this->buildProductPricing($product, $context, $discounts, $taxes);
 
-            // Cart invoice address
-            if (null !== $address = $cart->getInvoiceAddress()) {
-                $this->country = $address->getCountry();
-            }
-        }
-
-        // Logged in customer
-        if ((!$this->customerGroup || !$this->country) && $this->customerProvider->hasCustomer()) {
-            $customer = $this->customerProvider->getCustomer();
-            if (!$this->customerGroup) {
-                $this->customerGroup = $customer->getCustomerGroup();
-            }
-            if (!$this->country) {
-                if (null !== $address = $customer->getDefaultInvoiceAddress(true)) {
-                    $this->country = $address->getCountry();
+            // Option's net price override
+            if (null !== $price = $option->getNetPrice()) {
+                if ($currency !== $this->defaultCurrency) {
+                    // Currency conversion
+                    $price = $this->currencyConverter->convert($price, $this->defaultCurrency, $currency);
                 }
+                $pricing['price'] = $price;
             }
+            return $pricing;
         }
 
-        $this->initialized = true;
+        return [
+            'price'     => (float)$option->getNetPrice(),
+            'discounts' => [], // Prevent inheritance
+            'taxes'     => $this->getTaxesRates($option, $context),
+        ];
+    }
+
+    /**
+     * Returns the taxes rates for the given taxable and context.
+     *
+     * @param TaxableInterface $taxable
+     * @param ContextInterface $context
+     *
+     * @return float[]
+     */
+    public function getTaxesRates(TaxableInterface $taxable, ContextInterface $context)
+    {
+        $taxes = [];
+
+        $config = $this->taxResolver->resolveTaxes($taxable, $context->getDeliveryCountry());
+        foreach ($config as $tax) {
+            $taxes[] = (float)$tax->getRate();
+        }
+
+        return $taxes;
     }
 }

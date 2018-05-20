@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Helper\AvailabilityHelperInterface;
@@ -65,6 +66,11 @@ class FormBuilder
      */
     protected $formatter;
 
+    /**
+     * @var ContextInterface
+     */
+    protected $context;
+
 
     /**
      * Constructor.
@@ -101,23 +107,23 @@ class FormBuilder
     }
 
     /**
-     * Returns the product provider.
+     * Sets the context.
      *
-     * @return ProductProvider
+     * @param ContextInterface $context
      */
-    public function getProvider()
+    public function setContext(ContextInterface $context)
     {
-        return $this->productProvider;
+        $this->context = $context;
     }
 
     /**
-     * Returns the availability helper.
+     * Returns the context.
      *
-     * @return AvailabilityHelperInterface
+     * @return ContextInterface
      */
-    public function getAvailabilityHelper()
+    public function getContext()
     {
-        return $this->availabilityHelper;
+        return $this->context;
     }
 
     /**
@@ -206,6 +212,39 @@ class FormBuilder
     }
 
     /**
+     * Clears the bundle choice form.
+     *
+     * @param FormInterface $form
+     */
+    public function clearBundleChoiceForm(FormInterface $form)
+    {
+        foreach (['variant', 'configuration', 'options', 'quantity'] as $field) {
+            if ($form->has($field)) {
+                $form->remove($field);
+            }
+        }
+    }
+
+    /**
+     * Builds the bundle choice config.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    public function buildBundleChoiceConfig(Model\ProductInterface $product)
+    {
+        $config = [];
+
+        if ($product->getType() !== Model\ProductTypes::TYPE_VARIABLE) {
+            $config['pricing'] = $this->priceCalculator->buildProductPricing($product, $this->context);
+            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
+        }
+
+        return $config;
+    }
+
+    /**
      * Returns the variant choice label.
      *
      * @param Model\ProductInterface|null $variant
@@ -214,20 +253,15 @@ class FormBuilder
      */
     public function variantChoiceLabel(Model\ProductInterface $variant = null)
     {
-        if (null !== $variant) {
-            if (0 == strlen($label = $variant->getTitle())) {
-                $label = $variant->getAttributesTitle();
-            }
+        if (null === $variant) {
+            return null;
+        }
 
-            if (0 < $netPrice = $variant->getNetPrice()) {
-                // TODO User currency
-                $label .= sprintf(' (%s)', $this->formatter->formatCurrency($variant->getNetPrice(), 'EUR'));
-            }
-
+        if (!empty($label = $variant->getTitle())) {
             return $label;
         }
 
-        return null;
+        return $variant->getAttributesTitle();
     }
 
     /**
@@ -239,47 +273,48 @@ class FormBuilder
      */
     public function variantChoiceAttr(Model\ProductInterface $variant = null)
     {
-        if (null !== $variant) {
-            $groups = [];
+        if (null === $variant) {
+            return [];
+        }
 
-            $optionGroups = $this->productFilter->getOptionGroups($variant);
+        $groups = [];
 
-            /** @var Model\OptionGroupInterface $optionGroup */
-            foreach ($optionGroups as $optionGroup) {
-                $groupOptions = $this->productFilter->getGroupOptions($optionGroup);
-                $options = [];
-                /** @var Model\OptionInterface $option */
-                foreach ($groupOptions as $option) {
-                    $options[] = [
-                        'id'     => $option->getId(),
-                        'label'  => $this->optionChoiceLabel($option),
-                        'config' => $this->buildOptionConfig($option),
-                    ];
-                }
-                $groups[] = [
-                    'id'          => $optionGroup->getId(),
-                    'type'        => $optionGroup->getProduct()->getType(),
-                    'label'       => $optionGroup->getTitle(),
-                    'required'    => $optionGroup->isRequired(),
-                    'placeholder' => 'Choisissez une option', // TODO trans
-                    'options'     => $options,
+        $optionGroups = $this->productFilter->getOptionGroups($variant);
+
+        /** @var Model\OptionGroupInterface $optionGroup */
+        foreach ($optionGroups as $optionGroup) {
+            $groupOptions = $this->productFilter->getGroupOptions($optionGroup);
+            $options = [];
+            /** @var Model\OptionInterface $option */
+            foreach ($groupOptions as $option) {
+                $options[] = [
+                    'id'     => $option->getId(),
+                    'label'  => $this->optionChoiceLabel($option),
+                    'config' => $this->buildOptionConfig($option),
                 ];
             }
-
-            $config = [
-                'price'        => floatval($variant->getNetPrice()),
-                'groups'       => $groups,
-                'thumb'        => $this->getProductImagePath($variant),
-                'image'        => $this->getProductImagePath($variant, 'media_front'),
-                'availability' => $this->availabilityHelper->getAvailability($variant)->toArray(),
-            ];
-
-            return [
-                'data-config' => $this->jsonEncode($config),
+            $groups[] = [
+                'id'          => $optionGroup->getId(),
+                'type'        => $optionGroup->getProduct()->getType(),
+                'label'       => $optionGroup->getTitle(),
+                'required'    => $optionGroup->isRequired(),
+                'placeholder' => 'Choisissez une option', // TODO trans
+                'options'     => $options,
             ];
         }
 
-        return [];
+        $config = [
+            'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context), // TODO discounts/taxes flags (private item)
+            'groups'       => $groups,
+            'thumb'        => $this->getProductImagePath($variant),
+            'image'        => $this->getProductImagePath($variant, 'media_front'),
+            'availability' => $this->availabilityHelper->getAvailability($variant)->toArray(),
+        ];
+
+        return [
+            //'data-config'  => $this->jsonEncode($config),
+            'data-config' => $config,
+        ];
     }
 
     /**
@@ -291,35 +326,23 @@ class FormBuilder
      */
     public function optionChoiceLabel(Model\OptionInterface $option = null)
     {
-        if (null !== $option) {
-            $netPrice = 0;
-            if (null !== $product = $option->getProduct()) {
-                if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
-                    if (0 == strlen($label = $product->getTitle())) {
-                        $label = $product->getAttributesTitle();
-                    }
-                } else {
-                    $label = $product->getFullTitle();
-                }
-                $netPrice = $product->getNetPrice();
-            } else {
-                $label = $option->getTitle();
-            }
-
-            // Override net price with option's net price if set
-            if (null !== $option->getNetPrice()) {
-                $netPrice = $option->getNetPrice();
-            }
-
-            if (0 < $netPrice) {
-                // TODO User currency
-                $label .= sprintf(' (%s)', $this->formatter->formatCurrency($netPrice, 'EUR'));
-            }
-
-            return $label;
+        if (null === $option) {
+            return null;
         }
 
-        return null;
+        if (null === $product = $option->getProduct()) {
+            return $option->getTitle();
+        }
+
+        if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
+            if (!empty($label = $product->getTitle())) {
+                return $label;
+            }
+
+            return $product->getAttributesTitle();
+        }
+
+        return $product->getFullTitle();
     }
 
     /**
@@ -331,43 +354,14 @@ class FormBuilder
      */
     public function optionChoiceAttr(Model\OptionInterface $option = null)
     {
-        if (null !== $option) {
-            return [
-                'data-config' => $this->jsonEncode($this->buildOptionConfig($option)),
-            ];
+        if (null === $option) {
+            return [];
         }
 
-        return [];
-    }
-
-    /**
-     * Builds the option config.
-     *
-     * @param Model\OptionInterface $option
-     *
-     * @return array
-     */
-    protected function buildOptionConfig(Model\OptionInterface $option)
-    {
-        $config = [];
-
-        $netPrice = 0;
-
-        if (null !== $product = $option->getProduct()) {
-            $netPrice = $product->getNetPrice();
-            $config['thumb'] = $this->getProductImagePath($product);
-            $config['image'] = $this->getProductImagePath($product, 'media_front');
-            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
-        }
-
-        // Override net price with option's net price if set
-        if (null !== $option->getNetPrice()) {
-            $netPrice = $option->getNetPrice();
-        }
-
-        $config['price'] = floatval($netPrice);
-
-        return $config;
+        return [
+            //'data-config'  => $this->jsonEncode($this->buildOptionConfig($option)),
+            'data-config' => $this->buildOptionConfig($option),
+        ];
     }
 
     /**
@@ -394,6 +388,7 @@ class FormBuilder
             /** @var \Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface $image */
             $image = $images->first();
 
+            // TODO Absolute path instead of url
             return $this
                 ->cacheManager
                 ->getBrowserPath($image->getMedia()->getPath(), $filter);
@@ -416,41 +411,18 @@ class FormBuilder
      * Returns the form's pricing config for the given sale item.
      *
      * @param SaleItemInterface $item
-     * @param bool              $fallback
      *
      * @return array
      */
-    public function getFormConfig(SaleItemInterface $item, $fallback = true)
+    public function getFormConfig(SaleItemInterface $item)
     {
-        // Set pricing data
-        $config = $this->priceCalculator->getSaleItemPricingData($item, $fallback);
+        $config = [];
 
-        if (!empty($config['rules'])) {
-            $rules = [];
-            $previousQuantity = null;
-            foreach ($config['rules'] as $rule) {
-                if ($previousQuantity) {
-                    $rule['label'] = $this->translator->trans('ekyna_product.sale_item_configure.range', [
-                        '%min%' => $rule['quantity'],
-                        '%max%' => $previousQuantity - 1,
-                    ]);
-                } else {
-                    $rule['label'] = $this->translator->trans('ekyna_product.sale_item_configure.from', [
-                        '%min%' => $rule['quantity'],
-                    ]);
-                }
-
-                $rules[] = $rule;
-
-                $previousQuantity = $rule['quantity'];
-            }
-
-            $config['rules'] = $rules;
-        }
-
+        /** @var Model\ProductInterface $subject */
         if (null !== $subject = $item->getSubjectIdentity()->getSubject()) {
             $skippedTypes = [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_CONFIGURABLE];
             if (!in_array($subject->getType(), $skippedTypes, true)) {
+                $config['pricing'] = $this->priceCalculator->buildProductPricing($subject, $this->context);
                 $config['availability'] = $this->availabilityHelper->getAvailability($subject)->toArray();
             }
         }
@@ -459,21 +431,51 @@ class FormBuilder
     }
 
     /**
-     * Json encodes the given data (for from html config attribute).
+     * Returns the sale item configure form globals.
      *
-     * @param array $data
+     * @return array
+     */
+    public function getFormGlobals()
+    {
+        return [
+            'mode'     => $this->context->getVatDisplayMode(),
+            'currency' => $this->context->getCurrency()->getCode(),
+        ];
+    }
+
+    /**
+     * Returns the sale item configure form translations.
+     *
+     * @return array
+     */
+    public function getFormTranslations()
+    {
+        return [
+            'quantity'    => $this->translate('ekyna_core.field.quantity'),
+            'discount'    => $this->translate('ekyna_product.sale_item_configure.discount'),
+            'unit_price'  => $this->translate('ekyna_product.sale_item_configure.unit_price'),
+            'total'       => $this->translate('ekyna_product.sale_item_configure.total_price'),
+            'rule_table'  => $this->translate('ekyna_product.sale_item_configure.rule_table'),
+            'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
+            'ati'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.ati'),
+            'net'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.net'),
+//            'min_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.min_quantity'),
+//            'max_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.max_quantity'),
+        ];
+    }
+
+    /**
+     * Translates the given message.
+     *
+     * @param string $id
+     * @param array  $parameters
+     * @param string $domain
      *
      * @return string
      */
-    public function jsonEncode(array $data)
+    public function translate($id, array $parameters = [], $domain = null)
     {
-        $opts = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION;
-
-        if (false === $json = json_encode($data, $opts)) {
-            throw new \RuntimeException(json_last_error_msg());
-        }
-
-        return $json;
+        return $this->translator->trans($id, $parameters, $domain);
     }
 
     /**
@@ -514,49 +516,24 @@ class FormBuilder
     }
 
     /**
-     * Clears the bundle choice form.
+     * Builds the option config.
      *
-     * @param FormInterface $form
-     */
-    public function clearBundleChoiceForm(FormInterface $form)
-    {
-        foreach (['variant', 'configuration', 'options', 'quantity'] as $field) {
-            if ($form->has($field)) {
-                $form->remove($field);
-            }
-        }
-    }
-
-    /**
-     * Returns the sale item configure form translations.
+     * @param Model\OptionInterface $option
      *
      * @return array
      */
-    public function getTranslations()
+    protected function buildOptionConfig(Model\OptionInterface $option)
     {
-        return [
-            'quantity'     => $this->translate('ekyna_core.field.quantity'),
-            'discount'     => $this->translate('ekyna_product.sale_item_configure.discount'),
-            'unit_price'   => $this->translate('ekyna_product.sale_item_configure.unit_net_price'),
-            'total'        => $this->translate('ekyna_product.sale_item_configure.total_price'),
-            'rule_table'   => $this->translate('ekyna_product.sale_item_configure.rule_table'),
-            'price_table'  => $this->translate('ekyna_product.sale_item_configure.price_table'),
-//            'min_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.min_quantity'),
-//            'max_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.max_quantity'),
-        ];
-    }
+        $config = [];
 
-    /**
-     * Translates the given message.
-     *
-     * @param string $id
-     * @param array  $parameters
-     * @param string $domain
-     *
-     * @return string
-     */
-    public function translate($id, array $parameters = [], $domain = null)
-    {
-        return $this->translator->trans($id, $parameters, $domain);
+        if (null !== $product = $option->getProduct()) {
+            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
+            $config['thumb'] = $this->getProductImagePath($product);
+            $config['image'] = $this->getProductImagePath($product, 'media_front');
+        }
+
+        $config['pricing'] = $this->priceCalculator->buildOptionPricing($option, $this->context); // TODO discounts/taxes flags (private item)
+
+        return $config;
     }
 }

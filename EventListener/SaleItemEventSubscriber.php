@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
+use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
 use Ekyna\Component\Commerce\Exception\SubjectException;
@@ -19,6 +20,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SaleItemEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var ContextProviderInterface
+     */
+    protected $contextProvider;
+
     /**
      * @var ItemBuilder
      */
@@ -38,12 +44,18 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     /**
      * Constructor.
      *
-     * @param ItemBuilder   $itemBuilder
-     * @param FormBuilder   $formBuilder
-     * @param PriceResolver $priceResolver
+     * @param ContextProviderInterface $contextProvider
+     * @param ItemBuilder              $itemBuilder
+     * @param FormBuilder              $formBuilder
+     * @param PriceResolver            $priceResolver
      */
-    public function __construct(ItemBuilder $itemBuilder, FormBuilder $formBuilder, PriceResolver $priceResolver)
-    {
+    public function __construct(
+        ContextProviderInterface $contextProvider,
+        ItemBuilder $itemBuilder,
+        FormBuilder $formBuilder,
+        PriceResolver $priceResolver
+    ) {
+        $this->contextProvider = $contextProvider;
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formBuilder;
         $this->priceResolver = $priceResolver;
@@ -62,10 +74,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         $item = $event->getItem();
 
-        if ($sale = $item->getSale()) {
-            $this->itemBuilder->getFilter()->setCustomerGroup($sale->getCustomerGroup());
-        }
+        $context = $this->contextProvider->getContext($item->getSale()); // TODO fallback / admin_mode
 
+        $this->formBuilder->setContext($context);
+
+        $this->itemBuilder->getFilter()->setCustomerGroup($context->getCustomerGroup());
         $this->itemBuilder->initialize($item);
 
         $item->setPrivate(false); // Root items can't be private.
@@ -101,12 +114,12 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         $item = $event->getItem();
-        $sale = $item->getSale();
-        $country = $sale->getInvoiceAddress() ? $sale->getInvoiceAddress()->getCountry() : null;
+
+        $context = $this->contextProvider->getContext($item->getSale());
 
         $adjustmentsData = $this
             ->priceResolver
-            ->resolve($product, $item->getTotalQuantity(), $sale->getCustomerGroup(), $country);
+            ->resolve($product, $context, $item->getTotalQuantity());
 
         if ($adjustmentsData) {
             $event->addAdjustmentData($adjustmentsData);
@@ -170,11 +183,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            SaleItemEvents::INITIALIZE        => ['onSaleItemInitialize'],
-            SaleItemEvents::BUILD             => ['onSaleItemBuild'],
-            SaleItemEvents::DISCOUNT          => ['onSaleItemAdjustments'],
-            SaleItemFormEvent::BUILD_FORM     => ['onSaleItemBuildForm'],
-            SaleItemFormEvent::BUILD_VIEW     => ['onSaleItemBuildFormView'],
+            SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],
+            SaleItemEvents::BUILD         => ['onSaleItemBuild'],
+            SaleItemEvents::DISCOUNT      => ['onSaleItemAdjustments'],
+            SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
+            SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];
     }
 }

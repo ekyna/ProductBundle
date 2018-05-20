@@ -355,18 +355,17 @@
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver"
                  lazy="true">
             <argument id="ekyna_product.pricing.repository" type="service"/>
-            <argument id="ekyna_commerce.customer_group.repository" type="service"/>
-            <argument id="ekyna_commerce.country.repository" type="service"/>
         </service>
 
         <!-- Price calculator -->
         <service id="ekyna_product.pricing.calculator"
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator"
                  lazy="true">
-            <argument id="ekyna_product.commerce.subject_provider" type="service"/>
             <argument id="ekyna_product.pricing.resolver" type="service"/>
-            <argument id="ekyna_commerce.customer.security_provider" type="service"/>
-            <argument id="ekyna_commerce.cart.session_provider" type="service"/>
+            <argument id="ekyna_commerce.pricing.tax_resolver" type="service"/>
+            <argument id="ekyna_commerce.currency.converter" type="service"/>
+            <argument id="ekyna_commerce.common.context_provider" type="service"/>
+            <argument>%ekyna_commerce.default.currency%</argument>
         </service>
 
         <!-- Pricing event listener -->
@@ -393,6 +392,8 @@
             <argument type="service" id="ekyna_product.pricing.calculator"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
+            <argument type="service" id="translator"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>
         </service>
@@ -408,6 +409,7 @@
         <!-- Sale item event listener -->
         <service id="ekyna_product.sale_item.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber">
+            <argument type="service" id="ekyna_commerce.common.context_provider"/>
             <argument type="service" id="ekyna_product.commerce.item_builder"/>
             <argument type="service" id="ekyna_product.commerce.form_builder"/>
             <argument type="service" id="ekyna_product.pricing.resolver"/>
