@@ -119,14 +119,15 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.class = 'error';
             message = this.max_msg;
         } else if (quantity > this.a_qty) {
-            this.class = 'warning';
             if (this.r_msg) {
+                this.class = 'warning';
                 if (this.quantity > this.a_qty + this.r_qty) {
                     message = this.o_msg;
                 } else {
                     message = this.r_msg;
                 }
             } else {
+                this.class = 'error';
                 message = this.o_msg;
             }
         } else {
@@ -806,7 +807,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 availability: null
             };
 
-            var $variant = this.$element.find('option[value="' + this.$element.val() + '"]');
+            var $variant = this.$element.find('option[value="' + this.$element.val() + '"]').eq(0);
             if (1 === $variant.size() && $variant.data('config')) {
                 this.$variant = $variant;
 
@@ -1148,6 +1149,10 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.$availability.empty();
             this.$quantity.closest('.form-group').removeClass('has-error has-warning');
+
+            if (this.$submitButton) {
+                this.$submitButton.prop('disabled', false);
+            }
 
             if (0 < this.bundleSlots.length) {
                 $.each(this.bundleSlots, function () {
