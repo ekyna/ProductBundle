@@ -880,11 +880,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
                 label: null,
                 thumb: null,
                 image: null,
-                pricing: {
-                    price: 0,
-                    discounts: [],
-                    taxes: []
-                },
+                pricing: null,
                 groups: [],
                 availability: null
             };
@@ -924,19 +920,19 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
             this.$info.empty();
             this.$element.closest('.form-group').removeClass('has-error has-warning');
 
-            if (!(this.variant && this.variant.pricing && this.variant.availability)) {
+            if (!(this.variant)) {
                 return;
             }
 
             var quantity = this.item.getTotalQuantity(),
-                availability = Availability.resolve.call(this.variant.availability, quantity).display(),
+                availability = Availability.resolve.call(this.variant.availability, quantity),
                 prices = Pricing.display.call(this.variant.pricing, quantity);
 
-            if (this.variant.availability.class) {
-                this.$element.closest('.form-group').addClass('has-' + this.variant.availability.class);
+            if (availability.hasClass()) {
+                this.$element.closest('.form-group').addClass('has-' + availability.getClass());
             }
 
-            this.$info.html(availability + prices);
+            this.$info.html(availability.display() + prices);
         },
 
         hasVariant: function () {
