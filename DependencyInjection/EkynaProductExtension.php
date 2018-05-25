@@ -19,18 +19,20 @@ class EkynaProductExtension extends AbstractExtension
     {
         $config = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
 
+        $container->setParameter('ekyna_product.catalog_enabled', $config['catalog']['enabled']);
         $container->setParameter('ekyna_product.default.no_image', $config['default']['no_image']);
         $container->setParameter('ekyna_product.default.sale_item_form_theme', $config['default']['sale_item_form_theme']);
 
         $cartSuccessListener = $container->getDefinition('ekyna_product.add_to_cart.event_subscriber');
         $cartSuccessListener->replaceArgument(1, $config['default']['cart_success_template']);
 
-        $twigExtension = $container->getDefinition('ekyna_product.twig.product_extension');
-        $twigExtension->replaceArgument(6, [
-            'default_image'         => $config['default']['no_image'],
-            'final_price_format'    => $config['default']['final_price_format'],
-            'original_price_format' => $config['default']['original_price_format'],
-            'price_with_from'       => $config['default']['price_with_from'],
-        ]);
+        $pricingRenderer = $container->getDefinition('ekyna_product.pricing.renderer');
+        $pricingRenderer->replaceArgument(5, $config['pricing']);
+
+        if ($config['catalog']['enabled']) {
+            $catalogRegistry = $container->getDefinition('ekyna_product.catalog.registry');
+            $catalogRegistry->replaceArgument(0, $config['catalog']['themes']);
+            $catalogRegistry->replaceArgument(1, $config['catalog']['templates']);
+        }
     }
 }

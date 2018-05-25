@@ -209,6 +209,19 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Catalog form types -->
+        <service id="ekyna_product.catalog.theme_choice.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogThemeChoiceType">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.catalog_page.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogPageType">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
+            <tag name="form.type"/>
+            <tag name="form.js" selector=".catalog-page" path="ekyna-product/form/catalog-page"/>
+        </service>
+
         <!-- Category choice form type -->
         <service id="ekyna_product.category_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Category\CategoryChoiceType">
@@ -368,6 +381,18 @@
             <argument>%ekyna_commerce.default.currency%</argument>
         </service>
 
+        <!-- Price renderer -->
+        <service id="ekyna_product.pricing.renderer"
+                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer"
+                 lazy="true">
+            <argument id="ekyna_product.pricing.calculator" type="service"/>
+            <argument id="ekyna_resource.locale.request_provider" type="service"/>
+            <argument id="ekyna_commerce.util.formatter_factory" type="service"/>
+            <argument id="translator" type="service"/>
+            <argument id="templating" type="service"/>
+            <argument type="collection"/><!-- Replaced by DI extension -->
+        </service>
+
         <!-- Pricing event listener -->
         <service id="ekyna_product.pricing.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber">
@@ -385,16 +410,19 @@
             <tag name="ekyna_cms.schema_org_provider"/>
         </service>
 
-        <!-- Twig extension -->
+        <!-- Twig extensions -->
         <service id="ekyna_product.twig.product_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
             <argument type="service" id="ekyna_product.constants_helper"/>
-            <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_product.pricing.renderer"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
-            <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
-            <argument type="service" id="translator"/>
-            <argument type="collection"/><!-- Replaced By DI extension -->
+            <argument>%ekyna_product.default.no_image%</argument>
+            <tag name="twig.extension"/>
+        </service>
+        <service id="ekyna_product.twig.catalog_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
             <tag name="twig.extension"/>
         </service>
 
@@ -570,6 +598,20 @@
             <argument>%ekyna_product.product.class%</argument>
             <tag name="ekyna_cms.wide_search.provider"/>
         </service>-->
+
+        <!-- Catalog services -->
+        <service id="ekyna_product.catalog.registry"
+                 class="Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry">
+            <argument type="collection"/><!-- Replaced by DI extension -->
+            <argument type="collection"/><!-- Replaced by DI extension -->
+        </service>
+        <service id="ekyna_product.catalog.renderer"
+                 class="Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer">
+            <argument type="service" id="templating"/>
+            <argument type="service" id="knp_snappy.pdf"/>
+            <argument>%ekyna_commerce.company_logo%</argument>
+            <argument>%kernel.debug%</argument>
+        </service>
 
         <!-- Serialization -->
         <service id="ekyna_product.product.normalizer"

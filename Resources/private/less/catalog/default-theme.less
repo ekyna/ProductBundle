@@ -1,0 +1,151 @@
+@import "variables.less";
+
+// Core variables and mixins
+@import "default-variables.less";
+@import "../../../../../../../../bower_components/bootstrap/less/mixins.less";
+
+// Reset and dependencies
+@import "../../../../../../../../bower_components/bootstrap/less/normalize.less";
+//@import "../../../../../../../../bower_components/bootstrap/less/print.less";
+
+// Core CSS
+@import "../../../../../../../../bower_components/bootstrap/less/scaffolding.less";
+@import "../../../../../../../../bower_components/bootstrap/less/type.less";
+//@import "../../../../../../../../bower_components/bootstrap/less/code.less";
+@import "../../../../../../../../bower_components/bootstrap/less/grid.less";
+@import "../../../../../../../../bower_components/bootstrap/less/tables.less";
+@import "../../../../../../../../bower_components/bootstrap/less/buttons.less";
+
+@import "../../../../../../../../bower_components/bootstrap/less/responsive-embed.less";
+// Utility classes
+@import "../../../../../../../../bower_components/bootstrap/less/utilities.less";
+@import "../../../../../../../../bower_components/bootstrap/less/responsive-utilities.less";
+
+@ratio: 1.3;
+@default-padding: 0.6cm * @ratio;
+@header-height: 3cm * @ratio;
+@footer-height: 1.5cm * @ratio;
+
+.page {
+    padding-top: @header-height;
+    padding-bottom: @footer-height;
+}
+
+.header, .footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: #ddd;
+    color: @text-color;
+    padding: @default-padding;
+}
+
+.header {
+    top: 0;
+    height: @header-height;
+
+    > a.company-logo {
+        display: block;
+        height: @header-height - (@default-padding * 2);
+
+        > img {
+            height: 100%;
+            width: auto;
+        }
+    }
+}
+
+.footer {
+    bottom: 0;
+    height: @footer-height;
+}
+
+.product {
+    padding: @default-padding;
+
+    .brand {
+        color: @gray;
+    }
+
+    .field {
+        color: @gray;
+    }
+
+    .reference {
+        font-weight: bold;
+    }
+
+    .price {
+
+    }
+
+    .grid {
+        th, td {
+            font-size: floor((@font-size-base * .93));
+        }
+
+        caption {
+            padding-top: 0;
+        }
+    }
+
+    &.full {
+        height: (@height - @header-height - @footer-height);
+
+        h1 {
+            font-size: floor((@font-size-base * 4));
+            margin-bottom: floor((@font-size-base * 4));
+        }
+
+        p {
+            font-size: floor((@font-size-base * 2));
+            margin-bottom: floor((@font-size-base * 2));
+
+            &.image {
+                > img {
+                    margin: 0 auto;
+                }
+            }
+        }
+
+        overflow: hidden;
+    }
+
+    &.half {
+        height: (@height - @header-height - @footer-height) / 2;
+        overflow: hidden;
+
+        h1 {
+            font-size: floor((@font-size-base * 2.4));
+            margin-bottom: floor((@font-size-base * 2.4));
+        }
+
+        p {
+            font-size: floor((@font-size-base * 1.5));
+            margin-bottom: floor((@font-size-base * 1.5));
+        }
+
+        &:first-child {
+            border-bottom: 1px solid #ccc;
+        }
+
+        > img {
+            max-width: 50%;
+        }
+
+        &.left {
+            > img {
+                float: left;
+                margin: 0 @default-padding @default-padding 0;
+            }
+        }
+
+        &.right {
+            > img {
+                float: right;
+                margin: 0 0 @default-padding @default-padding;
+            }
+        }
+    }
+}
+

@@ -1,0 +1,60 @@
+ekyna_product_catalog_admin_home:
+    path: ""
+    defaults: { _controller: "ekyna_product.catalog.controller:homeAction" }
+    methods: [GET]
+
+ekyna_product_catalog_admin_list:
+    path: /list
+    defaults: { _controller: "ekyna_product.catalog.controller:listAction" }
+    methods: [GET|POST]
+
+ekyna_product_catalog_admin_new:
+    path: /new
+    defaults: { _controller: "ekyna_product.catalog.controller:newAction" }
+    methods: [GET|POST]
+
+ekyna_product_catalog_admin_show:
+    path: /{catalogId}/show
+    defaults: { _controller: "ekyna_product.catalog.controller:showAction" }
+    methods: [GET]
+    requirements:
+        catalogId: \d+
+
+ekyna_product_catalog_admin_render:
+    path: /{catalogId}/render
+    defaults:
+        _controller: "ekyna_product.catalog.controller:renderAction"
+    methods: [GET|POST]
+    requirements:
+        catalogId: \d+
+
+ekyna_product_catalog_admin_edit:
+    path: /{catalogId}/edit
+    defaults: { _controller: "ekyna_product.catalog.controller:editAction" }
+    methods: [GET|POST]
+    requirements:
+        catalogId: \d+
+
+#ekyna_product_catalog_admin_toggle:
+#    path: /{catalogId}/toggle/{field}
+#    defaults: { _controller: "ekyna_product.catalog.controller:toggleAction", field: visible }
+#    methods: [GET]
+#    requirements:
+#        catalogId: \d+
+#        field: \w+
+
+ekyna_product_catalog_admin_remove:
+    path: /{catalogId}/remove
+    defaults: { _controller: "ekyna_product.catalog.controller:removeAction" }
+    methods: [GET|POST]
+    requirements:
+        catalogId: \d+
+
+ekyna_product_catalog_admin_page_slots_form:
+    path: /page-slots-form/{template}
+    defaults: { _controller: "ekyna_product.catalog.controller:slotsFormAction" }
+    methods: [GET]
+    requirements:
+        template: "[a-z0-9_]+"
+    options:
+        expose: true

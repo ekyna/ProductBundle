@@ -92,7 +92,18 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_inventory_admin_index',
             'label'    => 'ekyna_product.inventory.title',
             'resource' => 'ekyna_product_product',
-            'position' => 99,
+            'position' => 98,
         ]]);
+
+        if ($container->getParameter('ekyna_product.catalog_enabled')) {
+            // Catalog
+            $pool->addMethodCall('createEntry', ['catalog', [
+                'name'     => 'catalog',
+                'route'    => 'ekyna_product_catalog_admin_list',
+                'label'    => 'ekyna_product.catalog.label.plural',
+                'resource' => 'ekyna_product_catalog',
+                'position' => 99,
+            ]]);
+        }
     }
 }

@@ -7,8 +7,6 @@ use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
-use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 
 /**
  * Class PriceResolver
@@ -48,7 +46,7 @@ class PriceResolver
     /**
      * Constructor.
      *
-     * @param PricingRepositoryInterface       $pricingRepository
+     * @param PricingRepositoryInterface $pricingRepository
      */
     public function __construct(PricingRepositoryInterface $pricingRepository)
     {
@@ -111,9 +109,8 @@ class PriceResolver
     /**
      * Finds the pricing matching the given product, group and country.
      *
-     * @param ProductInterface       $product
-     * @param CustomerGroupInterface $group
-     * @param CountryInterface       $country
+     * @param ProductInterface $product
+     * @param ContextInterface $context
      *
      * @return array
      */

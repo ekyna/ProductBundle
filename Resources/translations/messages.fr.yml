@@ -135,6 +135,37 @@ ekyna_product:
     cart:
         success: Cette article a bien été ajouté à votre panier.
 
+    catalog:
+        label:
+            singular: Catalogue
+            plural: Catalogues
+        header:
+            list: Catalogues <small>Liste des catalogues</small>
+            show: Détail du catalogue <small>%name%</small>
+            new: Créer un nouveau catalogue
+            edit: Modifier le catalogue <small>%name%</small>
+            remove: Supprimer le catalogue <small>%name%</small>
+        button:
+            list: Liste des catalogues
+            show: Détail du catalogue
+            new: Nouveau catalogue
+            edit: Modifier le catalogue
+            remove: Supprimer le catalogue
+        field:
+            template: Gabarit
+            pages: Pages
+            pager: 'Page %current% / %total%'
+            slots: Emplacements
+            display_prices: Afficher les prix
+            price_mention: 'Tarifs indicatifs au %date%'
+        theme:
+            default: Par défault
+        template:
+            full: Produit pleine page
+            half: 2 produits
+        alert:
+            no_item: Aucun catalogue configuré
+
     category:
         label:
             singular: Catégorie
@@ -236,7 +267,10 @@ ekyna_product:
             plural: Règle de tarification
         field:
             min_quantity: Qte. Min.
-            percent: Pourcentage
+            from: à partir de %min%
+            range: de %min% à %max%
+            discount: Remise
+            unit_price: Prix Unit.
         alert:
             no_item: Aucune régle configuré
 
@@ -303,11 +337,8 @@ ekyna_product:
     sale_item_configure:
         variant: Version
         choose_option: Choisissez une option
-        from: à partir de %min%
-        range: de %min% à %max%
         discount: Remise
         unit_price: Prix unit.
-        unit_net_price: Prix unit. HT # TODO remove (used in SaleView)
         total_price: Total
         rule_table: Vos tarifs
         price_table: Détail du prix unititaire

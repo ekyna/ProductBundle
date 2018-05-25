@@ -14,6 +14,10 @@ ekyna_product_category_admin:
     resource: admin/category.yml
     prefix:   /categories
 
+ekyna_product_catalog_admin:
+    resource: admin/catalog.yml
+    prefix:   /catalogs
+
 ekyna_product_brand_admin:
     resource: admin/brand.yml
     prefix:   /brands

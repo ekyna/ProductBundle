@@ -1,0 +1,31 @@
+{% spaceless %}
+<table class="table table-condensed table-striped {{ class }}">
+    <caption>{{ grid.designation }}</caption>
+    <thead>
+        <tr>
+            <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_product.pricing_rule.field.discount'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_product.pricing_rule.field.unit_price'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for rule in grid.rules -%}
+        <tr>
+            <td>
+            {% if rule.max is null -%}
+                {{ 'ekyna_product.pricing_rule.field.from'|trans({
+                    '%min%': rule.min
+                }) }}
+            {%- else -%}
+                {{ 'ekyna_product.pricing_rule.field.range'|trans({
+                    '%min%': rule.min, '%max%': rule.max
+                }) }}
+            {%- endif %}
+            </td>
+            <td class="text-right">{{ rule.percent|localizednumber('percent') }}</td>
+            <td class="text-right">{{ rule.price|localizedcurrency(grid.currency) }}</td>
+        </tr>
+    {%- endfor %}
+    </tbody>
+</table>
+{% endspaceless %}

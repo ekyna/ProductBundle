@@ -1,0 +1,29 @@
+@import "variables.less";
+
+.page {
+    position: relative;
+    max-width: 1200px;
+    margin: auto;
+}
+
+@media print {
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        text-rendering: optimizeLegibility;
+    }
+
+    .page {
+        position: relative;
+        page-break-after: always;
+        overflow: hidden;
+        box-sizing: border-box;
+        width: @width;
+        height: @height;
+    }
+
+    hr {
+        display: none;
+    }
+}

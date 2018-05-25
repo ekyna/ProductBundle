@@ -1,0 +1,30 @@
+{% spaceless %}
+<ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
+    <li class="active">
+        <a href="#catalog-general" id="toggle-general" data-toggle="tab">
+            {{ 'ekyna_core.field.general'|trans }}
+        </a>
+    </li>
+    <li>
+        <a href="#catalog-composition" id="toggle-general" data-toggle="tab">
+            {{ 'ekyna_product.product.field.composition'|trans }}
+        </a>
+    </li>
+</ul>
+<div class="panel-body form-body">
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ form_errors(form) }}
+    <div class="tab-content">
+        <div class="tab-pane active" id="catalog-general">
+            {{ form_row(form.title) }}
+            {{ form_row(form.theme) }}
+            {{ form_row(form.description) }}
+        </div>
+        <div class="tab-pane" id="catalog-composition">
+            {{ form_row(form.pages) }}
+        </div>
+    </div>
+    {{ form_rest(form) }}
+</div>
+{% endspaceless %}

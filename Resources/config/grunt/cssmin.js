@@ -5,7 +5,7 @@ module.exports = function (grunt, options) {
                 {
                     expand: true,
                     cwd: 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css',
-                    src: ['*.css'],
+                    src: ['**/*.css'],
                     dest: 'src/Ekyna/Bundle/ProductBundle/Resources/public/css',
                     ext: '.css'
                 }

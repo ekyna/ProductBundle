@@ -1,0 +1,17 @@
+{% spaceless %}
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{{ catalog.title }}</title>
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/catalog/base.css')) }}" rel="stylesheet" type="text/css" />
+    <link href="{{ absolute_url(asset(catalog|catalog_theme_stylesheet)) }}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    {% for page in catalog.pages -%}
+        {% if not loop.first %}<hr>{% endif %}
+        <div class="page">{% include page|catalog_page_template('render') %}</div>
+    {%- endfor %}
+</body>
+</html>
+{% endspaceless %}

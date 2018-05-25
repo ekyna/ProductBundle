@@ -1,0 +1,23 @@
+<div class="header">
+    {% block header -%}
+    <a href="{{ absolute_url('/') }}" class="company-logo">
+        <img alt="{{ get_setting('general.site_name') }}" src="{{ absolute_url(asset(logo_path)) }}">
+    </a>
+    {%- endblock header %}
+</div>
+<div class="content">
+    {% block content %}{% endblock content %}
+</div>
+<div class="footer">
+    {% block footer -%}
+        <p>
+            {{ 'ekyna_product.catalog.field.price_mention'|trans({'%date%': catalog.context.date|localizeddate('short', 'none')}) }}
+            <span class="pull-right">
+                {{- 'ekyna_product.catalog.field.pager'|trans({
+                    '%current%': loop.index,
+                    '%total%': catalog.pages|length
+                }) -}}
+            </span>
+        </p>
+    {%- endblock footer %}
+</div>

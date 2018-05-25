@@ -1,0 +1,18 @@
+{% extends "@EkynaAdmin/Entity/Default/edit.html.twig" %}
+
+{% block main %}
+    {{ form_start(form) }}
+    <div class="form-body">
+        {{ bootstrap_set_style('horizontal') }}
+        {{ bootstrap_set_col_size('md') }}
+        {{ bootstrap_set_label_col(3) }}
+        {{ bootstrap_set_widget_col(9) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.format) }}
+        {{ form_row(form.theme) }}
+        {{ form_row(form.displayPrices) }}
+        {{ form_widget(form.context) }}
+        {{ form_rest(form) }}
+    </div>
+    {{ form_end(form) }}
+{% endblock main %}

@@ -4,7 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\MediaBundle\Model as Media;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
@@ -778,7 +778,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         if (!empty($types)) {
             foreach ($types as $type) {
-                MediaTypes::isValid($type, true);
+                Media\MediaTypes::isValid($type, true);
             }
 
             return $this->medias->filter(function(Model\ProductMediaInterface $media) use ($types) {
@@ -1211,6 +1211,66 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Returns the product images.
+     *
+     * @param bool                 $withChildren
+     * @param int                  $limit
+     * @param ArrayCollection|null $images
+     *
+     * @return ArrayCollection|Media\MediaInterface[]
+     */
+    public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null)
+    {
+        if (null === $images) {
+            $images = new ArrayCollection();
+        }
+
+        foreach ($this->medias as $pm) {
+            $media = $pm->getMedia();
+            if ($media->getType() === Media\MediaTypes::IMAGE && !$images->contains($media)) {
+                $images->add($media);
+                if ($limit <= $images->count()) {
+                    break;
+                }
+            }
+        }
+
+        if ($withChildren && $limit > $images->count()) {
+            if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
+                /** @var Product $variant TODO */
+                foreach ($this->variants as $variant) {
+                    $variant->getImages(false, $limit, $images);
+                }
+            } elseif (in_array($this->type, [Model\ProductTypes::TYPE_BUNDLE, Model\ProductTypes::TYPE_CONFIGURABLE])) {
+                foreach ($this->bundleSlots as $slot) {
+                    $choices = $slot->getChoices();
+                    foreach ($choices as $choice) {
+                        $product = $choice->getProduct();
+                        if (0 < $product->getMedias()->count()) {
+                            foreach ($product->getMedias() as $pm) {
+                                $media = $pm->getMedia();
+                                if ($media->getType() === Media\MediaTypes::IMAGE && !$images->contains($media)) {
+                                    $images->add($media);
+                                    if ($limit <= $images->count()) {
+                                        break 3;
+                                    }
+                                    break;
+                                }
+                            }
+                        } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                            foreach ($product->getVariants() as $variant) {
+                                $variant->getImages(false, $limit, $images);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $images;
     }
 
     /**

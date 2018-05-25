@@ -6,7 +6,6 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Converter\CurrencyConverterInterface;
-use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Pricing\Model\Price;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes;
@@ -66,6 +65,16 @@ class PriceCalculator
         $this->currencyConverter = $currencyConverter;
         $this->contextProvider = $contextProvider;
         $this->defaultCurrency = $defaultCurrency;
+    }
+
+    /**
+     * Returns the priceResolver.
+     *
+     * @return PriceResolver
+     */
+    public function getPriceResolver()
+    {
+        return $this->priceResolver;
     }
 
     /**
@@ -184,29 +193,6 @@ class PriceCalculator
     }
 
     /**
-     * Returns the pricing data for the given sale item.
-     *
-     * @param SaleItemInterface $item
-     * @param bool              $fallback Whether to fallback to the logged in customer
-     *
-     * @return array The rules (array with quantities as keys and percentages as values)
-     */
-    /*public function getSaleItemPricingData(SaleItemInterface $item, $fallback = true)
-    {
-        if (!$this->productProvider->supportsRelative($item)) {
-            return [];
-        }
-
-        if (null === $product = $this->productProvider->resolve($item)) {
-            return [];
-        }
-
-        $context = $this->contextProvider->getContext($item->getSale(), $fallback);
-
-        return $this->buildProductPricing($product, $context);
-    }*/
-
-    /**
      * Returns the pricing data for the given product and context.
      *
      * @param Model\ProductInterface $product
@@ -261,6 +247,42 @@ class PriceCalculator
         }*/
 
         return $pricing;
+    }
+
+    /**
+     * Returns the pricing config for the given product and context.
+     *
+     * @param Model\ProductInterface $product
+     * @param ContextInterface|null  $context
+     *
+     * @return array
+     */
+    public function getPricingConfig(Model\ProductInterface $product, ContextInterface $context = null)
+    {
+        if (null === $context) {
+            $context = $this->contextProvider->getContext();
+        }
+
+        $config = $this->priceResolver->findPricing($product, $context);
+
+        if (!empty($config)) {
+            // Currency
+            $currency = $context->getCurrency()->getCode();
+            $price = $product->getNetPrice();
+
+            $config['currency'] = $currency;
+
+            if ($currency !== $this->defaultCurrency) {
+                // Currency conversion
+                $price = $this->currencyConverter->convert($price, $this->defaultCurrency, $currency);
+            }
+
+            foreach ($config['rules'] as &$rule) {
+                $rule['price'] = $price * (1 - $rule['percent'] / 100);
+            }
+        }
+
+        return $config;
     }
 
     /**
