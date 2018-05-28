@@ -181,6 +181,12 @@ class CatalogRegistry
     public static function getDefaultTemplates()
     {
         return [
+            'default.cover' => [
+                'label'     => 'ekyna_product.catalog.template.cover',
+                'form_type' => Type\CoverType::class,
+                'directory' => '@EkynaProduct/Catalog/Template/Cover',
+                'mockup'    => 'null',
+            ],
             'default.full' => [
                 'label'     => 'ekyna_product.catalog.template.full',
                 'form_type' => Type\FullType::class,

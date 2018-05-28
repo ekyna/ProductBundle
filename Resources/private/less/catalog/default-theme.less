@@ -66,6 +66,45 @@
     height: @footer-height;
 }
 
+.cover {
+    width: 100%;
+    height: @height;
+    margin-top: -@header-height;
+    margin-bottom: -@footer-height;
+    background-color: @theme-color;
+    position: relative;
+
+    > .inner {
+        position: absolute;
+        top: @height * 0.25;
+        height: @height * 0.5;
+        left: @width * 0.2;
+        width: @width * 0.6;
+    }
+
+    a.company-logo {
+        display: block;
+        width: 70%;
+        margin: 0 auto @default-padding*2 auto;
+
+        > img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    h1 {
+        text-align: center;
+        font-size: floor((@font-size-base * 4));
+        margin-bottom: floor((@font-size-base * 4));
+    }
+
+    p {
+        font-size: floor((@font-size-base * 1.8));
+        margin-bottom: floor((@font-size-base * 1.8));
+    }
+}
+
 .product {
     padding: 0 @default-padding;
 

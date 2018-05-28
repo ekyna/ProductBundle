@@ -1,0 +1,16 @@
+{#{% extends theme %}
+
+{% block content -%}#}
+{% spaceless %}
+{% set url = absolute_url('/') %}
+<div class="cover">
+    <div class="inner">
+        <a href="{{ url }}" class="company-logo">
+            <img alt="{{ get_setting('general.site_name') }}" src="{{ absolute_url(asset(logo_path)) }}">
+        </a>
+        <h1>{{ catalog.title }}</h1>
+        <div class="description">{{ catalog.description|raw }}</div>
+    </div>
+</div>
+{% endspaceless %}
+{#{% endblock content %}#}
