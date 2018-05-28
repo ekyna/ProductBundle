@@ -23,8 +23,8 @@ class CatalogController extends ResourceController
      */
     public function slotsFormAction(Request $request)
     {
-        $template = $this
-            ->get('ekyna_product.catalog.template_registry')
+        $config = $this
+            ->get('ekyna_product.catalog.registry')
             ->getTemplate($request->attributes->get('template'));
 
         $page = new CatalogPage(); // TODO edit => fetch
@@ -34,7 +34,7 @@ class CatalogController extends ResourceController
             ->createNamed('page__name', Type\FormType::class, $page, [
                 'compound'   => true,
             ])
-            ->add('slots', $template->getFormType());
+            ->add('slots', $config['form_type']);
 
         $response = $this->render('EkynaProductBundle:Admin/Catalog:page_slots_form.xml.twig', [
             'form' => $form->createView(),

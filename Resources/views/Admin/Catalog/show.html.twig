@@ -2,7 +2,7 @@
 
 {% block main %}
     <div class="actions">
-        {{ ui_button('ekyna_core.button.display', {
+        {{ ui_button('ekyna_product.catalog.button.render', {
             'type': 'link',
             'icon': 'file',
             'theme': 'primary',
@@ -30,7 +30,7 @@
                     {{ show_row(catalog.title, 'text', {
                         'label': 'ekyna_core.field.title'
                     }) }}
-                    {{ show_row(catalog|catalog_theme_label, 'text', {
+                    {{ show_row(catalog|catalog_theme_label|trans, 'text', {
                         'label': 'ekyna_core.field.theme'
                     }) }}
                     {{ show_row(catalog.description, 'textarea', {
@@ -40,8 +40,8 @@
                 </div>
                 <div class="tab-pane" id="catalog-composition">
                 {% for page in catalog.pages -%}
-                    <h4>Page {{ loop.index }}</h4>
-                    {% include page|catalog_page_template('show') %}
+                    <h4>Page {{ loop.index }} <small>{{ page|catalog_page_template_label|trans }}</small></h4>
+                    {% include page|catalog_page_template_path('show') %}
                     <hr>
                 {%- endfor %}
                 </div>

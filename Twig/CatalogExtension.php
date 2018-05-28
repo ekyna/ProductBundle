@@ -35,14 +35,15 @@ class CatalogExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('catalog_theme_label',      [$this, 'getCatalogThemeLabel']),
-            new \Twig_SimpleFilter('catalog_theme_stylesheet', [$this, 'getCatalogThemeStylesheet']),
-            new \Twig_SimpleFilter('catalog_page_template',    [$this, 'getPageTemplate']),
+            new \Twig_SimpleFilter('catalog_theme_label',         [$this, 'getCatalogThemeLabel']),
+            new \Twig_SimpleFilter('catalog_theme_stylesheet',    [$this, 'getCatalogThemeStylesheet']),
+            new \Twig_SimpleFilter('catalog_page_template_label', [$this, 'getPageTemplateLabel']),
+            new \Twig_SimpleFilter('catalog_page_template_path',  [$this, 'getPageTemplatePath']),
         ];
     }
 
     /**
-     * Returns the catalog label.
+     * Returns the catalog theme label.
      *
      * @param Catalog $catalog
      *
@@ -54,7 +55,7 @@ class CatalogExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the catalog theme.
+     * Returns the catalog theme stylesheet.
      *
      * @param Catalog $catalog
      *
@@ -66,14 +67,26 @@ class CatalogExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the page template.
+     * Returns the catalog page template label.
+     *
+     * @param CatalogPage $page
+     *
+     * @return string
+     */
+    public function getPageTemplateLabel(CatalogPage $page)
+    {
+        return $this->registry->getTemplate($page->getTemplate())['label'];
+    }
+
+    /**
+     * Returns the catalog page template path.
      *
      * @param CatalogPage $page
      * @param string      $name
      *
      * @return string
      */
-    public function getPageTemplate(CatalogPage $page, $name = 'render')
+    public function getPageTemplatePath(CatalogPage $page, $name = 'render')
     {
         $config = $this->registry->getTemplate($page->getTemplate());
 

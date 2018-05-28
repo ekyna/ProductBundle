@@ -1,65 +1,46 @@
 {% extends theme %}
 
-{% macro image(product) %}
-{% spaceless %}
-    {% set image = product.images|first %}
-    <img src="{{ absolute_url(image.path|imagine_filter('media_front')) }}" alt="{{ image.title }}"
-         class="img-responsive" width="800" height="600">
-{% endspaceless %}
-{% endmacro image %}
-
-{% macro infos(catalog, product) %}
-{% spaceless %}
-    <h1>
-        <span class="brand">{{ product.brand.title }}</span><br>
-        {{ product.fullTitle }}
-    </h1>
-    {% set grid = catalog.displayPrices ? product|product_discount_grid(null, 'grid') : null %}
-    {% if grid is not null %}
-    <div class="row">
-        <div class="col-xs-6">
-    {% endif %}
-    <p>
-        <span class="field">{{ 'ekyna_core.field.reference'|trans }}</span>&nbsp;
-        <span class="reference">{{ product.reference }}</span><br>
-        {% if catalog.displayPrices -%}
-            <span class="price">{{ product|product_price(null, false) }}</span>
-        {%- endif %}
-    </p>
-    <p>
-        <a href="{{ product|subject_public_url(false) }}" class="btn btn-primary">
-            Voir sur le site
-        </a>
-    </p>
-    {% if grid is not null %}
-        </div>
-        <div class="col-xs-6">
-            {{ grid|raw }}
-        </div>
-    </div>
-    {% endif %}
-{% endspaceless %}
-{% endmacro infos %}
-
-{% import _self as macros %}
+{% import '@EkynaProduct/Catalog/Template/macros.html.twig' as macros %}
 
 {% block content -%}
 {% spaceless %}
 {% for slot in page.slots|slice(0, 2) -%}
     {% set product = slot.product %}
     <div class="product half {{ loop.first ? 'left' : 'right' }}">
-        <div class="row">
-        {% if loop.first -%}
-            <div class="col-xs-6">{{ macros.image(product) }}</div>
-            <div class="col-xs-6">{{ macros.infos(catalog, product) }}</div>
-        {%- else -%}
-            <div class="col-xs-6">{{ macros.infos(catalog, product) }}</div>
-            <div class="col-xs-6">{{ macros.image(product) }}</div>
-        {%- endif %}
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                {{- product.description|raw -}}
+        <div class="inner">
+            <div class="row">
+            {% if loop.first -%}
+                <div class="col-xs-6">{{ macros.image(catalog, product) }}</div>
+                <div class="col-xs-6">
+                    {{ macros.title(catalog, product) }}
+                    <div class="row">
+                        <div class="col-xs-6">
+                            {{ macros.infos(catalog, product) }}
+                        </div>
+                        <div class="col-xs-6">
+                            {{ macros.grid(catalog, product) }}
+                        </div>
+                    </div>
+                </div>
+            {%- else -%}
+                <div class="col-xs-6">
+                    {{ macros.title(catalog, product) }}
+                    <div class="row">
+                        <div class="col-xs-6">
+                            {{ macros.infos(catalog, product) }}
+                        </div>
+                        <div class="col-xs-6">
+                            {{ macros.grid(catalog, product) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">{{ macros.image(catalog, product) }}</div>
+            {%- endif %}
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="description">{{ product.description|raw }}</div>
+                </div>
             </div>
         </div>
     </div>

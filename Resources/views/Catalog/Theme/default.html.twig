@@ -1,6 +1,15 @@
 <div class="header">
     {% block header -%}
-    <a href="{{ absolute_url('/') }}" class="company-logo">
+    {% set url = absolute_url('/') %}
+    <p>
+        {% set address = get_setting('general.site_address') %}
+        {% if address.phone is not empty %}Tél. {{ address.phone }}<br>{% endif %}{# TODO Trans #}
+        {% if address.mobile is not empty %}Port. {{ address.mobile }}<br>{% endif %}{# TODO Trans #}
+        {% set email = get_setting('general.admin_email') %}
+        <a href="mailto:{{ email }}">{{ email }}</a><br>
+        <a href="{{ url }}">{{ url }}</a>
+    </p>
+    <a href="{{ url }}" class="company-logo">
         <img alt="{{ get_setting('general.site_name') }}" src="{{ absolute_url(asset(logo_path)) }}">
     </a>
     {%- endblock header %}
@@ -10,14 +19,14 @@
 </div>
 <div class="footer">
     {% block footer -%}
-        <p>
-            {{ 'ekyna_product.catalog.field.price_mention'|trans({'%date%': catalog.context.date|localizeddate('short', 'none')}) }}
-            <span class="pull-right">
-                {{- 'ekyna_product.catalog.field.pager'|trans({
-                    '%current%': loop.index,
-                    '%total%': catalog.pages|length
-                }) -}}
-            </span>
-        </p>
+    <p>
+        {{ 'ekyna_product.catalog.field.price_mention'|trans({'%date%': catalog.context.date|localizeddate('short', 'none')}) }}
+        <span class="pull-right">
+            {{- 'ekyna_product.catalog.field.pager'|trans({
+                '%current%': loop.index,
+                '%total%': catalog.pages|length
+            }) -}}
+        </span>
+    </p>
     {%- endblock footer %}
 </div>

@@ -55,6 +55,6 @@ ekyna_product_catalog_admin_page_slots_form:
     defaults: { _controller: "ekyna_product.catalog.controller:slotsFormAction" }
     methods: [GET]
     requirements:
-        template: "[a-z0-9_]+"
+        template: "[a-z0-9\\._]+"
     options:
         expose: true

@@ -192,6 +192,12 @@ class CatalogRegistry
                 'directory' => '@EkynaProduct/Catalog/Template/Half',
                 'mockup'    => 'null',
             ],
+            'default.half_dual' => [
+                'label'     => 'ekyna_product.catalog.template.half_dual',
+                'form_type' => Type\HalfDualType::class,
+                'directory' => '@EkynaProduct/Catalog/Template/HalfDual',
+                'mockup'    => 'null',
+            ],
         ];
     }
 }

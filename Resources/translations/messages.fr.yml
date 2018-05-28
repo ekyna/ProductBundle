@@ -151,6 +151,7 @@ ekyna_product:
             new: Nouveau catalogue
             edit: Modifier le catalogue
             remove: Supprimer le catalogue
+            render: Générer un rendu
         field:
             template: Gabarit
             pages: Pages
@@ -161,8 +162,9 @@ ekyna_product:
         theme:
             default: Par défault
         template:
-            full: Produit pleine page
-            half: 2 produits
+            full: Article pleine page
+            half: Un article en haut, un article en bas
+            half_dual: Un article en haut, deux articles en bas
         alert:
             no_item: Aucun catalogue configuré
 

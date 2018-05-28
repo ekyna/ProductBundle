@@ -1,36 +1,22 @@
 {% extends theme %}
 
+{% import '@EkynaProduct/Catalog/Template/macros.html.twig' as macros %}
+
 {% block content -%}
 {% set product = (page.slots|first).product %}
 <div class="product full">
-    <h1>
-        <span class="brand">{{ product.brand.title }}</span><br>
-        {{ product.fullTitle }}
-    </h1>
-    <div class="row">
-        <div class="col-xs-8">
-            {% set image = product.images|first %}
-            <img src="{{ absolute_url(image.path|imagine_filter('media_front')) }}" alt="{{ image.title }}"
-                 class="img-responsive" width="800" height="600">
+    <div class="inner">
+        {{ macros.title(catalog, product) }}
+        <div class="row">
+            <div class="col-xs-8">
+                {{ macros.image(catalog, product) }}
+            </div>
+            <div class="col-xs-4">
+                {{ macros.infos(catalog, product) }}
+                {{ macros.grid(catalog, product) }}
+            </div>
         </div>
-        <div class="col-xs-4">
-            <p>
-                <span class="field">{{ 'ekyna_core.field.reference'|trans }}</span>&nbsp;
-                <span class="reference">{{ product.reference }}</span>
-                {% if catalog.displayPrices -%}
-                <br><span class="price">{{ product|product_price(null, false) }}</span>
-                {%- endif %}
-            </p>
-            <p>
-                <a href="{{ product|subject_public_url(false) }}" class="btn btn-primary">
-                    Voir sur le site
-                </a>
-            </p>
-            {% if catalog.displayPrices -%}
-            {{ product|product_discount_grid(null, 'grid') }}
-            {%- endif %}
-        </div>
+        <div class="description">{{ product.description|raw }}</div>
     </div>
-    {{ product.description|raw }}
 </div>
 {% endblock content -%}

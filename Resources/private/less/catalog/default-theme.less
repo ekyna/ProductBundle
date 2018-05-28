@@ -25,6 +25,7 @@
 @default-padding: 0.6cm * @ratio;
 @header-height: 3cm * @ratio;
 @footer-height: 1.5cm * @ratio;
+@theme-color: #ddd;
 
 .page {
     padding-top: @header-height;
@@ -35,7 +36,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    background: #ddd;
+    background: @theme-color;
     color: @text-color;
     padding: @default-padding;
 }
@@ -53,6 +54,11 @@
             width: auto;
         }
     }
+
+    > p {
+        float:right;
+        font-size: floor((@font-size-base * 1.2));
+    }
 }
 
 .footer {
@@ -61,7 +67,15 @@
 }
 
 .product {
-    padding: @default-padding;
+    padding: 0 @default-padding;
+
+    .inner {
+        padding: @default-padding 0;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
 
     .brand {
         color: @gray;
@@ -79,6 +93,10 @@
 
     }
 
+    .description {
+        margin-top: floor((@font-size-base * 1.2));
+    }
+
     .grid {
         th, td {
             font-size: floor((@font-size-base * .93));
@@ -86,6 +104,7 @@
 
         caption {
             padding-top: 0;
+            text-align: center;
         }
     }
 
@@ -126,7 +145,7 @@
         }
 
         &:first-child {
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid @theme-color;
         }
 
         > img {
@@ -144,6 +163,42 @@
             > img {
                 float: right;
                 margin: 0 0 @default-padding @default-padding;
+            }
+        }
+    }
+
+    &.dual {
+        height: (@height - @header-height - @footer-height) / 2;
+        overflow: hidden;
+
+        > div > div:first-child {
+            border-right: 1px solid @theme-color;
+
+            > .inner {
+                padding-right: @default-padding/2;
+            }
+        }
+
+        > div > div:last-child > .inner {
+            padding-left: @default-padding/2;
+        }
+
+        h1 {
+            font-size: floor((@font-size-base * 1.8));
+            margin-bottom: floor((@font-size-base * 1.8));
+        }
+
+        p {
+            font-size: floor((@font-size-base * 1.2));
+            margin-bottom: floor((@font-size-base * 1.2));
+        }
+
+        p.image {
+            max-height: 5.4cm * @ratio;
+            > img {
+                height: 5.4cm * @ratio;
+                width: auto;
+                margin: 0 auto;
             }
         }
     }
