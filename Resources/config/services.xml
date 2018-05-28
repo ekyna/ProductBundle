@@ -607,6 +607,7 @@
         </service>
         <service id="ekyna_product.catalog.renderer"
                  class="Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
             <argument type="service" id="templating"/>
             <argument type="service" id="knp_snappy.pdf"/>
             <argument>%ekyna_commerce.company_logo%</argument>

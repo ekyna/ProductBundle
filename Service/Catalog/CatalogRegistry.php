@@ -167,6 +167,7 @@ class CatalogRegistry
         return [
             'default' => [
                 'label' => 'ekyna_product.catalog.theme.default',
+                'path'  => '@EkynaProduct/Catalog/Theme/default.html.twig',
                 'css'   => 'bundles/ekynaproduct/css/catalog/default-theme.css',
             ],
         ];

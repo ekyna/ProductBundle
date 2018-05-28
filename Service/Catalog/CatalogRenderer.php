@@ -23,6 +23,11 @@ class CatalogRenderer
     const FORMAT_EMAIL = 'EMail';
 
     /**
+     * @var CatalogRegistry
+     */
+    protected $registry;
+
+    /**
      * @var EngineInterface
      */
     protected $templating;
@@ -46,17 +51,20 @@ class CatalogRenderer
     /**
      * Constructor.
      *
+     * @param CatalogRegistry $registry
      * @param EngineInterface    $templating
      * @param GeneratorInterface $pdfGenerator
      * @param string             $logoPath
      * @param bool               $debug
      */
     public function __construct(
+        CatalogRegistry $registry,
         EngineInterface $templating,
         GeneratorInterface $pdfGenerator,
         $logoPath,
         $debug = false
     ) {
+        $this->registry = $registry;
         $this->templating = $templating;
         $this->pdfGenerator = $pdfGenerator;
         $this->logoPath = $logoPath;
@@ -73,11 +81,12 @@ class CatalogRenderer
     public function render(Catalog $catalog)
     {
         $template = 'render';
+        $theme = $this->registry->getTheme($catalog->getTheme())['path'];
         // TODO $template = $catalog->getFormat() === static::FORMAT_EMAIL ? 'email' : 'render';
 
         $content = $this->templating->render('@EkynaProduct/Catalog/render.html.twig', [
             'catalog'   => $catalog,
-            'theme'     => '@EkynaProduct/Catalog/Theme/Default.html.twig',
+            'theme'     => $theme,
             'template'  => $template,
             'logo_path' => $this->logoPath,
         ]);

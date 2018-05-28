@@ -88,6 +88,7 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('label')->isRequired()->cannotBeEmpty()->end()
                                     ->scalarNode('css')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('path')->isRequired()->cannotBeEmpty()->end()
                                 ->end()
                             ->end()
                             ->defaultValue(CatalogRegistry::getDefaultThemes())

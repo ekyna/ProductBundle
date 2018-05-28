@@ -13,8 +13,6 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
                 $slots = $page.find('div.catalog-page-slots'),
                 xhr = null;
 
-            console.log('Catalog page form', $template.length, $slots.length);
-
             if (!(1 === $template.length && 1 === $slots.length)) {
                 throw 'Unexpected form composition';
             }
