@@ -60,6 +60,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             'net_price'   => (float)$product->getNetPrice(),
             'stock_state' => $product->getStockState(),
             'visible'     => $product->isVisible(),
+            'tax_group'   => $product->getTaxGroup()->getId(),
         ], $data);
 
         if (in_array('Default', $groups)) {

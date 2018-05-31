@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Form;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
-use Braincrafted\Bundle\BootstrapBundle\Form\Type\MoneyType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
@@ -49,24 +48,17 @@ class ProductFormBuilder
      */
     private $product;
 
-    /**
-     * @var string
-     */
-    private $defaultCurrency;
-
 
     /**
      * Constructor.
      *
      * @param string $productClass
      * @param string $mediaClass
-     * @param string $defaultCurrency
      */
-    public function __construct($productClass, $mediaClass, $defaultCurrency)
+    public function __construct($productClass, $mediaClass)
     {
         $this->productClass = $productClass;
         $this->mediaClass = $mediaClass;
-        $this->defaultCurrency = $defaultCurrency;
     }
 
     /**
@@ -330,11 +322,10 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'    => 'ekyna_product.product.field.net_price',
-            'currency' => $this->defaultCurrency,
-            'required' => false,
+            'required' => true,
         ], $options);
 
-        $this->form->add('netPrice', MoneyType::class, $options);
+        $this->form->add('netPrice', CO\Pricing\PriceType::class, $options);
 
         return $this;
     }
@@ -470,9 +461,9 @@ class ProductFormBuilder
      */
     public function addTaxGroupField(array $options = [])
     {
-        $options = array_replace([
+        /*$options = array_replace([
             'allow_new' => true,
-        ], $options);
+        ], $options);*/
 
         $this->form->add('taxGroup', CO\Pricing\TaxGroupChoiceType::class, $options);
 

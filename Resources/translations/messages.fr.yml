@@ -270,6 +270,7 @@ ekyna_product:
             plural: Règle de tarification
         field:
             min_quantity: Qte. Min.
+            percent: Pourcentage
             from: à partir de %min%
             range: de %min% à %max%
             discount: Remise

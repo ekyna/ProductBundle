@@ -58,22 +58,22 @@
         <div class="tab-pane" id="product-pricing">
             {% block pricing_content %}
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
-                </div>
-            </div>
-            <div class="row">
                 <div class="col-md-4">
-                    {{ form_row(form.netPrice, {'label_col': 6, 'widget_col': 6}) }}
+                    {{ form_row(form.reference, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.unit, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
                 <div class="col-md-4">
                     {{ form_row(form.weight, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-4">
-                    {{ form_row(form.unit, {'label_col': 6, 'widget_col': 6}) }}
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
             </div>
             <div class="row">

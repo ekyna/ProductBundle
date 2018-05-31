@@ -78,6 +78,7 @@
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
             <argument type="service" id="ekyna_product.product.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
+            <argument type="service" id="ekyna_commerce.pricing.tax_resolver"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.inventory_resupply.form_type"
@@ -303,7 +304,6 @@
                  class="%ekyna_product.product.form_type.builder.class%">
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
-            <argument>%ekyna_commerce.default.currency%</argument>
         </service>
 
         <!-- Product form types -->

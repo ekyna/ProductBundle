@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -29,17 +30,27 @@ class QuickEditType extends AbstractType
      */
     private $stockBuilder;
 
+    /**
+     * @var TaxResolverInterface
+     */
+    private $taxResolver;
+
 
     /**
      * Constructor.
      *
      * @param ProductFormBuilder $productBuilder
      * @param StockSubjectFormBuilder $stockBuilder
+     * @param TaxResolverInterface $taxResolver
      */
-    public function __construct(ProductFormBuilder $productBuilder, StockSubjectFormBuilder $stockBuilder)
-    {
+    public function __construct(
+        ProductFormBuilder $productBuilder,
+        StockSubjectFormBuilder $stockBuilder,
+        TaxResolverInterface $taxResolver
+    ) {
         $this->productBuilder = $productBuilder;
         $this->stockBuilder = $stockBuilder;
+        $this->taxResolver = $taxResolver;
     }
 
     /**
@@ -55,8 +66,16 @@ class QuickEditType extends AbstractType
             $this->productBuilder->initialize($product, $form);
             $this->stockBuilder->initialize($form);
 
+            $rates = [];
+            $taxes = $this->taxResolver->resolveTaxes($product);
+            foreach ($taxes as $tax) {
+                $rates[] = $tax->getRate() / 100;
+            }
+
             $this->productBuilder
-                ->addNetPriceField()
+                ->addNetPriceField([
+                    'rates' => $rates,
+                ])
                 ->addWeightField();
 
             $this->stockBuilder

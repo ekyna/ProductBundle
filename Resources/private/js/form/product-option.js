@@ -1,46 +1,114 @@
-define(['jquery'], function($) {
+define(['jquery', 'jquery-ui/widget', 'select2', 'ekyna-commerce/form/price'], function ($) {
     "use strict";
 
-    /**
-     * Option widget
-     */
-    $.fn.optionWidget = function() {
+    $.widget('ekyna_product.optionType', {
+        _create: function () {
+            this.$mode = this.element.find('div.option-mode input[type="radio"]');
+            this.$price = this.element.find('div.commerce-price');
+            this.$product = this.element.find('> .option-product > select.entity-search');
+            this.$taxGroup = this.element.find('> .option-data > .tax-group-choice');
 
-        this.each(function() {
+            this.$productWrapper = this.element.find('> .option-product');
+            this.$dataWrapper = this.element.find('> .option-data');
 
-            var $form = $(this),
-                $mode = $form.find('div.option-mode input[type="radio"]');
-
-            function onChange() {
-                var mode = $mode.filter(':checked').val();
-
-                $form.find('.option-wrapper').hide();
-                $form.find('.option-' + mode).show();
+            if (
+                2 !== this.$mode.length ||
+                1 !== this.$price.length ||
+                1 !== this.$product.length ||
+                1 !== this.$taxGroup.length
+            ) {
+                throw 'Missing product option type fields';
             }
 
-            $mode.on('change', onChange);
+            this._on(this.$mode, {'change': this._onModeChange});
 
-            onChange();
-        });
+            this._onModeChange();
+        },
+        _destroy: function () {
+            this._off(this.$mode, 'change');
+            this._off(this.$product, 'change');
+            this._off(this.$taxGroup, 'change');
 
-        return this;
-    };
+            this.$mode = undefined;
+            this.$product = undefined;
+            this.$taxGroup = undefined;
+        },
+        _onModeChange: function () {
+            this.$dataWrapper.hide();
+            this.$productWrapper.hide();
+
+            this._off(this.$taxGroup, 'change');
+            this._off(this.$product, 'change');
+
+            var mode = this.$mode.filter(':checked').val();
+            if (mode === 'product') {
+                this._on(this.$product, {'change': this._onProductChange});
+                this._onProductChange();
+                this.$productWrapper.show();
+            } else if (mode === 'data') {
+                this._on(this.$taxGroup, {'change': this._onTaxGroupChange});
+                this._onTaxGroupChange();
+                this.$dataWrapper.show();
+            }
+        },
+        _onProductChange: function () {
+            var id = null,
+                data = this.$product.select2('data');
+            if (data && data[0]) {
+                if (data[0].tax_group) {
+                    id = data[0].tax_group;
+                } else {
+                    var entity = $(data[0].element).data('entity');
+                    if (entity && entity.tax_group) {
+                        id = entity.tax_group;
+                    }
+                }
+            }
+
+            this.$price.priceType('option', 'taxes', this._getTaxes(id));
+        },
+        _onTaxGroupChange: function () {
+            this.$price.priceType('option', 'taxes', this._getTaxes(this.$taxGroup.val()));
+        },
+        _getTaxes: function (id) {
+            if (!id) {
+                return [];
+            }
+
+            var taxes = [],
+                data = this.$taxGroup.find('option[value="' + id + '"]').data('taxes');
+
+            if (data) {
+                $.each(data, function (index, value) {
+                    taxes.push(value.rate);
+                });
+            }
+
+            return taxes;
+        },
+        save: function () {
+            var mode = this.$mode.filter(':checked').val();
+            if (mode === 'data') {
+                this.$product.val(undefined).find('option:selected').prop('selected', false);
+            } else if (mode === 'product') {
+                this.$dataWrapper.find('input, select').val(undefined);
+            }
+        }
+    });
 
     return {
-        init: function($element) {
-            $element.optionWidget();
+        init: function ($element) {
+            $element.optionType();
         },
-        save: function($element) {
-            $element.each(function() {
-                var $form = $(this),
-                    $mode = $form.find('div.option-mode input[type="radio"]'),
-                    $product = $form.find('select.entity-search');
-
-                var mode = $mode.filter(':checked').val();
-                if (mode === 'data') {
-                    $product.val(undefined).find('option:selected').prop('selected', false);
-                }
-            });
+        save: function ($element) {
+            if ($element.data('ekyna_product.optionType')) {
+                $element.optionType('save');
+            }
+        },
+        destroy: function ($element) {
+            if ($element.data('ekyna_product.optionType')) {
+                $element.optionType('destroy');
+            }
         }
     };
 });

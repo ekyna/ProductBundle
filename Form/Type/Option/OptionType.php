@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Option;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\TaxGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
@@ -74,14 +75,9 @@ class OptionType extends ResourceFormType
                     'input_group' => ['append' => 'kg'],
                 ],
             ])
-            ->add('netPrice', Type\NumberType::class, [
+            ->add('netPrice', PriceType::class, [
                 'label'    => 'ekyna_product.product.field.net_price',
                 'required' => false,
-                'scale'    => 5,
-                'attr'     => [
-                    'placeholder' => 'ekyna_product.product.field.net_price',
-                    'input_group' => ['append' => '€'],
-                ],
             ])
             ->add('taxGroup', TaxGroupChoiceType::class, [
                 'select2'  => false,
