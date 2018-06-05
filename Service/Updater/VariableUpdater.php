@@ -246,4 +246,37 @@ class VariableUpdater
 
         return $changed;
     }
+
+    /**
+     * Updates the variable visibility.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return bool
+     */
+    public function updateVisibility(Model\ProductInterface $variable)
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $changed = false;
+
+        $hasVisibleVariant = false;
+
+        foreach ($variable->getVariants() as $variant) {
+            if ($variant->isVisible()) {
+                $hasVisibleVariant = true;
+                break;
+            }
+        }
+
+        if ($hasVisibleVariant && !$variable->isVisible()) {
+            $variable->setVisible(true);
+            $changed = true;
+        } elseif (!$hasVisibleVariant && $variable->isVisible()) {
+            $variable->setVisible(false);
+            $changed = true;
+        }
+
+        return $changed;
+    }
 }

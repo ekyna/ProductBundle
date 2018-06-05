@@ -120,7 +120,7 @@ class ProductFilter implements ProductFilterInterface
 
         $variants = [];
         foreach ($product->getVariants() as $variant) {
-            if ($this->isProductAvailable($variant)) {
+            if ($variant->isVisible() && $this->isProductAvailable($variant)) {
                 $variants[] = $variant;
             }
         }

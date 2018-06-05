@@ -1,7 +1,6 @@
 define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], function ($, Templates) {
     "use strict";
 
-
     var toggleDisabled = function ($element, disabled) {
         $element
             .prop('disabled', disabled)
@@ -1284,86 +1283,6 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
             this.$availability.html(availability.display());
         },
-
-        // updateAvailability: function () {
-        //     /*if (0 === this.$availabilityMessage.size()) {
-        //         return;
-        //     }*/
-        //
-        //     this.$availability.empty();
-        //     this.$quantity.closest('.form-group').removeClass('has-error');
-        //
-        //     if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-        //         this.$submitButton.prop('disabled', false);
-        //     }
-        //
-        //     // TODO let variant display is own availabitily
-        //     var config = this.config;
-        //     if (this.variant && this.variant.hasVariant()) {
-        //         config = this.variant.getVariant();
-        //     }
-        //
-        //     if (null === config.availability) {
-        //         return;
-        //     }
-        //
-        //     config = $.extend({
-        //         o_msg: null,
-        //         min_qty: 0,
-        //         min_msg: null,
-        //         max_qty: 0,
-        //         max_msg: null,
-        //         a_qty: 0,
-        //         a_msg: null,
-        //         r_qty: 0,
-        //         r_msg: null
-        //     }, config.availability);
-        //
-        //     var min = parseFloat(config.min_qty),
-        //         max = config.max_qty === 'INF' ? Number.POSITIVE_INFINITY : parseFloat(config.max_qty),
-        //         error = false,
-        //         messages = [];
-        //
-        //     if (min > this.totalQuantity) {
-        //         messages.push(config.min_msg);
-        //         error = true;
-        //     } else if (max < this.totalQuantity) {
-        //         messages.push(config.max_msg);
-        //         error = true;
-        //     } else {
-        //         // TODO If parent, display availability like for option
-        //         if (this.parentItem) return;
-        //
-        //         if (config.a_msg) {
-        //             messages.push(config.a_msg);
-        //         }
-        //
-        //         if (this.totalQuantity > config.a_qty) {
-        //             if (config.r_msg) {
-        //                 messages.push(config.r_msg);
-        //                 if (this.totalQuantity > config.a_qty + config.r_qty) {
-        //                     messages.push(config.o_msg);
-        //                 }
-        //             } else {
-        //                 messages.push(config.o_msg);
-        //             }
-        //         }
-        //     }
-        //
-        //     if (0 === messages.length) {
-        //         messages.push(config.o_msg);
-        //     }
-        //
-        //     if (error) {
-        //         this.$quantity.closest('.form-group').addClass('has-error');
-        //
-        //         if (!this.parentItem && this.$submitButton && !this.config.privileged) {
-        //             this.$submitButton.prop('disabled', true);
-        //         }
-        //     }
-        //
-        //     this.$availability.html(messages.join('<br>'));
-        // },
 
         getConfig: function () {
             return this.config;

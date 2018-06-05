@@ -348,6 +348,7 @@
         <!-- Product table type -->
         <service id="ekyna_product.product.table_type"
                  class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType"><!-- TODO use parameter defined by config builder -->
+            <argument type="service" id="ekyna_commerce.subject_helper"/>
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.brand.class%</argument>
             <argument>%ekyna_product.category.class%</argument>

@@ -12,10 +12,12 @@ use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
 use Ekyna\Component\Table\Exception\InvalidArgumentException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
+use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Ekyna\Component\Table\Util\ColumnSort;
 use Symfony\Component\OptionsResolver\Options;
@@ -28,6 +30,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProductType extends ResourceTableType
 {
+    /**
+     * @var SubjectHelperInterface
+     */
+    protected $subjectHelper;
+
     /**
      * @var string
      */
@@ -50,12 +57,22 @@ class ProductType extends ResourceTableType
 
 
     /**
-     * @inheritDoc
+     * Constructor.
+     *
+     * @param SubjectHelperInterface $subjectHelper
+     * @param string                 $productClass
+     * @param string                 $brandClass
+     * @param string                 $categoryClass
+     * @param string                 $taxGroupClass
+     * @param string                 $tagClass
      */
-    public function __construct($productClass, $brandClass, $categoryClass, $taxGroupClass, $tagClass)
-    {
+    public function __construct(
+        SubjectHelperInterface $subjectHelper,
+        $productClass, $brandClass, $categoryClass, $taxGroupClass, $tagClass
+    ) {
         parent::__construct($productClass);
 
+        $this->subjectHelper = $subjectHelper;
         $this->brandClass = $brandClass;
         $this->categoryClass = $categoryClass;
         $this->taxGroupClass = $taxGroupClass;
@@ -173,7 +190,22 @@ class ProductType extends ResourceTableType
                 ]);
         }
 
-        $buttons = [];
+        $buttons = [
+            function (RowInterface $row) {
+                $product = $row->getData();
+
+                if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
+                    return [
+                        'label' => 'ekyna_core.button.show_front',
+                        'class' => 'primary',
+                        'icon'  => 'eye-open',
+                        'path'  => $path,
+                    ];
+                }
+
+                return null;
+            },
+        ];
         if ($variantMode) {
             $buttons = [
                 [
