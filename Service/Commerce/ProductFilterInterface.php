@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 
 /**
@@ -12,6 +13,13 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
  */
 interface ProductFilterInterface
 {
+    /**
+     * Sets the context.
+     *
+     * @param ContextInterface $context
+     */
+    public function setContext(ContextInterface $context);
+
     /**
      * Returns whether the product is available.
      *
@@ -65,13 +73,4 @@ interface ProductFilterInterface
      * @return Model\OptionInterface[] The options
      */
     public function getGroupOptions(Model\OptionGroupInterface $group);
-
-    /**
-     * Sets the customer group.
-     *
-     * @param CustomerGroupInterface $group
-     *
-     * @return ProductFilterInterface
-     */
-    public function setCustomerGroup(CustomerGroupInterface $group = null);
 }

@@ -45,7 +45,7 @@ class VariableUpdater
             if ($variant->getPosition() != $position || (null === $variant->getPosition() && $position === 0)) {
                 $variant->setPosition($position);
 
-                if ($helper) {
+                if ($helper && !$helper->isScheduledForRemove($variant)) {
                     $helper->persistAndRecompute($variant);
                 }
 
@@ -84,12 +84,21 @@ class VariableUpdater
         $minPrice = null;
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
         foreach ($variants as $variant) {
-            if (null === $minPrice || $minPrice > $variant->getNetPrice()) {
-                $minPrice = $variant->getNetPrice();
+            if (!$variant->isVisible()) {
+                continue;
+            }
+            if (0 < $price = $variant->getNetPrice()) {
+                if (is_null($minPrice) || $minPrice > $price) {
+                    $minPrice = $price;
+                }
             }
         }
 
-        if (null !== $minPrice && 0 !== bccomp($variable->getNetPrice(), $minPrice, 5)) {
+        if (is_null($minPrice)) {
+            $minPrice = 0;
+        }
+
+        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $minPrice, 5)) {
             $variable->setNetPrice($minPrice);
 
             return true;

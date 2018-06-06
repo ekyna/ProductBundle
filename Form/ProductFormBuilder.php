@@ -322,7 +322,7 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'    => 'ekyna_product.product.field.net_price',
-            'required' => true,
+            'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);
 
         $this->form->add('netPrice', CO\Pricing\PriceType::class, $options);

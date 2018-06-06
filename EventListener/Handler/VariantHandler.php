@@ -47,7 +47,10 @@ class VariantHandler extends AbstractVariantHandler
 
             $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
 
-            if ($this->getVariableUpdater()->updateVisibility($variable)) {
+            $variableChanged = $this->getVariableUpdater()->updateVisibility($variable);
+            $variableChanged |= $this->getVariableUpdater()->updateMinPrice($variable);
+
+            if ($variableChanged) {
                 $this->persistenceHelper->persistAndRecompute($variable);
             }
         }
@@ -80,11 +83,6 @@ class VariantHandler extends AbstractVariantHandler
             if ($this->persistenceHelper->isChanged($variant, 'position')) {
                 $this->getVariableUpdater()->indexVariantsPositions($variable, $this->persistenceHelper);
             }
-            if ($this->persistenceHelper->isChanged($variant, 'visible')) {
-                if ($this->getVariableUpdater()->updateVisibility($variable)) {
-                    $this->persistenceHelper->persistAndRecompute($variable);
-                }
-            }
         }
 
         return $changed;
@@ -106,8 +104,10 @@ class VariantHandler extends AbstractVariantHandler
             if (!$this->persistenceHelper->isScheduledForRemove($variable)) {
                 $variableUpdater->indexVariantsPositions($variable, $this->persistenceHelper);
 
+                $variant->setVisible(false);
                 $changed = $variableUpdater->updateAvailability($variable);
                 $changed |= $variableUpdater->updateVisibility($variable);
+                $changed |= $variableUpdater->updateMinPrice($variable);
 
                 if ($changed) {
                     $this->persistenceHelper->persistAndRecompute($variable);

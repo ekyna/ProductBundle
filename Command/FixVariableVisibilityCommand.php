@@ -11,11 +11,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class VariantFixPositionCommand
+ * Class FixVariableVisibilityCommand
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariantFixPositionCommand extends ContainerAwareCommand
+class FixVariableVisibilityCommand extends ContainerAwareCommand
 {
     /**
      * @inheritDoc
@@ -23,9 +23,9 @@ class VariantFixPositionCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:variant:fix_position')
-            ->setDescription('Fixes the variants positions')
-            ->addArgument('variableId', InputArgument::OPTIONAL, 'The variable product identifier which variants will be fixed.');
+            ->setName('ekyna:product:variable:fix_visibility')
+            ->setDescription('Fixes the variables visibility')
+            ->addArgument('variableId', InputArgument::OPTIONAL, 'The variable product identifier to fix the visibility of.');
     }
 
     /**
@@ -59,7 +59,7 @@ class VariantFixPositionCommand extends ContainerAwareCommand
                 $name,
                 str_pad('.', 80 - mb_strlen($name), '.', STR_PAD_LEFT)
             ));
-            if (!$updater->indexVariantsPositions($variable)) {
+            if (!$updater->updateVisibility($variable)) {
                 $output->writeln('<comment>passed</comment>');
                 continue;
             }

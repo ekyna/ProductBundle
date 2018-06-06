@@ -146,13 +146,15 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        if ($this->getVariableUpdater()->updateAvailability($variable)) {
-            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
+        $changed = $this->getVariableUpdater()->updateAvailability($variable);
+        $changed |= $this->getVariableUpdater()->updateMinPrice($variable);
+        $changed |= $this->getVariableUpdater()->updateVisibility($variable);
 
-            return true;
+        if ($changed) {
+            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
         }
 
-        return false;
+        return $changed;
     }
 
     /**

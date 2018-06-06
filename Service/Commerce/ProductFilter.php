@@ -3,8 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Commerce\Customer\Provider\CustomerProviderInterface;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 
 /**
  * Class ProductFilter
@@ -13,16 +12,6 @@ use Ekyna\Component\Commerce\Customer\Provider\CustomerProviderInterface;
  */
 class ProductFilter implements ProductFilterInterface
 {
-    /**
-     * @var CustomerProviderInterface
-     */
-    private $customerProvider;
-
-    /**
-     * @var CustomerGroupInterface
-     */
-    private $customerGroup;
-
     /**
      * @var array
      */
@@ -53,15 +42,26 @@ class ProductFilter implements ProductFilterInterface
      */
     private $optionCache;
 
+    /**
+     * @var ContextInterface
+     */
+    private $context;
+
 
     /**
      * Constructor.
-     *
-     * @param CustomerProviderInterface $customerProvider
      */
-    public function __construct(CustomerProviderInterface $customerProvider)
+    public function __construct()
     {
-        $this->customerProvider = $customerProvider;
+        $this->clearCache();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setContext(ContextInterface $context)
+    {
+        $this->context = $context;
 
         $this->clearCache();
     }
@@ -76,16 +76,20 @@ class ProductFilter implements ProductFilterInterface
         }
 
         $available = true;
-        if (!empty($customerGroups = $product->getCustomerGroups()->toArray())) {
-            $available = in_array($this->getCustomerGroup(), $customerGroups, true);
+
+        // Not available if customer group miss match and user is not admin.
+        if (!$this->context->isAdmin() && !empty($customerGroups = $product->getCustomerGroups()->toArray())) {
+            $available = in_array($this->context->getCustomerGroup(), $customerGroups, true);
         }
 
         if ($available) {
             if (Model\ProductTypes::TYPE_VARIABLE === $product->getType()) {
+                // Not available if a variable has no available variants
                 if (empty($this->getVariants($product))) {
                     $available = false;
                 }
             } elseif (Model\ProductTypes::isBundled($product->getType())) {
+                // Not available if a required bundle slot has no available choices
                 foreach ($product->getBundleSlots() as $bundleSlot) {
                     if ($bundleSlot->isRequired() && empty($this->getSlotChoices($bundleSlot))) {
                         $available = false;
@@ -96,6 +100,7 @@ class ProductFilter implements ProductFilterInterface
         }
 
         if ($available) {
+            // Not available if a required option group has no available choices
             foreach ($product->getOptionGroups() as $optionGroup) {
                 if ($optionGroup->isRequired() && empty($this->getGroupOptions($optionGroup))) {
                     $available = false;
@@ -120,8 +125,11 @@ class ProductFilter implements ProductFilterInterface
 
         $variants = [];
         foreach ($product->getVariants() as $variant) {
-            // TODO Filter visibility for non admin users
-            if (/*$variant->isVisible() && */$this->isProductAvailable($variant)) {
+            // Skip if variant is not visible and user is not admin
+            if (!$variant->isVisible() && !$this->context->isAdmin()) {
+                continue;
+            }
+            if ($this->isProductAvailable($variant)) {
                 $variants[] = $variant;
             }
         }
@@ -205,35 +213,6 @@ class ProductFilter implements ProductFilterInterface
         }
 
         return $this->optionCache[$group->getId()] = $options;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setCustomerGroup(CustomerGroupInterface $group = null)
-    {
-        if ($this->customerGroup !== $group) {
-            $this->clearCache();
-        }
-
-        $this->customerGroup = $group;
-
-        return $this;
-    }
-
-    /**
-     * Returns the customer group (of logged in customer or current sale).
-     *
-     * @return CustomerGroupInterface
-     */
-    protected function getCustomerGroup()
-    {
-        if (null === $this->customerGroup) {
-            // TODO We need the sale's customer group, not the logged in user's group
-            $this->setCustomerGroup($this->customerProvider->getCustomerGroup());
-        }
-
-        return $this->customerGroup;
     }
 
     /**

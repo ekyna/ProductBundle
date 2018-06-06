@@ -11,6 +11,7 @@ use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectModeType;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
+use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
@@ -271,7 +272,7 @@ class ProductType extends ResourceTableType
                     'label'    => 'ekyna_core.field.visible',
                     'position' => 30,
                 ])
-                ->addFilter('reference', CType\Filter\TextType::class, [
+                ->addFilter('reference', ProductReferenceType::class, [
                     'label'    => 'ekyna_core.field.reference',
                     'position' => 40,
                 ])

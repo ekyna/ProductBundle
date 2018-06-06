@@ -74,11 +74,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         $item = $event->getItem();
 
-        $context = $this->contextProvider->getContext($item->getSale()); // TODO fallback / admin_mode
+        $context = $this->contextProvider->getContext($item->getSale());
 
         $this->formBuilder->setContext($context);
 
-        $this->itemBuilder->getFilter()->setCustomerGroup($context->getCustomerGroup());
+        $this->itemBuilder->getFilter()->setContext($context);
         $this->itemBuilder->initialize($item);
 
         $item->setPrivate(false); // Root items can't be private.
