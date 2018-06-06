@@ -120,7 +120,8 @@ class ProductFilter implements ProductFilterInterface
 
         $variants = [];
         foreach ($product->getVariants() as $variant) {
-            if ($variant->isVisible() && $this->isProductAvailable($variant)) {
+            // TODO Filter visibility for non admin users
+            if (/*$variant->isVisible() && */$this->isProductAvailable($variant)) {
                 $variants[] = $variant;
             }
         }
@@ -228,6 +229,7 @@ class ProductFilter implements ProductFilterInterface
     protected function getCustomerGroup()
     {
         if (null === $this->customerGroup) {
+            // TODO We need the sale's customer group, not the logged in user's group
             $this->setCustomerGroup($this->customerProvider->getCustomerGroup());
         }
 
