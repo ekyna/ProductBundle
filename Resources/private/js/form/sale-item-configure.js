@@ -44,7 +44,7 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         if (discounted) {
             if (Array.isArray(this.discounts)) {
                 discount = this.discounts.find(function (d) {
-                    return d.quantity < quantity;
+                    return d.quantity <= quantity;
                 });
             }
             if (discount) {

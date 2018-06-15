@@ -270,6 +270,14 @@ class PriceCalculator
             $currency = $context->getCurrency()->getCode();
             $price = $product->getNetPrice();
 
+            if ($context->isAtiDisplayMode()) {
+                if (!empty($rates = $this->getTaxesRates($product, $context))) {
+                    foreach ($rates as $rate) {
+                        $price *= 1 + $rate / 100;
+                    }
+                }
+            }
+
             $config['currency'] = $currency;
 
             if ($currency !== $this->defaultCurrency) {
