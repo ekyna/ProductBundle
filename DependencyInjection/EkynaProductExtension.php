@@ -26,6 +26,11 @@ class EkynaProductExtension extends AbstractExtension
         $cartSuccessListener = $container->getDefinition('ekyna_product.add_to_cart.event_subscriber');
         $cartSuccessListener->replaceArgument(1, $config['default']['cart_success_template']);
 
+        $editor = $config['editor'];
+        foreach ($editor as $plugin => $c) {
+            $container->setParameter('ekyna_product.editor.' . $plugin, $c);
+        }
+
         $pricingRenderer = $container->getDefinition('ekyna_product.pricing.renderer');
         $pricingRenderer->replaceArgument(5, $config['pricing']);
 

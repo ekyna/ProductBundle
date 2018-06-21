@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Twig;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -37,6 +38,11 @@ class ProductExtension extends \Twig_Extension
     private $localeProvider;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
+
+    /**
      * @var string
      */
     private $defaultImage;
@@ -49,6 +55,7 @@ class ProductExtension extends \Twig_Extension
      * @param PriceRenderer                  $priceRenderer
      * @param AttributeTypeRegistryInterface $attributeTypeRegistry
      * @param LocaleProviderInterface        $localeProvider
+     * @param ProductRepositoryInterface     $productRepository
      * @param string                         $defaultImage
      */
     public function __construct(
@@ -56,12 +63,14 @@ class ProductExtension extends \Twig_Extension
         PriceRenderer $priceRenderer,
         AttributeTypeRegistryInterface $attributeTypeRegistry,
         LocaleProviderInterface $localeProvider,
+        ProductRepositoryInterface $productRepository,
         $defaultImage = '/bundles/ekynaproduct/img/no-image.gif'
     ) {
         $this->constantHelper = $constantHelper;
         $this->priceRenderer = $priceRenderer;
         $this->attributeTypeRegistry = $attributeTypeRegistry;
         $this->localeProvider = $localeProvider;
+        $this->productRepository = $productRepository;
         $this->defaultImage = $defaultImage;
     }
 
@@ -145,6 +154,14 @@ class ProductExtension extends \Twig_Extension
             new \Twig_SimpleFunction(
                 'attribute_create_types',
                 [$this->attributeTypeRegistry, 'getChoices']
+            ),
+            new \Twig_SimpleFunction(
+                'get_product_by_id',
+                [$this->productRepository, 'findOneById']
+            ),
+            new \Twig_SimpleFunction(
+                'get_product_by_reference',
+                [$this->productRepository, 'findOneByReference']
             ),
         ];
     }

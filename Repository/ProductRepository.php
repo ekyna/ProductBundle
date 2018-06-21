@@ -101,7 +101,71 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findOneById($id)
     {
-        return $this->find($id);
+        $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb)
+            ->joinSeo($qb);
+
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $qb
+            ->andWhere($qb->expr()->eq($as . '.id', ':id'))
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            ->setParameters([
+                'id'               => $id,
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+            ])
+            ->getOneOrNullResult();
+
+        $this->loadAssociations($product);
+
+        return $product;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findOneByReference($reference)
+    {
+        $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb)
+            ->joinSeo($qb);
+
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $qb
+            ->andWhere($qb->expr()->eq($as . '.reference', ':reference'))
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            ->setParameters([
+                'reference'        => $reference,
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+            ])
+            ->getOneOrNullResult();
+
+        $this->loadAssociations($product);
+
+        return $product;
     }
 
     /**

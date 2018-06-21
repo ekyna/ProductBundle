@@ -2,9 +2,9 @@
 <doctrine-mapping
         xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
         xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+    <!--xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"-->
 
     <entity name="Ekyna\Bundle\ProductBundle\Entity\CatalogPage"
             table="product_catalog_page">
@@ -14,7 +14,7 @@
         </id>
 
         <field name="number" type="integer" column="number">
-            <gedmo:sortable-position />
+            <!--<gedmo:sortable-position />-->
         </field>
 
         <field name="template" column="template" type="string" length="64"/>
@@ -33,7 +33,7 @@
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Entity\Catalog" field="catalog" inversed-by="pages">
             <join-column name="catalog_id" referenced-column-name="id" nullable="true" on-delete="CASCADE"/>
-            <gedmo:sortable-group />
+            <!--<gedmo:sortable-group />-->
         </many-to-one>
 
     </entity>

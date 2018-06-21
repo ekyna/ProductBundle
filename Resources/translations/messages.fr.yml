@@ -2,7 +2,9 @@ ekyna_product:
     menu: Catalogue
     leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
 
-    #common: TODO group translations (like visible)
+    # TODO group translations (like visible)
+    common:
+        read_more: En savoir plus
 
     email:
         stock_report:

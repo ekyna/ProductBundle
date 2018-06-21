@@ -1,0 +1,28 @@
+{% spaceless %}
+<div class="slides">
+    <a href="javascript: void(0)" class="prev-slide"></a>
+    <a href="javascript: void(0)" class="next-slide"></a>
+    {% for product in products %}
+    {% set image = product.images(true, 1)|first %}
+    {% if image %}
+    <div class="slide{% if loop.first %} first{% endif %}">
+        {% set url = product|subject_public_url %}
+        <a href="{{ url }}">
+            <img src="{{ image.path|imagine_filter('media_front') }}" align="{{ image.title }}">
+        </a>
+        <div>
+            <p>
+                <strong>{{ product.brand.title }}</strong>
+                {{ product.fullTitle }}
+            </p>
+            <p>
+                <a href="{{ url }}">
+                    {{- 'ekyna_product.common.read_more'|trans -}}
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endspaceless %}

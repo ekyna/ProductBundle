@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('ekyna_product');
 
         $this->addDefaultSection($rootNode);
+        $this->addEditorSection($rootNode);
         $this->addPoolsSection($rootNode);
 
         return $treeBuilder;
@@ -104,6 +105,33 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->defaultValue(CatalogRegistry::getDefaultTemplates())
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds `editor` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addEditorSection(ArrayNodeDefinition $node)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        $node
+            ->children()
+                ->arrayNode('editor')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('slide')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('template')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('@EkynaProduct/Editor/Block/product_slide.html.twig')
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

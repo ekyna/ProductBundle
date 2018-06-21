@@ -36,7 +36,7 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function getUpdateDateBySlug($slug, $visible = true, array $types = null);
 
     /**
-     * Finds the product by id.
+     * Finds the product by id (if product is visible, as well as its brand and categories).
      *
      * @param int $id
      *
@@ -45,13 +45,22 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findOneById($id);
 
     /**
-     * Finds the product by slug.
+     * Finds the product by slug (if product is visible, as well as its brand and categories).
      *
      * @param string $slug
      *
      * @return Model\ProductInterface|null
      */
     public function findOneBySlug($slug);
+
+    /**
+     * Finds the product by reference (if product is visible, as well as its brand and categories).
+     *
+     * @param string $slug
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findOneByReference($slug);
 
     /**
      * Finds products by brand.

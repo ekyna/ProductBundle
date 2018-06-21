@@ -5,11 +5,11 @@ module.exports = {
         'clean:product_less'
     ],
     'build:product_js': [
-       // 'ts:product',
-       // 'uglify:product_ts',
+       'ts:product',
+       'uglify:product_ts',
        'twig:product',
-       'uglify:product_js'
-       // 'clean:product_ts'
+       'uglify:product_js',
+       'clean:product_ts'
     ],
     'build:product': [
         'clean:product_pre',

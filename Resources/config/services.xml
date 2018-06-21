@@ -337,6 +337,11 @@
             <argument>%ekyna_product.product.class%</argument>
             <tag name="form.type"/>
         </service>
+        <service id="ekyna_product.editor.block_plugin.product_slide.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Editor\ProductSlideBlockType">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <tag name="form.type"/>
+        </service>
 
         <!-- Product type column column type -->
         <service id="ekyna_product.product_type.column_type"
@@ -418,6 +423,7 @@
             <argument type="service" id="ekyna_product.pricing.renderer"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>
         </service>
@@ -578,6 +584,17 @@
             <tag name="form.type"/>
         </service>
 
+
+        <!-- CMS Editor plugins -->
+        <service id="ekyna_product.editor.block_plugin.product_thumb"
+                 class="Ekyna\Bundle\ProductBundle\Service\Editor\Block\ProductSlidePlugin"
+                 parent="ekyna_cms.editor.block_plugin.abstract"
+                 public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="templating"/>
+            <argument>%ekyna_product.editor.slide%</argument>
+            <tag name="ekyna_cms.editor.block_plugin"/>
+        </service>
 
         <!-- Search -->
         <!-- TODO Handle wide_search tag in \Ekyna\Bundle\ResourceBundle\Elastica\RepositoryManager
