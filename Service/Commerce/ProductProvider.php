@@ -105,7 +105,7 @@ class ProductProvider implements SubjectProviderInterface
             return $product;
         }
 
-        if (null === $product = $this->productRepository->findOneById($productId)) {
+        if (null === $product = $this->productRepository->find($productId)) {
             throw new SubjectException("Failed to resolve item subject.");
         }
 
