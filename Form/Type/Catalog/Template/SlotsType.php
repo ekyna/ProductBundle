@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SlotsType
@@ -42,6 +43,16 @@ class SlotsType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         FormUtil::addClass($view, 'catalog-page-slots');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'by_reference' => false,
+        ]);
     }
 
     /**

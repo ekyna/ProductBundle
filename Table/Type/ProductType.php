@@ -23,6 +23,7 @@ use Ekyna\Component\Table\TableBuilderInterface;
 use Ekyna\Component\Table\Util\ColumnSort;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class ProductType
@@ -35,6 +36,11 @@ class ProductType extends ResourceTableType
      * @var SubjectHelperInterface
      */
     protected $subjectHelper;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
+    protected $urlGenerator;
 
     /**
      * @var string
@@ -61,6 +67,7 @@ class ProductType extends ResourceTableType
      * Constructor.
      *
      * @param SubjectHelperInterface $subjectHelper
+     * @param UrlGeneratorInterface  $urlGenerator
      * @param string                 $productClass
      * @param string                 $brandClass
      * @param string                 $categoryClass
@@ -69,11 +76,13 @@ class ProductType extends ResourceTableType
      */
     public function __construct(
         SubjectHelperInterface $subjectHelper,
+        UrlGeneratorInterface $urlGenerator,
         $productClass, $brandClass, $categoryClass, $taxGroupClass, $tagClass
     ) {
         parent::__construct($productClass);
 
         $this->subjectHelper = $subjectHelper;
+        $this->urlGenerator = $urlGenerator;
         $this->brandClass = $brandClass;
         $this->categoryClass = $categoryClass;
         $this->taxGroupClass = $taxGroupClass;
@@ -197,10 +206,28 @@ class ProductType extends ResourceTableType
 
                 if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
                     return [
-                        'label' => 'ekyna_core.button.show_front',
-                        'class' => 'primary',
-                        'icon'  => 'eye-open',
-                        'path'  => $path,
+                        'label'  => 'ekyna_admin.resource.button.show_front',
+                        'class'  => 'default',
+                        'icon'   => 'eye-open',
+                        'target' => '_blank',
+                        'path'   => $path,
+                    ];
+                }
+
+                return null;
+            },
+            function (RowInterface $row) {
+                $product = $row->getData();
+
+                if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
+                    return [
+                        'label'  => 'ekyna_admin.resource.button.show_editor',
+                        'class'  => 'default',
+                        'icon'   => 'edit',
+                        'target' => '_blank',
+                        'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
+                            'path' => $path,
+                        ]),
                     ];
                 }
 

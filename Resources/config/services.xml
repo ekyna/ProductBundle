@@ -337,8 +337,8 @@
             <argument>%ekyna_product.product.class%</argument>
             <tag name="form.type"/>
         </service>
-        <service id="ekyna_product.editor.block_plugin.product_slide.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Editor\ProductSlideBlockType">
+        <service id="ekyna_product.editor.product_selection.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Editor\ProductSelectionType">
             <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="form.type"/>
         </service>
@@ -354,6 +354,7 @@
         <service id="ekyna_product.product.table_type"
                  class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType"><!-- TODO use parameter defined by config builder -->
             <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="router"/>
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.brand.class%</argument>
             <argument>%ekyna_product.category.class%</argument>

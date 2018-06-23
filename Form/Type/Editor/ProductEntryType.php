@@ -22,7 +22,13 @@ class ProductEntryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('product', ProductSearchType::class)
+            ->add('product', ProductSearchType::class, [
+                'label' => false,
+                'attr'  => [
+                    'label_col'  => 0,
+                    'widget_col' => 12,
+                ],
+            ])
             ->add('position', HiddenType::class, [
                 'attr' => [
                     'data-collection-role' => 'position',
@@ -35,6 +41,8 @@ class ProductEntryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class', ProductEntry::class);
+        $resolver->setDefaults([
+            'data_class' => ProductEntry::class,
+        ]);
     }
 }

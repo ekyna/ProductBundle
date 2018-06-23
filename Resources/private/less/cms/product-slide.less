@@ -1,170 +1,111 @@
 .product-slide {
     position: relative;
 
-    > .slides {
-        position: relative;
-        max-width: 100%;
-        width: 260px;
-        height: 260px;
+    > .wrap {
+        max-width: 400px;
+        width: 100%;
         margin: 0 auto;
 
-        > a {
-            bottom: 0;
-            display: block;
-            max-width: 10%;
-            position: absolute;
-            top: 0;
-            width: 100px;
-            z-index: 100;
-
-            &:before {
-                color: #404040;
-                display: inline-block;
-                font-family: monospace;
-                font-size: 40px;
-                height: 40px;
-                left: 50%;
-                line-height: 40px;
-                margin: -20px 0 0 -20px;
-                opacity: .33;
-                position: absolute;
-                text-align: center;
-                text-shadow: 0 2px 7px rgba(0, 0, 0, .33);
-                top: 50%;
-                transition: color .3s, opacity .3s;
-                width: 40px;
-            }
-
-            &:hover {
-                &:before {
-                    opacity: 1;
-                }
-            }
-
-            &.prev-slide {
-                left: 0;
-
-                &:before {
-                    content: "<";
-                }
-            }
-
-            &.next-slide {
-                right: 0;
-
-                &:before {
-                    content: ">";
-                }
-            }
-        }
-
-        > .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: none;
+        > .slides {
+            position: relative;
+            width: 100%;
+            padding-bottom: 80%;
 
             > a {
+                bottom: 0;
                 display: block;
                 position: absolute;
                 top: 0;
-                width: 100%;
-                height: auto;
+                width: 10%;
+                z-index: 100;
 
-                > img {
+                &:before {
+                    color: #404040;
+                    display: inline-block;
+                    font-family: monospace;
+                    font-size: 40px;
+                    height: 40px;
+                    left: 50%;
+                    line-height: 40px;
+                    margin: -20px 0 0 -20px;
+                    opacity: .33;
+                    position: absolute;
+                    text-align: center;
+                    text-shadow: 0 2px 7px rgba(0, 0, 0, .33);
+                    top: 50%;
+                    transition: color .3s, opacity .3s;
+                    width: 40px;
+                }
+
+                &:hover {
+                    &:before {
+                        opacity: 1;
+                    }
+                }
+
+                &.prev-slide {
+                    left: 0;
+
+                    &:before {
+                        content: "<";
+                    }
+                }
+
+                &.next-slide {
+                    right: 0;
+
+                    &:before {
+                        content: ">";
+                    }
+                }
+            }
+
+            > .slide {
+                position: absolute;
+                top: 0;
+                left: 10%;
+                right: 10%;
+                bottom: 0;
+                display: none;
+
+                > .slide-image {
+                    display: block;
+                    position: absolute;
+                    top: 0;
                     width: 100%;
                     height: auto;
-                }
-            }
 
-            > div {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                padding: 0 10%;
-
-                > p {
-                    font-size: 14px;
-                    line-height: 18px;
-
-                    > strong {
-                        display: block;
+                    > img {
+                        width: 100%;
+                        height: auto;
                     }
                 }
 
-                > p:last-child {
-                    text-align: center;
-                    margin-bottom: 0;
-                }
-            }
-
-            &.first {
-                display: block;
-            }
-        }
-    }
-}
-
-/** TODO Responsive min heights */
-@media (min-width: 768px) {
-    .product-slide {
-        position: relative;
-
-        > .slides {
-            width: 320px;
-            height: 320px;
-
-            > .slide {
                 > div {
-                    > p {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    padding: 10px 10%;
+
+                    > p.slide-caption {
+                        position: relative;
                         font-size: 16px;
-                        line-height: 22px;
+                        line-height: 20px;
+
+                        > strong {
+                            display: block;
+                        }
+                    }
+
+                    > p.slide-button {
+                        text-align: center;
+                        margin-bottom: 0;
                     }
                 }
-            }
-        }
-    }
-}
 
-@media (min-width: 992px) {
-    .product-slide {
-        position: relative;
-
-        > .slides {
-            width: 400px;
-            height: 400px;
-
-            > .slide {
-                > div {
-                    > p {
-                        font-size: 20px;
-                        line-height: 28px;
-                    }
-                }
-            }
-        }
-    }
-}
-
-@media (min-width: 1200px) {
-    .product-slide {
-        position: relative;
-
-        > .slides {
-            width: 500px;
-            height: 500px;
-
-            > .slide {
-                > div {
-                    padding: 0 15%;
-
-                    > p {
-                        font-size: 24px;
-                        line-height: 32px;
-                    }
+                &.first {
+                    display: block;
                 }
             }
         }
