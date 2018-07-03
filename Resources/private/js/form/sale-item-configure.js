@@ -1,4 +1,4 @@
-define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], function ($, Templates) {
+define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], function (require, $, Templates) {
     "use strict";
 
     var toggleDisabled = function ($element, disabled) {
@@ -1319,10 +1319,12 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
 
         var src = String($(this).attr('href'));
         if (src.length) {
-            $.fancybox.open({
-                src: src,
-                caption: $(this).attr('title'),
-                protect: true
+            require(['fancybox'], function() {
+                $.fancybox.open({
+                    src: src,
+                    caption: $(this).attr('title'),
+                    protect: true
+                });
             });
         }
 
@@ -1341,4 +1343,3 @@ define(['jquery', 'ekyna-product/templates', 'ekyna-number', 'fancybox'], functi
         }
     };
 });
-

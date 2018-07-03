@@ -1,47 +1,19 @@
-define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-ui'], function($, Dispatcher, StockUnits) {
+define(['require', 'jquery'], function(require, $) {
+    "use strict";
 
-    var $stockRefreshBtn = $('#stock-view-refresh'),
-        $stockView = $('#stock-view'),
-        stockXhr = null;
+    var EkynaProduct = function() {};
 
-    function refreshStock(skipUpdate) {
-        $stockView.loadingSpinner();
-
-        if (null !== stockXhr) {
-            stockXhr.abort();
-            stockXhr = null;
-        }
-
-        var url = $stockRefreshBtn.attr('href');
-
-        if (!!skipUpdate) {
-            url += '?no-update=1'
-        }
-
-        stockXhr = $.ajax({
-            url: url,
-            dataType: 'xml'
-        });
-
-        stockXhr.done(function(xml) {
-            var $view = $(xml).find('stockView');
-            if (1 === $view.size()) {
-                $stockView.html($view.text());
+    EkynaProduct.prototype = {
+        init: function() {
+            // Product slides
+            var $slides = $('.product-slide');
+            if (0 < $slides.length) {
+                require(['ekyna-product/cms/product-slide'], function(ProductSlide) {
+                    ProductSlide.init($slides);
+                })
             }
-        });
-    }
+        }
+    };
 
-    $stockRefreshBtn.on('click', function(e) {
-        e.preventDefault();
-
-        refreshStock();
-
-        return false;
-    });
-
-    Dispatcher.on('ekyna_commerce.stock_units.change', function() {
-        refreshStock(true);
-    });
-
-    new StockUnits('stock-units-view');
+    return new EkynaProduct;
 });
