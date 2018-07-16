@@ -109,9 +109,7 @@
             <tag name="ekyna_commerce.subject_provider"/>
         </service>
         <service id="ekyna_product.commerce.product_filter"
-                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductFilter">
-            <argument type="service" id="ekyna_commerce.customer.security_provider"/>
-        </service>
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductFilter"/>
         <service id="ekyna_product.commerce.item_builder"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder">
             <argument type="service" id="ekyna_product.commerce.subject_provider"/>
