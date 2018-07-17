@@ -261,19 +261,19 @@
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_adjustments">
-                <table class="table table-stripped table-condensed">
+                <table class="table table-stripped table-condensed table-hover">
                     <tr>
                         <th>{{ 'ekyna_core.field.designation'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.type'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.mode'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.amount'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.mode'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.amount'|trans }}</th>
                     </tr>
                     {% for adjustment in product.adjustments -%}
                         <tr>
                             <td>{{ adjustment.designation }}</td>
-                            <td>{{ adjustment.type|adjustment_type_label }}</td>
-                            <td>{{ adjustment.mode|adjustment_mode_label }}</td>
-                            <td>{{ adjustment.amount|localizedcurrency(commerce_default_currency) }}</td>
+                            <td class="text-right">{{ adjustment.type|adjustment_type_label }}</td>
+                            <td class="text-right">{{ adjustment.mode|adjustment_mode_label }}</td>
+                            <td class="text-right">{{ adjustment.amount|localizedcurrency(commerce_default_currency) }}</td>
                         </tr>
                         {# TODO translations ? #}
                     {% else %}
@@ -331,13 +331,13 @@
                         </div>
                         <div class="col-md-10">
                             <div class="show-widget">
-                                <table class="table table-stripped table-condensed">
+                                <table class="table table-stripped table-condensed table-hover">
                                     <tr>
                                         <th>{{ 'ekyna_core.field.designation'|trans }}</th>
                                         <th>{{ 'ekyna_core.field.reference'|trans }}</th>
-                                        <th>{{ 'ekyna_core.field.weight'|trans }}</th>
-                                        <th>{{ 'ekyna_core.field.price'|trans }}</th>
-                                        <th>{{ 'ekyna_core.field.group'|trans }}</th>
+                                        <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}</th>
+                                        <th class="text-right">{{ 'ekyna_core.field.price'|trans }}</th>
+                                        <th class="text-right">{{ 'ekyna_core.field.group'|trans }}</th>
                                     </tr>
                                     {% for option in group.options %}
                                     {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
@@ -355,17 +355,17 @@
                                         <td id="{{ optionId ~ 'reference' }}">
                                             {{- data.reference -}}
                                         </td>
-                                        <td id="{{ optionId ~ 'weight' }}">
+                                        <td id="{{ optionId ~ 'weight' }}" class="text-right">
                                             {{- data.weight|localizednumber }} kg
                                         </td>
-                                        <td id="{{ optionId ~ 'netPrice' }}">
+                                        <td id="{{ optionId ~ 'netPrice' }}" class="text-right">
                                         {%- if option.product and option.netPrice is same as(null) -%}
                                             {{- option.product.netPrice|localizedcurrency(commerce_default_currency) -}}
                                         {%- else -%}
                                             {{- option.netPrice|localizedcurrency(commerce_default_currency) -}}
                                         {%- endif -%}
                                         </td>
-                                        <td id="{{ optionId ~ 'taxGroup' }}">
+                                        <td id="{{ optionId ~ 'taxGroup' }}" class="text-right">
                                             {{- data.taxGroup -}}
                                         </td>
                                     </tr>
@@ -398,58 +398,61 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm">
             {%- if product is bundle_product -%}
-                <table class="table table-stripped table-condensed">
+                <table class="table table-stripped table-condensed table-hover">
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
-                        <th>{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.type'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.visible'|trans }}</th>
-                        <th>{{ 'ekyna_product.bundle_choice.field.hidden'|trans }}</th>
-                        <th>{{ 'ekyna_product.bundle_choice.field.use_options'|trans }}</th>
-                        <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
-                        <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.bundle_choice.field.hidden'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.bundle_choice.field.use_options'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.quantity'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                     </tr>
                     {%- for slot in product.bundleSlots -%}
-                    {%- set slotId = 'product_slots_' ~ loop.index0 ~ '_' -%}
+                    {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
                     <tr>
-                        <td id="{{ slotId ~ 'choice_0_product' }}">
+                        <td id="{{ slot_id ~ 'choice_0_product' }}">
                             {%- set choice = (slot.choices|first) -%}
-                            <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
-                                {{- choice.product -}}
+                            {%- set choice_product = choice.product -%}
+                            <a href="{{ admin_resource_path(choice_product) }}" class="show-entity">
+                                {{- choice_product -}}
                             </a>
                         </td>
-                        <td id="{{ slotId ~ 'stockState' }}" class="text-right" style="font-size: 11px">
-                            {{- choice.product|stock_subject_state_badge -}}
+                        <td id="{{ slot_id ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                            {{- choice_product|stock_subject_state_badge -}}
                         </td>
-                        <td id="{{ slotId ~ 'type' }}" class="text-right" style="font-size: 11px">
-                            {{- choice.product|product_type_badge -}}
+                        <td id="{{ slot_id ~ 'type' }}" class="text-right" style="font-size: 11px">
+                            {{- choice_product|product_type_badge -}}
                         </td>
-                        <td id="{{ slotId ~ 'visible' }}" class="text-right" style="font-size: 11px">
-                            {%- if choice.product.visible -%}
+                        <td id="{{ slot_id ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                            {%- if choice_product.visible -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slotId ~ 'hidden' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'hidden' }}" class="text-right" style="font-size: 11px">
                             {%- if choice.hidden -%}
                                 <span class="label label-warning">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-default">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slotId ~ 'useOptions' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'useOptions' }}" class="text-right" style="font-size: 11px">
                             {%- if choice.useOptions -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-warning">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slotId ~ 'minQuantity' }}" class="text-right">
+                        <td id="{{ slot_id ~ 'minQuantity' }}" class="text-right">
+                            {# TODO Packgaging format #}
                             {{- choice.minQuantity|localizednumber -}}
                         </td>
-                        <td id="{{ slotId ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {{- (choice.product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
+                        <td id="{{ slot_id ~ 'choice_0_product_netPrice' }}" class="text-right">
+                            {# TODO Packgaging format #}
+                            {{- (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
                     {% endfor %}
@@ -488,10 +491,10 @@
                     <span>{{ product|product_configurable_total_price|localizedcurrency(commerce_default_currency) }}</span>
                 </p>
                 {% for slot in product.bundleSlots %}
-                {% set slotId = 'product_slots_' ~ loop.index0 ~ '_' %}
+                {% set slot_id = 'product_slots_' ~ loop.index0 ~ '_' %}
                 <div class="slot collection-item">
                     {{ show_row(slot.translations, 'translations', {
-                        'id': slotId ~ 'translations',
+                        'id': slot_id ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
                             'description': {
@@ -505,63 +508,69 @@
                         <div class="col-md-6">
                             {{ show_row(slot.media, 'media', {
                                 'label': 'ekyna_core.field.image',
-                                'id': slotId ~ 'image',
+                                'id': slot_id ~ 'image',
                                 'label_col': 4
                             }) }}
                         </div>
                         <div class="col-md-6">
                             {{ show_row(slot.required, 'boolean', {
                                 'label': 'ekyna_core.field.required',
-                                'id': slotId ~ 'required',
+                                'id': slot_id ~ 'required',
                                 'label_col': 4
                             }) }}
                         </div>
                     </div>
-                    <table class="table table-stripped table-condensed">
+                    <table class="table table-stripped table-condensed table-hover">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
-                            <th>{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
-                            <th>{{ 'ekyna_core.field.visible'|trans }}</th>
-                            <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
-                            <th>{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
-                            <th>{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                         </tr>
                         {% for choice in slot.choices %}
-                        {% set choiceId = slotId ~ '_choice_' ~loop.index0 ~ '_' %}
+                        {% set choice_id = slot_id ~ '_choice_' ~loop.index0 ~ '_' %}
+                        {% set choice_product = choice.product %}
                         <tr>
-                            <td id="{{ choiceId ~ 'product' }}">
-                                <a href="{{ admin_resource_path(choice.product) }}" class="show-entity">
-                                    {{ choice.product }}
+                            <td id="{{ choice_id ~ 'product' }}">
+                                <a href="{{ admin_resource_path(choice_product) }}" class="show-entity">
+                                    {{- choice_product -}}
                                 </a>
                             </td>
-                            <td id="{{ choiceId ~ 'stockState' }}" class="text-right" style="font-size: 11px">
-                                {{- choice.product|stock_subject_state_badge -}}
+                            <td id="{{ choice_id ~ 'type' }}" class="text-right" style="font-size: 11px">
+                                {{- choice_product|product_type_badge -}}
                             </td>
-                            <td id="{{ choiceId ~ 'visible' }}" class="text-right" style="font-size: 11px">
-                                {%- if choice.product.visible -%}
+                            <td id="{{ choice_id ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                                {{- choice_product|stock_subject_state_badge -}}
+                            </td>
+                            <td id="{{ choice_id ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                                {%- if choice_product.visible -%}
                                     <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                                 {%- else -%}
                                     <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
                                 {%- endif -%}
                             </td>
-                            <td id="{{ choiceId ~ 'minQuantity' }}" class="text-right">
-                                {{ choice.minQuantity }}
+                            <td id="{{ choice_id ~ 'minQuantity' }}" class="text-right">
+                                {# TODO Packgaging format #}
+                                {{- choice.minQuantity|localizednumber -}}
                             </td>
-                            <td id="{{ choiceId ~ 'maxQuantity' }}" class="text-right">
-                                {{ choice.maxQuantity }}
+                            <td id="{{ choice_id ~ 'maxQuantity' }}" class="text-right">
+                                {# TODO Packgaging format #}
+                                {{- choice.maxQuantity|localizednumber -}}
                             </td>
-                            <td id="{{ choiceId ~ 'product_netPrice' }}" class="text-right">
-                                {{ choice.product.netPrice|localizedcurrency(commerce_default_currency) }}
+                            <td id="{{ choice_id ~ 'product_netPrice' }}" class="text-right">
+                                {{- (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="6" class="choice-rules">
+                            <td colspan="7" class="choice-rules">
                                 <em>[TODO] Choice rules</em> {# TODO rules #}
                             </td>
                         </tr>
                         {% endfor %}
                     </table>
-
                 </div>
                 {% endfor %}
             {% else %}
@@ -574,6 +583,47 @@
     </div>
 {% endspaceless %}
 {% endmacro show_configurable_composition %}
+
+
+{% macro show_relations(products) %}
+{% spaceless %}
+    <table class="table table-stripped table-condensed table-hover">
+        <tr>
+            <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+        </tr>
+        {% for product in products -%}
+            {% set relationId = 'relation_' ~loop.index0 ~ '_' %}
+            <tr>
+                <td id="{{ relationId ~ 'product' }}">
+                    <a href="{{ admin_resource_path(product) }}" class="show-entity">
+                        {{- product -}}
+                    </a>
+                </td>
+                <td id="{{ relationId ~ 'type' }}" class="text-right" style="font-size: 11px">
+                    {{- product|product_type_badge -}}
+                </td>
+                <td id="{{ relationId ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                    {{- product|stock_subject_state_badge -}}
+                </td>
+                <td id="{{ relationId ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                    {%- if product.visible -%}
+                        <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                    {%- else -%}
+                        <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                    {%- endif -%}
+                </td>
+                <td id="{{ relationId ~ 'product_netPrice' }}" class="text-right">
+                    {{- product.netPrice|localizedcurrency(commerce_default_currency) -}}
+                </td>
+            </tr>
+        {%- endfor %}
+    </table>
+{% endspaceless %}
+{% endmacro show_relations %}
 
 
 {% macro show_seo(product, options = {}) %}

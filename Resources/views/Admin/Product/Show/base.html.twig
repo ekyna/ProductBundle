@@ -36,6 +36,15 @@
             </a>
         </li>
         {% endif %}
+        {% block relations_tab %}
+        {% if optionParents is not empty or bundleParents is not empty -%}
+        <li>
+            <a href="#product-relations" id="toggle-product-relations" data-toggle="tab">
+                {{ 'ekyna_product.product.field.relations'|trans }}
+            </a>
+        </li>
+        {%- endif %}
+        {% endblock relations_tab %}
         {% block seo_tab %}
         <li>
             <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
@@ -136,12 +145,27 @@
             </div>
             {% endif %}
 
+            {% block relations_pane %}
+            {% if optionParents is not empty or bundleParents is not empty -%}
+            <div class="tab-pane" id="product-relations">
+                {% if optionParents is not empty %}
+                    <p class="h4">{{ 'ekyna_product.product.field.option_parents'|trans }}</p>
+                    {{ macros.show_relations(optionParents) }}
+                {% endif %}
+                {% if bundleParents is not empty %}
+                    <p class="h4">{{ 'ekyna_product.product.field.bundle_parents'|trans }}</p>
+                    {{ macros.show_relations(bundleParents) }}
+                {% endif %}
+            </div>
+            {%- endif %}
+            {% endblock relations_pane %}
+
             {% block seo_pane %}
-                <div class="tab-pane" id="product-seo">
-                {% block seo_content %}
-                    {{ macros.show_seo(product) }}
-                {% endblock seo_content %}
-                </div>
+            <div class="tab-pane" id="product-seo">
+            {% block seo_content %}
+                {{ macros.show_seo(product) }}
+            {% endblock seo_content %}
+            </div>
             {% endblock seo_pane %}
         </div>
     </div>

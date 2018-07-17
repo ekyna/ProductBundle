@@ -654,6 +654,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param Collection $collection
      *
      * @return bool
+     *
+     * @TODO Move in a AbstractResource or ResourceUtil class ? (search 'isInitialized' usages ...)
      */
     protected function isInitializedCollection(Collection $collection = null)
     {

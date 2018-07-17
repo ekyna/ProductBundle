@@ -502,6 +502,12 @@ class ProductController extends AbstractSubjectController
                 ->createView();
         }
 
+        /** @var \Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface $repository */
+        $repository = $this->getRepository();
+
+        $data['optionParents'] = $repository->findParentsByOptionProduct($product);
+        $data['bundleParents'] = $repository->findParentsByBundled($product);
+
         return null;
     }
 
@@ -510,7 +516,7 @@ class ProductController extends AbstractSubjectController
      *
      * @param ProductInterface $product
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface
      */
     protected function createNewSupplierProductForm(ProductInterface $product)
     {

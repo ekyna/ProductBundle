@@ -310,12 +310,15 @@ ekyna_product:
             configurable: Pack personnalisable
         field:
             parent: Parent
+            relations: Relations
             net_price: Prix HT
             total_net_price: Prix total HT
             pricing: Tarifs
             stock: Stocks
             released_at: Date de sortie
             composition: Composition
+            option_parents: Ce produit constitue une option des produits suivants
+            bundle_parents: Ce produit est inclus dans les packs suivants
         alert:
             no_item: Aucun produit configuré
             supplier_product_exists: >
