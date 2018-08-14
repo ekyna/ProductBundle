@@ -122,74 +122,172 @@ class PriceCalculator
     }
 
     /**
-     * Calculates the product (bundle) total price.
+     * Calculates the product min options price.
      *
      * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     */
+    public function calculateMinOptionsPrice(Model\ProductInterface $product)
+    {
+        $price = 0;
+
+        // For each option groups
+        foreach ($product->getOptionGroups() as $optionGroup) {
+            // Skip non required option group
+            if (!$optionGroup->isRequired()) {
+                continue;
+            }
+
+            // Get option with lowest price
+            $lowestOption = null;
+            foreach ($optionGroup->getOptions() as $option) {
+                if (null === $optionPrice = $option->getNetPrice()) {
+                    // Without product options
+                    $optionPrice = $option->getProduct()->getNetPrice();
+                }
+
+                if (null === $lowestOption || $optionPrice < $lowestOption) {
+                    $lowestOption = $optionPrice;
+                }
+            }
+
+            // If lowest price found for the option group
+            if (null !== $lowestOption) {
+                $price += $lowestOption;
+            }
+        }
+
+        return $price;
+    }
+
+    /**
+     * Calculates the (simple or variant) product min price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     */
+    public function calculateProductMinPrice(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertChildType($product);
+
+        return $product->getNetPrice() + $this->calculateMinOptionsPrice($product);
+    }
+
+    /**
+     * Calculates the variable product min price.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return float|int
+     */
+    public function calculateVariableMinPrice(Model\ProductInterface $variable)
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $price = null;
+
+        foreach ($variable->getVariants() as $variant) {
+            if (!$variant->isVisible()) {
+                continue;
+            }
+
+            $variantPrice = $this->calculateProductMinPrice($variant);
+
+            if (null === $price || $variantPrice < $price) {
+                $price = $variantPrice;
+            }
+        }
+
+        return $price + $this->calculateMinOptionsPrice($variable);
+    }
+
+    /**
+     * Calculates the bundle product min price.
+     *
+     * @param Model\ProductInterface $bundle
      *
      * @return float|int
      *
      * @todo The product (bundle) min price should be processed and persisted during update (flush)
      */
-    public function calculateBundleTotalPrice(Model\ProductInterface $product)
+    public function calculateBundleMinPrice(Model\ProductInterface $bundle)
     {
-        Model\ProductTypes::assertBundle($product);
+        Model\ProductTypes::assertBundle($bundle);
 
         $total = 0;
 
-        foreach ($product->getBundleSlots() as $slot) {
+        foreach ($bundle->getBundleSlots() as $slot) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
+            $childProduct = $choice->getProduct();
+
+            if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                $childPrice = $this->calculateBundleMinPrice($childProduct);
+            } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                $childPrice = $this->calculateVariableMinPrice($childProduct);
+            } else {
+                $childPrice = $this->calculateProductMinPrice($childProduct);
+            }
 
             // TODO Use packaging format
-
-            $total += $choice->getProduct()->getNetPrice() * $choice->getMinQuantity();
-
-            // TODO required options ?
-
-            // TODO Recurse if parent type
+            $total += $childPrice * $choice->getMinQuantity();
         }
 
-        return $total;
+        return $total + $this->calculateMinOptionsPrice($bundle);
     }
 
     /**
-     * Calculates the product (configurable) total.
+     * Calculates the configurable product min price.
      *
-     * @param Model\ProductInterface $product
+     * @param Model\ProductInterface $configurable
      *
      * @return float|int
      *
      * @todo The product (configurable) min price should be processed and persisted during update (flush)
      */
-    public function calculateConfigurableTotalPrice(Model\ProductInterface $product)
+    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable)
     {
-        Model\ProductTypes::assertConfigurable($product);
+        Model\ProductTypes::assertConfigurable($configurable);
 
         $total = 0;
 
-        foreach ($product->getBundleSlots() as $slot) {
-            $lowerPrice = null;
+        // For each bundle slots
+        foreach ($configurable->getBundleSlots() as $slot) {
+            // Skip non required slots
+            if (!$slot->isRequired()) {
+                continue;
+            }
 
+            // Get slot choice with lowest price.
+            $lowestChoice = null;
+            // For each slot choices
             foreach ($slot->getChoices() as $choice) {
                 $childProduct = $choice->getProduct();
 
+                // TODO Recurse if parent type (?)
+
+                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                    $childPrice = $this->calculateBundleMinPrice($childProduct);
+                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                    $childPrice = $this->calculateVariableMinPrice($childProduct);
+                } else {
+                    $childPrice = $this->calculateProductMinPrice($childProduct);
+                }
+
                 // TODO Use packaging format
+                $childPrice *= $choice->getMinQuantity();
 
-                $childPrice = $childProduct->getNetPrice() * $choice->getMinQuantity();
-
-                // TODO required options ?
-
-                // TODO Recurse if parent type
-
-                if (null === $lowerPrice || $childPrice < $lowerPrice) {
-                    $lowerPrice = $childPrice;
+                if (null === $lowestChoice || $childPrice < $lowestChoice) {
+                    $lowestChoice = $childPrice;
                 }
             }
 
-            $total += $lowerPrice;
+            $total += $lowestChoice;
         }
 
-        return $total;
+        return $total + $this->calculateMinOptionsPrice($configurable);
     }
 
     /**

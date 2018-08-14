@@ -221,7 +221,7 @@ class BundleUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        $netPrice = $this->priceCalculator->calculateBundleTotalPrice($bundle);
+        $netPrice = $this->priceCalculator->calculateBundleMinPrice($bundle);
         if ($netPrice !== $bundle->getNetPrice()) {
             $bundle->setNetPrice($netPrice);
 

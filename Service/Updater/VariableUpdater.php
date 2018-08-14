@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -13,6 +14,22 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class VariableUpdater
 {
+    /**
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param PriceCalculator $priceCalculator
+     */
+    public function __construct(PriceCalculator $priceCalculator)
+    {
+        $this->priceCalculator = $priceCalculator;
+    }
+
     /**
      * Indexes the variable's variants position.
      *
@@ -70,36 +87,10 @@ class VariableUpdater
     {
         Model\ProductTypes::assertVariable($variable);
 
-        $variants = $variable->getVariants()->getIterator();
-        if (0 == count($variants)) {
-            if (0 != $variable->getNetPrice()) {
-                $variable->setNetPrice(0);
+        $price = $this->priceCalculator->calculateVariableMinPrice($variable);
 
-                return true;
-            }
-
-            return false;
-        }
-
-        $minPrice = null;
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variant */
-        foreach ($variants as $variant) {
-            if (!$variant->isVisible()) {
-                continue;
-            }
-            if (0 < $price = $variant->getNetPrice()) {
-                if (is_null($minPrice) || $minPrice > $price) {
-                    $minPrice = $price;
-                }
-            }
-        }
-
-        if (is_null($minPrice)) {
-            $minPrice = 0;
-        }
-
-        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $minPrice, 5)) {
-            $variable->setNetPrice($minPrice);
+        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $price, 5)) {
+            $variable->setNetPrice($price);
 
             return true;
         }

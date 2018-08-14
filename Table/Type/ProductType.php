@@ -200,40 +200,6 @@ class ProductType extends ResourceTableType
                 ]);
         }
 
-        $buttons = [
-            function (RowInterface $row) {
-                $product = $row->getData();
-
-                if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
-                    return [
-                        'label'  => 'ekyna_admin.resource.button.show_front',
-                        'class'  => 'default',
-                        'icon'   => 'eye-open',
-                        'target' => '_blank',
-                        'path'   => $path,
-                    ];
-                }
-
-                return null;
-            },
-            function (RowInterface $row) {
-                $product = $row->getData();
-
-                if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
-                    return [
-                        'label'  => 'ekyna_admin.resource.button.show_editor',
-                        'class'  => 'default',
-                        'icon'   => 'edit',
-                        'target' => '_blank',
-                        'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
-                            'path' => $path,
-                        ]),
-                    ];
-                }
-
-                return null;
-            },
-        ];
         if ($variantMode) {
             $buttons = [
                 [
@@ -252,6 +218,41 @@ class ProductType extends ResourceTableType
                     'route_parameters_map' => ['productId' => 'id'],
                     'permission'           => 'edit',
                 ],
+            ];
+        } else {
+            $buttons = [
+                function (RowInterface $row) {
+                    $product = $row->getData();
+
+                    if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
+                        return [
+                            'label'  => 'ekyna_admin.resource.button.show_front',
+                            'class'  => 'default',
+                            'icon'   => 'eye-open',
+                            'target' => '_blank',
+                            'path'   => $path,
+                        ];
+                    }
+
+                    return null;
+                },
+                function (RowInterface $row) {
+                    $product = $row->getData();
+
+                    if (null !== $path = $this->subjectHelper->generatePublicUrl($product)) {
+                        return [
+                            'label'  => 'ekyna_admin.resource.button.show_editor',
+                            'class'  => 'default',
+                            'icon'   => 'edit',
+                            'target' => '_blank',
+                            'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
+                                'path' => $path,
+                            ]),
+                        ];
+                    }
+
+                    return null;
+                },
             ];
         }
         $buttons[] = [

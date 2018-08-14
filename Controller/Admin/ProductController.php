@@ -224,6 +224,7 @@ class ProductController extends AbstractSubjectController
         }
 
         // Product
+        // TODO Find the product if edit
         $context = $this->loadContext($request);
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = parent::createNew($context);
@@ -333,7 +334,8 @@ class ProductController extends AbstractSubjectController
                 break;
 
             case ProductTypes::TYPE_VARIABLE:
-                $updater = new Updater\VariableUpdater();
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\VariableUpdater($calculator);
                 $changed = $updater->updateStock($subject);
                 $changed |= $updater->updateAvailability($subject);
                 break;

@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Updater\VariantUpdater;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -27,14 +28,19 @@ abstract class AbstractVariantHandler extends AbstractHandler
     protected $localeProvider;
 
     /**
-     * @var ProductRepositoryInterface
-     */
-    protected $productRepository;
-
-    /**
      * @var AttributeTypeRegistryInterface
      */
     protected $typeRegistry;
+
+    /**
+     * @var PriceCalculator
+     */
+    protected $priceCalculator;
+
+    /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
 
     /**
      * @var VariantUpdater
@@ -50,21 +56,25 @@ abstract class AbstractVariantHandler extends AbstractHandler
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param LocaleProviderInterface    $localeProvider
-     * @param ProductRepositoryInterface $productRepository
+     * @param PersistenceHelperInterface     $persistenceHelper
+     * @param LocaleProviderInterface        $localeProvider
      * @param AttributeTypeRegistryInterface $typeRegistry
+     * @param PriceCalculator                $priceCalculator
+     * @param ProductRepositoryInterface     $productRepository
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         LocaleProviderInterface $localeProvider,
-        ProductRepositoryInterface $productRepository,
-        AttributeTypeRegistryInterface $typeRegistry
+        PriceCalculator $priceCalculator,
+        AttributeTypeRegistryInterface $typeRegistry,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->localeProvider = $localeProvider;
-        $this->productRepository = $productRepository;
         $this->typeRegistry = $typeRegistry;
+        $this->priceCalculator = $priceCalculator;
+
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -96,6 +106,6 @@ abstract class AbstractVariantHandler extends AbstractHandler
             return $this->variableUpdater;
         }
 
-        return $this->variableUpdater = new VariableUpdater();
+        return $this->variableUpdater = new VariableUpdater($this->priceCalculator);
     }
 }

@@ -148,7 +148,7 @@ class PriceRenderer
      */
     public function getBundlePrice(Model\ProductInterface $bundle)
     {
-        return $this->priceCalculator->calculateBundleTotalPrice($bundle);
+        return $this->priceCalculator->calculateBundleMinPrice($bundle);
     }
 
     /**
@@ -160,7 +160,7 @@ class PriceRenderer
      */
     public function getConfigurablePrice(Model\ProductInterface $configurable)
     {
-        return $this->priceCalculator->calculateConfigurableTotalPrice($configurable);
+        return $this->priceCalculator->calculateConfigurableMinPrice($configurable);
     }
 
     /**

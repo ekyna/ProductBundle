@@ -286,7 +286,7 @@ class ConfigurableUpdater
     {
         Model\ProductTypes::assertConfigurable($bundle);
 
-        $netPrice = $this->priceCalculator->calculateConfigurableTotalPrice($bundle);
+        $netPrice = $this->priceCalculator->calculateConfigurableMinPrice($bundle);
         if ($netPrice !== $bundle->getNetPrice()) {
             $bundle->setNetPrice($netPrice);
 
