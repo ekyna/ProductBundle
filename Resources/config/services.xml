@@ -360,6 +360,20 @@
             <argument>%ekyna_cms.tag.class%</argument>
             <tag name="table.type"/>
         </service>
+        <service id="ekyna_product.brand.table_type"
+                 class="Ekyna\Bundle\ProductBundle\Table\Type\BrandType">
+            <argument type="service" id="ekyna_admin.helper.resource_helper"/>
+            <argument type="service" id="router"/>
+            <argument>%ekyna_product.brand.class%</argument>
+            <tag name="table.type"/>
+        </service>
+        <service id="ekyna_product.category.table_type"
+                 class="Ekyna\Bundle\ProductBundle\Table\Type\CategoryType">
+            <argument type="service" id="ekyna_admin.helper.resource_helper"/>
+            <argument type="service" id="router"/>
+            <argument>%ekyna_product.category.class%</argument>
+            <tag name="table.type"/>
+        </service>
 
         <!-- Show types -->
         <service id="ekyna_product.show.attribute_config_type"

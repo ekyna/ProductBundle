@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -342,13 +343,23 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $qb = $this->createQueryBuilder('p');
 
+        $today = new \DateTime();
+        $today->setTime(0,0,0);
+
         return $qb
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->eq('p.stockMode', ':mode'))
-            ->andWhere($qb->expr()->lt('p.virtualStock', 'p.stockFloor'))
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->lt('p.virtualStock', 'p.stockFloor'),
+                $qb->expr()->andX(
+                    $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
+                    $qb->expr()->lt('p.estimatedDateOfArrival', ':today')
+                )
+            ))
             ->getQuery()
             ->setParameter('mode', $mode)
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
+            ->setParameter('today', $today, Type::DATETIME)
             ->getResult();
     }
 

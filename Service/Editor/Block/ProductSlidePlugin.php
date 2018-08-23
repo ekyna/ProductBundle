@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Editor\Block;
 
+use Ekyna\Bundle\CmsBundle\Editor\Adapter\AdapterInterface;
 use Ekyna\Bundle\CmsBundle\Editor\Model\BlockInterface;
 use Ekyna\Bundle\CmsBundle\Editor\Plugin\Block\AbstractPlugin;
 use Ekyna\Bundle\ProductBundle\Form\Type\Editor\ProductSlideBlockType;
@@ -106,7 +107,7 @@ class ProductSlidePlugin extends AbstractPlugin
     /**
      * @inheritDoc
      */
-    public function createWidget(BlockInterface $block, array $options, $position = 0)
+    public function createWidget(BlockInterface $block, AdapterInterface $adapter, array $options, $position = 0)
     {
         $data = $block->getData();
 
@@ -118,7 +119,7 @@ class ProductSlidePlugin extends AbstractPlugin
             }
         }
 
-        $view = parent::createWidget($block, $options, $position);
+        $view = parent::createWidget($block, $adapter, $options, $position);
         $view->getAttributes()->addClass('product-slide');
 
         if (empty($products)) {

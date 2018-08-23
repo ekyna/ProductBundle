@@ -129,6 +129,8 @@ class StockReportCommand extends Command
             'title'    => $title,
             'mode'     => $mode,
             'products' => $products,
+            'today'    => (new \DateTime())->setTime(0, 0, 0),
+            'locale'   => $this->translator->getLocale(),
         ]);
 
         $fromEmail = $this->settings->getParameter('notification.from_email');

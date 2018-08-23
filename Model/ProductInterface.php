@@ -628,6 +628,17 @@ interface ProductInterface extends
     public function setReleasedAt(\DateTime $releasedAt = null);
 
     /**
+     * Returns the product images.
+     *
+     * @param bool                 $withChildren
+     * @param int                  $limit
+     * @param ArrayCollection|null $images
+     *
+     * @return ArrayCollection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     */
+    public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null);
+
+    /**
      * Returns the variant uniqueness signature.
      *
      * @return string

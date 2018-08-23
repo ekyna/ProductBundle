@@ -2,10 +2,13 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
+use Ekyna\Bundle\AdminBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
+use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class BrandType
@@ -15,10 +18,38 @@ use Ekyna\Component\Table\TableBuilderInterface;
 class BrandType extends ResourceTableType
 {
     /**
+     * @var ResourceHelper
+     */
+    private $resourceHelper;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param ResourceHelper        $resourceHelper
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param string                $dataClass
+     */
+    public function __construct(ResourceHelper $resourceHelper, UrlGeneratorInterface $urlGenerator, $dataClass)
+    {
+        parent::__construct($dataClass);
+
+        $this->resourceHelper = $resourceHelper;
+        $this->urlGenerator = $urlGenerator;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
+        // TODO public / editor action buttons
+
         $builder
             ->addDefaultSort('position')
             ->setSortable(false)
@@ -41,6 +72,38 @@ class BrandType extends ResourceTableType
             ])
             ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
+                    function (RowInterface $row) {
+                        $category = $row->getData();
+
+                        if (null !== $path = $this->resourceHelper->generatePublicUrl($category)) {
+                            return [
+                                'label'  => 'ekyna_admin.resource.button.show_front',
+                                'class'  => 'default',
+                                'icon'   => 'eye-open',
+                                'target' => '_blank',
+                                'path'   => $path,
+                            ];
+                        }
+
+                        return null;
+                    },
+                    function (RowInterface $row) {
+                        $category = $row->getData();
+
+                        if (null !== $path = $this->resourceHelper->generatePublicUrl($category)) {
+                            return [
+                                'label'  => 'ekyna_admin.resource.button.show_editor',
+                                'class'  => 'default',
+                                'icon'   => 'edit',
+                                'target' => '_blank',
+                                'path'   => $this->urlGenerator->generate('ekyna_cms_editor_index', [
+                                    'path' => $path,
+                                ]),
+                            ];
+                        }
+
+                        return null;
+                    },
                     [
                         'label'                => 'ekyna_core.button.move_up',
                         'icon'                 => 'arrow-up',

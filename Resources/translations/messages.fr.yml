@@ -292,7 +292,6 @@ ekyna_product:
             convert: Convertir le produit <small>%name%</small>
             edit: Modifier le produit <small>%name%</small>
             remove: Supprimer le produit <small>%name%</small>
-            convert: Convertir le produit <small>%name%</small>
         button:
             list: Liste des produits
             show: Détail du produit

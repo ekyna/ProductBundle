@@ -1214,13 +1214,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
-     * Returns the product images.
-     *
-     * @param bool                 $withChildren
-     * @param int                  $limit
-     * @param ArrayCollection|null $images
-     *
-     * @return ArrayCollection|Media\MediaInterface[]
+     * @inheritdoc
      */
     public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null)
     {

@@ -9,7 +9,7 @@
         <div class="slide{% if loop.first %} first{% endif %}">
             {% set url = product|subject_public_url -%}
             <a href="{{ url }}" class="slide-image">
-                <img src="{{ image.path|imagine_filter('media_front') }}" align="{{ image.title }}">
+                <img src="{{ image.path|imagine_filter('product_slide') }}" align="{{ image.title }}">
             </a>
             <div>
                 <p class="slide-caption">
