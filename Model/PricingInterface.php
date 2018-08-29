@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityInterface;
+use Ekyna\Component\Resource\Model\TrackAssociationInterface;
 
 /**
  * Interface PricingInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface PricingInterface extends TaggedEntityInterface
+interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterface
 {
     /**
      * Returns the name.

@@ -118,6 +118,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findForInventoryExport();
 
     /**
+     * Finds a product with "pending offers" flag set to true.
+     *
+     * @return Model\ProductInterface
+     */
+    public function findOneByPendingOffers();
+
+    /**
      * Loads the product's medias.
      *
      * @param Model\ProductInterface $product

@@ -1,6 +1,6 @@
 {% spaceless %}
 <table class="table table-condensed table-striped {{ class }}">
-    <caption>{{ grid.designation }}</caption>
+    {#<caption>{{ pricing.designation }}</caption>#}
     <thead>
         <tr>
             <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
@@ -9,21 +9,21 @@
         </tr>
     </thead>
     <tbody>
-    {% for rule in grid.rules -%}
+    {% for offer in pricing.offers -%}
         <tr>
             <td>
-            {% if rule.max is null -%}
+            {% if offer.max is null -%}
                 {{ 'ekyna_product.pricing_rule.field.from'|trans({
-                    '%min%': rule.min
+                    '%min%': offer.min
                 }) }}
             {%- else -%}
                 {{ 'ekyna_product.pricing_rule.field.range'|trans({
-                    '%min%': rule.min, '%max%': rule.max
+                    '%min%': offer.min, '%max%': offer.max
                 }) }}
             {%- endif %}
             </td>
-            <td class="text-right">{{ rule.percent|localizednumber('percent') }}</td>
-            <td class="text-right">{{ rule.price|localizedcurrency(grid.currency) }}</td>
+            <td class="text-right">{{ offer.percent|localizednumber('percent') }}</td>
+            <td class="text-right">{{ offer.price|localizedcurrency(pricing.currency) }}</td>
         </tr>
     {%- endfor %}
     </tbody>

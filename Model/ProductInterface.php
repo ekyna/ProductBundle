@@ -596,6 +596,22 @@ interface ProductInterface extends
     public function setUnit($unit);
 
     /**
+     * Returns whether offers update is needed.
+     *
+     * @return bool
+     */
+    public function isPendingOffers();
+
+    /**
+     * Sets whether offers update is needed.
+     *
+     * @param bool $pending
+     *
+     * @return $this|ProductInterface
+     */
+    public function setPendingOffers($pending);
+
+    /**
      * Returns the position (variant ordering).
      *
      * @return int

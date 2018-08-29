@@ -33,6 +33,7 @@
         <field name="height" column="height" type="smallint" nullable="true"/>
         <field name="width" column="width" type="smallint" nullable="true"/>
         <field name="depth" column="depth" type="smallint" nullable="true"/>
+        <field name="pendingOffers" column="pending_offers" type="boolean" nullable="false"/>
         <field name="position" column="position" type="smallint" nullable="true"/>
 
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>

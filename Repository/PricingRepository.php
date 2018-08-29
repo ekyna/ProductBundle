@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PricingGridHydrator;
+use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
 /**
@@ -13,23 +14,43 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 class PricingRepository extends ResourceRepository implements PricingRepositoryInterface
 {
     /**
-     * Returns the pricings grid.
-     *
-     * @return array
+     * @var \Doctrine\ORM\Query
      */
-    public function getGrid()
+    private $byBrandQuery;
+
+
+    /**
+     * @inheritdoc
+     */
+    public function findRulesByBrand(BrandInterface $brand)
     {
-        $result = $this
-            ->createQueryBuilder($this->getAlias())
+        return $this
+            ->getByBrandQuery()
+            ->setParameter('brandId', $brand->getId())
+            ->getScalarResult();
+    }
+
+    /**
+     * Returns the "find by brand" query.
+     *
+     * @return \Doctrine\ORM\Query
+     */
+    private function getByBrandQuery()
+    {
+        if (null !== $this->byBrandQuery) {
+            return $this->byBrandQuery;
+        }
+
+        $qb = $this->createQueryBuilder('p');
+
+        return $this->byBrandQuery = $qb
             ->select([
                 'p.id as id',
-                'p.designation as designation',
+                //'p.designation as designation',
                 'g.id as group_id',
                 'c.id as country_id',
-                'b.id as brand_id',
-                'r.id as rule_id',
-                'r.minQuantity as rule_quantity',
-                'r.percent as rule_percent'
+                'r.minQuantity as min_qty',
+                'r.percent as percent'
             ])
             ->join('p.groups', 'g')
             ->join('p.countries', 'c')
@@ -39,12 +60,10 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->addOrderBy('c.id', 'ASC')
             ->addOrderBy('b.id', 'ASC')
             ->addOrderBy('r.minQuantity', 'DESC')
+            ->where($qb->expr()->eq('b.id', ':brandId'))
             ->getQuery()
-            ->useQueryCache(true)
+            ->useQueryCache(true);
             // TODO ->useResultCache(true, $this->getCachePrefix())
-            ->getResult(PricingGridHydrator::NAME);
-
-        return $result;
     }
 
     /**

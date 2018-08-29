@@ -4,6 +4,7 @@ ekyna_product:
 
     # TODO group translations (like visible)
     common:
+        percent: Pourcentage
         read_more: En savoir plus
 
     email:
@@ -223,6 +224,11 @@ ekyna_product:
             resupply: Réapprovisionnement
             out_of_stock: Rupture
 
+    offer:
+        label:
+            singular: Offre
+            plural: Offres
+
     option:
         label:
             singular: Option
@@ -272,13 +278,38 @@ ekyna_product:
             plural: Règle de tarification
         field:
             min_quantity: Qte. Min.
-            percent: Pourcentage
             from: à partir de %min%
             range: de %min% à %max%
             discount: Remise
             unit_price: Prix Unit.
         alert:
             no_item: Aucune régle configuré
+
+    special_offer:
+        label:
+            singular: Promotion
+            plural: Promotions
+        header:
+            list: Promotions <small>Liste des promotions</small>
+            show: Détail de la promotion <small>%name%</small>
+            new: Créer une nouvelle promotion
+            edit: Modifier la promotion <small>%name%</small>
+            remove: Supprimer la promotion <small>%name%</small>
+        button:
+            list: Liste des promotions
+            show: Détail de la promotion
+            new: Nouvelle promotion
+            edit: Modifier la promotion
+            remove: Supprimer la promotion
+        field:
+            countries: Pays de facturation
+            rules: Règles
+        message:
+            product_removed: |
+                Le produit <strong>{product}</strong> a été retiré de la liste
+                car il appartient à la marque <strong>{brand}</strong>.
+        alert:
+            no_item: Aucune promotion configuré
 
     product:
         label:
@@ -320,7 +351,9 @@ ekyna_product:
             bundle_parents: Ce produit est inclus dans les packs suivants
         alert:
             no_item: Aucun produit configuré
-            supplier_product_exists: >
+            pending_offers: |
+                Les offres de ce produit sont en attente de mise à jour.
+            supplier_product_exists: |
                 Une référence fournisseur existe déjà pour le fournisseur <strong>%name%</strong>.
 
     product_media:
@@ -351,10 +384,8 @@ ekyna_product:
         rule_table: Vos tarifs
         price_table: Détail du prix unititaire
         no_choice:
-            title: >
-                <strong>Sélectionnez un article&hellip;</strong>
-            description: >
-                <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>
+            title: <strong>Sélectionnez un article&hellip;</strong>
+            description: <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>
     variant:
         label:
             singular: Variante

@@ -164,7 +164,7 @@ class PriceRenderer
     }
 
     /**
-     * Renders the product discount grid.
+     * Renders the product pricing grid.
      *
      * @param Model\ProductInterface $product
      * @param ContextInterface|null  $context
@@ -172,12 +172,12 @@ class PriceRenderer
      *
      * @return string
      */
-    public function getDiscountGrid(
+    public function renderPricingGrid(
         Model\ProductInterface $product,
         ContextInterface $context = null,
-        $class = 'product-discount-grid'
+        $class = 'product-pricing-grid'
     ) {
-        $config = $this->priceCalculator->getPricingConfig($product, $context);
+        $config = $this->priceCalculator->getPricingGrid($product, $context);
 
         if (empty($config)) {
             return '';
@@ -185,23 +185,23 @@ class PriceRenderer
 
         // TODO packaging format
 
-        $rules = [];
+        $offers = [];
         $previousMin = null;
-        foreach ($config['rules'] as $rule) {
-            $rules[] = [
-                'min'     => $rule['quantity'],
+        foreach ($config['offers'] as $offer) {
+            $offers[] = [
+                'min'     => $offer['quantity'],
                 'max'     => $previousMin,
-                'percent' => $rule['percent'] / 100,
-                'price'   => $rule['price'],
+                'percent' => $offer['percent'] / 100,
+                'price'   => $offer['price'],
             ];
-            $previousMin = $rule['quantity'] - 1;
+            $previousMin = $offer['quantity'] - 1;
         }
 
-        $config['rules'] = array_reverse($rules);
+        $config['offers'] = array_reverse($offers);
 
         return $this->templating->render('@EkynaProduct/Pricing/grid.html.twig', [
-            'grid'  => $config,
-            'class' => $class,
+            'pricing' => $config,
+            'class'   => $class,
         ]);
     }
 

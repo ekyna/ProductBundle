@@ -106,7 +106,7 @@ class PriceCalculator
         $price = new Price($amount, $currency, $mode);
 
         // Discount adjustment
-        if (null !== $discount = $this->priceResolver->resolve($product, $context, 1)) {
+        if (null !== $discount = $this->priceResolver->resolve($product, $context)) {
             $price->addDiscount($discount);
         }
 
@@ -322,10 +322,9 @@ class PriceCalculator
             'taxes'     => null,
         ];
 
-        // Discount rules
+        // Offers rules
         if ($discounts) {
-            $config = $this->priceResolver->findPricing($product, $context);
-            $pricing['discounts'] = isset($config['rules']) ? $config['rules'] : []; // TODO unset rules id
+            $pricing['discounts'] = $this->priceResolver->findPricing($product, $context); // TODO unset rules id
         }
 
         /** @see \Ekyna\Component\Commerce\Common\Resolver\DiscountResolver::resolveSaleItem() */
@@ -348,47 +347,50 @@ class PriceCalculator
     }
 
     /**
-     * Returns the pricing config for the given product and context.
+     * Returns the pricing grid for the given product and context.
      *
      * @param Model\ProductInterface $product
      * @param ContextInterface|null  $context
      *
      * @return array
      */
-    public function getPricingConfig(Model\ProductInterface $product, ContextInterface $context = null)
+    public function getPricingGrid(Model\ProductInterface $product, ContextInterface $context = null)
     {
         if (null === $context) {
             $context = $this->contextProvider->getContext();
         }
 
-        $config = $this->priceResolver->findPricing($product, $context);
+        $offers = $this->priceResolver->findPricing($product, $context);
 
-        if (!empty($config)) {
-            // Currency
-            $currency = $context->getCurrency()->getCode();
-            $price = $product->getNetPrice();
+        if (empty($offers)) {
+            return [];
+        }
 
-            if ($context->isAtiDisplayMode()) {
-                if (!empty($rates = $this->getTaxesRates($product, $context))) {
-                    foreach ($rates as $rate) {
-                        $price *= 1 + $rate / 100;
-                    }
+        $pricing = [
+            'currency' => $currency = $context->getCurrency()->getCode(),
+            'offers'   => $offers,
+        ];
+
+        $price = $product->getNetPrice();
+
+        if ($context->isAtiDisplayMode()) {
+            if (!empty($rates = $this->getTaxesRates($product, $context))) {
+                foreach ($rates as $rate) {
+                    $price *= 1 + $rate / 100;
                 }
-            }
-
-            $config['currency'] = $currency;
-
-            if ($currency !== $this->defaultCurrency) {
-                // Currency conversion
-                $price = $this->currencyConverter->convert($price, $this->defaultCurrency, $currency);
-            }
-
-            foreach ($config['rules'] as &$rule) {
-                $rule['price'] = $price * (1 - $rule['percent'] / 100);
             }
         }
 
-        return $config;
+        if ($currency !== $this->defaultCurrency) {
+            // Currency conversion
+            $price = $this->currencyConverter->convert($price, $this->defaultCurrency, $currency);
+        }
+
+        foreach ($pricing['offers'] as &$offer) {
+            $offer['price'] = round($price * (1 - $offer['percent'] / 100), 5);
+        }
+
+        return $pricing;
     }
 
     /**
@@ -421,6 +423,7 @@ class PriceCalculator
                 }
                 $pricing['price'] = $price;
             }
+
             return $pricing;
         }
 

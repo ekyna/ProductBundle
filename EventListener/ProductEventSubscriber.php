@@ -7,8 +7,10 @@ use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGeneratorInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
+use Ekyna\Component\Resource\Event\QueueEvents;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -35,6 +37,11 @@ class ProductEventSubscriber implements EventSubscriberInterface
      */
     private $referenceGenerator;
 
+    /**
+     * @var OfferInvalidator
+     */
+    private $offerInvalidator;
+
 
     /**
      * Constructor.
@@ -42,15 +49,18 @@ class ProductEventSubscriber implements EventSubscriberInterface
      * @param PersistenceHelperInterface  $persistenceHelper
      * @param Handler\HandlerRegistry     $registry
      * @param ReferenceGeneratorInterface $referenceGenerator
+     * @param OfferInvalidator            $offerInvalidator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         Handler\HandlerRegistry $registry,
-        ReferenceGeneratorInterface $referenceGenerator
+        ReferenceGeneratorInterface $referenceGenerator,
+        OfferInvalidator $offerInvalidator
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
         $this->referenceGenerator = $referenceGenerator;
+        $this->offerInvalidator = $offerInvalidator;
     }
 
     /**
@@ -131,6 +141,11 @@ class ProductEventSubscriber implements EventSubscriberInterface
 
         if ($changed) {
             $this->persistenceHelper->persistAndRecompute($product);
+        }
+
+        // Schedule offers update if needed
+        if ($this->persistenceHelper->isChanged($product, ['netPrice'])) {
+            $this->offerInvalidator->invalidateByProductId($product->getId());
         }
     }
 
@@ -215,6 +230,14 @@ class ProductEventSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Queue close event handler.
+     */
+    public function onQueueClose()
+    {
+        $this->offerInvalidator->flush($this->persistenceHelper->getManager());
+    }
+
+    /**
      * Execute the event handlers method regarding to the product type,
      * and returns whether or the product has been changed.
      *
@@ -294,6 +317,7 @@ class ProductEventSubscriber implements EventSubscriberInterface
             ProductEvents::CHILD_PRICE_CHANGE        => ['onChildPriceChange', 0],
             ProductEvents::CHILD_STOCK_CHANGE        => ['onChildStockChange', 0],
             ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
+            QueueEvents::QUEUE_CLOSE                 => ['onQueueClose', 0],
         ];
     }
 }

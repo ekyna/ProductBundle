@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityTrait;
+use Ekyna\Component\Resource\Model\TrackAssociationTrait;
 
 /**
  * Class Pricing
@@ -17,7 +18,12 @@ use Ekyna\Component\Resource\Model\TaggedEntityTrait;
  */
 class Pricing implements PricingInterface
 {
-    use TaggedEntityTrait;
+    const REL_GROUPS    = 'groups';
+    const REL_COUNTRIES = 'countries';
+    const REL_BRANDS    = 'brands';
+
+    use TaggedEntityTrait,
+        TrackAssociationTrait;
 
     /**
      * @var int
@@ -35,22 +41,22 @@ class Pricing implements PricingInterface
     protected $designation;
 
     /**
-     * @var CustomerGroupInterface[]
+     * @var ArrayCollection|CustomerGroupInterface[]
      */
     protected $groups;
 
     /**
-     * @var CountryInterface[]
+     * @var ArrayCollection|CountryInterface[]
      */
     protected $countries;
 
     /**
-     * @var BrandInterface[]
+     * @var ArrayCollection|BrandInterface[]
      */
     protected $brands;
 
     /**
-     * @var PricingRuleInterface[]
+     * @var ArrayCollection|PricingRuleInterface[]
      */
     protected $rules;
 
@@ -280,6 +286,26 @@ class Pricing implements PricingInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Post load lifecycle event handler.
+     */
+    public function onPostLoad()
+    {
+        $this->takeSnapshot();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getAssociationsProperties()
+    {
+        return [
+            static::REL_GROUPS,
+            static::REL_COUNTRIES,
+            static::REL_BRANDS,
+        ];
     }
 
     /**

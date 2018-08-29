@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 
 /**
@@ -12,9 +13,11 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 interface PricingRepositoryInterface extends ResourceRepositoryInterface
 {
     /**
-     * Returns the pricings grid.
+     * Finds the pricing rules by brand.
+     *
+     * @param BrandInterface $brand
      *
      * @return array
      */
-    public function getGrid();
+    public function findRulesByBrand(BrandInterface $brand);
 }

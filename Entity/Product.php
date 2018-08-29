@@ -148,6 +148,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $unit = Common\Units::PIECE;
 
     /**
+     * @var bool
+     */
+    protected $pendingOffers;
+
+    /**
      * (Variant sorting)
      *
      * @var int
@@ -176,6 +181,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->references = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
+
+        // Schedule offer update a creation
+        $this->pendingOffers = true;
 
         $this->initializeAdjustments();
         $this->initializeStock();
@@ -1127,6 +1135,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setUnit($unit)
     {
         $this->unit = $unit;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isPendingOffers()
+    {
+        return $this->pendingOffers;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPendingOffers($pending)
+    {
+        $this->pendingOffers = (bool)$pending;
 
         return $this;
     }

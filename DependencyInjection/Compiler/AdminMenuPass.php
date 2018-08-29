@@ -77,12 +77,21 @@ class AdminMenuPass implements CompilerPassInterface
             'position' => 11,
         ]]);
 
-        // Pricings
+        // Pricing
         $pool->addMethodCall('createEntry', ['catalog', [
-            'name'     => 'pricings',
+            'name'     => 'pricing',
             'route'    => 'ekyna_product_pricing_admin_home',
             'label'    => 'ekyna_product.pricing.label.plural',
             'resource' => 'ekyna_product_pricing',
+            'position' => 96,
+        ]]);
+
+        // Special offers
+        $pool->addMethodCall('createEntry', ['catalog', [
+            'name'     => 'special_offer',
+            'route'    => 'ekyna_product_special_offer_admin_home',
+            'label'    => 'ekyna_product.special_offer.label.plural',
+            'resource' => 'ekyna_product_special_offer',
             'position' => 97,
         ]]);
 

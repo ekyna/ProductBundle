@@ -1,0 +1,43 @@
+ekyna_product_special_offer_admin_home:
+    path: ""
+    defaults: { _controller: "ekyna_product.special_offer.controller:homeAction" }
+    methods: [GET]
+
+ekyna_product_special_offer_admin_list:
+    path: /list
+    defaults: { _controller: "ekyna_product.special_offer.controller:listAction" }
+    methods: [GET|POST]
+
+ekyna_product_special_offer_admin_new:
+    path: /new
+    defaults: { _controller: "ekyna_product.special_offer.controller:newAction" }
+    methods: [GET|POST]
+
+ekyna_product_special_offer_admin_show:
+    path: /{specialOfferId}/show
+    defaults: { _controller: "ekyna_product.special_offer.controller:showAction" }
+    methods: [GET]
+    requirements:
+        specialOfferId: \d+
+
+ekyna_product_special_offer_admin_edit:
+    path: /{specialOfferId}/edit
+    defaults: { _controller: "ekyna_product.special_offer.controller:editAction" }
+    methods: [GET|POST]
+    requirements:
+        specialOfferId: \d+
+
+ekyna_product_special_offer_admin_toggle:
+    path: /{specialOfferId}/toggle/{field}
+    defaults: { _controller: "ekyna_product.special_offer.controller:toggleAction", field: enabled }
+    methods: [GET]
+    requirements:
+        specialOfferId: \d+
+        field: \w+
+
+ekyna_product_special_offer_admin_remove:
+    path: /{specialOfferId}/remove
+    defaults: { _controller: "ekyna_product.special_offer.controller:removeAction" }
+    methods: [GET|POST]
+    requirements:
+        specialOfferId: \d+

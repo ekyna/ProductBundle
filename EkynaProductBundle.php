@@ -50,6 +50,7 @@ class EkynaProductBundle extends AbstractBundle
             Model\ProductMediaInterface::class      => 'ekyna_product.product_media.class',
             Model\ProductReferenceInterface::class  => 'ekyna_product.product_reference.class',
             Model\ProductStockUnitInterface::class  => 'ekyna_product.product_stock_unit.class',
+            Model\SpecialOfferInterface::class      => 'ekyna_product.special_offer.class',
         ];
     }
 }

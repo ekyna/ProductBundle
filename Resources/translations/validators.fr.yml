@@ -34,3 +34,5 @@ ekyna_product:
     option:
         recursive_choice: Un produit ne peut pas être une option de lui-même.
         product_must_be_visible: Ce produit doit être visible.
+    special_offer:
+        at_least_one_brand_or_product: Veuillez sélectionner au moins un produit ou une marque.

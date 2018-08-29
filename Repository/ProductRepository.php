@@ -108,7 +108,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb);
+            ->joinSeo($qb)
+            ->joinOptionGroups($qb, true);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -144,7 +145,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb);
+            ->joinSeo($qb)
+            ->joinOptionGroups($qb, true);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -180,7 +182,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb);
+            ->joinSeo($qb)
+            ->joinOptionGroups($qb, true);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -217,7 +220,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $this
             ->joinCategories($qb)
-            ->joinBrand($qb);
+            ->joinBrand($qb)
+            ->joinOptionGroups($qb);
 
         $query = $qb
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -254,7 +258,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $this
             ->joinCategories($qb)
-            ->joinBrand($qb);
+            ->joinBrand($qb)
+            ->joinOptionGroups($qb);
 
         $query = $qb
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -377,6 +382,21 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameter('mode', [CStockModes::MODE_DISABLED])
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
             ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findOneByPendingOffers()
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->andWhere($qb->expr()->eq('p.pendingOffers', ':flag'))
+            ->getQuery()
+            ->setMaxResults(1)
+            ->setParameter('flag', true)
+            ->getOneOrNullResult();
     }
 
     /**
@@ -655,6 +675,32 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->leftJoin($alias . '.seo', 's')
             ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
             ->addSelect('s', 's_t');
+
+        return $this;
+    }
+
+    /**
+     * Adds the join parts for option groups to the query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param bool         $andOptions
+     * @param string       $alias
+     *
+     * @return ProductRepository
+     */
+    protected function joinOptionGroups(QueryBuilder $qb, $andOptions = false, $alias = null)
+    {
+        $alias = $alias ?: $this->getAlias();
+
+        $qb
+            ->leftJoin($alias . '.optionGroups', 'og')
+            ->addSelect('og');
+
+        if ($andOptions) {
+            $qb
+                ->leftJoin('og.options', 'op')
+                ->addSelect('op');
+        }
 
         return $this;
     }

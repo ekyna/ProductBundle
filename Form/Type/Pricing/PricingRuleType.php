@@ -27,7 +27,7 @@ class PricingRuleType extends ResourceFormType
                 ]
             ])
             ->add('percent', NumberType::class, [
-                'label' => 'ekyna_product.pricing_rule.field.percent',
+                'label' => 'ekyna_product.common.percent',
                 'attr' => [
                     'min' => 0,
                     'max' => 100,

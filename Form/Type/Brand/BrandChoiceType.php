@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Brand;
 use Doctrine\ORM\EntityRepository;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -36,12 +37,15 @@ class BrandChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'label' => 'ekyna_product.brand.label.singular',
-            'class' => $this->brandClass,
-            'query_builder' => function(EntityRepository $er) {
+            'label'         => function (Options $options) {
+                return 'ekyna_product.brand.label.' . ($options['multiple'] ? 'plural' : 'singular');
+            },
+            'class'         => $this->brandClass,
+            'query_builder' => function (EntityRepository $er) {
                 $qb = $er->createQueryBuilder('b');
+
                 return $qb->addOrderBy('b.name', 'ASC');
-            }
+            },
         ]);
     }
 

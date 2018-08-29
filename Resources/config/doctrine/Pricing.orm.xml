@@ -9,6 +9,10 @@
             name="Ekyna\Bundle\ProductBundle\Entity\Pricing"
             table="product_pricing">
 
+        <lifecycle-callbacks>
+            <lifecycle-callback type="postLoad" method="onPostLoad"/>
+        </lifecycle-callbacks>
+
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>

@@ -1,0 +1,31 @@
+{% spaceless %}
+<div class="show-product-offers">
+{% for list in offer_list %}
+    {% if loop.index0 % 4 == 0 %}
+    <div class="row">
+    {% endif %}
+        <div class="col-sm-6 col-md-4">
+            <div class="offers-list">
+                <p class="h5">{{ list.title }}</p>
+                <table class="table table-condensed">
+                    <tr>
+                        <th>Qty. Min.</th>
+                        <th>Percent</th>
+                        <th>Net price</th>
+                    </tr>
+                    {% for offer in list.offers %}
+                    <tr>
+                        <td>{{ offer.minQuantity }}</td>
+                        <td>{{ (offer.percent/100)|localizednumber('percent') }}</td>
+                        <td>{{ offer.netPrice|localizedcurrency(commerce_default_currency) }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% if loop.index % 4 == 0 %}
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+{% endspaceless %}

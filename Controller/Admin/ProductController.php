@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class ProductController
@@ -310,44 +311,6 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
-     * @inheritDoc
-     */
-    protected function updateStock(SubjectInterface $subject)
-    {
-        if (!$subject instanceof ProductInterface) {
-            return parent::updateStock($subject);
-        }
-
-        switch ($subject->getType()) {
-            case ProductTypes::TYPE_CONFIGURABLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
-                $updater = new Updater\ConfigurableUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            case ProductTypes::TYPE_BUNDLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
-                $updater = new Updater\BundleUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            case ProductTypes::TYPE_VARIABLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
-                $updater = new Updater\VariableUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            default:
-                $changed = parent::updateStock($subject);
-        }
-
-        return $changed;
-    }
-
-    /**
      * Move (variant) up.
      *
      * @param Request $request
@@ -435,6 +398,44 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function updateStock(SubjectInterface $subject)
+    {
+        if (!$subject instanceof ProductInterface) {
+            return parent::updateStock($subject);
+        }
+
+        switch ($subject->getType()) {
+            case ProductTypes::TYPE_CONFIGURABLE:
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\ConfigurableUpdater($calculator);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
+                break;
+
+            case ProductTypes::TYPE_BUNDLE:
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\BundleUpdater($calculator);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
+                break;
+
+            case ProductTypes::TYPE_VARIABLE:
+                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $updater = new Updater\VariableUpdater($calculator);
+                $changed = $updater->updateStock($subject);
+                $changed |= $updater->updateAvailability($subject);
+                break;
+
+            default:
+                $changed = parent::updateStock($subject);
+        }
+
+        return $changed;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function createNew(Context $context)
@@ -470,6 +471,10 @@ class ProductController extends AbstractSubjectController
     {
         /** @var ProductInterface $product */
         $product = $context->getResource();
+
+        if ($product->isPendingOffers()) {
+            $this->addFlash('ekyna_product.product.alert.pending_offers', 'warning');
+        }
 
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
             $table = $this
@@ -510,6 +515,10 @@ class ProductController extends AbstractSubjectController
         $data['optionParents'] = $repository->findParentsByOptionProduct($product);
         $data['bundleParents'] = $repository->findParentsByBundled($product);
 
+        if (ProductTypes::isChildType($product->getType())) {
+            $data['offer_list'] = $this->getOffersList($product);
+        }
+
         return null;
     }
 
@@ -541,5 +550,60 @@ class ProductController extends AbstractSubjectController
         }
 
         return parent::generateResourcePath($resource, $action, $parameters);
+    }
+
+    /**
+     * Returns the product's offer list.
+     *
+     * @param ProductInterface $product
+     *
+     * @return array
+     */
+    protected function getOffersList(ProductInterface $product)
+    {
+        $offers = $this
+            ->get('ekyna_product.offer.repository')
+            ->findByProduct($product);
+
+        $translator = $this->get('translator');
+        $allGroups = $translator->trans('ekyna_commerce.customer_group.message.all');
+        $allCountries = $translator->trans('ekyna_commerce.country.message.all');
+
+        $list = [];
+        foreach ($offers as $offer) {
+            $group = $offer->getGroup();
+            $country = $offer->getCountry();
+
+            $key = sprintf(
+                "%d-%d",
+                $group ? $group->getId() : 0,
+                $country ? $country->getId() : 0
+            );
+
+            $locale = $this->get('ekyna_resource.locale.request_provider')->getCurrentLocale();
+            $region = Intl::getRegionBundle();
+
+
+            if (!isset($list[$key])) {
+                $list[$key] = [
+                    'title' => sprintf(
+                        "%s / %s",
+                        $group ? $group->getTitle() : $allGroups,
+                        $country ? $region->getCountryName($country->getCode(), $locale) : $allCountries
+                    ),
+                    'offers' => [],
+                ];
+            }
+
+            $list[$key]['offers'][] = $offer;
+        }
+
+        $list = array_reverse($list);
+
+        foreach ($list as &$data) {
+            $data['offers'] = array_reverse($data['offers']);
+        }
+
+        return $list;
     }
 }

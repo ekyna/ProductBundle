@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Repository\OfferRepository;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
@@ -16,61 +16,19 @@ use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 class PriceResolver
 {
     /**
-     * @var PricingRepositoryInterface
+     * @var OfferRepository
      */
-    protected $pricingRepository;
-
-    /**
-     * @var array
-     *
-     * [
-     *     '{hash}' => [
-     *         'designation' => '{designation}',
-     *         'rules' => [
-     *             {min_quantity} => {percent}
-     *         ],
-     *     ],
-     * ]
-     *
-     * {hash} = "{group.id}-{country.id}-{brand.id}"
-     *
-     * sorted by :
-     *    group.id     ASC
-     *    country.id   ASC
-     *    brand.id     ASC
-     *    min_quantity DESC
-     */
-    protected $grid;
+    protected $offerRepository;
 
 
     /**
      * Constructor.
      *
-     * @param PricingRepositoryInterface $pricingRepository
+     * @param OfferRepository $offerRepository
      */
-    public function __construct(PricingRepositoryInterface $pricingRepository)
+    public function __construct(OfferRepository $offerRepository)
     {
-        $this->pricingRepository = $pricingRepository;
-
-        $this->initialize();
-    }
-
-    /**
-     * Clears the grid data.
-     */
-    public function clear()
-    {
-        $this->grid = null;
-    }
-
-    /**
-     * Initializes the price resolver.
-     */
-    public function initialize()
-    {
-        if (null === $this->grid) {
-            $this->grid = $this->pricingRepository->getGrid();
-        }
+        $this->offerRepository = $offerRepository;
     }
 
     /**
@@ -78,50 +36,42 @@ class PriceResolver
      *
      * @param ProductInterface $product
      * @param ContextInterface $context
-     * @param int              $quantity
+     * @param float            $quantity
+     * @param bool             $useCache
      *
      * @return \Ekyna\Component\Commerce\Common\Model\AdjustmentData|null
      */
-    public function resolve(
-        ProductInterface $product,
-        ContextInterface $context,
-        $quantity
-    ) {
-        $pricing = $this->findPricing($product, $context);
+    public function resolve(ProductInterface $product, ContextInterface $context, $quantity = 1.0, $useCache = true)
+    {
+        $offer = $this
+            ->offerRepository
+            ->findByProductAndContextAndQuantity($product, $context, $quantity, $useCache);
 
-        if (!empty($pricing)) {
-            foreach ($pricing['rules'] as $rule) {
-                if ($rule['quantity'] <= $quantity) {
-                    return new AdjustmentData(
-                        AdjustmentModes::MODE_PERCENT,
-                        sprintf('%s %s%%', $pricing['designation'], $rule['percent']), // TODO translation / number_format
-                        $rule['percent']
-                    );
-                }
-            }
+        if (is_null($offer)) {
+            return null;
         }
 
-        // TODO Promotions (search using date, return if better)
-
-        return null;
+        return new AdjustmentData(
+            AdjustmentModes::MODE_PERCENT,
+            sprintf('%s %s%%', 'Reduction', $offer['percent']), // TODO designation
+            // TODO translation / number_format
+            $offer['percent']
+        );
     }
 
     /**
      * Finds the pricing matching the given product, group and country.
      *
      * @param ProductInterface $product
-     * @param ContextInterface $context
+     * @param ContextInterface $context ,
+     * @param bool             $useCache
      *
      * @return array
      */
-    public function findPricing(ProductInterface $product, ContextInterface $context)
+    public function findPricing(ProductInterface $product, ContextInterface $context, $useCache = true)
     {
-        $hash = implode('-', [
-            $context->getCustomerGroup()->getId(),
-            $context->getInvoiceCountry()->getId(),
-            $product->getBrand()->getId(),
-        ]);
-
-        return isset($this->grid[$hash]) ? $this->grid[$hash] : [];
+        return $this
+            ->offerRepository
+            ->findByProductAndContext($product, $context, $useCache);
     }
 }

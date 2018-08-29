@@ -3,10 +3,14 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Pricing;
 
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Common\CountryChoiceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Customer\CustomerGroupChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * Class PricingType
@@ -15,39 +19,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class PricingType extends ResourceFormType
 {
-    /**
-     * @var string
-     */
-    protected $groupClass;
-
-    /**
-     * @var string
-     */
-    protected $countryClass;
-
-    /**
-     * @var string
-     */
-    protected $brandClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $pricingClass
-     * @param string $groupClass
-     * @param string $countryClass
-     * @param string $brandClass
-     */
-    public function __construct($pricingClass, $groupClass, $countryClass, $brandClass)
-    {
-        parent::__construct($pricingClass);
-
-        $this->groupClass = $groupClass;
-        $this->countryClass = $countryClass;
-        $this->brandClass = $brandClass;
-    }
-
     /**
      * @inheritdoc
      */
@@ -68,20 +39,17 @@ class PricingType extends ResourceFormType
                     'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
                 ],
             ])
-            ->add('groups', ResourceType::class, [
-                'label'    => 'ekyna_commerce.customer_group.label.plural',
-                'class'    => $this->groupClass,
+            ->add('groups', CustomerGroupChoiceType::class, [
                 'multiple' => true,
+                // TODO 'required' => false,
             ])
-            ->add('countries', ResourceType::class, [
-                'label'    => 'ekyna_product.pricing.field.countries',
-                'class'    => $this->countryClass,
+            ->add('countries', CountryChoiceType::class, [
                 'multiple' => true,
+                // TODO 'required' => false,
             ])
-            ->add('brands', ResourceType::class, [
-                'label'    => 'ekyna_product.brand.label.plural',
-                'class'    => $this->brandClass,
+            ->add('brands', BrandChoiceType::class, [
                 'multiple' => true,
+                // TODO 'required' => false,
             ])
             ->add('rules', CollectionType::class, [
                 'label'         => 'ekyna_product.pricing.field.rules',
@@ -89,6 +57,12 @@ class PricingType extends ResourceFormType
                 'entry_options' => [],
                 'allow_add'     => true,
                 'allow_delete'  => true,
-            ]);
+            ])
+            ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\PricingInterface $pricing */
+                $pricing = $event->getData();
+                /** @see \Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber::onPreUpdate() */
+                $pricing->takeSnapshot();
+            });
     }
 }

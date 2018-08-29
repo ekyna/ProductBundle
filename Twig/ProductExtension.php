@@ -105,8 +105,8 @@ class ProductExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
-                'product_discount_grid',
-                [$this->priceRenderer, 'getDiscountGrid'],
+                'product_pricing_grid',
+                [$this->priceRenderer, 'renderPricingGrid'],
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
