@@ -85,7 +85,6 @@ class PriceRenderer
         ], $options);
     }
 
-
     /**
      * Renders the product price.
      *
@@ -189,12 +188,12 @@ class PriceRenderer
         $previousMin = null;
         foreach ($config['offers'] as $offer) {
             $offers[] = [
-                'min'     => $offer['quantity'],
+                'min'     => $offer['min_qty'],
                 'max'     => $previousMin,
                 'percent' => $offer['percent'] / 100,
                 'price'   => $offer['price'],
             ];
-            $previousMin = $offer['quantity'] - 1;
+            $previousMin = $offer['min_qty'] - 1;
         }
 
         $config['offers'] = array_reverse($offers);

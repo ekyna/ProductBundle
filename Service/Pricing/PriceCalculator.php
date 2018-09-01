@@ -3,9 +3,12 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Converter\CurrencyConverterInterface;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Pricing\Model\Price;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes;
@@ -19,9 +22,9 @@ use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 class PriceCalculator
 {
     /**
-     * @var PriceResolver
+     * @var OfferRepositoryInterface
      */
-    private $priceResolver;
+    private $offerRepository;
 
     /**
      * @var TaxResolverInterface
@@ -47,34 +50,24 @@ class PriceCalculator
     /**
      * Constructor.
      *
-     * @param PriceResolver              $priceResolver
+     * @param OfferRepositoryInterface   $offerRepository
      * @param TaxResolverInterface       $taxResolver
      * @param CurrencyConverterInterface $currencyConverter
      * @param ContextProviderInterface   $contextProvider
      * @param string                     $defaultCurrency
      */
     public function __construct(
-        PriceResolver $priceResolver,
+        OfferRepositoryInterface $offerRepository,
         TaxResolverInterface $taxResolver,
         CurrencyConverterInterface $currencyConverter,
         ContextProviderInterface $contextProvider,
         $defaultCurrency
     ) {
-        $this->priceResolver = $priceResolver;
+        $this->offerRepository = $offerRepository;
         $this->taxResolver = $taxResolver;
         $this->currencyConverter = $currencyConverter;
         $this->contextProvider = $contextProvider;
         $this->defaultCurrency = $defaultCurrency;
-    }
-
-    /**
-     * Returns the priceResolver.
-     *
-     * @return PriceResolver
-     */
-    public function getPriceResolver()
-    {
-        return $this->priceResolver;
     }
 
     /**
@@ -106,8 +99,17 @@ class PriceCalculator
         $price = new Price($amount, $currency, $mode);
 
         // Discount adjustment
-        if (null !== $discount = $this->priceResolver->resolve($product, $context)) {
-            $price->addDiscount($discount);
+        $offer = $this
+            ->offerRepository
+            ->findOneByProductAndContextAndQuantity($product, $context);
+
+        if (!is_null($offer)) {
+            $price->addDiscount(new AdjustmentData(
+                AdjustmentModes::MODE_PERCENT,
+                sprintf('%s %s%%', 'Reduction', $offer['percent']), // TODO designation
+                // TODO translation / number_format
+                $offer['percent']
+            ));
         }
 
         // Taxation adjustments
@@ -324,7 +326,11 @@ class PriceCalculator
 
         // Offers rules
         if ($discounts) {
-            $pricing['discounts'] = $this->priceResolver->findPricing($product, $context); // TODO unset rules id
+            $offers = $this->offerRepository->findByProductAndContext($product, $context);
+            foreach ($offers as &$offer) {
+                unset($offer['price']);
+            }
+            $pricing['discounts'] = $offers;
         }
 
         /** @see \Ekyna\Component\Commerce\Common\Resolver\DiscountResolver::resolveSaleItem() */
@@ -360,7 +366,7 @@ class PriceCalculator
             $context = $this->contextProvider->getContext();
         }
 
-        $offers = $this->priceResolver->findPricing($product, $context);
+        $offers = $this->offerRepository->findByProductAndContext($product, $context);
 
         if (empty($offers)) {
             return [];

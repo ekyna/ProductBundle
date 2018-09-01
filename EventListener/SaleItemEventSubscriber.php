@@ -4,12 +4,14 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -36,9 +38,9 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     protected $formBuilder;
 
     /**
-     * @var PriceResolver
+     * @var OfferRepositoryInterface
      */
-    protected $priceResolver;
+    protected $offerRepository;
 
 
     /**
@@ -47,18 +49,18 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      * @param ContextProviderInterface $contextProvider
      * @param ItemBuilder              $itemBuilder
      * @param FormBuilder              $formBuilder
-     * @param PriceResolver            $priceResolver
+     * @param OfferRepositoryInterface $offerRepository
      */
     public function __construct(
         ContextProviderInterface $contextProvider,
         ItemBuilder $itemBuilder,
         FormBuilder $formBuilder,
-        PriceResolver $priceResolver
+        OfferRepositoryInterface $offerRepository
     ) {
         $this->contextProvider = $contextProvider;
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formBuilder;
-        $this->priceResolver = $priceResolver;
+        $this->offerRepository = $offerRepository;
     }
 
     /**
@@ -117,13 +119,21 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         $context = $this->contextProvider->getContext($item->getSale());
 
-        $adjustmentsData = $this
-            ->priceResolver
-            ->resolve($product, $context, $item->getTotalQuantity());
+        $offer = $this
+            ->offerRepository
+            ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
 
-        if ($adjustmentsData) {
-            $event->addAdjustmentData($adjustmentsData);
+        if (is_null($offer)) {
+            return;
         }
+
+        $type = 0 < $offer['special_offer_id'] ? 'Promotion' : 'Reduction'; // TODO translation
+
+        $event->addAdjustmentData(new AdjustmentData(
+            AdjustmentModes::MODE_PERCENT,
+            sprintf('%s %s%%', $type, $offer['percent']),
+            $offer['percent'] // TODO number_format
+        ));
     }
 
     /**

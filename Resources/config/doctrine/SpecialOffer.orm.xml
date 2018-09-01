@@ -13,6 +13,10 @@
             <lifecycle-callback type="postLoad" method="onPostLoad"/>
         </lifecycle-callbacks>
 
+        <unique-constraints>
+            <unique-constraint columns="name" name="unique_special_offer_reference" />
+        </unique-constraints>
+
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>

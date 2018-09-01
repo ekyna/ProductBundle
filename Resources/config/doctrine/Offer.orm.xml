@@ -21,6 +21,14 @@
             <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
         </many-to-one>
 
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface" field="specialOffer">
+            <join-column name="special_offer_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\PricingInterface" field="pricing">
+            <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+
         <many-to-one target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface" field="group">
             <join-column name="customer_group_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
         </many-to-one>

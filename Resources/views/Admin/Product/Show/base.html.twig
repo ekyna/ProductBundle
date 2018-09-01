@@ -22,6 +22,13 @@
             </a>
         </li>
         {% endblock pricing_tab %}
+        {% if offer_list is not empty %}
+        <li>
+            <a href="#product-offers" id="toggle-product-offers" data-toggle="tab">
+                {{- 'ekyna_product.offer.label.plural'|trans -}}
+            </a>
+        </li>
+        {% endif %}
         {% block stock_tab %}
         <li>
             <a href="#product-stock" id="toggle-product-stock" data-toggle="tab">
@@ -105,19 +112,14 @@
                     </div>
                 {% endblock pricing_content %}
                 {{ macros.show_option_groups(product) }}
-                {% if offer_list is defined %}
-                    <hr>
-                    <div class="row show-row">
-                        <div class="col-md-2 show-label">{{ 'ekyna_product.offer.label.plural'|trans }}</div>
-                        <div class="col-md-10">
-                            <div class="show-widget{# show-widget-block#}">
-                                {% include '@EkynaProduct/Admin/Product/offers.html.twig' %}
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
                 </div>
             {% endblock pricing_pane %}
+
+            {% if offer_list is not empty %}
+            <div class="tab-pane" id="product-offers">
+                {% include '@EkynaProduct/Admin/Product/Show/_offers.html.twig' %}
+            </div>
+            {% endif %}
 
             {% block stock_pane %}
                 <div class="tab-pane" id="product-stock">

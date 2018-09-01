@@ -103,7 +103,6 @@
         <service id="ekyna_product.commerce.subject_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider">
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_product.pricing.resolver"/>
             <argument>%ekyna_product.product.class%</argument>
             <tag name="ekyna_commerce.subject_provider"/>
         </service>
@@ -368,6 +367,12 @@
             <argument>%ekyna_product.category.class%</argument>
             <tag name="table.type"/>
         </service>
+        <service id="ekyna_product.special_offer.table_type"
+                 class="Ekyna\Bundle\ProductBundle\Table\Type\SpecialOfferType">
+            <argument>%ekyna_product.special_offer.class%</argument>
+            <argument>%ekyna_product.brand.class%</argument>
+            <tag name="table.type"/>
+        </service>
 
         <!-- Show types -->
         <service id="ekyna_product.show.attribute_config_type"
@@ -403,6 +408,8 @@
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument>%ekyna_commerce.customer_group.class%</argument>
             <argument>%ekyna_commerce.country.class%</argument>
+            <argument>%ekyna_product.pricing.class%</argument>
+            <argument>%ekyna_product.special_offer.class%</argument>
         </service>
 
         <!-- Offer invalidator -->
@@ -411,18 +418,11 @@
             <argument>%ekyna_product.product.class%</argument>
         </service>
 
-        <!-- Price resolver -->
-        <service id="ekyna_product.pricing.resolver"
-                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver"
-                 lazy="true">
-            <argument id="ekyna_product.offer.repository" type="service"/>
-        </service>
-
         <!-- Price calculator -->
         <service id="ekyna_product.pricing.calculator"
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator"
                  lazy="true">
-            <argument id="ekyna_product.pricing.resolver" type="service"/>
+            <argument id="ekyna_product.offer.repository" type="service"/>
             <argument id="ekyna_commerce.pricing.tax_resolver" type="service"/>
             <argument id="ekyna_commerce.currency.converter" type="service"/>
             <argument id="ekyna_commerce.common.context_provider" type="service"/>
@@ -518,7 +518,7 @@
             <argument type="service" id="ekyna_commerce.common.context_provider"/>
             <argument type="service" id="ekyna_product.commerce.item_builder"/>
             <argument type="service" id="ekyna_product.commerce.form_builder"/>
-            <argument type="service" id="ekyna_product.pricing.resolver"/>
+            <argument type="service" id="ekyna_product.offer.repository"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

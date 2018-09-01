@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
+use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
@@ -48,8 +49,14 @@ class OfferResolver
     public function resolve(ProductInterface $product)
     {
         $discounts = $this->pricingRepository->findRulesByBrand($product->getBrand());
+        foreach ($discounts as &$discount) {
+            $discount['type'] = Offer::TYPE_PRICING;
+        }
 
         $specialOffers = $this->specialOfferRepository->findRulesByProduct($product);
+        foreach ($specialOffers as &$specialOffer) {
+            $specialOffer['type'] = Offer::TYPE_SPECIAL;
+        }
 
         $offers = array_merge($discounts, $specialOffers);
 
@@ -72,7 +79,7 @@ class OfferResolver
 
         // Set net prices
         foreach ($offers as &$data) {
-            $data['net_price'] = round($product->getNetPrice() - ($product->getNetPrice() * $data['percent'] / 100), 5);
+            $data['net_price'] = round($product->getNetPrice() * (1 - $data['percent'] / 100), 5);
         }
 
         return $offers;

@@ -123,10 +123,10 @@ class OfferEventSubscriber implements EventSubscriberInterface
         foreach ($this->parentIds as $productId) {
             foreach ($groupIds as $groupId) {
                 foreach ($countryIds as $countryId) {
-                    /*$this->addId(
+                    $this->addId(
                         $this->cacheIds,
                         Offer::buildCacheIdByIds($productId, $groupId, $countryId)
-                    );*/
+                    );
                     $this->addId(
                         $this->cacheIds,
                         Offer::buildCacheIdByIds($productId, $groupId, $countryId, 1, false)

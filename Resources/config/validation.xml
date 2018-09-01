@@ -972,6 +972,9 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\SpecialOffer">
+        <property name="name">
+            <constraint name="NotBlank"/>
+        </property>
         <property name="percent">
             <constraint name="GreaterThan">
                 <option name="value">0</option>
@@ -982,6 +985,11 @@
                 <option name="value">1</option>
             </constraint>
         </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>name</value>
+            </option>
+        </constraint>
     </class>
 
 </constraint-mapping>

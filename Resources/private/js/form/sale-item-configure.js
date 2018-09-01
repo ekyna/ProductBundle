@@ -44,7 +44,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
         if (discounted) {
             if (Array.isArray(this.discounts)) {
                 discount = this.discounts.find(function (d) {
-                    return d.quantity <= quantity;
+                    return d.min_qty <= quantity;
                 });
             }
             if (discount) {
@@ -145,6 +145,10 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
      * @returns {AvailabilityResult}
      */
     Availability.resolve = function (quantity) {
+        if (!this) {
+            return new AvailabilityResult(0);
+        }
+
         if (quantity === undefined) {
             quantity = 1;
         }

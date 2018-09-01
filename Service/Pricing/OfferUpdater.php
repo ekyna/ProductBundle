@@ -52,6 +52,16 @@ class OfferUpdater
      */
     protected $countryClass;
 
+    /**
+     * @var string
+     */
+    protected $pricingClass;
+
+    /**
+     * @var string
+     */
+    protected $specialOfferClass;
+
 
     /**
      * Constructor.
@@ -63,6 +73,8 @@ class OfferUpdater
      * @param ProductRepositoryInterface $productRepository
      * @param string                     $customerGroupClass
      * @param string                     $countryClass
+     * @param string                     $pricingClass
+     * @param string                     $specialOfferClass
      */
     public function __construct(
         EntityManager $manager,
@@ -71,7 +83,9 @@ class OfferUpdater
         OfferRepository $offerRepository,
         ProductRepositoryInterface $productRepository,
         string $customerGroupClass,
-        string $countryClass
+        string $countryClass,
+        string $pricingClass,
+        string $specialOfferClass
     ) {
         $this->manager = $manager;
         $this->offerResolver = $offerResolver;
@@ -80,6 +94,8 @@ class OfferUpdater
         $this->productRepository = $productRepository;
         $this->customerGroupClass = $customerGroupClass;
         $this->countryClass = $countryClass;
+        $this->pricingClass = $pricingClass;
+        $this->specialOfferClass = $specialOfferClass;
     }
 
     /**
@@ -137,6 +153,11 @@ class OfferUpdater
             $offers = $this->offerResolver->resolve($variant);
 
             foreach ($offers as $offer) {
+                // Only offers for 1 quantity
+                if (1 != $offer['min_qty']) {
+                    continue;
+                }
+
                 $key = $this->getOfferKey($offer);
 
                 if (isset($newOffers[$key])) {
@@ -259,6 +280,16 @@ class OfferUpdater
                 );
             }
 
+            if ($data['type'] === Offer::TYPE_PRICING) {
+                $offer->setPricing(
+                    $this->manager->getReference($this->pricingClass, $data['id'])
+                );
+            } elseif ($data['type'] === Offer::TYPE_SPECIAL) {
+                $offer->setSpecialOffer(
+                    $this->manager->getReference($this->specialOfferClass, $data['id'])
+                );
+            }
+
             $this->manager->persist($offer);
         }
 
@@ -281,7 +312,9 @@ class OfferUpdater
             return;
         }
 
-        // TODO variant => variable
+        if (ProductTypes::TYPE_VARIANT === $product->getType()) {
+            $this->offerInvalidator->invalidateByProductId($product->getParent()->getId());
+        }
 
         $bundleParents = $this->productRepository->findParentsByBundled($product);
         foreach ($bundleParents as $b) {

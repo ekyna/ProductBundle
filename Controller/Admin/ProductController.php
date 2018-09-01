@@ -514,10 +514,7 @@ class ProductController extends AbstractSubjectController
 
         $data['optionParents'] = $repository->findParentsByOptionProduct($product);
         $data['bundleParents'] = $repository->findParentsByBundled($product);
-
-        if (ProductTypes::isChildType($product->getType())) {
-            $data['offer_list'] = $this->getOffersList($product);
-        }
+        $data['offer_list'] = $this->getOffersList($product);
 
         return null;
     }
@@ -583,12 +580,11 @@ class ProductController extends AbstractSubjectController
             $locale = $this->get('ekyna_resource.locale.request_provider')->getCurrentLocale();
             $region = Intl::getRegionBundle();
 
-
             if (!isset($list[$key])) {
                 $list[$key] = [
                     'title' => sprintf(
                         "%s / %s",
-                        $group ? $group->getTitle() : $allGroups,
+                        $group ? $group->getName() : $allGroups,
                         $country ? $region->getCountryName($country->getCode(), $locale) : $allCountries
                     ),
                     'offers' => [],

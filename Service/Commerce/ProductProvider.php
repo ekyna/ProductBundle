@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceResolver;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Ekyna\Component\Commerce\Subject\Entity\SubjectIdentity;
@@ -25,11 +24,6 @@ class ProductProvider implements SubjectProviderInterface
     protected $productRepository;
 
     /**
-     * @var PriceResolver
-     */
-    protected $priceResolver;
-
-    /**
      * @var string
      */
     private $productClass;
@@ -39,16 +33,11 @@ class ProductProvider implements SubjectProviderInterface
      * Constructor.
      *
      * @param ProductRepositoryInterface $productRepository
-     * @param PriceResolver              $priceResolver
      * @param string                     $productClass
      */
-    public function __construct(
-        ProductRepositoryInterface $productRepository,
-        PriceResolver $priceResolver,
-        $productClass
-    ) {
+    public function __construct(ProductRepositoryInterface $productRepository, $productClass)
+    {
         $this->productRepository = $productRepository;
-        $this->priceResolver = $priceResolver;
         $this->productClass = $productClass;
     }
 

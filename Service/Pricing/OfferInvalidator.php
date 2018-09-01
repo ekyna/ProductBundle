@@ -62,16 +62,11 @@ class OfferInvalidator
             $qb
                 ->update($this->productClass, 'p')
                 ->set('p.pendingOffers', ':flag')
-                ->andWhere($qb->expr()->in('p.type', ':types'))
                 ->andWhere($qb->expr()->in('p.id', ':product_ids'))
                 ->getQuery()
                 ->setParameters([
                     'flag'        => true,
                     'product_ids' => $this->productIds,
-                    'types' => [
-                        ProductTypes::TYPE_SIMPLE,
-                        ProductTypes::TYPE_VARIANT,
-                    ],
                 ])
                 ->execute();
         }
@@ -87,7 +82,7 @@ class OfferInvalidator
                 ->setParameters([
                     'flag'      => true,
                     'brand_ids' => $this->brandIds,
-                    'types' => [
+                    'types'     => [
                         ProductTypes::TYPE_SIMPLE,
                         ProductTypes::TYPE_VARIANT,
                     ],

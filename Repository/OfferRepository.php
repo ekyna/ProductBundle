@@ -14,7 +14,7 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class OfferRepository extends ResourceRepository
+class OfferRepository extends ResourceRepository implements OfferRepositoryInterface
 {
     /**
      * @var \Doctrine\ORM\Query
@@ -24,7 +24,7 @@ class OfferRepository extends ResourceRepository
     /**
      * @var \Doctrine\ORM\Query
      */
-    private $findByProductAndContextAndQuantityQuery;
+    private $findOneByProductAndContextAndQuantityQuery;
 
     /**
      * @var array
@@ -42,13 +42,7 @@ class OfferRepository extends ResourceRepository
     }
 
     /**
-     * Find offers by product, context and quantity.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
-     * @param bool                   $useCache
-     *
-     * @return array
+     * @inheritdoc
      */
     public function findByProductAndContext(
         Model\ProductInterface $product,
@@ -66,26 +60,35 @@ class OfferRepository extends ResourceRepository
             $query->useResultCache(false);
         }
 
-        return $query
+        $offers = $query
             ->setParameters([
                 'product' => $product,
                 'group'   => $group,
                 'country' => $country,
             ])
             ->getResult(Query::HYDRATE_SCALAR);
+
+        // Remove worst offers
+        // TODO Should be done by the query :s
+        foreach ($offers as $ak => $ad) {
+            foreach ($offers as $bk => $bd) {
+                if ($ak == $bk) {
+                    continue;
+                }
+
+                if ($ad['min_qty'] == $bd['min_qty'] && $ad['percent'] > $bd['percent']) {
+                    unset($offers[$bk]);
+                }
+            }
+        }
+
+        return $offers;
     }
 
     /**
-     * Find offers by product, context and quantity.
-     *
-     * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
-     * @param float                  $quantity
-     * @param bool                   $useCache
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function findByProductAndContextAndQuantity(
+    public function findOneByProductAndContextAndQuantity(
         Model\ProductInterface $product,
         ContextInterface $context,
         $quantity = 1.0,
@@ -95,9 +98,9 @@ class OfferRepository extends ResourceRepository
         $country = $context->getInvoiceCountry();
         $quantity = intval($quantity);
 
-        $query = $this->getFindByProductAndContextAndQuantityQuery();
+        $query = $this->getOneFindByProductAndContextAndQuantityQuery();
 
-        if ($useCache && 1 === $quantity && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
+        if ($useCache && (1 === $quantity) && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
             $query->useResultCache(true, null, Offer::buildCacheId($product, $group, $country, $quantity, false));
         } else {
             $query->useResultCache(false);
@@ -114,22 +117,17 @@ class OfferRepository extends ResourceRepository
     }
 
     /**
-     * Finds offers by product.
-     *
-     * @param Model\ProductInterface $product
-     * @param bool                   $asArray
-     *
-     * @return Offer[]|array[]
+     * @inheritdoc
      */
     public function findByProduct(Model\ProductInterface $product, $asArray = false)
     {
         $qb = $this->createQueryBuilder('o');
         $qb
             ->andWhere($qb->expr()->eq('o.product', ':product'))
-            ->addOrderBy('IDENTITY(o.group)', 'DESC')
-            ->addOrderBy('IDENTITY(o.country)', 'DESC')
+            ->addOrderBy('o.percent', 'DESC')
             ->addOrderBy('o.minQuantity', 'DESC')
-            ->addOrderBy('o.percent', 'DESC');
+            ->addOrderBy('IDENTITY(o.group)', 'DESC')
+            ->addOrderBy('IDENTITY(o.country)', 'DESC');
 
         $parameters = [
             'product' => $product,
@@ -156,18 +154,21 @@ class OfferRepository extends ResourceRepository
 
         return $this->findByProductAndContextQuery = $qb
             ->select([
-                'o.id as id',
+                //'o.id as id',
                 // TODO 'p.designation as designation',
-                'o.minQuantity as quantity',
+                //'IDENTITY(o.group) as group_id',
+                //'IDENTITY(o.country) as country_id',
+                'o.minQuantity as min_qty',
                 'o.percent as percent',
+                'o.netPrice as price',
             ])
             ->andWhere($ex->eq('o.product', ':product'))
             ->andWhere($ex->orX($ex->eq('o.group', ':group'), $ex->isNull('o.group')))
             ->andWhere($ex->orX($ex->eq('o.country', ':country'), $ex->isNull('o.country')))
+            ->addOrderBy('o.percent', 'DESC')
+            ->addOrderBy('o.minQuantity', 'DESC')
             ->addOrderBy('IDENTITY(o.group)', 'DESC')
             ->addOrderBy('IDENTITY(o.country)', 'DESC')
-            ->addOrderBy('o.minQuantity', 'DESC')
-            ->addOrderBy('o.percent', 'DESC')
             ->getQuery()
             ->useQueryCache(true);
     }
@@ -177,29 +178,32 @@ class OfferRepository extends ResourceRepository
      *
      * @return \Doctrine\ORM\Query
      */
-    private function getFindByProductAndContextAndQuantityQuery()
+    private function getOneFindByProductAndContextAndQuantityQuery()
     {
-        if (null !== $this->findByProductAndContextAndQuantityQuery) {
-            return $this->findByProductAndContextAndQuantityQuery;
+        if (null !== $this->findOneByProductAndContextAndQuantityQuery) {
+            return $this->findOneByProductAndContextAndQuantityQuery;
         }
 
         $qb = $this->createQueryBuilder('o');
         $ex = $qb->expr();
 
-        return $this->findByProductAndContextAndQuantityQuery = $qb
+        return $this->findOneByProductAndContextAndQuantityQuery = $qb
             ->select([
                 // TODO 'p.designation as designation',
                 'o.percent as percent',
+                'IDENTITY(o.specialOffer) as special_offer_id',
+                'IDENTITY(o.pricing) as pricing_id',
             ])
             ->andWhere($ex->eq('o.product', ':product'))
             ->andWhere($ex->orX($ex->eq('o.group', ':group'), $ex->isNull('o.group')))
             ->andWhere($ex->orX($ex->eq('o.country', ':country'), $ex->isNull('o.country')))
             ->andWhere($ex->lte('o.minQuantity', ':quantity'))
+            ->addOrderBy('o.percent', 'DESC')
+            ->addOrderBy('o.minQuantity', 'DESC')
             ->addOrderBy('IDENTITY(o.group)', 'DESC')
             ->addOrderBy('IDENTITY(o.country)', 'DESC')
-            ->addOrderBy('o.minQuantity', 'DESC')
-            ->addOrderBy('o.percent', 'DESC')
             ->getQuery()
+            ->setMaxResults(1)
             ->useQueryCache(true);
     }
 
@@ -222,6 +226,8 @@ class OfferRepository extends ResourceRepository
                 'o.minQuantity as min_qty',
                 'o.percent as percent',
                 'o.netPrice as net_price',
+                'IDENTITY(o.specialOffer) as special_offer_id',
+                'IDENTITY(o.pricing) as pricing_id',
             ])
             ->getQuery()
             ->setParameters($parameters)

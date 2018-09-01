@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
@@ -14,8 +14,8 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  */
 class Offer implements ResourceInterface
 {
-    const TYPE_SPECIAL  = 'special';
-    const TYPE_DISCOUNT = 'discount';
+    const TYPE_SPECIAL = 'special';
+    const TYPE_PRICING = 'pricing';
 
     /**
      * @var int
@@ -38,7 +38,7 @@ class Offer implements ResourceInterface
     private $minQuantity;
 
     /**
-     * @var ProductInterface
+     * @var Model\ProductInterface
      */
     private $product;
 
@@ -53,9 +53,14 @@ class Offer implements ResourceInterface
     private $country;
 
     /**
-     * @var string
+     * @var Model\SpecialOfferInterface
      */
-    private $type; // TODO
+    private $specialOffer;
+
+    /**
+     * @var Model\PricingInterface
+     */
+    private $pricing;
 
 
     /**
@@ -143,7 +148,7 @@ class Offer implements ResourceInterface
     /**
      * Returns the product.
      *
-     * @return ProductInterface
+     * @return Model\ProductInterface
      */
     public function getProduct()
     {
@@ -153,11 +158,11 @@ class Offer implements ResourceInterface
     /**
      * Sets the product.
      *
-     * @param ProductInterface $product
+     * @param Model\ProductInterface $product
      *
      * @return Offer
      */
-    public function setProduct(ProductInterface $product)
+    public function setProduct(Model\ProductInterface $product)
     {
         $this->product = $product;
 
@@ -213,6 +218,54 @@ class Offer implements ResourceInterface
     }
 
     /**
+     * Returns the special offer.
+     *
+     * @return Model\SpecialOfferInterface
+     */
+    public function getSpecialOffer()
+    {
+        return $this->specialOffer;
+    }
+
+    /**
+     * Sets the special offer.
+     *
+     * @param Model\SpecialOfferInterface $specialOffer
+     *
+     * @return Offer
+     */
+    public function setSpecialOffer(Model\SpecialOfferInterface $specialOffer = null)
+    {
+        $this->specialOffer = $specialOffer;
+
+        return $this;
+    }
+
+    /**
+     * Returns the pricing.
+     *
+     * @return Model\PricingInterface
+     */
+    public function getPricing()
+    {
+        return $this->pricing;
+    }
+
+    /**
+     * Sets the pricing.
+     *
+     * @param Model\PricingInterface $pricing
+     *
+     * @return Offer
+     */
+    public function setPricing(Model\PricingInterface $pricing = null)
+    {
+        $this->pricing = $pricing;
+
+        return $this;
+    }
+
+    /**
      * Returns this offer's cache id.
      *
      * @param null $quantity
@@ -234,7 +287,7 @@ class Offer implements ResourceInterface
     /**
      * Builds and returns the offer(s) cache id.
      *
-     * @param ProductInterface            $product
+     * @param Model\ProductInterface      $product
      * @param CustomerGroupInterface|null $group
      * @param CountryInterface|null       $country
      * @param float                       $quantity
@@ -245,7 +298,7 @@ class Offer implements ResourceInterface
      * @see \Ekyna\Bundle\ProductBundle\Repository\OfferRepository
      */
     public static function buildCacheId(
-        ProductInterface $product,
+        Model\ProductInterface $product,
         CustomerGroupInterface $group = null,
         CountryInterface $country = null,
         $quantity = null,
