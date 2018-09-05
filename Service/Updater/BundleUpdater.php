@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Component\Commerce\Common\Model\Units;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
@@ -41,6 +42,7 @@ class BundleUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
+        $unit = $bundle->getUnit();
         $justInTime = true; $disabled = true; $supplierPreOrder = true;
         $inStock = $virtualStock = $availableStock = $eda = null;
 
@@ -65,19 +67,19 @@ class BundleUpdater
                 }
 
                 // In stock
-                $slotInStock = $product->getInStock() / $choice->getMinQuantity();
+                $slotInStock = Units::round($product->getInStock() / $choice->getMinQuantity(), $unit);
                 if (null === $inStock || $slotInStock < $inStock) {
                     $inStock = $slotInStock;
                 }
 
                 // Available stock
-                $slotAvailableStock = $product->getAvailableStock() / $choice->getMinQuantity();
+                $slotAvailableStock = Units::round($product->getAvailableStock() / $choice->getMinQuantity(), $unit);
                 if (null === $availableStock || $slotAvailableStock < $availableStock) {
                     $availableStock = $slotAvailableStock;
                 }
 
                 // Virtual stock
-                $slotVirtualStock = $product->getVirtualStock() / $choice->getMinQuantity();
+                $slotVirtualStock = Units::round($product->getVirtualStock() / $choice->getMinQuantity(), $unit);
                 if (null === $virtualStock || $slotVirtualStock < $virtualStock) {
                     $virtualStock = $slotVirtualStock;
 

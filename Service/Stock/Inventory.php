@@ -326,6 +326,7 @@ DQL;
                 'p.stockMode as stock_mode',
                 'p.stockState as stock_state',
                 'p.stockFloor as stock_floor',
+                'p.replenishmentTime as replenishment',
                 'p.inStock as in_stock',
                 'p.availableStock as available_stock',
                 'p.virtualStock as virtual_stock',
@@ -341,9 +342,16 @@ DQL;
             ->leftJoin('p.brand', 'b')
             ->leftJoin('p.parent', 'parent')
             ->andWhere($pQb->expr()->in('p.type', ':types'))
+            ->andWhere($pQb->expr()->not($pQb->expr()->andX(
+                $pQb->expr()->eq('p.endOfLife', ':end_of_life'),
+                $pQb->expr()->neq('p.virtualStock', ':virtual_stock')
+
+            )))
             ->setParameters([
-                'types'    => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
-                'provider' => ProductProvider::NAME,
+                'types'         => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
+                'provider'      => ProductProvider::NAME,
+                'end_of_life'   => true,
+                'virtual_stock' => 0,
             ]);
 
         return $pQb;

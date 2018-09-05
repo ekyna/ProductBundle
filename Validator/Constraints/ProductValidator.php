@@ -62,20 +62,20 @@ class ProductValidator extends ConstraintValidator
             }
 
             // Bundle product must be visible if it composed by at least one visible product
-            if ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                foreach ($product->getBundleSlots() as $slot) {
-                    /** @var Model\BundleChoiceInterface $choice */
-                    $choice = $slot->getChoices()->first();
-                    if ($choice->getProduct()->isVisible()) {
-                        $this->context
-                            ->buildViolation($constraint->bundle_must_be_visible)
-                            ->atPath('visible')
-                            ->addViolation();
-
-                        return;
-                    }
-                }
-            }
+//            if ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+//                foreach ($product->getBundleSlots() as $slot) {
+//                    /** @var Model\BundleChoiceInterface $choice */
+//                    $choice = $slot->getChoices()->first();
+//                    if ($choice->getProduct()->isVisible()) {
+//                        $this->context
+//                            ->buildViolation($constraint->bundle_must_be_visible)
+//                            ->atPath('visible')
+//                            ->addViolation();
+//
+//                        return;
+//                    }
+//                }
+//            }
         }
 
         if (null === $product->getId() || $product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
@@ -86,16 +86,16 @@ class ProductValidator extends ConstraintValidator
 
         if ($product->isVisible()) {
             // Visible products can't compose invisible products
-            foreach ($bundleParents as $parent) {
-                if (!$parent->isVisible()) {
-                    $this->context
-                        ->buildViolation($constraint->child_must_not_be_visible)
-                        ->atPath('visible')
-                        ->addViolation();
-
-                    return;
-                }
-            }
+//            foreach ($bundleParents as $parent) {
+//                if (!$parent->isVisible()) {
+//                    $this->context
+//                        ->buildViolation($constraint->child_must_not_be_visible)
+//                        ->atPath('visible')
+//                        ->addViolation();
+//
+//                    return;
+//                }
+//            }
         } else {
             $optionParents = $this->productRepository->findParentsByOptionProduct($product);
             if (!empty($optionParents)) {

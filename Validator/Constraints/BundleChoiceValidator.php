@@ -43,12 +43,12 @@ class BundleChoiceValidator extends ConstraintValidator
         // Related to SaleItem : private sale item can't contain public children.
         // Without this constraint, the parent would become public.
         /** @see \Ekyna\Bundle\CommerceBundle\EventListener\SaleItemEventSubscriber::fixItemPrivacy() */
-        if (!$parent->isVisible() && $product->isVisible()) {
+        /*if (!$parent->isVisible() && $product->isVisible()) {
             $this->context
                 ->buildViolation($constraint->visibility_integrity)
                 ->atPath('product')
                 ->addViolation();
-        }
+        }*/
 
         // Private product choice must have the same tax group as the parent's one
         if (!$product->isVisible() && ($product->getTaxGroup() !== $parent->getTaxGroup())) {
