@@ -101,6 +101,8 @@ class ConfigurableUpdater
                 $slotsBestChoices[] = $bestChoice;
             }
 
+            $inStock = $virtualStock = $availableStock = $eda = null;
+
             // For each slot's best choice
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
             foreach ($slotsBestChoices as $choice) {
