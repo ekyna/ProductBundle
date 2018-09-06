@@ -11,6 +11,7 @@ use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectModeType;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
+use Ekyna\Bundle\ProductBundle\Table\Column\ReferenceType;
 use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
@@ -129,7 +130,7 @@ class ProductType extends ResourceTableType
                 'route_parameters_map' => ['productId' => 'id'],
                 'position'             => 30,
             ])
-            ->addColumn('reference', CType\Column\TextType::class, [
+            ->addColumn('reference', ReferenceType::class, [
                 'label'    => 'ekyna_core.field.reference',
                 'position' => 40,
             ])
