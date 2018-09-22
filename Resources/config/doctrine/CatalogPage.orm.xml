@@ -6,7 +6,8 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
     <!--xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"-->
 
-    <entity name="Ekyna\Bundle\ProductBundle\Entity\CatalogPage"
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\CatalogPage"
             table="product_catalog_page">
 
         <id name="id" type="integer" column="id">
@@ -36,6 +37,6 @@
             <!--<gedmo:sortable-group />-->
         </many-to-one>
 
-    </entity>
+    </mapped-superclass>
 
 </doctrine-mapping>
