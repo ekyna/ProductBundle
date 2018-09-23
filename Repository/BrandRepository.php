@@ -26,11 +26,11 @@ class BrandRepository extends TranslatableResourceRepository
 
         return $qb
             ->leftJoin($as . '.seo', 's')
-            ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
-            ->addSelect('s', 's_t')
+            ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
+            ->addSelect('b', 'b_t', 's')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
-            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
+            ->andWhere($qb->expr()->eq('b_t.slug', ':slug'))
+            ->andWhere($qb->expr()->eq('b_t.locale', ':locale'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)

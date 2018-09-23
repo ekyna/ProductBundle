@@ -600,17 +600,21 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      *
      * @param QueryBuilder $qb
      * @param string       $alias
+     * @param bool         $withTranslations
      *
      * @return ProductRepository
      */
-    protected function joinBrand(QueryBuilder $qb, $alias = null)
+    protected function joinBrand(QueryBuilder $qb, $alias = null, $withTranslations = true)
     {
         $alias = $alias ?: $this->getAlias();
 
-        $qb
-            ->join($alias . '.brand', 'b')
-            ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
-            ->addSelect('b', 'b_t');
+        $qb->join($alias . '.brand', 'b');
+
+        if ($withTranslations) {
+            $qb
+                ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
+                ->addSelect('b', 'b_t');
+        }
 
         return $this;
     }
@@ -629,10 +633,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $alias = $alias ?: $this->getAlias();
 
         $qb->leftJoin($alias . '.categories', 'c');
+
         if ($withTranslations) {
             $qb
-                ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
-                ->addSelect('b', 'b_t');
+                ->leftJoin('c.translations', 'c_t', Expr\Join::WITH, $this->getLocaleCondition('c_t'))
+                ->addSelect('c', 'c_t');
         }
 
         return $this;
