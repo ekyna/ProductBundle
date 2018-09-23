@@ -177,7 +177,11 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     public function findOneBySlug($slug)
     {
         $as = $this->getAlias();
-        $qb = $this->getQueryBuilder();
+        $qb = $this
+            ->getQueryBuilder()
+            ->resetDQLPart('join')
+            ->resetDQLPart('select')
+            ->select($as);
 
         $this
             ->joinCategories($qb)
@@ -187,10 +191,12 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
+            ->leftJoin($as . '.translations', 't', Expr\Join::WITH, $this->getLocaleCondition('t'))
+            ->addSelect('t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
-            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->andWhere($qb->expr()->eq('t.slug', ':slug'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)

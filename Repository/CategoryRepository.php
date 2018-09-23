@@ -30,11 +30,14 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
         $qb = $this->getQueryBuilder();
 
         return $qb
+            ->resetDQLPart('join')
+            ->resetDQLPart('select')
+            ->leftJoin($as . '.translations', 't', Expr\Join::WITH, $this->getLocaleCondition('t'))
             ->leftJoin($as . '.seo', 's')
             ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
-            ->addSelect('s', 's_t')
+            ->addSelect($as, 't', 's', 's_t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
+            ->andWhere($qb->expr()->eq('t.slug', ':slug'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
