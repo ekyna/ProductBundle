@@ -191,7 +191,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
-            ->andWhere($qb->expr()->eq('translation.locale', ':locale'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
@@ -201,7 +200,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
                 'brand_visible'    => true,
                 'category_visible' => true,
                 'slug'             => $slug,
-                'locale'           => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
 

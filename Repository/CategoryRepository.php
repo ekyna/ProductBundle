@@ -31,11 +31,10 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
 
         return $qb
             ->leftJoin($as . '.seo', 's')
-            ->leftJoin('c.translations', 'c_t', Expr\Join::WITH, $this->getLocaleCondition('c_t'))
-            ->addSelect('c', 'c_t', 's')
+            ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
+            ->addSelect('s', 's_t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('c_t.slug', ':slug'))
-            ->andWhere($qb->expr()->eq('c_t.locale', ':locale'))
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
@@ -43,7 +42,6 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->setParameters([
                 'visible' => true,
                 'slug'    => $slug,
-                'locale'  => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
     }

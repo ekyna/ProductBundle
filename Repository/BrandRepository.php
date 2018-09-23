@@ -21,16 +21,15 @@ class BrandRepository extends TranslatableResourceRepository
      */
     public function findOneBySlug($slug)
     {
-        $qb = $this->getQueryBuilder();
         $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
 
         return $qb
             ->leftJoin($as . '.seo', 's')
-            ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
-            ->addSelect('b', 'b_t', 's')
+            ->leftJoin('s.translations', 's_t', Expr\Join::WITH, $this->getLocaleCondition('s_t'))
+            ->addSelect('s', 's_t')
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('b_t.slug', ':slug'))
-            ->andWhere($qb->expr()->eq('b_t.locale', ':locale'))
+            ->andWhere($qb->expr()->eq('translation.slug', ':slug'))
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
@@ -38,7 +37,6 @@ class BrandRepository extends TranslatableResourceRepository
             ->setParameters([
                 'visible' => true,
                 'slug'    => $slug,
-                'locale'  => $this->localeProvider->getCurrentLocale(),
             ])
             ->getOneOrNullResult();
     }

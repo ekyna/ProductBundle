@@ -240,6 +240,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $translations = $this->translations->toArray();
             $this->translations = new ArrayCollection();
             foreach ($translations as $translation) {
+                /** @var Model\ProductTranslationInterface $t */
+                $t = clone $translation;
+                $t
+                    ->setSlug(null)
+                    ->setAttributesTitle(null);
                 $this->addTranslation(clone $translation);
             }
 
