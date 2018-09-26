@@ -31,11 +31,12 @@ class CatalogType extends ResourceFormType
                 'required' => false,
             ])
             ->add('pages', CollectionType::class, [
-                'label'        => 'ekyna_product.catalog.field.pages',
-                'entry_type'   => CatalogPageType::class,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'allow_sort'   => true,
+                'label'          => 'ekyna_product.catalog.field.pages',
+                'prototype_name' => '__page__',
+                'entry_type'     => CatalogPageType::class,
+                'allow_add'      => true,
+                'allow_delete'   => true,
+                'allow_sort'     => true,
             ]);
     }
 }
