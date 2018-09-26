@@ -68,6 +68,16 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $bundleSlots;
 
     /**
+     * @var ArrayCollection|Model\SpecialOfferInterface[]
+     */
+    protected $specialOffers;
+
+    /**
+     * @var ArrayCollection|Model\PricingInterface[]
+     */
+    protected $pricings;
+
+    /**
      * @var Model\BrandInterface
      */
     protected $brand;
@@ -125,6 +135,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var float
      */
+    protected $minPrice = 0;
+
+    /**
+     * @var float
+     */
     protected $weight = 0;
 
     /**
@@ -145,12 +160,17 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var string
      */
-    protected $unit = Common\Units::PIECE;
+    protected $unit = Common\Units::PIECE; // TODO move to StockSubjectTrait
 
     /**
      * @var bool
      */
     protected $pendingOffers;
+
+    /**
+     * @var bool
+     */
+    protected $pendingPrices;
 
     /**
      * (Variant sorting)
@@ -184,6 +204,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         // Schedule offer update a creation
         $this->pendingOffers = true;
+        $this->pendingPrices = true;
 
         $this->initializeAdjustments();
         $this->initializeStock();
@@ -552,9 +573,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function hasRequiredOptionGroup()
     {
-        foreach( $this->optionGroups as $optionGroup) {
+        // All types
+        foreach ($this->optionGroups as $optionGroup) {
             if ($optionGroup->isRequired()) {
                 return true;
+            }
+        }
+
+        // A variant inherits options from his parent
+        if ($this->parent) {
+            foreach ($this->parent->getOptionGroups() as $optionGroup) {
+                if ($optionGroup->isRequired()) {
+                    return true;
+                }
             }
         }
 
@@ -606,14 +637,130 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setBundleSlots(ArrayCollection $bundleSlots)
+    public function setBundleSlots(ArrayCollection $slots)
     {
         foreach ($this->bundleSlots as $slot) {
             $this->removeBundleSlot($slot);
         }
 
-        foreach ($bundleSlots as $slot) {
+        foreach ($slots as $slot) {
             $this->addBundleSlot($slot);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSpecialOffers()
+    {
+        return $this->specialOffers;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasSpecialOffer(Model\SpecialOfferInterface $offer)
+    {
+        return $this->specialOffers->contains($offer);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addSpecialOffer(Model\SpecialOfferInterface $offer)
+    {
+        if (!$this->hasSpecialOffer($offer)) {
+            $this->specialOffers->add($offer);
+            $offer->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeSpecialOffer(Model\SpecialOfferInterface $offer)
+    {
+        if ($this->hasSpecialOffer($offer)) {
+            $this->specialOffers->removeElement($offer);
+            $offer->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSpecialOffers(ArrayCollection $offers)
+    {
+        foreach ($this->specialOffers as $offer) {
+            $this->removeSpecialOffer($offer);
+        }
+
+        foreach ($offers as $offer) {
+            $this->addSpecialOffer($offer);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPricings()
+    {
+        return $this->pricings;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasPricing(Model\PricingInterface $pricing)
+    {
+        return $this->pricings->contains($pricing);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addPricing(Model\PricingInterface $pricing)
+    {
+        if (!$this->hasPricing($pricing)) {
+            $this->pricings->add($pricing);
+            $pricing->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removePricing(Model\PricingInterface $pricing)
+    {
+        if ($this->hasPricing($pricing)) {
+            $this->pricings->removeElement($pricing);
+            $pricing->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPricings(ArrayCollection $pricings)
+    {
+        foreach ($this->pricings as $pricing) {
+            $this->removePricing($pricing);
+        }
+
+        foreach ($pricings as $pricing) {
+            $this->addPricing($pricing);
         }
 
         return $this;
@@ -700,6 +847,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         return $this->customerGroups;
     }
+
     /**
      * @inheritdoc
      */
@@ -794,7 +942,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 Media\MediaTypes::isValid($type, true);
             }
 
-            return $this->medias->filter(function(Model\ProductMediaInterface $media) use ($types) {
+            return $this->medias->filter(function (Model\ProductMediaInterface $media) use ($types) {
                 return in_array($media->getMedia()->getType(), $types);
             });
         }
@@ -1057,6 +1205,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getMinPrice()
+    {
+        return $this->minPrice;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setMinPrice($minPrice)
+    {
+        $this->minPrice = $minPrice;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getWeight()
     {
         return $this->weight;
@@ -1158,6 +1324,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setPendingOffers($pending)
     {
         $this->pendingOffers = (bool)$pending;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isPendingPrices()
+    {
+        return $this->pendingPrices;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPendingPrices($pending)
+    {
+        $this->pendingPrices = (bool)$pending;
 
         return $this;
     }
@@ -1338,8 +1522,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         ksort($values);
-        $couples = array_map(function($k, $v) {
-            return $k.':'.$v;
+        $couples = array_map(function ($k, $v) {
+            return $k . ':' . $v;
         }, array_keys($values), $values);
 
         return md5(implode('-', $couples));

@@ -11,7 +11,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class SpecialOffer extends Constraint
 {
-    public $at_least_one_brand_or_product = 'ekyna_product.special_offer.at_least_one_brand_or_product';
+    public $at_least_one_brand_or_product     = 'ekyna_product.special_offer.at_least_one_brand_or_product';
+    public $products_and_brands_must_be_empty = 'ekyna_product.special_offer.products_and_brands_must_be_empty';
 
 
     /**

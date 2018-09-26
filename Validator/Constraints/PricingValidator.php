@@ -26,6 +26,26 @@ class PricingValidator extends ConstraintValidator
             throw new InvalidArgumentException("Expected instance of Pricing (validation constraint)");
         }
 
+        // Single product case
+        if (null !== $pricing->getProduct()) {
+            if (0 < $pricing->getBrands()->count()) {
+                $this
+                    ->context
+                    ->buildViolation($constraint->brands_must_be_empty)
+                    ->atPath('brands')
+                    ->addViolation();
+            }
 
+            return;
+        }
+
+        // Multiple product case
+        if (0 === $pricing->getBrands()->count()) {
+            $this
+                ->context
+                ->buildViolation($constraint->at_least_one_brand)
+                ->atPath('brands')
+                ->addViolation();
+        }
     }
 }

@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
@@ -34,6 +35,11 @@ class BundleHandler extends AbstractHandler
     private $priceCalculator;
 
     /**
+     * @var PriceInvalidator
+     */
+    private $priceInvalidator;
+
+    /**
      * @var BundleUpdater
      */
     private $bundleUpdater;
@@ -45,15 +51,18 @@ class BundleHandler extends AbstractHandler
      * @param PersistenceHelperInterface $persistenceHelper
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator            $priceCalculator
+     * @param PriceInvalidator           $priceInvalidator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         ProductRepositoryInterface $productRepository,
-        PriceCalculator $priceCalculator
+        PriceCalculator $priceCalculator,
+        PriceInvalidator $priceInvalidator
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
+        $this->priceInvalidator = $priceInvalidator;
     }
 
     /**
@@ -71,7 +80,9 @@ class BundleHandler extends AbstractHandler
 
         $changed |= $updater->updateAvailability($bundle);
 
-        $changed |= $updater->updatePrice($bundle);
+        $changed |= $updater->updateNetPrice($bundle);
+
+        $changed |= $updater->updateMinPrice($bundle);
 
         return $changed;
     }
@@ -99,10 +110,12 @@ class BundleHandler extends AbstractHandler
             $events[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
             $changed = true;
         }
-        if ($updater->updatePrice($bundle)) {
+        if ($updater->updateNetPrice($bundle)) {
             $events[] = ProductEvents::CHILD_PRICE_CHANGE;
             $changed = true;
         }
+
+        $changed |= $updater->updateMinPrice($bundle);
 
         if (!empty($events)) {
             $this->scheduleChildChangeEvents($bundle, $events);
@@ -118,13 +131,22 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        if ($this->getBundleUpdater()->updatePrice($bundle)) {
-            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_PRICE_CHANGE]);
+        $updater = $this->getBundleUpdater();
 
-            return true;
+        $this->priceInvalidator->invalidateByProduct($bundle);
+
+        $changed = false;
+
+        if ($updater->updateNetPrice($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_PRICE_CHANGE]);
+            $changed = true;
         }
 
-        return false;
+        if ($updater->updateMinPrice($bundle)) {
+            $changed = true;
+        }
+
+        return $changed;
     }
 
     /**

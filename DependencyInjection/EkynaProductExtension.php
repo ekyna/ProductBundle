@@ -32,7 +32,7 @@ class EkynaProductExtension extends AbstractExtension
         }
 
         $pricingRenderer = $container->getDefinition('ekyna_product.pricing.renderer');
-        $pricingRenderer->replaceArgument(5, $config['pricing']);
+        $pricingRenderer->replaceArgument(6, $config['pricing']);
 
         if ($config['catalog']['enabled']) {
             $catalogRegistry = $container->getDefinition('ekyna_product.catalog.registry');

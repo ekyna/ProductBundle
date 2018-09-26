@@ -171,6 +171,8 @@ class ItemBuilder
         }
 
         $this->buildFromVariant($item, $variant);
+
+        // TODO Variable product should always be public (not private) as it is a user choice.
     }
 
     /**
@@ -486,6 +488,8 @@ class ItemBuilder
             ->setData(static::OPTION_ID, $option->getId())
             ->setQuantity(1)
             ->setImmutable(true);
+
+        // TODO Option product should always be public (not private) as it is a user choice.
     }
 
     /**

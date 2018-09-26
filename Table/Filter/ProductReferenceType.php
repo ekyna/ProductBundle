@@ -27,11 +27,13 @@ class ProductReferenceType extends AbstractFilterType
 
         $qb = $adapter->getQueryBuilder();
         $alias = $qb->getRootAliases()[0];
+
+        $vReferencePath = $adapter->getQueryBuilderPath('variants.reference');
+
         $qb
-            ->leftJoin($alias . '.variants', 'v')
             ->andWhere($qb->expr()->orX(
                 $qb->expr()->eq($alias . '.reference', ':reference'),
-                $qb->expr()->eq('v.reference', ':reference')
+                $qb->expr()->eq($vReferencePath, ':reference')
             ))
             ->setParameter('reference', $activeFilter->getValue());
 

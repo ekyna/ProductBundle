@@ -32,20 +32,20 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     public function setName($name);
 
     /**
-     * Returns the designation.
+     * Returns the product.
      *
-     * @return string
+     * @return ProductInterface
      */
-    public function getDesignation();
+    public function getProduct();
 
     /**
-     * Sets the designation.
+     * Sets the product.
      *
-     * @param string $designation
+     * @param ProductInterface $product
      *
      * @return $this|PricingInterface
      */
-    public function setDesignation($designation);
+    public function setProduct(ProductInterface $product = null);
 
     /**
      * Returns the customer groups.

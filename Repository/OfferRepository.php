@@ -4,8 +4,9 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator;
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
-use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
@@ -31,8 +32,9 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
      */
     private $cachedCountryCodes;
 
+
     /**
-     * Sets the cachedCountryCodes.
+     * Sets the cached country codes.
      *
      * @param array $codes
      */
@@ -44,11 +46,8 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     /**
      * @inheritdoc
      */
-    public function findByProductAndContext(
-        Model\ProductInterface $product,
-        ContextInterface $context,
-        $useCache = true
-    ) {
+    public function findByProductAndContext(ProductInterface $product, ContextInterface $context, $useCache = true)
+    {
         $group = $context->getCustomerGroup();
         $country = $context->getInvoiceCountry();
 
@@ -89,7 +88,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
      * @inheritdoc
      */
     public function findOneByProductAndContextAndQuantity(
-        Model\ProductInterface $product,
+        ProductInterface $product,
         ContextInterface $context,
         $quantity = 1.0,
         $useCache = true
@@ -119,22 +118,22 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     /**
      * @inheritdoc
      */
-    public function findByProduct(Model\ProductInterface $product, $asArray = false)
+    public function findByProduct(ProductInterface $product, $asArray = false)
     {
         $qb = $this->createQueryBuilder('o');
         $qb
             ->andWhere($qb->expr()->eq('o.product', ':product'))
-            ->addOrderBy('o.percent', 'DESC')
-            ->addOrderBy('o.minQuantity', 'DESC')
             ->addOrderBy('IDENTITY(o.group)', 'DESC')
-            ->addOrderBy('IDENTITY(o.country)', 'DESC');
+            ->addOrderBy('IDENTITY(o.country)', 'DESC')
+            ->addOrderBy('o.percent', 'DESC')
+            ->addOrderBy('o.minQuantity', 'DESC');
 
         $parameters = [
             'product' => $product,
         ];
 
         return $asArray
-            ? $this->scalarResult($qb, $parameters)
+            ? $this->arrayResult($qb, $parameters)
             : $this->objectResult($qb, $parameters);
     }
 
@@ -154,10 +153,6 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
 
         return $this->findByProductAndContextQuery = $qb
             ->select([
-                //'o.id as id',
-                // TODO 'p.designation as designation',
-                //'IDENTITY(o.group) as group_id',
-                //'IDENTITY(o.country) as country_id',
                 'o.minQuantity as min_qty',
                 'o.percent as percent',
                 'o.netPrice as price',
@@ -189,7 +184,6 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
 
         return $this->findOneByProductAndContextAndQuantityQuery = $qb
             ->select([
-                // TODO 'p.designation as designation',
                 'o.percent as percent',
                 'IDENTITY(o.specialOffer) as special_offer_id',
                 'IDENTITY(o.pricing) as pricing_id',
@@ -208,30 +202,30 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     }
 
     /**
-     * Returns the query builder result as scalar.
+     * Returns the query builder result as array.
      *
      * @param QueryBuilder $qb
      * @param array        $parameters
      *
-     * @return Offer[]
+     * @return array
      */
-    private function scalarResult(QueryBuilder $qb, array $parameters)
+    private function arrayResult(QueryBuilder $qb, array $parameters)
     {
         return $qb
             ->select([
                 'o.id as id',
-                // TODO 'p.designation as designation',
                 'IDENTITY(o.group) as group_id',
                 'IDENTITY(o.country) as country_id',
                 'o.minQuantity as min_qty',
                 'o.percent as percent',
                 'o.netPrice as net_price',
+                'o.details as details',
                 'IDENTITY(o.specialOffer) as special_offer_id',
                 'IDENTITY(o.pricing) as pricing_id',
             ])
             ->getQuery()
             ->setParameters($parameters)
-            ->getScalarResult();
+            ->getResult(OfferScalarHydrator::NAME);
     }
 
     /**
@@ -240,7 +234,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
      * @param QueryBuilder $qb
      * @param array        $parameters
      *
-     * @return Offer[]
+     * @return \Ekyna\Bundle\ProductBundle\Entity\Offer[]
      */
     private function objectResult(QueryBuilder $qb, array $parameters)
     {

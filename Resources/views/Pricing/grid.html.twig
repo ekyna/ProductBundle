@@ -14,11 +14,11 @@
             <td>
             {% if offer.max is null -%}
                 {{ 'ekyna_product.pricing_rule.field.from'|trans({
-                    '%min%': offer.min
+                    '%min%': offer.min|localizednumber
                 }) }}
             {%- else -%}
                 {{ 'ekyna_product.pricing_rule.field.range'|trans({
-                    '%min%': offer.min, '%max%': offer.max
+                    '%min%': offer.min|localizednumber, '%max%': offer.max|localizednumber
                 }) }}
             {%- endif %}
             </td>

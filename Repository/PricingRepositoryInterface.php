@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 
 /**
@@ -13,11 +13,11 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
 interface PricingRepositoryInterface extends ResourceRepositoryInterface
 {
     /**
-     * Finds the pricing rules by brand.
+     * Finds the pricing rules by product.
      *
-     * @param BrandInterface $brand
+     * @param ProductInterface $product
      *
      * @return array
      */
-    public function findRulesByBrand(BrandInterface $brand);
+    public function findRulesByProduct(ProductInterface $product);
 }

@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
@@ -12,30 +11,28 @@ use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
  * @package Ekyna\Bundle\ProductBundle\Updater
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ConfigurableUpdater
+class ConfigurableUpdater extends AbstractUpdater
 {
     /**
-     * @var PriceCalculator
+     * @inheritdoc
      */
-    private $priceCalculator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PriceCalculator $priceCalculator
-     */
-    public function __construct(PriceCalculator $priceCalculator)
+    public function updateMinPrice(Model\ProductInterface $bundle)
     {
-        $this->priceCalculator = $priceCalculator;
+        Model\ProductTypes::assertConfigurable($bundle);
+
+        $minPrice = $this->priceCalculator->calculateConfigurableMinPrice($bundle);
+
+        if (is_null($bundle->getMinPrice()) || 0 !== bccomp($bundle->getMinPrice(), $minPrice, 5)) {
+            $bundle->setMinPrice($minPrice);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Updates the configurable stock data.
-     *
-     * @param Model\ProductInterface $bundle
-     *
-     * @return bool Whether or not the bundle has been changed.
+     * @inheritdoc
      */
     public function updateStock(Model\ProductInterface $bundle)
     {
@@ -275,26 +272,5 @@ class ConfigurableUpdater
         }
 
         return $changed;
-    }
-
-    /**
-     * Updates the configurable price.
-     *
-     * @param Model\ProductInterface $bundle
-     *
-     * @return bool
-     */
-    public function updatePrice(Model\ProductInterface $bundle)
-    {
-        Model\ProductTypes::assertConfigurable($bundle);
-
-        $netPrice = $this->priceCalculator->calculateConfigurableMinPrice($bundle);
-        if ($netPrice !== $bundle->getNetPrice()) {
-            $bundle->setNetPrice($netPrice);
-
-            return true;
-        }
-
-        return false;
     }
 }

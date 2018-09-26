@@ -13,9 +13,10 @@
             <generator strategy="AUTO"/>
         </id>
 
+        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="3" nullable="false"/>
+        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="false"/>
-        <field name="percent" column="percent" type="smallint" nullable="false"/>
-        <field name="minQuantity" column="min_quantity" type="smallint" nullable="false"/>
+        <field name="details" column="details" type="json_array" nullable="false"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
             <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />

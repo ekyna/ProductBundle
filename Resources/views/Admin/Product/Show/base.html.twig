@@ -22,13 +22,13 @@
             </a>
         </li>
         {% endblock pricing_tab %}
-        {% if offer_list is not empty %}
+        {% block offers_tab %}
         <li>
             <a href="#product-offers" id="toggle-product-offers" data-toggle="tab">
                 {{- 'ekyna_product.offer.label.plural'|trans -}}
             </a>
         </li>
-        {% endif %}
+        {% endblock offers_tab %}
         {% block stock_tab %}
         <li>
             <a href="#product-stock" id="toggle-product-stock" data-toggle="tab">
@@ -81,16 +81,19 @@
                 <div class="tab-pane" id="product-pricing">
                 {% block pricing_content %}
                     <div class="row">
-                        <div class="col-md-6">
-                            {{ macros.show_reference(product, {'label_col': 4}) }}
+                        <div class="col-md-4">
+                            {{ macros.show_net_price(product, {'label_col': 6}) }}
                         </div>
-                        <div class="col-md-6">
-                            {{ macros.show_tax_group(product, {'label_col': 4}) }}
+                        <div class="col-md-4">
+                            {{ macros.show_reference(product, {'label_col': 6}) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ macros.show_tax_group(product, {'label_col': 6}) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
-                            {{ macros.show_net_price(product, {'label_col': 6}) }}
+                            {{ macros.show_min_price(product, {'label_col': 6}) }}
                         </div>
                         <div class="col-md-4">
                             {{ macros.show_weight(product, {'label_col': 6}) }}
@@ -115,11 +118,14 @@
                 </div>
             {% endblock pricing_pane %}
 
-            {% if offer_list is not empty %}
+            {% block offers_pane %}
             <div class="tab-pane" id="product-offers">
+                {{ macros.show_special_offers(product) }}
+                {{ macros.show_pricings(product) }}
                 {% include '@EkynaProduct/Admin/Product/Show/_offers.html.twig' %}
+                {% include '@EkynaProduct/Admin/Product/Show/_prices.html.twig' %}
             </div>
-            {% endif %}
+            {% endblock offers_pane %}
 
             {% block stock_pane %}
                 <div class="tab-pane" id="product-stock">

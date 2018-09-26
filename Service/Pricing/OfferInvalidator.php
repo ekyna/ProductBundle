@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 
@@ -64,8 +65,10 @@ class OfferInvalidator
                 ->set('p.pendingOffers', ':flag')
                 ->andWhere($qb->expr()->in('p.id', ':product_ids'))
                 ->getQuery()
+                ->useQueryCache(false)
+                ->useResultCache(false)
                 ->setParameters([
-                    'flag'        => true,
+                    'flag'        => 1,
                     'product_ids' => $this->productIds,
                 ])
                 ->execute();
@@ -79,8 +82,10 @@ class OfferInvalidator
                 ->andWhere($qb->expr()->in('p.type', ':types'))
                 ->andWhere($qb->expr()->in('IDENTITY(p.brand)', ':brand_ids'))
                 ->getQuery()
+                ->useQueryCache(false)
+                ->useResultCache(false)
                 ->setParameters([
-                    'flag'      => true,
+                    'flag'      => 1,
                     'brand_ids' => $this->brandIds,
                     'types'     => [
                         ProductTypes::TYPE_SIMPLE,
@@ -94,12 +99,36 @@ class OfferInvalidator
     }
 
     /**
+     * Invalidates offers for the given pricing.
+     *
+     * @param PricingInterface $pricing
+     */
+    public function invalidatePricing(PricingInterface $pricing)
+    {
+        if (null !== $product = $pricing->getProduct()) {
+            $this->invalidateByProductId($product->getId());
+
+            return;
+        }
+
+        foreach ($pricing->getBrands() as $brand) {
+            $this->invalidateByBrandId($brand->getId());
+        }
+    }
+
+    /**
      * Invalidates offers for the given special offer.
      *
      * @param SpecialOfferInterface $specialOffer
      */
     public function invalidateSpecialOffer(SpecialOfferInterface $specialOffer)
     {
+        if (null !== $product = $specialOffer->getProduct()) {
+            $this->invalidateByProductId($product->getId());
+
+            return;
+        }
+
         foreach ($specialOffer->getProducts() as $product) {
             $this->invalidateByProductId($product->getId());
         }

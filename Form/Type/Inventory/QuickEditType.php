@@ -80,7 +80,11 @@ class QuickEditType extends AbstractType
 
             $this->stockBuilder
                 ->addGeocodeField()
-                ->addStockFloor();
+                ->addStockFloor()
+                ->addStockMode()
+                ->addReplenishmentTime()
+                ->addEndOfLifeField()
+                ->addQuoteOnlyField();
         });
     }
 

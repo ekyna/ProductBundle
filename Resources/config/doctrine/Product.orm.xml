@@ -28,12 +28,14 @@
         <field name="visible" column="visible" type="boolean" nullable="false"/>
         <field name="reference" column="reference" type="string" length="32" unique="true" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="minPrice" column="min_price" type="decimal" precision="10" scale="5" nullable="true"/>
         <field name="weight" column="weight" type="decimal" precision="7" scale="3" nullable="true"/>
         <field name="unit" column="unit" type="string" length="16" nullable="true"/>
         <field name="height" column="height" type="smallint" nullable="true"/>
         <field name="width" column="width" type="smallint" nullable="true"/>
         <field name="depth" column="depth" type="smallint" nullable="true"/>
         <field name="pendingOffers" column="pending_offers" type="boolean" nullable="false"/>
+        <field name="pendingPrices" column="pending_prices" type="boolean" nullable="false"/>
         <field name="position" column="position" type="smallint" nullable="true"/>
 
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
@@ -107,6 +109,20 @@
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface"
                      field="attributes" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface"
+                     field="specialOffers" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+        </one-to-many>
+
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingInterface"
+                     field="pricings" mapped-by="product" orphan-removal="true" index-by="id">
             <cascade>
                 <cascade-all/>
             </cascade>

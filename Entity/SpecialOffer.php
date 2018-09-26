@@ -59,7 +59,17 @@ class SpecialOffer implements SpecialOfferInterface
     /**
      * @var bool
      */
+    protected $stack;
+
+    /**
+     * @var bool
+     */
     protected $enabled;
+
+    /**
+     * @var ProductInterface
+     */
+    protected $product;
 
     /**
      * @var ArrayCollection|ProductInterface[]
@@ -89,6 +99,7 @@ class SpecialOffer implements SpecialOfferInterface
     {
         $this->percent = 0;
         $this->minQuantity = 1;
+        $this->stack = true;
         $this->enabled = false;
 
         $this->products = new ArrayCollection();
@@ -206,6 +217,24 @@ class SpecialOffer implements SpecialOfferInterface
     /**
      * @inheritdoc
      */
+    public function isStack()
+    {
+        return $this->stack;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStack(bool $stack)
+    {
+        $this->stack = $stack;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function isEnabled()
     {
         return $this->enabled;
@@ -214,11 +243,27 @@ class SpecialOffer implements SpecialOfferInterface
     /**
      * @inheritdoc
      */
-    public function setEnabled($enabled)
+    public function setEnabled(bool $enabled)
     {
-        $this->enabled = (bool)$enabled;
+        $this->enabled = $enabled;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setProduct(ProductInterface $product = null)
+    {
+        $this->product = $product;
     }
 
     /**

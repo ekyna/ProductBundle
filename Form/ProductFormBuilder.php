@@ -344,13 +344,44 @@ class ProductFormBuilder
             'prototype_name'  => '__option_group__',
             'sub_widget_col'  => 11,
             'button_col'      => 1,
-            'allow_sort'      => true,
             'entry_type'      => PR\Option\OptionGroupType::class,
+            'allow_add'       => true,
+            'allow_delete'    => true,
+            'allow_sort'      => true,
             'add_button_text' => 'ekyna_product.option_group.button.add',
             'required'        => false,
         ], $options);
 
         $this->form->add('optionGroups', CollectionType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the pricings field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addPricingsField(array $options = [])
+    {
+        if (in_array($this->product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE])) {
+            throw new InvalidArgumentException("Unexpected product type.");
+        }
+
+        $options = array_replace([
+            'label'           => 'ekyna_product.pricing.label.plural',
+            'entry_type'      => PR\Pricing\PricingType::class,
+            'entry_options'   => ['product_mode' => true],
+            'prototype_name'  => '__pricing__',
+            'allow_add'       => true,
+            'allow_delete'    => true,
+            'add_button_text' => 'ekyna_product.pricing.button.add',
+            'required'        => false,
+        ], $options);
+
+        $this->form->add('pricings', CollectionType::class, $options);
 
         return $this;
     }
@@ -384,9 +415,11 @@ class ProductFormBuilder
     public function addReferencesField(array $options = [])
     {
         $options = array_replace([
-            'label'      => 'ekyna_product.product_reference.label.plural',
-            'entry_type' => PR\ProductReferenceType::class,
-            'required'   => false,
+            'label'        => 'ekyna_product.product_reference.label.plural',
+            'entry_type'   => PR\ProductReferenceType::class,
+            'allow_add'    => true,
+            'allow_delete' => true,
+            'required'     => false,
         ], $options);
 
         $this->form->add('references', CollectionType::class, $options);
@@ -429,6 +462,34 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('seo', SeoType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the special offers field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addSpecialOffersField(array $options = [])
+    {
+        if (in_array($this->product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE])) {
+            throw new InvalidArgumentException("Unexpected product type.");
+        }
+
+        $options = array_replace([
+            'label'         => 'ekyna_product.special_offer.label.plural',
+            'entry_type'    => PR\SpecialOffer\SpecialOfferType::class,
+            'entry_options' => ['product_mode' => true],
+            'allow_add'     => true,
+            'allow_delete'  => true,
+            'add_button_text' => 'ekyna_product.special_offer.button.add',
+            'required'      => false,
+        ], $options);
+
+        $this->form->add('specialOffers', CollectionType::class, $options);
 
         return $this;
     }

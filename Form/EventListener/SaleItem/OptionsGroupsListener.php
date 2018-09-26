@@ -81,6 +81,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
             'children' => [],
         ];
 
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $this->itemBuilder->getProvider()->resolve($item);
 
         if ($product->getType() === ProductTypes::TYPE_BUNDLE) {

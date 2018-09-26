@@ -1,10 +1,13 @@
 {% spaceless %}
+{% if offers_list is not empty %}
+<hr>
+<h3>{{ 'ekyna_product.offer.label.plural'|trans }}</h3>
 <div class="show-product-offers">
-{% for list in offer_list %}
-    {% if loop.index0 % 4 == 0 %}
+{% for list in offers_list %}
+    {% if loop.index0 % 3 == 0 %}
     <div class="row">
     {% endif %}
-        <div class="col-sm-6 col-md-3">
+        <div class="col-sm-12 col-md-4">
             <div class="offers-list">
                 <p class="h5">{{ list.title }}</p>
                 <table class="table table-condensed">
@@ -16,32 +19,43 @@
                     </tr>
                     {% for offer in list.offers %}
                     <tr>
-                        <td>{{ offer.minQuantity }}</td>
-                        <td>{{ (offer.percent/100)|localizednumber('percent') }}</td>
+                        <td>{{ offer.minQuantity|localizednumber }}</td>
+                        <td>
+                            {{ offer.percent|localizednumber }}&nbsp;%
+                            ({%- for percent in offer.detailedPercents -%}
+                                {{ percent|localizednumber }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
+                            {%- endfor -%})
+                        </td>
                         <td>{{ offer.netPrice|localizedcurrency(commerce_default_currency) }}</td>
                         <td>
-                        {% if offer.pricing is not null -%}
-                            <a href="{{ admin_resource_path(offer.pricing) }}"
-                               class="btn btn-xs btn-default"
-                                title="{{ 'ekyna_product.pricing.label.singular'|trans }}">
-                                <i class="fa fa-arrow-right"></i>
-                            </a>
-                        {%- elseif offer.specialOffer is not null -%}
+                        {% if offer.specialOffer is not null -%}
+                        {% if offer.specialOffer.product is null -%}
                             <a href="{{ admin_resource_path(offer.specialOffer) }}"
                                class="btn btn-xs btn-primary"
                                title="{{ 'ekyna_product.special_offer.label.singular'|trans }}">
                                 <i class="fa fa-arrow-right"></i>
                             </a>
                         {% endif -%}
+                        {% endif -%}
+                        {% if offer.pricing is not null -%}
+                        {% if offer.pricing.product is null -%}
+                        <a href="{{ admin_resource_path(offer.pricing) }}"
+                           class="btn btn-xs btn-default"
+                            title="{{ 'ekyna_product.pricing.label.singular'|trans }}">
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                        {%- endif %}
+                        {%- endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </table>
             </div>
         </div>
-    {% if loop.last or loop.index % 4 == 0 %}
+    {% if loop.last or loop.index % 3 == 0 %}
     </div>
     {% endif %}
 {% endfor %}
 </div>
+{% endif %}
 {% endspaceless %}

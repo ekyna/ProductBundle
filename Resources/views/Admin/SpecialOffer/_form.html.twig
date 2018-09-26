@@ -13,21 +13,26 @@
     <div class="tab-content">
         <div class="tab-pane active" id="pricing-general">
             {{ form_row(form.name) }}
-            {#{{ form_row(form.designation) }}#}
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.percent, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.percent, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-6">
-                    {{ form_row(form.enabled, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.minQuantity, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.stack, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.startsAt, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.startsAt, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-6">
-                    {{ form_row(form.endsAt, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.endsAt, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.enabled, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
             </div>
             {{ form_row(form.products) }}

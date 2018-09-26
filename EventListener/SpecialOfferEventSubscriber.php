@@ -24,7 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class SpecialOfferEventSubscriber implements EventSubscriberInterface
 {
-    private const FIELDS = ['percent', 'minQuantity', 'startsAt', 'endsAt', 'enabled'];
+    private const FIELDS = ['percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
     /**
      * @var PersistenceHelperInterface
@@ -64,14 +64,13 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreInsert(ResourceEvent $event)
+    public function onInsert(ResourceEvent $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
         $this->simplify($specialOffer, $event);
 
         $this->buildName($specialOffer);
-        //$this->buildDesignation($specialOffer);
 
         $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
     }
@@ -81,14 +80,20 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreUpdate(ResourceEvent $event)
+    public function onUpdate(ResourceEvent $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
         $this->simplify($specialOffer, $event);
 
         $this->buildName($specialOffer);
-        //$this->buildDesignation($specialOffer);
+
+        // Special offer change(s)
+        if ($this->specialOfferHasChanged($specialOffer)) {
+            $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
+
+            return;
+        }
 
         // Products association changes
         foreach ($specialOffer->getInsertedIds(SpecialOffer::REL_PRODUCTS) as $id) {
@@ -112,7 +117,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreDelete(ResourceEvent $event)
+    public function onDelete(ResourceEvent $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -127,6 +132,11 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      */
     protected function simplify(SpecialOfferInterface $specialOffer, ResourceEvent $event)
     {
+        if (null !== $specialOffer->getProduct()) {
+            // Brands and products lists should be empty.
+            return;
+        }
+
         $brandIds = [];
 
         foreach ($specialOffer->getBrands() as $brand) {
@@ -153,18 +163,49 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Update event handler.
+     * Builds the special offer name.
      *
-     * @param ResourceEvent $event
+     * @param SpecialOfferInterface $specialOffer
      */
-    public function onUpdate(ResourceEvent $event)
+    protected function buildName(SpecialOfferInterface $specialOffer)
     {
-        $specialOffer = $this->getSpecialOfferFromEvent($event);
-
-        // Special offer change(s)
-        if ($this->specialOfferHasChanged($specialOffer)) {
-            $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
+        if (0 < strlen($specialOffer->getName())) {
+            return;
         }
+
+        $parts = ['-' . $specialOffer->getPercent() . '%'];
+
+        if (null !== $product = $specialOffer->getProduct()) {
+            if (32 > strlen($designation = $product->getDesignation())) {
+                $parts[] = $designation;
+            } else {
+                $parts[] = substr($designation, 0, 32) . '...';
+            }
+        } else {
+            if (empty($brands = $specialOffer->getBrands()->toArray())) {
+                $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
+            } else {
+                $parts[] = implode('/', array_map(function (BrandInterface $brand) {
+                    return $brand->getName();
+                }, $brands));
+            }
+        }
+
+        if (!empty($groups = $specialOffer->getGroups()->toArray())) {
+            $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
+                return $group->getName();
+            }, $groups));
+        }
+
+        if (!empty($countries = $specialOffer->getCountries()->toArray())) {
+            $parts[] = implode('/', array_map(function (CountryInterface $country) {
+                return $country->getName();
+            }, $countries));
+        }
+
+        $specialOffer->setName(implode(' - ', $parts));
+
+        $this->persistenceHelper->persistAndRecompute($specialOffer, false);
     }
 
     /**
@@ -180,6 +221,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
             return true;
         }
 
+        // TODO use track association trait methods ?
         $groups = $specialOffer->getGroups();
         if ($groups instanceof PersistentCollection && $groups->isDirty()) {
             return true;
@@ -200,7 +242,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      *
      * @return SpecialOfferInterface
      */
-    private function getSpecialOfferFromEvent(ResourceEvent $event)
+    protected function getSpecialOfferFromEvent(ResourceEvent $event)
     {
         $specialOffer = $event->getResource();
 
@@ -212,71 +254,14 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Builds the special offer name.
-     *
-     * @param SpecialOfferInterface $specialOffer
-     */
-    public function buildName(SpecialOfferInterface $specialOffer)
-    {
-        if (0 < strlen($specialOffer->getName())) {
-            return;
-        }
-
-        $parts = [$specialOffer->getPercent() . '%'];
-
-        if (!empty($groups = $specialOffer->getGroups()->toArray())) {
-            $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
-                return $group->getName();
-            }, $groups));
-        }
-
-        if (!empty($countries = $specialOffer->getCountries()->toArray())) {
-            $parts[] = implode('/', array_map(function (CountryInterface $country) {
-                return $country->getName();
-            }, $countries));
-        }
-
-        $brands = $specialOffer->getBrands()->toArray();
-
-        if (empty($brands)) {
-            $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
-        } else {
-            $parts[] = implode('/', array_map(function (BrandInterface $brand) {
-                return $brand->getName();
-            }, $specialOffer->getBrands()->toArray()));
-        }
-
-        $specialOffer->setName(implode(' - ', $parts));
-    }
-
-    /**
-     * Builds the special offer designation.
-     *
-     * @param SpecialOfferInterface $specialOffer
-     */
-//    public function buildDesignation(SpecialOfferInterface $specialOffer)
-//    {
-//        if (0 < strlen($specialOffer->getDesignation())) {
-//            return;
-//        }
-//
-//        $groups = implode('/', array_map(function(CustomerGroupInterface $group) {
-//            return $group->getName();
-//        }, $specialOffer->getGroups()->toArray()));
-//
-//        $specialOffer->setDesignation('Remise ' . $groups);
-//    }
-
-    /**
      * @inheritDoc
      */
     public static function getSubscribedEvents()
     {
         return [
-            SpecialOfferEvents::PRE_CREATE => ['onPreInsert', 0],
-            SpecialOfferEvents::PRE_UPDATE => ['onPreUpdate', 0],
-            SpecialOfferEvents::PRE_DELETE => ['onPreDelete', 0],
-            SpecialOfferEvents::UPDATE     => ['onUpdate', 0],
+            SpecialOfferEvents::INSERT => ['onInsert', 0],
+            SpecialOfferEvents::UPDATE => ['onUpdate', 0],
+            SpecialOfferEvents::DELETE => ['onDelete', 0],
         ];
     }
 }

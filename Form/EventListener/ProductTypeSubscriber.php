@@ -152,6 +152,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTaxGroupField()
             ->addAdjustmentsField()
             ->addOptionGroupsField()
+            ->addSpecialOffersField()
+            ->addPricingsField()
             ->addSeoField();
 
         $this->stockBuilder
@@ -245,7 +247,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
                 'disabled'  => true,
             ])
             ->addAdjustmentsField()
-            ->addOptionGroupsField();
+            ->addOptionGroupsField()
+            ->addSpecialOffersField()
+            ->addPricingsField();
 
         $this->stockBuilder
             ->addStockMode()
@@ -281,6 +285,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTaxGroupField()
             ->addBundleSlotsField()
             ->addOptionGroupsField()
+            ->addSpecialOffersField()
+            ->addPricingsField()
             // Seo
             ->addSeoField();
 

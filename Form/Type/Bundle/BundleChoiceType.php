@@ -71,11 +71,11 @@ class BundleChoiceType extends ResourceFormType
                     'entry_type'      => BundleChoiceRuleType::class,
                 ])
                 ->add('minQuantity', Type\NumberType::class, [
-                    'label' => 'ekyna_product.bundle_choice.field.min_quantity',
+                    'label' => 'ekyna_product.common.min_quantity',
                     'scale' => 3, // TODO Packaging
                 ])
                 ->add('maxQuantity', Type\NumberType::class, [
-                    'label' => 'ekyna_product.bundle_choice.field.max_quantity',
+                    'label' => 'ekyna_product.common.max_quantity',
                     'scale' => 3, // TODO Packaging
                 ])
                 ->add('position', CollectionPositionType::class);

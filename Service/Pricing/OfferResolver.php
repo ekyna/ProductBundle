@@ -48,41 +48,73 @@ class OfferResolver
      */
     public function resolve(ProductInterface $product)
     {
-        $discounts = $this->pricingRepository->findRulesByBrand($product->getBrand());
+        // Pricing rules
+        $discounts = $this->pricingRepository->findRulesByProduct($product);
         foreach ($discounts as &$discount) {
-            $discount['type'] = Offer::TYPE_PRICING;
+            $discount['details'] = [Offer::TYPE_PRICING => $discount['percent']];
         }
 
+        // Special offers rules
         $specialOffers = $this->specialOfferRepository->findRulesByProduct($product);
         foreach ($specialOffers as &$specialOffer) {
-            $specialOffer['type'] = Offer::TYPE_SPECIAL;
+            $specialOffer['details'] = [Offer::TYPE_SPECIAL => $specialOffer['percent']];
+        }
+
+        // Stacking special offers rules
+        $stackingOffers = array_filter($specialOffers, function($o) {
+            return $o['stack'];
+        });
+
+        // Removes worst stacking special offers
+        rules_purge($stackingOffers);
+
+        // Apply stacking special offers to pricing rules
+        foreach ($stackingOffers as $stacking) {
+            foreach ($discounts as &$discount) {
+                if (rule_apply_to($stacking, $discount)) {
+                    $discount['percent'] = round((1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100, 5);
+                    $discount['special_offer_id'] = $stacking['special_offer_id'];
+                    $discount['details'][Offer::TYPE_SPECIAL] = $stacking['percent'];
+                }
+            }
         }
 
         $offers = array_merge($discounts, $specialOffers);
 
-        // Purge useless (there is better) rules
-        foreach ($offers as $ak => $ad) {
-            foreach ($offers as $bk => $bd) {
-                if ($ak == $bk) {
-                    continue;
-                }
-
-                if (rule_is_better($bd, $ad)) {
-                    // B is a better rule, remove A
-                    unset($offers[$ak]);
-                }
-            }
-        }
+        // Remove worst offers
+        rules_purge($offers);
 
         // Sort results
         usort($offers, __NAMESPACE__ . '\rule_sort');
 
         // Set net prices
         foreach ($offers as &$data) {
+            unset($data['stack']);
             $data['net_price'] = round($product->getNetPrice() * (1 - $data['percent'] / 100), 5);
         }
 
         return $offers;
+    }
+}
+
+/**
+ * Removes the worst offers.
+ *
+ * @param array $rules
+ */
+function rules_purge(array &$rules)
+{
+    foreach ($rules as $ak => $ad) {
+        foreach ($rules as $bk => $bd) {
+            if ($ak == $bk) {
+                continue;
+            }
+
+            if (rule_is_better($bd, $ad)) {
+                // B is a better rule, remove A
+                unset($rules[$ak]);
+            }
+        }
     }
 }
 
@@ -96,10 +128,22 @@ class OfferResolver
  */
 function rule_is_better(array $a, array $b)
 {
+    return rule_apply_to($a, $b) && $a['percent'] >= $b['percent'];
+}
+
+/**
+ * Returns whether $a is applies to $b.
+ *
+ * @param array $a
+ * @param array $b
+ *
+ * @return bool
+ */
+function rule_apply_to(array $a, array $b)
+{
     return (is_null($a['group_id']) || $a['group_id'] == $b['group_id'])
         && (is_null($a['country_id']) || $a['country_id'] == $b['country_id'])
-        && $a['min_qty'] <= $b['min_qty']
-        && $a['percent'] >= $b['percent'];
+        && $a['min_qty'] <= $b['min_qty'];
 }
 
 /**

@@ -3,8 +3,10 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\CommerceBundle\Model\VatDisplayModes;
+use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
+use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Util\Formatter;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -27,6 +29,11 @@ class PriceRenderer
      * @var LocaleProviderInterface
      */
     private $localeProvider;
+
+    /**
+     * @var ContextProviderInterface
+     */
+    private $contextProvider;
 
     /**
      * @var FormatterFactory
@@ -57,16 +64,18 @@ class PriceRenderer
     /**
      * Constructor.
      *
-     * @param PriceCalculator         $priceCalculator
-     * @param LocaleProviderInterface $localeProvider
-     * @param FormatterFactory        $formatterFactory
-     * @param TranslatorInterface     $translator
-     * @param EngineInterface         $templating
-     * @param array                   $options
+     * @param PriceCalculator          $priceCalculator
+     * @param LocaleProviderInterface  $localeProvider
+     * @param ContextProviderInterface $contextProvider
+     * @param FormatterFactory         $formatterFactory
+     * @param TranslatorInterface      $translator
+     * @param EngineInterface          $templating
+     * @param array                    $options
      */
     public function __construct(
         PriceCalculator $priceCalculator,
         LocaleProviderInterface $localeProvider,
+        ContextProviderInterface $contextProvider,
         FormatterFactory $formatterFactory,
         TranslatorInterface $translator,
         EngineInterface $templating,
@@ -74,13 +83,14 @@ class PriceRenderer
     ) {
         $this->priceCalculator = $priceCalculator;
         $this->localeProvider = $localeProvider;
+        $this->contextProvider = $contextProvider;
         $this->formatterFactory = $formatterFactory;
         $this->translator = $translator;
         $this->templating = $templating;
 
         $this->options = array_replace([
-            'final_price_format'    => '%s&nbsp;<sup>%s</sup>',
-            'original_price_format' => '<del>%s</del>&nbsp;%s',
+            'final_price_format'    => '<strong>{amount}</strong>&nbsp;<sup>{mode}</sup>',
+            'original_price_format' => '<del>{amount}</del>&nbsp;',
             'price_with_from'       => false,
         ], $options);
     }
@@ -92,50 +102,68 @@ class PriceRenderer
      * @param ContextInterface       $context
      * @param bool                   $discount
      *
-     * @return string
+     * @return Model\PriceDisplay
      */
     public function getProductPrice(Model\ProductInterface $product, ContextInterface $context = null, $discount = true)
     {
+        // Do not display price for configurable products
+        if (Model\ProductTypes::isConfigurableType($product)) {
+            return new Model\PriceDisplay('', '', 'NC'); // TODO translation
+        }
+
         // TODO user locale and currency (in context provider)
+
+        if (null === $context) {
+            $context = $this->contextProvider->getContext();
+        }
 
         $price = $this->priceCalculator->getPrice($product, $context);
 
+        $currency = $context->getCurrency()->getCode();
+        $mode = $context->getVatDisplayMode();
+
         $formatter = $this->getFormatter();
-        if ($formatter->getCurrency() !== $price->getCurrency()) {
-            $formatter = $this->formatterFactory->create(
-                $this->localeProvider->getCurrentLocale(),
-                $price->getCurrency()
-            );
+        if ($formatter->getCurrency() !== $currency) {
+            $formatter = $this->formatterFactory->create($this->localeProvider->getCurrentLocale(), $currency);
         }
 
-        $current = sprintf(
-            $this->options['final_price_format'],
-            $formatter->currency($price->getTotal($discount), $price->getCurrency()),
-            $this->translator->trans(VatDisplayModes::getLabel($price->getMode()))
-        );
-
-        $from = false;
-        if (!in_array($product->getType(), [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT], true)) {
-            $from = true;
-        } else {
-            foreach ($product->getOptionGroups() as $optionGroup) {
-                if ($optionGroup->isRequired()) {
-                    $from = true;
-                }
-            }
-        }
-
-        $prefix = $this->options['price_with_from'] && $from
-            ? $this->translator->trans('ekyna_commerce.subject.price_from') . ' '
+        // From
+        $fromLabel = $this->options['price_with_from'] && $price['starting_from']
+            ? $this->translator->trans('ekyna_commerce.subject.price_from') . '&nbsp;'
             : '';
 
-        if ($discount && $price->hasDiscounts()) {
-            $previous = $formatter->currency($price->getTotal(false), $price->getCurrency());
+        $mode = $this->translator->trans(VatDisplayModes::getLabel($mode));
 
-            return $prefix . sprintf($this->options['original_price_format'], $previous, $current);
+        // Final
+        $final = (!$discount && 0 < $price['original_price'])
+            ? $price['original_price']
+            : $price['sell_price'];
+
+        $finalLabel = strtr($this->options['final_price_format'], [
+            '{amount}' => $formatter->currency($final, $currency),
+            '{mode}' => $mode,
+        ]);
+
+        // Original
+        $originalLabel = '';
+        if ($discount && 0 < $price['original_price']) {
+            $originalLabel = strtr($this->options['original_price_format'], [
+                '{amount}' => $formatter->currency($price['original_price'], $currency),
+                '{mode}' => $mode,
+            ]);
         }
 
-        return $prefix . $current;
+        // Result
+        $display = new Model\PriceDisplay($fromLabel, $originalLabel, $finalLabel);
+
+        if (isset($price['details'][Offer::TYPE_SPECIAL]) && 0 < $price['details'][Offer::TYPE_SPECIAL]) {
+            $display->setSpecialPercent($formatter->percent($price['details'][Offer::TYPE_SPECIAL]));
+        }
+        if (isset($price['details'][Offer::TYPE_PRICING]) && 0 < $price['details'][Offer::TYPE_PRICING]) {
+            $display->setPricingPercent($formatter->percent($price['details'][Offer::TYPE_PRICING]));
+        }
+
+        return $display;
     }
 
     /**
@@ -176,6 +204,10 @@ class PriceRenderer
         ContextInterface $context = null,
         $class = 'product-pricing-grid'
     ) {
+        if (null === $context) {
+            $context = $this->contextProvider->getContext();
+        }
+
         $config = $this->priceCalculator->getPricingGrid($product, $context);
 
         if (empty($config)) {

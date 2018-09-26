@@ -11,6 +11,7 @@ use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Event\ResourceEvent;
 use Ekyna\Component\Resource\Exception\InvalidArgumentException;
+use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -21,6 +22,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PricingEventSubscriber implements EventSubscriberInterface
 {
     /**
+     * @var PersistenceHelperInterface
+     */
+    private $persistenceHelper;
+
+    /**
      * @var OfferInvalidator
      */
     private $offerInvalidator;
@@ -29,10 +35,12 @@ class PricingEventSubscriber implements EventSubscriberInterface
     /**
      * Constructor.
      *
-     * @param OfferInvalidator $offerInvalidator
+     * @param PersistenceHelperInterface $persistenceHelper
+     * @param OfferInvalidator           $offerInvalidator
      */
-    public function __construct(OfferInvalidator $offerInvalidator)
+    public function __construct(PersistenceHelperInterface $persistenceHelper, OfferInvalidator $offerInvalidator)
     {
+        $this->persistenceHelper = $persistenceHelper;
         $this->offerInvalidator = $offerInvalidator;
     }
 
@@ -41,14 +49,13 @@ class PricingEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreInsert(ResourceEvent $event)
+    public function onInsert(ResourceEvent $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
         $this->buildName($pricing);
-        $this->buildDesignation($pricing);
 
-        $this->invalidateOffers($pricing);
+        $this->offerInvalidator->invalidatePricing($pricing);
     }
 
     /**
@@ -56,12 +63,11 @@ class PricingEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreUpdate(ResourceEvent $event)
+    public function onUpdate(ResourceEvent $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
         $this->buildName($pricing);
-        $this->buildDesignation($pricing);
 
         // Brands association changes
         foreach ($pricing->getInsertedIds(Pricing::REL_BRANDS) as $id) {
@@ -77,26 +83,55 @@ class PricingEventSubscriber implements EventSubscriberInterface
      *
      * @param ResourceEvent $event
      */
-    public function onPreDelete(ResourceEvent $event)
+    public function onDelete(ResourceEvent $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
         $this->buildName($pricing);
-        $this->buildDesignation($pricing);
 
-        $this->invalidateOffers($pricing);
+        $this->offerInvalidator->invalidatePricing($pricing);
     }
 
     /**
-     * Invalidates offers for the given pricing.
+     * Builds the pricing name.
      *
      * @param PricingInterface $pricing
      */
-    private function invalidateOffers(PricingInterface $pricing)
+    protected function buildName(PricingInterface $pricing)
     {
-        foreach ($pricing->getBrands() as $brand) {
-            $this->offerInvalidator->invalidateByBrandId($brand->getId());
+        if (0 < strlen($pricing->getName())) {
+            return;
         }
+
+        $parts = [];
+
+        if (null !== $product = $pricing->getProduct()) {
+            if (32 > strlen($designation = $product->getDesignation())) {
+                $parts[] = $designation;
+            } else {
+                $parts[] = substr($designation, 0, 32) . '...';
+            }
+        } else {
+            $parts[] = implode('/', array_map(function (BrandInterface $brand) {
+                return $brand->getName();
+            }, $pricing->getBrands()->toArray()));
+        }
+
+        if (!empty($groups = $pricing->getGroups()->toArray())) {
+            $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
+                return $group->getName();
+            }, $groups));
+        }
+
+        if (!empty($countries = $pricing->getCountries()->toArray())) {
+            $parts[] = implode('/', array_map(function (CountryInterface $country) {
+                return $country->getName();
+            }, $countries));
+        }
+
+        $pricing->setName(implode(' - ', $parts));
+
+        $this->persistenceHelper->persistAndRecompute($pricing, false);
     }
 
     /**
@@ -118,60 +153,14 @@ class PricingEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Builds the pricing name.
-     *
-     * @param PricingInterface $pricing
-     */
-    protected function buildName(PricingInterface $pricing)
-    {
-        if (0 < strlen($pricing->getName())) {
-            return;
-        }
-
-        $parts = [];
-
-        $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
-            return $group->getName();
-        }, $pricing->getGroups()->toArray()));
-
-        $parts[] = implode('/', array_map(function (CountryInterface $country) {
-            return $country->getName();
-        }, $pricing->getCountries()->toArray()));
-
-        $parts[] = implode('/', array_map(function (BrandInterface $brand) {
-            return $brand->getName();
-        }, $pricing->getBrands()->toArray()));
-
-        $pricing->setName(implode(' - ', $parts));
-    }
-
-    /**
-     * Builds the pricing designation.
-     *
-     * @param PricingInterface $pricing
-     */
-    protected function buildDesignation(PricingInterface $pricing)
-    {
-        if (0 < strlen($pricing->getDesignation())) {
-            return;
-        }
-
-        $groups = implode('/', array_map(function (CustomerGroupInterface $group) {
-            return $group->getName();
-        }, $pricing->getGroups()->toArray()));
-
-        $pricing->setDesignation('Remise ' . $groups); // TODO
-    }
-
-    /**
      * @inheritDoc
      */
     public static function getSubscribedEvents()
     {
         return [
-            PricingEvents::PRE_CREATE => ['onPreInsert', 0],
-            PricingEvents::PRE_UPDATE => ['onPreUpdate', 0],
-            PricingEvents::PRE_DELETE => ['onPreDelete', 0],
+            PricingEvents::INSERT => ['onInsert', 0],
+            PricingEvents::UPDATE => ['onUpdate', 0],
+            PricingEvents::DELETE => ['onDelete', 0],
         ];
     }
 }

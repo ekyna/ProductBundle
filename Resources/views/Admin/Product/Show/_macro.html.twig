@@ -186,6 +186,16 @@
 {% endmacro show_medias %}
 
 
+{% macro show_min_price(product, options = {}) %}
+{% spaceless %}
+    {{ show_row(product.minPrice|localizedcurrency(commerce_default_currency), 'text', {
+        'label': 'ekyna_product.product.field.min_price',
+        'id': 'product_minPrice',
+    }|merge(options)) }}
+{% endspaceless %}
+{% endmacro show_min_price %}
+
+
 {% macro show_net_price(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', {
@@ -392,6 +402,131 @@
 {% endmacro show_option_groups %}
 
 
+{% macro show_special_offers(product, options = {}) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{- 'ekyna_product.special_offer.label.plural'|trans -}}
+        </div>
+        <div class="col-md-10">
+            {%- if product.specialOffers is not empty -%}
+            <div class="show-widget show-widget-sm">
+                <table class="table table-stripped table-condensed">
+                    <tr>
+                        <th>{{ 'ekyna_core.field.name'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.common.percent'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.start_date'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.end_date'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_product.special_offer.field.stack'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.enabled'|trans }}</th>
+                    </tr>
+                    {% for offer in product.specialOffers -%}
+                    {% set offerId = 'product_specialOffers_' ~ loop.index0 ~ '_' -%}
+                    <tr>
+                        <td id="{{ offerId ~ 'name' }}">
+                            {{- offer.name -}}
+                        </td>
+                        <td id="{{ offerId ~ 'minQuantity' }}" class="text-right">
+                            {{- offer.minQuantity|localizednumber -}}
+                        </td>
+                        <td id="{{ offerId ~ 'percent' }}" class="text-right">
+                            {{- (offer.percent / 100)|localizednumber('percent') -}}
+                        </td>
+                        <td id="{{ offerId ~ 'startsAt' }}" class="text-right">
+                        {%- if offer.startsAt is null -%}
+                            <em>{{ 'ekyna_core.value.undefined'|trans }}</em>
+                        {%- else -%}
+                            {{ offer.startsAt|localizeddate('short', 'none') }}
+                        {%- endif -%}
+                        </td>
+                        <td id="{{ offerId ~ 'endsAt' }}" class="text-right">
+                        {%- if offer.endsAt is null -%}
+                            <em>{{ 'ekyna_core.value.undefined'|trans }}</em>
+                        {%- else -%}
+                            {{ offer.endsAt|localizeddate('short', 'none') }}
+                        {%- endif -%}
+                        </td>
+                        <td id="{{ offerId ~ 'stack' }}" class="text-right">
+                            {% if offer.stack -%}
+                                <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- endif %}
+                        </td>
+                        <td id="{{ offerId ~ 'enabled' }}" class="text-right">
+                            {% if offer.enabled -%}
+                                <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- endif %}
+                        </td>
+                    </tr>
+                    {%- endfor %}
+                </table>
+            </div>
+            {%- else -%}
+            <div class="show-widget show-widget-inline">
+                <em>{{ 'ekyna_core.value.none'|trans }}</em>
+            </div>
+            {%- endif -%}
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_special_offers %}
+
+
+{% macro show_pricings(product, options = {}) %}
+{% spaceless %}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{- 'ekyna_product.pricing.label.plural'|trans -}}
+        </div>
+        <div class="col-md-10">
+            {%- if product.pricings is not empty -%}
+            <div class="show-widget show-widget-sm">
+                <table class="table table-stripped table-condensed">
+                    <tr>
+                        <th>{{ 'ekyna_core.field.name'|trans }}</th>
+                        <th>{{ 'ekyna_product.pricing_rule.label.plural'|trans }}</th>
+                    </tr>
+                    {% for pricing in product.pricings -%}
+                    {% set pricingId = 'product_pricings_' ~ loop.index0 ~ '_' -%}
+                    <tr>
+                        <td id="{{ pricingId ~ 'name' }}">
+                            {{- pricing.name -}}
+                        </td>
+                        <td id="{{ pricingId ~ 'rules' }}">
+                            <table class="table table-condensed">
+                                <tr>
+                                    <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
+                                    {% for rule in pricing.rules -%}
+                                        <td class="text-right">{{ rule.minQuantity|localizednumber }}</td>
+                                    {%- endfor %}
+                                </tr>
+                                <tr>
+                                    <th class="text-right">{{ 'ekyna_product.common.percent'|trans }}</th>
+                                    {% for rule in pricing.rules -%}
+                                        <td class="text-right">{{ (rule.percent / 100)|localizednumber('percent') }}</td>
+                                    {%- endfor %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {%- endfor %}
+                </table>
+            </div>
+            {%- else -%}
+            <div class="show-widget show-widget-inline">
+                <em>{{ 'ekyna_core.value.none'|trans }}</em>
+            </div>
+            {%- endif -%}
+        </div>
+    </div>
+{% endspaceless %}
+{% endmacro show_pricings %}
+
+
 {% macro show_bundle_composition(product, options = {}) %}
 {% spaceless %}
     <div class="row show-row">
@@ -529,8 +664,8 @@
                             <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
-                            <th class="text-right">{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
-                            <th class="text-right">{{ 'ekyna_product.bundle_choice.field.min_quantity'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_product.common.max_quantity'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                         </tr>
                         {% for choice in slot.choices %}

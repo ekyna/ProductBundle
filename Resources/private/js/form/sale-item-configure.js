@@ -14,7 +14,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
      */
     var Pricing = {
         price: 0,
-        discounts: [],
+        offers: [],
         taxes: []
     };
 
@@ -39,16 +39,16 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
         }
 
         var result = this.price,
-            discount = undefined;
+            offer = undefined;
 
         if (discounted) {
-            if (Array.isArray(this.discounts)) {
-                discount = this.discounts.find(function (d) {
+            if (Array.isArray(this.offers)) {
+                offer = this.offers.find(function (d) {
                     return d.min_qty <= quantity;
                 });
             }
-            if (discount) {
-                result -= this.price * discount.percent / 100;
+            if (offer) {
+                result -= this.price * offer.percent / 100;
             }
         }
 
@@ -992,7 +992,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
                 price: 0,
                 pricing: {
                     price: 0,
-                    discounts: [],
+                    offers: [],
                     taxes: []
                 },
                 availability: null,
@@ -1060,6 +1060,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
             }
             this.bundleSlots = bundleSlots;
 
+            // Availability
             this.$availability = this.parentItem
                 ? this.$element.find('.sale-item-availability')
                 : this.$element.find('.sale-item-inner .sale-item-availability');

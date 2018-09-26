@@ -125,6 +125,7 @@ class ProductSlidePlugin extends AbstractPlugin
         if (empty($products)) {
             $view->content = '<p>Edit this block to select products.</p>';
         } else {
+            // TODO image source sets / imagine filters
             $view->content = $this->templating->render($this->config['template'], [
                 'duration'  => isset($data['duration']) ? $data['duration'] : null,
                 'max_width' => isset($data['max_width']) ? $data['max_width'] : null,

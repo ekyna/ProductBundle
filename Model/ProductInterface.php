@@ -234,12 +234,100 @@ interface ProductInterface extends
     /**
      * Sets the bundle slots.
      *
-     * @param ArrayCollection|BundleSlotInterface[] $bundleSlots
+     * @param ArrayCollection|BundleSlotInterface[] $slots
      *
      * @return $this|ProductInterface
      * @internal
      */
-    public function setBundleSlots(ArrayCollection $bundleSlots);
+    public function setBundleSlots(ArrayCollection $slots);
+
+    /**
+     * Returns the special offers.
+     *
+     * @return ArrayCollection|SpecialOfferInterface[]
+     */
+    public function getSpecialOffers();
+
+    /**
+     * Returns whether the product has the given special offer or not.
+     *
+     * @param SpecialOfferInterface $offer
+     *
+     * @return bool
+     */
+    public function hasSpecialOffer(SpecialOfferInterface $offer);
+
+    /**
+     * Adds the special offer.
+     *
+     * @param SpecialOfferInterface $offer
+     *
+     * @return $this|ProductInterface
+     */
+    public function addSpecialOffer(SpecialOfferInterface $offer);
+
+    /**
+     * Removes the special offer.
+     *
+     * @param SpecialOfferInterface $offer
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeSpecialOffer(SpecialOfferInterface $offer);
+
+    /**
+     * Sets the special offers.
+     *
+     * @param ArrayCollection|SpecialOfferInterface[] $offers
+     *
+     * @return $this|ProductInterface
+     * @internal
+     */
+    public function setSpecialOffers(ArrayCollection $offers);
+
+    /**
+     * Returns the pricings.
+     *
+     * @return ArrayCollection|PricingInterface[]
+     */
+    public function getPricings();
+
+    /**
+     * Returns whether the product has the given pricing or not.
+     *
+     * @param PricingInterface $pricing
+     *
+     * @return bool
+     */
+    public function hasPricing(PricingInterface $pricing);
+
+    /**
+     * Adds the pricing.
+     *
+     * @param PricingInterface $pricing
+     *
+     * @return $this|ProductInterface
+     */
+    public function addPricing(PricingInterface $pricing);
+
+    /**
+     * Removes the pricing.
+     *
+     * @param PricingInterface $pricing
+     *
+     * @return $this|ProductInterface
+     */
+    public function removePricing(PricingInterface $pricing);
+
+    /**
+     * Sets the pricings.
+     *
+     * @param ArrayCollection|PricingInterface[] $pricings
+     *
+     * @return $this|ProductInterface
+     * @internal
+     */
+    public function setPricings(ArrayCollection $pricings);
 
     /**
      * Returns the brand.
@@ -551,6 +639,22 @@ interface ProductInterface extends
     public function setNetPrice($netPrice);
 
     /**
+     * Returns the minimum price.
+     *
+     * @return float
+     */
+    public function getMinPrice();
+
+    /**
+     * Sets the minimum price.
+     *
+     * @param float $minPrice
+     *
+     * @return $this|ProductInterface
+     */
+    public function setMinPrice($minPrice);
+
+    /**
      * Sets the weight (kilograms).
      *
      * @param float $weight
@@ -610,6 +714,22 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setPendingOffers($pending);
+
+    /**
+     * Returns whether prices update is needed.
+     *
+     * @return bool
+     */
+    public function isPendingPrices();
+
+    /**
+     * Sets whether prices update is needed.
+     *
+     * @param bool $pending
+     *
+     * @return $this|ProductInterface
+     */
+    public function setPendingPrices($pending);
 
     /**
      * Returns the position (variant ordering).

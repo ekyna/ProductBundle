@@ -8,6 +8,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGeneratorInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Resource\Event\QueueEvents;
@@ -30,17 +31,22 @@ class ProductEventSubscriber implements EventSubscriberInterface
     /**
      * @var Handler\HandlerRegistry
      */
-    private $handlerRegistry;
+    protected $handlerRegistry;
 
     /**
      * @var ReferenceGeneratorInterface
      */
-    private $referenceGenerator;
+    protected $referenceGenerator;
 
     /**
      * @var OfferInvalidator
      */
-    private $offerInvalidator;
+    protected $offerInvalidator;
+
+    /**
+     * @var PriceInvalidator
+     */
+    protected $priceInvalidator;
 
 
     /**
@@ -50,17 +56,20 @@ class ProductEventSubscriber implements EventSubscriberInterface
      * @param Handler\HandlerRegistry     $registry
      * @param ReferenceGeneratorInterface $referenceGenerator
      * @param OfferInvalidator            $offerInvalidator
+     * @param PriceInvalidator            $priceInvalidator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         Handler\HandlerRegistry $registry,
         ReferenceGeneratorInterface $referenceGenerator,
-        OfferInvalidator $offerInvalidator
+        OfferInvalidator $offerInvalidator,
+        PriceInvalidator $priceInvalidator
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
         $this->referenceGenerator = $referenceGenerator;
         $this->offerInvalidator = $offerInvalidator;
+        $this->priceInvalidator = $priceInvalidator;
     }
 
     /**
@@ -234,7 +243,12 @@ class ProductEventSubscriber implements EventSubscriberInterface
      */
     public function onQueueClose()
     {
-        $this->offerInvalidator->flush($this->persistenceHelper->getManager());
+        $manager = $this->persistenceHelper->getManager();
+
+        $manager->getConnection()->transactional(function() use ($manager) {
+            $this->offerInvalidator->flush($manager);
+            $this->priceInvalidator->flush($manager);
+        });
     }
 
     /**

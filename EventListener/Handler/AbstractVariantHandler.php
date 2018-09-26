@@ -73,7 +73,6 @@ abstract class AbstractVariantHandler extends AbstractHandler
         $this->localeProvider = $localeProvider;
         $this->typeRegistry = $typeRegistry;
         $this->priceCalculator = $priceCalculator;
-
         $this->productRepository = $productRepository;
     }
 

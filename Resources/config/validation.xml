@@ -399,27 +399,13 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Pricing">
-        <property name="groups">
-            <constraint name="Count">
-                <option name="min">1</option>
-            </constraint>
-        </property>
-        <property name="countries">
-            <constraint name="Count">
-                <option name="min">1</option>
-            </constraint>
-        </property>
-        <property name="brands">
-            <constraint name="Count">
-                <option name="min">1</option>
-            </constraint>
-        </property>
         <property name="rules">
             <constraint name="Valid"/>
             <constraint name="Count">
                 <option name="min">1</option>
             </constraint>
         </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Pricing"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\PricingRule">
@@ -809,6 +795,28 @@
             <constraint name="Valid"/>
         </property>
 
+        <property name="specialOffers">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>variable</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+
+        <property name="pricings">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>variable</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
             <option name="groups">variant</option>
@@ -972,9 +980,6 @@
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\SpecialOffer">
-        <property name="name">
-            <constraint name="NotBlank"/>
-        </property>
         <property name="percent">
             <constraint name="GreaterThan">
                 <option name="value">0</option>
@@ -990,6 +995,7 @@
                 <value>name</value>
             </option>
         </constraint>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\SpecialOffer"/>
     </class>
 
 </constraint-mapping>

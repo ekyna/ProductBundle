@@ -2,11 +2,16 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
+use Ekyna\Component\Table\Exception\InvalidArgumentException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SpecialOfferType
@@ -39,6 +44,11 @@ class SpecialOfferType extends ResourceTableType
      */
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
+        $source = $builder->getSource();
+        if (!$source instanceof EntitySource) {
+            throw new InvalidArgumentException("Expected instance of " . EntitySource::class);
+        }
+
         $builder
             ->addColumn('name', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
@@ -48,19 +58,10 @@ class SpecialOfferType extends ResourceTableType
                 ],
                 'position'             => 10,
             ])
-            ->addColumn('brands', DType\Column\EntityType::class, [
-                'label'                => 'ekyna_product.brand.label.plural',
-                'entity_label'         => 'name',
-                'route_name'           => 'ekyna_product_brand_admin_show',
-                'route_parameters_map' => ['brandId' => 'id'],
-                'position'             => 20,
-            ])
-            ->addColumn('enabled', CType\Column\BooleanType::class, [
-                'label'                => 'ekyna_core.field.enabled',
-                'route_name'           => 'ekyna_product_special_offer_admin_toggle',
-                'route_parameters'     => ['field' => 'enabled'],
-                'route_parameters_map' => ['specialOfferId' => 'id'],
-                'position'             => 30,
+            ->addColumn('percent', CType\Column\NumberType::class, [
+                'label'    => 'ekyna_product.common.percent',
+                'append'   => '%',
+                'position' => 20,
             ])
             ->addColumn('startsAt', CType\Column\DateTimeType::class, [
                 'label'       => 'ekyna_core.field.start_date',
@@ -71,6 +72,45 @@ class SpecialOfferType extends ResourceTableType
                 'label'       => 'ekyna_core.field.end_date',
                 'time_format' => 'none',
                 'position'    => 50,
+            ]);
+
+        if (null !== $product = $options['product']) {
+            $source->setQueryBuilderInitializer(function (QueryBuilder $qb, $alias) use ($product) {
+                $qb
+                    ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+                    ->setParameter('product', $product);
+            });
+
+            $builder
+                ->setFilterable(false)
+                ->setSortable(false)
+                ->setPerPageChoices([100])
+                ->addColumn('enabled', CType\Column\BooleanType::class, [
+                    'label'    => 'ekyna_core.field.enabled',
+                    'position' => 60,
+                ]);
+
+            return;
+        } else {
+            $source->setQueryBuilderInitializer(function (QueryBuilder $qb, $alias) use ($product) {
+                $qb->andWhere($qb->expr()->isNull($alias . '.product'));
+            });
+        }
+
+        $builder
+            ->addColumn('brands', DType\Column\EntityType::class, [
+                'label'                => 'ekyna_product.brand.label.plural',
+                'entity_label'         => 'name',
+                'route_name'           => 'ekyna_product_brand_admin_show',
+                'route_parameters_map' => ['brandId' => 'id'],
+                'position'             => 30,
+            ])
+            ->addColumn('enabled', CType\Column\BooleanType::class, [
+                'label'                => 'ekyna_core.field.enabled',
+                'route_name'           => 'ekyna_product_special_offer_admin_toggle',
+                'route_parameters'     => ['field' => 'enabled'],
+                'route_parameters_map' => ['specialOfferId' => 'id'],
+                'position'             => 60,
             ])
             ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
@@ -94,15 +134,15 @@ class SpecialOfferType extends ResourceTableType
                 'label'    => 'ekyna_core.field.name',
                 'position' => 10,
             ])
+            ->addFilter('percent', CType\Filter\NumberType::class, [
+                'label'    => 'ekyna_product.common.percent',
+                'position' => 20,
+            ])
             ->addFilter('brands', DType\Filter\EntityType::class, [
                 'label'        => 'ekyna_product.brand.label.singular',
                 'class'        => $this->brandClass,
                 'entity_label' => 'name',
-                'position'     => 20,
-            ])
-            ->addFilter('enabled', CType\Filter\BooleanType::class, [
-                'label'    => 'ekyna_core.field.enabled',
-                'position' => 30,
+                'position'     => 30,
             ])
             ->addFilter('startsAt', CType\Filter\DateTimeType::class, [
                 'label'    => 'ekyna_core.field.start_date',
@@ -111,6 +151,22 @@ class SpecialOfferType extends ResourceTableType
             ->addFilter('endsAt', CType\Filter\DateTimeType::class, [
                 'label'    => 'ekyna_core.field.end_date',
                 'position' => 50,
+            ])
+            ->addFilter('enabled', CType\Filter\BooleanType::class, [
+                'label'    => 'ekyna_core.field.enabled',
+                'position' => 60,
             ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver
+            ->setDefault('product', null)
+            ->setAllowedTypes('product', [ProductInterface::class, 'null']);
     }
 }

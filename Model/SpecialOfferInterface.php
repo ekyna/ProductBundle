@@ -94,6 +94,22 @@ interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationI
     public function setEndsAt(\DateTime $date = null);
 
     /**
+     * Returns whether this special offer stacks over pricing rules.
+     *
+     * @return bool
+     */
+    public function isStack();
+
+    /**
+     * Sets whether this special offer stacks over pricing rules.
+     *
+     * @param bool $stack
+     *
+     * @return $this|SpecialOfferInterface
+     */
+    public function setStack(bool $stack);
+
+    /**
      * Returns the enabled.
      *
      * @return bool
@@ -107,7 +123,21 @@ interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationI
      *
      * @return $this|SpecialOfferInterface
      */
-    public function setEnabled($enabled);
+    public function setEnabled(bool $enabled);
+
+    /**
+     * Returns the product.
+     *
+     * @return ProductInterface
+     */
+    public function getProduct();
+
+    /**
+     * Sets the product.
+     *
+     * @param ProductInterface $product
+     */
+    public function setProduct(ProductInterface $product = null);
 
     /**
      * Returns the products.

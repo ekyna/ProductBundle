@@ -3,9 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
-use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
-use Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityTrait;
@@ -16,7 +14,7 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class Pricing implements PricingInterface
+class Pricing implements Model\PricingInterface
 {
     const REL_GROUPS    = 'groups';
     const REL_COUNTRIES = 'countries';
@@ -41,6 +39,11 @@ class Pricing implements PricingInterface
     protected $designation;
 
     /**
+     * @var Model\ProductInterface
+     */
+    protected $product;
+
+    /**
      * @var ArrayCollection|CustomerGroupInterface[]
      */
     protected $groups;
@@ -51,12 +54,12 @@ class Pricing implements PricingInterface
     protected $countries;
 
     /**
-     * @var ArrayCollection|BrandInterface[]
+     * @var ArrayCollection|Model\BrandInterface[]
      */
     protected $brands;
 
     /**
-     * @var ArrayCollection|PricingRuleInterface[]
+     * @var ArrayCollection|Model\PricingRuleInterface[]
      */
     protected $rules;
 
@@ -111,17 +114,17 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function getDesignation()
+    public function getProduct()
     {
-        return $this->designation;
+        return $this->product;
     }
 
     /**
      * @inheritdoc
      */
-    public function setDesignation($designation)
+    public function setProduct(Model\ProductInterface $product = null)
     {
-        $this->designation = $designation;
+        $this->product = $product;
 
         return $this;
     }
@@ -217,7 +220,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function hasBrand(BrandInterface $brand)
+    public function hasBrand(Model\BrandInterface $brand)
     {
         return $this->brands->contains($brand);
     }
@@ -225,7 +228,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function addBrand(BrandInterface $brand)
+    public function addBrand(Model\BrandInterface $brand)
     {
         if (!$this->hasBrand($brand)) {
             $this->brands->add($brand);
@@ -237,7 +240,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function removeBrand(BrandInterface $brand)
+    public function removeBrand(Model\BrandInterface $brand)
     {
         if ($this->hasBrand($brand)) {
             $this->brands->removeElement($brand);
@@ -257,7 +260,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function hasRule(PricingRuleInterface $rule)
+    public function hasRule(Model\PricingRuleInterface $rule)
     {
         return $this->rules->contains($rule);
     }
@@ -265,7 +268,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function addRule(PricingRuleInterface $rule)
+    public function addRule(Model\PricingRuleInterface $rule)
     {
         if (!$this->hasRule($rule)) {
             $this->rules->add($rule);
@@ -278,7 +281,7 @@ class Pricing implements PricingInterface
     /**
      * @inheritdoc
      */
-    public function removeRule(PricingRuleInterface $rule)
+    public function removeRule(Model\PricingRuleInterface $rule)
     {
         if ($this->hasRule($rule)) {
             $this->rules->removeElement($rule);

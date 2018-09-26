@@ -9,24 +9,30 @@
             name="Ekyna\Bundle\ProductBundle\Entity\SpecialOffer"
             table="product_special_offer">
 
+        <!--<unique-constraints>
+            <unique-constraint columns="name" name="unique_product_special_offer_reference" />
+        </unique-constraints>-->
+
         <lifecycle-callbacks>
             <lifecycle-callback type="postLoad" method="onPostLoad"/>
         </lifecycle-callbacks>
-
-        <unique-constraints>
-            <unique-constraint columns="name" name="unique_special_offer_reference" />
-        </unique-constraints>
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
 
         <field name="name" column="name" type="string" length="255" nullable="true"/>
-        <field name="percent" column="percent" type="smallint" nullable="false"/>
-        <field name="minQuantity" column="min_quantity" type="smallint" nullable="false"/>
+        <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
+        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="3" nullable="false"/>
         <field name="startsAt" column="starts_at" type="date" nullable="true"/>
         <field name="endsAt" column="ends_at" type="date" nullable="true"/>
+        <field name="stack" column="stack" type="boolean" nullable="false"/>
         <field name="enabled" column="enabled" type="boolean" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="product" inversed-by="specialOffers">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+        </many-to-one>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                       field="products">

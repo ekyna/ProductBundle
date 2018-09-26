@@ -3,4 +3,5 @@ doctrine:
         entity_managers:
             default:
                 hydrators:
-                    PricingGridHydrator: Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PricingGridHydrator
+                    OfferScalarHydrator: Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator
+                    PriceScalarHydrator: Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PriceScalarHydrator

@@ -2,7 +2,6 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
@@ -18,24 +17,20 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      * Find offers by product, context and quantity.
      *
      * @param ProductInterface $product
-     * @param ContextInterface       $context
-     * @param bool                   $useCache
+     * @param ContextInterface $context
+     * @param bool             $useCache
      *
      * @return array
      */
-    public function findByProductAndContext(
-        ProductInterface $product,
-        ContextInterface $context,
-        $useCache = true
-    );
+    public function findByProductAndContext(ProductInterface $product, ContextInterface $context, $useCache = true);
 
     /**
      * Find offers by product, context and quantity.
      *
      * @param ProductInterface $product
-     * @param ContextInterface       $context
-     * @param float                  $quantity
-     * @param bool                   $useCache
+     * @param ContextInterface $context
+     * @param float            $quantity
+     * @param bool             $useCache
      *
      * @return array
      */
@@ -50,9 +45,9 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      * Finds offers by product.
      *
      * @param ProductInterface $product
-     * @param bool                   $asArray
+     * @param bool             $asArray
      *
-     * @return Offer[]|array[]
+     * @return \Ekyna\Bundle\ProductBundle\Entity\Offer[]|array[]
      */
     public function findByProduct(ProductInterface $product, $asArray = false);
 }

@@ -72,32 +72,34 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
             return $this->byProductQuery;
         }
 
-        $qb = $this->createQueryBuilder('p');
+        $qb = $this->createQueryBuilder('s');
         $ex = $qb->expr();
 
         return $this->byProductQuery = $qb
             ->select([
-                'p.id as id',
-                // TODO 'p.designation as designation',
+                's.id as special_offer_id',
+                // TODO (?) 's.designation as designation',
                 'g.id as group_id',
                 'c.id as country_id',
-                'p.minQuantity as min_qty',
-                'p.percent as percent',
+                's.minQuantity as min_qty',
+                's.percent as percent',
+                's.stack as stack',
             ])
-            ->leftJoin('p.groups', 'g')
-            ->leftJoin('p.countries', 'c')
-            ->leftJoin('p.brands', 'b')
+            ->leftJoin('s.groups', 'g')
+            ->leftJoin('s.countries', 'c')
+            ->leftJoin('s.brands', 'b')
             ->addOrderBy('g.id', 'ASC')
             ->addOrderBy('c.id', 'ASC')
             ->addOrderBy('b.id', 'ASC')
-            ->addOrderBy('p.minQuantity', 'DESC')
-            ->andWhere($ex->eq('p.enabled', ':enabled'))
+            ->addOrderBy('s.minQuantity', 'DESC')
+            ->andWhere($ex->eq('s.enabled', ':enabled'))
             ->andWhere($ex->orX(
-                $ex->isMemberOf(':brand', 'p.brands'),
-                $ex->isMemberOf(':product', 'p.products')
+                $ex->eq('s.product', ':product'),
+                $ex->isMemberOf(':brand', 's.brands'),
+                $ex->isMemberOf(':product', 's.products')
             ))
-            ->andWhere($ex->orX($ex->isNull('p.startsAt'), $ex->lte('p.startsAt', ':now')))
-            ->andWhere($ex->orX($ex->isNull('p.endsAt'), $ex->gte('p.endsAt', ':now')))
+            ->andWhere($ex->orX($ex->isNull('s.startsAt'), $ex->lte('s.startsAt', ':now')))
+            ->andWhere($ex->orX($ex->isNull('s.endsAt'), $ex->gte('s.endsAt', ':now')))
             ->getQuery()
             ->useQueryCache(true);
     }
@@ -107,6 +109,6 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
      */
     protected function getAlias()
     {
-        return 'p';
+        return 's';
     }
 }

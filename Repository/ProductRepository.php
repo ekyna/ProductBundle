@@ -108,8 +108,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb)
-            ->joinOptionGroups($qb, true);
+            ->joinSeo($qb);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -129,6 +128,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
+        $this->loadOptions($product);
         $this->loadAssociations($product);
 
         return $product;
@@ -145,8 +145,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb)
-            ->joinOptionGroups($qb, true);
+            ->joinSeo($qb);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -166,6 +165,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
+        $this->loadOptions($product);
         $this->loadAssociations($product);
 
         return $product;
@@ -186,8 +186,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $this
             ->joinCategories($qb)
             ->joinBrand($qb)
-            ->joinSeo($qb)
-            ->joinOptionGroups($qb, true);
+            ->joinSeo($qb);
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $qb
@@ -209,6 +208,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
+        $this->loadOptions($product);
         $this->loadAssociations($product);
 
         return $product;
@@ -224,8 +224,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $this
             ->joinCategories($qb)
-            ->joinBrand($qb)
-            ->joinOptionGroups($qb);
+            ->joinBrand($qb);
 
         $query = $qb
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -262,8 +261,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $this
             ->joinCategories($qb)
-            ->joinBrand($qb)
-            ->joinOptionGroups($qb);
+            ->joinBrand($qb);
 
         $query = $qb
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -383,6 +381,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->neq('p.stockMode', ':mode'))
             ->getQuery()
+            ->useQueryCache(true)
             ->setParameter('mode', [CStockModes::MODE_DISABLED])
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
             ->getResult();
@@ -391,15 +390,40 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
-    public function findOneByPendingOffers()
+    public function findOneByPendingOffers(string $type)
     {
         $qb = $this->createQueryBuilder('p');
 
         return $qb
+            ->andWhere($qb->expr()->eq('p.type', ':type'))
             ->andWhere($qb->expr()->eq('p.pendingOffers', ':flag'))
-            ->getQuery()
             ->setMaxResults(1)
-            ->setParameter('flag', true)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'type' => $type,
+                'flag' => true,
+            ])
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findOneByPendingPrices(string $type)
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        return $qb
+            ->andWhere($qb->expr()->eq('p.type', ':type'))
+            ->andWhere($qb->expr()->eq('p.pendingPrices', ':flag'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'type' => $type,
+                'flag' => true,
+            ])
             ->getOneOrNullResult();
     }
 

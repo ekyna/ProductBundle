@@ -18,6 +18,7 @@ class ProductTypes extends AbstractConstants
     const TYPE_BUNDLE       = 'bundle';
     const TYPE_CONFIGURABLE = 'configurable';
 
+
     /**
      * Supported conversion types map.
      *
@@ -45,8 +46,8 @@ class ProductTypes extends AbstractConstants
 
         return [
             static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE,       'indigo'],
-            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'teal'],
             static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT,      'light-green'],
+            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'teal'],
             static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE,       'purple'],
             static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'red'],
         ];
@@ -61,11 +62,25 @@ class ProductTypes extends AbstractConstants
     {
         return [
             static::TYPE_SIMPLE,
-            static::TYPE_VARIABLE,
             static::TYPE_VARIANT,
+            static::TYPE_VARIABLE,
             static::TYPE_BUNDLE,
             static::TYPE_CONFIGURABLE,
         ];
+    }
+
+    /**
+     * Returns the theme for the given state.
+     *
+     * @param string $state
+     *
+     * @return string
+     */
+    static public function getTheme($state)
+    {
+        static::isValid($state, true);
+
+        return static::getConfig()[$state][1];
     }
 
     /**
@@ -84,6 +99,66 @@ class ProductTypes extends AbstractConstants
     }
 
     /**
+     * Returns whether the type is 'simple'.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return bool
+     */
+    static public function isSimpleType($type)
+    {
+        return static::TYPE_SIMPLE === static::typeFromProduct($type);
+    }
+
+    /**
+     * Returns whether the type is 'variant'.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return bool
+     */
+    static public function isVariantType($type)
+    {
+        return static::TYPE_VARIANT === static::typeFromProduct($type);
+    }
+
+    /**
+     * Returns whether the type is 'variable'.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return bool
+     */
+    static public function isVariableType($type)
+    {
+        return static::TYPE_VARIABLE === static::typeFromProduct($type);
+    }
+
+    /**
+     * Returns whether the type is 'bundle'.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return bool
+     */
+    static public function isBundleType($type)
+    {
+        return static::TYPE_BUNDLE === static::typeFromProduct($type);
+    }
+
+    /**
+     * Returns whether the type is 'configurable'.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return bool
+     */
+    static public function isConfigurableType($type)
+    {
+        return static::TYPE_CONFIGURABLE === static::typeFromProduct($type);
+    }
+
+    /**
      * Returns the 'child' types.
      *
      * @return array
@@ -99,13 +174,13 @@ class ProductTypes extends AbstractConstants
     /**
      * Returns whether the type is a 'child' one.
      *
-     * @param string $type
+     * @param ProductInterface|string $type
      *
      * @return bool
      */
     static public function isChildType($type)
     {
-        return in_array($type, static::getChildTypes(), true);
+        return in_array(static::typeFromProduct($type), static::getChildTypes(), true);
     }
 
     /**
@@ -125,13 +200,13 @@ class ProductTypes extends AbstractConstants
     /**
      * Returns whether the type is a 'parent' one.
      *
-     * @param string $type
+     * @param ProductInterface|string $type
      *
      * @return bool
      */
     static public function isParentType($type)
     {
-        return in_array($type, static::getParentTypes(), true);
+        return in_array(static::typeFromProduct($type), static::getParentTypes(), true);
     }
 
     /**
@@ -150,27 +225,13 @@ class ProductTypes extends AbstractConstants
     /**
      * Returns whether the type is a 'bundled' one.
      *
-     * @param string $type
+     * @param ProductInterface|string $type
      *
      * @return bool
      */
-    static public function isBundled($type)
+    static public function isBundledType($type)
     {
-        return in_array($type, static::getBundledTypes(), true);
-    }
-
-    /**
-     * Returns the theme for the given state.
-     *
-     * @param string $state
-     *
-     * @return string
-     */
-    static public function getTheme($state)
-    {
-        static::isValid($state, true);
-
-        return static::getConfig()[$state][1];
+        return in_array(static::typeFromProduct($type), static::getBundledTypes(), true);
     }
 
     /**
@@ -264,7 +325,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertBundled(ProductInterface $product)
     {
-        if (!static::isBundled($product->getType())) {
+        if (!static::isBundledType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'bundled' type.");
         }
     }
@@ -294,5 +355,25 @@ class ProductTypes extends AbstractConstants
         if ($product->getType() !== $type) {
             throw new InvalidArgumentException("Expected product of type '$type'.");
         }
+    }
+
+    /**
+     * Returns the type from product.
+     *
+     * @param ProductInterface|string $type
+     *
+     * @return string
+     */
+    static private function typeFromProduct($type)
+    {
+        if ($type instanceof ProductInterface) {
+            return $type->getType();
+        }
+
+        if (is_string($type)) {
+            return $type;
+        }
+
+        throw new InvalidArgumentException("Expected instance of " . ProductInterface::class . " or string.");
     }
 }

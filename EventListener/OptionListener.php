@@ -3,8 +3,10 @@
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\ProductBundle\Event\OptionEvents;
+use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\OptionInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,9 +43,9 @@ class OptionListener implements EventSubscriberInterface
     {
         $option = $this->getOptionFromEvent($event);
 
-        if ($this->handleDataFields($option)) {
-            $this->persistenceHelper->persistAndRecompute($option);
-        }
+        $this->handleDataFields($option);
+
+        $this->scheduleChildPriceChangeEvent($option->getGroup()->getProduct());
     }
 
     /**
@@ -55,8 +57,30 @@ class OptionListener implements EventSubscriberInterface
     {
         $option = $this->getOptionFromEvent($event);
 
-        if ($this->handleDataFields($option)) {
-            $this->persistenceHelper->persistAndRecompute($option);
+        $this->handleDataFields($option);
+
+        if ($this->persistenceHelper->isChanged($option, ['netPrice', 'product'])) {
+            $this->scheduleChildPriceChangeEvent($option->getGroup()->getProduct());
+        }
+    }
+
+    /**
+     * Delete event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function onDelete(ResourceEventInterface $event)
+    {
+        $option = $this->getOptionFromEvent($event);
+
+        if (null === $group = $option->getGroup()) {
+            $group = $this->persistenceHelper->getChangeSet($option, 'group')[0];
+        }
+        if (null === $product = $group->getProduct()) {
+            $product = $this->persistenceHelper->getChangeSet($group, 'product')[0];
+        }
+        if (null !== $product) {
+            $this->scheduleChildPriceChangeEvent($product);
         }
     }
 
@@ -64,10 +88,8 @@ class OptionListener implements EventSubscriberInterface
      * Clears the data fields of a product is bound to the option.
      *
      * @param OptionInterface $option
-     *
-     * @return bool Whether the option has been changed.
      */
-    private function handleDataFields(OptionInterface $option)
+    protected function handleDataFields(OptionInterface $option)
     {
         $changed = false;
 
@@ -99,7 +121,19 @@ class OptionListener implements EventSubscriberInterface
             }
         }
 
-        return $changed;
+        if ($changed) {
+            $this->persistenceHelper->persistAndRecompute($option);
+        }
+    }
+
+    /**
+     * Dispatches the child price change events.
+     *
+     * @param ProductInterface $product
+     */
+    protected function scheduleChildPriceChangeEvent(ProductInterface $product)
+    {
+        $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $product);
     }
 
     /**
@@ -110,7 +144,7 @@ class OptionListener implements EventSubscriberInterface
      * @return OptionInterface
      * @throws InvalidArgumentException
      */
-    private function getOptionFromEvent(ResourceEventInterface $event)
+    protected function getOptionFromEvent(ResourceEventInterface $event)
     {
         $resource = $event->getResource();
 
@@ -129,6 +163,7 @@ class OptionListener implements EventSubscriberInterface
         return [
             OptionEvents::INSERT => ['onInsert', 0],
             OptionEvents::UPDATE => ['onUpdate', 0],
+            OptionEvents::DELETE => ['onDelete', 0],
         ];
     }
 }

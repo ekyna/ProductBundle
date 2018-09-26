@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SpecialOfferType
@@ -29,14 +30,21 @@ class SpecialOfferType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, [
-                'label'    => 'ekyna_core.field.name',
-                'attr'     => [
-                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
-                ],
-            ])
             ->add('percent', IntegerType::class, [
                 'label' => 'ekyna_product.common.percent',
+            ])
+            ->add('minQuantity', IntegerType::class, [
+                'label' => 'ekyna_product.common.min_quantity',
+                'attr'  => [
+                    'min' => 1,
+                ],
+            ])
+            ->add('stack', CheckboxType::class, [
+                'label'    => 'ekyna_product.special_offer.field.stack',
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
             ])
             ->add('enabled', CheckboxType::class, [
                 'label'    => 'ekyna_core.field.enabled',
@@ -53,25 +61,6 @@ class SpecialOfferType extends ResourceFormType
                 'label'    => 'ekyna_core.field.end_date',
                 'required' => false,
             ])
-            /*->add('designation', TextType::class, [
-                'label'    => 'ekyna_core.field.designation',
-                'required' => false,
-                'attr'     => [
-                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
-                ],
-            ])*/
-            ->add('products', ProductChoiceType::class, [
-                'multiple' => true,
-                'required' => false,
-                'types'    => [
-                    ProductTypes::TYPE_SIMPLE,
-                    ProductTypes::TYPE_VARIANT,
-                ],
-            ])
-            ->add('brands', BrandChoiceType::class, [
-                'multiple' => true,
-                'required' => false,
-            ])
             ->add('groups', CustomerGroupChoiceType::class, [
                 'multiple' => true,
                 'required' => false,
@@ -82,9 +71,57 @@ class SpecialOfferType extends ResourceFormType
             ])
             ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface $specialOffer */
-                $specialOffer = $event->getData();
+                if (null === $specialOffer = $event->getData()) {
+                    return;
+                }
                 /** @see \Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferEventSubscriber::onPreUpdate() */
                 $specialOffer->takeSnapshot();
             });
+
+        if (!$options['product_mode']) {
+            $builder
+                ->add('name', TextType::class, [
+                    'label'    => 'ekyna_core.field.name',
+                    'required' => false,
+                    'attr'     => [
+                        'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                    ],
+                ])
+                ->add('products', ProductChoiceType::class, [
+                    'multiple' => true,
+                    'required' => false,
+                    'types'    => [
+                        ProductTypes::TYPE_SIMPLE,
+                        ProductTypes::TYPE_VARIANT,
+                        //ProductTypes::TYPE_BUNDLE,
+                    ],
+                ])
+                ->add('brands', BrandChoiceType::class, [
+                    'multiple' => true,
+                    'required' => false,
+                ]);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBlockPrefix()
+    {
+        return 'ekyna_product_special_offer';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver
+            ->setDefaults([
+                'product_mode' => false,
+            ])
+            ->setAllowedTypes('product_mode', 'bool');
     }
 }

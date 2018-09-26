@@ -285,6 +285,13 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Option group event listener -->
+        <service id="ekyna_product.option_group.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\OptionGroupListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Product form type builder -->
         <service id="ekyna_product.product.form_type.builder"
                  class="%ekyna_product.product.form_type.builder.class%">
@@ -403,9 +410,8 @@
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\OfferUpdater">
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
             <argument type="service" id="ekyna_product.offer.resolver"/>
-            <argument type="service" id="ekyna_product.offer.invalidator"/>
             <argument type="service" id="ekyna_product.offer.repository"/>
-            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <argument>%ekyna_commerce.customer_group.class%</argument>
             <argument>%ekyna_commerce.country.class%</argument>
             <argument>%ekyna_product.pricing.class%</argument>
@@ -418,14 +424,49 @@
             <argument>%ekyna_product.product.class%</argument>
         </service>
 
+        <!-- Price repository -->
+        <service id="ekyna_product.price.repository"
+                 class="Ekyna\Bundle\ProductBundle\Repository\PriceRepository">
+            <factory service="doctrine" method="getRepository"/>
+            <argument>%ekyna_product.price.class%</argument>
+            <call method="setCachedCountryCodes">
+                <argument>%ekyna_commerce.cache.countries%</argument>
+            </call>
+        </service>
+
+        <!-- Price event listener -->
+        <service id="ekyna_product.price.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\PriceEventSubscriber">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+            <tag name="kernel.event_listener" event="console.terminate" method="onTerminate"/>
+        </service>
+
+        <!-- Price updater -->
+        <service id="ekyna_product.price.updater"
+                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceUpdater">
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            <argument type="service" id="ekyna_product.offer.resolver"/>
+            <argument type="service" id="ekyna_product.price.repository"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
+            <argument>%ekyna_commerce.customer_group.class%</argument>
+            <argument>%ekyna_commerce.country.class%</argument>
+        </service>
+
+        <!-- Price invalidator -->
+        <service id="ekyna_product.price.invalidator"
+                 class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator">
+            <argument type="service" id="ekyna_product.product.repository"/>
+        </service>
+
         <!-- Price calculator -->
         <service id="ekyna_product.pricing.calculator"
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator"
                  lazy="true">
+            <argument id="ekyna_product.price.repository" type="service"/>
             <argument id="ekyna_product.offer.repository" type="service"/>
             <argument id="ekyna_commerce.pricing.tax_resolver" type="service"/>
             <argument id="ekyna_commerce.currency.converter" type="service"/>
-            <argument id="ekyna_commerce.common.context_provider" type="service"/>
             <argument>%ekyna_commerce.default.currency%</argument>
         </service>
 
@@ -435,6 +476,7 @@
                  lazy="true">
             <argument id="ekyna_product.pricing.calculator" type="service"/>
             <argument id="ekyna_resource.locale.request_provider" type="service"/>
+            <argument id="ekyna_commerce.common.context_provider" type="service"/>
             <argument id="ekyna_commerce.util.formatter_factory" type="service"/>
             <argument id="translator" type="service"/>
             <argument id="templating" type="service"/>
@@ -448,7 +490,6 @@
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="ekyna_commerce.country.repository"/>
             <tag name="resource.event_subscriber"/>
-            <!--<tag name="kernel.event_listener" event="kernel.terminate" method="onTerminate"/>-->
             <tag name="kernel.event_listener" event="console.terminate" method="onTerminate"/>
         </service>
 
@@ -464,6 +505,7 @@
         <!-- Pricing event listener -->
         <service id="ekyna_product.pricing.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <tag name="resource.event_subscriber"/>
         </service>
@@ -534,8 +576,10 @@
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.event_dispatcher"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
             <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variant product event handler -->
@@ -558,6 +602,9 @@
             <argument type="service" id="ekyna_product.pricing.calculator"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <call method="setPriceInvalidator">
+                <argument type="service" id="ekyna_product.price.invalidator"/>
+            </call>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
@@ -567,6 +614,7 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->
@@ -575,6 +623,7 @@
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
 
@@ -589,6 +638,7 @@
             <argument type="service" id="ekyna_product.product.event_subscriber.handler_registry"/>
             <argument type="service" id="ekyna_product.product.reference_generator"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
@@ -748,7 +798,13 @@
             <argument type="service" id="mailer"/>
             <tag name="console.command"/>
         </service>
-
+        <service id="ekyna_product.command.update_min_price"
+                 class="Ekyna\Bundle\ProductBundle\Command\UpdateMinPriceCommand">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
+            <argument type="service" id="ekyna_product.pricing.calculator"/>
+            <tag name="console.command"/>
+        </service>
     </services>
 
 </container>

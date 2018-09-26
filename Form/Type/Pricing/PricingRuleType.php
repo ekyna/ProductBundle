@@ -21,7 +21,7 @@ class PricingRuleType extends ResourceFormType
     {
         $builder
             ->add('minQuantity', IntegerType::class, [
-                'label' => 'ekyna_product.pricing_rule.field.min_quantity',
+                'label' => 'ekyna_product.common.min_quantity',
                 'attr' => [
                     'min' => 1,
                 ]

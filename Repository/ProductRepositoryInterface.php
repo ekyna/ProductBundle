@@ -120,9 +120,20 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     /**
      * Finds a product with "pending offers" flag set to true.
      *
+     * @param string $type
+     *
      * @return Model\ProductInterface
      */
-    public function findOneByPendingOffers();
+    public function findOneByPendingOffers(string $type);
+
+    /**
+     * Finds a product with "pending prices" flag set to true.
+     *
+     * @param string $type
+     *
+     * @return Model\ProductInterface
+     */
+    public function findOneByPendingPrices(string $type);
 
     /**
      * Loads the product's medias.

@@ -2,13 +2,14 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
- * Class Price
+ * Class Offer
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
@@ -23,19 +24,24 @@ class Offer implements ResourceInterface
     private $id;
 
     /**
+     * @var int
+     */
+    private $minQuantity;
+
+    /**
+     * @var float
+     */
+    private $percent;
+
+    /**
      * @var float
      */
     private $netPrice;
 
     /**
-     * @var int
+     * @var array
      */
-    private $percent;
-
-    /**
-     * @var int
-     */
-    private $minQuantity;
+    private $details = [];
 
     /**
      * @var Model\ProductInterface
@@ -64,6 +70,14 @@ class Offer implements ResourceInterface
 
 
     /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->details = [];
+    }
+
+    /**
      * Returns the id.
      *
      * @return int
@@ -71,6 +85,54 @@ class Offer implements ResourceInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Returns the minimum quantity.
+     *
+     * @return float
+     */
+    public function getMinQuantity()
+    {
+        return $this->minQuantity;
+    }
+
+    /**
+     * Sets the minimum quantity.
+     *
+     * @param float $quantity
+     *
+     * @return Offer
+     */
+    public function setMinQuantity(float $quantity)
+    {
+        $this->minQuantity = $quantity;
+
+        return $this;
+    }
+
+    /**
+     * Returns the percent.
+     *
+     * @return int
+     */
+    public function getPercent()
+    {
+        return $this->percent;
+    }
+
+    /**
+     * Sets the percent.
+     *
+     * @param float $percent
+     *
+     * @return Offer
+     */
+    public function setPercent(float $percent)
+    {
+        $this->percent = $percent;
+
+        return $this;
     }
 
     /**
@@ -98,49 +160,46 @@ class Offer implements ResourceInterface
     }
 
     /**
-     * Returns the percent.
+     * Returns the details.
      *
-     * @return int
+     * @return array
      */
-    public function getPercent()
+    public function getDetails()
     {
-        return $this->percent;
+        return $this->details;
     }
 
     /**
-     * Sets the percent.
+     * Sets the details.
      *
-     * @param int $percent
+     * @param array $details
      *
      * @return Offer
      */
-    public function setPercent($percent)
+    public function setDetails(array $details)
     {
-        $this->percent = $percent;
+        foreach ($details as $type => $percent) {
+            $this->addDetails((string)$type, (float)$percent);
+        }
 
         return $this;
     }
 
     /**
-     * Returns the minimum quantity.
+     * Adds the detail.
      *
-     * @return int
-     */
-    public function getMinQuantity()
-    {
-        return $this->minQuantity;
-    }
-
-    /**
-     * Sets the minimum quantity.
-     *
-     * @param int $quantity
+     * @param string $type
+     * @param float  $percent
      *
      * @return Offer
      */
-    public function setMinQuantity($quantity)
+    public function addDetails(string $type, float $percent)
     {
-        $this->minQuantity = $quantity;
+        if (!in_array($type, [static::TYPE_PRICING, static::TYPE_SPECIAL], true)) {
+            throw new InvalidArgumentException("Unexpected offer type");
+        }
+
+        $this->details[$type] = $percent;
 
         return $this;
     }
@@ -263,6 +322,24 @@ class Offer implements ResourceInterface
         $this->pricing = $pricing;
 
         return $this;
+    }
+
+    /**
+     * Returns the detailed percentages.
+     *
+     * @return float[]
+     */
+    public function getDetailedPercents()
+    {
+        $percents = [];
+
+        foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+            if (isset($this->details[$type])) {
+                $percents[] = $this->details[$type];
+            }
+        }
+
+        return $percents;
     }
 
     /**

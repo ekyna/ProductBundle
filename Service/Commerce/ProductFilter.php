@@ -88,7 +88,7 @@ class ProductFilter implements ProductFilterInterface
                 if (empty($this->getVariants($product))) {
                     $available = false;
                 }
-            } elseif (Model\ProductTypes::isBundled($product->getType())) {
+            } elseif (Model\ProductTypes::isBundledType($product->getType())) {
                 // Not available if a required bundle slot has no available choices
                 foreach ($product->getBundleSlots() as $bundleSlot) {
                     if ($bundleSlot->isRequired() && empty($this->getSlotChoices($bundleSlot))) {

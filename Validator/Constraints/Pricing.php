@@ -11,7 +11,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Pricing extends Constraint
 {
-    public $already_exists = 'ekyna_product.pricing.already_exists';
+    public $brands_must_be_empty = 'ekyna_product.pricing.brands_must_be_empty';
+    public $at_least_one_brand   = 'ekyna_product.pricing.at_least_one_brand';
 
     /**
      * {@inheritdoc}

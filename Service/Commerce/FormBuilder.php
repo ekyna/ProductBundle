@@ -140,7 +140,8 @@ class FormBuilder
         $this->buildProductForm($form, $product);
 
         // Quantity
-        $form->add('quantity', Sf\IntegerType::class, [ // TODO packaging
+        // TODO packaging
+        $form->add('quantity', Sf\IntegerType::class, [
             'label' => 'ekyna_core.field.quantity',
             'attr'  => [
                 'class' => 'sale-item-quantity',
@@ -304,7 +305,8 @@ class FormBuilder
         }
 
         $config = [
-            'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context), // TODO discounts/taxes flags (private item)
+            // TODO discounts/taxes flags (private item)
+            'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context),
             'groups'       => $groups,
             'thumb'        => $this->getProductImagePath($variant),
             'image'        => $this->getProductImagePath($variant, 'media_front'),
@@ -422,12 +424,28 @@ class FormBuilder
         if (null !== $subject = $item->getSubjectIdentity()->getSubject()) {
             $skippedTypes = [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_CONFIGURABLE];
             if (!in_array($subject->getType(), $skippedTypes, true)) {
+//            if (Model\ProductTypes::isChildType($subject->getType())) {
                 $config['pricing'] = $this->priceCalculator->buildProductPricing($subject, $this->context);
                 $config['availability'] = $this->availabilityHelper->getAvailability($subject)->toArray();
             }
         }
 
         return $config;
+    }
+
+    /**
+     * Returns the product config.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    public function buildProductConfig(Model\ProductInterface $product)
+    {
+        return [
+            'pricing'      => $this->priceCalculator->buildProductPricing($product, $this->context),
+            'availability' => $this->availabilityHelper->getAvailability($product)->toArray(),
+        ];
     }
 
     /**
@@ -459,8 +477,8 @@ class FormBuilder
             'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
             'ati'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.ati'),
             'net'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.net'),
-//            'min_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.min_quantity'),
-//            'max_quantity' => $this->translate('ekyna_commerce.stock_subject.availability.long.max_quantity'),
+            // 'min_quantity' => $this->translate('ekyna_product.common.min_quantity'),
+            // 'max_quantity' => $this->translate('ekyna_product.common.max_quantity'),
         ];
     }
 
@@ -489,7 +507,8 @@ class FormBuilder
         $repository = $this->productProvider->getRepository();
 
         // Variable : add variant choice form
-        if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT], true)) {
+        if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT],
+            true)) {
             $variable = $product->getType() === Model\ProductTypes::TYPE_VARIANT ? $product->getParent() : $product;
 
             $repository->loadVariants($variable);
@@ -498,8 +517,8 @@ class FormBuilder
                 'variable' => $variable,
             ]);
 
-            // Configurable : add configuration form
-        } elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+        } // Configurable : add configuration form
+        elseif ($product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
             $repository->loadConfigurableSlots($product);
 
             foreach ($product->getBundleSlots() as $slot) {
@@ -532,7 +551,8 @@ class FormBuilder
             $config['image'] = $this->getProductImagePath($product, 'media_front');
         }
 
-        $config['pricing'] = $this->priceCalculator->buildOptionPricing($option, $this->context); // TODO discounts/taxes flags (private item)
+        // TODO discounts/taxes flags (private item)
+        $config['pricing'] = $this->priceCalculator->buildOptionPricing($option, $this->context);
 
         return $config;
     }

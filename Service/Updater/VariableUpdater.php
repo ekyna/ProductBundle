@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -12,85 +11,19 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  * @package Ekyna\Bundle\ProductBundle\Updater
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariableUpdater
+class VariableUpdater extends AbstractUpdater
 {
     /**
-     * @var PriceCalculator
-     */
-    private $priceCalculator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PriceCalculator $priceCalculator
-     */
-    public function __construct(PriceCalculator $priceCalculator)
-    {
-        $this->priceCalculator = $priceCalculator;
-    }
-
-    /**
-     * Indexes the variable's variants position.
-     *
-     * @param Model\ProductInterface     $variable
-     * @param PersistenceHelperInterface $helper
-     *
-     * @return bool
-     */
-    public function indexVariantsPositions(Model\ProductInterface $variable, PersistenceHelperInterface $helper = null)
-    {
-        Model\ProductTypes::assertVariable($variable);
-
-        $variants = $variable->getVariants()->getIterator();
-
-        $changed = false;
-
-        // Sort with current position
-        $variants->uasort(function (Model\ProductInterface $vA, Model\ProductInterface $vB) {
-            if ($vA->getPosition() === $vB->getPosition()) {
-                return 0;
-            }
-
-            return $vA->getPosition() > $vB->getPosition() ? 1 : -1;
-        });
-
-        // Update positions if needed
-        $position = 0;
-        /** @var Model\ProductInterface $variant */
-        foreach ($variants as $variant) {
-            if ($variant->getPosition() != $position || (null === $variant->getPosition() && $position === 0)) {
-                $variant->setPosition($position);
-
-                if ($helper && !$helper->isScheduledForRemove($variant)) {
-                    $helper->persistAndRecompute($variant);
-                }
-
-                $changed = true;
-            }
-
-            $position++;
-        }
-
-        return $changed;
-    }
-
-    /**
-     * Updates the variable minimum price regarding to its variants.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool Whether the variable has been changed or not.
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @inheritdoc
      */
     public function updateMinPrice(Model\ProductInterface $variable)
     {
         Model\ProductTypes::assertVariable($variable);
 
-        $price = $this->priceCalculator->calculateVariableMinPrice($variable);
+        $minPrice = $this->priceCalculator->calculateVariableMinPrice($variable);
 
-        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $price, 5)) {
-            $variable->setNetPrice($price);
+        if (is_null($variable->getMinPrice()) || 0 !== bccomp($variable->getMinPrice(), $minPrice, 5)) {
+            $variable->setMinPrice($minPrice);
 
             return true;
         }
@@ -99,11 +32,7 @@ class VariableUpdater
     }
 
     /**
-     * Updates the variable stock.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool Whether the variable has been changed or not.
+     * @inheritdoc
      */
     public function updateStock(Model\ProductInterface $variable)
     {
@@ -200,11 +129,7 @@ class VariableUpdater
     }
 
     /**
-     * Updates the given variable availability regarding to its variants.
-     *
-     * @param Model\ProductInterface $variable
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function updateAvailability(Model\ProductInterface $variable)
     {
@@ -275,6 +200,51 @@ class VariableUpdater
         } elseif (!$hasVisibleVariant && $variable->isVisible()) {
             $variable->setVisible(false);
             $changed = true;
+        }
+
+        return $changed;
+    }
+
+    /**
+     * Indexes the variable's variants position.
+     *
+     * @param Model\ProductInterface     $variable
+     * @param PersistenceHelperInterface $helper
+     *
+     * @return bool
+     */
+    public function indexVariantsPositions(Model\ProductInterface $variable, PersistenceHelperInterface $helper = null)
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $variants = $variable->getVariants()->getIterator();
+
+        $changed = false;
+
+        // Sort with current position
+        $variants->uasort(function (Model\ProductInterface $vA, Model\ProductInterface $vB) {
+            if ($vA->getPosition() === $vB->getPosition()) {
+                return 0;
+            }
+
+            return $vA->getPosition() > $vB->getPosition() ? 1 : -1;
+        });
+
+        // Update positions if needed
+        $position = 0;
+        /** @var Model\ProductInterface $variant */
+        foreach ($variants as $variant) {
+            if ($variant->getPosition() != $position || (null === $variant->getPosition() && $position === 0)) {
+                $variant->setPosition($position);
+
+                if ($helper && !$helper->isScheduledForRemove($variant)) {
+                    $helper->persistAndRecompute($variant);
+                }
+
+                $changed = true;
+            }
+
+            $position++;
         }
 
         return $changed;

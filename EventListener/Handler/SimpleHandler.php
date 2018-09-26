@@ -6,6 +6,8 @@ use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
@@ -31,6 +33,11 @@ class SimpleHandler extends AbstractHandler
     private $dispatcher;
 
     /**
+     * @var PriceCalculator
+     */
+    private $calculator;
+
+    /**
      * @var StockSubjectUpdaterInterface
      */
     private $stockUpdater;
@@ -40,25 +47,36 @@ class SimpleHandler extends AbstractHandler
      */
     private $productRepository;
 
+    /**
+     * @var PriceInvalidator
+     */
+    private $priceInvalidator;
+
 
     /**
      * Constructor.
      *
      * @param PersistenceHelperInterface       $persistenceHelper
      * @param ResourceEventDispatcherInterface $dispatcher
+     * @param PriceCalculator                  $calculator
      * @param StockSubjectUpdaterInterface     $stockUpdater
      * @param ProductRepositoryInterface       $productRepository
+     * @param PriceInvalidator                 $priceInvalidator
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         ResourceEventDispatcherInterface $dispatcher,
+        PriceCalculator $calculator,
         StockSubjectUpdaterInterface $stockUpdater,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        PriceInvalidator $priceInvalidator
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->dispatcher = $dispatcher;
+        $this->calculator = $calculator;
         $this->stockUpdater = $stockUpdater;
         $this->productRepository = $productRepository;
+        $this->priceInvalidator = $priceInvalidator;
     }
 
     // TODO Deal with required option group stocks ?
@@ -70,7 +88,11 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        return $this->stockUpdater->update($product);
+        $changed = $this->stockUpdater->update($product);
+
+        $changed |= $this->updateMinPrice($product);
+
+        return $changed;
     }
 
     /**
@@ -85,15 +107,11 @@ class SimpleHandler extends AbstractHandler
 
         $stockProperties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
         if ($this->persistenceHelper->isChanged($product, 'stockMode')) {
-            if ($this->stockUpdater->update($product)) {
-                $changed = true;
-            }
+            $changed |= $this->stockUpdater->update($product);
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         } elseif ($this->persistenceHelper->isChanged($product, $stockProperties)) {
-            if ($this->stockUpdater->updateStockState($product)) {
-                $changed = true;
-            }
+            $changed |= $this->stockUpdater->updateStockState($product);
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         } elseif ($this->persistenceHelper->isChanged($product, 'stockState')) {
@@ -101,12 +119,20 @@ class SimpleHandler extends AbstractHandler
         }
 
         if ($this->persistenceHelper->isChanged($product, 'netPrice')) {
+            $changed |= $this->updateMinPrice($product);
+
+            $this->priceInvalidator->invalidateByProduct($product);
+
             $childEvents[] = ProductEvents::CHILD_PRICE_CHANGE;
         }
 
         $availabilityProperties = ['visible', 'quoteOnly', 'endOfLife'];
         if ($this->persistenceHelper->isChanged($product, $availabilityProperties)) {
             $childEvents[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
+
+            if ($this->persistenceHelper->isChanged($product, 'visible')) {
+                $this->priceInvalidator->invalidateParentsPrices($product);
+            }
         }
 
         if (!empty($childEvents)) {
@@ -139,13 +165,25 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        $changed = $this->stockUpdater->update($product);
-
-        if ($changed) {
+        if ($this->stockUpdater->update($product)) {
             $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
+
+            return true;
         }
 
-        return $changed;
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function handleChildPriceChange(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
+
+        $this->priceInvalidator->invalidateParentsPrices($product);
+
+        return $this->updateMinPrice($product);
     }
 
     /**
@@ -154,6 +192,25 @@ class SimpleHandler extends AbstractHandler
     public function supports(ProductInterface $product)
     {
         return in_array($product->getType(), ProductTypes::getChildTypes());
+    }
+
+    /**
+     * Updates the product minimum price.
+     *
+     * @param ProductInterface $product
+     *
+     * @return bool Whether the minimum price has been changed.
+     */
+    protected function updateMinPrice(ProductInterface $product)
+    {
+        $minPrice = $this->calculator->calculateProductMinPrice($product);
+        if (0 !== bccomp($product->getMinPrice(), $minPrice)) {
+            $product->setMinPrice($minPrice);
+
+            return true;
+        }
+
+        return true;
     }
 
     /**

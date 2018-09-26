@@ -2,8 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PricingGridHydrator;
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
 /**
@@ -16,17 +15,20 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
     /**
      * @var \Doctrine\ORM\Query
      */
-    private $byBrandQuery;
+    private $byProductQuery;
 
 
     /**
      * @inheritdoc
      */
-    public function findRulesByBrand(BrandInterface $brand)
+    public function findRulesByProduct(ProductInterface $product)
     {
         return $this
-            ->getByBrandQuery()
-            ->setParameter('brandId', $brand->getId())
+            ->getByProductQuery()
+            ->setParameters([
+                'brand'   => $product->getBrand(),
+                'product' => $product->getId(),
+            ])
             ->getScalarResult();
     }
 
@@ -35,22 +37,23 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
      *
      * @return \Doctrine\ORM\Query
      */
-    private function getByBrandQuery()
+    private function getByProductQuery()
     {
-        if (null !== $this->byBrandQuery) {
-            return $this->byBrandQuery;
+        if (null !== $this->byProductQuery) {
+            return $this->byProductQuery;
         }
 
         $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
 
-        return $this->byBrandQuery = $qb
+        return $this->byProductQuery = $qb
             ->select([
-                'p.id as id',
-                //'p.designation as designation',
+                'p.id as pricing_id',
+                // TODO (?) 'p.designation as designation',
                 'g.id as group_id',
                 'c.id as country_id',
                 'r.minQuantity as min_qty',
-                'r.percent as percent'
+                'r.percent as percent',
             ])
             ->join('p.groups', 'g')
             ->join('p.countries', 'c')
@@ -60,10 +63,12 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->addOrderBy('c.id', 'ASC')
             ->addOrderBy('b.id', 'ASC')
             ->addOrderBy('r.minQuantity', 'DESC')
-            ->where($qb->expr()->eq('b.id', ':brandId'))
+            ->where($ex->orX(
+                $ex->eq('p.product', ':product'),
+                $ex->isMemberOf(':brand', 'p.brands')
+            ))
             ->getQuery()
             ->useQueryCache(true);
-            // TODO ->useResultCache(true, $this->getCachePrefix())
     }
 
     /**

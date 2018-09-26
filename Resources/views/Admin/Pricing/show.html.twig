@@ -19,9 +19,9 @@
                 {{ show_row(pricing.name, 'text', {
                     'label': 'ekyna_core.field.name'
                 }) }}
-                {{ show_row(pricing.designation, 'text', {
+                {#{{ show_row(pricing.designation, 'text', {
                     'label': 'ekyna_core.field.designation'
-                }) }}
+                }) }}#}
                 {{ show_row(pricing.groups, 'entity', {
                     'label': 'ekyna_commerce.customer_group.label.plural',
                     'route': 'ekyna_commerce_customer_group_admin_show',
@@ -46,7 +46,7 @@
                             <table class="table table-condensed table-striped">
                                 <thead>
                                 <tr>
-                                    <th>{{ 'ekyna_product.pricing_rule.field.min_quantity'|trans }}</th>
+                                    <th>{{ 'ekyna_product.common.min_quantity'|trans }}</th>
                                     <th>{{ 'ekyna_product.common.percent'|trans }}</th>
                                 </tr>
                                 </thead>

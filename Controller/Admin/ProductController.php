@@ -472,7 +472,7 @@ class ProductController extends AbstractSubjectController
         /** @var ProductInterface $product */
         $product = $context->getResource();
 
-        if ($product->isPendingOffers()) {
+        if ($product->isPendingOffers() || $product->isPendingPrices()) {
             $this->addFlash('ekyna_product.product.alert.pending_offers', 'warning');
         }
 
@@ -514,7 +514,8 @@ class ProductController extends AbstractSubjectController
 
         $data['optionParents'] = $repository->findParentsByOptionProduct($product);
         $data['bundleParents'] = $repository->findParentsByBundled($product);
-        $data['offer_list'] = $this->getOffersList($product);
+        $data['offers_list'] = $this->getOffersList($product);
+        $data['prices_list'] = $this->getPricesList($product);
 
         return null;
     }
@@ -598,6 +599,60 @@ class ProductController extends AbstractSubjectController
 
         foreach ($list as &$data) {
             $data['offers'] = array_reverse($data['offers']);
+        }
+
+        return $list;
+    }
+
+    /**
+     * Returns the product's prices list.
+     *
+     * @param ProductInterface $product
+     *
+     * @return array
+     */
+    protected function getPricesList(ProductInterface $product)
+    {
+        $prices = $this
+            ->get('ekyna_product.price.repository')
+            ->findByProduct($product);
+
+        $translator = $this->get('translator');
+        $allGroups = $translator->trans('ekyna_commerce.customer_group.message.all');
+        $allCountries = $translator->trans('ekyna_commerce.country.message.all');
+
+        $list = [];
+        foreach ($prices as $price) {
+            $group = $price->getGroup();
+            $country = $price->getCountry();
+
+            $key = sprintf(
+                "%d-%d",
+                $group ? $group->getId() : 0,
+                $country ? $country->getId() : 0
+            );
+
+            $locale = $this->get('ekyna_resource.locale.request_provider')->getCurrentLocale();
+            $region = Intl::getRegionBundle();
+
+            if (!isset($list[$key])) {
+                $list[$key] = [
+                    'title' => sprintf(
+                        "%s / %s",
+                        $group ? $group->getName() : $allGroups,
+                        $country ? $region->getCountryName($country->getCode(), $locale) : $allCountries
+                    ),
+                    'prices' => [],
+                ];
+            }
+
+            $list[$key]['prices'][] = $price;
+        }
+
+        $list = array_reverse($list);
+
+        foreach ($list as &$data) {
+            $data['prices'] = array_reverse($data['prices']);
         }
 
         return $list;

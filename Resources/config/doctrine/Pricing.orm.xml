@@ -9,6 +9,10 @@
             name="Ekyna\Bundle\ProductBundle\Entity\Pricing"
             table="product_pricing">
 
+        <!--<unique-constraints>
+            <unique-constraint columns="name" name="unique_product_pricing_name" />
+        </unique-constraints>-->
+
         <lifecycle-callbacks>
             <lifecycle-callback type="postLoad" method="onPostLoad"/>
         </lifecycle-callbacks>
@@ -17,8 +21,7 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="name" column="name" type="string" length="64" unique="true" nullable="false"/>
-        <field name="designation" column="designation" type="string" length="64" nullable="true"/>
+        <field name="name" column="name" type="string" length="255" nullable="true"/>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface"
                      field="rules" mapped-by="pricing" orphan-removal="true">
@@ -29,6 +32,11 @@
                 <order-by-field name="minQuantity" direction="ASC"/>
             </order-by>
         </one-to-many>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="product" inversed-by="pricings">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
+        </many-to-one>
 
         <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                       field="groups">

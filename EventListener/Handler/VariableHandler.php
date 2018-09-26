@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
 /**
@@ -14,6 +15,22 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 class VariableHandler extends AbstractVariantHandler
 {
+    /**
+     * @var PriceInvalidator
+     */
+    private $priceInvalidator;
+
+
+    /**
+     * Sets the price invalidator.
+     *
+     * @param PriceInvalidator $invalidator
+     */
+    public function setPriceInvalidator($invalidator)
+    {
+        $this->priceInvalidator = $invalidator;
+    }
+
     /**
      * @inheritdoc
      */
@@ -129,6 +146,8 @@ class VariableHandler extends AbstractVariantHandler
     public function handleChildPriceChange(ResourceEventInterface $event)
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
+
+        $this->priceInvalidator->invalidateByProduct($variable);
 
         if ($this->getVariableUpdater()->updateMinPrice($variable)) {
             $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_PRICE_CHANGE]);
