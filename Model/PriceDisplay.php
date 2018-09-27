@@ -10,6 +10,11 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 class PriceDisplay
 {
     /**
+     * @var float
+     */
+    private $amount;
+
+    /**
      * @var string
      */
     private $from;
@@ -38,12 +43,14 @@ class PriceDisplay
     /**
      * Constructor.
      *
+     * @param float $amount
      * @param string $from
      * @param string $originalPrice
      * @param string $finalPrice
      */
-    public function __construct(string $from, string $originalPrice, string $finalPrice)
+    public function __construct(float $amount, string $from, string $originalPrice, string $finalPrice)
     {
+        $this->amount = $amount;
         $this->from = $from;
         $this->originalPrice = $originalPrice;
         $this->finalPrice = $finalPrice;
@@ -55,6 +62,16 @@ class PriceDisplay
     public function __toString()
     {
         return $this->from . $this->originalPrice . $this->finalPrice;
+    }
+
+    /**
+     * Returns the amount.
+     *
+     * @return float
+     */
+    public function getAmount()
+    {
+        return $this->amount;
     }
 
     /**

@@ -108,7 +108,7 @@ class PriceRenderer
     {
         // Do not display price for configurable products
         if (Model\ProductTypes::isConfigurableType($product)) {
-            return new Model\PriceDisplay('', '', 'NC'); // TODO translation
+            return new Model\PriceDisplay(0, '', '', 'NC'); // TODO translation
         }
 
         // TODO user locale and currency (in context provider)
@@ -154,7 +154,7 @@ class PriceRenderer
         }
 
         // Result
-        $display = new Model\PriceDisplay($fromLabel, $originalLabel, $finalLabel);
+        $display = new Model\PriceDisplay($final, $fromLabel, $originalLabel, $finalLabel);
 
         if (isset($price['details'][Offer::TYPE_SPECIAL]) && 0 < $price['details'][Offer::TYPE_SPECIAL]) {
             $display->setSpecialPercent($formatter->percent($price['details'][Offer::TYPE_SPECIAL]));
