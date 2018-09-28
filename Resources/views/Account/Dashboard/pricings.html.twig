@@ -1,0 +1,47 @@
+{% spaceless %}
+<div style="margin:15px;">
+{% set per_row = 3 %}
+{% for pricing in pricings %}
+{% if loop.first or loop.index0 % per_row == 0 %}<div class="row">{% endif %}
+    <div class="col-md-{{ 12 / per_row }}">
+        <div style="padding:15px;border:1px solid #ddd;border-radius:4px">
+            <p>
+                <strong>{{ 'ekyna_product.brand.label.plural'|trans }}:</strong>
+                {% if pricing.brands is not empty -%}
+                    {{ pricing.brands|join(', ') }}
+                {%- else -%}
+                    {{ 'ekyna_product.account.pricing.all_brands'|trans }}
+                {%- endif %}
+            </p>
+            <table class="table table-condensed table-striped account-pricing-grid">
+                <thead>
+                <tr>
+                    <th>{{ 'ekyna_core.field.quantity'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_product.pricing_rule.field.discount'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rule in pricing.rules -%}
+                    <tr>
+                        <td>
+                            {% if rule.max is null -%}
+                                {{ 'ekyna_product.pricing_rule.field.from'|trans({
+                                    '%min%': rule.min|localizednumber
+                                }) }}
+                            {%- else -%}
+                                {{ 'ekyna_product.pricing_rule.field.range'|trans({
+                                    '%min%': rule.min|localizednumber, '%max%': rule.max|localizednumber
+                                }) }}
+                            {%- endif %}
+                        </td>
+                        <td class="text-right">{{ rule.percent|localizednumber }}%</td>
+                    </tr>
+                {%- endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% if loop.last or loop.index % per_row == 0 %}</div>{% endif %}
+{% endfor %}
+</div>
+{% endspaceless %}

@@ -1,0 +1,56 @@
+{% spaceless %}
+<table style="width:100%">
+    <tr>
+        <td class="text-center">
+            <img src="{% if image is defined %}{{ image }}{% else %}/bundles/ekynamedia/img/media-none.gif{% endif %}"
+                 width="120" height="90" alt="Product image" style="margin-right:15px">
+        </td>
+        <td>
+            <p style="font-size:15px"><strong>{{ brand }}</strong><br>{{ designation }}</p>
+            <p style="font-size:14px">
+                {{ reference|first }}
+                <span class="pull-right">
+                    {{ min_price|localizedcurrency(commerce_default_currency) }}
+                    ({{ net_price|localizedcurrency(commerce_default_currency) }})
+                </span>
+            </p>
+        </td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td>
+            <dl class="dl-horizontal">
+                <dt>{{ 'ekyna_core.field.mode'|trans }}</dt>
+                <dd>{{ mode_badge|raw }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.geocode'|trans }}</dt>
+                <dd>{{ geocode }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.in_stock'|trans }}</dt>
+                <dd>{{ in }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.virtual_stock'|trans }}</dt>
+                <dd>{{ virtual }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.replenishment_time'|trans }}</dt>
+                <dd>{{ replenishment }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.quote_only'|trans }}</dt>
+                <dd>{{ quote_only }}</dd>
+            </dl>
+        </td>
+        <td>
+            <dl class="dl-horizontal">
+                <dt>{{ 'ekyna_core.field.status'|trans }}</dt>
+                <dd>{{ state_badge|raw }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.minimum_order_quantity'|trans }}</dt>
+                <dd>{{ moq }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.available_stock'|trans }}</dt>
+                <dd>{{ available }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.floor'|trans }}</dt>
+                <dd>{{ floor }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.estimated_date_of_arrival'|trans }}</dt>
+                <dd>{{ eda }}</dd>
+                <dt>{{ 'ekyna_commerce.stock_subject.field.end_of_life'|trans }}</dt>
+                <dd>{{ end_of_life }}</dd>
+            </dl>
+        </td>
+    </tr>
+</table>
+{% endspaceless %}

@@ -31,6 +31,56 @@ class ProductController extends AbstractSubjectController
 
 
     /**
+     * Product summary action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function summaryAction(Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException();
+        }
+
+        $context = $this->loadContext($request);
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $context->getResource();
+
+        $this->isGranted('VIEW', $product);
+
+        $response = new Response();
+        $response->setVary(['Accept', 'Accept-Encoding']);
+        $response->setLastModified($product->getUpdatedAt());
+
+        $html = false;
+        $accept = $request->getAcceptableContentTypes();
+
+        if (in_array('application/json', $accept, true)) {
+            $response->headers->add(['Content-Type' => 'application/json']);
+        } elseif (in_array('text/html', $accept, true)) {
+            $html = true;
+        } else {
+            throw $this->createNotFoundException("Unsupported content type.");
+        }
+
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
+        if ($html) {
+            $content = $this->get('serializer')->normalize($product, 'json', ['groups' => ['Summary']]);
+            $content = $this->renderView('EkynaProductBundle:Admin/Product:summary.html.twig', $content);
+        } else {
+            $content = $this->get('serializer')->serialize($product, 'json', ['groups' => ['Summary']]);
+        }
+
+        $response->setContent($content);
+
+        return $response;
+    }
+
+    /**
      * Create supplier product action.
      *
      * @param Request $request

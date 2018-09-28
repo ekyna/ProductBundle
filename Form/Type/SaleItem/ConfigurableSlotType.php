@@ -137,7 +137,6 @@ class ConfigurableSlotType extends Form\AbstractType
         foreach ($bundleChoices as $bundleChoice) {
             if ($bundleChoice->getId() == $choiceId) {
                 $this->addChoiceVars($view, $bundleChoice);
-                //$this->addConfigVars($view, $item, !$options['admin_mode']);
             } elseif ($bundleChoice) {
                 $choiceForm = $formFactory->createNamed('BUNDLE_CHOICE_NAME', BundleSlotChoiceType::class, null, [
                     'id'         => $view->vars['id'] . '_choice_' . $bundleChoice->getId(),
@@ -154,7 +153,6 @@ class ConfigurableSlotType extends Form\AbstractType
 
                 $choiceFormView = $choiceForm->createView();
                 $this->addChoiceVars($choiceFormView, $bundleChoice);
-                //$this->addConfigVars($choiceFormView, $fakeItem, !$options['admin_mode']);
 
                 // Remove the fake item
                 $item->removeChild($fakeItem);
@@ -217,23 +215,6 @@ class ConfigurableSlotType extends Form\AbstractType
 
         $view->vars['config'] = $this->formBuilder->buildBundleChoiceConfig($product);
     }
-
-    /**
-     * Adds the pricing vars to the view.
-     *
-     * @param Form\FormView     $view
-     * @param SaleItemInterface $item
-     * @param bool              $fallback
-     */
-    /*private function addConfigVars(Form\FormView $view, SaleItemInterface $item, $fallback)
-    {
-        $config = $this->formBuilder->getFormConfig($item, $fallback);
-
-        unset($config['currency']);
-
-        //$view->vars['config'] = $this->formBuilder->jsonEncode($config);
-        $view->vars['config'] = $config;
-    }*/
 
     /**
      * @inheritdoc

@@ -147,8 +147,14 @@ class Item
      */
     public function getOffer(string $key)
     {
-        if (isset($this->offers[$key])) {
-            return $this->offers[$key];
+        list($group, $country) = explode('-', $key);
+
+        $keys = array_unique([$key, '0-' . $country, $group . '-0', '0-0']);
+
+        foreach($keys as $k) {
+            if (isset($this->offers[$k])) {
+                return $this->offers[$k];
+            }
         }
 
         return null;

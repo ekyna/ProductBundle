@@ -990,6 +990,12 @@
                 <option name="value">1</option>
             </constraint>
         </property>
+        <property name="startsAt">
+            <constraint name="Date"/>
+        </property>
+        <property name="endsAt">
+            <constraint name="Date"/>
+        </property>
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
                 <value>name</value>

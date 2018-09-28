@@ -22,7 +22,7 @@
                 }) }}
             {%- endif %}
             </td>
-            <td class="text-right">{{ offer.percent|localizednumber('percent') }}</td>
+            <td class="text-right">{{ offer.percent|localizednumber }}%</td>
             <td class="text-right">{{ offer.price|localizedcurrency(pricing.currency) }}</td>
         </tr>
     {%- endfor %}

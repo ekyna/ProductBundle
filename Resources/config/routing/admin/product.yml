@@ -31,6 +31,15 @@ ekyna_product_product_admin_show:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_summary:
+    path: /{productId}/summary
+    defaults: { _controller: "ekyna_product.product.controller:summaryAction" }
+    methods: [GET]
+    requirements:
+        productId: \d+
+    options:
+        expose: true
+
 ekyna_product_product_admin_edit:
     path: /{productId}/edit
     defaults: { _controller: "ekyna_product.product.controller:editAction" }

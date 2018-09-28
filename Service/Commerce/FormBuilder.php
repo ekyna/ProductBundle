@@ -137,7 +137,7 @@ class FormBuilder
         /** @var Model\ProductInterface $product */
         $product = $this->productProvider->resolve($item);
 
-        $this->buildProductForm($form, $product);
+        $this->buildProductForm($form, $product, is_null($item->getParent()));
 
         // Quantity
         // TODO packaging
@@ -178,7 +178,7 @@ class FormBuilder
     public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice)
     {
         // TODO Disable fields for non selected bundle choices.
-        $this->buildProductForm($form, $bundleChoice->getProduct());
+        $this->buildProductForm($form, $bundleChoice->getProduct(), false);
 
         // TODO Use packaging format (+ integer/number field type)
 
@@ -239,7 +239,7 @@ class FormBuilder
 
         if ($product->getType() !== Model\ProductTypes::TYPE_VARIABLE) {
             $config['pricing'] = $this->priceCalculator->buildProductPricing($product, $this->context);
-            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
+            $config['availability'] = $this->availabilityHelper->getAvailability($product, false)->toArray();
         }
 
         return $config;
@@ -269,10 +269,11 @@ class FormBuilder
      * Returns the variant choice attributes.
      *
      * @param Model\ProductInterface|null $variant
+     * @param bool                        $root
      *
      * @return array
      */
-    public function variantChoiceAttr(Model\ProductInterface $variant = null)
+    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true)
     {
         if (null === $variant) {
             return [];
@@ -310,7 +311,7 @@ class FormBuilder
             'groups'       => $groups,
             'thumb'        => $this->getProductImagePath($variant),
             'image'        => $this->getProductImagePath($variant, 'media_front'),
-            'availability' => $this->availabilityHelper->getAvailability($variant)->toArray(),
+            'availability' => $this->availabilityHelper->getAvailability($variant, $root)->toArray(),
         ];
 
         return [
@@ -434,21 +435,6 @@ class FormBuilder
     }
 
     /**
-     * Returns the product config.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
-     */
-    public function buildProductConfig(Model\ProductInterface $product)
-    {
-        return [
-            'pricing'      => $this->priceCalculator->buildProductPricing($product, $this->context),
-            'availability' => $this->availabilityHelper->getAvailability($product)->toArray(),
-        ];
-    }
-
-    /**
      * Returns the sale item configure form globals.
      *
      * @return array
@@ -501,8 +487,9 @@ class FormBuilder
      *
      * @param FormInterface          $form
      * @param Model\ProductInterface $product
+     * @param bool                   $root
      */
-    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product)
+    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product, bool $root = true)
     {
         $repository = $this->productProvider->getRepository();
 
@@ -514,7 +501,8 @@ class FormBuilder
             $repository->loadVariants($variable);
 
             $form->add('variant', Pr\SaleItem\VariantChoiceType::class, [
-                'variable' => $variable,
+                'variable'  => $variable,
+                'root_item' => $root,
             ]);
 
         } // Configurable : add configuration form
@@ -546,7 +534,7 @@ class FormBuilder
         $config = [];
 
         if (null !== $product = $option->getProduct()) {
-            $config['availability'] = $this->availabilityHelper->getAvailability($product)->toArray();
+            $config['availability'] = $this->availabilityHelper->getAvailability($product, false)->toArray();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
         }

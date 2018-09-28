@@ -6,14 +6,18 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
 use Ekyna\Component\Resource\Model\TranslationInterface;
 use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
+use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
+use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareTrait;
 
 /**
  * Class ProductNormalizer
  * @package Ekyna\Bundle\ProductBundle\Service\Serializer
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductNormalizer extends AbstractTranslatableNormalizer
+class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheManagerAwareInterface
 {
+    use CacheManagerAwareTrait;
+
     /**
      * @var SubjectNormalizerHelper
      */
@@ -58,12 +62,26 @@ class ProductNormalizer extends AbstractTranslatableNormalizer
             'type'        => $product->getType(),
             'reference'   => $reference,
             'net_price'   => (float)$product->getNetPrice(),
+            'min_price'   => (float)$product->getMinPrice(),
             'stock_state' => $product->getStockState(),
             'visible'     => $product->isVisible(),
             'tax_group'   => $product->getTaxGroup()->getId(),
         ], $data);
 
-        if (in_array('Default', $groups)) {
+        if (in_array('Summary', $groups)) {
+            // Brand
+            if (null !== $brand = $product->getBrand()) {
+                $data['brand'] = $brand->getName();
+            }
+
+            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
+            if ($image = $product->getImages(true, 1)->first()) {
+                $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
+            }
+
+            $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
+
+        } elseif (in_array('Default', $groups)) {
 
             // Brand
             if (null !== $brand = $product->getBrand()) {

@@ -13,6 +13,11 @@ ekyna_product:
         stock_report:
             title: Rapport de stock [%mode%]
 
+    account:
+        pricing:
+            title: Vos tarifs préférentiels
+            all_brands: Toutes marques
+
     attribute:
         label:
             singular: Attribut

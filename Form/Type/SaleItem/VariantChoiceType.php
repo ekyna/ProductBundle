@@ -103,13 +103,27 @@ class VariantChoiceType extends AbstractType
                 'attr'          => [
                     'class' => 'sale-item-variant',
                 ],
+                'root_item'     => true,
                 'choices'       => $choices,
                 'choice_value'  => 'id',
-                'choice_label'  => [$this->formBuilder, 'variantChoiceLabel'],
-                'choice_attr'   => [$this->formBuilder, 'variantChoiceAttr'],
+                'choice_label'  => function (Model\ProductInterface $variant) {
+                    return $this->formBuilder->variantChoiceLabel($variant);
+                },
+                'choice_attr'   => function (Options $options, $value) {
+                    if ($value) {
+                        return $value;
+                    }
+
+                    $root = $options['root_item'];
+
+                    return function (Model\ProductInterface $variant) use ($root) {
+                        return $this->formBuilder->variantChoiceAttr($variant, $root);
+                    };
+                },
             ])
             ->setRequired(['variable'])
             ->setAllowedTypes('variable', Model\ProductInterface::class)
+            ->setAllowedTypes('root_item', 'bool')
             ->setAllowedValues('variable', function (Model\ProductInterface $variable) {
                 return $variable->getType() === Model\ProductTypes::TYPE_VARIABLE;
             });

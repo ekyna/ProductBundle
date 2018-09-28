@@ -22,6 +22,7 @@ use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Ekyna\Component\Table\Util\ColumnSort;
+use Ekyna\Component\Table\View;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -356,6 +357,17 @@ class ProductType extends ResourceTableType
                     'position'     => 998,
                 ]);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function buildRowView(View\RowView $view, RowInterface $row, array $options)
+    {
+        $view->vars['attr']['data-summary'] = json_encode([
+            'route'      => 'ekyna_product_product_admin_summary',
+            'parameters' => ['productId' => $row->getData('id')],
+        ]);
     }
 
     /**

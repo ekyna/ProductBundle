@@ -222,7 +222,7 @@ class PriceRenderer
             $offers[] = [
                 'min'     => $offer['min_qty'],
                 'max'     => $previousMin,
-                'percent' => $offer['percent'] / 100,
+                'percent' => round($offer['percent'], 2),
                 'price'   => $offer['price'],
             ];
             $previousMin = $offer['min_qty'] - 1;

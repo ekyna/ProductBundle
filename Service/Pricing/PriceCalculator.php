@@ -599,7 +599,7 @@ class PriceCalculator
 
             $mergedOffers[] = [
                 'min_qty' => $quantity,
-                'percent' => round($discount / $total * 100, 2),
+                'percent' => round($discount / $total * 100, 5),
             ];
         }
 

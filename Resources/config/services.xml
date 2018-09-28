@@ -20,6 +20,14 @@
 
     <services>
 
+        <!-- Account dashboard event subscriber -->
+        <service id="ekyna_product.account.dashboard_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber">
+            <argument type="service" id="ekyna_commerce.common.context_provider"/>
+            <argument type="service" id="ekyna_product.pricing.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Attribute types -->
         <service id="ekyna_product.attribute.type_registry"
                  class="Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistry"
@@ -564,6 +572,13 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <!-- Sale view type -->
+        <service id="ekyna_product.sale.view_type"
+                 class="Ekyna\Bundle\ProductBundle\Service\Commerce\SaleViewType"
+                 parent="ekyna_commerce.abstract_view_type">
+            <tag name="ekyna_commerce.view_type"/>
+        </service>
+
         <!-- Variant generator -->
         <service id="ekyna_product.product.variant_generator"
                  class="Ekyna\Bundle\ProductBundle\Service\Generator\VariantGenerator">
@@ -763,6 +778,9 @@
                  public="false">
             <call method="setSubjectNormalizerHelper">
                 <argument type="service" id="ekyna_commerce.subject.normalizer_helper"/>
+            </call>
+            <call method="setCacheManager">
+                <argument type="service" id="liip_imagine.cache.manager"/>
             </call>
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>

@@ -2,7 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
 /**
@@ -21,7 +22,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
     /**
      * @inheritdoc
      */
-    public function findRulesByProduct(ProductInterface $product)
+    public function findRulesByProduct(Model\ProductInterface $product)
     {
         return $this
             ->getByProductQuery()
@@ -30,6 +31,33 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
                 'product' => $product->getId(),
             ])
             ->getScalarResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findByContext(ContextInterface $context)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        return $qb
+            ->andWhere($ex->isNull('p.product'))
+            ->andWhere($ex->orX(
+                'p.groups IS EMPTY',
+                $ex->isMemberOf(':group', 'p.groups')
+            ))
+            ->andWhere($ex->orX(
+                'p.countries IS EMPTY',
+                $ex->isMemberOf(':country', 'p.countries')
+            ))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters([
+                'group' => $context->getCustomerGroup(),
+                'country' => $context->getInvoiceCountry(),
+            ])
+            ->getResult();
     }
 
     /**
