@@ -144,7 +144,7 @@ class PriceCalculator
         $total = $base;
 
         foreach ($taxes as $tax) {
-            $total += Money::round($base * $tax->getAmount() / 100, $currency);
+            $total += Money::round($base * $tax / 100, $currency);
         }
 
         return $total;
