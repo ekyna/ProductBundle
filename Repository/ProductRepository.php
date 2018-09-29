@@ -128,8 +128,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
-        $this->loadOptions($product);
-        $this->loadAssociations($product);
+        if (null !== $product) {
+            $this->loadOptions($product);
+            $this->loadAssociations($product);
+        }
 
         return $product;
     }
@@ -165,8 +167,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
-        $this->loadOptions($product);
-        $this->loadAssociations($product);
+        if (null !== $product) {
+            $this->loadOptions($product);
+            $this->loadAssociations($product);
+        }
 
         return $product;
     }
@@ -208,8 +212,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ])
             ->getOneOrNullResult();
 
-        $this->loadOptions($product);
-        $this->loadAssociations($product);
+        if (null !== $product) {
+            $this->loadOptions($product);
+            $this->loadAssociations($product);
+        }
 
         return $product;
     }
