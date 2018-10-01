@@ -358,7 +358,11 @@
                                     <tr>
                                         <td id="{{ optionId ~ 'designation' }}">
                                         {%- if option.product -%}
-                                            <a href="{{ admin_resource_path(option.product) }}">
+                                            <a href="{{ admin_resource_path(option.product) }}"
+                                               data-summary='{{ {
+                                                   'route': 'ekyna_product_product_admin_summary',
+                                                   'parameters': {'productId': option.product.id}
+                                               }|json_encode }}'>
                                                 {{ option.product.fullDesignation }}
                                             </a>
                                         {%- else -%}
@@ -539,6 +543,7 @@
                 <table class="table table-stripped table-condensed table-hover">
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                        <th>{{ 'ekyna_core.field.reference'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
@@ -553,9 +558,17 @@
                         <td id="{{ slot_id ~ 'choice_0_product' }}">
                             {%- set choice = (slot.choices|first) -%}
                             {%- set choice_product = choice.product -%}
-                            <a href="{{ admin_resource_path(choice_product) }}" class="show-entity">
+                            <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
+                                data-summary='{{ {
+                                    'route': 'ekyna_product_product_admin_summary',
+                                    'parameters': {'productId': choice_product.id}
+                                }|json_encode }}'>
                                 {{- choice_product -}}
                             </a>
+                        </td>
+                        <td id="{{ slot_id ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                            data-clipboard-copy="{{ choice_product.reference }}">
+                            {{- choice_product.reference -}}
                         </td>
                         <td id="{{ slot_id ~ 'stockState' }}" class="text-right" style="font-size: 11px">
                             {{- choice_product|stock_subject_state_badge -}}
@@ -595,7 +608,7 @@
                     </tr>
                     {% endfor %}
                     <tr>
-                        <td colspan="5" class="text-right">
+                        <td colspan="7" class="text-right">
                             <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
                         </td>
                         <td class="text-right">
@@ -661,6 +674,7 @@
                     <table class="table table-stripped table-condensed table-hover">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+                            <th>{{ 'ekyna_core.field.reference'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
@@ -673,9 +687,17 @@
                         {% set choice_product = choice.product %}
                         <tr>
                             <td id="{{ choice_id ~ 'product' }}">
-                                <a href="{{ admin_resource_path(choice_product) }}" class="show-entity">
+                                <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
+                                   data-summary='{{ {
+                                       'route': 'ekyna_product_product_admin_summary',
+                                       'parameters': {'productId': choice_product.id}
+                                   }|json_encode }}'>
                                     {{- choice_product -}}
                                 </a>
+                            </td>
+                            <td id="{{ choice_id ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                                data-clipboard-copy="{{ choice_product.reference }}">
+                                {{- choice_product.reference -}}
                             </td>
                             <td id="{{ choice_id ~ 'type' }}" class="text-right" style="font-size: 11px">
                                 {{- choice_product|product_type_badge -}}
@@ -728,6 +750,7 @@
     <table class="table table-stripped table-condensed table-hover">
         <tr>
             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
+            <th>{{ 'ekyna_core.field.reference'|trans }}</th>
             <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
             <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
@@ -737,9 +760,17 @@
             {% set relationId = 'relation_' ~loop.index0 ~ '_' %}
             <tr>
                 <td id="{{ relationId ~ 'product' }}">
-                    <a href="{{ admin_resource_path(product) }}" class="show-entity">
+                    <a href="{{ admin_resource_path(product) }}" class="show-entity"
+                       data-summary='{{ {
+                           'route': 'ekyna_product_product_admin_summary',
+                           'parameters': {'productId': product.id}
+                       }|json_encode }}'>
                         {{- product -}}
                     </a>
+                </td>
+                <td id="{{ relationId ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                    data-clipboard-copy="{{ product.reference }}">
+                    {{- product.reference -}}
                 </td>
                 <td id="{{ relationId ~ 'type' }}" class="text-right" style="font-size: 11px">
                     {{- product|product_type_badge -}}

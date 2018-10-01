@@ -981,11 +981,13 @@
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\SpecialOffer">
         <property name="percent">
+            <constraint name="NotNull"/>
             <constraint name="GreaterThan">
                 <option name="value">0</option>
             </constraint>
         </property>
         <property name="minQuantity">
+            <constraint name="NotNull"/>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">1</option>
             </constraint>
