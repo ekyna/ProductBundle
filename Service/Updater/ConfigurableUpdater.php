@@ -53,6 +53,10 @@ class ConfigurableUpdater extends AbstractUpdater
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bestChoice */
                 $bestChoice = null;
 
+                if (!$slot->isRequired()) {
+                    continue;
+                }
+
                 foreach ($slot->getChoices() as $choice) {
                     $product = $choice->getProduct();
 
