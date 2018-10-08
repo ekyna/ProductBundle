@@ -107,9 +107,9 @@ class PriceRenderer
     public function getProductPrice(Model\ProductInterface $product, ContextInterface $context = null, $discount = true)
     {
         // Do not display price for configurable products
-        if (Model\ProductTypes::isConfigurableType($product)) {
+        /*if (Model\ProductTypes::isConfigurableType($product)) {
             return new Model\PriceDisplay(0, '', '', 'NC'); // TODO translation
-        }
+        }*/
 
         // TODO user locale and currency (in context provider)
 
