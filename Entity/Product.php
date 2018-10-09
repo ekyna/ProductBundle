@@ -202,7 +202,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
 
-        // Schedule offer update a creation
+        // Schedule offer update at creation
         $this->pendingOffers = true;
         $this->pendingPrices = true;
 

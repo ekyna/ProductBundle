@@ -304,6 +304,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findParentsByBundled(Model\ProductInterface $bundled, $requiredSlots = false)
     {
+        if (is_null($bundled->getId())) {
+            return [];
+        }
+
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
@@ -328,6 +332,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      */
     public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false)
     {
+        if (is_null($product->getId())) {
+            return [];
+        }
+
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
 
