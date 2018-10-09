@@ -4,6 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
+use Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface;
+use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
 use Ekyna\Component\Resource\Model\TranslationInterface;
 use Ekyna\Component\Resource\Serializer\AbstractTranslatableNormalizer;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
@@ -23,6 +25,11 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
      */
     protected $helper;
 
+    /**
+     * @var SupplierProductRepositoryInterface
+     */
+    protected $supplierProductRepository;
+
 
     /**
      * Sets the helper.
@@ -32,6 +39,16 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
     public function setSubjectNormalizerHelper(SubjectNormalizerHelper $helper)
     {
         $this->helper = $helper;
+    }
+
+    /**
+     * Sets the supplier product repository.
+     *
+     * @param SupplierProductRepositoryInterface $repository
+     */
+    public function setSupplierProductRepository(SupplierProductRepositoryInterface $repository)
+    {
+        $this->supplierProductRepository = $repository;
     }
 
     /**
@@ -80,6 +97,14 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             }
 
             $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
+
+            $data['suppliers'] = array_map(function(SupplierProductInterface $reference) {
+                return [
+                    'name' => $reference->getSupplier()->getName(),
+                    'price' => $reference->getNetPrice(),
+                    'currency' => $reference->getSupplier()->getCurrency()->getCode(),
+                ];
+            }, $this->supplierProductRepository->findBySubject($product));
 
         } elseif (in_array('Default', $groups)) {
 

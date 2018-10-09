@@ -1,19 +1,37 @@
 {% spaceless %}
 <table style="width:100%">
     <tr>
-        <td class="text-center">
+        <td rowspan="2" class="text-center">
             <img src="{% if image is defined %}{{ image }}{% else %}/bundles/ekynamedia/img/media-none.gif{% endif %}"
                  width="120" height="90" alt="Product image" style="margin-right:15px">
         </td>
-        <td>
-            <p style="font-size:15px"><strong>{{ brand }}</strong><br>{{ designation }}</p>
-            <p style="font-size:14px">
-                {{ reference|first }}
-                <span class="pull-right">
-                    {{ min_price|localizedcurrency(commerce_default_currency) }}
-                    ({{ net_price|localizedcurrency(commerce_default_currency) }})
-                </span>
+        <td colspan="2">
+            <p style="font-size:15px">
+                <strong>{{ brand }}</strong><br>{{ designation }}
             </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <dl class="dl-horizontal">
+                <dt>{{ 'ekyna_core.field.reference'|trans }}</dt>
+                <dd>{{ reference|first }}</dd>
+                <dt>{{ 'ekyna_product.product.field.net_price'|trans }}</dt>
+                <dd>
+                    {{ net_price|localizedcurrency(commerce_default_currency) -}}
+                    &nbsp;(min&nbsp;{{ min_price|localizedcurrency(commerce_default_currency) }})
+                </dd>
+            </dl>
+        </td>
+        <td>
+        {% if suppliers is not empty -%}
+        <dl class="dl-horizontal">
+            {% for supplier in suppliers -%}
+                <dt>{{ supplier.name }}</dt>
+                <dd>{{ supplier.price|localizedcurrency(supplier.currency) }}</dd>
+            {%- endfor %}
+        </dl>
+        {%- endif %}
         </td>
     </tr>
 </table>

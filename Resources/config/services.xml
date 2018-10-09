@@ -782,6 +782,9 @@
             <call method="setCacheManager">
                 <argument type="service" id="liip_imagine.cache.manager"/>
             </call>
+            <call method="setSupplierProductRepository">
+                <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
+            </call>
             <tag name="serializer.normalizer"/>
             <tag name="serializer.denormalizer"/>
         </service>
