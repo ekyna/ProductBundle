@@ -550,14 +550,17 @@
                         <th class="text-right">{{ 'ekyna_product.bundle_choice.field.hidden'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_product.bundle_choice.field.use_options'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.quantity'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}&nbsp;(kg)</th>
                         <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
                     </tr>
+                    {%- set total_weight = 0 -%}
                     {%- for slot in product.bundleSlots -%}
                     {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
                     <tr>
                         <td id="{{ slot_id ~ 'choice_0_product' }}">
                             {%- set choice = (slot.choices|first) -%}
                             {%- set choice_product = choice.product -%}
+                            {%- set total_weight = total_weight + choice_product.weight * choice.minQuantity -%}
                             <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
                                 data-summary='{{ {
                                     'route': 'ekyna_product_product_admin_summary',
@@ -601,18 +604,23 @@
                             {# TODO Packgaging format #}
                             {{- choice.minQuantity|localizednumber -}}
                         </td>
+                        <td id="{{ slot_id ~ 'choice_0_product_weight' }}" class="text-right">
+                            {{- (choice_product.weight * choice.minQuantity)|localizednumber -}}
+                        </td>
                         <td id="{{ slot_id ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {# TODO Packgaging format #}
                             {{- (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
                     {% endfor %}
                     <tr>
-                        <td colspan="7" class="text-right">
-                            <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
+                        <td colspan="8" class="text-right">
+                            <strong>{{ 'ekyna_core.field.total'|trans }}</strong>
                         </td>
                         <td class="text-right">
-                            {{- product|product_bundle_total_price|localizedcurrency(commerce_default_currency) -}}
+                            {{- total_weight|localizednumber -}}
+                        </td>
+                        <td class="text-right">
+                            {{- product|product_bundle_total_price(false)|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
                 </table>

@@ -170,24 +170,26 @@ class PriceRenderer
      * Returns the configurable product total price.
      *
      * @param Model\ProductInterface $bundle
+     * @param bool                   $withOptions Whether to add options min price.
      *
      * @return float|int
      */
-    public function getBundlePrice(Model\ProductInterface $bundle)
+    public function getBundlePrice(Model\ProductInterface $bundle, $withOptions = true)
     {
-        return $this->priceCalculator->calculateBundleMinPrice($bundle);
+        return $this->priceCalculator->calculateBundleMinPrice($bundle, $withOptions);
     }
 
     /**
      * Returns the bundle product total price.
      *
      * @param Model\ProductInterface $configurable
+     * @param bool                   $withOptions Whether to add options min price.
      *
      * @return float|int
      */
-    public function getConfigurablePrice(Model\ProductInterface $configurable)
+    public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true)
     {
-        return $this->priceCalculator->calculateConfigurableMinPrice($configurable);
+        return $this->priceCalculator->calculateConfigurableMinPrice($configurable, $withOptions);
     }
 
     /**
