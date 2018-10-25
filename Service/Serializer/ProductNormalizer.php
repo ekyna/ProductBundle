@@ -85,32 +85,16 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             'tax_group'   => $product->getTaxGroup()->getId(),
         ], $data);
 
-        if (in_array('Summary', $groups)) {
-            // Brand
-            if (null !== $brand = $product->getBrand()) {
-                $data['brand'] = $brand->getName();
-            }
-
-            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
-            if ($image = $product->getImages(true, 1)->first()) {
-                $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
-            }
-
-            $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
-
-            $data['suppliers'] = array_map(function(SupplierProductInterface $reference) {
-                return [
-                    'name' => $reference->getSupplier()->getName(),
-                    'price' => $reference->getNetPrice(),
-                    'currency' => $reference->getSupplier()->getCurrency()->getCode(),
-                ];
-            }, $this->supplierProductRepository->findBySubject($product));
-
-        } elseif (in_array('Default', $groups)) {
+        if (in_array('Default', $groups)) {
 
             // Brand
             if (null !== $brand = $product->getBrand()) {
                 $data['brand'] = $brand->getId();
+            }
+
+            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
+            if ($image = $product->getImages(true, 1)->first()) {
+                $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_front');
             }
 
             // Seo
@@ -158,6 +142,31 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 return $r->getNumber();
             }, $product->getReferences()->toArray());
 
+        } elseif (in_array('Summary', $groups)) {
+
+            // Brand
+            if (null !== $brand = $product->getBrand()) {
+                $data['brand'] = $brand->getName();
+            }
+
+            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
+            if ($image = $product->getImages(true, 1)->first()) {
+                $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
+            }
+
+            $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
+
+            $data['suppliers'] = array_map(function(SupplierProductInterface $reference) {
+                return [
+                    'name' => $reference->getSupplier()->getName(),
+                    'price' => $reference->getNetPrice(),
+                    'currency' => $reference->getSupplier()->getCurrency()->getCode(),
+                ];
+            }, $this->supplierProductRepository->findBySubject($product));
+        }
+
+        if (in_array('Stock', $groups)) {
+            $data = array_replace($this->helper->normalizeStock($product, $format, $context), $data);
         }
 
         return $data;

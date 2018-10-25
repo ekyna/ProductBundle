@@ -139,45 +139,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
-    public function findOneByReference($reference)
-    {
-        $as = $this->getAlias();
-        $qb = $this->getQueryBuilder();
-
-        $this
-            ->joinCategories($qb)
-            ->joinBrand($qb)
-            ->joinSeo($qb);
-
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
-        $product = $qb
-            ->andWhere($qb->expr()->eq($as . '.reference', ':reference'))
-            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
-            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
-            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
-            ->setMaxResults(1)
-            ->getQuery()
-            ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
-            ->setParameters([
-                'reference'        => $reference,
-                'visible'          => true,
-                'brand_visible'    => true,
-                'category_visible' => true,
-            ])
-            ->getOneOrNullResult();
-
-        if (null !== $product) {
-            $this->loadOptions($product);
-            $this->loadAssociations($product);
-        }
-
-        return $product;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function findOneBySlug($slug)
     {
         $as = $this->getAlias();
@@ -218,6 +179,95 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         }
 
         return $product;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findOneByReference($reference)
+    {
+        $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb)
+            ->joinSeo($qb);
+
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        $product = $qb
+            ->andWhere($qb->expr()->eq($as . '.reference', ':reference'))
+            ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
+            ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
+            ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            ->setParameters([
+                'reference'        => $reference,
+                'visible'          => true,
+                'brand_visible'    => true,
+                'category_visible' => true,
+            ])
+            ->getOneOrNullResult();
+
+        if (null !== $product) {
+            $this->loadOptions($product);
+            $this->loadAssociations($product);
+        }
+
+        return $product;
+    }
+
+    /**
+     * Finds one product by external reference.
+     *
+     * @param string   $reference The product reference number
+     * @param string[] $types     To filter references types
+     * @param bool     $visible   Whether to fetch visible products only
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findOneByExternalReference($reference, $types = [], $visible = true)
+    {
+        foreach ($types as $type) {
+            Model\ProductReferenceTypes::isValid($type);
+        }
+
+        $qb = $this->getQueryBuilder('p');
+
+        $qb
+            ->join('p.references', 'r')
+            ->andWhere($qb->expr()->eq('r.number', ':reference'));
+
+        $parameters = [
+            'reference' => $reference,
+        ];
+
+        if ($visible) {
+            $this
+                ->joinCategories($qb)
+                ->joinBrand($qb);
+
+            $qb
+                ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+                ->andWhere($qb->expr()->eq('b.visible', ':visible'))
+                ->andWhere($qb->expr()->eq('c.visible', ':visible'));
+
+            $parameters['visible'] = true;
+        }
+
+        if (!empty($types)) {
+            $qb->andWhere($qb->expr()->in('r.type', ':types'));
+            $parameters['types'] = $types;
+        }
+
+        return $qb
+            ->getQuery()
+            ->useQueryCache(true)
+            ->setParameters($parameters)
+            ->getOneOrNullResult();
     }
 
     /**
@@ -365,7 +415,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $qb = $this->createQueryBuilder('p');
 
         $today = new \DateTime();
-        $today->setTime(0,0,0);
+        $today->setTime(0, 0, 0);
 
         return $qb
             ->andWhere($qb->expr()->in('p.type', ':types'))

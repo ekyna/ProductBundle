@@ -63,6 +63,15 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findOneByReference($slug);
 
     /**
+     * Finds one product by external reference.
+     *
+     * @param string $reference
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findOneByExternalReference($reference);
+
+    /**
      * Finds products by brand.
      *
      * @param Model\BrandInterface $brand
