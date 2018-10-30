@@ -56,11 +56,11 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     /**
      * Finds the product by reference (if product is visible, as well as its brand and categories).
      *
-     * @param string $slug
+     * @param string $reference
      *
      * @return Model\ProductInterface|null
      */
-    public function findOneByReference($slug);
+    public function findOneByReference($reference);
 
     /**
      * Finds one product by external reference.

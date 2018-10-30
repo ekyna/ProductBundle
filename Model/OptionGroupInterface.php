@@ -70,6 +70,22 @@ interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInte
     public function setRequired($required);
 
     /**
+     * Returns whether to display variant's full titles.
+     *
+     * @return bool
+     */
+    public function isFullTitle();
+
+    /**
+     * Sets the whether to display variant's full titles.
+     *
+     * @param bool $full
+     *
+     * @return $this|OptionGroupInterface
+     */
+    public function setFullTitle($full);
+
+    /**
      * Returns the options.
      *
      * @return ArrayCollection|OptionInterface[]

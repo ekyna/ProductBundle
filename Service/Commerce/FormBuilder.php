@@ -342,7 +342,9 @@ class FormBuilder
                 return $label;
             }
 
-            return $product->getAttributesTitle();
+            if (!$option->getGroup()->isFullTitle()) {
+                return $product->getAttributesTitle();
+            }
         }
 
         return $product->getFullTitle();

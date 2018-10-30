@@ -245,6 +245,8 @@ ekyna_product:
         label:
             singular: Groupe d'options
             plural: Groupes d'options
+        field:
+            full_title: Titres complets (variantes)
         button:
             add: Ajouter un groupe d'options
 

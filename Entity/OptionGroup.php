@@ -40,6 +40,11 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     protected $required;
 
     /**
+     * @var bool
+     */
+    protected $fullTitle;
+
+    /**
      * @var ArrayCollection|Model\OptionInterface[]
      */
     protected $options;
@@ -164,6 +169,24 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     public function setRequired($required)
     {
         $this->required = (bool)$required;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isFullTitle()
+    {
+        return $this->fullTitle;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setFullTitle($full)
+    {
+        $this->fullTitle = $full;
 
         return $this;
     }

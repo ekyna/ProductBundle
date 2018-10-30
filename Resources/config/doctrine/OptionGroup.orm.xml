@@ -26,6 +26,7 @@
 
         <field name="name" column="name" type="string" length="64" nullable="false"/>
         <field name="required" column="required" type="boolean" nullable="false"/>
+        <field name="fullTitle" column="full_title" type="boolean" nullable="false"/>
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />

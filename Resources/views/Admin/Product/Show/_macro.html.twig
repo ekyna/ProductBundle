@@ -316,18 +316,22 @@
                 {% for group in product.optionGroups %}
                 <div class="collection-item">
                     {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
+                    {{- show_row(group.name, 'text', {
+                        'label': 'ekyna_core.field.name',
+                        'id': groupId ~ 'name'
+                    }) -}}
                     <div class="row">
                         <div class="col-md-6">
-                            {{- show_row(group.name, 'text', {
-                                'label': 'ekyna_core.field.name',
-                                'id': groupId ~ 'name',
+                            {{- show_row(group.required, 'text', {
+                                'label': 'ekyna_core.field.required',
+                                'id': groupId ~ 'required',
                                 'label_col': 4
                             }) -}}
                         </div>
                         <div class="col-md-6">
-                            {{- show_row(group.required, 'boolean', {
-                                'label': 'ekyna_core.field.required',
-                                'id': groupId ~ 'required',
+                            {{- show_row(group.fullTitle, 'boolean', {
+                                'label': 'ekyna_product.option_group.field.full_title',
+                                'id': groupId ~ 'fullTitle',
                                 'label_col': 4
                             }) -}}
                         </div>

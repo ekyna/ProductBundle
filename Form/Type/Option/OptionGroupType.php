@@ -37,6 +37,13 @@ class OptionGroupType extends ResourceFormType
                     'align_with_widget' => true,
                 ],
             ])
+            ->add('fullTitle', Type\CheckboxType::class, [
+                'label'    => 'ekyna_product.option_group.field.full_title',
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
+            ])
             ->add('options', CollectionType::class, [
                 'label'           => 'ekyna_product.option.label.plural',
                 'prototype_name'  => '__option__',
