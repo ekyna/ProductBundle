@@ -31,4 +31,5 @@ final class ProductEvents
     const CHILD_STOCK_CHANGE        = 'ekyna_product.product.child_stock_change';
 
     const PUBLIC_URL                = 'ekyna_product.product.public_url';
+    const SCHEMA_ORG                = 'ekyna_product.product.schema_org';
 }

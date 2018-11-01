@@ -73,7 +73,7 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
         $query = $this->getOneFindByProductAndContextQuery();
 
         if ($useCache && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
-            $query->useResultCache(true, null, Price::buildCacheId($product, $group, $country));
+            $query->useResultCache(true, 3600, Price::buildCacheId($product, $group, $country));
         } else {
             $query->useResultCache(false);
         }

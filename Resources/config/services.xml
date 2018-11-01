@@ -529,6 +529,7 @@
         <!-- Schema.org providers -->
         <service id="ekyna_product.product.schema_provider"
                  class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\ProductProvider">
+            <argument type="service" id="ekyna_resource.event_dispatcher"/>
             <argument>%ekyna_commerce.default.currency%</argument>
             <tag name="ekyna_cms.schema_org_provider"/>
         </service>

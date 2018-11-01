@@ -2,10 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 
+use Ekyna\Bundle\CmsBundle\Event\SchemaOrgEvent;
 use Ekyna\Bundle\CmsBundle\Service\SchemaOrg;
-use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
+use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Spatie\SchemaOrg\Schema;
 
 /**
@@ -18,6 +20,11 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
     use SchemaOrg\BuilderAwareTrait;
 
     /**
+     * @var ResourceEventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @var string
      */
     protected $defaultCurrency;
@@ -26,11 +33,13 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
     /**
      * Constructor.
      *
-     * @param string $defaultCurrency
+     * @param ResourceEventDispatcherInterface $dispatcher
+     * @param string                           $currency
      */
-    public function __construct(string $defaultCurrency)
+    public function __construct(ResourceEventDispatcherInterface $dispatcher, string $currency)
     {
-        $this->defaultCurrency = $defaultCurrency;
+        $this->dispatcher = $dispatcher;
+        $this->defaultCurrency = $currency;
     }
 
     /**
@@ -102,20 +111,22 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
                     ->availability($this->getAvailability($object->getStockState()))
                     ->itemCondition('http://schema.org/NewCondition')
                     ->price((string)round($object->getNetPrice(), 2))// TODO Round regarding to currency
+                    // TODO ->priceValidUntil()
                     ->priceCurrency($this->defaultCurrency)
+                    // TODO ->seller()
             );
         }
 
-        /** @var Model\ProductMediaInterface $media */
-        if ($media = $object->getMedias([MediaTypes::IMAGE])->first()) {
-            $schema->image($this->schemaBuilder->build($media->getMedia()));
+        /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
+        if ($image = $object->getImages(true, 1)->first()) {
+            $schema->image($this->schemaBuilder->build($image));
         }
 
         /** @var Model\CategoryInterface $category */
         if ($category = $object->getCategories()->first()) {
             $parts = [];
 
-            do  {
+            do {
                 $parts[] = $category->getTitle();
             } while ($category = $category->getParent());
 
@@ -128,6 +139,13 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
         // TODO ->isConsumableFor()
         // TODO ->isRelatedTo()
         // TODO ->isSimilarTo()
+
+        $event = new SchemaOrgEvent();
+        $event
+            ->setSchema($schema)
+            ->setResource($object);
+
+        $this->dispatcher->dispatch(ProductEvents::SCHEMA_ORG, $event);
 
         return $schema;
     }
