@@ -18,7 +18,7 @@
 {% macro grid(catalog, product) %}
 {% spaceless %}
     {% if catalog.displayPrices -%}
-        {{ product|product_discount_grid(null, 'grid') }}
+        {{ product|product_pricing_grid(null, 'grid') }}
     {%- endif %}
 {% endspaceless %}
 {% endmacro grid %}
