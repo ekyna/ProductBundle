@@ -558,21 +558,16 @@ class PriceCalculator
 
         $children = [];
 
-        $this->listChildren($children, $product, $context);
+        $this->listChildren($children, $product, $context, $offers);
 
         $total = $hidden = 0;
 
         // Gather min quantities
-        $quantities = array_map(function($o) {
+        $quantities = array_map(function ($o) {
             return $o['min_qty'];
         }, $offers);
         foreach ($children as &$child) {
             $total += $child['price'];
-
-            if (null === $child['offers']) {
-                $child['offers'] = $offers;
-                continue;
-            }
 
             foreach ($child['offers'] as $offer) {
                 if (!in_array($offer['min_qty'], $quantities)) {
@@ -612,12 +607,18 @@ class PriceCalculator
      * @param array                  $list
      * @param Model\ProductInterface $bundle
      * @param ContextInterface       $context
+     * @param array                  $offers The parent offers
      * @param int                    $qty
      *
      * @return bool
      */
-    protected function listChildren(array &$list, Model\ProductInterface $bundle, ContextInterface $context, $qty = 1)
-    {
+    protected function listChildren(
+        array &$list,
+        Model\ProductInterface $bundle,
+        ContextInterface $context,
+        array $offers,
+        $qty = 1
+    ) {
         Model\ProductTypes::assertBundle($bundle);
 
         $visible = false;
@@ -628,16 +629,26 @@ class PriceCalculator
             $product = $choice->getProduct();
 
             if (Model\ProductTypes::isBundleType($product)) {
-                $visible |= $this->listChildren($list, $product, $context, $qty * $choice->getMinQuantity());
+                $offers = $this->mergeOffers(
+                    $offers,
+                    $this->offerRepository->findByProductAndContext($product, $context)
+                );
+
+                $visible |= $this->listChildren($list, $product, $context, $offers, $qty * $choice->getMinQuantity());
             } else {
                 $child = [
-                    'price'    => $product->getNetPrice() * $qty * $choice->getMinQuantity(),
-                    'offers'   => null,
+                    'price'  => $product->getNetPrice() * $qty * $choice->getMinQuantity(),
+                    'offers' => [],
                 ];
 
-                if (($product->isVisible() && !$choice->isHidden()) || $product->hasRequiredOptionGroup()) {
+                if ($product->isVisible() && !$choice->isHidden() && !($choice->isUseOptions() && $product->hasRequiredOptionGroup())) {
                     $visible = true;
-                    $child['offers'] = $this->offerRepository->findByProductAndContext($product, $context);
+                    $child['offers'] = $this->mergeOffers(
+                        $offers,
+                        $this->offerRepository->findByProductAndContext($product, $context)
+                    );
+                } else {
+                    $child['offers'] = $offers;
                 }
 
                 $list[] = $child;
@@ -645,5 +656,51 @@ class PriceCalculator
         }
 
         return $visible;
+    }
+
+    /**
+     * Merges two offers lists.
+     *
+     * @param array $a
+     * @param array $b
+     *
+     * @return array
+     */
+    protected function mergeOffers(array $a, array $b)
+    {
+        $offers = [];
+
+        $quantities = array_unique(array_map(function ($o) {
+            return $o['min_qty'];
+        }, $a, $b));
+
+        sort($quantities);
+
+        foreach ($quantities as $quantity) {
+            $percent = 0;
+
+            foreach ($a as $o) {
+                if ($o['min_qty'] <= $quantity && $o['percent'] > $percent) {
+                    $percent = $o['percent'];
+                    break;
+                }
+            }
+
+            foreach ($b as $o) {
+                if ($o['min_qty'] <= $quantity && $o['percent'] > $percent) {
+                    $percent = $o['percent'];
+                    break;
+                }
+            }
+
+            if (0 < $percent) {
+                $offers[] = [
+                    'percent' => $percent,
+                    'min_qty' => $quantity,
+                ];
+            }
+        }
+
+        return $offers;
     }
 }

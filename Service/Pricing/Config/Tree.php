@@ -26,6 +26,22 @@ class Tree extends Item
 
 
     /**
+     * Returns the tree root.
+     *
+     * @return Tree
+     */
+    public function getRoot()
+    {
+        $root = $this;
+
+        while ($root->hasParent()) {
+            $root = $root->getParent();
+        }
+
+        return $root;
+    }
+
+    /**
      * Returns the parent.
      *
      * @return Tree
@@ -47,6 +63,16 @@ class Tree extends Item
         $this->parent = $parent;
 
         return $this;
+    }
+
+    /**
+     * Returns whether the tree as a parent.
+     *
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return !is_null($this->parent);
     }
 
     /**
@@ -114,6 +140,30 @@ class Tree extends Item
         }
 
         return $qty;
+    }
+
+    /**
+     * Returns the tree best offer for the given key (regarding to root ones).
+     *
+     * @param string $key
+     *
+     * @return array|null
+     */
+    public function getBestOffer(string $key)
+    {
+        $offer = null;
+        $item = $this;
+
+        do {
+            if (is_null($o = $item->getOffer($key))) {
+                continue;
+            }
+            if (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2)) {
+                $offer = $o;
+            }
+        } while($item = $item->getParent());
+
+        return $offer;
     }
 
     /**

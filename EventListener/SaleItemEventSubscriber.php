@@ -12,6 +12,7 @@ use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -115,13 +116,26 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $offer = null;
         $item = $event->getItem();
 
         $context = $this->contextProvider->getContext($item->getSale());
 
-        $offer = $this
-            ->offerRepository
-            ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
+        // Loop through parents and keep the best offer
+        do {
+            if (null !== $product = $this->getProductFromItem($item)) {
+                $o = $this
+                    ->offerRepository
+                    ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
+
+                if (is_null($o)) {
+                    continue;
+                }
+                if (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2)) {
+                    $offer = $o;
+                }
+            }
+        } while ($item = $item->getParent());
 
         if (is_null($offer)) {
             return;
@@ -169,17 +183,33 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      *
      * @param SaleItemEvent $event
      *
-     * @return null|ProductInterface
+     * @return ProductInterface|null
      */
     protected function getProductFromEvent(SaleItemEvent $event)
     {
         $item = $event->getItem();
 
+        return $this->getProductFromItem($item);
+    }
+
+    /**
+     * Returns the product from the given sale item.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return ProductInterface|null
+     */
+    protected function getProductFromItem(SaleItemInterface $item)
+    {
         $provider = $this->itemBuilder->getProvider();
 
         if ($provider->supportsRelative($item)) {
             try {
-                return $provider->resolve($item);
+                $subject = $provider->resolve($item);
+
+                if ($subject instanceof ProductInterface) {
+                    return $subject;
+                }
             } catch (SubjectException $e) {
             }
         }

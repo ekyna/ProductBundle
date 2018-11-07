@@ -91,6 +91,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
             ->addOrderBy('g.id', 'ASC')
             ->addOrderBy('c.id', 'ASC')
             ->addOrderBy('b.id', 'ASC')
+            ->addOrderBy('s.percent', 'DESC')
             ->addOrderBy('s.minQuantity', 'DESC')
             ->andWhere($ex->eq('s.enabled', ':enabled'))
             ->andWhere($ex->orX(
@@ -100,6 +101,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
             ))
             ->andWhere($ex->orX($ex->isNull('s.startsAt'), $ex->lte('s.startsAt', ':now')))
             ->andWhere($ex->orX($ex->isNull('s.endsAt'), $ex->gte('s.endsAt', ':now')))
+            ->addGroupBy('s.id')
             ->getQuery()
             ->useQueryCache(true);
     }

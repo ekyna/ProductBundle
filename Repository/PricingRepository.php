@@ -28,7 +28,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->getByProductQuery()
             ->setParameters([
                 'brand'   => $product->getBrand(),
-                'product' => $product->getId(),
+                'product' => $product,
             ])
             ->getScalarResult();
     }
@@ -83,14 +83,16 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
                 'r.minQuantity as min_qty',
                 'r.percent as percent',
             ])
-            ->join('p.groups', 'g')
-            ->join('p.countries', 'c')
-            ->join('p.brands', 'b')
             ->join('p.rules', 'r')
+            ->leftJoin('p.groups', 'g')
+            ->leftJoin('p.countries', 'c')
+            ->leftJoin('p.brands', 'b')
             ->addOrderBy('g.id', 'ASC')
             ->addOrderBy('c.id', 'ASC')
             ->addOrderBy('b.id', 'ASC')
+            ->addOrderBy('r.percent', 'DESC')
             ->addOrderBy('r.minQuantity', 'DESC')
+            ->addGroupBy('r.id')
             ->where($ex->orX(
                 $ex->eq('p.product', ':product'),
                 $ex->isMemberOf(':brand', 'p.brands')

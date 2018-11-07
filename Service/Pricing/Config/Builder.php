@@ -109,8 +109,7 @@ class Builder
 
         $price = $flat->getBasePrice();
 
-        // Pick offer regarding to key
-        if (null !== $offer = $tree->getOffer($flat->getKey())) {
+        if (0 < $price && !is_null($offer = $tree->getBestOffer($flat->getKey()))) {
             // Store discount amount for each type
             foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
                 if (!isset($offer['details'][$type])) {
@@ -142,8 +141,7 @@ class Builder
                 $visible = true;
 
                 // Pick offer regarding to key
-                // TODO compare with tree root offer
-                if (null !== $offer = $child->getOffer($flat->getKey())) {
+                if (null !== $offer = $child->getBestOffer($flat->getKey())) {
                     // Store discount amount for each type
                     foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
                         if (!isset($offer['details'][$type])) {
@@ -157,7 +155,7 @@ class Builder
                 }
                 $flat->addSellPrice($price);
             } else {
-                // Else if child id hidden (results in a private sale item)
+                // Else if child is hidden (results in a private sale item)
                 $flat->addBasePrice($price);
             }
         }

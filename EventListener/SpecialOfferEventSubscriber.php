@@ -24,7 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class SpecialOfferEventSubscriber implements EventSubscriberInterface
 {
-    private const FIELDS = ['percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
+    private const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
     /**
      * @var PersistenceHelperInterface

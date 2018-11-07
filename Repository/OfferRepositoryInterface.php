@@ -20,19 +20,19 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      * @param ContextInterface $context
      * @param bool             $useCache
      *
-     * @return array
+     * @return array [['min_qty' => (float), 'percent' => (float), 'price' => (float)]]
      */
     public function findByProductAndContext(ProductInterface $product, ContextInterface $context, $useCache = true);
 
     /**
-     * Find offers by product, context and quantity.
+     * Find one offer for the given product, context and quantity.
      *
      * @param ProductInterface $product
      * @param ContextInterface $context
      * @param float            $quantity
      * @param bool             $useCache
      *
-     * @return array
+     * @return array ['percent' => (float), 'special_offer_id' => (int), 'pricing_id' => (int)]
      */
     public function findOneByProductAndContextAndQuantity(
         ProductInterface $product,

@@ -105,7 +105,7 @@ class Result
     }
 
     /**
-     * Returns the netPrice.
+     * Returns the base price.
      *
      * @return float
      */
@@ -129,7 +129,7 @@ class Result
     }
 
     /**
-     * Returns the netPrice.
+     * Returns the sell price.
      *
      * @return float
      */
