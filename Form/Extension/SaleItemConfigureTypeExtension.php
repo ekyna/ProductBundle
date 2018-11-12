@@ -32,6 +32,11 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
      */
     private $theme;
 
+    /**
+     * @var bool
+     */
+    private $displayOffers = false;
+
 
     /**
      * Constructor.
@@ -43,11 +48,21 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
     public function __construct(
         FormBuilder $formBuilder,
         FormRendererInterface $formRenderer,
-        $theme = 'EkynaProductBundle:Form:sale_item_configure.html.twig'
+        $theme = '@EkynaProduct/Form/sale_item_configure.html.twig'
     ) {
         $this->formBuilder = $formBuilder;
         $this->formRenderer = $formRenderer;
         $this->theme = $theme;
+    }
+
+    /**
+     * Sets whether to display offers.
+     *
+     * @param bool $display
+     */
+    public function setDisplayOffers(bool $display)
+    {
+        $this->displayOffers = $display;
     }
 
     /**
@@ -66,14 +81,70 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
             return;
         }
 
+        $view->vars['subject'] = $subject;
+
         // Set the form theme
         $this->formRenderer->setTheme($view, $this->theme);
 
         $config = $this->formBuilder->getFormConfig($item);
         $config['privileged'] = $options['admin_mode'];
+
         $view->vars['attr']['data-config'] = $config;
         $view->vars['attr']['data-globals'] = $this->formBuilder->getFormGlobals();
         $view->vars['attr']['data-trans'] = $this->formBuilder->getFormTranslations();
+
+        $view->vars['has_offers'] = $this->doDisplayOffers($view);
+    }
+
+    /**
+     * Returns whether offers should be displayed if any.
+     *
+     * @param FormView $view
+     *
+     * @return bool
+     */
+    private function doDisplayOffers(FormView $view)
+    {
+        if (!$this->displayOffers) {
+            return false;
+        }
+
+        if (isset($view->vars['attr']['data-config']['pricing'])) {
+            if (1 < count($view->vars['attr']['data-config']['pricing']['offers'])) {
+                return true;
+            }
+        }
+
+        foreach ($view->children as $name => $child) {
+            if ($name === 'configure') {
+                return false;
+            }
+
+            if ($name === 'variant') {
+                /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
+                foreach ($child->vars['choices'] as $choice) {
+                    if (1 < count($choice->attr['data-config']['pricing']['offers'])) {
+                        return true;
+                    }
+                }
+            }
+
+            if ($name === 'options') {
+                /** @var FormView $optionGroup */
+                foreach ($child->children as $optionGroup) {
+                    foreach ($optionGroup->children as $option) {
+                        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
+                        foreach ($option->vars['choices'] as $choice) {
+                            if (1 < count($choice->attr['data-config']['pricing']['offers'])) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -1,4 +1,4 @@
-define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], function (require, $, Templates) {
+define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], function (require, $, Templates) {
     "use strict";
 
     var toggleDisabled = function ($element, disabled) {
@@ -24,9 +24,10 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
     /**
      * @param {number} [quantity = 1]
      * @param {boolean} [discounted = true]
+     * @param {boolean} [unit = false]
      * @return {number}
      */
-    Pricing.calculate = function (quantity, discounted) {
+    Pricing.calculate = function (quantity, discounted, unit) {
         if (typeof this.price !== 'number' || 0 > this.price) {
             return 0;
         }
@@ -37,9 +38,16 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
         if (discounted === undefined) {
             discounted = true;
         }
+        if (unit === undefined) {
+            unit = true;
+        }
 
-        var result = this.price,
+        var result = Pricing.mode === 'ati' ? this.price : Math.fRound(this.price, 2), // TODO currency precision
             offer = undefined;
+
+        if (!unit) {
+            result *= quantity;
+        }
 
         if (discounted) {
             if (Array.isArray(this.offers)) {
@@ -48,14 +56,14 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
                 });
             }
             if (offer) {
-                result -= this.price * offer.percent / 100;
+                result -= Math.fRound(result * offer.percent / 100, 2); // TODO currency precision
             }
         }
 
         if (Array.isArray(this.taxes) && Pricing.mode === 'ati') {
             var base = result;
-            this.taxes.forEach(function (rate) {
-                result += base * rate / 100;
+            $.each(this.taxes, function (i, rate) {
+                result += Math.fRound(base * rate / 100, 2); // TODO currency precision
             });
         }
 
@@ -72,11 +80,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
             prefix = ''; //SaleItem.trans.unit_price + '&nbsp;';
 
         if (original !== final) {
-            prefix = '<del>' + original.formatPrice(Pricing.currency) + '</del>&nbsp;';
+            prefix = '<del>' + original.localizedCurrency(Pricing.currency) + '</del>&nbsp;';
         }
 
         return prefix +
-            '<strong>' + final.formatPrice(Pricing.currency) + '</strong>&nbsp;' +
+            '<strong>' + final.localizedCurrency(Pricing.currency) + '</strong>&nbsp;' +
             '<sup>' + (Pricing.mode === 'ati' ? SaleItem.trans.ati : SaleItem.trans.net) + '</sup>';
     };
 
@@ -173,65 +181,6 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
 
         return new AvailabilityResult(0, this.a_msg, this.a_qty);
     };
-
-    /*Availability.display = function (quantity) {
-        var result = Availability.resolve.call(this, quantity);
-
-        return result.message ? '<span>' + result.message + '</span>' : '';
-    };*/
-
-    /*Availability.merge = function(data, qty) {
-        if (null === data) {
-            return;
-        }
-
-        var max = data.max_qty === 'INF' ? Number.POSITIVE_INFINITY : data.max_qty;
-
-        if (qty < data.min_qty) {
-            if (!this.min_qty || this.min_qty < data.min_qty) {
-                this.min_qty = data.min_qty;
-                this.min_msg = data.min_msg;
-            }
-        } else if (qty > max) {
-            if (!this.max_qty || this.max_qty > max) {
-                this.max_qty = max;
-                this.max_msg = data.max_msg;
-            }
-        } else if (qty > data.a_qty) {
-            if (data.r_msg) {
-                if (qty > data.a_qty + data.r_qty) {
-                    this.o_msg = data.o_msg;
-                } else if (!this.r_qty || this.r_qty > data.r_qty) {
-                    this.r_qty = data.r_qty;
-                    this.r_msg = data.r_msg;
-                }
-            } else {
-                this.o_msg = data.o_msg;
-            }
-        } else if (!this.a_qty || this.a_qty > data.a_qty) {
-            this.a_qty = data.a_qty;
-            this.a_msg = data.a_msg;
-        }
-    };*/
-
-    /*Availability.merge = function(data) {
-        if (null === data) {
-            return;
-        }
-        if (!this.hasOwnProperty('o_msg') && data.hasOwnProperty('o_msg')) {
-            this.o_msg = data.o_msg;
-        }
-        var that = this;
-        ['min', 'max', 'a', 'r'].forEach(function(key) {
-            if (!data.hasOwnProperty(key + '_qty')) {
-                return;
-            }
-            if (!that.hasOwnProperty(key + '_qty') || (data[key + '_qty'] !== 'INF' && that[key + '_qty'] > data[key + '_qty'])) {
-                that[key + '_qty'] = data[key + '_qty'];
-                that[key + '_msg'] = data[key + '_msg'];
-            }
-        });
-    };*/
 
     // -------------------------------- BUNDLE SLOT --------------------------------
 
@@ -1035,6 +984,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
             // Pricing
             this.$pricing = this.$element.find('#' + this.id + '_pricing');
 
+            // Offers
+            this.$offers = this.$element.find('#' + this.id + '_offers');
+
             // Option groups
             this.optionGroups = undefined;
             this.$optionGroups = this.$element.find('#' + this.id + '_options').optionGroups(this);
@@ -1236,7 +1188,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
         },
 
         updatePricesAndAvailability: function() {
-            var that = this, display = '', availability = this.resolveAvailability();
+            var that = this,
+                display = '',
+                pricing = this.config.pricing,
+                availability = this.resolveAvailability();
+            this.originalUnit = 0;
             this.originalPrice = 0;
             this.finalPrice = 0;
 
@@ -1250,33 +1206,54 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-number'], functio
             if (0 < this.bundleSlots.length) {
                 $.each(this.bundleSlots, function () {
                     if (this.hasChoice()) {
-                        that.originalPrice += this.getChoice().getOriginalPrice();
+                        that.originalUnit += this.getChoice().getOriginalPrice();
                         that.finalPrice  += this.getChoice().getFinalPrice();
                     }
                 });
             } else {
-                var pricing = this.config.pricing;
                 if (this.variant && this.variant.hasVariant()) {
                     pricing = this.variant.getVariant().pricing;
                 }
 
-                this.originalPrice = Pricing.calculate.call(pricing, this.totalQuantity, false) * this.totalQuantity;
-                this.finalPrice = Pricing.calculate.call(pricing, this.totalQuantity) * this.totalQuantity;
+                this.originalUnit = Pricing.calculate.call(pricing, this.totalQuantity, false, true);
+                this.originalPrice = Pricing.calculate.call(pricing, this.totalQuantity, false, false);
+                this.finalPrice = Pricing.calculate.call(pricing, this.totalQuantity, true, false);
             }
 
+            this.originalUnit += this.optionGroups.getOriginalPrice();
             this.originalPrice += this.optionGroups.getOriginalPrice() * this.totalQuantity;
             this.finalPrice += this.optionGroups.getFinalPrice() * this.totalQuantity;
 
-            if (this.originalPrice !== this.finalPrice) {
-                display = '<del>' + this.originalPrice.formatPrice(Pricing.currency) + '</del>&nbsp;';
+            if (0 < this.originalPrice && this.originalPrice !== this.finalPrice) {
+                display = '<del>' + this.originalPrice.localizedCurrency(Pricing.currency) + '</del>&nbsp;';
             }
 
-            display += this.finalPrice.formatPrice(Pricing.currency);
+            display += '<strong>' + this.finalPrice.localizedCurrency(Pricing.currency) + '</strong>'
+                    + '&nbsp;<sup>' + SaleItem.trans[Pricing.mode] + '</sup>';
 
-            this.$pricing.html(Templates['sale_item_pricing.html.twig'].render({
-                label: SaleItem.trans.total + '&nbsp;' + SaleItem.trans[Pricing.mode],
-                price: display
-            }));
+            this.$pricing.html(display);
+
+            if (0 < pricing.offers.length) {
+                // TODO Gather and merge offers from root, variant and options.
+
+                var offers = [], previousMin = null;
+                $.each(pricing.offers, function(i, offer) {
+                    offers.push({
+                        min: Number(offer.min_qty).localizedNumber(),
+                        max: previousMin ? Number(previousMin).localizedNumber() : null,
+                        percent: Math.fRound(offer.percent, 2).localizedNumber(),
+                        price: Number(that.originalUnit * (1 - offer.percent / 100)).localizedCurrency(Pricing.currency)
+                    });
+                    previousMin = offer.min_qty - 1;
+                });
+                this.$offers.html(Templates['sale_item_offers.html.twig'].render({
+                    trans: SaleItem.trans,
+                    offers: offers.reverse(),
+                    quantity: this.totalQuantity
+                }));
+            } else {
+                this.$offers.empty();
+            }
 
             if (availability.hasClass()) {
                 this.$quantity.closest('.form-group').addClass('has-' + availability.getClass());

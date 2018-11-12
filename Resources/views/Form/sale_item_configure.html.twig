@@ -49,7 +49,14 @@
                             <div class="col-xs-12 sale-item-availability"></div>
                         </div>
                     </div>
-                    <div class="col-xs-6" id="{{ itemForm.vars.id }}_pricing"></div>
+                    <div class="col-xs-6">
+                        <div class="form-group sale-item-pricing">
+                            <label class="control-label col-sm-4">{{ 'ekyna_product.sale_item_configure.total_price'|trans }}</label>
+                            <div class="col-sm-8">
+                                <span class="form-control" id="{{ form.vars.id }}_pricing"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>
@@ -162,7 +169,6 @@
 {% block sale_item_configure_widget %}
 {% spaceless %}
     {{- bootstrap_backup_form_settings() -}}
-    {#{{- bootstrap_set_sizing('sm') -}}#}
     {{- bootstrap_set_style('horizontal') -}}
     {{- bootstrap_set_col_size('sm') -}}
     {{- bootstrap_set_label_col(3) -}}
@@ -184,6 +190,39 @@
                 </div>
         {% endif %}
 
+        {% if form.vars.subject is bundle_product %}
+        <div class="sale-item-bundle">
+            <p>{{ 'ekyna_product.sale_item_configure.bundle'|trans }}</p>
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="0%"/>
+                    <col width="100%"/>
+                    <col width="0%"/>
+                </colgroup>
+                {% for slot in form.vars.subject.bundleSlots %}
+                    {% set choice = slot.choices|first %}
+                    {% set childProduct = choice.product -%}
+                    {% if childProduct.visible and not choice.isHidden -%}
+                    <tr>
+                        <td>{{- choice.minQuantity|localizednumber -}}x</td>
+                        <td class="designation">
+                            {% set path = childProduct|subject_public_url -%}
+                            {% if path is not empty %}
+                            <a href="{{ childProduct|subject_public_url }}" title="{{ childProduct.fullDesignation(true) }}">
+                            {% endif %}
+                                {{- childProduct.fullDesignation(true) -}}
+                            {% if path is not empty %}</a>{% endif %}
+                        </td>
+                        <td class="hidden-xs" data-clipboard-copy="{{ childProduct.reference }}">
+                            {{- childProduct.reference -}}
+                        </td>
+                    </tr>
+                    {%- endif %}
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
         {%- if form.variant is defined -%}
             {{- form_row(form.variant) -}}
         {%- endif -%}
@@ -193,18 +232,37 @@
         {%- endif -%}
 
         <div class="row">
-            <div class="col-xs-6">
-                <div class="form-group{# form-group-sm#}">
-                    {{- bootstrap_set_label_col(6) -}}
-                    {{- form_label(form.quantity) -}}
+            {{- bootstrap_set_label_col(6) -}}
+            <div class="col-sm-6">
+                <div class="form-group">
+                    {{- form_label(form.quantity, null) -}}
                     <div class="col-sm-6">
                         {{- form_widget(form.quantity) -}}
-                        <div class="sale-item-availability"></div>
                     </div>
-                    {{- bootstrap_set_label_col(3) -}}
+                    <div class="sale-item-availability"></div>
+                </div>
+            {% if form.vars.has_offers %}
+                <div class="form-group sale-item-pricing inline">
+                    <div class="col-sm-12">
+                        <span class="form-control">
+                            {{ 'ekyna_product.sale_item_configure.total_price'|trans }}&nbsp;<span id="{{ form.vars.id }}_pricing"></span>
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="col-xs-6" id="{{ form.vars.id }}_pricing"></div>
+            <div class="col-sm-6 sale-item-offers" id="{{ form.vars.id }}_offers"></div>
+            {% else %}
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group sale-item-pricing">
+                    <label class="control-label col-sm-4">{{ 'ekyna_product.sale_item_configure.total_price'|trans }}</label>
+                    <div class="col-sm-8">
+                        <span class="form-control" id="{{ form.vars.id }}_pricing"></span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {{- bootstrap_set_label_col(3) -}}
         </div>
 
         {%- if form.vars.extended and form.configuration is not defined -%}
@@ -223,9 +281,11 @@
 
         {{- form_errors(form) -}}
 
-        {%- if form.submit is defined -%}
+        {%- if form.vars.submit_button -%}
         <p class="text-center">
-            {{- form_widget(form.submit) -}}
+            <button type="submit" id="{{ form.vars.id }}_submit" class="btn btn-primary">
+                <i class="fa fa-shopping-cart"></i> {{ 'ekyna_commerce.cart.button.add_item'|trans }}
+            </button>
         </p>
         {%- endif %}
     </div>{# End .sale-item-inner #}

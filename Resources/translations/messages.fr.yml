@@ -394,6 +394,7 @@ ekyna_product:
         total_price: Total
         rule_table: Vos tarifs
         price_table: Détail du prix unititaire
+        bundle: Ce pack est composé des articles suivants :
         no_choice:
             title: <strong>Sélectionnez un article&hellip;</strong>
             description: <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>

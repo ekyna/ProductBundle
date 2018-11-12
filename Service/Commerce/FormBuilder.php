@@ -315,7 +315,6 @@ class FormBuilder
         ];
 
         return [
-            //'data-config'  => $this->jsonEncode($config),
             'data-config' => $config,
         ];
     }
@@ -364,7 +363,6 @@ class FormBuilder
         }
 
         return [
-            //'data-config'  => $this->jsonEncode($this->buildOptionConfig($option)),
             'data-config' => $this->buildOptionConfig($option),
         ];
     }
@@ -465,8 +463,8 @@ class FormBuilder
             'price_table' => $this->translate('ekyna_product.sale_item_configure.price_table'),
             'ati'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.ati'),
             'net'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.net'),
-            // 'min_quantity' => $this->translate('ekyna_product.common.min_quantity'),
-            // 'max_quantity' => $this->translate('ekyna_product.common.max_quantity'),
+            'from'        => $this->translate('ekyna_product.pricing_rule.field.from'),
+            'range'       => $this->translate('ekyna_product.pricing_rule.field.range'),
         ];
     }
 

@@ -10,7 +10,7 @@
     }
 
     .form-body {
-        padding:0;
+        padding: 0;
 
         .form-footer {
             margin: 0;
@@ -59,7 +59,7 @@
 
         > strong {
             display: inline-block;
-            float:left;
+            float: left;
             margin-right: 12px;
             color: #808080;
         }
@@ -85,7 +85,7 @@
             }
 
             .slot-thumb {
-                display:none;
+                display: none;
                 float: left;
                 width: 60px;
                 height: 60px;
@@ -210,6 +210,11 @@
         color: #666666;
     }
 
+    .sale-item-availability {
+        padding: 0 15px;
+        clear: both;
+    }
+
     .sale-item-info {
         width: 20%;
         text-align: left;
@@ -231,11 +236,35 @@
         }
     }
 
+    .sale-item-bundle {
+        font-size: 13px;
+
+        table {
+            border-bottom: 1px solid #ddd;
+
+            td.designation {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 1px;
+            }
+        }
+    }
+
     .sale-item-list {
         margin-bottom: 0;
     }
 
     .sale-item-pricing {
+        .form-control {
+            text-align: center;
+
+            del, sup {
+                color: #999;
+                font-size: 80%;
+            }
+        }
+
         .dropdown-menu {
             width: 260px;
             margin: 0;
@@ -277,10 +306,22 @@
             }
         }
     }
+
+    .sale-item-offers {
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 500px) {
     .sale-item-configure {
+        .sale-item-pricing {
+            .form-control {
+                > del {
+                    display: none;
+                }
+            }
+        }
+
         .input-group {
             > .form-control:first-child {
                 border-radius: 4px 4px 0 0;
@@ -300,17 +341,39 @@
         }
     }
 }
+
 @media (min-width: 500px) {
     .sale-item-configure {
         .input-group {
             > .input-group-addon:last-child {
                 > span {
-                    display:block;
+                    display: block;
                 }
             }
         }
     }
 }
+
+@media (min-width: 768px) {
+    .sale-item-configure {
+        .form-group label + div {
+            padding-left: 0;
+        }
+
+        .sale-item-pricing.inline {
+            text-align: right;
+
+            .form-control {
+                display: inline-block;
+                width: auto;
+                min-width: 50%;
+                text-align: center;
+            }
+        }
+
+    }
+}
+
 
 @media (min-width: 768px) and (max-width: 991px) {
     .sale-item-configure {

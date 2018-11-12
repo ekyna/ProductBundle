@@ -13,7 +13,7 @@ module.exports = function (grunt, options) {
             files: {
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/js/templates.js': [
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_item_option_group.html.twig',
-                    'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_item_pricing.html.twig',
+                    'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_item_offers.html.twig',
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/inventory_line.html.twig'
                 ]
             }

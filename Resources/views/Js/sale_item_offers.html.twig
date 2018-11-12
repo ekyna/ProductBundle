@@ -1,0 +1,24 @@
+<table class="table table-condensed table-striped {{ class }}">
+    <thead>
+        <tr>
+            <th>{{ trans.quantity }}</th>
+            <th class="text-right">{{ trans.discount }}</th>
+            <th class="text-right">{{ trans.unit_price }}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for offer in offers %}
+        <tr{% if quantity >= offer.min and (offer.max is null or quantity <= offer.max) %} class="success"{% endif %}>
+            <td>
+            {% if offer.max is null %}
+                {{ trans.from|replace({'%min%': offer.min}) }}
+            {% else %}
+                {{ trans.range|replace({'%min%': offer.min, '%max%': offer.max}) }}
+            {% endif %}
+            </td>
+            <td class="text-right">{{ offer.percent }}%</td>
+            <td class="text-right">{{ offer.price }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

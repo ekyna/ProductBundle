@@ -213,7 +213,7 @@ class PriceRenderer
         $config = $this->priceCalculator->getPricingGrid($product, $context);
 
         if (empty($config)) {
-            return '';
+            return null;
         }
 
         // TODO packaging format
