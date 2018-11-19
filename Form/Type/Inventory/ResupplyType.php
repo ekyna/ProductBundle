@@ -62,7 +62,7 @@ class ResupplyType extends AbstractType
                 ]
             ])
             ->add('netPrice', NumberType::class, [
-                'label'       => 'ekyna_commerce.supplier_product.field.net_price',
+                'label'       => 'ekyna_commerce.field.buy_net_price',
                 'constraints' => [
                     new NotBlank(),
                     new GreaterThanOrEqual(0),

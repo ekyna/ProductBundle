@@ -16,7 +16,7 @@
             <dl class="dl-horizontal">
                 <dt>{{ 'ekyna_core.field.reference'|trans }}</dt>
                 <dd>{{ reference|first }}</dd>
-                <dt>{{ 'ekyna_product.product.field.net_price'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.net_price'|trans }}</dt>
                 <dd>
                     {{ net_price|localizedcurrency(commerce_default_currency) -}}
                     &nbsp;(min&nbsp;{{ min_price|localizedcurrency(commerce_default_currency) }})
@@ -41,11 +41,11 @@
             <dl class="dl-horizontal">
                 <dt>{{ 'ekyna_core.field.mode'|trans }}</dt>
                 <dd>{{ mode_badge|raw }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.geocode'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.geocode'|trans }}</dt>
                 <dd>{{ geocode }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.in_stock'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.in_stock'|trans }}</dt>
                 <dd>{{ in }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.virtual_stock'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.virtual_stock'|trans }}</dt>
                 <dd>{{ virtual }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.replenishment_time'|trans }}</dt>
                 <dd>{{ replenishment }}</dd>
@@ -59,11 +59,11 @@
                 <dd>{{ state_badge|raw }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.minimum_order_quantity'|trans }}</dt>
                 <dd>{{ moq }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.available_stock'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.available_stock'|trans }}</dt>
                 <dd>{{ available }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.floor'|trans }}</dt>
                 <dd>{{ floor }}</dd>
-                <dt>{{ 'ekyna_commerce.stock_subject.field.estimated_date_of_arrival'|trans }}</dt>
+                <dt>{{ 'ekyna_commerce.field.replenishment_eda'|trans }}</dt>
                 <dd>{{ eda }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.end_of_life'|trans }}</dt>
                 <dd>{{ end_of_life }}</dd>

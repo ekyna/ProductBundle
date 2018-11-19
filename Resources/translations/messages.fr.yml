@@ -2,7 +2,7 @@ ekyna_product:
     menu: Catalogue
     leave_blank_to_auto_generate: Laisser vide pour générer automatiquement.
 
-    # TODO group translations (like visible)
+    # TODO group translations (like visible) use commerce ones
     common:
         percent: Pourcentage
         min_quantity: Qte. min.
@@ -351,9 +351,9 @@ ekyna_product:
         field:
             parent: Parent
             relations: Relations
-            net_price: Prix HT
+            net_price: Prix HT # TODO use ekyna_commerce.field.net_price
             min_price: Prix Min.
-            total_net_price: Prix total HT
+            total_net_price: Prix total HT # TODO use ekyna_commerce.field... ?
             pricing: Tarifs
             stock: Stocks
             released_at: Date de sortie
@@ -381,11 +381,6 @@ ekyna_product:
             ean13: Code EAN 13
             manufacturer: Référence fabricant
 
-    product_stock_unit:
-        label:
-            singular: Unité de stock
-            plural: Unités de stock
-
     sale_item_configure:
         variant: Version
         choose_option: Choisissez une option
@@ -394,7 +389,7 @@ ekyna_product:
         total_price: Total
         rule_table: Vos tarifs
         price_table: Détail du prix unititaire
-        bundle: Ce pack est composé des articles suivants :
+        bundle: Ce pack est composé des articles suivants
         no_choice:
             title: <strong>Sélectionnez un article&hellip;</strong>
             description: <p>&hellip;parmi les choix disponibles ci-dessus à droite.</p>

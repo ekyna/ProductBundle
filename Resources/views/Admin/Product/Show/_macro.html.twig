@@ -199,7 +199,7 @@
 {% macro show_net_price(product, options = {}) %}
 {% spaceless %}
     {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', {
-        'label': 'ekyna_product.product.field.net_price',
+        'label': 'ekyna_commerce.field.net_price',
         'id': 'product_netPrice',
     }|merge(options)) }}
 {% endspaceless %}
@@ -555,7 +555,7 @@
                         <th class="text-right">{{ 'ekyna_product.bundle_choice.field.use_options'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.quantity'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}&nbsp;(kg)</th>
-                        <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
                     </tr>
                     {%- set total_weight = 0 -%}
                     {%- for slot in product.bundleSlots -%}
@@ -692,7 +692,7 @@
                             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_product.common.max_quantity'|trans }}</th>
-                            <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+                            <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
                         </tr>
                         {% for choice in slot.choices %}
                         {% set choice_id = slot_id ~ '_choice_' ~loop.index0 ~ '_' %}
@@ -766,7 +766,7 @@
             <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
             <th class="text-right">{{ 'ekyna_commerce.stock_subject.field.state'|trans }}</th>
             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
-            <th class="text-right">{{ 'ekyna_product.product.field.net_price'|trans }}</th>
+            <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
         </tr>
         {% for product in products -%}
             {% set relationId = 'relation_' ~loop.index0 ~ '_' %}

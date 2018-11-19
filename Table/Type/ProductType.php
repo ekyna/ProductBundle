@@ -136,7 +136,7 @@ class ProductType extends ResourceTableType
                 'position' => 40,
             ])
             ->addColumn('netPrice', BType\Column\PriceType::class, [
-                'label'    => 'ekyna_product.product.field.net_price',
+                'label'    => 'ekyna_commerce.field.net_price',
                 'currency' => 'EUR', // TODO
                 'position' => 50,
             ])
@@ -307,7 +307,7 @@ class ProductType extends ResourceTableType
                     'position' => 40,
                 ])
                 ->addFilter('netPrice', CType\Filter\NumberType::class, [
-                    'label'    => 'ekyna_product.product.field.net_price',
+                    'label'    => 'ekyna_commerce.field.net_price',
                     'position' => 50,
                 ])
                 ->addFilter('weight', CType\Filter\NumberType::class, [

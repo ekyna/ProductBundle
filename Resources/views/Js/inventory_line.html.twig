@@ -1,4 +1,7 @@
-<tr data-id="{{ id }}">
+<tr data-id="{{ id }}" data-summary='{{ {
+    'route': 'ekyna_product_product_admin_summary',
+    'parameters': {'productId': id}
+}|json_encode }}'>
     <td>{{ brand }}</td>
     <td><a href="{{ url }}">{{ designation }}</a></td>
     <td>{{ reference }}</td>

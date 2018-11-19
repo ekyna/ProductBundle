@@ -76,7 +76,7 @@ class OptionType extends ResourceFormType
                 ],
             ])
             ->add('netPrice', PriceType::class, [
-                'label'    => 'ekyna_product.product.field.net_price',
+                'label'    => 'ekyna_commerce.field.net_price',
                 'required' => false,
             ])
             ->add('taxGroup', TaxGroupChoiceType::class, [

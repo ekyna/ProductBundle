@@ -321,7 +321,7 @@ class ProductFormBuilder
     public function addNetPriceField(array $options = [])
     {
         $options = array_replace([
-            'label'    => 'ekyna_product.product.field.net_price',
+            'label'    => 'ekyna_commerce.field.net_price',
             'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);
 
@@ -638,7 +638,7 @@ class ProductFormBuilder
             'label'    => 'ekyna_core.field.height',
             'attr'     => [
                 'placeholder' => 'ekyna_core.field.height',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
             ],
             'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);
@@ -661,7 +661,7 @@ class ProductFormBuilder
             'label'    => 'ekyna_core.field.width',
             'attr'     => [
                 'placeholder' => 'ekyna_core.field.width',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
             ],
             'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);
@@ -684,7 +684,7 @@ class ProductFormBuilder
             'label'    => 'ekyna_core.field.depth',
             'attr'     => [
                 'placeholder' => 'ekyna_core.field.depth',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETRE)],
+                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
             ],
             'required' => !(isset($options['disabled']) && $options['disabled']),
         ], $options);

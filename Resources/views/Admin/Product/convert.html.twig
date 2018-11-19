@@ -21,7 +21,7 @@
         <dd>{{ source.designation }}</dd>
         <dt>{{ 'ekyna_core.field.visible'|trans }}</dt>
         <dd>{% if source.visible %}{{ 'ekyna_core.value.yes'|trans }}{% else %}{{ 'ekyna_core.value.no'|trans }}{% endif %}</dd>
-        <dt>{{ 'ekyna_product.product.field.net_price'|trans }}</dt>
+        <dt>{{ 'ekyna_commerce.field.net_price'|trans }}</dt>
         <dd>{{ source.netPrice|localizedcurrency(commerce_default_currency) }}</dd>
         <dt>{{ 'ekyna_core.field.weight'|trans }}</dt>
         <dd>{{ source.weight|localizednumber }}&nbsp;kg</dd>

@@ -1,0 +1,401 @@
+ekyna_product:
+    menu: Catalog
+    leave_blank_to_auto_generate: Leave empty to generate automatically.
+
+    # TODO group translations (like visible) use commerce ones
+    common:
+        percent: Pourcentage
+        min_quantity: Min. Qty.
+        max_quantity: Max. Qty.
+        read_more: Read more
+
+    email:
+        stock_report:
+            title: Stock report [%mode%]
+
+    account:
+        pricing:
+            title: Your pricing
+            all_brands: All brands
+
+    attribute:
+        label:
+            singular: Attribute
+            plural: Attributes
+        header:
+            list: Attributes <small>List of the attributes</small>
+            show: Attribute detail <small>%name%</small>
+            new: Create a new attribute
+            edit: Edit the attribute <small>%name%</small>
+            remove: Remove the attribute <small>%name%</small>
+        type:
+            select: Choice
+            text: Text
+            boolean: Boolean
+            unit: Unit
+        config:
+            multiple: Multiple choice
+            suffix: Suffix
+        help:
+            suffix: "Enter a value (ex: &laquo; capsule(s) &raquo;) if you choose unit 'Piece'"
+        button:
+            list: Attributes list
+            show: Attribute details
+            new: New attribute
+            edit: Edit the attribute
+            remove: Remove the attribute
+        alert:
+            no_item: No attribute configured
+
+    attribute_choice:
+        label:
+            singular: Attribute choice
+            plural: Attribute choices
+        header:
+            list: Attribute choices <small>List of the choices</small>
+            show: Choice details <small>%name%</small>
+            new: Create a new choice
+            edit: Edit the choice <small>%name%</small>
+            remove: Remove the choice <small>%name%</small>
+        button:
+            list: List of choices
+            show: Choice details
+            new: New choice
+            edit: Edit the choice
+            remove: Remove the choice
+        alert:
+            no_item: No choice configured
+
+    attribute_set:
+        label:
+            singular: Archetype
+            plural: Archetypes
+        header:
+            list: Archetypes <small>Liste of the archetypes</small>
+            show: Archetype details <small>%name%</small>
+            new: Create a new archetype
+            edit: Edit the archetype <small>%name%</small>
+            remove: Remove the archetype <small>%name%</small>
+        button:
+            list: Archetypes list
+            show: Archetype details
+            new: New archetype
+            edit: Edit the archetype
+            remove: Remove the archetype
+        alert:
+            no_item: No archetype configured
+
+    attribute_slot:
+        field:
+            naming: Naming
+        help:
+            naming: Generate variants designations with this attribute.
+
+    brand:
+        label:
+            singular: Brand
+            plural: Brands
+        header:
+            list: Brands <small>List of the brands</small>
+            show: Brand details <small>%name%</small>
+            new: Create a new brand
+            edit: Edit the brand <small>%name%</small>
+            remove: Remove the brand <small>%name%</small>
+        button:
+            list: Brands list
+            show: Brand details
+            new: New brand
+            edit: Edit the brand
+            remove: remove the brand
+        alert:
+            no_item: No brand configured
+
+    bundle_slot:
+        label:
+            singular: Slot
+            plural: Slots
+        button:
+            add: Add a product
+            add_configurable: Add a slot
+
+    bundle_choice:
+        label:
+            singular: Product
+            plural: Choice
+        field:
+            hidden: Hidden
+            use_options: Options
+        button:
+            add: Add a choice
+
+    bundle_choice_rule:
+        label:
+            singular: Rule
+            plural: Rules
+        type:
+            disabled: Disabled
+            optional: Optional
+        field:
+            expression: Expression
+        button:
+            add: Add a rule
+
+    cart:
+        success: This product has been added to your cart.
+
+    catalog:
+        label:
+            singular: Catalog
+            plural: Catalogs
+        header:
+            list: Catalogs <small>List of the catalogs</small>
+            show: Catalog details <small>%name%</small>
+            new: Create a new catalog
+            edit: Edit the catalog <small>%name%</small>
+            remove: Remove the catalog <small>%name%</small>
+        button:
+            list: Catalogs list
+            show: Catalog details
+            new: New catalog
+            edit: Edit the catalog
+            remove: Remove the catalog
+            render: Render the catalog
+        field:
+            template: Template
+            pages: Pages
+            pager: 'Page %current% of %total%'
+            slots: Slots
+            display_prices: Display prices
+            price_mention: 'Indicative prices at %date%'
+        theme:
+            default: Default
+        template:
+            cover: Cover
+            full: Full page product
+            half: One product up, on down
+            half_dual: One product up, two down
+        alert:
+            no_item: No catalog configured
+
+    category:
+        label:
+            singular: Category
+            plural: Categories
+        header:
+            list: Categories <small>List of the categories</small>
+            show: Category details <small>%name%</small>
+            new: Create a new category
+            new_child: Create a new category under <small>%name%</small>
+            edit: Edit the category <small>%name%</small>
+            remove: Remove the category <small>%name%</small>
+        button:
+            list: Categories list
+            show: Category details
+            new: New category
+            edit: Edit the category
+            remove: Remove the category
+        alert:
+            no_item: No category configured
+
+    convert:
+        help:
+            tag_choice: |
+                Select the <strong>variable</strong> product tags.
+                Tags not selected will be trasfered to the <strong>variant</strong> created.
+            option_group_choice: |
+                Select the <strong>variable</strong> product options groups.
+                Options groups not selected will be trasfered to the <strong>variant</strong> created.
+            media_choice: |
+                Select the <strong>variable</strong> product medias.
+                Medias not selected will be trasfered to the <strong>variant</strong> created.
+        variable_success: |
+            Conversion succeed.<br>
+            Please check all the variable <strong>AND</strong> the created variant informations.
+
+    inventory:
+        title: Inventory
+        field:
+            profile: Profile
+        button:
+            export_units: Export stock units
+            export_products: Export products
+        modal:
+            orders: Customer orders
+            resupply: Resupply
+        profile:
+            none: None
+            treatment: Treatment
+            resupply: Resupply
+            out_of_stock: Out of stock
+
+    offer:
+        label:
+            singular: Offer
+            plural: Offers
+
+    option:
+        label:
+            singular: Option
+            plural: Options
+        button:
+            add: Add an option
+
+    option_group:
+        label:
+            singular: Options group
+            plural: Options groups
+        field:
+            full_title: Fill titles (variants)
+        button:
+            add: Add an options groups
+
+    price:
+        label:
+            singular: Displayed price
+            plural: Displayed prices
+        alert:
+            no_item: No price configured
+
+    pricing:
+        label:
+            singular: Pricing
+            plural: Pricings
+        header:
+            list: Pricings <small>List of the pricings</small>
+            show: Pricing details <small>%name%</small>
+            new: Create a new pricing
+            edit: Edit the pricing <small>%name%</small>
+            remove: Remove the pricing <small>%name%</small>
+        button:
+            list: Pricings list
+            show: Pricing details
+            new: New pricing
+            edit: Edit the pricing
+            remove: Remove the pricing
+            add: Add a pricing
+        field:
+            countries: Invoice countries
+            rules: Rules
+        alert:
+            no_item: No pricing configured
+
+    pricing_rule:
+        label:
+            singular: Pricing rule
+            plural: Pricing rules
+        field:
+            from: from %min%
+            range: from %min% to %max%
+            discount: Discount
+            unit_price: Unit price
+        button:
+            add: Add a rule
+        alert:
+            no_item: No rule configured
+
+    special_offer:
+        label:
+            singular: Special offer
+            plural: Special offers
+        header:
+            list: Special offers <small>List of special offers</small>
+            show: Special offer details <small>%name%</small>
+            new: Create a new special offer
+            edit: Edit the special offer <small>%name%</small>
+            remove: Remove the special offer <small>%name%</small>
+        button:
+            list: Special offers list
+            show: Special offer details
+            new: New special offer
+            edit: Edit the special offer
+            remove: Remove the special offer
+            add: Add a special offer
+        field:
+            stack: Stackable
+            countries: Invoice country
+        message:
+            product_removed: |
+                The product <strong>{product}</strong> has been put out of the list
+                because it belongs to the brand <strong>{brand}</strong>.
+        alert:
+            no_item: No special offer configured
+
+    product:
+        label:
+            singular: Product
+            plural: Product
+        header:
+            list: Products <small>List of the products</small>
+            show: Product details <small>%name%</small>
+            new: Create a new product
+            duplicate: Duplicate the product <small>%name%</small>
+            convert: Convert the product <small>%name%</small>
+            edit: Edit the product <small>%name%</small>
+            remove: Remove the product <small>%name%</small>
+        button:
+            list: Products list
+            show: Product details
+            new: New product
+            edit: Edit the product
+            duplicate: Duplicate the product
+            remove: Remove the product
+            convert: Convert
+            label: Label
+        type:
+            simple: Simple
+            variable: Variable
+            variant: Variante
+            bundle: Pack
+            configurable: Configurable pack
+        field:
+            parent: Parent
+            relations: Relations
+            min_price: Min. price
+            total_net_price: Total ex-tax
+            pricing: Pricing
+            stock: Stocks
+            released_at: Released at
+            composition: Composition
+            option_parents: This product is an option of the following products
+            bundle_parents: This product is included in the following bundles
+        alert:
+            no_item: No product configured
+            pending_offers: |
+                This product has pending offers and pricing updates.
+            supplier_product_exists: |
+                A supplier reference already exists for the supplier <strong>%name%</strong>.
+
+    product_media:
+        label:
+            singular: Media
+            plural: Medias
+
+    product_reference:
+        label:
+            singular: External reference
+            plural: External references
+        type:
+            ean8: EAN 8 code
+            ean13: EAN 13 code
+            manufacturer: Manufacturer SKU
+
+    sale_item_configure:
+        variant: Version
+        choose_option: Choose an option
+        discount: Discount
+        unit_price: Unit price
+        total_price: Total
+        rule_table: Your pricing
+        price_table: Detailed unit price
+        bundle: This bundle contains the following products
+        no_choice:
+            title: <strong>Pick a product&hellip;</strong>
+            description: <p>&hellip;from the available choices below on the right.</p>
+    variant:
+        label:
+            singular: Variant
+            plural: Variants
+        header:
+            list: Variants <small>List of the variants</small>
+        button:
+            new: New variant

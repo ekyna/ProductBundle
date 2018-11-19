@@ -77,7 +77,7 @@ class InventoryType extends AbstractType
                 'required' => false,
             ])
             ->add('geocode', Type\TextType::class, [
-                'label'    => 'ekyna_commerce.stock_subject.field.geocode',
+                'label'    => 'ekyna_commerce.field.geocode',
                 'required' => false,
             ])
             ->add('mode', Type\ChoiceType::class, [
