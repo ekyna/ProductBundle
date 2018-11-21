@@ -54,7 +54,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->getQuery()
             ->useQueryCache(true)
             ->setParameters([
-                'group' => $context->getCustomerGroup(),
+                'group'   => $context->getCustomerGroup(),
                 'country' => $context->getInvoiceCountry(),
             ])
             ->getResult();
@@ -92,7 +92,6 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
             ->addOrderBy('b.id', 'ASC')
             ->addOrderBy('r.percent', 'DESC')
             ->addOrderBy('r.minQuantity', 'DESC')
-            ->addGroupBy('r.id')
             ->where($ex->orX(
                 $ex->eq('p.product', ':product'),
                 $ex->isMemberOf(':brand', 'p.brands')
