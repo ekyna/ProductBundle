@@ -1,6 +1,6 @@
-{% extends "EkynaAdminBundle:Entity/Default:show.html.twig" %}
+{% extends '@EkynaAdmin/Entity/Default/show.html.twig' %}
 
-{% import "EkynaProductBundle:Admin/Product:_macro.html.twig" as macros %}
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
 
 {% block title %}
     {{ admin_resource_pin(resource) }}
@@ -51,15 +51,15 @@
         </div>
     </div>
     {% if product is simple_product %}
-        {% include 'EkynaProductBundle:Admin/Product/Show:simple.html.twig' %}
+        {% include '@EkynaProduct/Admin/Product/Show/simple.html.twig' %}
     {% elseif product is variable_product %}
-        {% include 'EkynaProductBundle:Admin/Product/Show:variable.html.twig' %}
+        {% include '@EkynaProduct/Admin/Product/Show/variable.html.twig' %}
     {% elseif product is variant_product %}
-        {% include 'EkynaProductBundle:Admin/Product/Show:variant.html.twig' %}
+        {% include '@EkynaProduct/Admin/Product/Show/variant.html.twig' %}
     {% elseif product is bundle_product %}
-        {% include 'EkynaProductBundle:Admin/Product/Show:bundle.html.twig' %}
+        {% include '@EkynaProduct/Admin/Product/Show/bundle.html.twig' %}
     {% elseif product is configurable_product %}
-        {% include 'EkynaProductBundle:Admin/Product/Show:configurable.html.twig' %}
+        {% include '@EkynaProduct/Admin/Product/Show/configurable.html.twig' %}
     {% else %}
         <div class="panel-body form-body">
             <p>Unexpected product type.</p>

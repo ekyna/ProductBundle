@@ -50,7 +50,7 @@ class ProductController extends Controller
 
         $view = $form->createView();
 
-        $response = $this->render('EkynaProductBundle:Test/Product:detail.html.twig', [
+        $response = $this->render('@EkynaProduct/Test/Product/detail.html.twig', [
             'product' => $product,
             'form'    => $view,
         ]);
@@ -67,7 +67,7 @@ class ProductController extends Controller
             throw $this->createNotFoundException("Product not found.");
         }
 
-        return $this->render('EkynaProductBundle:Test/Product:dump.html.twig', [
+        return $this->render('@EkynaProduct/Test/Product/dump.html.twig', [
             'product' => $product,
         ]);
     }

@@ -46,7 +46,7 @@ class InventoryController extends Controller
 
         $data = $inventory->getContext();
 
-        return $this->render('EkynaProductBundle:Admin/Inventory:index.html.twig', [
+        return $this->render('@EkynaProduct/Admin/Inventory/index.html.twig', [
             'data' => $data,
             'form' => $form->createView(),
         ]);
@@ -134,7 +134,7 @@ class InventoryController extends Controller
             ],
         ]);
         $modal->setVars([
-            'form_template' => 'EkynaProductBundle:Admin/Inventory:_quick_edit_form.html.twig',
+            'form_template' => '@EkynaProduct/Admin/Inventory/_quick_edit_form.html.twig',
         ]);
 
         return $this->get('ekyna_core.modal')->render($modal);

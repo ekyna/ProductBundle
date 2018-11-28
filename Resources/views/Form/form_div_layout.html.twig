@@ -1,4 +1,4 @@
-{% extends 'EkynaAdminBundle:Form:form_div_layout.html.twig' %}
+{% extends '@EkynaAdmin/Form/form_div_layout.html.twig' %}
 
 
 {% block ekyna_product_attribute_slot_widget %}
@@ -445,7 +445,7 @@
     {%- if supplierOrder is not same as(null) -%}
     <tr id="supplier_order_{{ supplierOrder.id }}_details" class="supplier-order-details" style="display:none;">
         <td>&nbsp;</td>
-        <td colspan="5">{% include "EkynaCommerceBundle:Admin/SupplierOrder/Show:items.html.twig" %}</td>
+        <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
     </tr>
     {%- endif -%}
 {% endspaceless %}

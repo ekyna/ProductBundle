@@ -61,7 +61,7 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
 
         $widget = new DashboardWidget(
             'ekyna_product.account.pricing.title',
-            'EkynaProductBundle:Account/Dashboard:pricings.html.twig',
+            '@EkynaProduct/Account/Dashboard/pricings.html.twig',
             'default'
         );
         $widget

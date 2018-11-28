@@ -141,7 +141,7 @@ class PriceRenderer
 
         $finalLabel = strtr($this->options['final_price_format'], [
             '{amount}' => $formatter->currency($final, $currency),
-            '{mode}' => $mode,
+            '{mode}'   => $mode,
         ]);
 
         // Original
@@ -149,7 +149,7 @@ class PriceRenderer
         if ($discount && 0 < $price['original_price']) {
             $originalLabel = strtr($this->options['original_price_format'], [
                 '{amount}' => $formatter->currency($price['original_price'], $currency),
-                '{mode}' => $mode,
+                '{mode}'   => $mode,
             ]);
         }
 

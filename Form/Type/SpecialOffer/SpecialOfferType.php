@@ -11,6 +11,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -30,8 +31,13 @@ class SpecialOfferType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('percent', IntegerType::class, [
+            ->add('percent', NumberType::class, [
                 'label' => 'ekyna_product.common.percent',
+                'scale' => 2,
+                'attr'  => [
+                    'min' => 0,
+                    'max' => 100,
+                ],
             ])
             ->add('minQuantity', IntegerType::class, [
                 'label' => 'ekyna_product.common.min_quantity',

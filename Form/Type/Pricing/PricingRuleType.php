@@ -22,16 +22,17 @@ class PricingRuleType extends ResourceFormType
         $builder
             ->add('minQuantity', IntegerType::class, [
                 'label' => 'ekyna_product.common.min_quantity',
-                'attr' => [
+                'attr'  => [
                     'min' => 1,
-                ]
+                ],
             ])
             ->add('percent', NumberType::class, [
                 'label' => 'ekyna_product.common.percent',
-                'attr' => [
+                'scale' => 2,
+                'attr'  => [
                     'min' => 0,
                     'max' => 100,
-                ]
+                ],
             ]);
     }
 

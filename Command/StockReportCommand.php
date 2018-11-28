@@ -125,7 +125,7 @@ class StockReportCommand extends Command
             '%mode%' => $this->translator->trans(BStockModes::getLabel($mode)),
         ]);
 
-        $body = $this->templating->render('EkynaProductBundle:Email:stock_report.html.twig', [
+        $body = $this->templating->render('@EkynaProduct/Email/stock_report.html.twig', [
             'title'    => $title,
             'mode'     => $mode,
             'products' => $products,

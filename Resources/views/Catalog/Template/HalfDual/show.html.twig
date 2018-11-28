@@ -1,4 +1,4 @@
-{% import "EkynaProductBundle:Catalog:macros.html.twig" as macros %}
+{% import '@EkynaProduct/Catalog/macros.html.twig' as macros %}
 
 {% for slot in page.slots|slice(0, 3) -%}
     {{ macros.show_product(slot) }}

@@ -70,7 +70,7 @@ class ProductController extends AbstractSubjectController
 
         if ($html) {
             $content = $this->get('serializer')->normalize($product, 'json', ['groups' => ['Summary']]);
-            $content = $this->renderView('EkynaProductBundle:Admin/Product:summary.html.twig', $content);
+            $content = $this->renderView('@EkynaProduct/Admin/Product/summary.html.twig', $content);
         } else {
             $content = $this->get('serializer')->serialize($product, 'json', ['groups' => ['Summary']]);
         }

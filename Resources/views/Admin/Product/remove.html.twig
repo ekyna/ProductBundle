@@ -1,6 +1,6 @@
-{% extends "EkynaAdminBundle:Entity/Default:remove.html.twig" %}
+{% extends '@EkynaAdmin/Entity/Default/remove.html.twig' %}
 
-{% import "EkynaProductBundle:Admin/Product:_macro.html.twig" as macros %}
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
 
 {% block title %}
     {{ parent() }} {{ product|product_type_badge }}

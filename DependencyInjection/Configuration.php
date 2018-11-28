@@ -203,7 +203,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    'show.html' => 'EkynaProductBundle:Admin/AttributeSet:show.html',
+                                    'show.html' => '@EkynaProduct/Admin/AttributeSet/show.html',
                                 ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\AttributeSet')->end()
                                 ->scalarNode('controller')->end()
@@ -218,8 +218,8 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html' => 'EkynaProductBundle:Admin/Brand:_form.html',
-                                    'show.html'  => 'EkynaProductBundle:Admin/Brand:show.html',
+                                    '_form.html' => '@EkynaProduct/Admin/Brand/_form.html',
+                                    'show.html'  => '@EkynaProduct/Admin/Brand/show.html',
                                 ])->end()
                                 ->scalarNode('parent')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Brand')->end()
@@ -276,9 +276,9 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html'  => 'EkynaProductBundle:Admin/Catalog:_form.html',
-                                    'show.html'   => 'EkynaProductBundle:Admin/Catalog:show.html',
-                                    'render.html' => 'EkynaProductBundle:Admin/Catalog:render.html',
+                                    '_form.html'  => '@EkynaProduct/Admin/Catalog/_form.html',
+                                    'show.html'   => '@EkynaProduct/Admin/Catalog/show.html',
+                                    'render.html' => '@EkynaProduct/Admin/Catalog/render.html',
                                 ])->end()
                                 ->scalarNode('parent')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Catalog')->end()
@@ -303,10 +303,10 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html'     => 'EkynaProductBundle:Admin/Category:_form.html',
-                                    'list.html'      => 'EkynaProductBundle:Admin/Category:list.html',
-                                    'new_child.html' => 'EkynaProductBundle:Admin/Category:new_child.html',
-                                    'show.html'      => 'EkynaProductBundle:Admin/Category:show.html',
+                                    '_form.html'     => '@EkynaProduct/Admin/Category/_form.html',
+                                    'list.html'      => '@EkynaProduct/Admin/Category/list.html',
+                                    'new_child.html' => '@EkynaProduct/Admin/Category/new_child.html',
+                                    'show.html'      => '@EkynaProduct/Admin/Category/show.html',
                                 ])->end()
                                 ->scalarNode('parent')->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Category')->end()
@@ -385,8 +385,8 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html' => 'EkynaProductBundle:Admin/Pricing:_form.html',
-                                    'show.html'  => 'EkynaProductBundle:Admin/Pricing:show.html',
+                                    '_form.html' => '@EkynaProduct/Admin/Pricing/_form.html',
+                                    'show.html'  => '@EkynaProduct/Admin/Pricing/show.html',
                                 ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Pricing')->end()
                                 ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\PricingRepository')->end()
@@ -407,14 +407,14 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html'     => 'EkynaProductBundle:Admin/Product:_form.html',
-                                    'list.html'      => 'EkynaProductBundle:Admin/Product:list.html',
-                                    'new.html'       => 'EkynaProductBundle:Admin/Product:new.html',
-                                    'show.html'      => 'EkynaProductBundle:Admin/Product:show.html',
-                                    'edit.html'      => 'EkynaProductBundle:Admin/Product:edit.html',
-                                    'duplicate.html' => 'EkynaProductBundle:Admin/Product:duplicate.html',
-                                    'convert.html'   => 'EkynaProductBundle:Admin/Product:convert.html',
-                                    'remove.html'    => 'EkynaProductBundle:Admin/Product:remove.html',
+                                    '_form.html'     => '@EkynaProduct/Admin/Product/_form.html',
+                                    'list.html'      => '@EkynaProduct/Admin/Product/list.html',
+                                    'new.html'       => '@EkynaProduct/Admin/Product/new.html',
+                                    'show.html'      => '@EkynaProduct/Admin/Product/show.html',
+                                    'edit.html'      => '@EkynaProduct/Admin/Product/edit.html',
+                                    'duplicate.html' => '@EkynaProduct/Admin/Product/duplicate.html',
+                                    'convert.html'   => '@EkynaProduct/Admin/Product/convert.html',
+                                    'remove.html'    => '@EkynaProduct/Admin/Product/remove.html',
                                 ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Product')->end()
                                 ->scalarNode('controller')->defaultValue('Ekyna\Bundle\ProductBundle\Controller\Admin\ProductController')->end()
@@ -493,8 +493,8 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->variableNode('templates')->defaultValue([
-                                    '_form.html' => 'EkynaProductBundle:Admin/SpecialOffer:_form.html',
-                                    'show.html'  => 'EkynaProductBundle:Admin/SpecialOffer:show.html',
+                                    '_form.html' => '@EkynaProduct/Admin/SpecialOffer/_form.html',
+                                    'show.html'  => '@EkynaProduct/Admin/SpecialOffer/show.html',
                                 ])->end()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\SpecialOffer')->end()
                                 ->scalarNode('controller')->defaultValue('Ekyna\Bundle\ProductBundle\Controller\Admin\SpecialOfferController')->end()
