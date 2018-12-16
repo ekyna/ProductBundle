@@ -6,6 +6,9 @@ use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Event\PriceEvents;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
+use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
+use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
 use Ekyna\Component\Resource\Event\ResourceEvent;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,6 +26,16 @@ class PriceEventSubscriber implements EventSubscriberInterface
     private $persistenceHelper;
 
     /**
+     * @var CustomerGroupRepositoryInterface
+     */
+    private $customerGroupRepository;
+
+    /**
+     * @var CountryRepositoryInterface
+     */
+    private $countryRepository;
+
+    /**
      * @var array
      */
     private $cacheIds = [];
@@ -32,10 +45,17 @@ class PriceEventSubscriber implements EventSubscriberInterface
      * Constructor.
      *
      * @param PersistenceHelperInterface       $persistenceHelper
+     * @param CustomerGroupRepositoryInterface $customerGroupRepository
+     * @param CountryRepositoryInterface       $countryRepository
      */
-    public function __construct(PersistenceHelperInterface $persistenceHelper)
-    {
+    public function __construct(
+        PersistenceHelperInterface $persistenceHelper,
+        CustomerGroupRepositoryInterface $customerGroupRepository,
+        CountryRepositoryInterface $countryRepository
+    ) {
         $this->persistenceHelper = $persistenceHelper;
+        $this->customerGroupRepository = $customerGroupRepository;
+        $this->countryRepository = $countryRepository;
     }
 
     /**
@@ -47,7 +67,21 @@ class PriceEventSubscriber implements EventSubscriberInterface
     {
         $price = $this->getPriceFromEvent($event);
 
-        $this->cacheIds[] = $price->getCacheId();
+        $groups = $price->getGroup()
+            ? [$price->getGroup()->getId()]
+            : $this->customerGroupRepository->getIdentifiers();
+
+        $countries = $price->getCountry()
+            ? [$price->getCountry()->getId()]
+            : $this->countryRepository->getIdentifiers(true);
+
+        $product = $price->getProduct()->getId();
+
+        foreach ($groups as $group) {
+            foreach ($countries as $country) {
+                CacheUtil::addKeyToList($this->cacheIds, CacheUtil::buildPriceKeyByIds($product, $group, $country));
+            }
+        }
     }
 
     /**

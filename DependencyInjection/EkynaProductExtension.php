@@ -39,5 +39,7 @@ class EkynaProductExtension extends AbstractExtension
             $catalogRegistry->replaceArgument(0, $config['catalog']['themes']);
             $catalogRegistry->replaceArgument(1, $config['catalog']['templates']);
         }
+
+        $container->setParameter('ekyna_product.cache_ttl', $config['default']['cache_ttl']);
     }
 }

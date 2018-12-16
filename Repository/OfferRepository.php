@@ -5,8 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator;
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
@@ -18,6 +18,16 @@ use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 class OfferRepository extends ResourceRepository implements OfferRepositoryInterface
 {
     /**
+     * @var array
+     */
+    private $cachedCountryCodes;
+
+    /**
+     * @var int
+     */
+    private $cacheTtl = 3600;
+
+    /**
      * @var \Doctrine\ORM\Query
      */
     private $findByProductAndContextQuery;
@@ -26,11 +36,6 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
      * @var \Doctrine\ORM\Query
      */
     private $findOneByProductAndContextAndQuantityQuery;
-
-    /**
-     * @var array
-     */
-    private $cachedCountryCodes;
 
 
     /**
@@ -44,6 +49,16 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
     }
 
     /**
+     * Sets the cache lifetime.
+     *
+     * @param int $cacheTtl
+     */
+    public function setCacheTtl(int $cacheTtl)
+    {
+        $this->cacheTtl = $cacheTtl;
+    }
+
+    /**
      * @inheritdoc
      */
     public function findByProductAndContext(ProductInterface $product, ContextInterface $context, $useCache = true)
@@ -54,7 +69,7 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
         $query = $this->getFindByProductAndContextQuery();
 
         if ($useCache && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
-            $query->useResultCache(true, 3600, Offer::buildCacheId($product, $group, $country));
+            $query->useResultCache(true, $this->cacheTtl, CacheUtil::buildOfferKey($product, $group, $country));
         } else {
             $query->useResultCache(false);
         }
@@ -100,7 +115,8 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
         $query = $this->getOneFindByProductAndContextAndQuantityQuery();
 
         if ($useCache && (1 === $quantity) && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
-            $query->useResultCache(true, 3600, Offer::buildCacheId($product, $group, $country, $quantity, false));
+            $key = CacheUtil::buildOfferKey($product, $group, $country, $quantity, false);
+            $query->useResultCache(true, $this->cacheTtl, $key);
         } else {
             $query->useResultCache(false);
         }

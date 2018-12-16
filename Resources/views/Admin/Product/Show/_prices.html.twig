@@ -18,35 +18,16 @@
                     {% for price in list.prices %}
                     <tr>
                         <td>
-                            {{ price.percent|localizednumber }}&nbsp;%
+                            <strong>{{ price.percent|localizednumber }}&nbsp;%</strong>
                             ({%- for percent in price.detailedPercents -%}
                                 {{ percent|localizednumber }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
                             {%- endfor -%})
                         </td>
                         <td>
                             {% if price.originalPrice > price.sellPrice %}
-                                <del>{{ price.originalPrice|localizedcurrency(commerce_default_currency) }}</del>
+                                <del>{{ price.originalPrice|localizedcurrency(commerce_default_currency) }}</del>&nbsp;
                             {% endif %}
-                            {{ price.sellPrice|localizedcurrency(commerce_default_currency) }}
-                        </td>
-                        <td>
-                        {#{% if price.pricing is not null -%}
-                            {% if price.pricing.product is null -%}
-                            <a href="{{ admin_resource_path(price.pricing) }}"
-                               class="btn btn-xs btn-default"
-                                title="{{ 'ekyna_product.pricing.label.singular'|trans }}">
-                                <i class="fa fa-arrow-right"></i>
-                            </a>
-                            {%- endif %}
-                        {%- elseif price.specialOffer is not null -%}
-                            {% if price.specialOffer.product is null -%}
-                            <a href="{{ admin_resource_path(price.specialOffer) }}"
-                               class="btn btn-xs btn-primary"
-                               title="{{ 'ekyna_product.special_offer.label.singular'|trans }}">
-                                <i class="fa fa-arrow-right"></i>
-                            </a>
-                            {% endif -%}
-                        {% endif -%}#}
+                            <strong class="text-primary">{{ price.sellPrice|localizedcurrency(commerce_default_currency) }}</strong>
                         </td>
                     </tr>
                     {% endfor %}

@@ -5,7 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
 use Ekyna\Component\Resource\Event\ResourceEvent;
@@ -38,12 +38,7 @@ class OfferEventSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    private $childrenIds = [];
-
-    /**
-     * @var array
-     */
-    private $parentIds = [];
+    private $productIds = [];
 
     /**
      * @var array
@@ -77,7 +72,11 @@ class OfferEventSubscriber implements EventSubscriberInterface
     {
         $offer = $this->getOfferFromEvent($event);
 
-        $this->invalidateOffer($offer);
+        $id = (int)$offer->getProduct()->getId();
+
+        if (!in_array($id, $this->productIds, true)) {
+            $this->productIds[] = $id;
+        }
     }
 
     /**
@@ -85,7 +84,7 @@ class OfferEventSubscriber implements EventSubscriberInterface
      */
     public function onTerminate()
     {
-        if (empty($this->childrenIds) && empty($this->parentIds)) {
+        if (empty($this->productIds)) {
             return;
         }
 
@@ -99,37 +98,19 @@ class OfferEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $groupIds = $this->customerGroupRepository->getIdentifiers();
-        $countryIds = $this->countryRepository->getIdentifiers(true);
+        $groups = $this->customerGroupRepository->getIdentifiers();
+        $countries = $this->countryRepository->getIdentifiers(true);
 
-        array_unshift($groupIds, 0);
-        array_unshift($countryIds, 0);
-
-        foreach ($this->childrenIds as $productId) {
-            foreach ($groupIds as $groupId) {
-                foreach ($countryIds as $countryId) {
-                    $this->addId(
+        foreach ($this->productIds as $product) {
+            foreach ($groups as $group) {
+                foreach ($countries as $country) {
+                    CacheUtil::addKeyToList(
                         $this->cacheIds,
-                        Offer::buildCacheIdByIds($productId, $groupId, $countryId)
+                        CacheUtil::buildOfferKeyByIds($product, $group, $country)
                     );
-                    $this->addId(
+                    CacheUtil::addKeyToList(
                         $this->cacheIds,
-                        Offer::buildCacheIdByIds($productId, $groupId, $countryId, 1, false)
-                    );
-                }
-            }
-        }
-
-        foreach ($this->parentIds as $productId) {
-            foreach ($groupIds as $groupId) {
-                foreach ($countryIds as $countryId) {
-                    $this->addId(
-                        $this->cacheIds,
-                        Offer::buildCacheIdByIds($productId, $groupId, $countryId)
-                    );
-                    $this->addId(
-                        $this->cacheIds,
-                        Offer::buildCacheIdByIds($productId, $groupId, $countryId, 1, false)
+                        CacheUtil::buildOfferKeyByIds($product, $group, $country, 1, false)
                     );
                 }
             }
@@ -144,34 +125,7 @@ class OfferEventSubscriber implements EventSubscriberInterface
         }
 
         $this->cacheIds = [];
-    }
-
-    /**
-     * Invalidate the result cache for the given offer.
-     *
-     * @param Offer $offer
-     */
-    private function invalidateOffer(Offer $offer)
-    {
-        $product = $offer->getProduct();
-        if (ProductTypes::isChildType($product->getType())) {
-            $this->addId($this->childrenIds, $product->getId());
-        } else {
-            $this->addId($this->parentIds, $product->getId());
-        }
-    }
-
-    /**
-     * Adds the product id to the children list.
-     *
-     * @param array  $list
-     * @param string $id
-     */
-    private function addId(&$list, $id)
-    {
-        if (!in_array($id, $list, true)) {
-            $list[] = $id;
-        }
+        $this->productIds = [];
     }
 
     /**

@@ -5,8 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\PriceScalarHydrator;
-use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
@@ -23,6 +23,11 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
     private $cachedCountryCodes;
 
     /**
+     * @var int
+     */
+    private $cacheTtl = 3600;
+
+    /**
      * @var Query
      */
     private $findOneByProductAndContextQuery;
@@ -33,9 +38,19 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
      *
      * @param array $codes
      */
-    public function setCachedCountryCodes($codes)
+    public function setCachedCountryCodes(array $codes)
     {
         $this->cachedCountryCodes = $codes;
+    }
+
+    /**
+     * Sets the cache lifetime.
+     *
+     * @param int $cacheTtl
+     */
+    public function setCacheTtl(int $cacheTtl)
+    {
+        $this->cacheTtl = $cacheTtl;
     }
 
     /**
@@ -73,7 +88,7 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
         $query = $this->getOneFindByProductAndContextQuery();
 
         if ($useCache && $country && in_array($country->getCode(), $this->cachedCountryCodes, true)) {
-            $query->useResultCache(true, 3600, Price::buildCacheId($product, $group, $country));
+            $query->useResultCache(true, $this->cacheTtl, CacheUtil::buildPriceKey($product, $group, $country));
         } else {
             $query->useResultCache(false);
         }

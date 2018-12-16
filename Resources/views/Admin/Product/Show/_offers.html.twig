@@ -21,12 +21,14 @@
                     <tr>
                         <td>{{ offer.minQuantity|localizednumber }}</td>
                         <td>
-                            {{ offer.percent|localizednumber }}&nbsp;%
+                            <strong>{{ offer.percent|localizednumber }}&nbsp;%</strong>
                             ({%- for percent in offer.detailedPercents -%}
                                 {{ percent|localizednumber }}&nbsp;%{% if not loop.last %},&nbsp;{% endif -%}
                             {%- endfor -%})
                         </td>
-                        <td>{{ offer.netPrice|localizedcurrency(commerce_default_currency) }}</td>
+                        <td>
+                            <strong class="text-primary">{{ offer.netPrice|localizedcurrency(commerce_default_currency) }}</strong>
+                        </td>
                         <td>
                         {% if offer.specialOffer is not null -%}
                         {% if offer.specialOffer.product is null -%}

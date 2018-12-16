@@ -404,6 +404,9 @@
             <call method="setCachedCountryCodes">
                 <argument>%ekyna_commerce.cache.countries%</argument>
             </call>
+            <call method="setCacheTtl">
+                <argument>%ekyna_product.cache_ttl%</argument>
+            </call>
         </service>
 
         <!-- Offer resolver -->
@@ -440,12 +443,17 @@
             <call method="setCachedCountryCodes">
                 <argument>%ekyna_commerce.cache.countries%</argument>
             </call>
+            <call method="setCacheTtl">
+                <argument>%ekyna_product.cache_ttl%</argument>
+            </call>
         </service>
 
         <!-- Price event listener -->
         <service id="ekyna_product.price.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\PriceEventSubscriber">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <argument type="service" id="ekyna_commerce.customer_group.repository"/>
+            <argument type="service" id="ekyna_commerce.country.repository"/>
             <tag name="resource.event_subscriber"/>
             <tag name="kernel.event_listener" event="console.terminate" method="onTerminate"/>
         </service>
