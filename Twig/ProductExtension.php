@@ -126,6 +126,10 @@ class ProductExtension extends \Twig_Extension
                 'product_image',
                 [$this, 'getProductImagePath']
             ),
+            new \Twig_SimpleFilter(
+                'bundle_visible_products',
+                [$this, 'getBundleVisibleProducts']
+            ),
         ];
     }
 
@@ -172,21 +176,13 @@ class ProductExtension extends \Twig_Extension
     public function getTests()
     {
         return [
-            new \Twig_SimpleTest('simple_product', function (Model\ProductInterface $product) {
-                return $product->getType() === Model\ProductTypes::TYPE_SIMPLE;
-            }),
-            new \Twig_SimpleTest('variable_product', function (Model\ProductInterface $product) {
-                return $product->getType() === Model\ProductTypes::TYPE_VARIABLE;
-            }),
-            new \Twig_SimpleTest('variant_product', function (Model\ProductInterface $product) {
-                return $product->getType() === Model\ProductTypes::TYPE_VARIANT;
-            }),
-            new \Twig_SimpleTest('bundle_product', function (Model\ProductInterface $product) {
-                return $product->getType() === Model\ProductTypes::TYPE_BUNDLE;
-            }),
-            new \Twig_SimpleTest('configurable_product', function (Model\ProductInterface $product) {
-                return $product->getType() === Model\ProductTypes::TYPE_CONFIGURABLE;
-            }),
+            new \Twig_SimpleTest('simple_product',       [Model\ProductTypes::class, 'isSimpleType']),
+            new \Twig_SimpleTest('variable_product',     [Model\ProductTypes::class, 'isVariableType']),
+            new \Twig_SimpleTest('variant_product',      [Model\ProductTypes::class, 'isVariantType']),
+            new \Twig_SimpleTest('bundle_product',       [Model\ProductTypes::class, 'isBundleType']),
+            new \Twig_SimpleTest('configurable_product', [Model\ProductTypes::class, 'isConfigurableType']),
+            new \Twig_SimpleTest('child_product',        [Model\ProductTypes::class, 'isChildType']),
+            new \Twig_SimpleTest('parent_product',       [Model\ProductTypes::class, 'isParentType']),
         ];
     }
 
@@ -233,6 +229,34 @@ class ProductExtension extends \Twig_Extension
         }
 
         return null;
+    }
+
+    /**
+     * Returns the bundle visible products.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    public function getBundleVisibleProducts(Model\ProductInterface $product)
+    {
+        Model\ProductTypes::assertBundle($product);
+
+        $visible = [];
+
+        foreach ($product->getBundleSlots() as $slot) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
+            $choiceProduct = $choice->getProduct();
+            if ($choiceProduct->isVisible() && !$choice->isHidden()) {
+                $visible[] = [
+                    'quantity' => $choice->getMinQuantity(),
+                    'product' => $choiceProduct,
+                ];
+            }
+        }
+
+        return $visible;
     }
 
     /**

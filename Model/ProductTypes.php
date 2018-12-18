@@ -45,11 +45,11 @@ class ProductTypes extends AbstractConstants
         $prefix = 'ekyna_product.product.type.';
 
         return [
-            static::TYPE_SIMPLE       => [$prefix . static::TYPE_SIMPLE,       'indigo'],
-            static::TYPE_VARIANT      => [$prefix . static::TYPE_VARIANT,      'light-green'],
-            static::TYPE_VARIABLE     => [$prefix . static::TYPE_VARIABLE,     'teal'],
-            static::TYPE_BUNDLE       => [$prefix . static::TYPE_BUNDLE,       'purple'],
-            static::TYPE_CONFIGURABLE => [$prefix . static::TYPE_CONFIGURABLE, 'red'],
+            self::TYPE_SIMPLE       => [$prefix . self::TYPE_SIMPLE,       'indigo'],
+            self::TYPE_VARIANT      => [$prefix . self::TYPE_VARIANT,      'light-green'],
+            self::TYPE_VARIABLE     => [$prefix . self::TYPE_VARIABLE,     'teal'],
+            self::TYPE_BUNDLE       => [$prefix . self::TYPE_BUNDLE,       'purple'],
+            self::TYPE_CONFIGURABLE => [$prefix . self::TYPE_CONFIGURABLE, 'red'],
         ];
     }
 
@@ -61,11 +61,11 @@ class ProductTypes extends AbstractConstants
     static public function getTypes()
     {
         return [
-            static::TYPE_SIMPLE,
-            static::TYPE_VARIANT,
-            static::TYPE_VARIABLE,
-            static::TYPE_BUNDLE,
-            static::TYPE_CONFIGURABLE,
+            self::TYPE_SIMPLE,
+            self::TYPE_VARIANT,
+            self::TYPE_VARIABLE,
+            self::TYPE_BUNDLE,
+            self::TYPE_CONFIGURABLE,
         ];
     }
 
@@ -78,9 +78,9 @@ class ProductTypes extends AbstractConstants
      */
     static public function getTheme($state)
     {
-        static::isValid($state, true);
+        self::isValid($state, true);
 
-        return static::getConfig()[$state][1];
+        return self::getConfig()[$state][1];
     }
 
     /**
@@ -91,10 +91,10 @@ class ProductTypes extends AbstractConstants
     static public function getCreateTypes()
     {
         return [
-            static::TYPE_SIMPLE,
-            static::TYPE_VARIABLE,
-            static::TYPE_BUNDLE,
-            static::TYPE_CONFIGURABLE,
+            self::TYPE_SIMPLE,
+            self::TYPE_VARIABLE,
+            self::TYPE_BUNDLE,
+            self::TYPE_CONFIGURABLE,
         ];
     }
 
@@ -107,7 +107,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isSimpleType($type)
     {
-        return static::TYPE_SIMPLE === static::typeFromProduct($type);
+        return self::TYPE_SIMPLE === self::typeFromProduct($type);
     }
 
     /**
@@ -119,7 +119,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isVariantType($type)
     {
-        return static::TYPE_VARIANT === static::typeFromProduct($type);
+        return self::TYPE_VARIANT === self::typeFromProduct($type);
     }
 
     /**
@@ -131,7 +131,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isVariableType($type)
     {
-        return static::TYPE_VARIABLE === static::typeFromProduct($type);
+        return self::TYPE_VARIABLE === self::typeFromProduct($type);
     }
 
     /**
@@ -143,7 +143,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isBundleType($type)
     {
-        return static::TYPE_BUNDLE === static::typeFromProduct($type);
+        return self::TYPE_BUNDLE === self::typeFromProduct($type);
     }
 
     /**
@@ -155,7 +155,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isConfigurableType($type)
     {
-        return static::TYPE_CONFIGURABLE === static::typeFromProduct($type);
+        return self::TYPE_CONFIGURABLE === self::typeFromProduct($type);
     }
 
     /**
@@ -180,7 +180,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isChildType($type)
     {
-        return in_array(static::typeFromProduct($type), static::getChildTypes(), true);
+        return in_array(self::typeFromProduct($type), self::getChildTypes(), true);
     }
 
     /**
@@ -206,7 +206,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isParentType($type)
     {
-        return in_array(static::typeFromProduct($type), static::getParentTypes(), true);
+        return in_array(self::typeFromProduct($type), self::getParentTypes(), true);
     }
 
     /**
@@ -231,7 +231,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function isBundledType($type)
     {
-        return in_array(static::typeFromProduct($type), static::getBundledTypes(), true);
+        return in_array(self::typeFromProduct($type), self::getBundledTypes(), true);
     }
 
     /**
@@ -243,7 +243,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertSimple(ProductInterface $product)
     {
-        static::assertType($product, static::TYPE_SIMPLE);
+        self::assertType($product, self::TYPE_SIMPLE);
     }
 
     /**
@@ -255,7 +255,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertVariable(ProductInterface $product)
     {
-        static::assertType($product, static::TYPE_VARIABLE);
+        self::assertType($product, self::TYPE_VARIABLE);
     }
 
     /**
@@ -267,7 +267,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertVariant(ProductInterface $product)
     {
-        static::assertType($product, static::TYPE_VARIANT);
+        self::assertType($product, self::TYPE_VARIANT);
     }
 
     /**
@@ -279,7 +279,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertBundle(ProductInterface $product)
     {
-        static::assertType($product, static::TYPE_BUNDLE);
+        self::assertType($product, self::TYPE_BUNDLE);
     }
 
     /**
@@ -291,7 +291,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertConfigurable(ProductInterface $product)
     {
-        static::assertType($product, static::TYPE_CONFIGURABLE);
+        self::assertType($product, self::TYPE_CONFIGURABLE);
     }
 
     /**
@@ -301,7 +301,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertChildType(ProductInterface $product)
     {
-        if (!static::isChildType($product->getType())) {
+        if (!self::isChildType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'child' type.");
         }
     }
@@ -313,7 +313,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertParentType(ProductInterface $product)
     {
-        if (!static::isParentType($product->getType())) {
+        if (!self::isParentType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'parent' type.");
         }
     }
@@ -325,7 +325,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function assertBundled(ProductInterface $product)
     {
-        if (!static::isBundledType($product->getType())) {
+        if (!self::isBundledType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'bundled' type.");
         }
     }
@@ -339,7 +339,7 @@ class ProductTypes extends AbstractConstants
      */
     static public function getConversionTypes(ProductInterface $product)
     {
-        return static::CONVERSION_MAP[$product->getType()];
+        return self::CONVERSION_MAP[$product->getType()];
     }
 
     /**
