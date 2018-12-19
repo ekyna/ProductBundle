@@ -61,7 +61,7 @@ class SlotsType extends AbstractType
     {
         $resolver
             ->setDefaults([
-                'slot_count'   => null,
+                'slot_count'   => 0,
                 'by_reference' => false,
             ])
             ->setAllowedTypes('slot_count', 'int');
