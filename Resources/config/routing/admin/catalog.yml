@@ -58,3 +58,12 @@ ekyna_product_catalog_admin_page_slots_form:
         template: "[a-z0-9\\._]+"
     options:
         expose: true
+
+ekyna_product_catalog_admin_render_from_sale:
+    path: /render-from-sale/{type}/{id}
+    defaults:
+        _controller: "ekyna_product.catalog.controller:renderFromSaleAction"
+    methods: [GET|POST]
+    requirements:
+        type: cart|order|quote
+        id: \d+

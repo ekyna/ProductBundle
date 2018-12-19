@@ -104,6 +104,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('label')->isRequired()->cannotBeEmpty()->end()
                                     ->scalarNode('form_type')->isRequired()->cannotBeEmpty()->end()
                                     ->scalarNode('directory')->isRequired()->cannotBeEmpty()->end()
+                                    ->integerNode('slots')->end()
                                     ->scalarNode('mockup')->isRequired()->cannotBeEmpty()->end()
                                 ->end()
                             ->end()

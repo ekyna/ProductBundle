@@ -181,28 +181,32 @@ class CatalogRegistry
     public static function getDefaultTemplates()
     {
         return [
-            'default.cover' => [
+            'default.cover'     => [
                 'label'     => 'ekyna_product.catalog.template.cover',
                 'form_type' => Type\CoverType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Cover',
+                'slots'     => 0,
                 'mockup'    => 'null',
             ],
-            'default.full' => [
+            'default.full'      => [
                 'label'     => 'ekyna_product.catalog.template.full',
                 'form_type' => Type\FullType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Full',
+                'slots'     => 1,
                 'mockup'    => 'null',
             ],
-            'default.half' => [
+            'default.half'      => [
                 'label'     => 'ekyna_product.catalog.template.half',
                 'form_type' => Type\HalfType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Half',
+                'slots'     => 2,
                 'mockup'    => 'null',
             ],
             'default.half_dual' => [
                 'label'     => 'ekyna_product.catalog.template.half_dual',
                 'form_type' => Type\HalfDualType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/HalfDual',
+                'slots'     => 3,
                 'mockup'    => 'null',
             ],
         ];

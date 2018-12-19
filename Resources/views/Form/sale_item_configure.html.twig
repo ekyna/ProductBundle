@@ -190,38 +190,37 @@
                 </div>
         {% endif %}
 
-        {% if form.vars.subject is bundle_product %}
-        <div class="sale-item-bundle">
-            <p>{{ 'ekyna_product.sale_item_configure.bundle'|trans }}</p>
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="0%"/>
-                    <col width="100%"/>
-                    <col width="0%"/>
-                </colgroup>
-                {% for slot in form.vars.subject.bundleSlots %}
-                    {% set choice = slot.choices|first %}
-                    {% set childProduct = choice.product -%}
-                    {% if childProduct.visible and not choice.isHidden -%}
+        {% if form.vars.subject is bundle_product -%}
+            {% set bundle_products = form.vars.subject|bundle_visible_products -%}
+            {% if bundle_products is not empty -%}
+            <div class="sale-item-bundle">
+                <p>{{ 'ekyna_product.sale_item_configure.bundle'|trans }}</p>
+                <table class="table table-condensed">
+                    <colgroup>
+                        <col width="0%"/>
+                        <col width="100%"/>
+                        <col width="0%"/>
+                    </colgroup>
+                    {% for bundle_product in bundle_products -%}
                     <tr>
-                        <td>{{- choice.minQuantity|localizednumber -}}x</td>
+                        <td>{{- bundle_product.quantity|localizednumber -}}x</td>
                         <td class="designation">
-                            {% set path = childProduct|subject_public_url -%}
-                            {% if path is not empty %}
-                            <a href="{{ childProduct|subject_public_url }}" title="{{ childProduct.fullDesignation(true) }}">
-                            {% endif %}
-                                {{- childProduct.fullDesignation(true) -}}
-                            {% if path is not empty %}</a>{% endif %}
+                            {% set path = bundle_product.product|subject_public_url -%}
+                            {% if path is not empty -%}
+                            <a href="{{ path }}" title="{{ bundle_product.product.fullDesignation(true) }}">
+                            {%- endif -%}
+                                {{- bundle_product.product.fullDesignation(true) -}}
+                            {% if path is not empty %}</a>{% endif -%}
                         </td>
-                        <td class="hidden-xs" data-clipboard-copy="{{ childProduct.reference }}">
-                            {{- childProduct.reference -}}
+                        <td class="hidden-xs" data-clipboard-copy="{{ bundle_product.product.reference }}">
+                            {{- bundle_product.product.reference -}}
                         </td>
                     </tr>
-                    {%- endif %}
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
+                    {%- endfor %}
+                </table>
+            </div>
+            {%- endif %}
+        {%- endif %}
 
         {%- if form.variant is defined -%}
             {{- form_row(form.variant) -}}

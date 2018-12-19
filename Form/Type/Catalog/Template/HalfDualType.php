@@ -2,22 +2,29 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class HalfDualType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class HalfDualType extends SlotsType
+class HalfDualType extends AbstractType
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $this->addSlot($builder, 0);
-        $this->addSlot($builder, 1);
-        $this->addSlot($builder, 2);
+        $resolver->setDefault('slot_count', 3);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getParent()
+    {
+        return SlotsType::class;
     }
 }

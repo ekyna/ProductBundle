@@ -6,9 +6,9 @@ use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\SlotsType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\TemplateChoiceType;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -45,9 +45,7 @@ class CatalogPageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('template', ChoiceType::class, [
-                'label'   => 'ekyna_product.catalog.field.template',
-                'choices' => $this->buildTemplateChoices(),
+            ->add('template', TemplateChoiceType::class, [
                 'attr'    => [
                     'class' => 'catalog-page-template',
                 ],
@@ -77,22 +75,6 @@ class CatalogPageType extends AbstractType
         $type = empty($templateName) ? SlotsType::class : $this->registry->getTemplate($templateName)['form_type'];
 
         $form->add('slots', $type);
-    }
-
-    /**
-     * Returns the templates choices.
-     *
-     * @return array
-     */
-    private function buildTemplateChoices()
-    {
-        $choices = [];
-
-        foreach ($this->registry->allTemplates() as $name => $config) {
-            $choices[$config['label']] = $name;
-        }
-
-        return $choices;
     }
 
     /**

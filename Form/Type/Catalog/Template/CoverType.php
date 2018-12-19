@@ -2,20 +2,29 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template;
 
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class CoverType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CoverType extends SlotsType
+class CoverType extends AbstractType
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefault('slot_count', 0);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getParent()
+    {
+        return SlotsType::class;
     }
 }

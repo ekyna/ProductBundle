@@ -20,7 +20,11 @@
 <div class="footer">
     {% block footer -%}
     <p>
-        {{ 'ekyna_product.catalog.field.price_mention'|trans({'%date%': catalog.context.date|localizeddate('short', 'none')}) }}
+        {% if catalog.displayPrices -%}
+            {{ 'ekyna_product.catalog.field.price_mention'|trans({
+                '%date%': catalog.context.date|localizeddate('short', 'none')
+            }) }}
+        {%- endif %}
         <span class="pull-right">
             {{- 'ekyna_product.catalog.field.pager'|trans({
                 '%current%': loop.index,

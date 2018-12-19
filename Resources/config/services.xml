@@ -226,6 +226,11 @@
             <tag name="form.type"/>
             <tag name="form.js" selector=".catalog-page" path="ekyna-product/form/catalog-page"/>
         </service>
+        <service id="ekyna_product.catalog_template.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\TemplateChoiceType">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
+            <tag name="form.type"/>
+        </service>
 
         <!-- Category choice form type -->
         <service id="ekyna_product.category_choice.form_type"
@@ -571,6 +576,13 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <!-- Sale buttons event listener -->
+        <service id="ekyna_product.sale_buttons.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\SaleButtonsEventSubscriber">
+            <argument type="service" id="router"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Sale item event listener -->
         <service id="ekyna_product.sale_item.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber">
@@ -776,6 +788,7 @@
             <argument type="service" id="ekyna_product.catalog.registry"/>
             <argument type="service" id="templating"/>
             <argument type="service" id="knp_snappy.pdf"/>
+            <argument type="service" id="ekyna_commerce.subject_helper"/>
             <argument>%ekyna_commerce.company_logo%</argument>
             <argument>%kernel.debug%</argument>
         </service>

@@ -153,6 +153,7 @@ ekyna_product:
             new: Create a new catalog
             edit: Edit the catalog <small>%name%</small>
             remove: Remove the catalog <small>%name%</small>
+            render_from_sale: Catalog from <small>%number%</small>
         button:
             list: Catalogs list
             show: Catalog details
@@ -160,6 +161,7 @@ ekyna_product:
             edit: Edit the catalog
             remove: Remove the catalog
             render: Render the catalog
+            render_from_sale: Generate a catalog
         field:
             template: Template
             pages: Pages
@@ -167,6 +169,7 @@ ekyna_product:
             slots: Slots
             display_prices: Display prices
             price_mention: 'Indicative prices at %date%'
+            save: Save as attachment
         theme:
             default: Default
         template:

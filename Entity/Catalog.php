@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
+use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -68,6 +69,24 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
      */
     private $context;
 
+    /**
+     * (non-mapped)
+     * @var string
+     */
+    private $template;
+
+    /**
+     * (non-mapped)
+     * @var ArrayCollection|SaleItemInterface[]
+     */
+    private $saleItems;
+
+    /**
+     * (non-mapped)
+     * @var bool
+     */
+    private $save;
+
 
     /**
      * Constructor.
@@ -75,6 +94,7 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
     public function __construct()
     {
         $this->pages = new ArrayCollection();
+        $this->saleItems = new ArrayCollection();
     }
 
     /**
@@ -310,13 +330,13 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
     /**
      * Sets whether to display prices.
      *
-     * @param bool $displayPrices
+     * @param bool $display
      *
      * @return Catalog
      */
-    public function setDisplayPrices($displayPrices)
+    public function setDisplayPrices($display)
     {
-        $this->displayPrices = (bool)$displayPrices;
+        $this->displayPrices = (bool)$display;
 
         return $this;
     }
@@ -338,9 +358,117 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
      *
      * @return Catalog
      */
-    public function setContext($context)
+    public function setContext(ContextInterface $context)
     {
         $this->context = $context;
+
+        return $this;
+    }
+
+    /**
+     * Returns the template.
+     *
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * Sets the template.
+     *
+     * @param string $template
+     *
+     * @return Catalog
+     */
+    public function setTemplate(string $template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * Returns the sale items.
+     *
+     * @return ArrayCollection|SaleItemInterface[]
+     */
+    public function getSaleItems()
+    {
+        return $this->saleItems;
+    }
+
+    /**
+     * Sets the sale items.
+     *
+     * @param SaleItemInterface[] $items
+     *
+     * @return Catalog
+     */
+    public function setSaleItems(array $items)
+    {
+        $this->saleItems = new ArrayCollection();
+
+        foreach ($items as $item) {
+            $this->addSaleItem($item);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds the sale item.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return Catalog
+     */
+    public function addSaleItem(SaleItemInterface $item)
+    {
+        if (!$this->saleItems->contains($item)) {
+            $this->saleItems->add($item);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes the sale item.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return Catalog
+     */
+    public function removeSaleItem(SaleItemInterface $item)
+    {
+        if ($this->saleItems->contains($item)) {
+            $this->saleItems->removeElement($item);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns whether to save the catalog render.
+     *
+     * @return bool
+     */
+    public function isSave()
+    {
+        return $this->save;
+    }
+
+    /**
+     * Sets whether to save the catalog render.
+     *
+     * @param bool $save
+     *
+     * @return Catalog
+     */
+    public function setSave($save)
+    {
+        $this->save = $save;
 
         return $this;
     }

@@ -4,7 +4,11 @@ namespace Ekyna\Bundle\ProductBundle\Service\Catalog;
 
 use Behat\Transliterator\Transliterator;
 use Ekyna\Bundle\ProductBundle\Entity\Catalog;
+use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
+use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use Knp\Snappy\GeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +42,11 @@ class CatalogRenderer
     protected $pdfGenerator;
 
     /**
+     * @var SubjectHelperInterface
+     */
+    protected $subjectHelper;
+
+    /**
      * @var string
      */
     protected $logoPath;
@@ -51,22 +60,25 @@ class CatalogRenderer
     /**
      * Constructor.
      *
-     * @param CatalogRegistry $registry
-     * @param EngineInterface    $templating
-     * @param GeneratorInterface $pdfGenerator
-     * @param string             $logoPath
-     * @param bool               $debug
+     * @param CatalogRegistry        $registry
+     * @param EngineInterface        $templating
+     * @param GeneratorInterface     $pdfGenerator
+     * @param SubjectHelperInterface $subjectHelper
+     * @param string                 $logoPath
+     * @param bool                   $debug
      */
     public function __construct(
         CatalogRegistry $registry,
         EngineInterface $templating,
         GeneratorInterface $pdfGenerator,
+        SubjectHelperInterface $subjectHelper,
         $logoPath,
         $debug = false
     ) {
         $this->registry = $registry;
         $this->templating = $templating;
         $this->pdfGenerator = $pdfGenerator;
+        $this->subjectHelper = $subjectHelper;
         $this->logoPath = $logoPath;
         $this->debug = $debug;
     }
@@ -83,6 +95,10 @@ class CatalogRenderer
         $template = 'render';
         $theme = $this->registry->getTheme($catalog->getTheme())['path'];
         // TODO $template = $catalog->getFormat() === static::FORMAT_EMAIL ? 'email' : 'render';
+
+        if (0 === $catalog->getPages()->count()) {
+            $this->buildPages($catalog);
+        }
 
         $content = $this->templating->render('@EkynaProduct/Catalog/render.html.twig', [
             'catalog'   => $catalog,
@@ -106,12 +122,59 @@ class CatalogRenderer
     }
 
     /**
+     * Builds the catalog pages from sale items list.
+     *
+     * @param Catalog $catalog
+     *
+     * @throws \Ekyna\Component\Commerce\Exception\SubjectException
+     */
+    private function buildPages(Catalog $catalog)
+    {
+        $products = [];
+
+        foreach ($catalog->getSaleItems() as $item) {
+            $product = $this->subjectHelper->resolve($item);
+
+            if (!$product instanceof ProductInterface) {
+                continue;
+            }
+
+            $products[] = $product;
+        }
+
+        if (empty($products)) {
+            throw new \LogicException("No product found.");
+        }
+
+        $max = $this->registry->getTemplate($catalog->getTemplate())['slots'];
+        if (0 >= $max) {
+            throw new \LogicException("Template does not have products slots.");
+        }
+
+        $count = 0;
+        $page = null;
+        foreach ($products as $product) {
+            if ($count % $max === 0) {
+                $page = new CatalogPage();
+                $page->setTemplate($catalog->getTemplate());
+                $catalog->addPage($page);
+            }
+
+            $slot = new CatalogSlot();
+            $slot->setProduct($product);
+            $page->addSlot($slot);
+
+            $count++;
+        }
+    }
+
+    /**
      * Returns the catalog response.
      *
      * @param Catalog $catalog
      * @param Request $request
      *
-     * @return string
+     * @return Response
      */
     public function respond(Catalog $catalog, Request $request = null)
     {

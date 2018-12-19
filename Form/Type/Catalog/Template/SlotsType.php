@@ -17,6 +17,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SlotsType extends AbstractType
 {
     /**
+     * @inheritdoc
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        for ($i = 0; $i < $options['slot_count']; $i++) {
+            $this->addSlot($builder, $i);
+        }
+    }
+
+    /**
      * Creates and adds a slot form.
      *
      * @param FormBuilderInterface $builder
@@ -27,10 +37,9 @@ class SlotsType extends AbstractType
      */
     protected function addSlot(FormBuilderInterface $builder, $index, $product = true)
     {
-        $slot = $builder
-            ->create((string)$index, SlotType::class, [
-                'product' => $product,
-            ]);
+        $slot = $builder->create((string)$index, SlotType::class, [
+            'product' => $product,
+        ]);
 
         $builder->add($slot);
 
@@ -50,9 +59,12 @@ class SlotsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'by_reference' => false,
-        ]);
+        $resolver
+            ->setDefaults([
+                'slot_count'   => null,
+                'by_reference' => false,
+            ])
+            ->setAllowedTypes('slot_count', 'int');
     }
 
     /**

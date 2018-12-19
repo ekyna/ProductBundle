@@ -153,6 +153,7 @@ ekyna_product:
             new: Créer un nouveau catalogue
             edit: Modifier le catalogue <small>%name%</small>
             remove: Supprimer le catalogue <small>%name%</small>
+            render_from_sale: Catalogue d'après <small>%number%</small>
         button:
             list: Liste des catalogues
             show: Détail du catalogue
@@ -160,6 +161,7 @@ ekyna_product:
             edit: Modifier le catalogue
             remove: Supprimer le catalogue
             render: Générer un rendu
+            render_from_sale: Générer un catalogue
         field:
             template: Gabarit
             pages: Pages
@@ -167,6 +169,7 @@ ekyna_product:
             slots: Emplacements
             display_prices: Afficher les prix
             price_mention: 'Tarifs indicatifs au %date%'
+            save: Enregistrer en pièce jointe
         theme:
             default: Par défault
         template:
