@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Comparable;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -10,7 +11,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface AttributeSetInterface extends ResourceInterface
+interface AttributeSetInterface extends ResourceInterface, Comparable
 {
     /**
      * Returns the name.

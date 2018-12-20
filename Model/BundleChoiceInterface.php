@@ -4,13 +4,14 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model\SortableInterface;
 
 /**
  * Interface BundleChoiceInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface BundleChoiceInterface extends ResourceInterface
+interface BundleChoiceInterface extends ResourceInterface, SortableInterface
 {
     /**
      * Returns the slot.
@@ -151,20 +152,4 @@ interface BundleChoiceInterface extends ResourceInterface
      * @internal
      */
     public function setRules(ArrayCollection $rules);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return $this|BundleChoiceInterface
-     */
-    public function setPosition($position);
 }

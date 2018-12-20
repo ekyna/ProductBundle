@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
  * Class BundleChoiceRule
@@ -11,6 +12,8 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class BundleChoiceRule implements Model\BundleChoiceRuleInterface
 {
+    use SortableTrait;
+
     /**
      * @var integer
      */
@@ -30,11 +33,6 @@ class BundleChoiceRule implements Model\BundleChoiceRuleInterface
      * @var string
      */
     protected $expression;
-
-    /**
-     * @var integer
-     */
-    protected $position;
 
 
     /**
@@ -115,24 +113,6 @@ class BundleChoiceRule implements Model\BundleChoiceRuleInterface
     public function setExpression($expression)
     {
         $this->expression = $expression;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
 
         return $this;
     }

@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
  * Class BundleChoice
@@ -12,6 +13,8 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class BundleChoice implements Model\BundleChoiceInterface
 {
+    use SortableTrait;
+
     /**
      * @var integer
      */
@@ -51,11 +54,6 @@ class BundleChoice implements Model\BundleChoiceInterface
      * @var ArrayCollection|Model\BundleChoiceRuleInterface[]
      */
     protected $rules;
-
-    /**
-     * @var integer
-     */
-    protected $position;
 
 
     /**
@@ -260,24 +258,6 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function setRules(ArrayCollection $rules)
     {
         $this->rules = $rules;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
 
         return $this;
     }

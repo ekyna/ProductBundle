@@ -3,13 +3,14 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model\SortableInterface;
 
 /**
  * Interface BundleChoiceRuleInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface BundleChoiceRuleInterface extends ResourceInterface
+interface BundleChoiceRuleInterface extends ResourceInterface, SortableInterface
 {
     /**
      * Returns the choice.
@@ -58,20 +59,4 @@ interface BundleChoiceRuleInterface extends ResourceInterface
      * @return $this|BundleChoiceRuleInterface
      */
     public function setExpression($expression);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return $this|BundleChoiceRuleInterface
-     */
-    public function setPosition($position);
 }

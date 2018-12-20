@@ -23,6 +23,7 @@ interface ProductInterface extends
     Cms\SeoSubjectInterface,
     Cms\TagsSubjectInterface,
     RM\TranslatableInterface,
+    RM\SortableInterface,
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,
     AdjustableInterface,
@@ -730,22 +731,6 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setPendingPrices($pending);
-
-    /**
-     * Returns the position (variant ordering).
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position (variant ordering).
-     *
-     * @param int $position
-     *
-     * @return $this|ProductInterface
-     */
-    public function setPosition($position);
 
     /**
      * Returns the "released at" date.

@@ -151,4 +151,26 @@ class AttributeSet implements Model\AttributeSetInterface
 
         return false;
     }
+
+    /**
+     * @inheritDoc
+     *
+     * @see https://github.com/Atlantic18/DoctrineExtensions/issues/1726
+     */
+    public function compareTo($other)
+    {
+        if ($other instanceof Model\AttributeSetInterface) {
+            if ($this->id && $other->getId()) {
+                return $this->id - $other->getId();
+            }
+            if ($this->id && !$other->getId()) {
+                return 1;
+            }
+            if (!$this->id && $other->getId()) {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
 }

@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
  * Class AttributeSlot
@@ -11,6 +12,8 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class AttributeSlot implements Model\AttributeSlotInterface
 {
+    use SortableTrait;
+
     /**
      * @var int
      */
@@ -35,11 +38,6 @@ class AttributeSlot implements Model\AttributeSlotInterface
      * @var bool
      */
     protected $naming = false;
-
-    /**
-     * @var integer
-     */
-    protected $position;
 
 
     /**
@@ -127,24 +125,6 @@ class AttributeSlot implements Model\AttributeSlotInterface
     public function setNaming($naming)
     {
         $this->naming = (bool)$naming;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
 
         return $this;
     }

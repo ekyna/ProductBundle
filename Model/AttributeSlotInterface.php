@@ -3,13 +3,14 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Ekyna\Component\Resource\Model\ResourceInterface;
+use Ekyna\Component\Resource\Model\SortableInterface;
 
 /**
  * Interface AttributeSlotInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface AttributeSlotInterface extends ResourceInterface
+interface AttributeSlotInterface extends ResourceInterface, SortableInterface
 {
     /**
      * Returns the set.
@@ -74,20 +75,4 @@ interface AttributeSlotInterface extends ResourceInterface
      * @return $this|AttributeSlotInterface
      */
     public function setNaming($naming);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return $this|AttributeSlotInterface
-     */
-    public function setPosition($position);
 }

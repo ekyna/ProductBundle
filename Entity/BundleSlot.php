@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\AbstractTranslatable;
+use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
  * Class BundleSlot
@@ -16,7 +17,8 @@ use Ekyna\Component\Resource\Model\AbstractTranslatable;
  */
 class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterface
 {
-    use MediaSubjectTrait;
+    use MediaSubjectTrait,
+        SortableTrait;
 
     /**
      * @var integer
@@ -37,11 +39,6 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
      * @var bool
      */
     protected $required;
-
-    /**
-     * @var integer
-     */
-    protected $position;
 
 
     /**
@@ -215,24 +212,6 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     public function setRequired($required)
     {
         $this->required = (bool)$required;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
 
         return $this;
     }

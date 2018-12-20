@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
+use Ekyna\Component\Resource\Model\SortableInterface;
 use Ekyna\Component\Resource\Model\TranslatableInterface;
 
 /**
@@ -13,7 +14,7 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  *
  * @method BundleSlotTranslationInterface translate($locale = null, $create = false)
  */
-interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterface
+interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterface, SortableInterface
 {
     /**
      * Returns the bundle.
@@ -121,20 +122,4 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
      * @return $this|BundleSlotInterface
      */
     public function setRequired($required);
-
-    /**
-     * Returns the position.
-     *
-     * @return int
-     */
-    public function getPosition();
-
-    /**
-     * Sets the position.
-     *
-     * @param int $position
-     *
-     * @return $this|BundleSlotInterface
-     */
-    public function setPosition($position);
 }

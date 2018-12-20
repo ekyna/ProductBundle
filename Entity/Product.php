@@ -27,6 +27,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         Cms\TagsSubjectTrait,
+        RM\SortableTrait,
         RM\TimestampableTrait,
         RM\TaggedEntityTrait,
         Pricing\TaxableTrait,
@@ -171,13 +172,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      * @var bool
      */
     protected $pendingPrices;
-
-    /**
-     * (Variant sorting)
-     *
-     * @var int
-     */
-    protected $position;
 
     /**
      * @var \DateTime
@@ -1342,24 +1336,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setPendingPrices($pending)
     {
         $this->pendingPrices = (bool)$pending;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPosition($position)
-    {
-        $this->position = (int)$position;
 
         return $this;
     }
