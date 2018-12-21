@@ -35,7 +35,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Products
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'products',
-            'route'    => 'ekyna_product_product_admin_home',
+            'route'    => 'ekyna_product_product_admin_list',
             'label'    => 'ekyna_product.product.label.plural',
             'resource' => 'ekyna_product_product',
             'position' => 1,
@@ -44,7 +44,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Categories
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'categories',
-            'route'    => 'ekyna_product_category_admin_home',
+            'route'    => 'ekyna_product_category_admin_list',
             'label'    => 'ekyna_product.category.label.plural',
             'resource' => 'ekyna_product_category',
             'position' => 2,
@@ -53,7 +53,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Brands
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'brands',
-            'route'    => 'ekyna_product_brand_admin_home',
+            'route'    => 'ekyna_product_brand_admin_list',
             'label'    => 'ekyna_product.brand.label.plural',
             'resource' => 'ekyna_product_brand',
             'position' => 3,
@@ -62,7 +62,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Attribute sets
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'attribute_sets',
-            'route'    => 'ekyna_product_attribute_set_admin_home',
+            'route'    => 'ekyna_product_attribute_set_admin_list',
             'label'    => 'ekyna_product.attribute_set.label.plural',
             'resource' => 'ekyna_product_attribute_set',
             'position' => 10,
@@ -71,7 +71,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Attributes
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'attributes',
-            'route'    => 'ekyna_product_attribute_admin_home',
+            'route'    => 'ekyna_product_attribute_admin_list',
             'label'    => 'ekyna_product.attribute.label.plural',
             'resource' => 'ekyna_product_attribute',
             'position' => 11,
@@ -80,7 +80,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Pricing
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'pricing',
-            'route'    => 'ekyna_product_pricing_admin_home',
+            'route'    => 'ekyna_product_pricing_admin_list',
             'label'    => 'ekyna_product.pricing.label.plural',
             'resource' => 'ekyna_product_pricing',
             'position' => 96,
@@ -89,7 +89,7 @@ class AdminMenuPass implements CompilerPassInterface
         // Special offers
         $pool->addMethodCall('createEntry', ['catalog', [
             'name'     => 'special_offer',
-            'route'    => 'ekyna_product_special_offer_admin_home',
+            'route'    => 'ekyna_product_special_offer_admin_list',
             'label'    => 'ekyna_product.special_offer.label.plural',
             'resource' => 'ekyna_product_special_offer',
             'position' => 97,

@@ -257,7 +257,6 @@ class ProductController extends AbstractSubjectController
         );
     }
 
-
     /**
      * Product attributes form action.
      *
@@ -282,6 +281,7 @@ class ProductController extends AbstractSubjectController
         $product->setType(ProductTypes::TYPE_SIMPLE);
 
         // Attribute Set
+        /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface $attributeSet */
         $attributeSet = $this->get('ekyna_product.attribute_set.repository')->find(
             $request->attributes->get('attributeSetId')
         );
