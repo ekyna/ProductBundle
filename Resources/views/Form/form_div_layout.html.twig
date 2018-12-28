@@ -1,336 +1,304 @@
-{% extends '@EkynaAdmin/Form/form_div_layout.html.twig' %}
-
-
-{% block ekyna_product_attribute_slot_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
+{%- block ekyna_product_attribute_slot_widget -%}
+    {{- form_errors(form) -}}
     <div class="row">
         <div class="col-md-4">
-            {{ form_widget(form.attribute) }}
-            {{ form_errors(form.attribute) }}
+            {{- form_widget(form.attribute) -}}
+            {{- form_errors(form.attribute) -}}
         </div>
         <div class="col-md-2">
-            {{ form_row(form.required) }}
+            {{- form_row(form.required) -}}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.naming) }}
+            {{- form_row(form.naming) -}}
         </div>
     </div>
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_attribute_slot_widget %}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_attribute_slot_widget -%}
 
 
-{% block ekyna_product_product_attributes_widget %}
-{% spaceless %}
+{%- block ekyna_product_product_attributes_widget -%}
     <div {{ block('widget_container_attributes') }}>
-        {% set attributesFrom = form %}
-        {{ form_errors(attributesFrom) }}
-        {% for child in attributesFrom %}
+        {%- set attributesFrom = form -%}
+        {{- form_errors(attributesFrom) -}}
+        {%- for child in attributesFrom -%}
         <div class="form-group">
-            {{ form_label(child) }}
+            {{- form_label(child) -}}
             <div class="col-md-10">
-                {% if child.choices is defined %}
-                    {{ form_widget(child.choices) }}
-                {% else %}
-                    {% set attr = child.value.vars.attr %}
-                    {% set form = child.value %}
-                    {{ block('form_input_group') }}
-                {% endif %}
+                {%- if child.choices is defined -%}
+                    {{- form_widget(child.choices) -}}
+                {%- else -%}
+                    {%- set attr = child.value.vars.attr -%}
+                    {%- set form = child.value -%}
+                    {{- block('form_input_group') -}}
+                {%- endif -%}
             </div>
         </div>
-        {% endfor %}
-        {{ form_rest(attributesFrom) }}
-        {% set form = attributesFrom %}
+        {%- endfor -%}
+        {{- form_rest(attributesFrom) -}}
+        {%- set form = attributesFrom -%}
     </div>
-{% endspaceless %}
-{% endblock ekyna_product_product_attributes_widget %}
+{%- endblock ekyna_product_product_attributes_widget -%}
 
 
-{% block ekyna_product_bundle_slot_widget %}
-{% spaceless %}
-    {% if form.vars.configurable %}<div class="ekyna-collection-item">{% endif %}
-        {{ form_errors(form) }}
-        {% if form.vars.configurable %}
-            {{ form_row(form.translations, {'widget_col': 12}) }}
+{%- block ekyna_product_bundle_slot_widget -%}
+    {%- if form.vars.configurable %}<div class="ekyna-collection-item">{% endif -%}
+        {{- form_errors(form) -}}
+        {%- if form.vars.configurable -%}
+            {{- form_row(form.translations, {'widget_col': 12}) -}}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(form.media, {'label_col': 4, 'widget_col': 8}) }}
+                    {{- form_row(form.media, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
+                    {{- form_row(form.required, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
             </div>
-        {% endif %}
-        {{ form_row(form.choices, {'widget_col': 12}) }}
-        {{ form_rest(form) }}
-    {% if form.vars.configurable %}</div>{% endif %}
-{% endspaceless %}
-{% endblock ekyna_product_bundle_slot_widget %}
+        {%- endif -%}
+        {{- form_row(form.choices, {'widget_col': 12}) -}}
+        {{- form_rest(form) -}}
+    {%- if form.vars.configurable %}</div>{% endif -%}
+{%- endblock ekyna_product_bundle_slot_widget -%}
 
 
-{% block ekyna_product_bundle_choice_widget %}
-{% spaceless %}
-    {{ bootstrap_backup_form_settings() }}
-    {{ bootstrap_set_sizing('sm') }}
+{%- block ekyna_product_bundle_choice_widget -%}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
     <div class="ekyna-collection-item">
-        {{ form_errors(form) }}
-        {{ form_row(form.product, {'label_col': 2, 'widget_col': 10}) }}
-        {% if configurable %}
+        {{- form_errors(form) -}}
+        {{- form_row(form.product, {'label_col': 2, 'widget_col': 10}) -}}
+        {%- if configurable -%}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) }}
+                    {{- form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) }}
+                    {{- form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
             </div>
-            {{ form_row(form.rules, {'label_col': 2, 'widget_col': 10}) }}
-        {% else %}
+            {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
+        {%- else -%}
             <div class="row">
                 <div class="col-md-4">
-                    {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) }}
+                    {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
                 </div>
                 <div class="col-md-4">
-                    {{ form_row(form.useOptions, {'label_col': 6, 'widget_col': 6}) }}
+                    {{- form_row(form.useOptions, {'label_col': 6, 'widget_col': 6}) -}}
                 </div>
                 <div class="col-md-4">
-                    {{ form_row(form.hidden, {'label_col': 6, 'widget_col': 6}) }}
+                    {{- form_row(form.hidden, {'label_col': 6, 'widget_col': 6}) -}}
                 </div>
             </div>
-        {% endif %}
-        {{ form_rest(form) }}
+        {%- endif -%}
+        {{- form_rest(form) -}}
     </div>
-    {{ bootstrap_restore_form_settings() }}
-{% endspaceless %}
-{% endblock ekyna_product_bundle_choice_widget %}
+    {{- bootstrap_restore_form_settings() -}}
+{%- endblock ekyna_product_bundle_choice_widget -%}
 
 
-{% block ekyna_product_bundle_choice_rule_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
+{%- block ekyna_product_bundle_choice_rule_widget -%}
+    {{- form_errors(form) -}}
     <div class="row">
         <div class="col-md-3">
-            {{ form_widget(form.type, {'sizing': 'sm'}) }}
-            {{ form_errors(form.type, {'sizing': 'sm'}) }}
+            {{- form_widget(form.type, {'sizing': 'sm'}) -}}
+            {{- form_errors(form.type, {'sizing': 'sm'}) -}}
         </div>
         <div class="col-md-9">
-            {{ form_widget(form.expression, {'sizing': 'sm'}) }}
-            {{ form_errors(form.expression, {'sizing': 'sm'}) }}
+            {{- form_widget(form.expression, {'sizing': 'sm'}) -}}
+            {{- form_errors(form.expression, {'sizing': 'sm'}) -}}
         </div>
     </div>
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_bundle_choice_rule_widget %}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_bundle_choice_rule_widget -%}
 
 
-{% block ekyna_product_catalog_slots_widget %}
-{% spaceless %}
+{%- block ekyna_product_catalog_slots_widget -%}
     <div {{ block('widget_container_attributes') }}>
-    {{ form_errors(form) }}
-    {% for child in form -%}
-        {{ form_widget(child) }}
-    {%- endfor %}
-    {{ form_rest(form) }}
+    {{- form_errors(form) -}}
+    {%- for child in form -%}
+        {{- form_widget(child) -}}
+    {%- endfor -%}
+    {{- form_rest(form) -}}
     </div>
-{% endspaceless %}
-{% endblock ekyna_product_catalog_slots_widget %}
+{%- endblock ekyna_product_catalog_slots_widget -%}
 
 
-{% block ekyna_product_catalog_slot_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
-    {{ block('form_rows') }}
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_catalog_slot_widget %}
+{%- block ekyna_product_catalog_slot_widget -%}
+    {{- form_errors(form) -}}
+    {{- block('form_rows') -}}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_catalog_slot_widget -%}
 
 
-{% block ekyna_product_option_widget %}
-{% spaceless %}
-    {{ bootstrap_backup_form_settings() }}
-    {{ bootstrap_set_sizing('sm') }}
+{%- block ekyna_product_option_widget -%}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
     <div class="ekyna-collection-item product-option">
-        {{ form_errors(form) }}
+        {{- form_errors(form) -}}
         <div class="row form-group">
             <div class="col-md-6">
-                {{ form_widget(form.mode) }}
-                {{ form_errors(form.mode) }}
+                {{- form_widget(form.mode) -}}
+                {{- form_errors(form.mode) -}}
             </div>
             <div class="col-md-6">
-                {{ form_widget(form.netPrice) }}
-                {{ form_errors(form.netPrice) }}
+                {{- form_widget(form.netPrice) -}}
+                {{- form_errors(form.netPrice) -}}
             </div>
         </div>
         <div class="option-product option-wrapper">
-            {{ form_widget(form.product) }}
-            {{ form_errors(form.product) }}
+            {{- form_widget(form.product) -}}
+            {{- form_errors(form.product) -}}
         </div>
         <div class="option-data option-wrapper">
             <div class="row form-group">
                 <div class="col-md-12">
-                    {{ form_widget(form.designation) }}
-                    {{ form_errors(form.designation) }}
+                    {{- form_widget(form.designation) -}}
+                    {{- form_errors(form.designation) -}}
                 </div>
             </div>
-            {{ form_widget(form.translations, {'label_col': 0, 'widget_col': 12}) }}
+            {{- form_widget(form.translations, {'label_col': 0, 'widget_col': 12}) -}}
             <div class="row form-group">
                 <div class="col-md-6">
-                    {{ form_widget(form.reference) }}
-                    {{ form_errors(form.reference) }}
+                    {{- form_widget(form.reference) -}}
+                    {{- form_errors(form.reference) -}}
                 </div>
                 <div class="col-md-6">
-                    {{ form_widget(form.weight) }}
-                    {{ form_errors(form.weight) }}
+                    {{- form_widget(form.weight) -}}
+                    {{- form_errors(form.weight) -}}
                 </div>
             </div>
-            {{ form_widget(form.taxGroup) }}
-            {{ form_errors(form.taxGroup) }}
+            {{- form_widget(form.taxGroup) -}}
+            {{- form_errors(form.taxGroup) -}}
         </div>
-        {{ form_rest(form) }}
+        {{- form_rest(form) -}}
     </div>
-    {{ bootstrap_restore_form_settings() }}
-{% endspaceless %}
-{% endblock ekyna_product_option_widget %}
+    {{- bootstrap_restore_form_settings() -}}
+{%- endblock ekyna_product_option_widget -%}
 
 
-{% block ekyna_product_option_group_widget %}
-{% spaceless %}
-    {{ bootstrap_backup_form_settings() }}
-    {{ bootstrap_set_sizing('sm') }}
+{%- block ekyna_product_option_group_widget -%}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
     <div class="ekyna-collection-item">
-        {{ form_errors(form) }}
-        {{ form_row(form.name, {'label_col': 4, 'widget_col': 8}) }}
+        {{- form_errors(form) -}}
+        {{- form_row(form.name, {'label_col': 4, 'widget_col': 8}) -}}
         <div class="row">
             <div class="col-md-6">
-                {{ form_row(form.required, {'label_col': 4, 'widget_col': 8}) }}
+                {{- form_row(form.required, {'label_col': 4, 'widget_col': 8}) -}}
             </div>
             <div class="col-md-6">
-                {{ form_row(form.fullTitle, {'label_col': 4, 'widget_col': 8}) }}
+                {{- form_row(form.fullTitle, {'label_col': 4, 'widget_col': 8}) -}}
             </div>
         </div>
-        {{ form_row(form.translations, {'label_col': 0, 'widget_col': 12}) }}
-        {{ form_rest(form) }}
+        {{- form_row(form.translations, {'label_col': 0, 'widget_col': 12}) -}}
+        {{- form_rest(form) -}}
     </div>
-    {{ bootstrap_restore_form_settings() }}
-{% endspaceless %}
-{% endblock ekyna_product_option_group_widget %}
+    {{- bootstrap_restore_form_settings() -}}
+{%- endblock ekyna_product_option_group_widget -%}
 
 
-{% block ekyna_product_pricing_widget %}
-{% spaceless %}
+{%- block ekyna_product_pricing_widget -%}
 <div class="ekyna-collection-item">
-    {{ bootstrap_backup_form_settings() }}
-    {{ bootstrap_set_sizing('sm') }}
-    {{ form_errors(form) }}
-    {{ form_row(form.groups, {'label_col': 2, 'widget_col': 10}) }}
-    {{ form_row(form.countries, {'label_col': 2, 'widget_col': 10}) }}
-    {{ form_row(form.rules, {'label_col': 2, 'widget_col': 10}) }}
-    {{ form_rest(form) }}
-    {{ bootstrap_restore_form_settings() }}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
+    {{- form_errors(form) -}}
+    {{- form_row(form.groups, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_row(form.countries, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_rest(form) -}}
+    {{- bootstrap_restore_form_settings() -}}
 </div>
-{% endspaceless %}
-{% endblock ekyna_product_pricing_widget %}
+{%- endblock ekyna_product_pricing_widget -%}
 
 
-{% block ekyna_product_pricing_rule_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
+{%- block ekyna_product_pricing_rule_widget -%}
+    {{- form_errors(form) -}}
     <div class="row">
         <div class="col-md-6">
-            {{ form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) }}
+            {{- form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) -}}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.percent, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) }}
+            {{- form_row(form.percent, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) -}}
         </div>
     </div>
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_pricing_rule_widget %}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_pricing_rule_widget -%}
 
 
-{% block ekyna_product_reference_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
+{%- block ekyna_product_reference_widget -%}
+    {{- form_errors(form) -}}
     <div class="row">
         <div class="col-md-6">
-            {{ form_widget(form.type, {'sizing': 'sm'}) }}
-            {{ form_errors(form.type) }}
+            {{- form_widget(form.type, {'sizing': 'sm'}) -}}
+            {{- form_errors(form.type) -}}
         </div>
         <div class="col-md-6">
-            {{ form_widget(form.number, {'sizing': 'sm'}) }}
-            {{ form_errors(form.number) }}
+            {{- form_widget(form.number, {'sizing': 'sm'}) -}}
+            {{- form_errors(form.number) -}}
         </div>
     </div>
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_reference_widget %}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_reference_widget -%}
 
 
-{% block ekyna_product_special_offer_widget %}
-{% spaceless %}
+{%- block ekyna_product_special_offer_widget -%}
 <div class="ekyna-collection-item">
-    {{ bootstrap_backup_form_settings() }}
-    {{ bootstrap_set_sizing('sm') }}
-    {{ form_errors(form) }}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
+    {{- form_errors(form) -}}
     <div class="row">
         <div class="col-md-4">
-            {{ form_row(form.percent, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.percent, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.minQuantity, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.minQuantity, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.stack, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.stack, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
-            {{ form_row(form.startsAt, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.startsAt, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.endsAt, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.endsAt, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.enabled, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.enabled, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
     </div>
-    {{ form_row(form.groups, {'label_col': 2, 'widget_col': 10}) }}
-    {{ form_row(form.countries, {'label_col': 2, 'widget_col': 10}) }}
-    {{ form_rest(form) }}
-    {{ bootstrap_restore_form_settings() }}
+    {{- form_row(form.groups, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_row(form.countries, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_rest(form) -}}
+    {{- bootstrap_restore_form_settings() -}}
 </div>
-{% endspaceless %}
-{% endblock ekyna_product_special_offer_widget %}
+{%- endblock ekyna_product_special_offer_widget -%}
 
 
-{% block ekyna_product_inventory_resupply_widget %}
-{% spaceless %}
-    {{ render_subjects_stock([product]) }}
+{%- block ekyna_product_inventory_resupply_widget -%}
+    {{- render_subjects_stock([product]) -}}
     <hr>
-    {{ bootstrap_set_style('horizontal') }}
-    {{ bootstrap_set_col_size('md') }}
-    {{ form_errors(form) }}
-    {{ form_widget(form.supplierProduct, {'widget_col': 12}) }}
-    {{ form_errors(form.supplierProduct) }}
+    {{- bootstrap_set_style('horizontal') -}}
+    {{- bootstrap_set_col_size('md') -}}
+    {{- form_errors(form) -}}
+    {{- form_widget(form.supplierProduct, {'widget_col': 12}) -}}
+    {{- form_errors(form.supplierProduct) -}}
     <div class="row">
         <div class="col-md-4">
-            {{ form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.quantity, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.netPrice, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.netPrice, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
         <div class="col-md-4">
-            {{ form_row(form.estimatedDateOfArrival, {'label_col': 6, 'widget_col': 6}) }}
+            {{- form_row(form.estimatedDateOfArrival, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
     </div>
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_inventory_resupply_widget %}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_inventory_resupply_widget -%}
 
 
-{% block ekyna_product_inventory_resupply_products_widget %}
-{% spaceless %}
+{%- block ekyna_product_inventory_resupply_products_widget -%}
     <table class="table table-condensed supplier-products">
         <thead>
         <tr>
@@ -346,21 +314,19 @@
         </tr>
         </thead>
         <tbody>
-        {% for child in form.children -%}
+        {%- for child in form.children -%}
             {{- form_widget(child) -}}
-        {%- endfor %}
+        {%- endfor -%}
         </tbody>
     </table>
-{% endspaceless %}
-{% endblock ekyna_product_inventory_resupply_products_widget %}
+{%- endblock ekyna_product_inventory_resupply_products_widget -%}
 
 
-{% block ekyna_product_inventory_resupply_product_widget %}
-{% spaceless %}
+{%- block ekyna_product_inventory_resupply_product_widget -%}
     <tr>
         <td>
-            {{ form_widget(form.choice) }}
-            {{ form_errors(form.choice) }}
+            {{- form_widget(form.choice) -}}
+            {{- form_errors(form.choice) -}}
         </td>
         <td>
             <a href="{{ admin_resource_path(supplierProduct.supplier) }}" target="_blank">
@@ -385,16 +351,14 @@
     <tr id="supplier_product_{{ supplierProduct.id }}_details" class="supplier-product-details" style="display:none;">
         <td>&nbsp;</td>
         <td colspan="6">
-            {{ form_widget(form.supplierOrder, {'widget_col': 12}) }}
-            {{ form_errors(form.supplierOrder) }}
+            {{- form_widget(form.supplierOrder, {'widget_col': 12}) -}}
+            {{- form_errors(form.supplierOrder) -}}
         </td>
     </tr>
-{% endspaceless %}
-{% endblock ekyna_product_inventory_resupply_product_widget %}
+{%- endblock ekyna_product_inventory_resupply_product_widget -%}
 
 
-{% block ekyna_product_inventory_resupply_orders_widget %}
-{% spaceless %}
+{%- block ekyna_product_inventory_resupply_orders_widget -%}
     <table class="table table-condensed supplier-orders">
         <thead>
         <tr>
@@ -412,12 +376,10 @@
         {%- endfor -%}
         </tbody>
     </table>
-{% endspaceless %}
-{% endblock ekyna_product_inventory_resupply_orders_widget %}
+{%- endblock ekyna_product_inventory_resupply_orders_widget -%}
 
 
-{% block ekyna_product_inventory_resupply_order_widget %}
-{% spaceless %}
+{%- block ekyna_product_inventory_resupply_order_widget -%}
     <tr>
         <td>{{ form_widget(form) }}</td>
         {%- if supplierOrder is not same as(null) -%}
@@ -448,26 +410,23 @@
         <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
     </tr>
     {%- endif -%}
-{% endspaceless %}
-{% endblock ekyna_product_inventory_resupply_order_widget %}
+{%- endblock ekyna_product_inventory_resupply_order_widget -%}
 
 
-{% block ekyna_product_convert_media_choice_widget %}
-{% spaceless %}
-    {{ form_errors(form) }}
-    {% for child in form.children %}
+{%- block ekyna_product_convert_media_choice_widget -%}
+    {{- form_errors(form) -}}
+    {%- for child in form.children -%}
         <label for="{{ child.vars.id }}" style="display:inline-block; margin:0 15px 15px 0;position:relative;">
-            {% if child.vars.media is not same as(null) %}
-                {{ child.vars.media|media_thumb }}
-            {% endif %}
+            {%- if child.vars.media is not same as(null) -%}
+                {{- child.vars.media|media_thumb -}}
+            {%- endif -%}
             <span style="position:absolute;top:0;right:0;background-color:#f5f5f5;border-bottom-left-radius:4px;line-height:0;padding:5px;">
-                {{ form_widget(child) }}
+                {{- form_widget(child) -}}
             </span>
-            {% if child.vars.media is same as(null) %}
-                {{ child.vars.label }}
-            {% endif %}
+            {%- if child.vars.media is same as(null) -%}
+                {{- child.vars.label -}}
+            {%- endif -%}
         </label>
-    {% endfor %}
-    {{ form_rest(form) }}
-{% endspaceless %}
-{% endblock ekyna_product_convert_media_choice_widget %}
+    {%- endfor -%}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_convert_media_choice_widget -%}

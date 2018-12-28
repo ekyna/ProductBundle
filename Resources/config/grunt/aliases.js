@@ -13,7 +13,7 @@ module.exports = {
     ],
     'build:product': [
         'clean:product_pre',
-        'copy:product_img',
+        'imagemin:product',
         'build:product_css',
         'build:product_js',
         'clean:product_post'
