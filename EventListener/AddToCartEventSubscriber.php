@@ -62,7 +62,6 @@ class AddToCartEventSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
-
     /**
      * @inheritDoc
      */

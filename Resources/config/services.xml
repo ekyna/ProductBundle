@@ -831,6 +831,12 @@
             <tag name="serializer.denormalizer"/>
         </service>
 
+        <!-- Google tracking helper -->
+        <service id="ekyna_product.google.tracking_helper"
+                 class="Ekyna\Bundle\ProductBundle\Service\Google\TrackingHelper">
+            <argument type="service" id="ekyna_google.tracking.pool"/>
+        </service>
+
         <!-- Commands -->
         <service id="ekyna_product.command.stock_report"
                  class="Ekyna\Bundle\ProductBundle\Command\StockReportCommand">

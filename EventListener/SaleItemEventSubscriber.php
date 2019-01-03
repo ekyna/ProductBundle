@@ -106,11 +106,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Sale item build event handler.
+     * Sale item discount event handler.
      *
      * @param SaleItemEvent $event
      */
-    public function onSaleItemAdjustments(SaleItemEvent $event)
+    public function onSaleItemDiscount(SaleItemEvent $event)
     {
         if (!$product = $this->getProductFromEvent($event)) {
             return;
@@ -225,7 +225,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         return [
             SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],
             SaleItemEvents::BUILD         => ['onSaleItemBuild'],
-            SaleItemEvents::DISCOUNT      => ['onSaleItemAdjustments'],
+            SaleItemEvents::DISCOUNT      => ['onSaleItemDiscount'],
             SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
             SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];
