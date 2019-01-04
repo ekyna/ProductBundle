@@ -2,9 +2,9 @@
     <div class="col-md-3 text-center">
         {% set media = product|product_image %}
         {% if media is not null %}
-            <img alt="{{ media.title }}" height="60" src="{{ media.path|imagine_filter('slot_thumb') }}" width="60">
+            <img alt="{{ media.title }}" class="img-responsive" height="60" src="{{ media.path|imagine_filter('slot_thumb') }}" width="60">
         {% else %}
-            <img alt="{{ product.fullTitle() }}" height="60" src="{{ product_default_image() }}" width="60">
+            <img alt="{{ product.fullTitle() }}" class="img-responsive" height="60" src="{{ product_default_image() }}" width="60">
         {% endif %}
     </div>
     <div class="col-md-9">

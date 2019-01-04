@@ -82,7 +82,7 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
                     eol = true;
                 }
                 $.each(data.products, function (index, product) {
-                    $(Templates['inventory_line.html.twig'].render(product)).appendTo($list);
+                    $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)).appendTo($list);
                 });
             }
         });

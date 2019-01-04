@@ -7,7 +7,7 @@ module.exports = function (grunt, options) {
                 variable: 'templates',
                 template_key: function(path) {
                     var split = path.split('/');
-                    return split[split.length-1];
+                    return '@EkynaProduct/Js/' + split[split.length-1];
                 }
             },
             files: {

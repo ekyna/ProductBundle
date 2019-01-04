@@ -716,7 +716,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
             data.parent = this.name;
 
-            $group = $(Templates['sale_item_option_group.html.twig'].render(data));
+            $group = $(Templates['@EkynaProduct/Js/sale_item_option_group.html.twig'].render(data));
             $group.appendTo(this.$element).optionGroup(this);
 
             this.$groups.push($group);
@@ -1246,7 +1246,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     });
                     previousMin = offer.min_qty - 1;
                 });
-                this.$offers.html(Templates['sale_item_offers.html.twig'].render({
+                this.$offers.html(Templates['@EkynaProduct/Js/sale_item_offers.html.twig'].render({
                     trans: SaleItem.trans,
                     offers: offers.reverse(),
                     quantity: this.totalQuantity
