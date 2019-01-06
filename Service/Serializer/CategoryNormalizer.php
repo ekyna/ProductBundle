@@ -14,24 +14,21 @@ class CategoryNormalizer extends AbstractTranslatableNormalizer
 {
     /**
      * @inheritdoc
+     *
+     * @param Model\CategoryInterface $category
      */
     public function normalize($category, $format = null, array $context = [])
     {
         $data = parent::normalize($category, $format, $context);
 
-        /** @var Model\CategoryInterface $category */
-        $groups = isset($context['groups']) ? (array)$context['groups'] : [];
-
         $data['name'] = $category->getName();
         $data['visible'] = $category->isVisible();
 
-        if (in_array('Default', $groups)) {
-            // Seo
+        if ($this->contextHasGroup(['Default', 'Category'], $context)) {
             if (null !== $seo = $category->getSeo()) {
                 $data['seo'] = $seo->getId();
             }
-        } elseif (in_array('Search', $groups)) {
-            // Seo
+        } elseif ($this->contextHasGroup('Search', $context)) {
             if (null !== $seo = $category->getSeo()) {
                 $data['seo'] = $this->normalizeObject($seo, $format, $context);
             }

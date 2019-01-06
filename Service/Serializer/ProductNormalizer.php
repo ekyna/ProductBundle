@@ -58,9 +58,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
      */
     public function normalize($product, $format = null, array $context = [])
     {
-        $groups = isset($context['groups']) ? (array)$context['groups'] : [];
-
-        if (in_array('StockView', $groups)) {
+        if ($this->contextHasGroup('StockView', $context)) {
             return $this->helper->normalizeStock($product, $format, $context);
         }
 
@@ -85,7 +83,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             'tax_group'   => $product->getTaxGroup()->getId(),
         ], $data);
 
-        if (in_array('Default', $groups)) {
+        if ($this->contextHasGroup(['Default', 'Product'], $context)) {
 
             // Brand
             if (null !== $brand = $product->getBrand()) {
@@ -112,7 +110,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 return $this->normalizeObject($r, $format, $context);
             }, $product->getReferences()->toArray());
 
-        } elseif (in_array('Search', $groups)) {
+        } elseif ($this->contextHasGroup('Search', $context)) {
 
             // Brand
             if (null !== $brand = $product->getBrand()) {
@@ -142,7 +140,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 return $r->getNumber();
             }, $product->getReferences()->toArray());
 
-        } elseif (in_array('Summary', $groups)) {
+        } elseif ($this->contextHasGroup('Summary', $context)) {
 
             // Brand
             if (null !== $brand = $product->getBrand()) {
@@ -165,7 +163,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             }, $this->supplierProductRepository->findBySubject($product));
         }
 
-        if (in_array('Stock', $groups)) {
+        if ($this->contextHasGroup('Stock', $context)) {
             $data = array_replace($this->helper->normalizeStock($product, $format, $context), $data);
         }
 

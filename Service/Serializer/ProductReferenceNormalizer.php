@@ -19,15 +19,14 @@ class ProductReferenceNormalizer implements NormalizerInterface, DenormalizerInt
 
     /**
      * @inheritdoc
+     *
+     * @param Model\ProductReferenceInterface $reference
      */
     public function normalize($reference, $format = null, array $context = [])
     {
-        /** @var Model\ProductReferenceInterface $reference */
-        //$groups = isset($context['groups']) ? (array)$context['groups'] : [];
-
         return [
-            'id' => $reference->getId(),
-            'type' => $reference->getType(),
+            'id'     => $reference->getId(),
+            'type'   => $reference->getType(),
             'number' => $reference->getNumber(),
         ];
     }

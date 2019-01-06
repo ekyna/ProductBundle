@@ -14,24 +14,21 @@ class BrandNormalizer extends AbstractTranslatableNormalizer
 {
     /**
      * @inheritdoc
+     *
+     * @param Model\BrandInterface $brand
      */
     public function normalize($brand, $format = null, array $context = [])
     {
         $data = parent::normalize($brand, $format, $context);
 
-        /** @var Model\BrandInterface $brand */
-        $groups = isset($context['groups']) ? (array)$context['groups'] : [];
-
         $data['name'] = $brand->getName();
         $data['visible'] = $brand->isVisible();
 
-        if (in_array('Default', $groups)) {
-            // Seo
+        if ($this->contextHasGroup(['Default', 'Brand'], $context)) {
             if (null !== $seo = $brand->getSeo()) {
                 $data['seo'] = $seo->getId();
             }
-        } elseif (in_array('Search', $groups)) {
-            // Seo
+        } elseif ($this->contextHasGroup('Search', $context)) {
             if (null !== $seo = $brand->getSeo()) {
                 $data['seo'] = $this->normalizeObject($seo, $format, $context);
             }
