@@ -52,6 +52,13 @@
         </li>
         {%- endif %}
         {% endblock relations_tab %}
+        {% block stat_tab %}
+        <li>
+            <a href="#product-stat" id="toggle-product-stat" data-toggle="tab">
+                {{ 'ekyna_product.stat.label'|trans }}
+            </a>
+        </li>
+        {% endblock stat_tab %}
         {% block seo_tab %}
         <li>
             <a href="#product-seo" id="toggle-product-seo" data-toggle="tab">
@@ -178,6 +185,14 @@
             </div>
             {%- endif %}
             {% endblock relations_pane %}
+
+            {% block stat_pane %}
+            <div class="tab-pane" id="product-stat">
+            {% block stat_content %}
+                {{ product_stat_count_chart(product) }}
+            {% endblock stat_content %}
+            </div>
+            {% endblock stat_pane %}
 
             {% block seo_pane %}
             <div class="tab-pane" id="product-seo">

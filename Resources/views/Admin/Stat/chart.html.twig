@@ -1,0 +1,8 @@
+<div class="product-chart">
+    <canvas id="{{ id }}" width="400" height="200"></canvas>
+    <script type="application/javascript">
+        require(['chart'], function(Chart) {
+            new Chart(document.getElementById("{{ id }}"), {{ config|json_encode|raw }});
+        });
+    </script>
+</div>

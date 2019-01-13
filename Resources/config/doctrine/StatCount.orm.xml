@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\StatCount"
+            repository-class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository"
+            table="product_stat_count">
+
+        <indexes>
+            <index columns="date" name="index_product_stat_date"/>
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint columns="product_id,date,group_id"
+                               name="unique_product_stat_count"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="date" column="date" type="string" length="7" nullable="false"/>
+        <field name="count" column="count" type="integer" nullable="false"/>
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="product">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
+                     field="customerGroup">
+            <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+        </many-to-one>
+
+    </entity>
+
+</doctrine-mapping>

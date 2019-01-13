@@ -29,6 +29,17 @@ class ProductController extends AbstractSubjectController
     use RC\TinymceTrait,
         RC\ToggleableTrait;
 
+    /**
+     * Product stats action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function statsData(Request $request)
+    {
+
+    }
 
     /**
      * Product summary action.

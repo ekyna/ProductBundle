@@ -634,6 +634,38 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * @inheritdoc
+     */
+    public function findNextStatUpdate(\DateTime $maxDate = null)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        $qb
+            ->andWhere($ex->eq('p.endOfLife', ':endOfLife'))
+            ->orderBy('p.statUpdatedAt', 'ASC');
+
+        if (!is_null($maxDate)) {
+            $qb->andWhere($ex->orX(
+                $ex->isNull('p.statUpdatedAt'),
+                $ex->lt('p.statUpdatedAt', ':max_date')
+            ));
+        }
+
+        $query = $qb
+            ->getQuery()
+            ->setMaxResults(1)
+            ->setParameter('endOfLife', false);
+
+        if (!is_null($maxDate)) {
+            $query->setParameter('max_date', $maxDate, Type::DATETIME);
+        }
+
+        return $query
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Returns the getUpdateDateBy* query builder.
      *
      * @param bool       $visible

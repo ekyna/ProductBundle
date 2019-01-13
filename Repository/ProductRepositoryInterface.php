@@ -178,4 +178,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * @param Model\ProductInterface $configurable
      */
     public function loadConfigurableSlots(Model\ProductInterface $configurable);
+
+    /**
+     * Returns the product for which stats should be updated.
+     *
+     * @param \DateTime $maxDate
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findNextStatUpdate(\DateTime $maxDate = null);
 }

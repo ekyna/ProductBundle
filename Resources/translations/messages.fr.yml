@@ -324,6 +324,11 @@ ekyna_product:
         alert:
             no_item: Aucune promotion configuré
 
+    stat:
+        label: Statistiques
+        count: Nombre de ventes
+        cross: Cross selling
+
     product:
         label:
             singular: Produit

@@ -539,35 +539,6 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
-        <!-- Schema.org providers -->
-        <service id="ekyna_product.product.schema_provider"
-                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\ProductProvider">
-            <argument type="service" id="ekyna_resource.event_dispatcher"/>
-            <argument>%ekyna_commerce.default.currency%</argument>
-            <tag name="ekyna_cms.schema_org_provider"/>
-        </service>
-        <service id="ekyna_product.brand.schema_provider"
-                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\BrandProvider">
-            <tag name="ekyna_cms.schema_org_provider"/>
-        </service>
-
-        <!-- Twig extensions -->
-        <service id="ekyna_product.twig.product_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
-            <argument type="service" id="ekyna_product.constants_helper"/>
-            <argument type="service" id="ekyna_product.pricing.renderer"/>
-            <argument type="service" id="ekyna_product.attribute.type_registry"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
-            <argument type="service" id="ekyna_product.product.repository"/>
-            <argument>%ekyna_product.default.no_image%</argument>
-            <tag name="twig.extension"/>
-        </service>
-        <service id="ekyna_product.twig.catalog_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension">
-            <argument type="service" id="ekyna_product.catalog.registry"/>
-            <tag name="twig.extension"/>
-        </service>
-
         <!-- Add to cart event subscriber -->
         <service id="ekyna_product.add_to_cart.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\AddToCartEventSubscriber">
@@ -831,10 +802,83 @@
             <tag name="serializer.denormalizer"/>
         </service>
 
+        <!-- Stat count repository -->
+        <service id="ekyna_product.stat_count.repository"
+                 class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
+            <factory service="doctrine" method="getRepository"/>
+            <argument>Ekyna\Bundle\ProductBundle\Entity\StatCount</argument>
+        </service>
+        <!-- Stat cross repository -->
+        <service id="ekyna_product.stat_cross.repository"
+                 class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
+            <factory service="doctrine" method="getRepository"/>
+            <argument>Ekyna\Bundle\ProductBundle\Entity\StatCross</argument>
+        </service>
+
+        <!-- Stat updater -->
+        <service id="ekyna_product.stat.updater"
+                 class="Ekyna\Bundle\ProductBundle\Service\Stat\StatUpdater"
+                 public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_commerce.customer_group.repository"/>
+            <argument type="service" id="doctrine.orm.default_entity_manager"/>
+        </service>
+
+        <!-- Stat chart builder factory -->
+        <service id="ekyna_product.stat.chart_builder_factory"
+                 class="Ekyna\Bundle\ProductBundle\Service\Stat\ChartBuilderFactory">
+            <argument type="service" id="ekyna_product.stat_count.repository"/>
+            <argument type="service" id="ekyna_commerce.customer_group.repository"/>
+            <argument type="service" id="translator"/>
+        </service>
+
+        <!-- Stat chart renderer -->
+        <service id="ekyna_product.stat.chart_renderer"
+                 class="Ekyna\Bundle\ProductBundle\Service\Stat\ChartRenderer">
+            <argument type="service" id="ekyna_product.stat.chart_builder_factory"/>
+            <argument type="service" id="templating"/>
+            <argument type="collection"/>
+        </service>
+
         <!-- Google tracking helper -->
         <service id="ekyna_product.google.tracking_helper"
                  class="Ekyna\Bundle\ProductBundle\Service\Google\TrackingHelper">
             <argument type="service" id="ekyna_google.tracking.pool"/>
+        </service>
+
+
+        <!-- Schema.org providers -->
+        <service id="ekyna_product.product.schema_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\ProductProvider">
+            <argument type="service" id="ekyna_resource.event_dispatcher"/>
+            <argument>%ekyna_commerce.default.currency%</argument>
+            <tag name="ekyna_cms.schema_org_provider"/>
+        </service>
+        <service id="ekyna_product.brand.schema_provider"
+                 class="Ekyna\Bundle\ProductBundle\Service\SchemaOrg\BrandProvider">
+            <tag name="ekyna_cms.schema_org_provider"/>
+        </service>
+
+        <!-- Twig extensions -->
+        <service id="ekyna_product.twig.product_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
+            <argument type="service" id="ekyna_product.constants_helper"/>
+            <argument type="service" id="ekyna_product.pricing.renderer"/>
+            <argument type="service" id="ekyna_product.attribute.type_registry"/>
+            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument>%ekyna_product.default.no_image%</argument>
+            <tag name="twig.extension"/>
+        </service>
+        <service id="ekyna_product.twig.catalog_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension">
+            <argument type="service" id="ekyna_product.catalog.registry"/>
+            <tag name="twig.extension"/>
+        </service>
+        <service id="ekyna_product.twig.stat_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\StatExtension">
+            <argument type="service" id="ekyna_product.stat.chart_renderer"/>
+            <tag name="twig.extension"/>
         </service>
 
         <!-- Commands -->
@@ -854,6 +898,12 @@
             <argument type="service" id="ekyna_product.pricing.calculator"/>
             <tag name="console.command"/>
         </service>
+        <service id="ekyna_product.command.stat_update"
+                 class="Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand">
+            <argument type="service" id="ekyna_product.stat.updater"/>
+            <tag name="console.command"/>
+        </service>
+
     </services>
 
 </container>

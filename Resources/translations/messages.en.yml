@@ -323,6 +323,11 @@ ekyna_product:
         alert:
             no_item: No special offer configured
 
+    stat:
+        label: Statistics
+        count: Sales count
+        cross: Cross selling
+
     product:
         label:
             singular: Product

@@ -742,11 +742,27 @@ interface ProductInterface extends
     /**
      * Sets the "released at" date.
      *
-     * @param \DateTime $releasedAt
+     * @param \DateTime $date
      *
      * @return $this|ProductInterface
      */
-    public function setReleasedAt(\DateTime $releasedAt = null);
+    public function setReleasedAt(\DateTime $date = null);
+
+    /**
+     * Returns the "stat updated at" datetime.
+     *
+     * @return \DateTime
+     */
+    public function getStatUpdatedAt();
+
+    /**
+     * Sets the "stat updated at" datetime.
+     *
+     * @param \DateTime $date
+     *
+     * @return $this|ProductInterface
+     */
+    public function setStatUpdatedAt(\DateTime $date = null);
 
     /**
      * Returns the product images.

@@ -39,6 +39,7 @@
         <field name="position" column="position" type="smallint" nullable="true"/>
 
         <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
+        <field name="statUpdatedAt" column="stat_updated_at" type="datetime" nullable="true"/>
 
         <field name="createdAt" type="datetime" column="created_at">
             <gedmo:timestampable on="create"/>

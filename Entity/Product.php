@@ -178,6 +178,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     protected $releasedAt;
 
+    /**
+     * @var \DateTime
+     */
+    protected $statUpdatedAt;
+
 
     /**
      * Constructor.
@@ -1351,9 +1356,27 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setReleasedAt(\DateTime $releasedAt = null)
+    public function setReleasedAt(\DateTime $date = null)
     {
-        $this->releasedAt = $releasedAt;
+        $this->releasedAt = $date;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStatUpdatedAt()
+    {
+        return $this->statUpdatedAt;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStatUpdatedAt(\DateTime $date = null)
+    {
+        $this->statUpdatedAt = $date;
 
         return $this;
     }
