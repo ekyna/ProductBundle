@@ -42,11 +42,6 @@ class StatCross
      */
     private $customerGroup;
 
-    /**
-     * @var \DateTime
-     */
-    private $updatedAt;
-
 
     /**
      * Returns the id.
@@ -174,30 +169,6 @@ class StatCross
     public function setCustomerGroup(CustomerGroupInterface $group): StatCross
     {
         $this->customerGroup = $group;
-
-        return $this;
-    }
-
-    /**
-     * Returns the "updated at" datetime.
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt(): \DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Sets the "updated at" datetime.
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return StatCross
-     */
-    public function setUpdatedAt(\DateTime $updatedAt): StatCross
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

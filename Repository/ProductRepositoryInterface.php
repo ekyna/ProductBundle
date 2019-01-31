@@ -10,6 +10,8 @@ use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterfac
  * Interface ProductRepositoryInterface
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method Model\ProductInterface|null find($id)
  */
 interface ProductRepositoryInterface extends TranslatableResourceRepositoryInterface, SubjectRepositoryInterface
 {
@@ -187,4 +189,24 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * @return Model\ProductInterface|null
      */
     public function findNextStatUpdate(\DateTime $maxDate = null);
+
+    /**
+     * Returns the visible products with best seller mode set to 'always'.
+     *
+     * @param int   $limit
+     * @param array $exclude
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     */
+    public function findBestSellers(int $limit = 8, array $exclude = []);
+
+    /**
+     * Returns the visible products with cross selling mode set to 'always'.
+     *
+     * @param int   $limit
+     * @param array $exclude
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     */
+    public function findCrossSelling(int $limit = 8, array $exclude = []);
 }

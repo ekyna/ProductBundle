@@ -4,12 +4,21 @@
 {% block general_content %}
     {{ parent() }}
     {{ form_row(form.categories) }}
+    {{ form_row(form.brand) }}
     <div class="row">
         <div class="col-md-6">
-            {{ form_row(form.brand, {'label_col': 4, 'widget_col': 8}) }}
+            {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
         </div>
         <div class="col-md-6">
-            {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
+            {{ form_row(form.visibility, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_row(form.bestSeller, {'label_col': 4, 'widget_col': 8}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.crossSelling, {'label_col': 4, 'widget_col': 8}) }}
         </div>
     </div>
     {{ form_row(form.attributeSet) }}

@@ -70,9 +70,13 @@ class CategoryType extends ResourceTableType
                 'route_parameters_map' => ['categoryId' => 'id'],
                 'position'             => 20,
             ])
+            ->addColumn('visibility', CType\Column\NumberType::class, [
+                'label'    => 'ekyna_product.common.visibility',
+                'position' => 30,
+            ])
             ->addColumn('createdAt', CType\Column\DateTimeType::class, [
                 'label'    => 'ekyna_core.field.created_at',
-                'position' => 30,
+                'position' => 40,
             ])
             ->addColumn('actions', BType\Column\NestedActionsType::class, [
                 'roots'                 => false,

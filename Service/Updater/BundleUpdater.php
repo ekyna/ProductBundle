@@ -76,7 +76,9 @@ class BundleUpdater extends AbstractUpdater
 
                 // State
                 $disabled = false;
-                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                    continue;
+                } else {
                     $justInTime = false;
                 }
 

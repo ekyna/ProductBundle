@@ -1,4 +1,4 @@
-define(['gsap/TimelineLite'], function (TimelineLite) {
+define(['jquery', 'gsap/TimelineLite'], function ($, TimelineLite) {
 
     var resizeInitialized = false;
 
@@ -122,13 +122,8 @@ define(['gsap/TimelineLite'], function (TimelineLite) {
             });
         }
 
-        function fontSize () {
-
-        }
-
         $container.on('click', 'a.prev-slide', prev);
         $container.on('click', 'a.next-slide', next);
-
 
         mainTL.seek(transition + 2 * offset);
     }

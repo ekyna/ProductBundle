@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
 /**
@@ -663,6 +664,85 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         return $query
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findBestSellers(int $limit = 8, array $exclude = [])
+    {
+        return $this->findHighlight('bestSeller', $limit, $exclude);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findCrossSelling(int $limit = 8, array $exclude = [])
+    {
+        return $this->findHighlight('crossSelling', $limit, $exclude);
+    }
+
+    /**
+     * Returns the highlighted products.
+     *
+     * @param string $type
+     * @param int    $limit
+     * @param array  $exclude
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     */
+    protected function findHighlight(string $type, int $limit, array $exclude = [])
+    {
+        Model\HighlightModes::isValidType($type);
+
+        $parameters = [
+            'mode'        => Model\HighlightModes::MODE_ALWAYS,
+            'type'        => Model\ProductTypes::TYPE_CONFIGURABLE,
+            'stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
+            'visible'     => true,
+        ];
+
+        $as = $this->getAlias();
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        $this
+            ->joinCategories($qb)
+            ->joinBrand($qb);
+
+        $qb
+            ->andWhere($ex->eq($as . '.' . $type, ':mode'))
+            ->andWhere($ex->neq($as . '.type', ':type'))
+            ->andWhere($ex->neq($as . '.stockState', ':stock_state'))
+            ->andWhere($ex->eq($as . '.visible', ':visible'))
+            ->andWhere($ex->eq('b.visible', ':visible'))
+            ->andWhere($ex->eq('c.visible', ':visible'))
+            ->addOrderBy('p.visibility', 'DESC');
+
+        if (!empty($exclude)) {
+            $qb->andWhere($ex->notIn($as . '.id', ':exclude'));
+            $parameters['exclude'] = $exclude;
+        }
+
+        $this->filterFindHighlight($qb, $parameters, $type);
+
+        return $qb
+            ->getQuery()
+            ->setParameters($parameters)
+            ->setMaxResults($limit)
+            ->getResult();
+    }
+
+    /**
+     * Apply custom filtering to findHighlight method.
+     *
+     * @param QueryBuilder $qb
+     * @param array        $parameters
+     * @param string       $type
+     */
+    protected function filterFindHighlight(QueryBuilder $qb, array &$parameters, string $type)
+    {
+
     }
 
     /**

@@ -72,6 +72,14 @@ class ConfigurableUpdater extends AbstractUpdater
 
                     $bestProduct = $bestChoice->getProduct();
 
+                    if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                        if ($choice->getProduct()->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                            $bestChoice = $choice;
+                        }
+
+                        continue;
+                    }
+
                     // Available stock
                     if (0 < $availableStock = $product->getAvailableStock() / $choice->getMinQuantity()) {
                         $bestAvailableStock = $bestProduct->getAvailableStock() / $bestChoice->getMinQuantity();
@@ -115,7 +123,9 @@ class ConfigurableUpdater extends AbstractUpdater
 
                 // State
                 $disabled = false;
-                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                    continue;
+                } else {
                     $justInTime = false;
                 }
 

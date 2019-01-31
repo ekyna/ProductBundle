@@ -18,7 +18,8 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Category extends RM\AbstractTranslatable implements Model\CategoryInterface
 {
-    use Cms\ContentSubjectTrait,
+    use Model\VisibilityTrait,
+        Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         MediaSubjectTrait,
         TreeTrait,
@@ -45,11 +46,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
      */
     protected $parent;
 
-    /**
-     * @var boolean
-     */
-    protected $visible;
-
 
     /**
      * Constructor
@@ -58,7 +54,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     {
         parent::__construct();
 
-        $this->visible = true;
         $this->children = new ArrayCollection();
     }
 
@@ -156,24 +151,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     public function getParent()
     {
         return $this->parent;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isVisible()
-    {
-        return $this->visible;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setVisible($visible)
-    {
-        $this->visible = $visible;
-
-        return $this;
     }
 
     /**

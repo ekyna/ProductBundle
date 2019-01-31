@@ -110,4 +110,103 @@ class ConstantsHelper extends AbstractConstantsHelper
 
         return $this->renderLabel($type->getLabel());
     }
+
+    /**
+     * Renders the product best seller label.
+     *
+     * @param Model\ProductInterface|string $modeOrProduct
+     *
+     * @return string
+     */
+    public function renderProductBestSellerLabel($modeOrProduct)
+    {
+        if ($modeOrProduct instanceof Model\ProductInterface) {
+            $modeOrProduct = $modeOrProduct->getBestSeller();
+        }
+
+        return $this->renderHighlightModeLabel($modeOrProduct);
+    }
+
+    /**
+     * Renders the product best seller badge.
+     *
+     * @param Model\ProductInterface|string $modeOrProduct
+     *
+     * @return string
+     */
+    public function renderProductBestSellerBadge($modeOrProduct)
+    {
+        if ($modeOrProduct instanceof Model\ProductInterface) {
+            $modeOrProduct = $modeOrProduct->getBestSeller();
+        }
+
+        return $this->renderHighlightModeBadge($modeOrProduct);
+    }
+
+    /**
+     * Renders the product cross selling label.
+     *
+     * @param Model\ProductInterface|string $modeOrProduct
+     *
+     * @return string
+     */
+    public function renderProductCrossSellingLabel($modeOrProduct)
+    {
+        if ($modeOrProduct instanceof Model\ProductInterface) {
+            $modeOrProduct = $modeOrProduct->getCrossSelling();
+        }
+
+        return $this->renderHighlightModeLabel($modeOrProduct);
+    }
+
+    /**
+     * Renders the product cross selling badge.
+     *
+     * @param Model\ProductInterface|string $modeOrProduct
+     *
+     * @return string
+     */
+    public function renderProductCrossSellingBadge($modeOrProduct)
+    {
+        if ($modeOrProduct instanceof Model\ProductInterface) {
+            $modeOrProduct = $modeOrProduct->getCrossSelling();
+        }
+
+        return $this->renderHighlightModeBadge($modeOrProduct);
+    }
+
+    /**
+     * Renders the highlight mode label.
+     *
+     * @param string $mode
+     *
+     * @return string
+     */
+    protected function renderHighlightModeLabel($mode)
+    {
+        if (Model\HighlightModes::isValid($mode)) {
+            return $this->renderLabel(Model\HighlightModes::getLabel($mode));
+        }
+
+        return $this->renderLabel();
+    }
+
+    /**
+     * Renders the highlight mode badge.
+     *
+     * @param string $mode
+     *
+     * @return string
+     */
+    protected function renderHighlightModeBadge($mode)
+    {
+        $theme = 'default';
+        if (Model\ProductTypes::isValid($mode)) {
+            $theme = Model\ProductTypes::getTheme($mode);
+        }
+
+        $label = $this->renderHighlightModeLabel($mode);
+
+        return $this->renderBadge($label, $theme);
+    }
 }

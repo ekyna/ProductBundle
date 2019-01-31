@@ -1,0 +1,25 @@
+{%- set product_path = product|subject_public_url -%}
+<div class="product-thumb">
+    <a href="{{ product_path }}" class="title">
+        {{- product.title -}}
+    </a>
+    {% set image = product|product_image %}
+    <a href="{{ product_path }}" class="image">
+        {% if image is not null %}
+            <img class="img-responsive" src="{{ image.path|imagine_filter('product_slide') }}" alt="{{ image.title }}">
+        {% else %}
+            <img class="img-responsive" src="{{ product_default_image() }}" alt="{{ product.title }}">
+        {% endif %}
+    </a>
+    <p class="status">
+        {{- product|stock_subject_availability|raw -}}<br>
+        {{- product|product_price -}}
+    </p>
+    <a href="{{ product_path }}" class="btn btn-sm btn-default read-more">
+        Read more
+    </a>
+    <a href="{{ product_path }}" class="btn btn-sm btn-primary add-to-cart"
+       data-add-to-cart="{{ product|subject_add_to_cart_url }}">
+        Add to cart
+    </a>
+</div>

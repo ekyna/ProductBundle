@@ -41,6 +41,7 @@ class StatUpdateCommand extends Command
             ->setName('ekyna:product:stat:update')
             ->setDescription('Updates the products stats')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Whether to force update')
+            ->addOption('purge', null, InputOption::VALUE_NONE, 'Whether to purge stats first')
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'The maximum execution time in seconds', 120);
     }
 
@@ -56,6 +57,11 @@ class StatUpdateCommand extends Command
         $this->updater->setOutput($output);
         $this->updater->setDebug($debug);
         $this->updater->setForce($force);
+
+        if ($input->getOption('purge')) {
+            $this->updater->purge();
+        }
+
         $this->updater->setMaxUpdateDate((new \DateTime())->modify("-$limit seconds"));
 
         $limit *= 1000;

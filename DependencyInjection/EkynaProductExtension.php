@@ -19,27 +19,37 @@ class EkynaProductExtension extends AbstractExtension
     {
         $config = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
 
-        $container->setParameter('ekyna_product.catalog_enabled', $config['catalog']['enabled']);
+        // Defaults
         $container->setParameter('ekyna_product.default.no_image', $config['default']['no_image']);
         $container->setParameter('ekyna_product.default.sale_item_form_theme', $config['default']['sale_item_form_theme']);
+        $container->setParameter('ekyna_product.cache_ttl', $config['default']['cache_ttl']);
 
-        $cartSuccessListener = $container->getDefinition('ekyna_product.add_to_cart.event_subscriber');
-        $cartSuccessListener->replaceArgument(1, $config['default']['cart_success_template']);
+        $container
+            ->getDefinition('ekyna_product.add_to_cart.event_subscriber')
+            ->replaceArgument(1, $config['default']['cart_success_template']);
 
-        $editor = $config['editor'];
-        foreach ($editor as $plugin => $c) {
-            $container->setParameter('ekyna_product.editor.' . $plugin, $c);
-        }
-
-        $pricingRenderer = $container->getDefinition('ekyna_product.pricing.renderer');
-        $pricingRenderer->replaceArgument(6, $config['pricing']);
-
+        // Catalog
+        $container->setParameter('ekyna_product.catalog_enabled', $config['catalog']['enabled']);
         if ($config['catalog']['enabled']) {
             $catalogRegistry = $container->getDefinition('ekyna_product.catalog.registry');
             $catalogRegistry->replaceArgument(0, $config['catalog']['themes']);
             $catalogRegistry->replaceArgument(1, $config['catalog']['templates']);
         }
 
-        $container->setParameter('ekyna_product.cache_ttl', $config['default']['cache_ttl']);
+        // Editor
+        $editor = $config['editor'];
+        foreach ($editor as $plugin => $c) {
+            $container->setParameter('ekyna_product.editor.' . $plugin, $c);
+        }
+
+        // Highlight
+        $container
+            ->getDefinition('ekyna_product.highlight')
+            ->replaceArgument(6, $config['highlight']);
+
+        // Pricing
+        $container
+            ->getDefinition('ekyna_product.pricing.renderer')
+            ->replaceArgument(6, $config['pricing']);
     }
 }

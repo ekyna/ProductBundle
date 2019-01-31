@@ -43,7 +43,7 @@ class CatalogController extends ResourceController
             ])
             ->add('slots', $config['form_type']);
 
-        $response = $this->render('EkynaProductBundle:Admin/Catalog:page_slots_form.xml.twig', [
+        $response = $this->render('@EkynaProduct/Admin/Catalog/page_slots_form.xml.twig', [
             'form' => $form->createView(),
             'name' => $request->query->get('name'),
         ]);
@@ -144,6 +144,8 @@ class CatalogController extends ResourceController
 
             if ($catalog->isSave()) {
                 $this->saveSaleCatalog($sale, $response->getContent());
+
+                return $this->redirect($this->generateResourcePath($sale, 'show'));
             }
 
             return $response;

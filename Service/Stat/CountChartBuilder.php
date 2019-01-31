@@ -2,58 +2,21 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\StatCountRepository;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CountChartBuilder
  * @package Ekyna\Bundle\ProductBundle\Service\Stat
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CountChartBuilder
+class CountChartBuilder extends AbstractChartBuilder
 {
-    private static $colors = [
-        '#f44336',
-        '#9c27b0',
-        '#3f51b5',
-        '#03a9f4',
-        '#009688',
-        '#8bc34a',
-        '#ffeb3b',
-        '#ff9800',
-        '#795548',
-        '#607d8b',
-        '#000000',
-        '#ff5722',
-    ];
-
     /**
      * @var StatCountRepository
      */
-    private $countRepository;
-
-    /**
-     * @var CustomerGroupRepositoryInterface
-     */
-    private $groupRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var \DatePeriod
-     */
-    private $period;
-
-    /**
-     * @var ProductInterface
-     */
-    private $product;
+    protected $countRepository;
 
 
     /**
@@ -61,51 +24,16 @@ class CountChartBuilder
      *
      * @param StatCountRepository              $countRepository
      * @param CustomerGroupRepositoryInterface $groupRepository
-     * @param TranslatorInterface              $translator
      */
-    public function __construct(
-        StatCountRepository $countRepository,
-        CustomerGroupRepositoryInterface $groupRepository,
-        TranslatorInterface $translator
-    ) {
+    public function __construct(StatCountRepository $countRepository, CustomerGroupRepositoryInterface $groupRepository)
+    {
         $this->countRepository = $countRepository;
-        $this->groupRepository = $groupRepository;
-        $this->translator = $translator;
+
+        parent::__construct($groupRepository);
     }
 
     /**
-     * Sets the date period.
-     *
-     * @param \DateTime $from
-     * @param \DateTime $to
-     *
-     * @return CountChartBuilder
-     */
-    public function setPeriod(\DateTime $from, \DateTime $to)
-    {
-        $this->period = new \DatePeriod($from, new \DateInterval('P1M'), $to->modify('+1 month'));
-
-        return $this;
-    }
-
-    /**
-     * Sets the product.
-     *
-     * @param ProductInterface $product
-     *
-     * @return CountChartBuilder
-     */
-    public function setProduct(ProductInterface $product)
-    {
-        $this->product = $product;
-
-        return $this;
-    }
-
-    /**
-     * Builds the count chart config.
-     *
-     * @return array
+     * @inheritdoc
      */
     public function build()
     {
@@ -120,12 +48,16 @@ class CountChartBuilder
         // Sum
         $color = self::$colors[$count];
         $dataSets[] = [
-            'label'           => 'Tous', // TODO trans
-            'fill'            => false,
-            'borderWidth'     => 0.8,
-            'borderColor'     => $color,
-            'backgroundColor' => $color,
-            'data'            => array_values($this->getProductData()),
+            'label'            => 'Tous', // TODO trans
+            'fill'             => false,
+            'lineTension'      => 0,
+            'borderWidth'      => 0.8,
+            'borderColor'      => $color,
+            'backgroundColor'  => $color,
+            'pointStyle'       => 'rectRot',
+            'pointRadius'      => 5,
+            'pointBorderColor' => 'transparent',
+            'data'             => array_values($this->getProductData()),
         ];
         $count++;
 
@@ -135,12 +67,16 @@ class CountChartBuilder
         foreach ($groups as $group) {
             $color = self::$colors[$count];
             $dataSets[] = [
-                'label'           => $group->getName(),
-                'fill'            => false,
-                'borderWidth'     => 0.8,
-                'borderColor'     => $color,
-                'backgroundColor' => $color,
-                'data'            => array_values($this->getProductData($group)),
+                'label'            => $group->getName(),
+                'fill'             => false,
+                'lineTension'      => 0,
+                'borderWidth'      => 0.8,
+                'borderColor'      => $color,
+                'backgroundColor'  => $color,
+                'pointStyle'       => 'rectRot',
+                'pointRadius'      => 5,
+                'pointBorderColor' => 'transparent',
+                'data'             => array_values($this->getProductData($group)),
             ];
             $count++;
         }
@@ -152,10 +88,6 @@ class CountChartBuilder
                 'datasets' => $dataSets,
             ],
             'options' => [
-                'title'  => [
-                    'display' => true,
-                    'text'    => $this->translator->trans('ekyna_product.stat.count'),
-                ],
                 'legend' => [
                     'labels' => [
                         'usePointStyle' => true,
@@ -194,26 +126,5 @@ class CountChartBuilder
             ->findByProductAndPeriodAndGroup($this->product, $this->period, $group);
 
         return $this->fillData($data);
-    }
-
-    /**
-     * Fills the data by adding missing date indexes.
-     *
-     * @param array $data
-     *
-     * @return array
-     */
-    private function fillData(array $data)
-    {
-        /** @var \DateTime $d */
-        foreach ($this->period as $d) {
-            $index = $d->format('Y-m');
-            if (!isset($data[$index])) {
-                $data[$index] = 0;
-            };
-        }
-        ksort($data);
-
-        return $data;
     }
 }

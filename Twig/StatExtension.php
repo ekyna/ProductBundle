@@ -16,6 +16,7 @@ class StatExtension extends \Twig_Extension
      */
     private $renderer;
 
+
     /**
      * Constructor.
      *
@@ -36,7 +37,12 @@ class StatExtension extends \Twig_Extension
                 'product_stat_count_chart',
                 [$this->renderer, 'renderProductCountChart'],
                 ['is_safe' => ['html']]
-            )
+            ),
+            new \Twig_SimpleFunction(
+                'product_stat_cross_chart',
+                [$this->renderer, 'renderProductCrossChart'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 }

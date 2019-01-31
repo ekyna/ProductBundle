@@ -16,6 +16,7 @@ use Ekyna\Bundle\CmsBundle\Model as Cms;
  * @method CategoryTranslationInterface translate($locale = null, $create = false)
  */
 interface CategoryInterface extends
+    VisibilityInterface,
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
     MediaSubjectInterface,
@@ -89,22 +90,6 @@ interface CategoryInterface extends
      * @return CategoryInterface
      */
     public function getParent();
-
-    /**
-     * Returns the visible.
-     *
-     * @return bool
-     */
-    public function isVisible();
-
-    /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return $this|CategoryInterface
-     */
-    public function setVisible($visible);
 
     /**
      * Returns the (translated) title.

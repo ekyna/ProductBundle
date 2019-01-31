@@ -70,6 +70,10 @@ class BrandType extends ResourceTableType
                 'route_parameters_map' => ['brandId' => 'id'],
                 'position'             => 20,
             ])
+            ->addColumn('visibility', CType\Column\NumberType::class, [
+                'label'    => 'ekyna_product.common.visibility',
+                'position' => 30,
+            ])
             ->addColumn('actions', BType\Column\ActionsType::class, [
                 'buttons' => [
                     function (RowInterface $row) {

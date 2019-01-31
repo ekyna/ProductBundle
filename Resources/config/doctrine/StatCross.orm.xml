@@ -25,7 +25,6 @@
 
         <field name="date" column="date" type="string" length="7" nullable="false"/>
         <field name="count" column="count" type="integer" nullable="false"/>
-        <field name="updatedAt" column="updated_at" type="datetime" nullable="false"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="source">

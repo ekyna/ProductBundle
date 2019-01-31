@@ -65,4 +65,25 @@ class ChartRenderer
             'config' => $config,
         ]);
     }
+
+    /**
+     * Renders the product cross chart.
+     *
+     * @param ProductInterface $product
+     *
+     * @return string
+     */
+    public function renderProductCrossChart(ProductInterface $product)
+    {
+        $config = $this
+            ->factory
+            ->crossChartBuilder()
+            ->setProduct($product)
+            ->build();
+
+        return $this->templating->render($this->config['template'], [
+            'id'     => 'product-cross-chart-' . $product->getId(),
+            'config' => $config,
+        ]);
+    }
 }

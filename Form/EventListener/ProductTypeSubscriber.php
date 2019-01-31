@@ -114,6 +114,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $attributeSet = null;
         if (0 < $id = intval($data['attributeSet'])) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface $attributeSet */
             $attributeSet = $this->attributeSetRepository->find($id);
         }
 
@@ -133,6 +134,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addVisibilityField()
+            ->addBestSellerField()
+            ->addCrossSellingField()
             ->addCategoriesField()
             ->addCustomerGroupsField()
             ->addReleasedAtField()
@@ -177,6 +181,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addVisibilityField()
+            ->addBestSellerField()
+            ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField(['disabled' => true])
@@ -271,6 +278,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addVisibilityField()
+            ->addBestSellerField()
+            ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField(['disabled' => true])
@@ -310,6 +320,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
+            ->addVisibilityField()
+            ->addBestSellerField()
+            ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
             ->addWeightField(['disabled' => true])

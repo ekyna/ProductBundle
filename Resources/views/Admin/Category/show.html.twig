@@ -23,16 +23,19 @@
     <div class="show-body">
         <div class="tab-content">
             <div class="tab-pane active" id="category-general">
+                {{ show_row(category.name, 'text', {
+                    'label': 'ekyna_core.field.name'
+                }) }}
                 <div class="row">
                     <div class="col-md-6">
-                        {{ show_row(category.name, 'text', {
-                            'label': 'ekyna_core.field.name',
+                        {{ show_row(category.visible, 'boolean', {
+                            'label': 'ekyna_core.field.visible',
                             'label_col': 4
                         }) }}
                     </div>
                     <div class="col-md-6">
-                        {{ show_row(category.visible, 'boolean', {
-                            'label': 'ekyna_core.field.visible',
+                        {{ show_row(category.visibility, 'number', {
+                            'label': 'ekyna_product.common.visibility',
                             'label_col': 4
                         }) }}
                     </div>

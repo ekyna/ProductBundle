@@ -17,4 +17,28 @@
         </p>
     </div>
 </div>
-{{ google_tracking() }}
+{% set products = get_cross_selling(product, {'limit': 3}) %}
+{% if products is not empty %}
+<div class="row">
+    <div class="col-md-12">
+        <p>{{ 'ekyna_product.highlight.cross_selling'|trans }}</p>
+    </div>
+</div>
+<div class="row">
+    {%- for product in products|slice(0, 3) -%}
+    <div class="col-md-4">
+        <a href="{{ product|subject_public_url }}" class="cross-selling-thumb">
+            {%- set image = product|product_image -%}
+            {%- if image is not null -%}
+                {# TODO filter #}
+                <img class="img-responsive" src="{{ image.path|imagine_filter('product_slide') }}" alt="{{ image.title }}">
+            {%- else -%}
+                <img class="img-responsive" src="{{ product_default_image() }}" alt="{{ product.title }}">
+            {%- endif -%}
+            <span class="title">{{ product.title }}</span><br>
+            <span class="price">{{ product|product_price }}</span>
+        </a>
+    </div>
+    {%- endfor -%}
+</div>
+{% endif %}

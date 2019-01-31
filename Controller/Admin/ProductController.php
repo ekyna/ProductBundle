@@ -30,18 +30,6 @@ class ProductController extends AbstractSubjectController
         RC\ToggleableTrait;
 
     /**
-     * Product stats action.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function statsData(Request $request)
-    {
-
-    }
-
-    /**
      * Product summary action.
      *
      * @param Request $request
@@ -62,7 +50,8 @@ class ProductController extends AbstractSubjectController
 
         $response = new Response();
         $response->setVary(['Accept', 'Accept-Encoding']);
-        $response->setLastModified($product->getUpdatedAt());
+        $response->setExpires(new \DateTime('+3 min'));
+        //$response->setLastModified($product->getUpdatedAt());
 
         $html = false;
         $accept = $request->getAcceptableContentTypes();
@@ -75,9 +64,9 @@ class ProductController extends AbstractSubjectController
             throw $this->createNotFoundException("Unsupported content type.");
         }
 
-        if ($response->isNotModified($request)) {
+        /*if ($response->isNotModified($request)) {
             return $response;
-        }
+        }*/
 
         if ($html) {
             $content = $this->get('serializer')->normalize($product, 'json', ['groups' => ['Summary']]);
@@ -310,7 +299,7 @@ class ProductController extends AbstractSubjectController
             ->initialize($product, $form)
             ->addAttributesField($attributeSet);
 
-        $response = $this->render('EkynaProductBundle:Admin/Product:attributes_form.xml.twig', [
+        $response = $this->render('@EkynaProduct/Admin/Product/attributes_form.xml.twig', [
             'form' => $form->createView(),
         ]);
 

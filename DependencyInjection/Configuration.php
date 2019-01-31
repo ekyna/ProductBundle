@@ -23,7 +23,10 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('ekyna_product');
 
         $this->addDefaultSection($rootNode);
+        $this->addCatalogSection($rootNode);
         $this->addEditorSection($rootNode);
+        $this->addPricingSection($rootNode);
+        $this->addHighlightSection($rootNode);
         $this->addPoolsSection($rootNode);
 
         return $treeBuilder;
@@ -59,22 +62,19 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('pricing')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('final_price_format')
-                            ->cannotBeEmpty()
-                            ->defaultValue('<strong>{amount}</strong>&nbsp;<sup>{mode}</sup>')
-                        ->end()
-                        ->scalarNode('original_price_format')
-                            ->cannotBeEmpty()
-                            ->defaultValue('<del>{amount}</del>&nbsp;')
-                        ->end()
-                        ->booleanNode('price_with_from')
-                            ->defaultTrue()
-                        ->end()
-                    ->end()
-                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds `catalog` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addCatalogSection(ArrayNodeDefinition $node)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        $node
+            ->children()
                 ->arrayNode('catalog')
                     ->addDefaultsIfNotSet()
                     ->treatFalseLike([
@@ -136,6 +136,90 @@ class Configuration implements ConfigurationInterface
                                     ->defaultValue('@EkynaProduct/Editor/Block/product_slide.html.twig')
                                 ->end()
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds `highlight` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addHighlightSection(ArrayNodeDefinition $node)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        $node
+            ->children()
+                ->arrayNode('highlight')
+                    ->canBeDisabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('thumb_template')
+                            ->cannotBeEmpty()
+                            ->defaultValue('@EkynaProduct/Highlight/thumb.html.twig')
+                        ->end()
+                        ->arrayNode('best_seller')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('template')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('@EkynaProduct/Highlight/best.html.twig')
+                                ->end()
+                                ->scalarNode('from')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('-6 months')
+                                ->end()
+                                ->integerNode('limit')
+                                    ->defaultValue(8)
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('cross_selling')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('template')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('@EkynaProduct/Highlight/cross.html.twig')
+                                ->end()
+                                ->scalarNode('from')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('-6 months')
+                                ->end()
+                                ->integerNode('limit')
+                                    ->defaultValue(4)
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds `pricing` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addPricingSection(ArrayNodeDefinition $node)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        $node
+            ->children()
+                ->arrayNode('pricing')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('final_price_format')
+                            ->cannotBeEmpty()
+                            ->defaultValue('<strong>{amount}</strong>&nbsp;<sup>{mode}</sup>')
+                        ->end()
+                        ->scalarNode('original_price_format')
+                            ->cannotBeEmpty()
+                            ->defaultValue('<del>{amount}</del>&nbsp;')
+                        ->end()
+                        ->booleanNode('price_with_from')
+                            ->defaultTrue()
                         ->end()
                     ->end()
                 ->end()

@@ -1,141 +1,140 @@
-{% macro show_designation(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.designation, 'text', {
+{%- macro show_designation(product, options = {}) -%}
+    {{- show_row(product.designation, 'text', {
         'label': 'ekyna_core.field.designation',
         'id': 'product_designation'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_designation %}
+    }|merge(options)) -}}
+{%- endmacro show_designation -%}
 
 
-{% macro show_visible(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.visible, 'boolean', {
+{%- macro show_visible(product, options = {}) -%}
+    {{- show_row(product.visible, 'boolean', {
         'label': 'ekyna_core.field.visible',
         'id': 'product_visible'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_visible %}
+    }|merge(options)) -}}
+{%- endmacro show_visible -%}
 
 
-{% macro show_brand(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.brand, 'entity', {
+{%- macro show_visibility(product, options = {}) -%}
+    {{- show_row(product.visible, 'number', {
+        'label': 'ekyna_product.common.visibility',
+        'id': 'product_visibility'
+    }|merge(options)) -}}
+{%- endmacro show_visibility -%}
+
+
+{%- macro show_best_seller(product, options = {}) -%}
+    {{- show_row(product|product_best_seller_badge, 'text', {
+        'label': 'ekyna_product.product.field.best_seller',
+        'id': 'product_best_seller'
+    }|merge(options)) -}}
+{%- endmacro show_best_seller -%}
+
+
+{%- macro show_cross_selling(product, options = {}) -%}
+    {{- show_row(product|product_cross_selling_badge, 'text', {
+        'label': 'ekyna_product.product.field.cross_selling',
+        'id': 'product_cross_selling'
+    }|merge(options)) -}}
+{%- endmacro show_cross_selling -%}
+
+
+{%- macro show_brand(product, options = {}) -%}
+    {{- show_row(product.brand, 'entity', {
         'label': 'ekyna_product.brand.label.singular',
         'route': 'ekyna_product_brand_admin_show',
         'route_parameters_map': {'brandId': 'id'},
         'id': 'product_brand'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_brand %}
+    }|merge(options)) -}}
+{%- endmacro show_brand -%}
 
 
-{% macro show_categories(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.categories, 'entity', {
+{%- macro show_categories(product, options = {}) -%}
+    {{- show_row(product.categories, 'entity', {
         'label': 'ekyna_product.category.label.plural',
         'route': 'ekyna_product_category_admin_show',
         'route_parameters_map': {'categoryId': 'id'},
         'id': 'product_categories'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_categories %}
+    }|merge(options)) -}}
+{%- endmacro show_categories -%}
 
 
-{% macro show_customer_groups(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.customerGroups, 'entity', {
+{%- macro show_customer_groups(product, options = {}) -%}
+    {{- show_row(product.customerGroups, 'entity', {
         'label': 'ekyna_commerce.customer_group.label.plural',
         'route': 'ekyna_commerce_customer_group_admin_show',
         'route_parameters_map': {'customerGroupId': 'id'},
         'id': 'product_customerGroups'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_customer_groups %}
+    }|merge(options)) -}}
+{%- endmacro show_customer_groups -%}
 
 
-{% macro show_released_at(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.releasedAt, 'datetime', {
+{%- macro show_released_at(product, options = {}) -%}
+    {{- show_row(product.releasedAt, 'datetime', {
         'label': 'ekyna_product.product.field.released_at',
         'date_format': 'short',
         'time_format': 'none',
         'id': 'product_releasedAt'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_released_at %}
+    }|merge(options)) -}}
+{%- endmacro show_released_at -%}
 
 
-{% macro show_reference(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.reference, 'text', {
+{%- macro show_reference(product, options = {}) -%}
+    {{- show_row(product.reference, 'text', {
         'label': 'ekyna_core.field.reference',
         'id': 'product_reference',
         'attr': {
             'data-clipboard-copy': product.reference
         }
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_reference %}
+    }|merge(options)) -}}
+{%- endmacro show_reference -%}
 
 
-{% macro show_weight(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.weight, 'number', {
+{%- macro show_weight(product, options = {}) -%}
+    {{- show_row(product.weight, 'number', {
         'label': 'ekyna_core.field.weight',
         'id': 'product_weight',
         'append': ' kg'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_weight %}
+    }|merge(options)) -}}
+{%- endmacro show_weight -%}
 
 
-{% macro show_height(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.height, 'number', {
+{%- macro show_height(product, options = {}) -%}
+    {{- show_row(product.height, 'number', {
         'label': 'ekyna_core.field.height',
         'id': 'product_height',
         'append': ' mm'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_height %}
+    }|merge(options)) -}}
+{%- endmacro show_height -%}
 
 
-{% macro show_width(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.width, 'number', {
+{%- macro show_width(product, options = {}) -%}
+    {{- show_row(product.width, 'number', {
         'label': 'ekyna_core.field.width',
         'id': 'product_width',
         'append': ' mm'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_width %}
+    }|merge(options)) -}}
+{%- endmacro show_width -%}
 
 
-{% macro show_depth(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.depth, 'number', {
+{%- macro show_depth(product, options = {}) -%}
+    {{- show_row(product.depth, 'number', {
         'label': 'ekyna_core.field.depth',
         'id': 'product_depth',
         'append': ' mm'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_depth %}
+    }|merge(options)) -}}
+{%- endmacro show_depth -%}
 
 
-{% macro show_unit(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.unit, 'unit', {
+{%- macro show_unit(product, options = {}) -%}
+    {{- show_row(product.unit, 'unit', {
         'label': 'ekyna_commerce.unit.label',
         'id': 'product_unit'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_unit %}
+    }|merge(options)) -}}
+{%- endmacro show_unit -%}
 
 
-{% macro show_translations(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.translations, 'translations', {
+{%- macro show_translations(product, options = {}) -%}
+    {{- show_row(product.translations, 'translations', {
         'id': 'product_translations',
         'fields': {
             'title': {'label': 'ekyna_core.field.title'},
@@ -147,130 +146,112 @@
                 'options': {'height': 150}
             }
         }
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_translations %}
+    }|merge(options)) -}}
+{%- endmacro show_translations -%}
 
 
-{% macro show_attribute_set(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.attributeSet, 'entity', {
+{%- macro show_attribute_set(product, options = {}) -%}
+    {{- show_row(product.attributeSet, 'entity', {
         'label': 'ekyna_product.attribute_set.label.singular',
         'id': 'product_attributeSet',
         'route': 'ekyna_product_attribute_set_admin_show',
         'route_parameters_map': {'attributeSetId': 'id'}
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_attribute_set %}
+    }|merge(options)) -}}
+{%- endmacro show_attribute_set -%}
 
 
-{% macro show_variable(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.parent, 'entity', {
+{%- macro show_variable(product, options = {}) -%}
+    {{- show_row(product.parent, 'entity', {
         'label': 'ekyna_product.product.field.parent',
         'id': 'product_parent',
         'route': 'ekyna_product_product_admin_show',
         'route_parameters_map': {'productId': 'id'},
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_variable %}
+    }|merge(options)) -}}
+{%- endmacro show_variable -%}
 
 
-{% macro show_medias(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.medias, 'medias', {
+{%- macro show_medias(product, options = {}) -%}
+    {{- show_row(product.medias, 'medias', {
         'label': 'ekyna_core.field.medias',
         'id': 'product_medias'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_medias %}
+    }|merge(options)) -}}
+{%- endmacro show_medias -%}
 
 
-{% macro show_min_price(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.minPrice|localizedcurrency(commerce_default_currency), 'text', {
+{%- macro show_min_price(product, options = {}) -%}
+    {{- show_row(product.minPrice|localizedcurrency(commerce_default_currency), 'text', {
         'label': 'ekyna_product.product.field.min_price',
         'id': 'product_minPrice',
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_min_price %}
+    }|merge(options)) -}}
+{%- endmacro show_min_price -%}
 
 
-{% macro show_net_price(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', {
+{%- macro show_net_price(product, options = {}) -%}
+    {{- show_row(product.netPrice|localizedcurrency(commerce_default_currency), 'text', {
         'label': 'ekyna_commerce.field.net_price',
         'id': 'product_netPrice',
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_net_price %}
+    }|merge(options)) -}}
+{%- endmacro show_net_price -%}
 
 
-{% macro show_tax_group(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.taxGroup, 'entity', {
+{%- macro show_tax_group(product, options = {}) -%}
+    {{- show_row(product.taxGroup, 'entity', {
         'label': 'ekyna_commerce.tax_group.label.singular',
         'id': 'product_taxGroup',
         'route': 'ekyna_commerce_tax_group_admin_show',
         'route_parameters_map': {'taxGroupId': 'id'},
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_tax_group %}
+    }|merge(options)) -}}
+{%- endmacro show_tax_group -%}
 
 
-{% macro show_references(product, options = {}) %}
-{% spaceless %}
+{%- macro show_references(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_product.product_reference.label.plural'|trans }}
+            {{- 'ekyna_product.product_reference.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_references">
-                {% if product.references is not empty %}
+                {%- if product.references is not empty -%}
                     <dl class="dl-horizontal">
-                        {% for reference in product.references %}
+                        {%- for reference in product.references -%}
                             <dt>{{ reference|product_reference_type_label }}</dt>
                             <dd data-clipboard-copy="{{ reference.number }}">{{ reference.number }}</dd>
-                        {% endfor %}
+                        {%- endfor -%}
                     </dl>
-                {% else %}
+                {%- else -%}
                     <em>{{ 'ekyna_core.value.none'|trans }}</em>
-                {% endif %}
+                {%- endif -%}
             </div>
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_references %}
+{%- endmacro show_references -%}
 
 
-{% macro show_attributes(product, options = {}) %}
-{% spaceless %}
-    {% if product is simple_product or product is variant_product %}
+{%- macro show_attributes(product, options = {}) -%}
+    {%- if product is simple_product or product is variant_product -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_product.attribute.label.plural'|trans }}
+            {{- 'ekyna_product.attribute.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_attributes">
                 <dl class="dl-horizontal">
-                    {% for attribute in product.attributes -%}
+                    {%- for attribute in product.attributes -%}
                     <dt>{{ attribute.attributeSlot.attribute.name }}</dt>
                     <dd>{{ attribute|product_attribute }}</dd>
-                    {%- endfor %}
+                    {%- endfor -%}
                 </dl>
             </div>
         </div>
     </div>
-    {% endif %}
-{% endspaceless %}
-{% endmacro show_attributes %}
+    {%- endif -%}
+{%- endmacro show_attributes -%}
 
 
-{% macro show_adjustments(product, options = {}) %}
-{% spaceless %}
+{%- macro show_adjustments(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_commerce.adjustment.label.plural'|trans }}
+            {{- 'ekyna_commerce.adjustment.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_adjustments">
@@ -281,7 +262,7 @@
                         <th class="text-right">{{ 'ekyna_core.field.mode'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.amount'|trans }}</th>
                     </tr>
-                    {% for adjustment in product.adjustments -%}
+                    {%- for adjustment in product.adjustments -%}
                         <tr>
                             <td>{{ adjustment.designation }}</td>
                             <td class="text-right">{{ adjustment.type|adjustment_type_label }}</td>
@@ -289,23 +270,21 @@
                             <td class="text-right">{{ adjustment.amount|localizedcurrency(commerce_default_currency) }}</td>
                         </tr>
                         {# TODO translations ? #}
-                    {% else %}
+                    {%- else -%}
                         <tr>
                             <td colspan="4">
-                                {{ 'ekyna_core.value.none'|trans }}
+                                {{- 'ekyna_core.value.none'|trans -}}
                             </td>
                         </tr>
-                    {% endfor %}
+                    {%- endfor -%}
                 </table>
             </div>
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_adjustments %}
+{%- endmacro show_adjustments -%}
 
 
-{% macro show_option_groups(product, options = {}) %}
-{% spaceless %}
+{%- macro show_option_groups(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{- 'ekyna_product.option_group.label.plural'|trans -}}
@@ -313,9 +292,9 @@
         <div class="col-md-10">
             {%- if product.optionGroups|length -%}
             <div class="show-widget show-widget-sm">
-                {% for group in product.optionGroups %}
+                {%- for group in product.optionGroups -%}
                 <div class="collection-item">
-                    {% set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' %}
+                    {%- set groupId = 'product_optionGroups_' ~ loop.index0 ~ '_' -%}
                     {{- show_row(group.name, 'text', {
                         'label': 'ekyna_core.field.name',
                         'id': groupId ~ 'name'
@@ -356,9 +335,9 @@
                                         <th class="text-right">{{ 'ekyna_core.field.price'|trans }}</th>
                                         <th class="text-right">{{ 'ekyna_core.field.group'|trans }}</th>
                                     </tr>
-                                    {% for option in group.options %}
-                                    {% set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' %}
-                                    {% set data = option.product ?: option %}
+                                    {%- for option in group.options -%}
+                                    {%- set optionId = groupId ~ 'options_' ~ loop.index0 ~ '_' -%}
+                                    {%- set data = option.product ?: option -%}
                                     <tr>
                                         <td id="{{ optionId ~ 'designation' }}">
                                         {%- if option.product -%}
@@ -367,17 +346,17 @@
                                                    'route': 'ekyna_product_product_admin_summary',
                                                    'parameters': {'productId': option.product.id}
                                                }|json_encode }}'>
-                                                {{ option.product.fullDesignation }}
+                                                {{- option.product.fullDesignation -}}
                                             </a>
                                         {%- else -%}
-                                            {{ data.designation }}
+                                            {{- data.designation -}}
                                         {%- endif -%}
                                         </td>
                                         <td id="{{ optionId ~ 'reference' }}" data-clipboard-copy="{{ data.reference }}">
                                             {{- data.reference -}}
                                         </td>
                                         <td id="{{ optionId ~ 'weight' }}" class="text-right">
-                                            {{- data.weight|localizednumber }} kg
+                                            {{- data.weight|localizednumber ~ ' kg' -}}
                                         </td>
                                         <td id="{{ optionId ~ 'netPrice' }}" class="text-right">
                                         {%- if option.product and option.netPrice is same as(null) -%}
@@ -391,13 +370,13 @@
                                         </td>
                                     </tr>
                                     {# TODO translations ? #}
-                                    {% endfor %}
+                                    {%- endfor -%}
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                {%- endfor -%}
             </div>
             {%- else -%}
             <div class="show-widget show-widget-inline">
@@ -406,12 +385,10 @@
             {%- endif -%}
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_option_groups %}
+{%- endmacro show_option_groups -%}
 
 
-{% macro show_special_offers(product, options = {}) %}
-{% spaceless %}
+{%- macro show_special_offers(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{- 'ekyna_product.special_offer.label.plural'|trans -}}
@@ -429,8 +406,8 @@
                         <th class="text-right">{{ 'ekyna_product.special_offer.field.stack'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.enabled'|trans }}</th>
                     </tr>
-                    {% for offer in product.specialOffers -%}
-                    {% set offerId = 'product_specialOffers_' ~ loop.index0 ~ '_' -%}
+                    {%- for offer in product.specialOffers -%}
+                    {%- set offerId = 'product_specialOffers_' ~ loop.index0 ~ '_' -%}
                     <tr>
                         <td id="{{ offerId ~ 'name' }}">
                             {{- offer.name -}}
@@ -456,21 +433,21 @@
                         {%- endif -%}
                         </td>
                         <td id="{{ offerId ~ 'stack' }}" class="text-right">
-                            {% if offer.stack -%}
+                            {%- if offer.stack -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
-                            {%- endif %}
+                            {%- endif -%}
                         </td>
                         <td id="{{ offerId ~ 'enabled' }}" class="text-right">
-                            {% if offer.enabled -%}
+                            {%- if offer.enabled -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
-                            {%- endif %}
+                            {%- endif -%}
                         </td>
                     </tr>
-                    {%- endfor %}
+                    {%- endfor -%}
                 </table>
             </div>
             {%- else -%}
@@ -480,12 +457,10 @@
             {%- endif -%}
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_special_offers %}
+{%- endmacro show_special_offers -%}
 
 
-{% macro show_pricings(product, options = {}) %}
-{% spaceless %}
+{%- macro show_pricings(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{- 'ekyna_product.pricing.label.plural'|trans -}}
@@ -498,8 +473,8 @@
                         <th>{{ 'ekyna_core.field.name'|trans }}</th>
                         <th>{{ 'ekyna_product.pricing_rule.label.plural'|trans }}</th>
                     </tr>
-                    {% for pricing in product.pricings -%}
-                    {% set pricingId = 'product_pricings_' ~ loop.index0 ~ '_' -%}
+                    {%- for pricing in product.pricings -%}
+                    {%- set pricingId = 'product_pricings_' ~ loop.index0 ~ '_' -%}
                     <tr>
                         <td id="{{ pricingId ~ 'name' }}">
                             {{- pricing.name -}}
@@ -508,20 +483,20 @@
                             <table class="table table-condensed">
                                 <tr>
                                     <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
-                                    {% for rule in pricing.rules -%}
+                                    {%- for rule in pricing.rules -%}
                                         <td class="text-right">{{ rule.minQuantity|localizednumber }}</td>
-                                    {%- endfor %}
+                                    {%- endfor -%}
                                 </tr>
                                 <tr>
                                     <th class="text-right">{{ 'ekyna_product.common.percent'|trans }}</th>
-                                    {% for rule in pricing.rules -%}
+                                    {%- for rule in pricing.rules -%}
                                         <td class="text-right">{{ (rule.percent / 100)|localizednumber('percent') }}</td>
-                                    {%- endfor %}
+                                    {%- endfor -%}
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    {%- endfor %}
+                    {%- endfor -%}
                 </table>
             </div>
             {%- else -%}
@@ -531,12 +506,10 @@
             {%- endif -%}
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_pricings %}
+{%- endmacro show_pricings -%}
 
 
-{% macro show_bundle_composition(product, options = {}) %}
-{% spaceless %}
+{%- macro show_bundle_composition(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{- 'ekyna_product.bundle_slot.label.plural'|trans -}}
@@ -615,7 +588,7 @@
                             {{- (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                         </td>
                     </tr>
-                    {% endfor %}
+                    {%- endfor -%}
                     <tr>
                         <td colspan="8" class="text-right">
                             <strong>{{ 'ekyna_core.field.total'|trans }}</strong>
@@ -636,27 +609,25 @@
             </div>
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_bundle_composition %}
+{%- endmacro show_bundle_composition -%}
 
 
-{% macro show_configurable_composition(product, options = {}) %}
-{% spaceless %}
+{%- macro show_configurable_composition(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">
-            {{ 'ekyna_product.bundle_slot.label.plural'|trans }}
+            {{- 'ekyna_product.bundle_slot.label.plural'|trans -}}
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-configurable">
-            {% if product is configurable_product %}
+            {%- if product is configurable_product -%}
                 <p class="total">
                     <strong>{{ 'ekyna_product.product.field.total_net_price'|trans }}</strong>
                     <span>{{ product|product_configurable_total_price|localizedcurrency(commerce_default_currency) }}</span>
                 </p>
-                {% for slot in product.bundleSlots %}
-                {% set slot_id = 'product_slots_' ~ loop.index0 ~ '_' %}
+                {%- for slot in product.bundleSlots -%}
+                {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
                 <div class="slot collection-item">
-                    {{ show_row(slot.translations, 'translations', {
+                    {{- show_row(slot.translations, 'translations', {
                         'id': slot_id ~ 'translations',
                         'fields': {
                             'title': {'label': 'ekyna_core.field.title'},
@@ -666,21 +637,21 @@
                                 'options': {'html': true},
                             },
                         }
-                    }) }}
+                    }) -}}
                     <div class="row">
                         <div class="col-md-6">
-                            {{ show_row(slot.media, 'media', {
+                            {{- show_row(slot.media, 'media', {
                                 'label': 'ekyna_core.field.image',
                                 'id': slot_id ~ 'image',
                                 'label_col': 4
-                            }) }}
+                            }) -}}
                         </div>
                         <div class="col-md-6">
-                            {{ show_row(slot.required, 'boolean', {
+                            {{- show_row(slot.required, 'boolean', {
                                 'label': 'ekyna_core.field.required',
                                 'id': slot_id ~ 'required',
                                 'label_col': 4
-                            }) }}
+                            }) -}}
                         </div>
                     </div>
                     <table class="table table-stripped table-condensed table-hover">
@@ -694,9 +665,9 @@
                             <th class="text-right">{{ 'ekyna_product.common.max_quantity'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
                         </tr>
-                        {% for choice in slot.choices %}
-                        {% set choice_id = slot_id ~ '_choice_' ~loop.index0 ~ '_' %}
-                        {% set choice_product = choice.product %}
+                        {%- for choice in slot.choices -%}
+                        {%- set choice_id = slot_id ~ '_choice_' ~loop.index0 ~ '_' -%}
+                        {%- set choice_product = choice.product -%}
                         <tr>
                             <td id="{{ choice_id ~ 'product' }}">
                                 <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
@@ -741,24 +712,22 @@
                                 <em>[TODO] Choice rules</em> {# TODO rules #}
                             </td>
                         </tr>
-                        {% endfor %}
+                        {%- endfor -%}
                     </table>
                 </div>
-                {% endfor %}
-            {% else %}
+                {%- endfor -%}
+            {%- else -%}
                 <p class="alert alert-danger">
                     <em>Wrong product type</em>
                 </p>
-            {% endif %}
+            {%- endif -%}
             </div>
         </div>
     </div>
-{% endspaceless %}
-{% endmacro show_configurable_composition %}
+{%- endmacro show_configurable_composition -%}
 
 
-{% macro show_relations(products) %}
-{% spaceless %}
+{%- macro show_relations(products) -%}
     <table class="table table-stripped table-condensed table-hover">
         <tr>
             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
@@ -768,8 +737,8 @@
             <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
             <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
         </tr>
-        {% for product in products -%}
-            {% set relationId = 'relation_' ~loop.index0 ~ '_' %}
+        {%- for product in products -%}
+            {%- set relationId = 'relation_' ~loop.index0 ~ '_' -%}
             <tr>
                 <td id="{{ relationId ~ 'product' }}">
                     <a href="{{ admin_resource_path(product) }}" class="show-entity"
@@ -801,24 +770,20 @@
                     {{- product.netPrice|localizedcurrency(commerce_default_currency) -}}
                 </td>
             </tr>
-        {%- endfor %}
+        {%- endfor -%}
     </table>
-{% endspaceless %}
-{% endmacro show_relations %}
+{%- endmacro show_relations -%}
 
 
-{% macro show_seo(product, options = {}) %}
-{% spaceless %}
-    {{ show_row(product.seo, 'seo', {
+{%- macro show_seo(product, options = {}) -%}
+    {{- show_row(product.seo, 'seo', {
         'id': 'product_seo'
-    }|merge(options)) }}
-{% endspaceless %}
-{% endmacro show_seo %}
+    }|merge(options)) -}}
+{%- endmacro show_seo -%}
 
 
-{% macro show_stock_units(product) %}
-{% spaceless %}
-    {%- if product.stockMode is not stock_mode_disabled %}
+{%- macro show_stock_units(product) -%}
+    {%- if product.stockMode is not stock_mode_disabled -%}
         <hr>
         {%- if product.stockMode is stock_mode_manual -%}
         <div class="actions">
@@ -836,5 +801,41 @@
             'id': 'stock-units-view'
         }) -}}
     {%- endif -%}
-{% endspaceless %}
-{% endmacro show_stock_units %}
+{%- endmacro show_stock_units -%}
+
+
+{%- macro show_stat_charts(product) -%}
+    <div class="panel-group" id="stat_collapse" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="count_stat_heading">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#stat_collapse" href="#collapse_count_chart"
+                       aria-expanded="true" aria-controls="collapseOne" style="display:block;">
+                        {{- 'ekyna_product.stat.count'|trans -}}
+                    </a>
+                </h4>
+            </div>
+            <div id="collapse_count_chart" class="panel-collapse collapse in" role="tabpanel"
+                 aria-labelledby="count_stat_heading">
+                <div class="panel-body">
+                    {{- product_stat_count_chart(product) -}}
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="cross_stat_heading">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#stat_collapse" href="#collapse_cross_chart"
+                       aria-expanded="true" aria-controls="collapseOne" style="display:block;">
+                        {{- 'ekyna_product.stat.cross'|trans -}}
+                    </a>
+                </h4>
+            </div>
+            <div id="collapse_cross_chart" class="panel-collapse collapse" role="tabpanel" aria-labelledby="cross_stat_heading">
+                <div class="panel-body">
+                    {{- product_stat_cross_chart(product) -}}
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro show_stat_charts -%}

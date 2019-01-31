@@ -13,14 +13,15 @@ use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
  *
  * @method BrandTranslationInterface translate($locale = null, $create = false)
  */
-interface BrandInterface
-    extends Cms\ContentSubjectInterface,
-            Cms\SeoSubjectInterface,
-            MediaSubjectInterface,
-            RM\SortableInterface,
-            RM\TimestampableInterface,
-            RM\TranslatableInterface,
-            RM\TaggedEntityInterface
+interface BrandInterface extends
+    VisibilityInterface,
+    Cms\ContentSubjectInterface,
+    Cms\SeoSubjectInterface,
+    MediaSubjectInterface,
+    RM\SortableInterface,
+    RM\TimestampableInterface,
+    RM\TranslatableInterface,
+    RM\TaggedEntityInterface
 {
     /**
      * Returns the name.
@@ -37,22 +38,6 @@ interface BrandInterface
      * @return $this|BrandInterface
      */
     public function setName($name);
-
-    /**
-     * Returns the visible.
-     *
-     * @return bool
-     */
-    public function isVisible();
-
-    /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return $this|BrandInterface
-     */
-    public function setVisible($visible);
 
     /**
      * Returns the (translated) title.

@@ -19,6 +19,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @method ProductTranslationInterface translate($locale = null, $create = false)
  */
 interface ProductInterface extends
+    VisibilityInterface,
     Cms\ContentSubjectInterface,
     Cms\SeoSubjectInterface,
     Cms\TagsSubjectInterface,
@@ -606,22 +607,6 @@ interface ProductInterface extends
     public function getFullDesignation($withBrand = false);
 
     /**
-     * Returns the visible.
-     *
-     * @return bool
-     */
-    public function isVisible();
-
-    /**
-     * Sets the visible.
-     *
-     * @param bool $visible
-     *
-     * @return $this|ProductInterface
-     */
-    public function setVisible($visible);
-
-    /**
      * Sets the reference.
      *
      * @param string $reference
@@ -747,6 +732,38 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setReleasedAt(\DateTime $date = null);
+
+    /**
+     * Returns the best seller mode.
+     *
+     * @return int
+     */
+    public function getBestSeller();
+
+    /**
+     * Sets the best seller mode.
+     *
+     * @param int $value
+     *
+     * @return $this|ProductInterface
+     */
+    public function setBestSeller(int $value);
+
+    /**
+     * Returns the cross selling mode.
+     *
+     * @return int
+     */
+    public function getCrossSelling();
+
+    /**
+     * Sets the cross selling mode.
+     *
+     * @param int $value
+     *
+     * @return $this|ProductInterface
+     */
+    public function setCrossSelling(int $value);
 
     /**
      * Returns the "stat updated at" datetime.

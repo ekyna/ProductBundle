@@ -100,6 +100,16 @@ class ProductExtension extends \Twig_Extension
                 [$this->constantHelper, 'renderAttributeTypeLabel']
             ),
             new \Twig_SimpleFilter(
+                'product_best_seller_badge',
+                [$this->constantHelper, 'renderProductBestSellerBadge'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
+                'product_cross_selling_badge',
+                [$this->constantHelper, 'renderProductCrossSellingBadge'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
                 'product_price',
                 [$this->priceRenderer, 'getProductPrice'],
                 ['is_safe' => ['html']]

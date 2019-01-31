@@ -83,7 +83,7 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_pricing_admin_list',
             'label'    => 'ekyna_product.pricing.label.plural',
             'resource' => 'ekyna_product_pricing',
-            'position' => 96,
+            'position' => 70,
         ]]);
 
         // Special offers
@@ -92,7 +92,7 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_special_offer_admin_list',
             'label'    => 'ekyna_product.special_offer.label.plural',
             'resource' => 'ekyna_product_special_offer',
-            'position' => 97,
+            'position' => 71,
         ]]);
 
         // Inventory
@@ -101,7 +101,16 @@ class AdminMenuPass implements CompilerPassInterface
             'route'    => 'ekyna_product_inventory_admin_index',
             'label'    => 'ekyna_product.inventory.title',
             'resource' => 'ekyna_product_product',
-            'position' => 98,
+            'position' => 80,
+        ]]);
+
+        // Highlight
+        $pool->addMethodCall('createEntry', ['catalog', [
+            'name'     => 'highlight',
+            'route'    => 'ekyna_product_highlight_admin_index',
+            'label'    => 'ekyna_product.highlight.title',
+            'resource' => 'ekyna_product_product',
+            'position' => 81,
         ]]);
 
         if ($container->getParameter('ekyna_product.catalog_enabled')) {
@@ -111,7 +120,7 @@ class AdminMenuPass implements CompilerPassInterface
                 'route'    => 'ekyna_product_catalog_admin_list',
                 'label'    => 'ekyna_product.catalog.label.plural',
                 'resource' => 'ekyna_product_catalog',
-                'position' => 99,
+                'position' => 90,
             ]]);
         }
     }

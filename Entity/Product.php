@@ -23,7 +23,8 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
-    use Common\AdjustableTrait,
+    use Model\VisibilityTrait,
+        Common\AdjustableTrait,
         Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         Cms\TagsSubjectTrait,
@@ -119,11 +120,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $attributesDesignation;
 
     /**
-     * @var bool
-     */
-    protected $visible = false;
-
-    /**
      * @var string
      */
     protected $reference;
@@ -166,17 +162,27 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var bool
      */
-    protected $pendingOffers;
+    protected $pendingOffers = true; // Schedule offers update at creation
 
     /**
      * @var bool
      */
-    protected $pendingPrices;
+    protected $pendingPrices = true; // Schedule prices update at creation
 
     /**
      * @var \DateTime
      */
     protected $releasedAt;
+
+    /**
+     * @var int
+     */
+    protected $bestSeller = Model\HighlightModes::MODE_AUTO;
+
+    /**
+     * @var int
+     */
+    protected $crossSelling = Model\HighlightModes::MODE_AUTO;
 
     /**
      * @var \DateTime
@@ -200,10 +206,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->references = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->variants = new ArrayCollection();
-
-        // Schedule offer update at creation
-        $this->pendingOffers = true;
-        $this->pendingPrices = true;
 
         $this->initializeAdjustments();
         $this->initializeStock();
@@ -1150,24 +1152,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function isVisible()
-    {
-        return $this->visible;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setVisible($visible)
-    {
-        $this->visible = (bool)$visible;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getReference()
     {
         return $this->reference;
@@ -1359,6 +1343,42 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setReleasedAt(\DateTime $date = null)
     {
         $this->releasedAt = $date;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBestSeller()
+    {
+        return $this->bestSeller;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBestSeller(int $value)
+    {
+        $this->bestSeller = $value;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCrossSelling()
+    {
+        return $this->crossSelling;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCrossSelling(int $value)
+    {
+        $this->crossSelling = $value;
 
         return $this;
     }

@@ -111,6 +111,15 @@
                 <option name="max">64</option>
             </constraint>
         </property>
+        <property name="visibility">
+            <constraint name="NotBlank"/>
+            <constraint name="Type">
+                <option name="type">int</option>
+            </constraint>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+            </constraint>
+        </property>
         <property name="translations">
             <constraint name="Count">
                 <option name="min">1</option>
@@ -258,6 +267,15 @@
             <constraint name="NotBlank"/>
             <constraint name="Length">
                 <option name="max">64</option>
+            </constraint>
+        </property>
+        <property name="visibility">
+            <constraint name="NotBlank"/>
+            <constraint name="Type">
+                <option name="type">int</option>
+            </constraint>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
             </constraint>
         </property>
         <property name="translations">
@@ -793,6 +811,34 @@
 
         <property name="adjustments">
             <constraint name="Valid"/>
+        </property>
+
+        <property name="visibility">
+            <constraint name="NotBlank"/>
+            <constraint name="Type">
+                <option name="type">int</option>
+            </constraint>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+
+        <property name="bestSeller">
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Bundle\ProductBundle\Model\HighlightModes</value>
+                    <value>getConstants</value>
+                </option>
+            </constraint>
+        </property>
+
+        <property name="crossSelling">
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Bundle\ProductBundle\Model\HighlightModes</value>
+                    <value>getConstants</value>
+                </option>
+            </constraint>
         </property>
 
         <property name="specialOffers">

@@ -1,0 +1,152 @@
+{%- extends "@EkynaAdmin/Entity/layout.html.twig" -%}
+
+{%- block page_title -%}
+    {{ 'ekyna_product.highlight.title'|trans }} - {{ parent() }}
+{%- endblock page_title -%}
+
+
+{%- block title -%}
+    <h1>{{ 'ekyna_product.highlight.title'|trans }}</h1>
+{%- endblock title -%}
+
+{%- block main -%}
+    <table id="highlight" class="table table-condensed table-striped">
+        <thead>
+        <tr>
+            <th class="sort">
+                <a class="asc" data-property="id" href="javascript: void(0)">ID</a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="brand" href="javascript: void(0)">
+                    {{- 'ekyna_product.brand.label.singular'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="designation" href="javascript: void(0)">
+                    {{- 'ekyna_core.field.designation'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="reference" href="javascript: void(0)">
+                    {{- 'ekyna_core.field.reference'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="visible" href="javascript: void(0)">
+                    {{- 'ekyna_core.field.visible'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="visibility" href="javascript: void(0)">
+                    {{- 'ekyna_product.common.visibility'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="bestSeller" href="javascript: void(0)">
+                    {{- 'ekyna_product.product.field.best_seller'|trans -}}
+                </a>
+            </th>
+            <th class="sort">
+                <a class="none" data-property="crossSelling" href="javascript: void(0)">
+                    {{- 'ekyna_product.product.field.cross_selling'|trans -}}
+                </a>
+            </th>
+        </tr>
+        </thead>
+        <thead class="filters">
+        <tr>
+            <th>
+                <input name="id" type="text" class="form-control input-sm">
+            </th>
+            <th>
+                <input name="brand" type="text" class="form-control input-sm">
+            </th>
+            <th>
+                <input name="designation" type="text" class="form-control input-sm">
+            </th>
+            <th>
+                <input name="reference" type="text" class="form-control input-sm">
+            </th>
+            <th>
+                <select name="visible" class="form-control input-sm">
+                    <option value=""></option>
+                    {% for label, value in visible_choices -%}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {%- endfor %}
+                </select>
+            </th>
+            <th>
+                <input name="visibility" type="number" class="form-control input-sm">
+            </th>
+            <th>
+                <select name="bestSeller" class="form-control input-sm">
+                    <option value=""></option>
+                    {% for label, value in highlight_choices -%}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {%- endfor %}
+                </select>
+            </th>
+            <th>
+                <select name="crossSelling" class="form-control input-sm">
+                    <option value=""></option>
+                    {% for label, value in highlight_choices -%}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {%- endfor %}
+                </select>
+            </th>
+        </tr>
+        </thead>
+        <tbody class="products">
+        {% set properties = ['id', 'brand','designation','reference','visible','visibility','bestSeller','crossSelling'] %}
+        {% for product in products -%}
+        <tr data-id="{{ product.id }}"{% for p in properties %} data-{{ p }}="{{ product[p] }}"{% endfor %}>
+            <td>
+                {{- product.id -}}
+            </td>
+            <td>
+                {{- product.brand -}}
+            </td>
+            <td>
+                <a href="{{ path('ekyna_product_product_admin_show', {'productId' : product.id}) }}"
+                    data-summary='{"route": "ekyna_product_product_admin_summary", "parameters": {"productId": {{ product.id }}'>
+                    {{- product.designation -}}
+                </a>
+            </td>
+            <td>
+                {{- product.reference -}}
+            </td>
+            <td>
+                <input name="visible" type="checkbox"{% if product.visible %} checked="checked"{% endif %}>
+            </td>
+            <td>
+                <input name="visibility" type="number" class="form-control input-sm" value="{{ product.visibility }}">
+            </td>
+            <td>
+                <select name="bestSeller" class="form-control input-sm">
+                {% for label, value in highlight_choices -%}
+                    <option value="{{ value }}"{% if product.bestSeller == value %} selected="selected"{% endif %}>{{ label }}</option>
+                {%- endfor %}
+                </select>
+            </td>
+            <td>
+                <select name="crossSelling" class="form-control input-sm">
+                {% for label, value in highlight_choices -%}
+                    <option value="{{ value }}"{% if product.crossSelling == value %} selected="selected"{% endif %}>{{ label }}</option>
+                {%- endfor %}
+                </select>
+            </td>
+        </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{%- endblock main -%}
+
+{%- block javascripts -%}
+    {{ parent() -}}
+    <script type="text/javascript">require(['ekyna-product/admin/highlight']);</script>
+{%- endblock javascripts -%}
+
+{%- block stylesheets -%}
+    {{ parent() }}
+    <link href="{{ asset('bundles/ekynaproduct/css/admin/highlight.css') }}" rel="stylesheet" type="text/css"/>
+{%- endblock stylesheets -%}

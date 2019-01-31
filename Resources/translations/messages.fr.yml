@@ -8,6 +8,7 @@ ekyna_product:
         min_quantity: Qte. min.
         max_quantity: Qte. max.
         read_more: En savoir plus
+        visibility: Visibilité
 
     email:
         stock_report:
@@ -215,6 +216,14 @@ ekyna_product:
             Conversion réussie. Veuillez vérifier les informations du produit variable
             <strong>ET</strong> de la variante créée.
 
+    highlight:
+        title: Mise en valeur
+        mode:
+            auto: Auto
+            always: Toujours
+            never: Jamais
+        best_sellers: Meilleures ventes
+        cross_selling: Ces articles pourraient vous intéresser
 
     inventory:
         title: Inventaire
@@ -364,6 +373,8 @@ ekyna_product:
             total_net_price: Prix total HT # TODO use ekyna_commerce.field... ?
             pricing: Tarifs
             stock: Stocks
+            best_seller: Meilleure vente
+            cross_selling: Cross selling
             released_at: Date de sortie
             composition: Composition
             option_parents: Ce produit constitue une option des produits suivants

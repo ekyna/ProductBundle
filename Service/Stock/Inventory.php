@@ -32,8 +32,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class Inventory
 {
-    const PENDING_DQL = <<<DQL
-(
+    const PENDING_DQL = "(
   SELECT SUM(nsoi.quantity) 
   FROM _class_ nsoi
   JOIN nsoi.product nsp
@@ -41,17 +40,14 @@ class Inventory
   WHERE nsp.subjectIdentity.provider = :provider
     AND nsp.subjectIdentity.identifier = p.id
     AND nso.state = '_state_'
-) AS pending
-DQL;
+) AS pending";
 
-    const STOCK_SUB_DQL = <<<DQL
-(
+    const STOCK_SUB_DQL = "(
     SELECT SUM(_table_._field_)
     FROM _class_ _table_
     WHERE _table_.state <> '_state_'
     AND _table_.product = p.id
-) AS _alias_
-DQL;
+) AS _alias_";
 
     const SESSION_KEY = 'inventory_context';
 

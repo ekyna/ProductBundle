@@ -7,8 +7,7 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type as Types;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -24,16 +23,19 @@ class BrandType extends ResourceFormType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, [
+            ->add('name', Types\TextType::class, [
                 'label'    => 'ekyna_core.field.name',
                 'required' => true,
             ])
-            ->add('visible', CheckboxType::class, [
+            ->add('visible', Types\CheckboxType::class, [
                 'label'    => 'ekyna_core.field.visible',
                 'required' => false,
                 'attr'     => [
                     'align_with_widget' => true,
                 ],
+            ])
+            ->add('visibility', Types\NumberType::class, [
+                'label' => 'ekyna_product.common.visibility',
             ])
             ->add('translations', TranslationsFormsType::class, [
                 'form_type'      => BrandTranslationType::class,

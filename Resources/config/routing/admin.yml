@@ -33,3 +33,7 @@ ekyna_product_special_offer_admin:
 ekyna_product_inventory_admin:
     resource: admin/inventory.yml
     prefix:   /inventory
+
+ekyna_product_highlight_admin:
+    resource: admin/highlight.yml
+    prefix:   /highlight

@@ -16,6 +16,7 @@
 
         <field name="name" type="string" column="name" length="64"/>
         <field name="visible" column="visible" type="boolean" nullable="false"/>
+        <field name="visibility" column="visibility" type="smallint" nullable="false"/>
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />

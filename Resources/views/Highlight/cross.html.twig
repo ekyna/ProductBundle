@@ -1,0 +1,15 @@
+<div class="container cross-selling">
+    <div class="row">
+        <div class="col-md-12">
+            <p class="title">{{ 'ekyna_product.highlight.cross_selling'|trans }}</p>
+        </div>
+    </div>
+    {%- set nb_per_row = nb_per_row|default(4) -%}
+    {%- for product in products -%}
+        {%- if loop.index0 % nb_per_row == 0 %}<div class="row">{% endif -%}
+        <div class="col-md-{{ 12 / nb_per_row }}">
+            {% include thumb_template with {'product': product} only %}
+        </div>
+        {%- if loop.index % nb_per_row == 0 or loop.last %}</div>{% endif -%}
+    {%- endfor -%}
+</div>

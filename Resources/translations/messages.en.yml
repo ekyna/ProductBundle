@@ -8,6 +8,7 @@ ekyna_product:
         min_quantity: Min. Qty.
         max_quantity: Max. Qty.
         read_more: Read more
+        visibility: Visibility
 
     email:
         stock_report:
@@ -215,6 +216,15 @@ ekyna_product:
             Conversion succeed.<br>
             Please check all the variable <strong>AND</strong> the created variant informations.
 
+    highlight:
+        title: Highlight
+        mode:
+            auto: Auto
+            always: Always
+            never: Never
+        best_sellers: Best sellers
+        cross_selling: Some articles that may be of interest
+
     inventory:
         title: Inventory
         field:
@@ -327,7 +337,6 @@ ekyna_product:
         label: Statistics
         count: Sales count
         cross: Cross selling
-
     product:
         label:
             singular: Product
@@ -363,6 +372,8 @@ ekyna_product:
             pricing: Pricing
             stock: Stocks
             released_at: Released at
+            best_seller: Best seller
+            cross_selling: Cross selling
             composition: Composition
             option_parents: This product is an option of the following products
             bundle_parents: This product is included in the following bundles

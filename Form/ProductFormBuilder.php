@@ -13,6 +13,7 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
+use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
@@ -480,13 +481,13 @@ class ProductFormBuilder
         }
 
         $options = array_replace([
-            'label'         => 'ekyna_product.special_offer.label.plural',
-            'entry_type'    => PR\SpecialOffer\SpecialOfferType::class,
-            'entry_options' => ['product_mode' => true],
-            'allow_add'     => true,
-            'allow_delete'  => true,
+            'label'           => 'ekyna_product.special_offer.label.plural',
+            'entry_type'      => PR\SpecialOffer\SpecialOfferType::class,
+            'entry_options'   => ['product_mode' => true],
+            'allow_add'       => true,
+            'allow_delete'    => true,
             'add_button_text' => 'ekyna_product.special_offer.button.add',
-            'required'      => false,
+            'required'        => false,
         ], $options);
 
         $this->form->add('specialOffers', CollectionType::class, $options);
@@ -597,6 +598,64 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('visible', SF\CheckboxType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the visibility field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addVisibilityField(array $options = [])
+    {
+        $options = array_replace([
+            'label' => 'ekyna_product.common.visibility',
+        ], $options);
+
+        $this->form->add('visibility', SF\NumberType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the best seller field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addBestSellerField(array $options = [])
+    {
+        $options = array_replace([
+            'label'   => 'ekyna_product.product.field.best_seller',
+            'choices' => HighlightModes::getChoices(),
+            'select2' => false,
+        ], $options);
+
+        $this->form->add('bestSeller', SF\ChoiceType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the cross selling field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addCrossSellingField(array $options = [])
+    {
+        $options = array_replace([
+            'label'   => 'ekyna_product.product.field.cross_selling',
+            'choices' => HighlightModes::getChoices(),
+            'select2' => false,
+        ], $options);
+
+        $this->form->add('crossSelling', SF\ChoiceType::class, $options);
 
         return $this;
     }
