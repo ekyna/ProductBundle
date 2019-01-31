@@ -807,12 +807,18 @@
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCount</argument>
+            <call method="setLocaleProvider">
+                <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            </call>
         </service>
         <!-- Stat cross repository -->
         <service id="ekyna_product.stat_cross.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCross</argument>
+            <call method="setLocaleProvider">
+                <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            </call>
         </service>
 
         <!-- Stat updater -->
@@ -828,6 +834,8 @@
         <service id="ekyna_product.stat.chart_builder_factory"
                  class="Ekyna\Bundle\ProductBundle\Service\Stat\ChartBuilderFactory">
             <argument type="service" id="ekyna_product.stat_count.repository"/>
+            <argument type="service" id="ekyna_product.stat_cross.repository"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="translator"/>
         </service>
@@ -838,6 +846,25 @@
             <argument type="service" id="ekyna_product.stat.chart_builder_factory"/>
             <argument type="service" id="templating"/>
             <argument type="collection"/>
+        </service>
+
+        <!-- Highlight -->
+        <service id="ekyna_product.highlight"
+                 class="Ekyna\Bundle\ProductBundle\Service\Highlight\Highlight">
+            <argument type="service" id="ekyna_commerce.common.context_provider"/>
+            <argument type="service" id="ekyna_commerce.cart.session_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.stat_count.repository"/>
+            <argument type="service" id="ekyna_product.stat_cross.repository"/>
+            <argument type="service" id="templating"/>
+            <argument type="collection"/><!-- Replaced by DI extesion -->
+        </service>
+
+        <!-- Checkout event listener -->
+        <service id="ekyna_product.event_subscriber.checkout"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\CheckoutEventSubscriber">
+            <argument type="service" id="ekyna_product.highlight"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
 
         <!-- Google tracking helper -->
@@ -873,6 +900,11 @@
         <service id="ekyna_product.twig.catalog_extension"
                  class="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension">
             <argument type="service" id="ekyna_product.catalog.registry"/>
+            <tag name="twig.extension"/>
+        </service>
+        <service id="ekyna_product.twig.highlight_extension"
+                 class="Ekyna\Bundle\ProductBundle\Twig\HighlightExtension">
+            <argument type="service" id="ekyna_product.highlight"/>
             <tag name="twig.extension"/>
         </service>
         <service id="ekyna_product.twig.stat_extension"
