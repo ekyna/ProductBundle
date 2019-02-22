@@ -25,4 +25,12 @@ final class BrandEvents
     const POST_DELETE = 'ekyna_product.brand.post_delete';
 
     const PUBLIC_URL  = 'ekyna_product.brand.public_url';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

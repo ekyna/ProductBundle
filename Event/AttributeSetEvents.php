@@ -23,4 +23,12 @@ final class AttributeSetEvents
 
     const PRE_DELETE  = 'ekyna_product.attribute_set.pre_delete';
     const POST_DELETE = 'ekyna_product.attribute_set.post_delete';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

@@ -8,6 +8,8 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  * Interface BundleSlotTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method BundleSlotInterface getTranslatable()
  */
 interface BundleSlotTranslationInterface extends TranslationInterface
 {

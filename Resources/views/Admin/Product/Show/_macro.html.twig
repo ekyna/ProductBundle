@@ -9,7 +9,8 @@
 {%- macro show_visible(product, options = {}) -%}
     {{- show_row(product.visible, 'boolean', {
         'label': 'ekyna_core.field.visible',
-        'id': 'product_visible'
+        'id': 'product_visible',
+        'color': true
     }|merge(options)) -}}
 {%- endmacro show_visible -%}
 

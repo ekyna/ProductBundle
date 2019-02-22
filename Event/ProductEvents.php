@@ -32,4 +32,12 @@ final class ProductEvents
 
     const PUBLIC_URL                = 'ekyna_product.product.public_url';
     const SCHEMA_ORG                = 'ekyna_product.product.schema_org';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

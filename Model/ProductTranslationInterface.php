@@ -8,6 +8,8 @@ use Ekyna\Component\Resource\Model as RM;
  * Interface ProductTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method ProductInterface getTranslatable()
  */
 interface ProductTranslationInterface extends RM\TranslationInterface
 {

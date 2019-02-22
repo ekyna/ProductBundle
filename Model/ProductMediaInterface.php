@@ -24,7 +24,7 @@ interface ProductMediaInterface extends GalleryMediaInterface, ResourceInterface
     /**
      * Returns the product.
      *
-     * @return ProductMediaInterface
+     * @return ProductInterface
      */
     public function getProduct();
 }

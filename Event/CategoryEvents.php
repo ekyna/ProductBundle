@@ -25,4 +25,12 @@ final class CategoryEvents
     const POST_DELETE = 'ekyna_product.category.post_delete';
 
     const PUBLIC_URL  = 'ekyna_product.category.public_url';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

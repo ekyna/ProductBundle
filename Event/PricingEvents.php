@@ -23,4 +23,12 @@ final class PricingEvents
 
     const PRE_DELETE  = 'ekyna_product.pricing.pre_delete';
     const POST_DELETE = 'ekyna_product.pricing.post_delete';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

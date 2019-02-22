@@ -649,10 +649,24 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Product media event listener -->
+        <service id="ekyna_product.product_media.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductMediaEventSubscriber">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Product stock unit event listener -->
         <service id="ekyna_product.product_stock_unit.event_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitEventSubscriber"
                  parent="ekyna_commerce.stock_unit.abstract_listener">
+            <tag name="resource.event_subscriber"/>
+        </service>
+
+        <!-- Product translation event listener -->
+        <service id="ekyna_product.product_translation.event_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductTranslationEventSubscriber">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
         </service>
 

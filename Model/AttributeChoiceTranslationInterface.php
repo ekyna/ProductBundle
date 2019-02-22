@@ -8,6 +8,8 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  * Interface AttributeChoiceTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method AttributeChoiceInterface getTranslatable()
  */
 interface AttributeChoiceTranslationInterface extends TranslationInterface
 {

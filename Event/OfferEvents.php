@@ -23,4 +23,12 @@ final class OfferEvents
 
     const PRE_DELETE  = 'ekyna_product.offer.pre_delete';
     const POST_DELETE = 'ekyna_product.offer.post_delete';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

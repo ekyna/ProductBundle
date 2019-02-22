@@ -12,4 +12,12 @@ final class BundleSlotEvents
     const INSERT = 'ekyna_product.bundle_slot.insert';
     const UPDATE = 'ekyna_product.bundle_slot.update';
     const DELETE = 'ekyna_product.bundle_slot.delete';
+
+
+    /**
+     * Disabled constructor.
+     */
+    private function __construct()
+    {
+    }
 }

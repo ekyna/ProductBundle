@@ -8,6 +8,8 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
  * Interface CategoryTranslationInterface
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method CategoryInterface getTranslatable()
  */
 interface CategoryTranslationInterface extends TranslationInterface
 {
