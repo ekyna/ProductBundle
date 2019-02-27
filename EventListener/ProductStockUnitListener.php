@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductStockUnitEventSubscriber extends AbstractStockUnitListener implements EventSubscriberInterface
+class ProductStockUnitListener extends AbstractStockUnitListener implements EventSubscriberInterface
 {
     /**
      * @inheritdoc

@@ -454,8 +454,8 @@
         </service>
 
         <!-- Price event listener -->
-        <service id="ekyna_product.price.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\PriceEventSubscriber">
+        <service id="ekyna_product.price.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\PriceListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="ekyna_commerce.country.repository"/>
@@ -505,8 +505,8 @@
         </service>
 
         <!-- Offer event listener -->
-        <service id="ekyna_product.offer.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\OfferEventSubscriber">
+        <service id="ekyna_product.offer.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\OfferListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="ekyna_commerce.country.repository"/>
@@ -516,7 +516,7 @@
 
         <!-- Special offer event listener -->
         <service id="ekyna_product.special_offer.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferEventSubscriber">
+                 class="Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <argument type="service" id="translator"/>
@@ -524,16 +524,16 @@
         </service>
 
         <!-- Pricing event listener -->
-        <service id="ekyna_product.pricing.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber">
+        <service id="ekyna_product.pricing.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\PricingListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Pricing rule event listener -->
-        <service id="ekyna_product.pricing_rule.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\PricingRuleEventSubscriber">
+        <service id="ekyna_product.pricing_rule.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\PricingRuleListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <tag name="resource.event_subscriber"/>
@@ -639,8 +639,8 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
 
         <!-- Product event listener -->
-        <service id="ekyna_product.product.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductEventSubscriber">
+        <service id="ekyna_product.product.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.product.event_subscriber.handler_registry"/>
             <argument type="service" id="ekyna_product.product.reference_generator"/>
@@ -650,37 +650,37 @@
         </service>
 
         <!-- Product media event listener -->
-        <service id="ekyna_product.product_media.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductMediaEventSubscriber">
+        <service id="ekyna_product.product_media.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductMediaListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Product stock unit event listener -->
-        <service id="ekyna_product.product_stock_unit.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitEventSubscriber"
+        <service id="ekyna_product.product_stock_unit.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitListener"
                  parent="ekyna_commerce.stock_unit.abstract_listener">
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Product translation event listener -->
-        <service id="ekyna_product.product_translation.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductTranslationEventSubscriber">
+        <service id="ekyna_product.product_translation.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ProductTranslationListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Supplier product event listener -->
-        <service id="ekyna_product.supplier_product.event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\SupplierProductEventSubscriber">
+        <service id="ekyna_product.supplier_product.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\SupplierProductListener">
             <argument type="service" id="request_stack"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Product label event listener -->
-        <service id="ekyna_product.product.label_event_subscriber"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\LabelEventSubscriber">
+        <service id="ekyna_product.product.label_listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\LabelListener">
             <tag name="kernel.event_subscriber"/>
         </service>
 

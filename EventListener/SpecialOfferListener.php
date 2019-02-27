@@ -18,28 +18,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class SpecialOfferEventSubscriber
+ * Class SpecialOfferListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class SpecialOfferEventSubscriber implements EventSubscriberInterface
+class SpecialOfferListener implements EventSubscriberInterface
 {
-    private const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
+    protected const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
     /**
      * @var OfferInvalidator
      */
-    private $offerInvalidator;
+    protected $offerInvalidator;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    protected $translator;
 
 
     /**
@@ -63,6 +63,8 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      * Pre insert event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return SpecialOfferInterface
      */
     public function onInsert(ResourceEvent $event)
     {
@@ -73,12 +75,16 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
         $this->buildName($specialOffer);
 
         $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
+
+        return $specialOffer;
     }
 
     /**
      * Pre update event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return SpecialOfferInterface
      */
     public function onUpdate(ResourceEvent $event)
     {
@@ -92,7 +98,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
         if ($this->specialOfferHasChanged($specialOffer)) {
             $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
 
-            return;
+            return $specialOffer;
         }
 
         // Products association changes
@@ -110,18 +116,24 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
         foreach ($specialOffer->getRemovedIds(SpecialOffer::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
         }
+
+        return $specialOffer;
     }
 
     /**
      * Pre delete event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return SpecialOfferInterface
      */
     public function onDelete(ResourceEvent $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
         $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
+
+        return $specialOffer;
     }
 
     /**
@@ -130,7 +142,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      * @param SpecialOfferInterface $specialOffer
      * @param ResourceEvent         $event
      */
-    protected function simplify(SpecialOfferInterface $specialOffer, ResourceEvent $event)
+    private function simplify(SpecialOfferInterface $specialOffer, ResourceEvent $event)
     {
         if (null !== $specialOffer->getProduct()) {
             // Brands and products lists should be empty.
@@ -167,7 +179,7 @@ class SpecialOfferEventSubscriber implements EventSubscriberInterface
      *
      * @param SpecialOfferInterface $specialOffer
      */
-    protected function buildName(SpecialOfferInterface $specialOffer)
+    private function buildName(SpecialOfferInterface $specialOffer)
     {
         if (0 < strlen($specialOffer->getName())) {
             return;

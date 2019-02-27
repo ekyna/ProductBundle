@@ -11,23 +11,23 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class PricingRuleEventSubscriber
+ * Class PricingRuleListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class PricingRuleEventSubscriber implements EventSubscriberInterface
+class PricingRuleListener implements EventSubscriberInterface
 {
-    private const FIELDS = ['percent', 'minQuantity'];
+    protected const FIELDS = ['percent', 'minQuantity'];
 
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
     /**
      * @var OfferInvalidator
      */
-    private $offerInvalidator;
+    protected $offerInvalidator;
 
 
     /**
@@ -46,18 +46,24 @@ class PricingRuleEventSubscriber implements EventSubscriberInterface
      * Insert event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingRuleInterface
      */
     public function onInsert(ResourceEvent $event)
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
         $this->offerInvalidator->invalidatePricing($pricingRule->getPricing());
+
+        return $pricingRule;
     }
 
     /**
      * Update event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingRuleInterface
      */
     public function onUpdate(ResourceEvent $event)
     {
@@ -66,12 +72,16 @@ class PricingRuleEventSubscriber implements EventSubscriberInterface
         if ($this->persistenceHelper->isChanged($pricingRule, static::FIELDS)) {
             $this->offerInvalidator->invalidatePricing($pricingRule->getPricing());
         }
+
+        return $pricingRule;
     }
 
     /**
      * Delete event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingRuleInterface
      */
     public function onDelete(ResourceEvent $event)
     {
@@ -79,13 +89,15 @@ class PricingRuleEventSubscriber implements EventSubscriberInterface
 
         if (null === $pricing = $pricingRule->getPricing()) {
             if (empty($cs = $this->persistenceHelper->getChangeSet($pricingRule, ['pricing']))) {
-                return;
+                return $pricingRule;
             }
 
             $pricing = $cs[0];
         }
 
         $this->offerInvalidator->invalidatePricing($pricing);
+
+        return $pricingRule;
     }
 
     /**

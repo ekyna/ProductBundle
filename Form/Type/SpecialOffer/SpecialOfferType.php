@@ -80,7 +80,7 @@ class SpecialOfferType extends ResourceFormType
                 if (null === $specialOffer = $event->getData()) {
                     return;
                 }
-                /** @see \Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferEventSubscriber::onPreUpdate() */
+                /** @see \Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener::onPreUpdate() */
                 $specialOffer->takeSnapshot();
             });
 

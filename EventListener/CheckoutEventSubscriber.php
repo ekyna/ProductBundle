@@ -16,7 +16,7 @@ class CheckoutEventSubscriber implements EventSubscriberInterface
     /**
      * @var Highlight
      */
-    private $highlight;
+    protected $highlight;
 
 
     /**

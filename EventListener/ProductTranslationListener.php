@@ -9,16 +9,16 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class ProductTranslationEventSubscriber
+ * Class ProductTranslationListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductTranslationEventSubscriber implements EventSubscriberInterface
+class ProductTranslationListener implements EventSubscriberInterface
 {
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
 
     /**
@@ -35,14 +35,12 @@ class ProductTranslationEventSubscriber implements EventSubscriberInterface
      * Product translation change event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return ProductTranslationInterface
      */
     public function onChange(ResourceEventInterface $event)
     {
-        $translation = $event->getResource();
-
-        if (!$translation instanceof ProductTranslationInterface) {
-            throw new \UnexpectedValueException("Expected instance of " . ProductTranslationInterface::class);
-        }
+        $translation = $this->getTranslationFromEvent($event);
 
         if (null === $product = $translation->getTranslatable()) {
             $product = $this->persistenceHelper->getChangeSet($translation, 'product')[0];
@@ -53,6 +51,26 @@ class ProductTranslationEventSubscriber implements EventSubscriberInterface
 
             $this->persistenceHelper->persistAndRecompute($product, false);
         }
+
+        return $translation;
+    }
+
+    /**
+     * Returns the translation from the event.
+     *
+     * @param ResourceEventInterface $event
+     *
+     * @return ProductTranslationInterface
+     */
+    protected function getTranslationFromEvent(ResourceEventInterface $event)
+    {
+        $translation = $event->getResource();
+
+        if (!$translation instanceof ProductTranslationInterface) {
+            throw new \UnexpectedValueException("Expected instance of " . ProductTranslationInterface::class);
+        }
+
+        return $translation;
     }
 
     /**

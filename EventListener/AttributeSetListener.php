@@ -19,24 +19,32 @@ class AttributeSetListener implements EventSubscriberInterface
      * Pre update event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return AttributeSetInterface
      */
     public function onPreUpdate(ResourceEventInterface $event)
     {
         $attributeSet = $this->getAttributeSetFromEvent($event);
 
         // TODO Prevent slot removal if used by any product attribute.
+
+        return $attributeSet;
     }
 
     /**
      * Pre delete event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return AttributeSetInterface
      */
     public function onPreDelete(ResourceEventInterface $event)
     {
         $attributeSet = $this->getAttributeSetFromEvent($event);
 
         // TODO Prevent removal if any slot is used by any product attribute.
+
+        return $attributeSet;
     }
 
     /**

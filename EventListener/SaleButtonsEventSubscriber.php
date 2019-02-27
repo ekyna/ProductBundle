@@ -19,7 +19,7 @@ class SaleButtonsEventSubscriber implements EventSubscriberInterface
     /**
      * @var UrlGeneratorInterface
      */
-    private $urlGenerator;
+    protected $urlGenerator;
 
 
     /**

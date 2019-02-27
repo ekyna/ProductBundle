@@ -9,16 +9,16 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class ProductMediaEventSubscriber
+ * Class ProductMediaListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductMediaEventSubscriber implements EventSubscriberInterface
+class ProductMediaListener implements EventSubscriberInterface
 {
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
 
     /**
@@ -35,14 +35,12 @@ class ProductMediaEventSubscriber implements EventSubscriberInterface
      * Product media change event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return ProductMediaInterface
      */
     public function onChange(ResourceEventInterface $event)
     {
-        $media = $event->getResource();
-
-        if (!$media instanceof ProductMediaInterface) {
-            throw new \UnexpectedValueException("Expected instance of " . ProductMediaInterface::class);
-        }
+        $media = $this->getMediaFromEvent($event);
 
         if (null === $product = $media->getProduct()) {
             $product = $this->persistenceHelper->getChangeSet($media, 'product')[0];
@@ -53,6 +51,26 @@ class ProductMediaEventSubscriber implements EventSubscriberInterface
 
             $this->persistenceHelper->persistAndRecompute($product, false);
         }
+
+        return $media;
+    }
+
+    /**
+     * Returns the media from the resource event.
+     *
+     * @param ResourceEventInterface $event
+     *
+     * @return ProductMediaInterface
+     */
+    protected function getMediaFromEvent(ResourceEventInterface $event)
+    {
+        $media = $event->getResource();
+
+        if (!$media instanceof ProductMediaInterface) {
+            throw new \UnexpectedValueException("Expected instance of " . ProductMediaInterface::class);
+        }
+
+        return $media;
     }
 
     /**

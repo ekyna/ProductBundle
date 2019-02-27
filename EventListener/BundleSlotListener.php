@@ -39,18 +39,24 @@ class BundleSlotListener implements EventSubscriberInterface
      * Insert event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleSlotInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
         $slot = $this->getBundleSlotFromEvent($event);
 
         $this->scheduleChildPriceChangeEvent($slot->getBundle());
+
+        return $slot;
     }
 
     /**
      * Update event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleSlotInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
@@ -59,12 +65,16 @@ class BundleSlotListener implements EventSubscriberInterface
         if ($this->persistenceHelper->isChanged($slot, ['required'])) {
             $this->scheduleChildPriceChangeEvent($slot->getBundle());
         }
+
+        return $slot;
     }
 
     /**
      * Delete event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleSlotInterface
      */
     public function onDelete(ResourceEventInterface $event)
     {
@@ -76,6 +86,8 @@ class BundleSlotListener implements EventSubscriberInterface
         }
 
         $this->scheduleChildPriceChangeEvent($bundle);
+
+        return $slot;
     }
 
     /**
@@ -98,7 +110,7 @@ class BundleSlotListener implements EventSubscriberInterface
      * @return BundleSlotInterface
      * @throws InvalidArgumentException
      */
-    private function getBundleSlotFromEvent(ResourceEventInterface $event)
+    protected function getBundleSlotFromEvent(ResourceEventInterface $event)
     {
         $resource = $event->getResource();
 

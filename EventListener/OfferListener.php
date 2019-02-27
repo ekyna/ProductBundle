@@ -14,26 +14,26 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * OfferEventSubscriber
+ * OfferListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class OfferEventSubscriber implements EventSubscriberInterface
+class OfferListener implements EventSubscriberInterface
 {
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
     /**
      * @var CustomerGroupRepositoryInterface
      */
-    private $customerGroupRepository;
+    protected $customerGroupRepository;
 
     /**
      * @var CountryRepositoryInterface
      */
-    private $countryRepository;
+    protected $countryRepository;
 
     /**
      * @var array
@@ -67,6 +67,8 @@ class OfferEventSubscriber implements EventSubscriberInterface
      * Insert/Update/Delete event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return Offer
      */
     public function onChange(ResourceEvent $event)
     {
@@ -77,6 +79,8 @@ class OfferEventSubscriber implements EventSubscriberInterface
         if (!in_array($id, $this->productIds, true)) {
             $this->productIds[] = $id;
         }
+
+        return $offer;
     }
 
     /**
@@ -135,7 +139,7 @@ class OfferEventSubscriber implements EventSubscriberInterface
      *
      * @return Offer
      */
-    private function getOfferFromEvent(ResourceEvent $event)
+    protected function getOfferFromEvent(ResourceEvent $event)
     {
         $offer = $event->getResource();
 

@@ -38,6 +38,8 @@ class OptionListener implements EventSubscriberInterface
      * Insert event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return OptionInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
@@ -46,12 +48,16 @@ class OptionListener implements EventSubscriberInterface
         $this->handleDataFields($option);
 
         $this->scheduleChildPriceChangeEvent($option->getGroup()->getProduct());
+
+        return $option;
     }
 
     /**
      * Update event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return OptionInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
@@ -62,12 +68,16 @@ class OptionListener implements EventSubscriberInterface
         if ($this->persistenceHelper->isChanged($option, ['netPrice', 'product'])) {
             $this->scheduleChildPriceChangeEvent($option->getGroup()->getProduct());
         }
+
+        return $option;
     }
 
     /**
      * Delete event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return OptionInterface
      */
     public function onDelete(ResourceEventInterface $event)
     {
@@ -82,6 +92,8 @@ class OptionListener implements EventSubscriberInterface
         if (null !== $product) {
             $this->scheduleChildPriceChangeEvent($product);
         }
+
+        return $option;
     }
 
     /**

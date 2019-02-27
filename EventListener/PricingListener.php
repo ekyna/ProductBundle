@@ -15,21 +15,21 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class PricingEventSubscriber
+ * Class PricingListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class PricingEventSubscriber implements EventSubscriberInterface
+class PricingListener implements EventSubscriberInterface
 {
     /**
      * @var PersistenceHelperInterface
      */
-    private $persistenceHelper;
+    protected $persistenceHelper;
 
     /**
      * @var OfferInvalidator
      */
-    private $offerInvalidator;
+    protected $offerInvalidator;
 
 
     /**
@@ -48,6 +48,8 @@ class PricingEventSubscriber implements EventSubscriberInterface
      * Pre insert event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingInterface
      */
     public function onInsert(ResourceEvent $event)
     {
@@ -56,12 +58,16 @@ class PricingEventSubscriber implements EventSubscriberInterface
         $this->buildName($pricing);
 
         $this->offerInvalidator->invalidatePricing($pricing);
+
+        return $pricing;
     }
 
     /**
      * Pre update event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingInterface
      */
     public function onUpdate(ResourceEvent $event)
     {
@@ -76,12 +82,16 @@ class PricingEventSubscriber implements EventSubscriberInterface
         foreach ($pricing->getRemovedIds(Pricing::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
         }
+
+        return $pricing;
     }
 
     /**
      * Pre delete event handler.
      *
      * @param ResourceEvent $event
+     *
+     * @return PricingInterface
      */
     public function onDelete(ResourceEvent $event)
     {
@@ -90,6 +100,8 @@ class PricingEventSubscriber implements EventSubscriberInterface
         $this->buildName($pricing);
 
         $this->offerInvalidator->invalidatePricing($pricing);
+
+        return $pricing;
     }
 
     /**

@@ -17,11 +17,11 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class ProductEventSubscriber
+ * Class ProductListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductEventSubscriber implements EventSubscriberInterface
+class ProductListener implements EventSubscriberInterface
 {
     /**
      * @var PersistenceHelperInterface

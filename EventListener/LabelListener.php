@@ -8,11 +8,11 @@ use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class LabelEventSubscriber
+ * Class LabelListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class LabelEventSubscriber implements EventSubscriberInterface
+class LabelListener implements EventSubscriberInterface
 {
     /**
      * Build subject label event handler.

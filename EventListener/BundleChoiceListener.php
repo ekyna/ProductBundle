@@ -39,18 +39,24 @@ class BundleChoiceListener implements EventSubscriberInterface
      * Insert event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleChoiceInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
         $choice = $this->getBundleChoiceFromEvent($event);
 
         $this->scheduleChildPriceChangeEvent($choice->getSlot()->getBundle());
+
+        return $choice;
     }
 
     /**
      * Update event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleChoiceInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
@@ -59,12 +65,16 @@ class BundleChoiceListener implements EventSubscriberInterface
         if ($this->persistenceHelper->isChanged($choice, ['product', 'minQuantity', 'useOptions', 'hidden'])) {
             $this->scheduleChildPriceChangeEvent($choice->getSlot()->getBundle());
         }
+
+        return $choice;
     }
 
     /**
      * Delete event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return BundleChoiceInterface
      */
     public function onDelete(ResourceEventInterface $event)
     {
@@ -79,6 +89,8 @@ class BundleChoiceListener implements EventSubscriberInterface
         }
 
         $this->scheduleChildPriceChangeEvent($bundle);
+
+        return $choice;
     }
 
     /**
@@ -101,7 +113,7 @@ class BundleChoiceListener implements EventSubscriberInterface
      * @return BundleChoiceInterface
      * @throws InvalidArgumentException
      */
-    private function getBundleChoiceFromEvent(ResourceEventInterface $event)
+    protected function getBundleChoiceFromEvent(ResourceEventInterface $event)
     {
         $resource = $event->getResource();
 

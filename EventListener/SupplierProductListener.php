@@ -11,11 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class SupplierProductEventSubscriber
+ * Class SupplierProductListener
  * @package Ekyna\Bundle\CommerceBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class SupplierProductEventSubscriber implements EventSubscriberInterface
+class SupplierProductListener implements EventSubscriberInterface
 {
     /**
      * @var RequestStack

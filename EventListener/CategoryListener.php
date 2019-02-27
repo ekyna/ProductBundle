@@ -36,6 +36,8 @@ class CategoryListener implements EventSubscriberInterface
      * Insert event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return CategoryInterface
      */
     public function onInsert(ResourceEventInterface $event)
     {
@@ -44,12 +46,16 @@ class CategoryListener implements EventSubscriberInterface
         $this->fixVisibility($category);
 
         $this->fixChildrenVisibility($category);
+
+        return $category;
     }
 
     /**
      * Update event handler.
      *
      * @param ResourceEventInterface $event
+     *
+     * @return CategoryInterface
      */
     public function onUpdate(ResourceEventInterface $event)
     {
@@ -60,6 +66,8 @@ class CategoryListener implements EventSubscriberInterface
         if (!$category->isVisible() && $this->persistenceHelper->isChanged($category, 'visible')) {
             $this->fixChildrenVisibility($category);
         }
+
+        return $category;
     }
 
     /**
@@ -105,7 +113,7 @@ class CategoryListener implements EventSubscriberInterface
      * @return CategoryInterface
      * @throws InvalidArgumentException
      */
-    private function getCategoryFromEvent(ResourceEventInterface $event)
+    protected function getCategoryFromEvent(ResourceEventInterface $event)
     {
         $resource = $event->getResource();
 

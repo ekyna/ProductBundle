@@ -48,7 +48,7 @@ class PricingType extends ResourceFormType
                 if (null === $pricing = $event->getData()) {
                     return;
                 }
-                /** @see \Ekyna\Bundle\ProductBundle\EventListener\PricingEventSubscriber::onPreUpdate() */
+                /** @see \Ekyna\Bundle\ProductBundle\EventListener\PricingListener::onPreUpdate() */
                 $pricing->takeSnapshot();
             });
 

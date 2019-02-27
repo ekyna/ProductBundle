@@ -67,7 +67,7 @@ final class CacheUtil
      *
      * @return string
      *
-     * @see \Ekyna\Bundle\ProductBundle\EventListener\OfferEventSubscriber
+     * @see \Ekyna\Bundle\ProductBundle\EventListener\OfferListener
      */
     public static function buildOfferKeyByIds(
         int $productId,
@@ -123,7 +123,7 @@ final class CacheUtil
      *
      * @return string
      *
-     * @see \Ekyna\Bundle\ProductBundle\EventListener\PriceEventSubscriber
+     * @see \Ekyna\Bundle\ProductBundle\EventListener\PriceListener
      */
     public static function buildPriceKeyByIds(
         int $productId,
