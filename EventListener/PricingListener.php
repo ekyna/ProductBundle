@@ -9,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -47,11 +47,11 @@ class PricingListener implements EventSubscriberInterface
     /**
      * Pre insert event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingInterface
      */
-    public function onInsert(ResourceEvent $event)
+    public function onInsert(ResourceEventInterface $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
@@ -65,11 +65,11 @@ class PricingListener implements EventSubscriberInterface
     /**
      * Pre update event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingInterface
      */
-    public function onUpdate(ResourceEvent $event)
+    public function onUpdate(ResourceEventInterface $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
@@ -89,11 +89,11 @@ class PricingListener implements EventSubscriberInterface
     /**
      * Pre delete event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingInterface
      */
-    public function onDelete(ResourceEvent $event)
+    public function onDelete(ResourceEventInterface $event)
     {
         $pricing = $this->getPricingFromEvent($event);
 
@@ -149,11 +149,11 @@ class PricingListener implements EventSubscriberInterface
     /**
      * Returns the pricing from the event.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingInterface
      */
-    protected function getPricingFromEvent(ResourceEvent $event)
+    protected function getPricingFromEvent(ResourceEventInterface $event)
     {
         $pricing = $event->getResource();
 

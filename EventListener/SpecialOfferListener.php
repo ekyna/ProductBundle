@@ -10,7 +10,7 @@ use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
@@ -62,11 +62,11 @@ class SpecialOfferListener implements EventSubscriberInterface
     /**
      * Pre insert event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return SpecialOfferInterface
      */
-    public function onInsert(ResourceEvent $event)
+    public function onInsert(ResourceEventInterface $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -82,11 +82,11 @@ class SpecialOfferListener implements EventSubscriberInterface
     /**
      * Pre update event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return SpecialOfferInterface
      */
-    public function onUpdate(ResourceEvent $event)
+    public function onUpdate(ResourceEventInterface $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -123,11 +123,11 @@ class SpecialOfferListener implements EventSubscriberInterface
     /**
      * Pre delete event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return SpecialOfferInterface
      */
-    public function onDelete(ResourceEvent $event)
+    public function onDelete(ResourceEventInterface $event)
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
@@ -140,9 +140,9 @@ class SpecialOfferListener implements EventSubscriberInterface
      * Simplifies the special offer by removing products covered by brands.
      *
      * @param SpecialOfferInterface $specialOffer
-     * @param ResourceEvent         $event
+     * @param ResourceEventInterface         $event
      */
-    private function simplify(SpecialOfferInterface $specialOffer, ResourceEvent $event)
+    private function simplify(SpecialOfferInterface $specialOffer, ResourceEventInterface $event)
     {
         if (null !== $specialOffer->getProduct()) {
             // Brands and products lists should be empty.
@@ -250,11 +250,11 @@ class SpecialOfferListener implements EventSubscriberInterface
     /**
      * Returns the special offer from the event.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return SpecialOfferInterface
      */
-    protected function getSpecialOfferFromEvent(ResourceEvent $event)
+    protected function getSpecialOfferFromEvent(ResourceEventInterface $event)
     {
         $specialOffer = $event->getResource();
 

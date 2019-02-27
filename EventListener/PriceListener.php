@@ -9,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -61,11 +61,11 @@ class PriceListener implements EventSubscriberInterface
     /**
      * Insert/Update/Delete event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return Price
      */
-    public function onChange(ResourceEvent $event)
+    public function onChange(ResourceEventInterface $event)
     {
         $price = $this->getPriceFromEvent($event);
 
@@ -121,11 +121,11 @@ class PriceListener implements EventSubscriberInterface
     /**
      * Returns the price from the event.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return Price
      */
-    protected function getPriceFromEvent(ResourceEvent $event)
+    protected function getPriceFromEvent(ResourceEventInterface $event)
     {
         $offer = $event->getResource();
 

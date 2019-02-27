@@ -8,7 +8,7 @@ use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -66,11 +66,11 @@ class OfferListener implements EventSubscriberInterface
     /**
      * Insert/Update/Delete event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return Offer
      */
-    public function onChange(ResourceEvent $event)
+    public function onChange(ResourceEventInterface $event)
     {
         $offer = $this->getOfferFromEvent($event);
 
@@ -135,11 +135,11 @@ class OfferListener implements EventSubscriberInterface
     /**
      * Returns the offer from the event.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return Offer
      */
-    protected function getOfferFromEvent(ResourceEvent $event)
+    protected function getOfferFromEvent(ResourceEventInterface $event)
     {
         $offer = $event->getResource();
 

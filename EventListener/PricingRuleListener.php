@@ -6,7 +6,7 @@ use Ekyna\Bundle\ProductBundle\Event\PricingRuleEvents;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -45,11 +45,11 @@ class PricingRuleListener implements EventSubscriberInterface
     /**
      * Insert event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingRuleInterface
      */
-    public function onInsert(ResourceEvent $event)
+    public function onInsert(ResourceEventInterface $event)
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
@@ -61,11 +61,11 @@ class PricingRuleListener implements EventSubscriberInterface
     /**
      * Update event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingRuleInterface
      */
-    public function onUpdate(ResourceEvent $event)
+    public function onUpdate(ResourceEventInterface $event)
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
@@ -79,11 +79,11 @@ class PricingRuleListener implements EventSubscriberInterface
     /**
      * Delete event handler.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingRuleInterface
      */
-    public function onDelete(ResourceEvent $event)
+    public function onDelete(ResourceEventInterface $event)
     {
         $pricingRule = $this->getPricingRuleFromEvent($event);
 
@@ -103,11 +103,11 @@ class PricingRuleListener implements EventSubscriberInterface
     /**
      * Returns the pricing rule from the event.
      *
-     * @param ResourceEvent $event
+     * @param ResourceEventInterface $event
      *
      * @return PricingRuleInterface
      */
-    protected function getPricingRuleFromEvent(ResourceEvent $event)
+    protected function getPricingRuleFromEvent(ResourceEventInterface $event)
     {
         $pricingRule = $event->getResource();
 
