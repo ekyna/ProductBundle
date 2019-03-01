@@ -42,7 +42,8 @@ class StatUpdateCommand extends Command
             ->setDescription('Updates the products stats')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Whether to force update')
             ->addOption('purge', null, InputOption::VALUE_NONE, 'Whether to purge stats first')
-            ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'The maximum execution time in seconds', 120);
+            ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'The maximum execution time in seconds', 120)
+            ->addOption('breathe', null, InputOption::VALUE_REQUIRED, 'Delay between each product update in milliseconds', 0);
     }
 
     /**
@@ -51,8 +52,10 @@ class StatUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $debug = !$input->getOption('no-debug');
-        $force = $input->getOption('force');
-        $limit = $input->getOption('limit');
+        $force = (bool)$input->getOption('force');
+
+        $limit = intval($input->getOption('limit'));
+        $breathe = intval($input->getOption('breathe'));
 
         $this->updater->setOutput($output);
         $this->updater->setDebug($debug);
@@ -70,6 +73,11 @@ class StatUpdateCommand extends Command
         while ($limit > $sum + $avg * 2) {
             if (null === $time = $this->updater->updateNextProduct()) {
                 break;
+            }
+
+            if (0 < $breathe) {
+                usleep($breathe * 1000);
+                $sum += $breathe;
             }
 
             $count++;

@@ -227,7 +227,7 @@ class SpecialOfferListener implements EventSubscriberInterface
      *
      * @return bool
      */
-    private function specialOfferHasChanged(SpecialOfferInterface $specialOffer)
+    protected function specialOfferHasChanged(SpecialOfferInterface $specialOffer)
     {
         if ($this->persistenceHelper->isChanged($specialOffer, static::FIELDS)) {
             return true;

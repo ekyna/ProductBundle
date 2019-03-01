@@ -19,11 +19,11 @@ class RegisterProductEventHandlerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('ekyna_product.product.event_subscriber.handler_registry')) {
+        if (!$container->has('ekyna_product.product.listener.handler_registry')) {
             throw new ServiceNotFoundException('Product event handlers registry is not available.');
         }
 
-        $registryDefinition = $container->getDefinition('ekyna_product.product.event_subscriber.handler_registry');
+        $registryDefinition = $container->getDefinition('ekyna_product.product.listener.handler_registry');
         foreach ($container->findTaggedServiceIds('ekyna_product.product_event_handler') as $serviceId => $tag) {
             $registryDefinition->addMethodCall('addHandler', [new Reference($serviceId)]);
         }

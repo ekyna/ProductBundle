@@ -101,7 +101,7 @@
         </service>
 
         <!-- Category event listener -->
-        <service id="ekyna_product.category.event_subscriber"
+        <service id="ekyna_product.category.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\CategoryListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
@@ -202,13 +202,13 @@
         </service>
 
         <!-- Bundle choice event listener -->
-        <service id="ekyna_product.bundle_choice.event_subscriber"
+        <service id="ekyna_product.bundle_choice.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\BundleChoiceListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
         </service>
         <!-- Bundle slot event listener -->
-        <service id="ekyna_product.bundle_slot.event_subscriber"
+        <service id="ekyna_product.bundle_slot.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\BundleSlotListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
@@ -292,14 +292,14 @@
         </service>
 
         <!-- Option event listener -->
-        <service id="ekyna_product.option.event_subscriber"
+        <service id="ekyna_product.option.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\OptionListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
         <!-- Option group event listener -->
-        <service id="ekyna_product.option_group.event_subscriber"
+        <service id="ekyna_product.option_group.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\OptionGroupListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <tag name="resource.event_subscriber"/>
@@ -515,7 +515,7 @@
         </service>
 
         <!-- Special offer event listener -->
-        <service id="ekyna_product.special_offer.event_subscriber"
+        <service id="ekyna_product.special_offer.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
@@ -578,7 +578,7 @@
         </service>
 
         <!-- Simple product event handler -->
-        <service id="ekyna_product.product.event_subscriber.simple_handler"
+        <service id="ekyna_product.product.listener.simple_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\SimpleHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
@@ -590,7 +590,7 @@
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variant product event handler -->
-        <service id="ekyna_product.product.event_subscriber.variant_handler"
+        <service id="ekyna_product.product.listener.variant_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariantHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
@@ -601,7 +601,7 @@
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Variable product event handler -->
-        <service id="ekyna_product.product.event_subscriber.variable_handler"
+        <service id="ekyna_product.product.listener.variable_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariableHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
@@ -615,7 +615,7 @@
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
-        <service id="ekyna_product.product.event_subscriber.bundle_handler"
+        <service id="ekyna_product.product.listener.bundle_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\BundleHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
@@ -625,7 +625,7 @@
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->
-        <service id="ekyna_product.product.event_subscriber.configurable_handler"
+        <service id="ekyna_product.product.listener.configurable_handler"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\ConfigurableHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
@@ -635,14 +635,14 @@
         </service>
 
         <!-- Product event handlers registry -->
-        <service id="ekyna_product.product.event_subscriber.handler_registry"
+        <service id="ekyna_product.product.listener.handler_registry"
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
 
         <!-- Product event listener -->
         <service id="ekyna_product.product.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\ProductListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_product.product.event_subscriber.handler_registry"/>
+            <argument type="service" id="ekyna_product.product.listener.handler_registry"/>
             <argument type="service" id="ekyna_product.product.reference_generator"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
