@@ -793,6 +793,17 @@ interface ProductInterface extends
     public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null);
 
     /**
+     * Returns the product files.
+     *
+     * @param bool                 $withChildren
+     * @param int                  $limit
+     * @param ArrayCollection|null $images
+     *
+     * @return ArrayCollection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     */
+    public function getFiles($withChildren = false, $limit = 5, ArrayCollection $images = null);
+
+    /**
      * Returns the variant uniqueness signature.
      *
      * @return string

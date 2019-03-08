@@ -160,15 +160,15 @@ class PriceCalculator
      */
     public function calculateMinPrice(Model\ProductInterface $product, $withOptions = true)
     {
-        if (Model\ProductTypes::TYPE_CONFIGURABLE === $product->getType()) {
+        if (Model\ProductTypes::isConfigurableType($product)) {
             return $this->calculateConfigurableMinPrice($product, $withOptions);
         }
 
-        if (Model\ProductTypes::TYPE_BUNDLE === $product->getType()) {
+        if (Model\ProductTypes::isBundleType($product)) {
             return $this->calculateBundleMinPrice($product, $withOptions);
         }
 
-        if (Model\ProductTypes::TYPE_VARIABLE === $product->getType()) {
+        if (Model\ProductTypes::isVariableType($product)) {
             return $this->calculateVariableMinPrice($product, $withOptions);
         }
 
@@ -227,14 +227,17 @@ class PriceCalculator
      *
      * @param Model\ProductInterface $product
      * @param bool                   $withOptions Whether to add options min price.
+     * @param float                  $price       Price override.
      *
      * @return float|int
      */
-    public function calculateProductMinPrice(Model\ProductInterface $product, $withOptions = true)
+    public function calculateProductMinPrice(Model\ProductInterface $product, $withOptions = true, $price = null)
     {
         Model\ProductTypes::assertChildType($product);
 
-        $price = $product->getNetPrice();
+        if (is_null($price)) {
+            $price = $product->getNetPrice();
+        }
 
         if ($withOptions) {
             $price += $this->calculateMinOptionsPrice($product);
@@ -248,24 +251,25 @@ class PriceCalculator
      *
      * @param Model\ProductInterface $variable
      * @param bool                   $withOptions Whether to add options min price.
+     * @param float                  $price       Price override.
      *
      * @return float|int
      */
-    public function calculateVariableMinPrice(Model\ProductInterface $variable, $withOptions = true)
+    public function calculateVariableMinPrice(Model\ProductInterface $variable, $withOptions = true, $price = null)
     {
         Model\ProductTypes::assertVariable($variable);
 
-        $price = null;
+        if (is_null($price)) {
+            foreach ($variable->getVariants() as $variant) {
+                if (!$variant->isVisible()) {
+                    continue;
+                }
 
-        foreach ($variable->getVariants() as $variant) {
-            if (!$variant->isVisible()) {
-                continue;
-            }
+                $variantPrice = $this->calculateProductMinPrice($variant, $withOptions);
 
-            $variantPrice = $this->calculateProductMinPrice($variant, $withOptions);
-
-            if (null === $price || $variantPrice < $price) {
-                $price = $variantPrice;
+                if (null === $price || $variantPrice < $price) {
+                    $price = $variantPrice;
+                }
             }
         }
 
@@ -281,33 +285,36 @@ class PriceCalculator
      *
      * @param Model\ProductInterface $bundle
      * @param bool                   $withOptions Whether to add options min price.
+     * @param float                  $price       Price override.
      *
      * @return float|int
      *
      * @todo The product (bundle) min price should be processed and persisted during update (flush)
      */
-    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $withOptions = true)
+    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $withOptions = true, $price = null)
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        $price = 0;
+        if (is_null($price)) {
+            $price = 0;
+            foreach ($bundle->getBundleSlots() as $slot) {
+                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
+                $childProduct = $choice->getProduct();
+                $choiceOptions = $withOptions && $choice->isUseOptions();
+                $choicePrice = $choice->getNetPrice();
 
-        foreach ($bundle->getBundleSlots() as $slot) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-            $choice = $slot->getChoices()->first();
-            $childProduct = $choice->getProduct();
-            $choiceOptions = $withOptions && $choice->isUseOptions();
+                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                    $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceOptions, $choicePrice);
+                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                    $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceOptions, $choicePrice);
+                } else {
+                    $childPrice = $this->calculateProductMinPrice($childProduct, $choiceOptions, $choicePrice);
+                }
 
-            if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceOptions);
-            } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceOptions);
-            } else {
-                $childPrice = $this->calculateProductMinPrice($childProduct, $choiceOptions);
+                // TODO Use packaging format
+                $price += $childPrice * $choice->getMinQuantity();
             }
-
-            // TODO Use packaging format
-            $price += $childPrice * $choice->getMinQuantity();
         }
 
         if ($withOptions) {
@@ -346,8 +353,6 @@ class PriceCalculator
             foreach ($slot->getChoices() as $choice) {
                 $childProduct = $choice->getProduct();
                 $choiceOptions = $withOptions && $choice->isUseOptions();
-
-                // TODO Recurse if parent type (?)
 
                 if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
                     $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceOptions);

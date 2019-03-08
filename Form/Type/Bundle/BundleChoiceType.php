@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
@@ -85,6 +86,10 @@ class BundleChoiceType extends ResourceFormType
                     'label'         => 'ekyna_core.field.quantity',
                     'property_path' => 'minQuantity',
                     'scale'         => 3, // TODO Packaging
+                ])
+                ->add('netPrice', PriceType::class, [
+                    'label'    => 'ekyna_commerce.field.net_price',
+                    'required' => false,
                 ])
                 ->add('hidden', Type\CheckboxType::class, [
                     'label'    => 'ekyna_product.bundle_choice.field.hidden',

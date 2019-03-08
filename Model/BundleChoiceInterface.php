@@ -94,6 +94,22 @@ interface BundleChoiceInterface extends ResourceInterface, SortableInterface
     public function setUseOptions($use);
 
     /**
+     * Returns the net price.
+     *
+     * @return float
+     */
+    public function getNetPrice();
+
+    /**
+     * Sets the net price.
+     *
+     * @param float $price
+     *
+     * @return $this|BundleChoiceInterface
+     */
+    public function setNetPrice($price);
+
+    /**
      * Returns whether the choice is hidden or not.
      *
      * @return bool

@@ -171,8 +171,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         }
 
         if (quantity > this.a_qty) {
-            this.class = 'warning';
-            if (this.r_msg && this.quantity <= this.a_qty + this.r_qty) {
+            if (this.r_msg && quantity <= this.a_qty + this.r_qty) {
                 return new AvailabilityResult(1, this.r_msg); // TODO EDA / days
             }
 

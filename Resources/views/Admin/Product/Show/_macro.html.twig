@@ -534,7 +534,6 @@
                         <th class="text-right">{{ 'ekyna_commerce.sale.field.margin'|trans }}</th>
                     </tr>
                     {%- set total_weight = 0 -%}
-                    {%- set total_purchase = 0 -%}
                     {%- for slot in product.bundleSlots -%}
                     {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
                     <tr>
@@ -589,17 +588,27 @@
                             {{- (choice_product.weight * choice.minQuantity)|localizednumber -}}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_netPrice' }}" class="text-right">
-                            {% set price = choice_product.netPrice * choice.minQuantity%}
+                            {% if choice.netPrice is not null %}
+                                {% set price = choice.netPrice * choice.minQuantity %}
+                                <del>{{ (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) }}</del>
+                            {% else %}
+                                {% set price = choice_product.netPrice * choice.minQuantity %}
+                            {% endif %}
                             {{- price|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_buyPrice' }}" class="text-right">
-                            {% set purchase = choice_product|subject_purchase_cost * choice.minQuantity %}
-                            {% set total_purchase = total_purchase + purchase %}
+                            {% set purchase = choice_product|product_purchase_cost(false) * choice.minQuantity %}
                             {{- purchase|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_margin' }}" class="text-right">
-                        {%- if 0 < purchase and 0 < price -%}
+                        {%- if 0 < purchase  -%}
+                            {%- if 0 < price -%}
                             {{ ((price - purchase) / price * 100)|round(2)|localizednumber }}%
+                            {%- else -%}
+                                <span class="text-red">-&infin;</span>
+                            {%- endif -%}
+                        {%- else -%}
+                            -
                         {%- endif -%}
                         </td>
                     </tr>
@@ -616,11 +625,18 @@
                             {{- total_price|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td class="text-right">
+                            {% set total_purchase = product|product_purchase_cost(false) %}
                             {{- total_purchase|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td class="text-right">
-                        {%- if 0 < total_purchase and 0 < total_price -%}
-                            {{ ((total_price - total_purchase) / total_price * 100)|round(2)|localizednumber }}%
+                        {%- if 0 < total_purchase  -%}
+                            {%- if 0 < total_price -%}
+                                {{ ((total_price - total_purchase) / total_price * 100)|round(2)|localizednumber }}%
+                            {%- else -%}
+                                <span class="text-red">-&infin;</span>
+                            {%- endif -%}
+                        {%- else -%}
+                            -
                         {%- endif -%}
                         </td>
                     </tr>
@@ -732,7 +748,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="7" class="choice-rules">
+                            <td colspan="8" class="choice-rules">
                                 <em>[TODO] Choice rules</em> {# TODO rules #}
                             </td>
                         </tr>

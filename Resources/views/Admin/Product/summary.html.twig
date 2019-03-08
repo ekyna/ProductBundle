@@ -6,8 +6,10 @@
                  width="120" height="90" alt="Product image" style="margin-right:15px">
         </td>
         <td colspan="2">
-            <p style="font-size:15px">
-                <strong>{{ brand }}</strong><br>{{ designation }}
+            <p>
+                {{ type|product_type_badge }}
+                <strong style="font-size:15px;margin-left:8px;">{{ brand }}</strong><br>
+                <span style="font-size:15px">{{ designation }}</span>
             </p>
         </td>
     </tr>

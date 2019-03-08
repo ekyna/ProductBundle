@@ -151,6 +151,8 @@ class ConfigurableUpdater extends AbstractUpdater
                             $eda = $slotEda;
                         }
                     }
+                } else {
+                    $virtualStock = 0;
                 }
 
                 // Supplier pre order

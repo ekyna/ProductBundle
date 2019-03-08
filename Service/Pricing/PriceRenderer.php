@@ -26,6 +26,11 @@ class PriceRenderer
     private $priceCalculator;
 
     /**
+     * @var PurchaseCostCalculator
+     */
+    private $purchaseCostCalculator;
+
+    /**
      * @var LocaleProviderInterface
      */
     private $localeProvider;
@@ -65,6 +70,7 @@ class PriceRenderer
      * Constructor.
      *
      * @param PriceCalculator          $priceCalculator
+     * @param PurchaseCostCalculator $purchaseCostCalculator
      * @param LocaleProviderInterface  $localeProvider
      * @param ContextProviderInterface $contextProvider
      * @param FormatterFactory         $formatterFactory
@@ -74,6 +80,7 @@ class PriceRenderer
      */
     public function __construct(
         PriceCalculator $priceCalculator,
+        PurchaseCostCalculator $purchaseCostCalculator,
         LocaleProviderInterface $localeProvider,
         ContextProviderInterface $contextProvider,
         FormatterFactory $formatterFactory,
@@ -82,6 +89,7 @@ class PriceRenderer
         array $options
     ) {
         $this->priceCalculator = $priceCalculator;
+        $this->purchaseCostCalculator = $purchaseCostCalculator;
         $this->localeProvider = $localeProvider;
         $this->contextProvider = $contextProvider;
         $this->formatterFactory = $formatterFactory;
@@ -190,6 +198,19 @@ class PriceRenderer
     public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true)
     {
         return $this->priceCalculator->calculateConfigurableMinPrice($configurable, $withOptions);
+    }
+
+    /**
+     * Returns the product purchase cost.
+     *
+     * @param Model\ProductInterface $product
+     * @param bool                   $withOptions Whether to add options min cost.
+     *
+     * @return float|int
+     */
+    public function getPurchaseCost(Model\ProductInterface $product, $withOptions = true)
+    {
+        return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions);
     }
 
     /**

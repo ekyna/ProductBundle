@@ -46,6 +46,11 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $useOptions;
 
     /**
+     * @var float
+     */
+    protected $netPrice;
+
+    /**
      * @var bool
      */
     protected $hidden;
@@ -188,6 +193,24 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function setUseOptions($use)
     {
         $this->useOptions = (bool)$use;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNetPrice()
+    {
+        return $this->netPrice;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNetPrice($price)
+    {
+        $this->netPrice = $price;
 
         return $this;
     }

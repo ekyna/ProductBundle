@@ -49,7 +49,7 @@ class FixVariableVisibilityCommand extends ContainerAwareCommand
         }
 
         $manager = $this->getContainer()->get('ekyna_product.product.manager');
-        $calculator = $this->getContainer()->get('ekyna_product.pricing.calculator');
+        $calculator = $this->getContainer()->get('ekyna_product.pricing.price_calculator');
         $updater = new VariableUpdater($calculator);
 
         $count = 0;

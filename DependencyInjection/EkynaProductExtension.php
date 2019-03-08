@@ -50,6 +50,6 @@ class EkynaProductExtension extends AbstractExtension
         // Pricing
         $container
             ->getDefinition('ekyna_product.pricing.renderer')
-            ->replaceArgument(6, $config['pricing']);
+            ->replaceArgument(7, $config['pricing']);
     }
 }

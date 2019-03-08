@@ -48,6 +48,11 @@ class ProductListener implements EventSubscriberInterface
      */
     protected $priceInvalidator;
 
+    /**
+     * @var array
+     */
+    private $stockDefaults;
+
 
     /**
      * Constructor.
@@ -57,19 +62,22 @@ class ProductListener implements EventSubscriberInterface
      * @param ReferenceGeneratorInterface $referenceGenerator
      * @param OfferInvalidator            $offerInvalidator
      * @param PriceInvalidator            $priceInvalidator
+     * @param array                       $stockDefaults
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         Handler\HandlerRegistry $registry,
         ReferenceGeneratorInterface $referenceGenerator,
         OfferInvalidator $offerInvalidator,
-        PriceInvalidator $priceInvalidator
+        PriceInvalidator $priceInvalidator,
+        array $stockDefaults
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
         $this->referenceGenerator = $referenceGenerator;
         $this->offerInvalidator = $offerInvalidator;
         $this->priceInvalidator = $priceInvalidator;
+        $this->stockDefaults = $stockDefaults;
     }
 
     /**
@@ -77,7 +85,44 @@ class ProductListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      */
-    public function preCreate(ResourceEventInterface $event)
+    public function onInitialize(ResourceEventInterface $event)
+    {
+        $product = $this->getProductFromEvent($event);
+
+        if (ProductTypes::isChildType($product)) {
+            $this->setStockDefaults($product);
+        }
+    }
+
+    /**
+     * Sets the product's stock defaults.
+     *
+     * @param ProductInterface $product
+     */
+    private function setStockDefaults(ProductInterface $product)
+    {
+        $map = [
+            'stock_mode'             => 'setStockMode',
+            'stock_floor'            => 'setStockFloor',
+            'replenishment_time'     => 'setReplenishmentTime',
+            'minimum_order_quantity' => 'setMinimumOrderQuantity',
+            'quote_only'             => 'setQuoteOnly',
+            'end_of_life'            => 'setEndOfLife',
+        ];
+
+        foreach ($map as $key => $method) {
+            if (isset($this->stockDefaults[$key])) {
+                $product->{$method}($this->stockDefaults[$key]);
+            }
+        }
+    }
+
+    /**
+     * Pre create event handler.
+     *
+     * @param ResourceEventInterface $event
+     */
+    public function onPreCreate(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -92,7 +137,7 @@ class ProductListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      */
-    public function preUpdate(ResourceEventInterface $event)
+    public function onPreUpdate(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -107,7 +152,7 @@ class ProductListener implements EventSubscriberInterface
      *
      * @param ResourceEventInterface $event
      */
-    public function preDelete(ResourceEventInterface $event)
+    public function onPreDelete(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event);
 
@@ -245,7 +290,7 @@ class ProductListener implements EventSubscriberInterface
     {
         $manager = $this->persistenceHelper->getManager();
 
-        $manager->getConnection()->transactional(function() use ($manager) {
+        $manager->getConnection()->transactional(function () use ($manager) {
             $this->offerInvalidator->flush($manager);
             $this->priceInvalidator->flush($manager);
         });
@@ -321,9 +366,10 @@ class ProductListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ProductEvents::PRE_CREATE                => ['preCreate', 0],
-            ProductEvents::PRE_UPDATE                => ['preUpdate', 0],
-            ProductEvents::PRE_DELETE                => ['preDelete', 0],
+            ProductEvents::INITIALIZE                => ['onInitialize', 0],
+            ProductEvents::PRE_CREATE                => ['onPreCreate', 0],
+            ProductEvents::PRE_UPDATE                => ['onPreUpdate', 0],
+            ProductEvents::PRE_DELETE                => ['onPreDelete', 0],
             ProductEvents::INSERT                    => ['onInsert', 0],
             ProductEvents::UPDATE                    => ['onUpdate', 0],
             ProductEvents::DELETE                    => ['onDelete', 0],

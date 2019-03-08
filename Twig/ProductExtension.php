@@ -128,6 +128,10 @@ class ProductExtension extends \Twig_Extension
                 [$this->priceRenderer, 'getConfigurablePrice']
             ),
             new \Twig_SimpleFilter(
+                'product_purchase_cost',
+                [$this->priceRenderer, 'getPurchaseCost']
+            ),
+            new \Twig_SimpleFilter(
                 'product_attribute',
                 [$this, 'renderProductAttribute'],
                 ['is_safe' => ['html']]
@@ -261,7 +265,7 @@ class ProductExtension extends \Twig_Extension
             if ($choiceProduct->isVisible() && !$choice->isHidden()) {
                 $visible[] = [
                     'quantity' => $choice->getMinQuantity(),
-                    'product' => $choiceProduct,
+                    'product'  => $choiceProduct,
                 ];
             }
         }

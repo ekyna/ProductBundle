@@ -1501,6 +1501,57 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $images;
     }
 
+    public function getFiles($withChildren = false, $limit = 5, ArrayCollection $files = null)
+    {
+        if (null === $files) {
+            $files = new ArrayCollection();
+        }
+
+        foreach ($this->medias as $pm) {
+            $media = $pm->getMedia();
+            if ($media->getType() === Media\MediaTypes::FILE && !$files->contains($media)) {
+                $files->add($media);
+                if ($limit <= $files->count()) {
+                    break;
+                }
+            }
+        }
+
+        if ($withChildren && $limit > $files->count()) {
+            if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
+                /** @var Product $variant TODO */
+                foreach ($this->variants as $variant) {
+                    $variant->getFiles(false, $limit, $files);
+                }
+            } elseif (in_array($this->type, [Model\ProductTypes::TYPE_BUNDLE, Model\ProductTypes::TYPE_CONFIGURABLE])) {
+                foreach ($this->bundleSlots as $slot) {
+                    $choices = $slot->getChoices();
+                    foreach ($choices as $choice) {
+                        $product = $choice->getProduct();
+                        if (0 < $product->getMedias()->count()) {
+                            foreach ($product->getMedias() as $pm) {
+                                $media = $pm->getMedia();
+                                if ($media->getType() === Media\MediaTypes::FILE && !$files->contains($media)) {
+                                    $files->add($media);
+                                    if ($limit <= $files->count()) {
+                                        break 3;
+                                    }
+                                    break;
+                                }
+                            }
+                        } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                            foreach ($product->getVariants() as $variant) {
+                                $variant->getFiles(false, $limit, $files);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $files;
+    }
+
     /**
      * @inheritDoc
      */

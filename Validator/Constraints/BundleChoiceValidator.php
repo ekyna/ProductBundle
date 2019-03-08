@@ -33,7 +33,7 @@ class BundleChoiceValidator extends ConstraintValidator
         $product = $bundleChoice->getProduct();
 
         // Disallow recursion
-        if ($product && $product === $parent) {
+        if ($product === $parent) {
             $this->context
                 ->buildViolation($constraint->recursive_choice)
                 ->atPath('product')

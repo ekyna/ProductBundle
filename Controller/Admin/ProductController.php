@@ -458,21 +458,21 @@ class ProductController extends AbstractSubjectController
 
         switch ($subject->getType()) {
             case ProductTypes::TYPE_CONFIGURABLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $calculator = $this->get('ekyna_product.pricing.price_calculator');
                 $updater = new Updater\ConfigurableUpdater($calculator);
                 $changed = $updater->updateStock($subject);
                 $changed |= $updater->updateAvailability($subject);
                 break;
 
             case ProductTypes::TYPE_BUNDLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $calculator = $this->get('ekyna_product.pricing.price_calculator');
                 $updater = new Updater\BundleUpdater($calculator);
                 $changed = $updater->updateStock($subject);
                 $changed |= $updater->updateAvailability($subject);
                 break;
 
             case ProductTypes::TYPE_VARIABLE:
-                $calculator = $this->get('ekyna_product.pricing.calculator');
+                $calculator = $this->get('ekyna_product.pricing.price_calculator');
                 $updater = new Updater\VariableUpdater($calculator);
                 $changed = $updater->updateStock($subject);
                 $changed |= $updater->updateAvailability($subject);

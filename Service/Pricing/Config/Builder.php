@@ -37,13 +37,15 @@ class Builder
      * @param Model\ProductInterface $product
      * @param bool                   $visible
      * @param bool                   $options
+     * @param float                  $netPrice
      *
      * @return Tree
      */
     public function build(
         Model\ProductInterface $product,
         bool $visible = true,
-        bool $options = true
+        bool $options = true,
+        float $netPrice = null
     ) {
         $tree = new Tree();
         $tree->setVisible($visible);
@@ -63,13 +65,16 @@ class Builder
                 $child = $this->build(
                     $choiceProduct,
                     $visible && $choiceProduct->isVisible() && !$choice->isHidden(),
-                    $options && $choice->isUseOptions()
+                    $options && $choice->isUseOptions(),
+                    $choice->getNetPrice()
                 );
 
                 $child->setQuantity($choice->getMinQuantity());
 
                 $tree->addChild($child);
             }
+        } elseif (!is_null($netPrice)) {
+            $tree->addNetPrice($netPrice);
         } else {
             $tree->addNetPrice($product->getNetPrice());
         }

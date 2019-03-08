@@ -361,6 +361,11 @@ class ItemBuilder
             $item->setPrivate(true);
         }
 
+        // Override item net price (from product) with choice's net price if set
+        if (null !== $choice->getNetPrice()) {
+            $item->setNetPrice($choice->getNetPrice());
+        }
+
         $item
             ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
             ->setData(static::BUNDLE_CHOICE_ID, $choice->getId())
