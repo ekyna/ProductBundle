@@ -192,7 +192,7 @@ class BundleUpdater extends AbstractUpdater
 
         $changed = false;
 
-        $quoteOnly = $endOfLife = true;
+        $quoteOnly = $endOfLife = false;
 
         $bundleSlots = $bundle->getBundleSlots()->getIterator();
         /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface $slot */
@@ -203,15 +203,15 @@ class BundleUpdater extends AbstractUpdater
                 $product = $choice->getProduct();
 
                 // Quote only
-                if (!$product->isQuoteOnly()) {
-                    $quoteOnly = false;
+                if ($product->isQuoteOnly()) {
+                    $quoteOnly = true;
                 }
                 // End of life
-                if (!$product->isEndOfLife()) {
-                    $endOfLife = false;
+                if ($product->isEndOfLife()) {
+                    $endOfLife = true;
                 }
-                // Break if both false
-                if (!$quoteOnly && !$endOfLife) {
+                // Break if both true
+                if ($quoteOnly && $endOfLife) {
                     break;
                 }
             }

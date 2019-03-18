@@ -224,6 +224,12 @@ class ProductFilter implements ProductFilterInterface
      */
     protected function isChoiceAvailable(Model\BundleChoiceInterface $choice)
     {
+        $product = $choice->getProduct();
+
+        if (!$this->context->isAdmin() && ($product->isQuoteOnly() || $product->isEndOfLife())) {
+            return false;
+        }
+
         return $this->isProductAvailable($choice->getProduct());
     }
 
@@ -238,6 +244,10 @@ class ProductFilter implements ProductFilterInterface
     {
         if (null === $product = $option->getProduct()) {
             return true;
+        }
+
+        if (!$this->context->isAdmin() && ($product->isQuoteOnly() || $product->isEndOfLife())) {
+            return false;
         }
 
         return $this->isProductAvailable($product);
