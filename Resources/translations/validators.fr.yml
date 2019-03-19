@@ -12,6 +12,7 @@ ekyna_product:
         visibility_integrity: Ce produit est visible et ne peut pas composer un produit invisible.
         tax_group_integrity: Le produit choisi doit avoir le même groupe de taxe.
         recursive_choice: Vous ne pouvez pas composer un produit avec lui-même.
+        forbidden_price_override: Le prix d'un pack ne peut pas être redéfini.
     bundle_slot:
         too_many_choices: Un seul produit doit être configuré.
     pricing:

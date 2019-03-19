@@ -40,6 +40,13 @@ class BundleChoiceValidator extends ConstraintValidator
                 ->addViolation();
         }
 
+        if (null !== $bundleChoice->getNetPrice() && !Model\ProductTypes::isChildType($product)) {
+            $this->context
+                ->buildViolation($constraint->forbidden_price_override)
+                ->atPath('netPrice')
+                ->addViolation();
+        }
+
         // Related to SaleItem : private sale item can't contain public children.
         // Without this constraint, the parent would become public.
         /** @see \Ekyna\Bundle\CommerceBundle\EventListener\SaleItemEventSubscriber::fixItemPrivacy() */

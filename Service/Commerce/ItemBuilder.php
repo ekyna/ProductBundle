@@ -715,6 +715,11 @@ class ItemBuilder
 
         $this->initialize($item, $options && $choice->isUseOptions());
 
+        // Override item net price (from product) with choice's net price if set
+        if (null !== $choice->getNetPrice()) {
+            $item->setNetPrice($choice->getNetPrice());
+        }
+
         $item
             ->setQuantity($choice->getMinQuantity())
             ->setPosition($choice->getSlot()->getPosition())

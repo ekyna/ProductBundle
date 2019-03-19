@@ -251,33 +251,31 @@ class PriceCalculator
      *
      * @param Model\ProductInterface $variable
      * @param bool                   $withOptions Whether to add options min price.
-     * @param float                  $price       Price override.
+     * @param float                  $override    Price override.
      *
      * @return float|int
      */
-    public function calculateVariableMinPrice(Model\ProductInterface $variable, $withOptions = true, $price = null)
+    public function calculateVariableMinPrice(Model\ProductInterface $variable, $withOptions = true, $override = null)
     {
         Model\ProductTypes::assertVariable($variable);
 
-        if (is_null($price)) {
-            foreach ($variable->getVariants() as $variant) {
-                if (!$variant->isVisible()) {
-                    continue;
-                }
+        foreach ($variable->getVariants() as $variant) {
+            if (!$variant->isVisible()) {
+                continue;
+            }
 
-                $variantPrice = $this->calculateProductMinPrice($variant, $withOptions);
+            $variantPrice = $this->calculateProductMinPrice($variant, $withOptions, $override);
 
-                if (null === $price || $variantPrice < $price) {
-                    $price = $variantPrice;
-                }
+            if (null === $override || $variantPrice < $override) {
+                $override = $variantPrice;
             }
         }
 
-        if (is_null($price)) {
-            $price = 0;
+        if (is_null($override)) {
+            $override = 0;
         }
 
-        return $price;
+        return $override;
     }
 
     /**
