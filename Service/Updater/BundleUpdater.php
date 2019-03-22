@@ -70,15 +70,14 @@ class BundleUpdater extends AbstractUpdater
                 $choice = $slot->getChoices()->first();
                 $product = $choice->getProduct();
 
+                // Mode
                 if ($product->getStockMode() === StockSubjectModes::MODE_DISABLED) {
                     continue;
                 }
 
                 // State
                 $disabled = false;
-                if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
-                    continue;
-                } else {
+                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
                     $justInTime = false;
                 }
 

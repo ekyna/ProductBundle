@@ -72,38 +72,21 @@ class ConfigurableUpdater extends AbstractUpdater
 
                     $bestProduct = $bestChoice->getProduct();
 
+                    // Mode
                     if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
-                        if ($choice->getProduct()->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                        if ($bestProduct->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
+                            $bestChoice = $choice;
+                        } elseif ($this->isBetterChoice($choice, $bestChoice)) {
                             $bestChoice = $choice;
                         }
 
                         continue;
+                    } elseif($bestProduct->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
+                        continue;
                     }
 
-                    // Available stock
-                    if (0 < $availableStock = $product->getAvailableStock() / $choice->getMinQuantity()) {
-                        $bestAvailableStock = $bestProduct->getAvailableStock() / $bestChoice->getMinQuantity();
-                        if ($bestAvailableStock < $availableStock) {
-                            $bestChoice = $choice;
-                            continue;
-                        }
-                    }
-
-                    // Virtual stock
-                    if (0 < $virtualStock = $product->getVirtualStock() / $choice->getMinQuantity()) {
-                        $bestVirtualStock = $bestProduct->getVirtualStock() / $bestChoice->getMinQuantity();
-                        if ($bestVirtualStock < $virtualStock) {
-                            $bestChoice = $choice;
-                            continue;
-                        }
-
-                        // Estimated date of arrival
-                        if (null !== $eda = $product->getEstimatedDateOfArrival()) {
-                            $bestEda = $bestProduct->getEstimatedDateOfArrival();
-                            if (null === $bestEda || $bestEda > $eda) {
-                                $bestChoice = $choice;
-                            }
-                        }
+                    if ($this->isBetterChoice($choice, $bestChoice)) {
+                        $bestChoice = $choice;
                     }
                 }
 
@@ -123,9 +106,7 @@ class ConfigurableUpdater extends AbstractUpdater
 
                 // State
                 $disabled = false;
-                if ($product->getStockMode() === StockSubjectModes::MODE_JUST_IN_TIME) {
-                    continue;
-                } else {
+                if ($product->getStockMode() !== StockSubjectModes::MODE_JUST_IN_TIME) {
                     $justInTime = false;
                 }
 
@@ -226,6 +207,46 @@ class ConfigurableUpdater extends AbstractUpdater
         }
 
         return $changed;
+    }
+
+    /**
+     * Returns true if the A choice is better than the B choice.
+     *
+     * @param Model\BundleChoiceInterface $a
+     * @param Model\BundleChoiceInterface $b
+     *
+     * @return bool
+     */
+    private function isBetterChoice(Model\BundleChoiceInterface $a, Model\BundleChoiceInterface $b)
+    {
+        $aProduct = $a->getProduct();
+        $bProduct = $b->getProduct();
+
+        // Available stock
+        if (0 < $aAvailable = $aProduct->getAvailableStock() / $a->getMinQuantity()) {
+            $bAvailable = $bProduct->getAvailableStock() / $b->getMinQuantity();
+            if ($bAvailable < $aAvailable) {
+                return true;
+            }
+        }
+
+        // Virtual stock
+        if (0 < $aVirtual = $aProduct->getVirtualStock() / $a->getMinQuantity()) {
+            $bVirtual = $bProduct->getVirtualStock() / $b->getMinQuantity();
+            if ($bVirtual < $aVirtual) {
+                return true;
+            }
+
+            // Estimated date of arrival
+            if (null !== $aEda = $aProduct->getEstimatedDateOfArrival()) {
+                $bEda = $bProduct->getEstimatedDateOfArrival();
+                if (null === $bEda || $bEda > $aEda) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
