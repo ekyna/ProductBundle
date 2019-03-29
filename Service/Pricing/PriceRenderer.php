@@ -7,7 +7,6 @@ use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
-use Ekyna\Component\Commerce\Common\Util\Formatter;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Templating\EngineInterface;
@@ -54,11 +53,6 @@ class PriceRenderer
      * @var EngineInterface
      */
     private $templating;
-
-    /**
-     * @var Formatter
-     */
-    private $formatter;
 
     /**
      * @var array
@@ -119,8 +113,6 @@ class PriceRenderer
             return new Model\PriceDisplay(0, '', '', 'NC'); // TODO translation
         }*/
 
-        // TODO user locale and currency (in context provider)
-
         if (null === $context) {
             $context = $this->contextProvider->getContext();
         }
@@ -130,10 +122,7 @@ class PriceRenderer
         $currency = $context->getCurrency()->getCode();
         $mode = $context->getVatDisplayMode();
 
-        $formatter = $this->getFormatter();
-        if ($formatter->getCurrency() !== $currency) {
-            $formatter = $this->formatterFactory->create($this->localeProvider->getCurrentLocale(), $currency);
-        }
+        $formatter = $this->formatterFactory->create($this->localeProvider->getCurrentLocale(), $currency);
 
         // From
         $fromLabel = $this->options['price_with_from'] && $price['starting_from']
@@ -257,22 +246,5 @@ class PriceRenderer
             'pricing' => $config,
             'class'   => $class,
         ]);
-    }
-
-    /**
-     * Returns the formatter.
-     *
-     * @return Formatter
-     */
-    protected function getFormatter()
-    {
-        if (null !== $this->formatter) {
-            return $this->formatter;
-        }
-
-        return $this->formatter = $this->formatterFactory->create(
-            $this->localeProvider->getCurrentLocale()
-        // TODO currency
-        );
     }
 }

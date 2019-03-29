@@ -628,7 +628,7 @@ class ProductController extends AbstractSubjectController
                 $country ? $country->getId() : 0
             );
 
-            $locale = $this->get('ekyna_resource.locale.request_provider')->getCurrentLocale();
+            $locale = $this->get('ekyna_resource.locale_provider')->getCurrentLocale();
             $region = Intl::getRegionBundle();
 
             if (!isset($list[$key])) {
@@ -682,7 +682,7 @@ class ProductController extends AbstractSubjectController
                 $country ? $country->getId() : 0
             );
 
-            $locale = $this->get('ekyna_resource.locale.request_provider')->getCurrentLocale();
+            $locale = $this->get('ekyna_resource.locale_provider')->getCurrentLocale();
             $region = Intl::getRegionBundle();
 
             if (!isset($list[$key])) {

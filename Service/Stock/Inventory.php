@@ -11,7 +11,8 @@ use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
-use Ekyna\Component\Commerce\Common\Util\Formatter;
+use Ekyna\Component\Commerce\Common\Util\FormatterAwareTrait;
+use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
@@ -32,6 +33,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class Inventory
 {
+    use FormatterAwareTrait;
+
     const PENDING_DQL = "(
   SELECT SUM(nsoi.quantity) 
   FROM _class_ nsoi
@@ -92,11 +95,6 @@ class Inventory
     private $stockUnitClass;
 
     /**
-     * @var Formatter
-     */
-    private $formatter;
-
-    /**
      * @var array
      */
     private $config;
@@ -121,7 +119,7 @@ class Inventory
      * @param TranslatorInterface   $translator
      * @param FormFactory           $formFactory
      * @param SessionInterface      $session
-     * @param Formatter             $formatter
+     * @param FormatterFactory      $formatterFactory
      * @param string                $supplierOrderItemClass
      * @param string                $stockUnitClass
      */
@@ -132,7 +130,7 @@ class Inventory
         TranslatorInterface $translator,
         FormFactory $formFactory,
         SessionInterface $session,
-        Formatter $formatter,
+        FormatterFactory $formatterFactory,
         $supplierOrderItemClass,
         $stockUnitClass
     ) {
@@ -142,7 +140,7 @@ class Inventory
         $this->translator = $translator;
         $this->formFactory = $formFactory;
         $this->session = $session;
-        $this->formatter = $formatter;
+        $this->formatterFactory = $formatterFactory;
 
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
@@ -216,6 +214,8 @@ class Inventory
             $this->saveContext();
         }
 
+        $formatter = $this->getFormatter();
+
         // Context
         $context = $this->getContext();
 
@@ -249,16 +249,16 @@ class Inventory
             ]);
 
             // Format price
-            $product['net_price'] = $this->formatter->currency((float)$product['net_price']);
+            $product['net_price'] = $formatter->currency((float)$product['net_price']);
 
             // Format weight
-            $product['weight'] = $this->formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
+            $product['weight'] = $formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
 
             // Format stock
-            $product['stock_floor'] = $this->formatter->number((float)$product['stock_floor']);
-            $product['in_stock'] = $this->formatter->number((float)$product['in_stock']);
-            $product['available_stock'] = $this->formatter->number((float)$product['available_stock']);
-            $product['virtual_stock'] = $this->formatter->number((float)$product['virtual_stock']);
+            $product['stock_floor'] = $formatter->number((float)$product['stock_floor']);
+            $product['in_stock'] = $formatter->number((float)$product['in_stock']);
+            $product['available_stock'] = $formatter->number((float)$product['available_stock']);
+            $product['virtual_stock'] = $formatter->number((float)$product['virtual_stock']);
 
             // Eda
             /** @var \DateTime $eda */
@@ -273,12 +273,12 @@ class Inventory
             }
 
             // Stock sums
-            $product['pending'] = 0 < $product['pending'] ? $this->formatter->number((float)$product['pending']) : '';
-            $product['ordered'] = $this->formatter->number((float)$product['ordered']);
-            $product['received'] = $this->formatter->number((float)$product['received']);
-            $product['adjusted'] = $this->formatter->number((float)$product['adjusted']);
-            $product['sold'] = $this->formatter->number((float)$product['sold']);
-            $product['shipped'] = $this->formatter->number((float)$product['shipped']);
+            $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
+            $product['ordered'] = $formatter->number((float)$product['ordered']);
+            $product['received'] = $formatter->number((float)$product['received']);
+            $product['adjusted'] = $formatter->number((float)$product['adjusted']);
+            $product['sold'] = $formatter->number((float)$product['sold']);
+            $product['shipped'] = $formatter->number((float)$product['shipped']);
 
             // Stock mode badge
             $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
@@ -298,7 +298,6 @@ class Inventory
 
         return $products;
     }
-
 
     /**
      * Returns the products query builder.

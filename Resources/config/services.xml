@@ -64,7 +64,7 @@
             <argument type="service" id="translator"/>
             <argument type="service" id="form.factory"/>
             <argument type="service" id="session"/>
-            <argument type="service" id="ekyna_commerce.util.formatter.default"/>
+            <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
             <argument>%ekyna_commerce.supplier_order_item.class%</argument>
             <argument>%ekyna_product.product_stock_unit.class%</argument>
         </service>
@@ -127,7 +127,7 @@
             <argument type="service" id="ekyna_product.commerce.product_filter"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_commerce.availability_helper"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="translator"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <call method="setCacheManager">
@@ -506,7 +506,7 @@
                  lazy="true">
             <argument id="ekyna_product.pricing.price_calculator" type="service"/>
             <argument id="ekyna_product.pricing.purchase_cost_calculator" type="service"/>
-            <argument id="ekyna_resource.locale.request_provider" type="service"/>
+            <argument id="ekyna_resource.locale_provider" type="service"/>
             <argument id="ekyna_commerce.common.context_provider" type="service"/>
             <argument id="ekyna_commerce.util.formatter_factory" type="service"/>
             <argument id="translator" type="service"/>
@@ -604,7 +604,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariantHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_product.product.repository"/>
@@ -615,7 +615,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\Handler\VariableHandler"
                  public="false">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_product.product.repository"/>
@@ -705,7 +705,7 @@
         <!-- Variant constraint validator -->
         <service id="ekyna_product.validator.variant_validator"
                  class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_resource.locale_provider"/>
             <tag name="validator.constraint_validator"/>
         </service>
 
@@ -833,7 +833,7 @@
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCount</argument>
             <call method="setLocaleProvider">
-                <argument type="service" id="ekyna_resource.locale.request_provider"/>
+                <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>
         </service>
         <!-- Stat cross repository -->
@@ -842,7 +842,7 @@
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCross</argument>
             <call method="setLocaleProvider">
-                <argument type="service" id="ekyna_resource.locale.request_provider"/>
+                <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>
         </service>
 
@@ -917,7 +917,7 @@
             <argument type="service" id="ekyna_product.constants_helper"/>
             <argument type="service" id="ekyna_product.pricing.renderer"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
-            <argument type="service" id="ekyna_resource.locale.request_provider"/>
+            <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>

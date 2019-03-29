@@ -6,7 +6,7 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Commerce\Common\Converter\CurrencyConverterInterface;
+use Ekyna\Component\Commerce\Common\Currency\CurrencyConverterInterface;
 use Ekyna\Component\Commerce\Common\Util\Money;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes;
@@ -401,7 +401,9 @@ class PriceCalculator
         $currency = $context->getCurrency()->getCode();
         if ($currency !== $this->defaultCurrency) {
             // Currency conversion
-            $amount = $this->currencyConverter->convert($amount, $this->defaultCurrency, $currency);
+            $amount = $this
+                ->currencyConverter
+                ->convert($amount, $this->defaultCurrency, $currency, $context->getDate());
         }
 
         $pricing = [
@@ -468,7 +470,9 @@ class PriceCalculator
 
         if ($currency !== $this->defaultCurrency) {
             // Currency conversion
-            $price = $this->currencyConverter->convert($price, $this->defaultCurrency, $currency);
+            $price = $this
+                ->currencyConverter
+                ->convert($price, $this->defaultCurrency, $currency, $context->getDate());
         }
 
         foreach ($offers as &$offer) {
@@ -497,30 +501,38 @@ class PriceCalculator
         bool $withOffers = true,
         bool $withTaxes = true
     ) {
-        // Currency
-        $currency = $context->getCurrency()->getCode();
-
         if (null !== $product = $option->getProduct()) {
             $pricing = $this->buildProductPricing($product, $context, $withOffers, $withTaxes);
 
             // Option's net price override
             if (null !== $price = $option->getNetPrice()) {
-                $pricing['price'] = $price;
+                $pricing['price'] = $this
+                    ->currencyConverter
+                    ->convert(
+                        $price,
+                        $this->defaultCurrency,
+                        $context->getCurrency()->getCode(),
+                        $context->getDate()
+                    );
             }
-        } else {
-            $pricing = [
-                'price'  => (float)$option->getNetPrice(),
-                'offers' => [], // Prevent inheritance
-                'taxes'  => $withTaxes ? $this->getTaxesRates($option, $context) : [],
-            ];
+
+            return $pricing;
         }
 
-        // Currency conversion
-        if (0 < $pricing['price'] && $currency !== $this->defaultCurrency) {
-            $pricing['price'] = $this->currencyConverter->convert($pricing['price'], $this->defaultCurrency, $currency);
-        }
+        $price = $this
+            ->currencyConverter
+            ->convert(
+                (float)$option->getNetPrice(),
+                $this->defaultCurrency,
+                $context->getCurrency()->getCode(),
+                $context->getDate()
+            );
 
-        return $pricing;
+        return [
+            'price'  => $price,
+            'offers' => [], // Prevent inheritance
+            'taxes'  => $withTaxes ? $this->getTaxesRates($option, $context) : [],
+        ];
     }
 
     /**
