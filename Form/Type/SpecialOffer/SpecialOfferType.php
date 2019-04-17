@@ -72,6 +72,7 @@ class SpecialOfferType extends ResourceFormType
                 'required' => false,
             ])
             ->add('countries', CountryChoiceType::class, [
+                'enabled'  => false,
                 'multiple' => true,
                 'required' => false,
             ])

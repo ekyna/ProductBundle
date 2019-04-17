@@ -339,7 +339,7 @@ class Inventory
             ->andWhere($pQb->expr()->in('p.type', ':types'))
             ->andWhere($pQb->expr()->not($pQb->expr()->andX(
                 $pQb->expr()->eq('p.endOfLife', ':end_of_life'),
-                $pQb->expr()->neq('p.virtualStock', ':virtual_stock')
+                $pQb->expr()->gte('p.virtualStock', ':virtual_stock')
 
             )))
             ->setParameters([
