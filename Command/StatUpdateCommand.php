@@ -42,6 +42,7 @@ class StatUpdateCommand extends Command
             ->setDescription('Updates the products stats')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Whether to force update')
             ->addOption('purge', null, InputOption::VALUE_NONE, 'Whether to purge stats first')
+            ->addOption('interval', null, InputOption::VALUE_REQUIRED, 'The interval between 2 updates for a given product in hours', 6)
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'The maximum execution time in seconds', 120)
             ->addOption('breathe', null, InputOption::VALUE_REQUIRED, 'Delay between each product update in milliseconds', 0);
     }
@@ -54,6 +55,7 @@ class StatUpdateCommand extends Command
         $debug = !$input->getOption('no-debug');
         $force = (bool)$input->getOption('force');
 
+        $interval = intval($input->getOption('interval'));
         $limit = intval($input->getOption('limit'));
         $breathe = intval($input->getOption('breathe'));
 
@@ -65,7 +67,7 @@ class StatUpdateCommand extends Command
             $this->updater->purge();
         }
 
-        $this->updater->setMaxUpdateDate((new \DateTime())->modify("-$limit seconds"));
+        $this->updater->setMaxUpdateDate((new \DateTime())->modify("-$interval hours"));
 
         $limit *= 1000;
         $count = $sum = $avg = 0;
