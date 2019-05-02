@@ -635,13 +635,17 @@ class ItemBuilder
             ->setPrivate(!$product->isVisible());
 
         // Filter bundle slots if configurable
-        $bundlesSlots = $configurable ? $this->filter->getBundleSlots($product) : $product->getBundleSlots();
+        $bundlesSlots = $configurable
+            ? $this->filter->getBundleSlots($product)
+            : $product->getBundleSlots()->toArray();
 
         // For each bundle/configurable slots
         $bundleSlotIds = [];
         foreach ($bundlesSlots as $bundleSlot) {
             // Filter bundle slot choices if configurable
-            $bundlesChoices = $configurable ? $this->filter->getSlotChoices($bundleSlot) : $bundleSlot->getChoices();
+            $bundlesChoices = $configurable
+                ? $this->filter->getSlotChoices($bundleSlot)
+                : $bundleSlot->getChoices()->toArray();
 
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
             $defaultChoice = current($bundlesChoices);
