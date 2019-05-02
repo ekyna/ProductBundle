@@ -492,7 +492,8 @@ class ItemBuilder
             ->setData(static::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setData(static::OPTION_ID, $option->getId())
             ->setQuantity(1)
-            ->setImmutable(true);
+            ->setImmutable(true)
+            ->setConfigurable(false);
 
         // TODO Option product should always be public (not private) as it is a user choice.
     }
@@ -626,19 +627,21 @@ class ItemBuilder
     {
         ProductTypes::assertBundled($product);
 
+        $configurable = $product->getType() === ProductTypes::TYPE_CONFIGURABLE;
+
         $item
             ->setCompound(true)
-            ->setConfigurable($product->getType() === ProductTypes::TYPE_CONFIGURABLE)
+            ->setConfigurable($configurable)
             ->setPrivate(!$product->isVisible());
 
-        // Filter bundle slots
-        $bundlesSlots = $this->filter->getBundleSlots($product);
+        // Filter bundle slots if configurable
+        $bundlesSlots = $configurable ? $this->filter->getBundleSlots($product) : $product->getBundleSlots();
 
         // For each bundle/configurable slots
         $bundleSlotIds = [];
         foreach ($bundlesSlots as $bundleSlot) {
-            // Filter bundle slots
-            $bundlesChoices = $this->filter->getSlotChoices($bundleSlot);
+            // Filter bundle slot choices if configurable
+            $bundlesChoices = $configurable ? $this->filter->getSlotChoices($bundleSlot) : $bundleSlot->getChoices();
 
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $defaultChoice */
             $defaultChoice = current($bundlesChoices);
@@ -876,7 +879,7 @@ class ItemBuilder
 
         // Filter product option groups
         if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $variable */
+            /** @var ProductInterface $variable */
             $variable = $product->getParent();
 
             // Filter variant option groups
