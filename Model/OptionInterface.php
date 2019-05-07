@@ -47,6 +47,22 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
     public function setProduct(ProductInterface $product = null);
 
     /**
+     * Returns whether to cascade option groups.
+     *
+     * @return bool
+     */
+    public function isCascade();
+
+    /**
+     * Sets whether to cascade option groups.
+     *
+     * @param bool $inherit
+     *
+     * @return $this|OptionInterface
+     */
+    public function setCascade(bool $inherit);
+
+    /**
      * Returns the designation.
      *
      * @return string

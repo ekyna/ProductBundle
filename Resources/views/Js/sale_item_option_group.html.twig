@@ -1,8 +1,8 @@
-<div class="form-group{# form-group-sm#}" data-id="{{ id }}" data-type="{{ type }}">
+<div class="form-group{# form-group-sm#}" data-id="{{ id }}" data-position="{{ position }}">
     <label class="control-label col-sm-3{% if required %} required{% endif %}">{{ label }}</label>
     <div class="col-sm-9">
         <div class="input-group">
-            <select name="{{ parent }}[option_group_{{ id }}][choice]" class="sale-item-option form-control{# input-sm#}"{% if required %} required="required"{% endif %}">
+            <select name="{{ parent }}[option_group_{{ id }}][choice]" class="sale-item-option form-control{# input-sm#}"{% if required %} required="required"{% endif %}>
                 {% if not required %}<option selected="selected" value>{{ placeholder }}</option>{% endif %}
                 {% for option in options %}<option value="{{ option.id }}" data-config='{{ option.config|json_encode|escape }}'>{{ option.label }}</option>{% endfor %}
             </select>

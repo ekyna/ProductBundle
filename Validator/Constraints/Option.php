@@ -12,7 +12,6 @@ use Symfony\Component\Validator\Constraint;
 class Option extends Constraint
 {
     public $recursive_choice        = 'ekyna_product.option.recursive_choice';
-    public $product_must_be_visible = 'ekyna_product.option.product_must_be_visible';
 
     /**
      * {@inheritdoc}

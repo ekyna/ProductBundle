@@ -28,14 +28,19 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     protected $id;
 
     /**
+     * @var Model\OptionGroupInterface
+     */
+    protected $group;
+
+    /**
      * @var Model\ProductInterface
      */
     protected $product;
 
     /**
-     * @var Model\OptionGroupInterface
+     * @var bool
      */
-    protected $group;
+    protected $cascade;
 
     /**
      * @var string
@@ -134,6 +139,30 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     public function setProduct(Model\ProductInterface $product = null)
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether option product's options should be added to the form (add to sale)..
+     *
+     * @return bool
+     */
+    public function isCascade()
+    {
+        return $this->cascade;
+    }
+
+    /**
+     * Sets whether option product's options should be added to the form (add to sale).
+     *
+     * @param bool $cascade
+     *
+     * @return Option
+     */
+    public function setCascade(bool $cascade)
+    {
+        $this->cascade = $cascade;
 
         return $this;
     }

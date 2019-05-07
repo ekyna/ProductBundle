@@ -4,10 +4,10 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Helper\AvailabilityHelperInterface;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Liip\ImagineBundle\Imagine\Cache as Imagine;
@@ -100,6 +100,7 @@ class FormBuilder
         $this->translator = $translator;
         $this->noImagePath = $noImagePath;
 
+        // TODO Use formatter factory
         $this->formatter = \NumberFormatter::create(
             $this->localeProvider->getCurrentLocale(),
             \NumberFormatter::CURRENCY
@@ -279,36 +280,10 @@ class FormBuilder
             return [];
         }
 
-        $groups = [];
-
-        $optionGroups = $this->productFilter->getOptionGroups($variant);
-
-        /** @var Model\OptionGroupInterface $optionGroup */
-        foreach ($optionGroups as $optionGroup) {
-            $groupOptions = $this->productFilter->getGroupOptions($optionGroup);
-            $options = [];
-            /** @var Model\OptionInterface $option */
-            foreach ($groupOptions as $option) {
-                $options[] = [
-                    'id'     => $option->getId(),
-                    'label'  => $this->optionChoiceLabel($option),
-                    'config' => $this->buildOptionConfig($option),
-                ];
-            }
-            $groups[] = [
-                'id'          => $optionGroup->getId(),
-                'type'        => $optionGroup->getProduct()->getType(),
-                'label'       => $optionGroup->getTitle(),
-                'required'    => $optionGroup->isRequired(),
-                'placeholder' => 'Choisissez une option', // TODO trans
-                'options'     => $options,
-            ];
-        }
-
         $config = [
             // TODO discounts/taxes flags (private item)
             'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context),
-            'groups'       => $groups,
+            'groups'       => $this->buildOptionsGroupsConfig($variant),
             'thumb'        => $this->getProductImagePath($variant),
             'image'        => $this->getProductImagePath($variant, 'media_front'),
             'availability' => $this->availabilityHelper->getAvailability($variant, $root)->toArray(),
@@ -425,7 +400,6 @@ class FormBuilder
         if (null !== $subject = $item->getSubjectIdentity()->getSubject()) {
             $skippedTypes = [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_CONFIGURABLE];
             if (!in_array($subject->getType(), $skippedTypes, true)) {
-//            if (Model\ProductTypes::isChildType($subject->getType())) {
                 $config['pricing'] = $this->priceCalculator->buildProductPricing($subject, $this->context);
                 $config['availability'] = $this->availabilityHelper->getAvailability($subject)->toArray();
             }
@@ -537,11 +511,52 @@ class FormBuilder
             $config['availability'] = $this->availabilityHelper->getAvailability($product, false)->toArray();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
+            if ($option->isCascade()) {
+                $config['groups'] = $this->buildOptionsGroupsConfig($product);
+            }
         }
 
         // TODO discounts/taxes flags (private item)
         $config['pricing'] = $this->priceCalculator->buildOptionPricing($option, $this->context);
 
         return $config;
+    }
+
+    /**
+     * Builds the product options groups config.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    protected function buildOptionsGroupsConfig(Model\ProductInterface $product)
+    {
+        $groups = [];
+
+        $optionGroups = $this->productFilter->getOptionGroups($product);
+
+        /** @var Model\OptionGroupInterface $optionGroup */
+        foreach ($optionGroups as $optionGroup) {
+            $groupOptions = $this->productFilter->getGroupOptions($optionGroup);
+            $options = [];
+            /** @var Model\OptionInterface $option */
+            foreach ($groupOptions as $option) {
+                $options[] = [
+                    'id'     => $option->getId(),
+                    'label'  => $this->optionChoiceLabel($option),
+                    'config' => $this->buildOptionConfig($option),
+                ];
+            }
+            $groups[] = [
+                'id'          => $optionGroup->getId(),
+                'label'       => $optionGroup->getTitle(),
+                'required'    => $optionGroup->isRequired(),
+                'placeholder' => $this->translate('ekyna_product.sale_item_configure.choose_option'),
+                'position'    => $optionGroup->getPosition(),
+                'options'     => $options,
+            ];
+        }
+
+        return $groups;
     }
 }

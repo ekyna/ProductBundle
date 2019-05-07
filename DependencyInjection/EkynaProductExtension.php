@@ -8,20 +8,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Class EkynaProductExtension
  * @package Ekyna\Bundle\ProductBundle\DependencyInjection
- * @author Étienne Dauvergne <contact@ekyna.com>
+ * @author  Étienne Dauvergne <contact@ekyna.com>
  */
 class EkynaProductExtension extends AbstractExtension
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $config = $this->configure($configs, 'ekyna_product', new Configuration(), $container);
 
         // Defaults
-        $container->setParameter('ekyna_product.default.no_image', $config['default']['no_image']);
-        $container->setParameter('ekyna_product.default.sale_item_form_theme', $config['default']['sale_item_form_theme']);
+        $container->setParameter(
+            'ekyna_product.default.no_image',
+            $config['default']['no_image']
+        );
+        $container->setParameter(
+            'ekyna_product.default.sale_item_form_theme',
+            $config['default']['sale_item_form_theme']
+        );
         $container->setParameter('ekyna_product.cache_ttl', $config['default']['cache_ttl']);
 
         $container

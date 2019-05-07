@@ -29,6 +29,12 @@
         <field name="weight" column="weight"  type="decimal" precision="7" scale="3" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
 
+        <field name="cascade" column="is_cascade" type="boolean">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
+
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />
         </field>

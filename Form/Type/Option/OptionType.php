@@ -40,11 +40,18 @@ class OptionType extends ResourceFormType
             ])
             ->add('product', ProductSearchType::class, [
                 'required' => false,
-                'visible'  => true,
                 'types'    => [
                     ProductTypes::TYPE_SIMPLE,
                     ProductTypes::TYPE_VARIANT,
+                    ProductTypes::TYPE_BUNDLE,
                 ],
+            ])
+            ->add('cascade', Type\CheckboxType::class, [
+                'label'    => 'ekyna_product.option.label.plural',
+                'required' => false,
+                'attr' => [
+                    'class' => 'product-cascade',
+                ]
             ])
             ->add('designation', Type\TextType::class, [
                 'label'    => 'ekyna_core.field.designation',

@@ -64,12 +64,12 @@ class OptionGroupType extends Form\AbstractType
 
         $transformer = new IdToChoiceObjectTransformer($options);
 
-        $postSubmitListener = function (Form\FormEvent $event) {
+        $submitListener = function (Form\FormEvent $event) use ($options) {
             $item = $event->getForm()->getParent()->getData();
 
             /** @var Model\OptionInterface $option */
             if (null !== $option = $event->getData()) {
-                $this->itemBuilder->buildFromOption($item, $option);
+                $this->itemBuilder->buildFromOption($item, $option, count($options));
             }
         };
 
@@ -88,7 +88,7 @@ class OptionGroupType extends Form\AbstractType
                 'choice_attr'   => [$this->formBuilder, 'optionChoiceAttr'],
             ])
             ->addModelTransformer($transformer)
-            ->addEventListener(Form\FormEvents::SUBMIT, $postSubmitListener, 1024);
+            ->addEventListener(Form\FormEvents::SUBMIT, $submitListener, 1024);
 
         $builder->add($field);
     }
@@ -102,7 +102,11 @@ class OptionGroupType extends Form\AbstractType
         $optionGroup = $options['option_group'];
 
         $view->vars['group_id'] = $optionGroup->getId();
-        $view->vars['group_type'] = $optionGroup->getProduct()->getType();
+        $view->vars['group_position'] = $optionGroup->getPosition();
+
+        if ($options['required'] && (1 === count($options['choices']))) {
+            $view->vars['attr']['style'] = 'display: none;';
+        }
     }
 
     /**
@@ -110,18 +114,17 @@ class OptionGroupType extends Form\AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver
+            ->setRequired(['option_group'])
             ->setDefaults([
                 'data_class' => SaleItemInterface::class,
-                'required'   => function (Options $options, $value) {
+                'required'   => function (Options $options, /** @noinspection PhpUnusedParameterInspection */ $value) {
                     /** @var Model\OptionGroupInterface $optionGroup */
                     $optionGroup = $options['option_group'];
 
                     return $optionGroup->isRequired();
                 },
             ])
-            ->setRequired(['option_group'])
             ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);
     }
 }

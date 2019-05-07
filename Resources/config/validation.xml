@@ -333,6 +333,7 @@
                 <option name="types">
                     <value>simple</value>
                     <value>variant</value>
+                    <value>bundle</value>
                 </option>
             </constraint>
         </property>

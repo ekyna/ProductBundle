@@ -39,7 +39,7 @@ class ProductTranslationType extends AbstractType
             ])
             ->add('description', TinymceType::class, [
                 'label'    => 'ekyna_core.field.content',
-                'theme'    => 'front',
+                'theme'    => 'simple',
                 'required' => false,
             ]);
     }

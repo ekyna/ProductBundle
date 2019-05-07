@@ -39,12 +39,5 @@ class OptionValidator extends ConstraintValidator
 
             return;
         }
-
-        if (null !== $product && !$product->isVisible()) {
-            $this->context
-                ->buildViolation($constraint->product_must_be_visible)
-                ->atPath('product')
-                ->addViolation();
-        }
     }
 }

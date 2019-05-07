@@ -139,7 +139,8 @@
         {% set sizing = sizing|default(bootstrap_get_sizing()) %}
         {% for child in form %}
         <div class="form-group{% if sizing in ['sm', 'lg'] %} form-group-{{ sizing }}{% endif %}"
-             data-id="{{ child.vars.group_id }}" data-type="{{ child.vars.group_type }}">
+             data-id="{{ child.vars.group_id }}" data-position="{{ child.vars.group_position }}"
+             {%- if child.vars.group_parent is defined %} data-parent="{{ child.vars.group_parent }}"{% endif %}>
             {{- form_label(child) -}}
             <div class="col-sm-9">
                 <div class="input-group">

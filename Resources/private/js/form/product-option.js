@@ -5,16 +5,18 @@ define(['jquery', 'jquery-ui/widget', 'select2', 'ekyna-commerce/form/price'], f
         _create: function () {
             this.$mode = this.element.find('div.option-mode input[type="radio"]');
             this.$price = this.element.find('div.commerce-price');
-            this.$product = this.element.find('> .option-product > select.entity-search');
-            this.$taxGroup = this.element.find('> .option-data > .tax-group-choice');
-
             this.$productWrapper = this.element.find('> .option-product');
             this.$dataWrapper = this.element.find('> .option-data');
+
+            this.$product = this.$productWrapper.find('select.entity-search');
+            this.$cascade = this.$productWrapper.find('input.product-cascade');
+            this.$taxGroup = this.$dataWrapper.find('.tax-group-choice');
 
             if (
                 2 !== this.$mode.length ||
                 1 !== this.$price.length ||
                 1 !== this.$product.length ||
+                1 !== this.$cascade.length ||
                 1 !== this.$taxGroup.length
             ) {
                 throw 'Missing product option type fields';
@@ -90,6 +92,7 @@ define(['jquery', 'jquery-ui/widget', 'select2', 'ekyna-commerce/form/price'], f
             var mode = this.$mode.filter(':checked').val();
             if (mode === 'data') {
                 this.$product.val(undefined).find('option:selected').prop('selected', false);
+                this.$cascade.prop('checked', false);
             } else if (mode === 'product') {
                 this.$dataWrapper.find('input, select').val(undefined);
             }

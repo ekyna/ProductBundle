@@ -44,7 +44,6 @@ class OptionsGroupsListener implements EventSubscriberInterface
     public function onPreSetData(FormEvent $event)
     {
         // Event data : Model data (doctrine collection of sale items)
-
         $this->buildForm($event->getForm());
     }
 
@@ -56,18 +55,18 @@ class OptionsGroupsListener implements EventSubscriberInterface
     public function onPreSubmit(FormEvent $event)
     {
         // Event data : Request data (associative array)
-
-        $this->buildForm($event->getForm());
+        $this->buildForm($event->getForm(), $event->getData());
     }
 
     /**
      * Builds the tree map.
      *
      * @param SaleItemInterface $item
+     * @param array             $data   The submitted data
      *
      * @return array
      */
-    private function buildTreeMap(SaleItemInterface $item)
+    private function buildTreeMap(SaleItemInterface $item, array $data = null)
     {
         $groups = $this->itemBuilder->getOptionGroups($item);
 
@@ -77,13 +76,17 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
         $map = [
             'ids'      => $groupIds,
-            'groups'   => $this->itemBuilder->getOptionGroups($item),
+            'groups'   => $groups,
             'children' => [],
+            'slot_id'  => null,
+            'group_id' => null,
         ];
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $this->itemBuilder->getProvider()->resolve($item);
 
+        // Ids of bundle slots having choices with options.
+        $bundleSlotIds = [];
         if ($product->getType() === ProductTypes::TYPE_BUNDLE) {
             foreach ($product->getBundleSlots() as $slot) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
@@ -92,27 +95,76 @@ class OptionsGroupsListener implements EventSubscriberInterface
                     continue;
                 }
 
-                foreach ($item->getChildren() as $index => $child) {
-                    if (!$child->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                $bundleSlotIds[] = (int)$slot->getId();
+            }
+        }
+
+        foreach ($item->getChildren() as $index => $child) {
+            // Bundle slot lookup
+            if (0 < $slotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID))) {
+                if (in_array($slotId, $bundleSlotIds, true)) {
+                    $childMap = $this->buildTreeMap($child, $data);
+
+                    // Skip when no groups or children
+                    if (!(empty($childMap['groups']) && empty($childMap['children']))) {
+                        $childMap['slot_id'] = $slotId;
+                        $map['children'][] = $childMap;
+
+                        continue;
+                    }
+                }
+            }
+
+            // Skip option group lookup if no submitted data
+            if (null === $data) {
+                continue;
+            }
+
+            // Option group lookup
+            if (0 < $groupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID))) {
+                if (!isset($data['option_group_' . $groupId])) {
+                    continue;
+                }
+
+                if (0 >= $optionId = intval($data['option_group_' . $groupId]['choice'])) {
+                    continue;
+                }
+
+                $found = false;
+                foreach ($groups as $group) {
+                    if ($group->getId() != $groupId) {
                         continue;
                     }
 
-                    if ($slot->getId() === $child->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                        $childMap = $this->buildTreeMap($child);
-
-                        // Skip when no groups or children
-                        if (empty($childMap['groups']) && empty($childMap['children'])) {
-                            continue 2;
-                        }
-
-                        $childMap['slot_id'] = $slot->getId();
-
-                        $map['children'][] = $childMap;
-
-                        continue 2;
+                    // Skip if group has no options
+                    $options = $this->itemBuilder->getFilter()->getGroupOptions($group);
+                    if (empty($options)) {
+                        continue; // TODO Should never happen ?
                     }
 
-                    //throw new LogicException("Item children / Option groups miss match.");
+                    foreach ($options as $option) {
+                        if ($option->getId() != $optionId) {
+                            continue;
+                        }
+
+                        $found = true;
+
+                        if ($option->isCascade() && !is_null($p = $option->getProduct())) {
+                            $this->itemBuilder->buildFromOption($child, $option, count($options));
+
+                            $childMap = $this->buildTreeMap($child, $data);
+
+                            // Skip when no groups or children
+                            if (!(empty($childMap['groups']) && empty($childMap['children']))) {
+                                $childMap['group_id'] = $groupId;
+                                $map['children'][] = $childMap;
+                            }
+                        }
+                    }
+                }
+
+                if (!$found) {
+                    throw new LogicException("Option not found.");
                 }
             }
         }
@@ -148,13 +200,32 @@ class OptionsGroupsListener implements EventSubscriberInterface
         // Recurse for children
         foreach ($treeMap['children'] as $childMap) {
             foreach ($item->getChildren() as $childItem) {
-                // Skip non bundle slot child
-                if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    continue;
+                // Bundle choice options
+                if (isset($childMap['slot_id'])) {
+                    // Skip non bundle slot child
+                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        $this->clearItems($childItem, $childMap);
+
+                        continue 2; // Next child map
+                    }
                 }
 
-                if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    $this->clearItems($childItem, $childMap);
+                // Option product options
+                if (isset($childMap['group_id'])) {
+                    // Skip non option group child
+                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                        $this->clearItems($childItem, $childMap);
+
+                        continue 2; // Next child map
+                    }
                 }
             }
         }
@@ -171,7 +242,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         $groups = $treeMap['groups'];
 
         // Creates missing item children
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $group */
+        /** @var OptionGroupInterface $group */
         foreach ($groups as $group) {
             // Find matching sale item's child
             foreach ($item->getChildren() as $childItem) {
@@ -189,13 +260,32 @@ class OptionsGroupsListener implements EventSubscriberInterface
         // Recurse for children
         foreach ($treeMap['children'] as $childMap) {
             foreach ($item->getChildren() as $childItem) {
-                // Skip non bundle slot child
-                if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    continue;
+                // Bundle choice options
+                if (isset($childMap['slot_id'])) {
+                    // Skip non bundle slot child
+                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        $this->createItems($childItem, $childMap);
+
+                        continue 2; // Next child map
+                    }
                 }
 
-                if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    $this->createItems($childItem, $childMap);
+                // Option product options
+                if (isset($childMap['group_id'])) {
+                    // Skip non option group child
+                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                        $this->createItems($childItem, $childMap);
+
+                        continue 2; // Next child map
+                    }
                 }
             }
         }
@@ -211,7 +301,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function buildFlatMap(SaleItemInterface $item, array $treeMap, array &$flatMap, array $indexes = [])
     {
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
+        /** @var OptionGroupInterface $optionGroup */
         foreach ($treeMap['groups'] as $optionGroup) {
             foreach ($item->getChildren() as $index => $child) {
                 if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
@@ -229,13 +319,32 @@ class OptionsGroupsListener implements EventSubscriberInterface
         // Recurse for children
         foreach ($treeMap['children'] as $childMap) {
             foreach ($item->getChildren() as $index => $childItem) {
-                // Skip non bundle slot child
-                if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    continue;
+                // Bundle choice options
+                if (isset($childMap['slot_id'])) {
+                    // Skip non bundle slot child
+                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                        $this->buildFlatMap($childItem, $childMap, $flatMap, array_merge($indexes, [$index]));
+
+                        continue 2; // Next child map
+                    }
                 }
 
-                if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
-                    $this->buildFlatMap($childItem, $childMap, $flatMap, array_merge($indexes, [$index]));
+                // Option product options
+                if (isset($childMap['group_id'])) {
+                    // Skip non option group child
+                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                        continue; // Next child item
+                    }
+
+                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                        $this->buildFlatMap($childItem, $childMap, $flatMap, array_merge($indexes, [$index]));
+
+                        continue 2; // Next child map
+                    }
                 }
             }
         }
@@ -271,7 +380,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function createForms(FormInterface $form, array $flatMap)
     {
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
+        /** @var OptionGroupInterface $optionGroup */
         foreach ($flatMap as $propertyPath => $optionGroup) {
             $name = 'option_group_' . $optionGroup->getId();
             if ($form->has($name)) {
@@ -291,15 +400,16 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * Builds the option groups forms.
      *
      * @param FormInterface $form
+     * @param array         $data The submitted data
      */
-    private function buildForm(FormInterface $form)
+    private function buildForm(FormInterface $form, array $data = null)
     {
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $item */
+        /** @var SaleItemInterface $item */
         if (null === $item = $form->getParent()->getData()) {
             return;
         }
 
-        $treeMap = $this->buildTreeMap($item);
+        $treeMap = $this->buildTreeMap($item, $data);
 
         $this->clearItems($item, $treeMap);
         $this->createItems($item, $treeMap);

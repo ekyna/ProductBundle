@@ -150,8 +150,15 @@
             </div>
         </div>
         <div class="option-product option-wrapper">
-            {{- form_widget(form.product) -}}
-            {{- form_errors(form.product) -}}
+            <div class="row form-group">
+                <div class="col-md-9">
+                    {{- form_widget(form.product) -}}
+                    {{- form_errors(form.product) -}}
+                </div>
+                <div class="col-md-3">
+                    {{- form_row(form.cascade) -}}
+                </div>
+            </div>
         </div>
         <div class="option-data option-wrapper">
             <div class="row form-group">

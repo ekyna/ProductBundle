@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 class BundleChoiceValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate($bundleChoice, Constraint $constraint)
     {
@@ -47,33 +47,8 @@ class BundleChoiceValidator extends ConstraintValidator
                 ->addViolation();
         }
 
-        // Related to SaleItem : private sale item can't contain public children.
-        // Without this constraint, the parent would become public.
-        /** @see \Ekyna\Bundle\CommerceBundle\EventListener\SaleItemEventSubscriber::fixItemPrivacy() */
-        /*if (!$parent->isVisible() && $product->isVisible()) {
-            $this->context
-                ->buildViolation($constraint->visibility_integrity)
-                ->atPath('product')
-                ->addViolation();
-        }*/
-
-        // Private product choice must have the same tax group as the parent's one
-        if (!$product->isVisible() && ($product->getTaxGroup() !== $parent->getTaxGroup())) {
-            $this->context
-                ->buildViolation($constraint->tax_group_integrity)
-                ->atPath('product')
-                ->addViolation();
-        }
-
         // Only for 'configurable' product type
         if ($parent->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
-            // Configurable product must have public children
-            if (!$product->isVisible()) {
-                $this->context
-                    ->buildViolation($constraint->must_be_visible)
-                    ->atPath('product')
-                    ->addViolation();
-            }
             // Asserts that the maximum quantity is greater than the minimum quantity
             if ($bundleChoice->getMinQuantity() > $bundleChoice->getMaxQuantity()) {
                 $this->context
