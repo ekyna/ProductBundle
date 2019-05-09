@@ -30,6 +30,10 @@ class EkynaProductExtension extends AbstractExtension
         );
         $container->setParameter('ekyna_product.cache_ttl', $config['default']['cache_ttl']);
 
+        $accountConfig = [
+            'catalog' => $config['catalog']['enabled'] && $config['catalog']['account'],
+        ];
+
         $container
             ->getDefinition('ekyna_product.add_to_cart.event_subscriber')
             ->replaceArgument(1, $config['default']['cart_success_template']);
@@ -41,6 +45,16 @@ class EkynaProductExtension extends AbstractExtension
             $catalogRegistry->replaceArgument(0, $config['catalog']['themes']);
             $catalogRegistry->replaceArgument(1, $config['catalog']['templates']);
         }
+
+        // Account menu event subscriber
+        $container
+            ->getDefinition('ekyna_product.account.menu_subscriber')
+            ->replaceArgument(1, $accountConfig);
+
+        // Account routing loader
+        $container
+            ->getDefinition('ekyna_product.routing.account_loader')
+            ->replaceArgument(0, $accountConfig);
 
         // Editor
         $editor = $config['editor'];

@@ -267,6 +267,39 @@
         </property>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Catalog">
+        <property name="title">
+            <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
+        </property>
+        <property name="theme">
+            <constraint name="NotBlank"/>
+            <!-- TODO validate choice -->
+        </property>
+        <property name="pages">
+            <constraint name="Valid"/>
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\CatalogPage">
+        <property name="template">
+            <constraint name="NotBlank"/>
+            <!-- TODO validate choice -->
+        </property>
+        <property name="slots">
+            <constraint name="Valid"/>
+        </property>
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\CatalogSlot">
+        <!-- TODO validate product (if required by template) -->
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Category">
         <property name="name">
             <constraint name="NotBlank"/>

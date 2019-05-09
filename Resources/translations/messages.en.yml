@@ -18,6 +18,23 @@ ekyna_product:
         pricing:
             title: Your pricing
             all_brands: All brands
+        catalog:
+            title: My catalogs
+            new:
+                title: New catalog
+                success: The catalog has been created.
+            edit:
+                title: Edit the catalog
+                success: The catalog has been saved.
+            remove:
+                title: Delete the catalog
+                confirm: You are about to delete this catalog, please confirm.
+                success: The catalog has been deleted.
+            print:
+                title: Print the catalog
+                button: Print
+            show: Catalog details
+            empty_list: No catalog configured
 
     attribute:
         label:

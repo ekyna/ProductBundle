@@ -1,3 +1,6 @@
 ekyna_product_admin:
     resource: "routing/admin.yml"
     prefix:   /admin/catalog
+
+ekyna_product_front:
+    resource: "routing/front.yml"

@@ -1,0 +1,48 @@
+# Ticket
+ekyna_product_account_catalog_index:
+    path: ""
+    methods: [GET]
+    controller: EkynaProductBundle:Account/Catalog:index
+    options:
+        _cms:
+            name: Mes catalogues
+            parent: ekyna_user_account_index
+            position: 70
+            locked: true
+            advanced: false
+            seo:
+                follow: false
+                index: false
+
+ekyna_product_account_catalog_new:
+    path: /create
+    methods: [GET, POST]
+    controller: EkynaProductBundle:Account/Catalog:new
+
+ekyna_product_account_catalog_show:
+    path: /{catalogId}
+    methods: [GET]
+    controller: EkynaProductBundle:Account/Catalog:show
+    requirements:
+        catalogId: \d+
+
+ekyna_product_account_catalog_edit:
+    path: /{catalogId}/edit
+    methods: [GET, POST]
+    controller: EkynaProductBundle:Account/Catalog:edit
+    requirements:
+        catalogId: \d+
+
+ekyna_product_account_catalog_remove:
+    path: /{catalogId}/remove
+    methods: [GET, POST]
+    controller: EkynaProductBundle:Account/Catalog:remove
+    requirements:
+        catalogId: \d+
+
+ekyna_product_account_catalog_print:
+    path: /{catalogId}/print
+    methods: [GET, POST]
+    controller: EkynaProductBundle:Account/Catalog:print
+    requirements:
+        catalogId: \d+

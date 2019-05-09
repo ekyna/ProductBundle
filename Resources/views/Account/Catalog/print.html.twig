@@ -1,0 +1,31 @@
+{% extends '@EkynaCommerce/Account/layout.html.twig' %}
+
+{% block account %}
+{% spaceless %}
+    <h3>{{ 'ekyna_product.account.catalog.print.title'|trans|raw }}</h3>
+    <hr>
+    {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+    <div class="form-body">
+        {{ bootstrap_set_style('horizontal') }}
+        {{ bootstrap_set_col_size('md') }}
+        {{ bootstrap_set_label_col(3) }}
+        {{ bootstrap_set_widget_col(9) }}
+
+        {{ form_errors(form) }}
+        {{ form_widget(form.context) }}
+        {{ form_rest(form) }}
+    </div>
+    {{ form_end(form) }}
+    <hr>
+    <h3>{{ 'ekyna_product.account.catalog.title'|trans|raw }}</h3>
+    <hr>
+    {% include '@EkynaProduct/Account/Catalog/_list.html.twig' with {
+        'catalogs': catalogs, 'customer': customer
+    } only %}
+{% endspaceless %}
+{% endblock account %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/ekynaproduct/css/account/catalog.css') }}" rel="stylesheet" type="text/css"/>
+{% endblock %}

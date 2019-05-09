@@ -2,8 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
+use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
+use Ekyna\Component\Table\Exception\InvalidArgumentException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
 
@@ -19,6 +22,15 @@ class CatalogType extends ResourceTableType
      */
     public function buildTable(TableBuilderInterface $builder, array $options)
     {
+        $source = $builder->getSource();
+        if (!$source instanceof EntitySource) {
+            throw new InvalidArgumentException("Expected instance of " . EntitySource::class);
+        }
+
+        $source->setQueryBuilderInitializer(function (QueryBuilder $qb, $alias) {
+            $qb->andWhere($qb->expr()->isNull($alias . '.customer'));
+        });
+
         $builder
             ->addColumn('title', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.name',

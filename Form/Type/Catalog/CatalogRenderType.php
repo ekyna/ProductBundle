@@ -29,26 +29,30 @@ class CatalogRenderType extends AbstractType
         $builder->add('theme', CatalogThemeChoiceType::class);
 
         if (null === $sale = $options['sale']) {
-            $builder
-                ->add('format', ChoiceType::class, [
-                    'label'   => 'ekyna_core.field.format',
-                    'choices' => CatalogRenderer::getFormats(),
-                ])
-                ->add('displayPrices', ChoiceType::class, [
-                    'label'    => 'ekyna_product.catalog.field.display_prices',
-                    'choices'  => [
-                        'ekyna_core.value.yes' => 1,
-                        'ekyna_core.value.no'  => 0,
-                    ],
-                    'expanded' => true,
-                    'attr'     => [
-                        'inline'            => true,
-                        'align_with_widget' => true,
-                    ],
-                ])
-                ->add('context', ContextType::class, [
-                    'label' => false,
-                ]);
+            if ($options['admin_mode']) {
+                $builder
+                    ->add('format', ChoiceType::class, [
+                        'label'   => 'ekyna_core.field.format',
+                        'choices' => CatalogRenderer::getFormats(),
+                    ])
+                    ->add('displayPrices', ChoiceType::class, [
+                        'label'    => 'ekyna_product.catalog.field.display_prices',
+                        'choices'  => [
+                            'ekyna_core.value.yes' => 1,
+                            'ekyna_core.value.no'  => 0,
+                        ],
+                        'expanded' => true,
+                        'attr'     => [
+                            'inline'            => true,
+                            'align_with_widget' => true,
+                        ],
+                    ]);
+            }
+
+            $builder->add('context', ContextType::class, [
+                'label'      => false,
+                'admin_mode' => $options['admin_mode'],
+            ]);
 
             return;
         }
@@ -65,9 +69,9 @@ class CatalogRenderType extends AbstractType
             ->add('save', CheckboxType::class, [
                 'label'    => 'ekyna_product.catalog.field.save',
                 'required' => false,
-                'attr' => [
+                'attr'     => [
                     'align_with_widget' => true,
-                ]
+                ],
             ]);
     }
 

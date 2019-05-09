@@ -2,10 +2,20 @@
     {% block header -%}
     {% set url = absolute_url('/') %}
     <p>
-        {% set address = get_setting('general.site_address') %}
-        {% if address.phone is not empty %}Tél. {{ address.phone }}<br>{% endif %}{# TODO Trans #}
-        {% if address.mobile is not empty %}Port. {{ address.mobile }}<br>{% endif %}{# TODO Trans #}
-        {% set email = get_setting('general.admin_email') %}
+        {% set address = commerce_warehouse(catalog.context) -%}
+        {% if address is null -%}
+            {% set address = get_setting('general.site_address') %}
+        {%- endif -%}
+        {%- if address.phone is not empty %}
+            {{ 'ekyna_core.field.phone'|trans }}
+            {{ address.phone|phone_number_format }}<br>
+        {%- elseif address.mobile is not empty -%}
+            {{ 'ekyna_core.field.mobile'|trans }}
+            {{ address.mobile|phone_number_format }}<br>
+        {%- endif -%}
+
+        {# TODO warehouse email #}
+        {%- set email = get_setting('general.admin_email') -%}
         <a href="mailto:{{ email }}">{{ email }}</a><br>
         <a href="{{ url }}">{{ url }}</a>
     </p>

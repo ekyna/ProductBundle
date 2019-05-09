@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Resource\Model as RM;
@@ -20,6 +21,11 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
      * @var int
      */
     private $id;
+
+    /**
+     * @var CustomerInterface
+     */
+    private $customer;
 
     /**
      * @var string
@@ -116,15 +122,25 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
     }
 
     /**
-     * Sets the id.
+     * Returns the customer.
      *
-     * @param int $id
+     * @return CustomerInterface
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+    /**
+     * Sets the customer.
+     *
+     * @param CustomerInterface $customer
      *
      * @return Catalog
      */
-    public function setId($id)
+    public function setCustomer(CustomerInterface $customer = null)
     {
-        $this->id = $id;
+        $this->customer = $customer;
 
         return $this;
     }

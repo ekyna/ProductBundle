@@ -79,12 +79,16 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->treatFalseLike([
                         'enabled'   => false,
+                        'account'   => false,
                         'themes'    => [],
                         'templates' => [],
                     ])
                     ->children()
                         ->booleanNode('enabled')
                             ->defaultTrue()
+                        ->end()
+                        ->booleanNode('account')
+                            ->defaultFalse()
                         ->end()
                         ->arrayNode('themes')
                             ->useAttributeAsKey('name')

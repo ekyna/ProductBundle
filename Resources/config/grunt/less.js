@@ -6,6 +6,9 @@ module.exports = function (grunt, options) {
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/form.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/form.less',
 
+                'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/account/catalog.css':
+                    'src/Ekyna/Bundle/ProductBundle/Resources/private/less/account/catalog.less',
+
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/show.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/show.less',
 

@@ -18,6 +18,23 @@ ekyna_product:
         pricing:
             title: Vos tarifs préférentiels
             all_brands: Toutes marques
+        catalog:
+            title: Mes catalogues
+            new:
+                title: Nouveau catalogue
+                success: Le catalogue a bien été enregistré.
+            edit:
+                title: Modifier le catalogue
+                success: Le catalogue a bien été modifié.
+            remove:
+                title: Supprimer le catalogue
+                confirm: Êtes-vous sûr de vouloir supprimer ce catalogue ?
+                success: Le catalogue a bien été supprimé.
+            print:
+                title: Imprimer le catalogue
+                button: Imprimer
+            show: Détail du catalogue
+            empty_list: Aucun catalogue enregistré
 
     attribute:
         label:

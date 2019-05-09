@@ -28,6 +28,21 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <!-- Account menu event subscriber -->
+        <service id="ekyna_product.account.menu_subscriber"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\AccountMenuSubscriber">
+            <argument type="service" id="ekyna_commerce.customer.security_provider"/>
+            <argument type="collection"/><!-- Replaced by DI extension -->
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <!-- Routing loader -->
+        <service id="ekyna_product.routing.account_loader"
+                 class="Ekyna\Bundle\ProductBundle\Service\Routing\AccountLoader">
+            <argument type="collection"/><!-- Replaced by DI extension -->
+            <tag name="routing.loader"/>
+        </service>
+
         <!-- Attribute types -->
         <service id="ekyna_product.attribute.type_registry"
                  class="Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistry"

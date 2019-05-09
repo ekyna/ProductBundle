@@ -1,0 +1,45 @@
+{% spaceless %}
+<div class="table-responsive">
+    <table class="table table-stripped">
+        <thead>
+        <tr>
+            <th>{{ 'ekyna_core.field.name'|trans }}</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for catalog in catalogs -%}
+            {% set path = path('ekyna_product_account_catalog_show', {'catalogId': catalog.id}) -%}
+            <tr>
+                <td>
+                    <a href="{{ path }}">{{ catalog.title }}</a>
+                </td>
+                <td class="text-right">
+                    <a href="{{ path }}" class="btn btn-xs btn-default">
+                        {{- 'ekyna_core.button.show'|trans -}}
+                    </a>&nbsp;
+                    <a href="{{ path('ekyna_product_account_catalog_print', {'catalogId': catalog.id}) }}"
+                       class="btn btn-xs btn-primary">
+                        {{- 'ekyna_product.account.catalog.print.button'|trans -}}
+                    </a>&nbsp;
+                    <a href="{{ path('ekyna_product_account_catalog_edit', {'catalogId': catalog.id}) }}"
+                       class="btn btn-xs btn-warning">
+                        {{- 'ekyna_core.button.edit'|trans -}}
+                    </a>&nbsp;
+                    <a href="{{ path('ekyna_product_account_catalog_remove', {'catalogId': catalog.id}) }}"
+                       class="btn btn-xs btn-danger">
+                        {{- 'ekyna_core.button.remove'|trans -}}
+                    </a>
+                </td>
+            </tr>
+        {%- else -%}
+            <tr>
+                <td colspan="{{ 2 }}">
+                    <em>{{ 'ekyna_product.account.catalog.empty_list'|trans }}</em>
+                </td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+</div>
+{% endspaceless %}
