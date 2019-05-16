@@ -104,7 +104,9 @@ class OptionGroupType extends Form\AbstractType
         $view->vars['group_id'] = $optionGroup->getId();
         $view->vars['group_position'] = $optionGroup->getPosition();
 
-        if ($options['required'] && (1 === count($options['choices']))) {
+        $choices = $this->itemBuilder->getFilter()->getGroupOptions($optionGroup);
+
+        if ($options['required'] && (1 === count($choices))) {
             $view->vars['attr']['style'] = 'display: none;';
         }
     }

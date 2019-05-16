@@ -1133,13 +1133,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                         that.optionGroups.createGroups(variant.groups, parent);
                     }
 
-                    that.onChildChange();
+                    that.onChange();
                 });
             }
-
-            this.$bundleSlots.on('change', function () {
-                that.onChildChange();
-            });
 
             this.$optionGroups.on('pre_change', function (e, option, parent) {
                 if (!option) {
@@ -1154,7 +1150,20 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     that.optionGroups.createGroups(option.groups, parent);
                 }
 
-                that.onChildChange();
+                that.onChange();
+            });
+
+            this.$bundleSlots.on('change', function () {
+                that.onChange();
+            });
+
+            this.$element.on('child_change', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                that.onChange();
+
+                return false;
             });
 
             this.$quantity.on('keyup change mouseup', function () {
@@ -1164,12 +1173,15 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
         unbindEvents: function () {
             if (this.$variant) {
-                this.$variant.variant().off('change');
+                this.$variant.off('pre_change');
+                this.$variant.off('post_change');
             }
 
-            this.$bundleSlots.off('change');
+            this.$optionGroups.off('pre_change');
+            this.$optionGroups.off('post_change');
 
-            this.$optionGroups.off('change');
+            this.$bundleSlots.off('change');
+            this.$element.off('child_change');
 
             this.$quantity.off('keyup change mouseup');
         },
@@ -1220,12 +1232,12 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             this.onChange();
         },
 
-        onChildChange: function () {
-            this.updatePricesAndAvailability();
-        },
-
         onChange: function () {
             this.updatePricesAndAvailability();
+
+            if (this.parentItem) {
+                this.parentItem.$element.trigger('child_change');
+            }
         },
 
         resolveAvailability: function() {
