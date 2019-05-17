@@ -500,10 +500,11 @@ class FormBuilder
      * Builds the option config.
      *
      * @param Model\OptionInterface $option
+     * @param bool                  $allowCascade
      *
      * @return array
      */
-    protected function buildOptionConfig(Model\OptionInterface $option)
+    protected function buildOptionConfig(Model\OptionInterface $option, bool $allowCascade = true)
     {
         $config = [];
 
@@ -511,8 +512,8 @@ class FormBuilder
             $config['availability'] = $this->availabilityHelper->getAvailability($product, false)->toArray();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
-            if ($option->isCascade()) {
-                $config['groups'] = $this->buildOptionsGroupsConfig($product);
+            if ($allowCascade && $option->isCascade()) {
+                $config['groups'] = $this->buildOptionsGroupsConfig($product, false);
             }
         }
 
@@ -526,10 +527,11 @@ class FormBuilder
      * Builds the product options groups config.
      *
      * @param Model\ProductInterface $product
+     * @param bool                   $allowCascade
      *
      * @return array
      */
-    protected function buildOptionsGroupsConfig(Model\ProductInterface $product)
+    protected function buildOptionsGroupsConfig(Model\ProductInterface $product, bool $allowCascade = true)
     {
         $groups = [];
 
@@ -544,7 +546,7 @@ class FormBuilder
                 $options[] = [
                     'id'     => $option->getId(),
                     'label'  => $this->optionChoiceLabel($option),
-                    'config' => $this->buildOptionConfig($option),
+                    'config' => $this->buildOptionConfig($option, $allowCascade),
                 ];
             }
             $groups[] = [

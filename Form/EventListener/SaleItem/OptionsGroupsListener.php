@@ -62,11 +62,12 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * Builds the tree map.
      *
      * @param SaleItemInterface $item
-     * @param array             $data   The submitted data
+     * @param array             $data The submitted data
+     * @param bool              $optionCascade
      *
      * @return array
      */
-    private function buildTreeMap(SaleItemInterface $item, array $data = null)
+    private function buildTreeMap(SaleItemInterface $item, array $data = null, bool $optionCascade = true)
     {
         $groups = $this->itemBuilder->getOptionGroups($item);
 
@@ -144,10 +145,10 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
                         $found = true;
 
-                        if ($option->isCascade() && !is_null($p = $option->getProduct())) {
+                        if ($optionCascade && $option->isCascade() && !is_null($p = $option->getProduct())) {
                             $this->itemBuilder->buildFromOption($child, $option, count($options));
 
-                            $childMap = $this->buildTreeMap($child, $data);
+                            $childMap = $this->buildTreeMap($child, $data, false);
 
                             // Skip when no groups or children
                             if (!(empty($childMap['groups']) && empty($childMap['children']))) {

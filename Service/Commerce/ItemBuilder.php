@@ -212,8 +212,8 @@ class ItemBuilder
             ->setConfigurable(false)
             ->setPrivate(!$product->isVisible());
 
-        // Filter bundle slots
-        $bundlesSlots = $this->filter->getBundleSlots($product);
+        // (Do not filter bundle slots)
+        $bundlesSlots = $product->getBundleSlots()->toArray();
 
         // Every slot must match a single item
         $bundleSlotIds = [];
