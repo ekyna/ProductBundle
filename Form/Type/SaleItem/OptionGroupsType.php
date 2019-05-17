@@ -46,6 +46,10 @@ class OptionGroupsType extends Form\AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['name'] = $view->vars['full_name'];
+
+        // Reverse option groups order
+        /** @see \Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\OptionsGroupsListener::createForms() */
+        $view->children = array_reverse($view->children, true);
     }
 
     /**

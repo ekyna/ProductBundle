@@ -34,8 +34,6 @@ class SaleViewType extends AbstractViewType
             return;
         }
 
-
-
         $link = [
             'data-summary'  => json_encode([
                 'route'      => 'ekyna_product_product_admin_summary',

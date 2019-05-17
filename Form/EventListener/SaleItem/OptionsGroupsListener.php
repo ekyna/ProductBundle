@@ -115,18 +115,13 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 }
             }
 
-            // Skip option group lookup if no submitted data
-            if (null === $data) {
-                continue;
-            }
-
             // Option group lookup
             if (0 < $groupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID))) {
-                if (!isset($data['option_group_' . $groupId])) {
-                    continue;
+                $optionId = intval($child->getData(ItemBuilder::OPTION_ID));
+                if (isset($data['option_group_' . $groupId])) {
+                    $optionId = intval($data['option_group_' . $groupId]['choice']);
                 }
-
-                if (0 >= $optionId = intval($data['option_group_' . $groupId]['choice'])) {
+                if (0 >= $optionId) {
                     continue;
                 }
 
@@ -380,14 +375,38 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function createForms(FormInterface $form, array $flatMap)
     {
+        // We need to revert the order of the form's children so that
+        // fields for cascaded options are submitted first.
+
+        $removed = [];
+
+        // 1. Remove children but keep references.
         /** @var OptionGroupInterface $optionGroup */
         foreach ($flatMap as $propertyPath => $optionGroup) {
+            $name = 'option_group_' . $optionGroup->getId();
+            if (!$form->has($name)) {
+                continue;
+            }
+
+            $removed[$name] = $form->get($name);
+
+            $form->remove($name);
+        }
+
+        // 2. (Re)Add in reversed order.
+        /** @var OptionGroupInterface $optionGroup */
+        foreach (array_reverse($flatMap, true) as $propertyPath => $optionGroup) {
             $name = 'option_group_' . $optionGroup->getId();
             if ($form->has($name)) {
                 continue;
             }
 
-            // Find matching sale item's child
+            if (isset($removed[$name])) {
+                $form->add($removed[$name]);
+                unset($removed[$name]);
+                continue;
+            }
+
             $form->add($name, OptionGroupType::class, [
                 'label'         => $optionGroup->getTitle(),
                 'property_path' => $propertyPath,
