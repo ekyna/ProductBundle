@@ -91,7 +91,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getId()
     {
@@ -99,7 +99,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getSlot()
     {
@@ -107,7 +107,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setSlot(Model\BundleSlotInterface $slot = null)
     {
@@ -126,7 +126,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getProduct()
     {
@@ -134,7 +134,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setProduct(Model\ProductInterface $product)
     {
@@ -144,7 +144,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getMinQuantity()
     {
@@ -152,7 +152,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setMinQuantity($quantity)
     {
@@ -162,7 +162,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getMaxQuantity()
     {
@@ -170,7 +170,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setMaxQuantity($quantity)
     {
@@ -180,7 +180,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function isUseOptions()
     {
@@ -188,7 +188,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setUseOptions($use)
     {
@@ -198,7 +198,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getNetPrice()
     {
@@ -206,7 +206,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setNetPrice($price)
     {
@@ -216,7 +216,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function isHidden()
     {
@@ -224,7 +224,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setHidden($hidden)
     {
@@ -234,7 +234,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getRules()
     {
@@ -242,7 +242,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function hasRule(Model\BundleChoiceRuleInterface $rule)
     {
@@ -250,7 +250,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function addRule(Model\BundleChoiceRuleInterface $rule)
     {
@@ -263,7 +263,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function removeRule(Model\BundleChoiceRuleInterface $rule)
     {
@@ -276,7 +276,7 @@ class BundleChoice implements Model\BundleChoiceInterface
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setRules(ArrayCollection $rules)
     {

@@ -32,6 +32,13 @@ class BundleSlotValidator extends ConstraintValidator
         // Only for 'configurable' product type.
 
         if ($bundleSlot->getBundle()->getType() === Model\ProductTypes::TYPE_CONFIGURABLE) {
+            if ($bundleSlot->isRequired() && 0 < $bundleSlot->getRules()->count()) {
+                $this->context
+                    ->buildViolation($constraint->required_with_rules)
+                    ->atPath('required')
+                    ->addViolation();
+            }
+
             return;
         }
 
@@ -40,7 +47,7 @@ class BundleSlotValidator extends ConstraintValidator
         // Asserts that one and only one choice is configured.
         if (1 != $bundleSlot->getChoices()->count()) {
             $this->context
-                ->buildViolation($constraint->tooManyChoices)
+                ->buildViolation($constraint->too_many_choices)
                 ->atPath('choices')
                 ->addViolation();
         }

@@ -6,25 +6,25 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 
 /**
- * Interface BundleChoiceRuleInterface
+ * Interface BundleSlotRuleInterface
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface BundleChoiceRuleInterface extends BundleRuleInterface, SortableInterface
+interface BundleSlotRuleInterface extends BundleRuleInterface, SortableInterface
 {
     /**
      * Returns the choice.
      *
-     * @return BundleChoiceInterface
+     * @return BundleSlotInterface
      */
-    public function getChoice();
+    public function getSlot();
 
     /**
      * Sets the choice.
      *
-     * @param BundleChoiceInterface $choice
+     * @param BundleSlotInterface $slot
      *
-     * @return $this|BundleChoiceRuleInterface
+     * @return $this|BundleSlotRuleInterface
      */
-    public function setChoice(BundleChoiceInterface $choice = null);
+    public function setSlot(BundleSlotInterface $slot = null);
 }

@@ -59,7 +59,7 @@ class BundleChoiceTest extends TestCase
         $choice->addRule($rule);
 
         $this->assertTrue($choice->hasRule($rule));
-        $this->assertEquals($choice, $rule->getChoice());
+        $this->assertEquals($choice, $rule->getSlot());
     }
 
     public function test_removeRule()
@@ -71,6 +71,6 @@ class BundleChoiceTest extends TestCase
         $choice->removeRule($rule);
 
         $this->assertFalse($choice->hasRule($rule));
-        $this->assertNull($rule->getChoice());
+        $this->assertNull($rule->getSlot());
     }
 }

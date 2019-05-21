@@ -5,6 +5,17 @@
         xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping
                         http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractBundleRule">
+        <property name="type">
+            <constraint name="NotBlank"/>
+            <constraint name="Callback">
+                <value>Ekyna\Bundle\ProductBundle\Model\BundleRuleTypes</value>
+                <value>isValid</value>
+            </constraint>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleRule"/>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Attribute">
         <property name="name">
             <constraint name="NotBlank"/>
@@ -207,6 +218,16 @@
             </constraint>
         </property>
         <property name="rules">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleRules"/>
             <constraint name="Valid"/>
         </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleChoice"/>
@@ -216,17 +237,6 @@
         <property name="choice">
             <constraint name="NotNull"/>
         </property>
-        <property name="type">
-            <constraint name="NotBlank"/>
-            <constraint name="Callback">
-                <value>Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleTypes</value>
-                <value>isValidType</value>
-            </constraint>
-        </property>
-        <!-- TODO expression validation
-        <property name="expression">
-            <constraint name="Valid"/>
-        </property>-->
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlot">
@@ -243,6 +253,16 @@
             <constraint name="Valid"/>
             <constraint name="Count">
                 <option name="min">1</option>
+                <option name="groups">
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Count">
+                <option name="max">1</option>
+                <option name="groups">
+                    <value>bundle</value>
+                </option>
             </constraint>
         </property>
         <property name="translations">
@@ -253,9 +273,28 @@
                 </option>
             </constraint>
         </property>
+        <property name="rules">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleRules"/>
+            <constraint name="Valid"/>
+        </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleSlot"/>
 
         <!-- TODO translations -->
+    </class>
+
+    <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlotRule">
+        <property name="slot">
+            <constraint name="NotNull"/>
+        </property>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation">

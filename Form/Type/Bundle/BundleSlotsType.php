@@ -3,7 +3,10 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,6 +45,14 @@ class BundleSlotsType extends AbstractType
                 },
             ])
             ->setAllowedTypes('configurable', 'bool');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        FormUtil::addClass($view, 'product-bundle-slots');
     }
 
     /**

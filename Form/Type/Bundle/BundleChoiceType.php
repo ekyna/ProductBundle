@@ -5,7 +5,6 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
-use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -47,8 +46,8 @@ class BundleChoiceType extends ResourceFormType
     {
         // TODO only visible products for configurable
         $builder->add('product', ProductSearchType::class, [
-//            'visible' => $options['configurable'],
-            'types'   => $options['configurable'] ? [
+            // 'visible' => $options['configurable'],
+            'types' => $options['configurable'] ? [
                 ProductTypes::TYPE_SIMPLE,
                 ProductTypes::TYPE_VARIABLE,
                 ProductTypes::TYPE_VARIANT,
@@ -63,13 +62,9 @@ class BundleChoiceType extends ResourceFormType
         if ($options['configurable']) {
             // TODO options ( + fixed/user defined)
             $builder
-                ->add('rules', CollectionType::class, [
-                    'label'           => 'ekyna_product.bundle_choice_rule.label.plural',
-                    'sub_widget_col'  => 9,
-                    'button_col'      => 3,
-                    'allow_sort'      => true,
-                    'add_button_text' => 'ekyna_product.bundle_choice_rule.button.add',
-                    'entry_type'      => BundleChoiceRuleType::class,
+                ->add('rules', BundleRulesType::class, [
+                    'entry_type' => BundleChoiceRuleType::class,
+                    'prototype_name'  => '__choice_rule__',
                 ])
                 ->add('minQuantity', Type\NumberType::class, [
                     'label' => 'ekyna_product.common.min_quantity',

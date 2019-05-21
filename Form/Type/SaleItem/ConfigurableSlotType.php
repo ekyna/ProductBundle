@@ -10,6 +10,7 @@ use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -65,6 +66,9 @@ class ConfigurableSlotType extends Form\AbstractType
         $choiceLabel = function (Model\BundleChoiceInterface $choice) {
             return $choice->getProduct()->getFullDesignation(true);
         };
+        $choiceAttr = function (Model\BundleChoiceInterface $choice) {
+            return $this->formBuilder->bundleChoiceAttr($choice);
+        };
 
         $field = $builder
             ->create('choice', Type\ChoiceType::class, [
@@ -79,6 +83,7 @@ class ConfigurableSlotType extends Form\AbstractType
                 'choices'       => $bundleChoices,
                 'choice_value'  => 'id',
                 'choice_label'  => $choiceLabel,
+                'choice_attr'   => $choiceAttr,
             ])
             ->addModelTransformer($transformer);
 
@@ -193,6 +198,7 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['slot_description'] = $bundleSlot->getDescription();
         $view->vars['slot_media'] = $bundleSlot->getMedia();
         $view->vars['choices_forms'] = $choicesForms;
+        $view->vars['config'] = $this->formBuilder->buildBundleSlotConfig($bundleSlot);
     }
 
     /**

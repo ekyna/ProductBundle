@@ -209,10 +209,20 @@
             <argument>%ekyna_product.bundle_choice_rule.class%</argument>
             <tag name="form.type"/>
         </service>
+        <service id="ekyna_product.bundle_slots.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotsType">
+            <tag name="form.js" selector=".product-bundle-slots" path="ekyna-product/form/product-bundle-slots"/>
+            <tag name="form.type"/>
+        </service>
         <service id="ekyna_product.bundle_slot.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotType">
             <argument>%ekyna_product.bundle_slot.class%</argument>
             <argument>%ekyna_product.bundle_choice.class%</argument>
+            <tag name="form.type"/>
+        </service>
+        <service id="ekyna_product.bundle_slot_rule.form_type"
+                 class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotRuleType">
+            <argument>%ekyna_product.bundle_slot_rule.class%</argument>
             <tag name="form.type"/>
         </service>
 

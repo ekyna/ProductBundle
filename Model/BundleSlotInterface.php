@@ -122,4 +122,48 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
      * @return $this|BundleSlotInterface
      */
     public function setRequired($required);
+
+    /**
+     * Returns the rules.
+     *
+     * @return ArrayCollection|BundleSlotRuleInterface[]
+     */
+    public function getRules();
+
+    /**
+     * Returns whether the bundle slot has the rule or not.
+     *
+     * @param BundleSlotRuleInterface $rule
+     *
+     * @return bool
+     */
+    public function hasRule(BundleSlotRuleInterface $rule);
+
+    /**
+     * Adds the rule.
+     *
+     * @param BundleSlotRuleInterface $rule
+     *
+     * @return $this|BundleSlotInterface
+     */
+    public function addRule(BundleSlotRuleInterface $rule);
+
+    /**
+     * Removes the rule.
+     *
+     * @param BundleSlotRuleInterface $rule
+     *
+     * @return $this|BundleSlotInterface
+     */
+    public function removeRule(BundleSlotRuleInterface $rule);
+
+    /**
+     * Sets the rules.
+     *
+     * @param ArrayCollection|BundleSlotRuleInterface[] $rules
+     *
+     * @return $this|BundleSlotInterface
+     * @internal
+     */
+    public function setRules(ArrayCollection $rules);
 }

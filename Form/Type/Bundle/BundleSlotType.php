@@ -84,9 +84,13 @@ class BundleSlotType extends ResourceFormType
                 ->add('required', CheckboxType::class, [
                     'label'    => 'ekyna_core.field.required',
                     'required' => false,
-                    'attr' => [
+                    'attr'     => [
                         'align_with_widget' => true,
-                    ]
+                    ],
+                ])
+                ->add('rules', BundleRulesType::class, [
+                    'entry_type' => BundleSlotRuleType::class,
+                    'prototype_name'  => '__slot_rule__',
                 ]);
         }
 

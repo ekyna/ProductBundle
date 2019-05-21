@@ -183,6 +183,49 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
     // -------------------------------- BUNDLE SLOT --------------------------------
 
+    function resolveRulesAction(rules, slots) {
+        var action = null;
+        $.each(rules, function(type, conditions) {
+            if (0 === conditions.length) {
+                // No conditions -> next rule
+                return true;
+            }
+
+            var all = type.substring(type.lastIndexOf('_') + 1) === 'all',
+                fulfill = all;
+
+            $.each(conditions, function (i, cond) {
+                if (slots[cond.s].$radio.filter('[data-index=' + cond.c + ']').is(':checked')) {
+                    if (!all) {
+                        fulfill = true;
+                        return false;
+                    }
+                } else if(all) {
+                    fulfill = true;
+                    return false;
+                }
+            });
+
+            var a = type.substring(0, type.indexOf('_'));
+
+            // Rule does not fulfill -> next rule
+            if (!fulfill) {
+                if (a === 'show') {
+                    action = 'hide';
+                }
+
+                return true;
+            }
+
+            action = a;
+
+            // Rule fulfill -> abort
+            return false;
+        });
+
+        return action;
+    }
+
     function BundleSlot ($element, parentItem) {
         this.$element = $element;
         this.$element.data('bundleSlot', this);
@@ -199,8 +242,13 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         init: function () {
             this.busy = false;
 
-            this.$choice = undefined;
-            this.choice = undefined;
+            this.config = $.extend({
+                required: false,
+                rules: {}
+            }, this.$element.data('config'));
+
+            this.hidden = false;
+            this.required = this.config.required;
 
             this.$radio = this.$element.find('.slot-buttons input[type=radio]');
             this.$label = this.$element.find('.slot-buttons label');
@@ -211,6 +259,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 toggleDisabled($(this), true);
             });
 
+            this.clearChoice();
             this.bindEvents();
             this.selectChoice();
         },
@@ -243,11 +292,19 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     return false;
                 }
 
-                var index = that.$radio.filter(':checked').data('index') - 1,
-                    $prev = that.$radio.filter('[data-index=' + index + ']');
+                var index = that.$radio.filter(':checked').data('index'),
+                    $radio = $(that.$radio.filter(':not(:disabled)').get().reverse()),
+                    $prev = null;
 
-                if (0 === $prev.size()) {
-                    $prev = $(that.$radio.eq(that.$radio.size() - 1));
+                $radio.each(function() {
+                    if (index > $(this).data('index')) {
+                        $prev = $(this);
+                        return false;
+                    }
+                });
+
+                if (!$prev || 0 === $prev.size()) {
+                    $prev = $radio.first();
                 }
 
                 $prev.prop('checked', true);
@@ -260,11 +317,19 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     return false;
                 }
 
-                var index = that.$radio.filter(':checked').data('index') + 1,
-                    $next = that.$radio.filter('[data-index=' + index + ']');
+                var index = that.$radio.filter(':checked').data('index'),
+                    $radio = that.$radio.filter(':not(:disabled)'),
+                    $next = null;
 
-                if (0 === $next.size()) {
-                    $next = $(that.$radio.eq(0));
+                $radio.each(function() {
+                    if (index < $(this).data('index')) {
+                        $next = $(this);
+                        return false;
+                    }
+                });
+
+                if (!$next || 0 === $next.size()) {
+                    $next = $radio.first();
                 }
 
                 $next.prop('checked', true);
@@ -291,6 +356,64 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             }
         },
 
+        show: function() {
+            if (!this.hidden) {
+                return;
+            }
+
+            this.busy = true;
+            this.hidden = false;
+
+            var that = this;
+            this.$element.slideDown(250, function() {
+                that.busy = false;
+            });
+        },
+
+        hide: function() {
+            if (this.hidden) {
+                return;
+            }
+
+            this.busy = true;
+            this.hidden = true;
+
+            var that = this;
+            this.$element.slideUp(250, function () {
+                that.busy = false;
+            });
+
+            var $radio = this.$radio.filter('[value=""]').eq(0);
+            if ($radio.is(':not(:checked)')) {
+                $radio.prop('checked', true);
+                this.selectChoice();
+            }
+        },
+
+        toggleRequired: function(required) {
+            if (required) {
+                if (this.required) {
+                    return;
+                }
+
+                this.required = true;
+
+                this.$radio.filter('[value=""]').eq(0).prop('disabled', true).parent('li').hide();
+                toggleDisabled(this.$element.find('.slot-choice-form[data-id="0"]').hide(), true);
+
+                return;
+            }
+
+            if (!this.required) {
+                return;
+            }
+
+            this.required = false;
+
+            this.$radio.filter('[value=""]').eq(0).prop('disabled', false).parent('li').show();
+            toggleDisabled(this.$element.find('.slot-choice-form[data-id="0"]'), false);
+        },
+
         selectChoice: function () {
             if (0 === this.$radio.size()) {
                 this.$choice = this.$element.find('.slot-choice-form').saleItem(this.parentItem);
@@ -299,13 +422,22 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 return;
             }
 
+            // Fix checked and disabled
+            if (this.$radio.filter(':checked').is(':disabled')) {
+                this.$radio.filter(':not(:disabled)').eq(0).prop('checked', true);
+            }
+
             var that = this,
                 $current = that.$choice,
                 current = that.choice,
-                choiceId = this.$radio.filter(':checked').val() || 0,
+                choiceId = this.$radio.filter(':checked:not(:disabled)').val() || 0,
                 $selected = this.$element.find('.slot-choice-form[data-id="' + choiceId + '"]');
 
-            if (1 !== $selected.size()) {
+            if (0 === $selected.size()) {
+                return;
+            }
+
+            if ($selected === $current) {
                 return;
             }
 
@@ -320,7 +452,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 } else {
                     that.choice = undefined;
                 }
-                that.$choice.fadeIn(250);
+                that.$choice.show().fadeIn(250);
                 that.$element.trigger('change');
                 that.busy = false;
             };
@@ -339,6 +471,67 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             }
         },
 
+        updateState: function() {
+            var slots = this.parentItem.bundleSlots,
+                changed = false,
+                that = this;
+
+            this.$radio.filter(':not([value=""])').each(function() {
+                var $radio = $(this),
+                    rules = $radio.data('rules');
+
+                if (resolveRulesAction(rules, slots) === 'hide') {
+                    if ($radio.is(':disabled')) {
+                        return;
+                    }
+
+                    $radio.prop('disabled', true).parent('li').hide();
+                    toggleDisabled(that.$element.find('.slot-choice-form[data-id="' + $radio.prop('val') + '"]').hide(), true);
+
+                    changed = true;
+                } else {
+                    if ($radio.is(':not(:disabled)')) {
+                        return;
+                    }
+
+                    $radio.prop('disabled', false).parent('li').show();
+                    toggleDisabled(that.$element.find('.slot-choice-form[data-id="' + $radio.prop('val') + '"]').show(), false);
+
+                    changed = true;
+                }
+            });
+
+            switch (resolveRulesAction(this.config.rules, slots)) {
+                case 'hide':
+                    this.toggleRequired(false);
+                    this.hide();
+                    changed = true;
+                    break;
+
+                case 'show':
+                    this.toggleRequired(false);
+                    this.show();
+                    changed = true;
+                    break;
+
+                case 'required':
+                    this.toggleRequired(true);
+                    this.show();
+                    changed = true;
+                    break;
+
+                default:
+                    this.toggleRequired(false);
+                    this.show();
+            }
+
+            if (changed && this.$radio.filter(':checked').eq(0).is(':disabled')) {
+                this.selectChoice();
+            }
+
+            return changed;
+        },
+
         updateQuantity: function () {
             if (this.choice) {
                 this.choice.onQuantityChange();
@@ -351,6 +544,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
         getChoice: function () {
             return this.choice;
+        },
+
+        clearChoice: function() {
+            this.$choice = undefined;
+            this.choice = undefined;
         }
     });
 
@@ -1161,7 +1359,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 e.preventDefault();
                 e.stopPropagation();
 
-                that.onChange();
+                that.onChildChange();
 
                 return false;
             });
@@ -1230,6 +1428,15 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             });
 
             this.onChange();
+        },
+
+        onChildChange: function() {
+            $.each(this.bundleSlots, function () {
+                this.updateState();
+            });
+
+            // TODO Not if any bundle slot changed choice during state update.
+            //this.onChange();
         },
 
         onChange: function () {

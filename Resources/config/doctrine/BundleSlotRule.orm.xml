@@ -7,8 +7,8 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <mapped-superclass
-            name="Ekyna\Bundle\ProductBundle\Entity\BundleChoiceRule"
-            table="product_bundle_choice_rule">
+            name="Ekyna\Bundle\ProductBundle\Entity\BundleSlotRule"
+            table="product_bundle_slot_rule">
 
         <indexes>
             <index columns="position" name="idx_bundle_choice_rule_position" />
@@ -26,9 +26,9 @@
             <gedmo:sortable-position />
         </field>
 
-        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface"
-                     field="choice" inversed-by="rules">
-            <join-column name="choice_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface"
+                     field="slot" inversed-by="rules">
+            <join-column name="slot_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
             <gedmo:sortable-group />
         </many-to-one>
 

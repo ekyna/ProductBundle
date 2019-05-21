@@ -146,17 +146,20 @@ ekyna_product:
         button:
             add: Add a choice
 
-    bundle_choice_rule:
+    bundle_rule:
         label:
             singular: Rule
             plural: Rules
         type:
-            disabled: Disabled
-            optional: Optional
-        field:
-            expression: Expression
+            hide_if_all: Hide if all
+            hide_if_any: Hide if any
+            show_if_all: Show if all
+            show_if_any: Show if any
+            required_if_all: Required if all
+            required_if_any: Required if any
         button:
             add: Add a rule
+            add_condition: Add a condition
 
     cart:
         success: This product has been added to your cart.

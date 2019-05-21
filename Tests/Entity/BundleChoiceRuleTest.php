@@ -18,9 +18,9 @@ class BundleChoiceRuleTest extends TestCase
         $rule = new BundleChoiceRule();
         $choice = new BundleChoice();
 
-        $rule->setChoice($choice);
+        $rule->setSlot($choice);
 
-        $this->assertEquals($choice, $rule->getChoice());
+        $this->assertEquals($choice, $rule->getSlot());
         $this->assertTrue($choice->hasRule($rule));
     }
 
@@ -29,10 +29,10 @@ class BundleChoiceRuleTest extends TestCase
         $rule = new BundleChoiceRule();
         $choice = new BundleChoice();
 
-        $rule->setChoice($choice);
-        $rule->setChoice(null);
+        $rule->setSlot($choice);
+        $rule->setSlot(null);
 
-        $this->assertNull($rule->getChoice());
+        $this->assertNull($rule->getSlot());
         $this->assertFalse($choice->hasRule($rule));
     }
 
@@ -42,10 +42,10 @@ class BundleChoiceRuleTest extends TestCase
         $choiceA = new BundleChoice();
         $choiceB = new BundleChoice();
 
-        $rule->setChoice($choiceA);
-        $rule->setChoice($choiceB);
+        $rule->setSlot($choiceA);
+        $rule->setSlot($choiceB);
 
-        $this->assertEquals($choiceB, $rule->getChoice());
+        $this->assertEquals($choiceB, $rule->getSlot());
         $this->assertTrue($choiceB->hasRule($rule));
         $this->assertFalse($choiceA->hasRule($rule));
     }

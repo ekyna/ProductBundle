@@ -3,7 +3,10 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\CoreBundle\Form\Util\FormUtil;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -61,6 +64,14 @@ class BundleChoicesType extends AbstractType
             ->setRequired('choice_class')
             ->setAllowedTypes('configurable', 'bool')
             ->setAllowedTypes('choice_class', 'string');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        FormUtil::addClass($view, 'product-bundle-choices');
     }
 
     /**

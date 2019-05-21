@@ -40,6 +40,11 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
      */
     protected $required;
 
+    /**
+     * @var ArrayCollection|Model\BundleSlotRuleInterface[]
+     */
+    protected $rules;
+
 
     /**
      * Constructor.
@@ -50,6 +55,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
 
         $this->choices = new ArrayCollection();
         $this->required = true;
+        $this->rules = new ArrayCollection();
     }
 
     /**
@@ -66,11 +72,17 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
             foreach ($choices as $choice) {
                 $this->addChoice(clone $choice);
             }
+            
+            $rules = $this->rules->toArray();
+            $this->rules = new ArrayCollection();
+            foreach ($rules as $rule) {
+                $this->addRule(clone $rule);
+            }
         }
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getId()
     {
@@ -78,7 +90,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getBundle()
     {
@@ -86,7 +98,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setBundle(Model\ProductInterface $bundle = null)
     {
@@ -105,7 +117,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getTitle()
     {
@@ -113,7 +125,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     /*public function setTitle($title)
     {
@@ -123,7 +135,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }*/
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getDescription()
     {
@@ -131,7 +143,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     /*public function setDescription($description)
     {
@@ -141,7 +153,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }*/
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getChoices()
     {
@@ -149,7 +161,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function hasChoice(Model\BundleChoiceInterface $choice)
     {
@@ -157,7 +169,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function addChoice(Model\BundleChoiceInterface $choice)
     {
@@ -170,7 +182,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function removeChoice(Model\BundleChoiceInterface $choice)
     {
@@ -183,7 +195,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function setChoices($choices)
     {
@@ -193,9 +205,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * Returns the required.
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function isRequired()
     {
@@ -203,15 +213,63 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     }
 
     /**
-     * Sets the required.
-     *
-     * @param bool $required
-     *
-     * @return BundleSlot
+     * @inheritDoc
      */
     public function setRequired($required)
     {
         $this->required = (bool)$required;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRules()
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasRule(Model\BundleSlotRuleInterface $rule)
+    {
+        return $this->rules->contains($rule);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addRule(Model\BundleSlotRuleInterface $rule)
+    {
+        if (!$this->hasRule($rule)) {
+            $this->rules->add($rule);
+            $rule->setSlot($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeRule(Model\BundleSlotRuleInterface $rule)
+    {
+        if ($this->hasRule($rule)) {
+            $this->rules->removeElement($rule);
+            $rule->setSlot(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setRules(ArrayCollection $rules)
+    {
+        $this->rules = $rules;
 
         return $this;
     }

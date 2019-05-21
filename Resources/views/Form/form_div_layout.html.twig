@@ -54,6 +54,7 @@
                 </div>
             </div>
         {%- endif -%}
+        {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
         {{- form_row(form.choices, {'widget_col': 12}) -}}
         {{- form_rest(form) -}}
     {%- if form.vars.configurable %}</div>{% endif -%}
@@ -100,20 +101,92 @@
 {%- endblock ekyna_product_bundle_choice_widget -%}
 
 
-{%- block ekyna_product_bundle_choice_rule_widget -%}
+{%- block ekyna_product_bundle_rule_widget -%}
+    {% set prev_sizing = bootstrap_get_sizing() %}
+    {{ bootstrap_set_sizing('sm') }}
     {{- form_errors(form) -}}
     <div class="row">
-        <div class="col-md-3">
-            {{- form_widget(form.type, {'sizing': 'sm'}) -}}
-            {{- form_errors(form.type, {'sizing': 'sm'}) -}}
+        <div class="col-md-4">
+            {{- form_widget(form.type) -}}
+            {{- form_errors(form.type) -}}
         </div>
-        <div class="col-md-9">
-            {{- form_widget(form.expression, {'sizing': 'sm'}) -}}
-            {{- form_errors(form.expression, {'sizing': 'sm'}) -}}
+        <div class="col-md-8">
+            {{- form_widget(form.conditions) -}}
+            {{- form_errors(form.conditions) -}}
         </div>
     </div>
     {{- form_rest(form) -}}
-{%- endblock ekyna_product_bundle_choice_rule_widget -%}
+    {{ bootstrap_set_sizing(prev_sizing) }}
+{%- endblock ekyna_product_bundle_rule_widget -%}
+
+{%- block ekyna_product_bundle_rule_conditions_widget -%}
+    {%- set attr = attr|merge({'class': 'ekyna-collection' }) -%}
+    {%- set delete_button_confirm = ' data-confirm="' ~ (form.vars.delete_button_confirm|trans|escape) ~ '"' -%}
+
+    {# Prototype #}
+    {%- if prototype is defined -%}
+        {# Controls #}
+        {%- set controls =
+            '<button type="button" class="btn btn-danger btn-xs" data-collection-role="remove" ' ~
+                    'data-collection="' ~ form.vars.id ~ '" data-field="__id__"' ~ delete_button_confirm ~ '>' ~
+                '<span class="glyphicon glyphicon-remove"></span>' ~
+            '</button>' -%}
+        {%- set attr = attr|merge({'data-prototype': form.vars.id ~ '_prototype'}) -%}
+        {%- set attr = attr|merge({'data-prototype-name': prototype_name}) -%}
+        <div class="ekyna-collection-prototype" id="{{ form.vars.id }}_prototype">
+            {{- form_widget(prototype)|replace({'__controls__': controls}) -}}
+        </div>
+    {%- endif -%}
+    <div {{ block('widget_container_attributes') }}>
+        <table class="table table-condensed" style="margin-bottom:0">
+            <thead>
+            <tr>
+                <th>{{ 'ekyna_product.bundle_slot.label.singular'|trans }}</th>
+                <th>{{ 'ekyna_product.bundle_choice.label.singular'|trans }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody class="ekyna-collection-child-container">
+            {%- for child in form.children -%}
+                {%- set controls =
+                    '<button type="button" class="btn btn-danger btn-xs" data-collection-role="remove" ' ~
+                            'data-collection="' ~ form.vars.id ~ '" data-field="' ~ child.vars.id ~ '"' ~
+                            delete_button_confirm ~ '>' ~
+                        '<span class="glyphicon glyphicon-remove"></span>' ~
+                    '</button>' -%}
+                {{- form_widget(child)|replace({'__controls__': controls})|raw -}}
+            {%- endfor -%}
+            </tbody>
+        </table>
+        {{- form_errors(form) -}}
+        {%- if form.vars.allow_add -%}
+        <p>
+            <button type="button" class="btn btn-link btn-xs" data-collection-role="add"
+                    data-collection="{{ form.vars.id }}" data-prototype-name="{{ prototype_name }}">
+                {{- form.vars.add_button_text|trans({}, translation_domain)|raw -}}
+            </button>
+        </p>
+        {%- endif -%}
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock ekyna_product_bundle_rule_conditions_widget -%}
+
+{%- block ekyna_product_bundle_rule_condition_widget -%}
+    {%- set class = attr.class|default('') -%}
+    {%- set attr = attr|merge({'class': ('ekyna-collection-child ' ~ class)|trim }) -%}
+    <tr {{ block('widget_container_attributes') }}>
+        <td>
+            {{- form_widget(form.slot) -}}
+            {{- form_errors(form.slot) -}}
+        </td>
+        <td>
+            {{- form_widget(form.choice) -}}
+            {{- form_errors(form.choice) -}}
+        </td>
+        <td class="ekyna-collection-controls">__controls__</td>
+    </tr>
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_bundle_rule_condition_widget -%}
 
 
 {%- block ekyna_product_catalog_slots_widget -%}

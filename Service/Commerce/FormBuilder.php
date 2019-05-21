@@ -247,6 +247,35 @@ class FormBuilder
     }
 
     /**
+     * Builds the bundle slot config.
+     *
+     * @param Model\BundleSlotInterface $slot
+     *
+     * @return array
+     */
+    public function buildBundleSlotConfig(Model\BundleSlotInterface $slot): array
+    {
+        return [
+            'required' => $slot->isRequired(),
+            'rules'    => $this->buildBundleRulesConfig($slot->getRules()->toArray()),
+        ];
+    }
+
+    /**
+     * Returns the bundle choice attributes.
+     *
+     * @param Model\BundleChoiceInterface $choice
+     *
+     * @return array
+     */
+    public function bundleChoiceAttr(Model\BundleChoiceInterface $choice)
+    {
+        return [
+            'data-rules' => $this->buildBundleRulesConfig($choice->getRules()->toArray()),
+        ];
+    }
+
+    /**
      * Returns the variant choice label.
      *
      * @param Model\ProductInterface|null $variant
@@ -560,5 +589,30 @@ class FormBuilder
         }
 
         return $groups;
+    }
+
+    /**
+     * Builds the bundle rules config.
+     *
+     * @param array $rules
+     *
+     * @return array
+     */
+    protected function buildBundleRulesConfig(array $rules)
+    {
+        $config = [];
+
+        /** @var Model\BundleRuleInterface $rule */
+        foreach ($rules as $rule) {
+            $config[$rule->getType()] = [];
+            foreach ($rule->getConditions() as $condition) {
+                $config[$rule->getType()][] = [
+                    's' => $condition['slot'],
+                    'c' => $condition['choice'],
+                ];
+            }
+        }
+
+        return $config;
     }
 }

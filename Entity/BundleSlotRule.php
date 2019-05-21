@@ -6,23 +6,23 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
- * Class BundleChoiceRule
+ * Class BundleSlotRule
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BundleChoiceRule extends AbstractBundleRule implements Model\BundleChoiceRuleInterface
+class BundleSlotRule extends AbstractBundleRule implements Model\BundleSlotRuleInterface
 {
     use SortableTrait;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
     /**
-     * @var Model\BundleChoiceInterface
+     * @var Model\BundleSlotInterface
      */
-    protected $choice;
+    protected $slot;
 
 
     /**
@@ -32,7 +32,7 @@ class BundleChoiceRule extends AbstractBundleRule implements Model\BundleChoiceR
     {
         if ($this->id) {
             $this->id = null;
-            $this->choice = null;
+            $this->slot = null;
         }
     }
 
@@ -47,24 +47,24 @@ class BundleChoiceRule extends AbstractBundleRule implements Model\BundleChoiceR
     /**
      * @inheritDoc
      */
-    public function getChoice()
+    public function getSlot()
     {
-        return $this->choice;
+        return $this->slot;
     }
 
     /**
      * @inheritDoc
      */
-    public function setChoice(Model\BundleChoiceInterface $choice = null)
+    public function setSlot(Model\BundleSlotInterface $slot = null)
     {
-        if ($this->choice !== $choice) {
-            if ($previous = $this->choice) {
-                $this->choice = null;
+        if ($this->slot !== $slot) {
+            if ($previous = $this->slot) {
+                $this->slot = null;
                 $previous->removeRule($this);
             }
 
-            if ($this->choice = $choice) {
-                $this->choice->addRule($this);
+            if ($this->slot = $slot) {
+                $this->slot->addRule($this);
             }
         }
 
