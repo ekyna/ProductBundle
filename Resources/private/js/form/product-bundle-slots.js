@@ -1,159 +1,282 @@
 define(['jquery', 'jquery-ui/widget'], function ($) {
     "use strict";
 
-    $.widget('ekyna_product.bundleRules', {
-        _create: function () {
-            this.bindEvents();
-        },
-        _destroy: function () {
-            this.unbindEvents();
-        },
-        save: function () {
+    /* -------------------------- BundleRules -------------------------- */
 
-        },
-        lock: function() {
-            this.disable();
-            this._hide(this.element);
-        },
-        unlock: function() {
-            this.enable();
-            this._show(this.element);
-        },
-        bindEvents: function () {
+    function BundleRules($element) {
+        this.$element = $element;
+        this.$element.data('bundleRules', this);
 
-        },
-        unbindEvents: function () {
+        this.locked = false;
+        this.$group = this.$element.closest('.form-group');
 
+        this.init();
+    }
+
+    BundleRules.prototype.init = function() {
+
+    };
+
+    BundleRules.prototype.save = function() {
+        if (this.locked) {
+            // TODO Remove conditions / rules
         }
-    });
+    };
 
-    $.widget('ekyna_product.bundleChoice', {
-        _create: function () {
-            this.bindEvents();
-        },
-        _destroy: function () {
-            this.unbindEvents();
-        },
-        save: function () {
+    BundleRules.prototype.destroy = function() {
 
-        },
-        bindEvents: function () {
+    };
 
-        },
-        unbindEvents: function () {
-
+    BundleRules.prototype.lock = function() {
+        if (this.locked) {
+            return;
         }
-    });
 
-    $.widget('ekyna_product.bundleChoices', {
-        _create: function () {
-            this.bindEvents();
-        },
-        _destroy: function () {
-            this.unbindEvents();
-        },
-        save: function () {
+        this.locked = true;
 
-        },
-        bindEvents: function () {
+        this.$group
+            .hide()
+            .find('select,input').prop('disabled', true);
+    };
 
-        },
-        unbindEvents: function () {
-
+    BundleRules.prototype.unlock = function() {
+        if (!this.locked) {
+            return;
         }
-    });
 
-    $.widget('ekyna_product.bundleSlot', {
-        _create: function () {
-            this.id = this.element.attr('id');
+        this.locked = false;
 
-            this.$required = this.element.find('#' + this.id + '_required');
-            this.$rules = this.element.find('#' + this.id + '_rules');
-            this.$rules.bundleRules();
+        this.$group
+            .show()
+            .find('select,input').prop('disabled', false);
+    };
 
-            this.bindEvents();
-        },
-        _destroy: function () {
-            this.unbindEvents();
-        },
-        update: function() {
-
-        },
-        save: function () {
-
-        },
-        bindEvents: function () {
-            this._on(this.$required, {'change': this.onRequiredChange});
-        },
-        unbindEvents: function () {
-            this._off(this.$required, 'change');
-        },
-        onRequiredChange: function() {
-            if (1 === this.$required.val()) {
-                this.$rules.bundleRules('lock');
-            } else {
-                this.$rules.bundleRules('unlock');
+    $.fn.bundleRules = function() {
+        return this.each(function () {
+            if (undefined === $(this).data('bundleRules')) {
+                new BundleRules($(this));
             }
-        }
-    });
+        });
+    };
 
-    $.widget('ekyna_product.bundleSlots', {
-        _create: function () {
-            console.log('Bundle slots');
+    /* -------------------------- BundleChoice -------------------------- */
 
-            this.bindEvents();
+    function BundleChoice($element, slotIndex) {
+        this.$element = $element;
+        this.slotIndex = slotIndex;
+        this.$element.data('bundleChoice', this);
 
-            this.element.find('> ul > li').bundleSlot();
-        },
-        _destroy: function () {
-            this.bindEvents();
+        this.init();
+    }
 
-            this.element.find('> ul > li').bundleSlot('destroy');
-        },
-        save: function () {
+    BundleChoice.prototype.init = function() {
+        this.$number = $('<span class="bundle-choice-index"></span>').appendTo(this.$element);
+        this.update();
+    };
 
-        },
-        bindEvents: function () {
-            this._on(this.element, {
-                'ekyna-collection-field-added': this.onSlotAdded,
-                'ekyna-collection-field-removed': this.onSlotRemoved,
-                'ekyna-collection-field-moved-up': this.onSlotMovedUp,
-                'ekyna-collection-field-moved-down': this.onSlotMovedDown
+    BundleChoice.prototype.save = function() {
+
+    };
+
+    BundleChoice.prototype.destroy = function() {
+
+    };
+
+    BundleChoice.prototype.setSlotIndex = function(index) {
+        this.slotIndex = index;
+        this.update();
+    };
+
+    BundleChoice.prototype.update = function() {
+        this.$number.text(this.slotIndex + '.' + this.$element.index());
+    };
+
+    $.fn.bundleChoice = function(slotIndex) {
+        return this.each(function () {
+            if (undefined === $(this).data('bundleChoice')) {
+                new BundleChoice($(this), slotIndex);
+            }
+        });
+    };
+
+    /* -------------------------- BundleChoices -------------------------- */
+
+    function BundleChoices($element, slotIndex) {
+        this.$element = $element;
+        this.$element.data('bundleChoices', this);
+
+        this.slotIndex = slotIndex;
+
+        this.init();
+    }
+
+    BundleChoices.prototype.init = function() {
+        this.$choices = this.$element.find('> ul > li').bundleChoice(this.slotIndex);
+
+        var onChange = $.proxy(this.onChange, this);
+        this.$element.on('ekyna-collection-field-added', onChange);
+        this.$element.on('ekyna-collection-field-removed', onChange);
+        this.$element.on('ekyna-collection-field-moved-up', onChange);
+        this.$element.on('ekyna-collection-field-moved-down', onChange);
+    };
+
+    BundleChoices.prototype.save = function() {
+
+    };
+
+    BundleChoices.prototype.destroy = function() {
+
+    };
+
+    BundleChoices.prototype.setSlotIndex = function(index) {
+        this.slotIndex = index;
+        this.$choices.each(function() {
+            $(this).data('bundleChoice').setSlotIndex(index);
+        });
+    };
+
+    BundleChoices.prototype.onChange = function() {
+        var slotIndex = this.slotIndex;
+
+        this.$choices = this.$element.find('> ul > li')
+            .bundleChoice(this.slotIndex)
+            .each(function() {
+                $(this).data('bundleChoice').setSlotIndex(slotIndex);
             });
-        },
-        unbindEvents: function () {
-            this._off(
-                this.element,
-                'ekyna-collection-field-added ekyna-collection-field-removed ' +
-                'ekyna-collection-field-moved-up ekyna-collection-field-moved-down'
-            );
-        },
-        onSlotAdded: function () {
-            console.log('onSlotAdded');
-        },
-        onSlotRemoved: function () {
-            console.log('onSlotRemoved');
-        },
-        onSlotMovedUp: function () {
-            console.log('onSlotMovedUp');
-        },
-        onSlotMovedDown: function () {
-            console.log('onSlotMovedDown');
+    };
+
+    $.fn.bundleChoices = function(slotIndex) {
+        return this.each(function () {
+            if (undefined === $(this).data('bundleChoices')) {
+                new BundleChoices($(this), slotIndex);
+            }
+        });
+    };
+
+    /* -------------------------- BundleSlot -------------------------- */
+
+    function BundleSlot($element) {
+        this.$element = $element;
+        this.$element.data('bundleSlot', this);
+
+        this.init();
+    }
+
+    BundleSlot.prototype.init = function() {
+        this.id = this.$element.attr('id');
+
+        var index = this.$element.index();
+        this.$number = $('<span class="bundle-slot-index"></span>')
+            .text(index)
+            .appendTo(this.$element);
+
+        this.$required = this.$element.find('#' + this.id + '_required');
+        this.$rules = this.$element.find('#' + this.id + '_rules').bundleRules();
+        this.$choices = this.$element.find('#' + this.id + '_choices').bundleChoices(index);
+
+        this.$required.on('change', $.proxy(this.onRequiredChange, this));
+        this.onRequiredChange();
+    };
+
+    BundleSlot.prototype.save = function() {
+        this.$rules.data('bundleRules').save();
+    };
+
+    BundleSlot.prototype.update = function() {
+        var index = this.$element.index();
+        this.$number.text(index);
+        this.$choices.data('bundleChoices').setSlotIndex(index);
+    };
+
+    BundleSlot.prototype.destroy = function() {
+        this.$required.off('change');
+    };
+
+    BundleSlot.prototype.onRequiredChange = function() {
+        if (this.$required.is(':checked')) {
+            this.$rules.data('bundleRules').lock();
+        } else {
+            this.$rules.data('bundleRules').unlock();
         }
-    });
+    };
+
+    $.fn.bundleSlot = function() {
+        return this.each(function () {
+            if (undefined === $(this).data('bundleSlot')) {
+                new BundleSlot($(this));
+            }
+        });
+    };
+
+    /* -------------------------- BundleSlots -------------------------- */
+
+    function BundleSlots($element) {
+        this.$element = $element;
+        this.$element.data('bundleSlots', this);
+
+        this.init();
+    }
+
+    BundleSlots.prototype.init = function() {
+        this.$slots = this.$element.find('> ul > li').bundleSlot();
+
+        var onChange = $.proxy(this.onChange, this);
+        this.$element.on('ekyna-collection-field-added', onChange);
+        this.$element.on('ekyna-collection-field-removed', onChange);
+        this.$element.on('ekyna-collection-field-moved-up', onChange);
+        this.$element.on('ekyna-collection-field-moved-down', onChange);
+    };
+
+    BundleSlots.prototype.save = function() {
+        this.$slots.each(function() {
+            $(this).data('bundleSlot').save();
+        });
+    };
+
+    BundleSlots.prototype.destroy = function() {
+        this.$element.off('ekyna-collection-field-added');
+        this.$element.off('ekyna-collection-field-removed');
+        this.$element.off('ekyna-collection-field-moved-up');
+        this.$element.off('ekyna-collection-field-moved-down');
+
+        this.$slots.each(function() {
+            $(this).data('bundleSlot').destroy();
+        });
+    };
+
+    BundleSlots.prototype.onChange = function() {
+        this.$slots = this.$element
+            .find('> ul > li')
+            .bundleSlot()
+            .each(function() {
+                $(this).data('bundleSlot').update();
+            });
+    };
+
+    $.fn.bundleSlots = function() {
+        return this.each(function () {
+            if (undefined === $(this).data('bundleSlots')) {
+                new BundleSlots($(this));
+            }
+        });
+    };
+
+    /* -------------------------- Export -------------------------- */
 
     return {
         init: function ($element) {
             $element.bundleSlots();
         },
         save: function ($element) {
-            if ($element.data('ekyna_product.bundleSlots')) {
-                $element.bundleSlots('save');
+            var bundleSlots = $element.data('bundleSlots');
+            if (undefined !== bundleSlots) {
+                bundleSlots.destroy();
             }
         },
         destroy: function ($element) {
-            if ($element.data('ekyna_product.bundleSlots')) {
-                $element.bundleSlots('destroy');
+            var bundleSlots = $element.data('bundleSlots');
+            if (undefined !== bundleSlots) {
+                bundleSlots.destroy();
             }
         }
     };

@@ -197,8 +197,9 @@ class ConfigurableSlotType extends Form\AbstractType
         $view->vars['slot_title'] = $bundleSlot->getTitle();
         $view->vars['slot_description'] = $bundleSlot->getDescription();
         $view->vars['slot_media'] = $bundleSlot->getMedia();
+        $view->vars['slot_config'] = $this->formBuilder->buildBundleSlotConfig($bundleSlot);
+
         $view->vars['choices_forms'] = $choicesForms;
-        $view->vars['config'] = $this->formBuilder->buildBundleSlotConfig($bundleSlot);
     }
 
     /**

@@ -31,6 +31,26 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
+     * Renders the bundle rule type label.
+     *
+     * @param Model\BundleRuleInterface|string $typeOrRule
+     *
+     * @return string
+     */
+    public function renderBundleRuleTypeLabel($typeOrRule)
+    {
+        if ($typeOrRule instanceof Model\BundleRuleInterface) {
+            $typeOrRule = $typeOrRule->getType();
+        }
+
+        if (Model\BundleRuleTypes::isValid($typeOrRule)) {
+            return $this->renderLabel(Model\BundleRuleTypes::getLabel($typeOrRule));
+        }
+
+        return $this->renderLabel();
+    }
+
+    /**
      * Renders the product type label.
      *
      * @param Model\ProductInterface|string $typeOrProduct

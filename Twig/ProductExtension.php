@@ -81,6 +81,11 @@ class ProductExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFilter(
+                'bundle_rule_type',
+                [$this->constantHelper, 'renderBundleRuleTypeLabel'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFilter(
                 'product_type_label',
                 [$this->constantHelper, 'renderProductTypeLabel'],
                 ['is_safe' => ['html']]
@@ -143,6 +148,10 @@ class ProductExtension extends \Twig_Extension
             new \Twig_SimpleFilter(
                 'bundle_visible_products',
                 [$this, 'getBundleVisibleProducts']
+            ),
+            new \Twig_SimpleFilter(
+                'bundle_condition_product',
+                [$this, 'getBundleRuleConditionProduct']
             ),
         ];
     }
@@ -271,6 +280,33 @@ class ProductExtension extends \Twig_Extension
         }
 
         return $visible;
+    }
+
+    /**
+     * Renders the bundle rule condition product.
+     *
+     * @param array                  $condition
+     * @param Model\ProductInterface $bundle
+     *
+     * @return Model\ProductInterface
+     */
+    public function getBundleRuleConditionProduct(array $condition, Model\ProductInterface $bundle): ? Model\ProductInterface
+    {
+        foreach ($bundle->getBundleSlots() as $si => $slot) {
+            if ($si != $condition['slot']) {
+                continue;
+            }
+
+            foreach ($slot->getChoices() as $ci => $choice) {
+                if ($ci != $condition['choice']) {
+                    continue;
+                }
+
+                return $choice->getProduct();
+            }
+        }
+
+        return null;
     }
 
     /**

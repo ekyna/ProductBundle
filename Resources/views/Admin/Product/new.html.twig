@@ -7,3 +7,8 @@
 {% block actions %}
     {{ admin_resource_btn(resource_id, 'list') }}
 {% endblock actions %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/ekynaproduct/css/admin/form.css') }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}

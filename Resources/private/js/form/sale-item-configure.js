@@ -539,7 +539,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         },
 
         hasChoice: function () {
-            return undefined !== this.choice;
+            return !!this.choice;
         },
 
         getChoice: function () {
@@ -1290,6 +1290,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 });
             }
             this.bundleSlots = bundleSlots;
+            $.each(this.bundleSlots, function() {
+                this.updateState();
+            });
 
             // Availability
             this.$availability = this.parentItem
@@ -1435,8 +1438,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.updateState();
             });
 
-            // TODO Not if any bundle slot changed choice during state update.
-            //this.onChange();
+            this.onChange();
         },
 
         onChange: function () {

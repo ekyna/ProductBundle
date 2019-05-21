@@ -652,7 +652,34 @@
 {%- endmacro show_bundle_composition -%}
 
 
+{%- macro show_bundle_rules(rules, bundle) -%}
+    <table class="table table-stripped table-condensed table-hover">
+    {%- for rule in rules -%}
+        <tr>
+            <td>{{ rule|bundle_rule_type }}</td>
+            <td>
+            {%- for cond in rule.conditions -%}
+                [{{ cond['slot'] }}.{{ cond['choice'] }}]&nbsp;
+                {%- set product = cond|bundle_condition_product(bundle) -%}
+                {%- if product is null -%}
+                    <strong class="text-danger">Not found</strong>
+                {%- else -%}
+                    <a href="{{ admin_resource_path(product) }}" data-summary='{{ {
+                        'route': 'ekyna_product_product_admin_summary',
+                        'parameters': {'productId': product.id}
+                    }|json_encode }}'>{{ product }}</a>
+                {%- endif -%}
+                <br>
+            {%- endfor -%}
+            </td>
+        </tr>
+    {%- endfor -%}
+    </table>
+{%- endmacro show_bundle_rules -%}
+
+
 {%- macro show_configurable_composition(product, options = {}) -%}
+    {% import _self as macros %}
     <div class="row show-row">
         <div class="col-md-2 show-label">
             {{- 'ekyna_product.bundle_slot.label.plural'|trans -}}
@@ -694,6 +721,18 @@
                             }) -}}
                         </div>
                     </div>
+                    {%- if slot.rules is not empty -%}
+                    <div class="row show-row">
+                        <div class="col-md-2 show-label">
+                            {{- 'ekyna_product.bundle_rule.label.plural'|trans -}}
+                        </div>
+                        <div class="col-md-10">
+                            <div id="{{ slot_id ~ 'rules' }}" class="show-widget bundle-rules">
+                                {{- macros.show_bundle_rules(slot.rules, product) -}}
+                            </div>
+                        </div>
+                    </div>
+                    {%- endif -%}
                     <table class="table table-stripped table-condensed table-hover">
                         <tr>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
@@ -706,7 +745,7 @@
                             <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
                         </tr>
                         {%- for choice in slot.choices -%}
-                        {%- set choice_id = slot_id ~ '_choice_' ~loop.index0 ~ '_' -%}
+                        {%- set choice_id = slot_id ~ '_choice_' ~ loop.index0 ~ '_' -%}
                         {%- set choice_product = choice.product -%}
                         <tr>
                             <td id="{{ choice_id ~ 'product' }}">
@@ -747,11 +786,13 @@
                                 {{- (choice_product.netPrice * choice.minQuantity)|localizedcurrency(commerce_default_currency) -}}
                             </td>
                         </tr>
+                        {%- if choice.rules is not empty -%}
                         <tr>
-                            <td colspan="8" class="choice-rules">
-                                <em>[TODO] Choice rules</em> {# TODO rules #}
+                            <td colspan="9" class="bundle-rules">
+                                {{- macros.show_bundle_rules(choice.rules, product) -}}
                             </td>
                         </tr>
+                        {%- endif -%}
                         {%- endfor -%}
                     </table>
                 </div>

@@ -79,7 +79,7 @@
 {% block sale_item_configurable_slot_widget %}
 {% spaceless %}
     {# TODO form_errors(form) #}
-    <div class="bundle-slot" data-config='{{ form.vars.config|json_encode_data|raw }}'>
+    <div class="bundle-slot" data-config='{{ form.vars.slot_config|json_encode_data|raw }}'>
         <div class="slot-info">
             {%- if form.vars.slot_media is not same as(null) -%}
                 <span class="slot-thumb">
