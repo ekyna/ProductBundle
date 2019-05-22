@@ -179,7 +179,7 @@ class FormBuilder
     public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice)
     {
         // TODO Disable fields for non selected bundle choices.
-        $this->buildProductForm($form, $bundleChoice->getProduct(), false);
+        $this->buildProductForm($form, $bundleChoice->getProduct(), false, $bundleChoice->isUseOptions());
 
         // TODO Use packaging format (+ integer/number field type)
 
@@ -300,10 +300,11 @@ class FormBuilder
      *
      * @param Model\ProductInterface|null $variant
      * @param bool                        $root
+     * @param bool                        $options
      *
      * @return array
      */
-    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true)
+    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true, bool $options = true)
     {
         if (null === $variant) {
             return [];
@@ -312,7 +313,7 @@ class FormBuilder
         $config = [
             // TODO discounts/taxes flags (private item)
             'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context),
-            'groups'       => $this->buildOptionsGroupsConfig($variant),
+            'groups'       => $options ? $this->buildOptionsGroupsConfig($variant) : [],
             'thumb'        => $this->getProductImagePath($variant),
             'image'        => $this->getProductImagePath($variant, 'media_front'),
             'availability' => $this->availabilityHelper->getAvailability($variant, $root)->toArray(),
@@ -491,9 +492,14 @@ class FormBuilder
      * @param FormInterface          $form
      * @param Model\ProductInterface $product
      * @param bool                   $root
+     * @param bool                   $options
      */
-    protected function buildProductForm(FormInterface $form, Model\ProductInterface $product, bool $root = true)
-    {
+    protected function buildProductForm(
+        FormInterface $form,
+        Model\ProductInterface $product,
+        bool $root = true,
+        bool $options = true
+    ) {
         $repository = $this->productProvider->getRepository();
 
         // Variable : add variant choice form
@@ -504,8 +510,9 @@ class FormBuilder
             $repository->loadVariants($variable);
 
             $form->add('variant', Pr\SaleItem\VariantChoiceType::class, [
-                'variable'  => $variable,
-                'root_item' => $root,
+                'variable'    => $variable,
+                'root_item'   => $root,
+                'use_options' => $options,
             ]);
 
         } // Configurable : add configuration form
@@ -521,8 +528,10 @@ class FormBuilder
             $form->add('configuration', Pr\SaleItem\ConfigurableSlotsType::class);
         }
 
-        $repository->loadOptions($product);
-        $form->add('options', Pr\SaleItem\OptionGroupsType::class);
+        if ($options) {
+            $repository->loadOptions($product);
+            $form->add('options', Pr\SaleItem\OptionGroupsType::class);
+        }
     }
 
     /**

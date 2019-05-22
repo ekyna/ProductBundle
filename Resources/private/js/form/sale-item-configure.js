@@ -1254,8 +1254,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             this.$offers = this.$element.find('#' + this.id + '_offers');
 
             // Option groups
+            this.optionGroups = null;
             this.$optionGroups = this.$element.find('#' + this.id + '_options').optionGroups(this);
-            this.optionGroups = this.$optionGroups.data('optionGroups');
+            if (this.$optionGroups.size()) {
+                this.optionGroups = this.$optionGroups.data('optionGroups');
+            }
 
             // Variant
             var $variant = this.$element.find('#' + this.id + '_variant');
@@ -1266,20 +1269,24 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 // Variant options groups
                 if (this.variant.hasVariant()) {
                     var variant = this.variant.getVariant();
-                    this.optionGroups.createGroups(variant.groups, 'variant');
+                    if (this.optionGroups) {
+                        this.optionGroups.createGroups(variant.groups, 'variant');
+                    }
                 }
             }
 
             // Option groups cascade
-            var that = this;
-            $.each(this.optionGroups.getGroups(), function(index, group) {
-                if (!group.hasOption()) {
-                    return true;
-                }
+            if (this.optionGroups) {
+                var that = this;
+                $.each(this.optionGroups.getGroups(), function (index, group) {
+                    if (!group.hasOption()) {
+                        return true;
+                    }
 
-                var option = group.getOption();
-                that.optionGroups.createGroups(option.groups, group.getId());
-            });
+                    var option = group.getOption();
+                    that.optionGroups.createGroups(option.groups, group.getId());
+                });
+            }
 
             // Bundle slots
             var bundleSlots = [];
@@ -1311,7 +1318,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 }
             }
 
-            this.optionGroups.sortGroups();
+            if (this.optionGroups) {
+                this.optionGroups.sortGroups();
+            }
 
             this.bindEvents();
             this.onChange();
@@ -1326,11 +1335,13 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                         return;
                     }
 
-                    that.optionGroups.lockGroups(parent);
+                    if (that.optionGroups) {
+                        that.optionGroups.lockGroups(parent);
+                    }
                 });
 
                 this.$variant.on('post_change', function (e, variant, parent) {
-                    if (variant) {
+                    if (variant && that.optionGroups) {
                         that.optionGroups.createGroups(variant.groups, parent);
                     }
 
@@ -1338,21 +1349,23 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 });
             }
 
-            this.$optionGroups.on('pre_change', function (e, option, parent) {
-                if (!option) {
-                    return;
-                }
+            if (this.optionGroups) {
+                this.$optionGroups.on('pre_change', function (e, option, parent) {
+                    if (!option) {
+                        return;
+                    }
 
-                that.optionGroups.lockGroups(parent);
-            });
+                    that.optionGroups.lockGroups(parent);
+                });
 
-            this.$optionGroups.on('post_change', function (e, option, parent) {
-                if (option) {
-                    that.optionGroups.createGroups(option.groups, parent);
-                }
+                this.$optionGroups.on('post_change', function (e, option, parent) {
+                    if (option) {
+                        that.optionGroups.createGroups(option.groups, parent);
+                    }
 
-                that.onChange();
-            });
+                    that.onChange();
+                });
+            }
 
             this.$bundleSlots.on('change', function () {
                 that.onChange();
@@ -1398,7 +1411,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.destroy();
             });
 
-            this.optionGroups.destroy();
+            if (this.optionGroups) {
+                this.optionGroups.destroy();
+            }
 
             this.$element.removeData();
         },
@@ -1424,7 +1439,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.variant.updatePricesAndAvailability();
             }
 
-            this.optionGroups.updatePricesAndAvailability();
+            if (this.optionGroups) {
+                this.optionGroups.updatePricesAndAvailability();
+            }
 
             $.each(this.bundleSlots, function () {
                 this.updateQuantity();
@@ -1469,7 +1486,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 baseResult = Availability.resolve.call(this.config.availability, this.getTotalQuantity());
             }
 
-            baseResult.merge(this.optionGroups.resolveAvailability());
+            if (this.optionGroups) {
+                baseResult.merge(this.optionGroups.resolveAvailability());
+            }
 
             return baseResult;
         },
@@ -1508,9 +1527,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.finalPrice = Pricing.calculate.call(pricing, this.totalQuantity, true, false);
             }
 
-            this.originalUnit += this.optionGroups.getOriginalPrice();
-            this.originalPrice += this.optionGroups.getOriginalPrice() * this.totalQuantity;
-            this.finalPrice += this.optionGroups.getFinalPrice() * this.totalQuantity;
+            if (this.optionGroups) {
+                this.originalUnit += this.optionGroups.getOriginalPrice();
+                this.originalPrice += this.optionGroups.getOriginalPrice() * this.totalQuantity;
+                this.finalPrice += this.optionGroups.getFinalPrice() * this.totalQuantity;
+            }
 
             if (0 < this.originalPrice && this.originalPrice !== this.finalPrice) {
                 display = '<del>' + this.originalPrice.localizedCurrency(Pricing.currency) + '</del>&nbsp;';

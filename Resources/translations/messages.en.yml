@@ -151,12 +151,12 @@ ekyna_product:
             singular: Rule
             plural: Rules
         type:
-            hide_if_all: Hide if all
-            hide_if_any: Hide if any
-            show_if_all: Show if all
-            show_if_any: Show if any
-            required_if_all: Required if all
-            required_if_any: Required if any
+            hide_if_all: Hide if all conditions
+            hide_if_any: Hide if any condition
+            show_if_all: Show if all conditions
+            show_if_any: Show if any condition
+            required_if_all: Required if all conditions
+            required_if_any: Required if any condition
         button:
             add: Add a rule
             add_condition: Add a condition

@@ -44,27 +44,33 @@ class BundleChoiceType extends ResourceFormType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // TODO only visible products for configurable
-        $builder->add('product', ProductSearchType::class, [
-            // 'visible' => $options['configurable'],
-            'types' => $options['configurable'] ? [
-                ProductTypes::TYPE_SIMPLE,
-                ProductTypes::TYPE_VARIABLE,
-                ProductTypes::TYPE_VARIANT,
-                ProductTypes::TYPE_BUNDLE,
-            ] : [
-                ProductTypes::TYPE_SIMPLE,
-                ProductTypes::TYPE_VARIANT,
-                ProductTypes::TYPE_BUNDLE,
-            ],
-        ]);
+        $builder
+            ->add('product', ProductSearchType::class, [
+                'types' => $options['configurable'] ? [
+                    ProductTypes::TYPE_SIMPLE,
+                    ProductTypes::TYPE_VARIABLE,
+                    ProductTypes::TYPE_VARIANT,
+                    ProductTypes::TYPE_BUNDLE,
+                ] : [
+                    ProductTypes::TYPE_SIMPLE,
+                    ProductTypes::TYPE_VARIANT,
+                    ProductTypes::TYPE_BUNDLE,
+                ],
+            ])
+            ->add('useOptions', Type\CheckboxType::class, [
+                'label'    => 'ekyna_product.bundle_choice.field.use_options',
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
+            ]);
 
         if ($options['configurable']) {
             // TODO options ( + fixed/user defined)
             $builder
                 ->add('rules', BundleRulesType::class, [
-                    'entry_type' => BundleChoiceRuleType::class,
-                    'prototype_name'  => '__choice_rule__',
+                    'entry_type'     => BundleChoiceRuleType::class,
+                    'prototype_name' => '__choice_rule__',
                 ])
                 ->add('minQuantity', Type\NumberType::class, [
                     'label' => 'ekyna_product.common.min_quantity',
@@ -88,13 +94,6 @@ class BundleChoiceType extends ResourceFormType
                 ])
                 ->add('hidden', Type\CheckboxType::class, [
                     'label'    => 'ekyna_product.bundle_choice.field.hidden',
-                    'required' => false,
-                    'attr'     => [
-                        'align_with_widget' => true,
-                    ],
-                ])
-                ->add('useOptions', Type\CheckboxType::class, [
-                    'label'    => 'ekyna_product.bundle_choice.field.use_options',
                     'required' => false,
                     'attr'     => [
                         'align_with_widget' => true,

@@ -151,12 +151,12 @@ ekyna_product:
             singular: Règle
             plural: Règles
         type:
-            hide_if_all: Masquer si toutes
-            hide_if_any: Masquer si au moins une
-            show_if_all: Afficher si toutes
-            show_if_any: Afficher si au moins une
-            required_if_all: Requis si toutes
-            required_if_any: Requis si au moins une
+            hide_if_all: Masquer si toutes conditions
+            hide_if_any: Masquer si au moins une condition
+            show_if_all: Afficher si toutes conditions
+            show_if_any: Afficher si au moins une condition
+            required_if_all: Requis si toutes conditions
+            required_if_any: Requis si au moins une condition
         button:
             add: Ajouter une règle
             add_condition: Ajouter une condition

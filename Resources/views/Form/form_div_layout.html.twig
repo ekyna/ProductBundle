@@ -69,11 +69,14 @@
         {{- form_row(form.product, {'label_col': 2, 'widget_col': 10}) -}}
         {%- if configurable -%}
             <div class="row">
-                <div class="col-md-6">
-                    {{- form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) -}}
+                <div class="col-md-5">
+                    {{- form_row(form.minQuantity, {'label_col': 5, 'widget_col': 7}) -}}
                 </div>
-                <div class="col-md-6">
-                    {{- form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) -}}
+                <div class="col-md-5">
+                    {{- form_row(form.maxQuantity, {'label_col': 5, 'widget_col': 7}) -}}
+                </div>
+                <div class="col-md-2">
+                    {{- form_row(form.useOptions, {'label_col': 0, 'widget_col': 12}) -}}
                 </div>
             </div>
             {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}

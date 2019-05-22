@@ -213,6 +213,7 @@ class ItemBuilder
             ->setPrivate(!$product->isVisible());
 
         // (Do not filter bundle slots)
+        /** @var \Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface[] $bundlesSlots */
         $bundlesSlots = $product->getBundleSlots()->toArray();
 
         // Every slot must match a single item
