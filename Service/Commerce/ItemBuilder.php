@@ -394,7 +394,10 @@ class ItemBuilder
             return;
         }
 
-        $item->setConfigurable(true);
+        // Configurable only if root item
+        if (null === $item->getParent()) {
+            $item->setConfigurable(true);
+        }
 
         $optionGroupIds = [];
         foreach ($optionGroups as $optionGroup) {
@@ -473,7 +476,7 @@ class ItemBuilder
         $item->setNetPrice(0);
 
         if (null !== $product = $option->getProduct()) {
-            $this->buildFromProduct($item, $product);
+            $this->buildFromProduct($item, $product); // TODO Cascade / exclude
             $item->unsetData(self::VARIANT_ID); // Not a variant choice
         } else {
             $designation = sprintf(

@@ -4,8 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\OptionGroupType;
-use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -68,16 +67,21 @@ class OptionsGroupsListener implements EventSubscriberInterface
      * Builds the tree map.
      *
      * @param SaleItemInterface $item
-     * @param array             $data The submitted data
+     * @param array             $data    The submitted data
      * @param bool              $cascade
+     * @param array             $exclude The option groups ids to exclude
      *
      * @return array
      */
-    private function buildTreeMap(SaleItemInterface $item, array $data = null, bool $cascade = true)
-    {
-        $groups = $this->itemBuilder->getOptionGroups($item, $this->exclude);
+    private function buildTreeMap(
+        SaleItemInterface $item,
+        array $data = null,
+        bool $cascade = true,
+        array $exclude = []
+    ) {
+        $groups = $this->itemBuilder->getOptionGroups($item, $exclude);
 
-        $groupIds = array_map(function (OptionGroupInterface $group) {
+        $groupIds = array_map(function (Model\OptionGroupInterface $group) {
             return $group->getId();
         }, $groups);
 
@@ -94,17 +98,38 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
         foreach ($item->getChildren() as $index => $child) {
             // Bundle slot lookup
-            if (0 < $slotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID))) {
-                if ($product->getType() === ProductTypes::TYPE_BUNDLE) {
-                    $childMap = $this->buildTreeMap($child, $data);
+            if ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                if (0 < $slotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID))) {
+                    $choiceId = intval($child->getData(ItemBuilder::BUNDLE_CHOICE_ID));
 
-                    // Add map if groups or children
-                    if (!empty($childMap['groups']) || !empty($childMap['children'])) {
-                        $childMap['slot_id'] = $slotId;
-                        $map['children'][] = $childMap;
+                    $found = false;
+                    foreach ($product->getBundleSlots() as $slot) {
+                        /** @var Model\BundleChoiceInterface $choice */
+                        $choice = $slot->getChoices()->first();
+                        if ($choiceId != $choice->getId()) {
+                            continue;
+                        }
 
-                        continue; // TODO Really ?
+                        $found = true;
+
+                        $childMap = $this->buildTreeMap($child, $data, $cascade, array_unique(array_merge(
+                            $exclude, $choice->getExcludedOptionGroups()
+                        )));
+
+                        // Add map if groups or children
+                        if (!empty($childMap['groups']) || !empty($childMap['children'])) {
+                            $childMap['slot_id'] = $slotId;
+                            $map['children'][] = $childMap;
+
+                            continue 2; // TODO Really ?
+                        }
+
+                        break;
                     }
+
+                    /* if (!$found) {
+                        throw new LogicException("Bundle choice not found.");
+                    }*/
                 }
             }
 
@@ -120,7 +145,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
                 $found = false;
                 foreach ($groups as $group) {
-                    if ($group->getId() != $groupId) {
+                    if ($groupId != $group->getId()) {
                         continue;
                     }
 
@@ -131,7 +156,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
                     }
 
                     foreach ($options as $option) {
-                        if ($option->getId() != $optionId) {
+                        if ($optionId != $option->getId()) {
                             continue;
                         }
 
@@ -140,7 +165,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
                         if ($cascade && $option->isCascade() && !is_null($p = $option->getProduct())) {
                             $this->itemBuilder->buildFromOption($child, $option, count($options));
 
-                            $childMap = $this->buildTreeMap($child, $data, false);
+                            $childMap = $this->buildTreeMap($child, $data, false, $exclude);
 
                             // Add map if groups or children
                             if (!empty($childMap['groups']) || !empty($childMap['children'])) {
@@ -148,12 +173,16 @@ class OptionsGroupsListener implements EventSubscriberInterface
                                 $map['children'][] = $childMap;
                             }
                         }
+
+                        break;
                     }
+
+                    break;
                 }
 
-                if (!$found) {
+                /*if (!$found) {
                     throw new LogicException("Option not found.");
-                }
+                }*/
             }
         }
 
@@ -230,7 +259,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         $groups = $treeMap['groups'];
 
         // Creates missing item children
-        /** @var OptionGroupInterface $group */
+        /** @var Model\OptionGroupInterface $group */
         foreach ($groups as $group) {
             // Find matching sale item's child
             foreach ($item->getChildren() as $childItem) {
@@ -289,7 +318,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function buildFlatMap(SaleItemInterface $item, array $treeMap, array &$flatMap, array $indexes = [])
     {
-        /** @var OptionGroupInterface $optionGroup */
+        /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($treeMap['groups'] as $optionGroup) {
             foreach ($item->getChildren() as $index => $child) {
                 if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
@@ -346,7 +375,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private function clearForms(FormInterface $form, array $flatMap)
     {
-        $groupIds = array_map(function (OptionGroupInterface $group) {
+        $groupIds = array_map(function (Model\OptionGroupInterface $group) {
             return $group->getId();
         }, $flatMap);
 
@@ -374,7 +403,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         $removed = [];
 
         // 1. Remove children but keep references.
-        /** @var OptionGroupInterface $optionGroup */
+        /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($flatMap as $propertyPath => $optionGroup) {
             $name = 'option_group_' . $optionGroup->getId();
             if (!$form->has($name)) {
@@ -387,7 +416,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         }
 
         // 2. (Re)Add in reversed order.
-        /** @var OptionGroupInterface $optionGroup */
+        /** @var Model\OptionGroupInterface $optionGroup */
         foreach (array_reverse($flatMap, true) as $propertyPath => $optionGroup) {
             $name = 'option_group_' . $optionGroup->getId();
             if ($form->has($name)) {
@@ -422,7 +451,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
             return;
         }
 
-        $treeMap = $this->buildTreeMap($item, $data);
+        $treeMap = $this->buildTreeMap($item, $data, true, $this->exclude);
 
         $this->clearItems($item, $treeMap);
         $this->createItems($item, $treeMap);
