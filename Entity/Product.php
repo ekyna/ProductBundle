@@ -629,7 +629,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             foreach ($this->bundleSlots as $slot) {
                 /** @var Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
-                foreach ($choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups()) as $group) {
+                foreach ($choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups(), true) as $group) {
                     if (in_array($group->getId(), $exclude)) {
                         continue;
                     }
