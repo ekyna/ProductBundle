@@ -53,8 +53,8 @@
                     {{- form_row(form.required, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
             </div>
+            {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
         {%- endif -%}
-        {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
         {{- form_row(form.choices, {'widget_col': 12}) -}}
         {{- form_rest(form) -}}
     {%- if form.vars.configurable %}</div>{% endif -%}
@@ -69,34 +69,28 @@
         {{- form_row(form.product, {'label_col': 2, 'widget_col': 10}) -}}
         {%- if configurable -%}
             <div class="row">
-                <div class="col-md-5">
-                    {{- form_row(form.minQuantity, {'label_col': 5, 'widget_col': 7}) -}}
+                <div class="col-md-6">
+                    {{- form_row(form.minQuantity, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
-                <div class="col-md-5">
-                    {{- form_row(form.maxQuantity, {'label_col': 5, 'widget_col': 7}) -}}
-                </div>
-                <div class="col-md-2">
-                    {{- form_row(form.useOptions, {'label_col': 0, 'widget_col': 12}) -}}
+                <div class="col-md-6">
+                    {{- form_row(form.maxQuantity, {'label_col': 4, 'widget_col': 8}) -}}
                 </div>
             </div>
+            {{- form_row(form.excludedOptionGroups, {'label_col': 2, 'widget_col': 10}) -}}
             {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
         {%- else -%}
             <div class="row">
-                <div class="col-md-6">
-                    {{- form_row(form.quantity, {'label_col': 4, 'widget_col': 8}) -}}
+                <div class="col-md-5">
+                    {{- form_row(form.quantity, {'label_col': 5, 'widget_col': 7}) -}}
                 </div>
-                <div class="col-md-6">
-                    {{- form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) -}}
+                <div class="col-md-5">
+                    {{- form_row(form.netPrice, {'label_col': 5, 'widget_col': 7}) -}}
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    {{- form_row(form.useOptions, {'label_col': 4, 'widget_col': 8}) -}}
-                </div>
-                <div class="col-md-6">
-                    {{- form_row(form.hidden, {'label_col': 4, 'widget_col': 8}) -}}
+                <div class="col-md-2">
+                    {{- form_row(form.hidden, {'label_col': 0, 'widget_col': 12}) -}}
                 </div>
             </div>
+            {{- form_row(form.excludedOptionGroups, {'label_col': 2, 'widget_col': 10}) -}}
         {%- endif -%}
         {{- form_rest(form) -}}
     </div>

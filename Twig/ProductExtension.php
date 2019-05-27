@@ -153,6 +153,11 @@ class ProductExtension extends \Twig_Extension
                 'bundle_condition_product',
                 [$this, 'getBundleRuleConditionProduct']
             ),
+            new \Twig_SimpleFilter(
+                'bundle_choice_option_groups',
+                [$this, 'renderBundleChoiceOptionGroups'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
@@ -307,6 +312,65 @@ class ProductExtension extends \Twig_Extension
         }
 
         return null;
+    }
+
+    /**
+     * Renders the bundle choice option groups badge.
+     *
+     * @param Model\BundleChoiceInterface $choice
+     *
+     * @return string
+     */
+    public function renderBundleChoiceOptionGroups(Model\BundleChoiceInterface $choice): string
+    {
+        $product = $choice->getProduct();
+
+        $excluded = $choice->getExcludedOptionGroups();
+        $groups = $product->resolveOptionGroups([], true);
+
+        $all = $exc = 0;
+        $popover = '<ul class="list-unstyled">';
+        foreach ($groups as $group) {
+            $all++;
+            if (in_array($group->getId(), $excluded)) {
+                $icon = '<i class="fa fa-remove text-danger"/>';
+                $exc++;
+            } else {
+                $icon = '<i class="fa fa-check text-success"/>';
+            }
+
+            $label = sprintf(
+                '[%s] %s',
+                $group->isRequired() ? 'Required' : 'Optional',
+                addcslashes($group->getName(), "'")
+            );
+
+            $popover .= "<li>$icon $label</li>";
+        }
+
+        $popover .= "</ul>";
+
+        if ($exc === 0) {
+            $theme = 'success';
+            $icon = '<i class="fa fa-check"/>';
+        } elseif ($all === $exc) {
+            $theme = 'danger';
+            $icon = '<i class="fa fa-remove"/>';
+        } else {
+            $theme = 'warning';
+            $icon = '<i class="fa fa-check"/>';
+        }
+
+        if ($all === 0) {
+            $popover = '';
+        } else {
+            $popover = " data-toggle=\"popover\" data-content='$popover'";
+        }
+
+        return sprintf(
+            '<span class="label label-%s"%s>%s</span>',
+            $theme, $popover, $icon
+        );
     }
 
     /**

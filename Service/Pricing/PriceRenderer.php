@@ -173,7 +173,7 @@ class PriceRenderer
      */
     public function getBundlePrice(Model\ProductInterface $bundle, $withOptions = true)
     {
-        return $this->priceCalculator->calculateBundleMinPrice($bundle, $withOptions);
+        return $this->priceCalculator->calculateBundleMinPrice($bundle, !$withOptions);
     }
 
     /**
@@ -186,7 +186,7 @@ class PriceRenderer
      */
     public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true)
     {
-        return $this->priceCalculator->calculateConfigurableMinPrice($configurable, $withOptions);
+        return $this->priceCalculator->calculateConfigurableMinPrice($configurable, !$withOptions);
     }
 
     /**

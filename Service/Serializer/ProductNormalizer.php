@@ -110,7 +110,12 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 return $this->normalizeObject($r, $format, $context);
             }, $product->getReferences()->toArray());
 
+            // Option groups
+            $data['option_groups'] = $this->normalizeOptionGroups($product);
+
         } elseif ($this->contextHasGroup('Search', $context)) {
+
+            // TODO This group seems not used ... See ProductController::searchAction
 
             // Brand
             if (null !== $brand = $product->getBrand()) {
@@ -140,6 +145,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 return $r->getNumber();
             }, $product->getReferences()->toArray());
 
+            // Option groups
+            $data['option_groups'] = $this->normalizeOptionGroups($product);
+
         } elseif ($this->contextHasGroup('Summary', $context)) {
 
             // Brand
@@ -154,10 +162,10 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
 
             $data = array_replace($data, $this->helper->normalizeStock($product, $format, $context));
 
-            $data['suppliers'] = array_map(function(SupplierProductInterface $reference) {
+            $data['suppliers'] = array_map(function (SupplierProductInterface $reference) {
                 return [
-                    'name' => $reference->getSupplier()->getName(),
-                    'price' => $reference->getNetPrice(),
+                    'name'     => $reference->getSupplier()->getName(),
+                    'price'    => $reference->getNetPrice(),
                     'currency' => $reference->getSupplier()->getCurrency()->getCode(),
                 ];
             }, $this->supplierProductRepository->findBySubject($product));
@@ -168,6 +176,24 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
         }
 
         return $data;
+    }
+
+    /**
+     * Normalizes the product option groups.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    protected function normalizeOptionGroups(Model\ProductInterface $product)
+    {
+        return array_map(function (Model\OptionGroupInterface $g) {
+            return [
+                'id'       => $g->getId(),
+                'name'     => $g->getName(),
+                'required' => $g->isRequired(),
+            ];
+        }, $product->resolveOptionGroups([], true));
     }
 
     /**

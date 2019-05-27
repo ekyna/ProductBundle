@@ -87,11 +87,11 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
         $oldChoiceId = $form->get('choice')->getData();
 
-        // Choice field's data is not ready (pre submit has not been yet called on the child form)
+        // Choice field's data is not ready (pre submit has not been called on the child form)
         // So we fetch the choice id from this form's event data.
         $choiceId = $event->getData()['choice'];
 
-        if ($oldChoiceId && ($oldChoiceId != $choiceId)) {
+        if ($oldChoiceId != $choiceId) {
             $this->formBuilder->clearBundleChoiceForm($form);
         }
 
@@ -104,8 +104,6 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
             // (Re)Build the form
             $this->formBuilder->buildBundleChoiceForm($form, $choice);
-        } else {
-            $this->formBuilder->clearBundleChoiceForm($form);
         }
     }
 

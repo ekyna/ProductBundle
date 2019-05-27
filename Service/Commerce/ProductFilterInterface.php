@@ -4,7 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 
 /**
  * Interface ProductFilterInterface
@@ -24,10 +23,11 @@ interface ProductFilterInterface
      * Returns whether the product is available.
      *
      * @param Model\ProductInterface $product
+     * @param array                  $exclude The option groups ids to exclude
      *
      * @return bool
      */
-    public function isProductAvailable(Model\ProductInterface $product);
+    public function isProductAvailable(Model\ProductInterface $product, array $exclude = []);
 
     /**
      * Returns the available variants for the given variable product.
@@ -60,10 +60,11 @@ interface ProductFilterInterface
      * Returns the available option groups for the given product.
      *
      * @param Model\ProductInterface $product The product
+     * @param array                  $exclude The option groups ids to exclude
      *
      * @return Model\OptionGroupInterface[] The available option groups
      */
-    public function getOptionGroups(Model\ProductInterface $product);
+    public function getOptionGroups(Model\ProductInterface $product, array $exclude = []);
 
     /**
      * Returns the available options for the given option group.

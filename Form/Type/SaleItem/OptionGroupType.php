@@ -60,18 +60,20 @@ class OptionGroupType extends Form\AbstractType
             $required = true;
         }
 
-        $options = $this->itemBuilder->getFilter()->getGroupOptions($optionGroup);
+        $choices = $this->itemBuilder->getFilter()->getGroupOptions($optionGroup);
 
-        $transformer = new IdToChoiceObjectTransformer($options);
+        $transformer = new IdToChoiceObjectTransformer($choices);
 
-        $submitListener = function (Form\FormEvent $event) use ($options) {
+        $submitListener = function (Form\FormEvent $event) use ($choices) {
             $item = $event->getForm()->getParent()->getData();
 
             /** @var Model\OptionInterface $option */
             if (null !== $option = $event->getData()) {
-                $this->itemBuilder->buildFromOption($item, $option, count($options));
+                $this->itemBuilder->buildFromOption($item, $option, count($choices));
             }
         };
+
+        $exclude = $options['exclude_options'];
 
         $field = $builder
             ->create('choice', ChoiceType::class, [
@@ -82,10 +84,12 @@ class OptionGroupType extends Form\AbstractType
                 'constraints'   => $constraints,
                 'select2'       => false,
                 'attr'          => ['class' => 'sale-item-option'],
-                'choices'       => $options,
+                'choices'       => $choices,
                 'choice_value'  => 'id',
                 'choice_label'  => [$this->formBuilder, 'optionChoiceLabel'],
-                'choice_attr'   => [$this->formBuilder, 'optionChoiceAttr'],
+                'choice_attr'   => function (Model\OptionInterface $option) use ($exclude) {
+                    return $this->formBuilder->optionChoiceAttr($option, $exclude);
+                },
             ])
             ->addModelTransformer($transformer)
             ->addEventListener(Form\FormEvents::SUBMIT, $submitListener, 1024);
@@ -119,14 +123,20 @@ class OptionGroupType extends Form\AbstractType
         $resolver
             ->setRequired(['option_group'])
             ->setDefaults([
-                'data_class' => SaleItemInterface::class,
-                'required'   => function (Options $options, /** @noinspection PhpUnusedParameterInspection */ $value) {
+                'data_class'      => SaleItemInterface::class,
+                'exclude_options' => [], // The option groups ids to exclude
+                'required'        => function (
+                    Options $options,
+                    /** @noinspection PhpUnusedParameterInspection */
+                    $value
+                ) {
                     /** @var Model\OptionGroupInterface $optionGroup */
                     $optionGroup = $options['option_group'];
 
                     return $optionGroup->isRequired();
                 },
             ])
-            ->setAllowedTypes('option_group', Model\OptionGroupInterface::class);
+            ->setAllowedTypes('option_group', Model\OptionGroupInterface::class)
+            ->setAllowedTypes('exclude_options', 'array');
     }
 }

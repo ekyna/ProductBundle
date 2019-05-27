@@ -211,7 +211,9 @@
         </service>
         <service id="ekyna_product.bundle_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotsType">
-            <tag name="form.js" selector=".product-bundle-slots" path="ekyna-product/form/product-bundle-slots"/>
+            <tag name="form.js"
+                 selector=".product-bundle-slots"
+                 path="ekyna-product/form/product-bundle-slots"/>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.bundle_slot.form_type"

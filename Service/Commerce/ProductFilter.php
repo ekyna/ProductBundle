@@ -69,7 +69,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function isProductAvailable(Model\ProductInterface $product)
+    public function isProductAvailable(Model\ProductInterface $product, array $exclude = [])
     {
         if ($this->hasProductAvailability($product)) {
             return $this->getProductAvailability($product);
@@ -102,6 +102,11 @@ class ProductFilter implements ProductFilterInterface
         if ($available) {
             // Not available if a required option group has no available choices
             foreach ($product->getOptionGroups() as $optionGroup) {
+                // SKip excluded option group
+                if (in_array($optionGroup->getId(), $exclude)) {
+                    continue;
+                }
+
                 if ($optionGroup->isRequired() && empty($this->getGroupOptions($optionGroup))) {
                     $available = false;
                     break;
@@ -180,20 +185,30 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getOptionGroups(Model\ProductInterface $product)
+    public function getOptionGroups(Model\ProductInterface $product, array $exclude = [])
     {
-        if (isset($this->groupCache[$product->getId()])) {
-            return $this->groupCache[$product->getId()];
+        $key = implode('-', $exclude);
+
+        if (!isset($this->groupCache[$product->getId()])) {
+            $this->groupCache[$product->getId()] = [];
+        }
+
+        if (isset($this->groupCache[$product->getId()][$key])) {
+            return $this->groupCache[$product->getId()][$key];
         }
 
         $groups = [];
         foreach ($product->getOptionGroups() as $group) {
+            if (in_array($group->getId(), $exclude)) {
+                continue;
+            }
+
             if (!empty($this->getGroupOptions($group))) {
                 $groups[] = $group;
             }
         }
 
-        return $this->groupCache[$product->getId()] = $groups;
+        return $this->groupCache[$product->getId()][$key] = $groups;
     }
 
     /**
@@ -230,7 +245,7 @@ class ProductFilter implements ProductFilterInterface
             return false;
         }
 
-        return $this->isProductAvailable($choice->getProduct());
+        return $this->isProductAvailable($choice->getProduct(), $choice->getExcludedOptionGroups());
     }
 
     /**

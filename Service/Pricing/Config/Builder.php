@@ -36,7 +36,7 @@ class Builder
      *
      * @param Model\ProductInterface $product
      * @param bool                   $visible
-     * @param bool                   $options
+     * @param array                  $exclude The option group ids to exclude
      * @param float                  $netPrice
      *
      * @return Tree
@@ -44,7 +44,7 @@ class Builder
     public function build(
         Model\ProductInterface $product,
         bool $visible = true,
-        bool $options = true,
+        array $exclude = [],
         float $netPrice = null
     ) {
         $tree = new Tree();
@@ -65,7 +65,7 @@ class Builder
                 $child = $this->build(
                     $choiceProduct,
                     $visible && $choiceProduct->isVisible() && !$choice->isHidden(),
-                    $options && $choice->isUseOptions(),
+                    array_unique(array_merge($exclude, $choice->getExcludedOptionGroups())),
                     $choice->getNetPrice()
                 );
 
@@ -79,7 +79,7 @@ class Builder
             $tree->addNetPrice($product->getNetPrice());
         }
 
-        if ($options) {
+        if ($exclude) {
             $optionGroups = $product->getOptionGroups()->toArray();
             if (Types::TYPE_VARIANT === $product->getType()) {
                 $optionGroups = array_merge($optionGroups, $product->getParent()->getOptionGroups()->toArray());

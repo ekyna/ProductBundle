@@ -21,7 +21,7 @@ class BundleUpdater extends AbstractUpdater
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        $netPrice = $this->priceCalculator->calculateBundleMinPrice($bundle, false);
+        $netPrice = $this->priceCalculator->calculateBundleMinPrice($bundle, true);
         if (is_null($bundle->getNetPrice()) || 0 !== bccomp($bundle->getNetPrice(), $netPrice, 5)) {
             $bundle->setNetPrice($netPrice);
 

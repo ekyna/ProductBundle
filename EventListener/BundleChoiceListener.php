@@ -62,7 +62,8 @@ class BundleChoiceListener implements EventSubscriberInterface
     {
         $choice = $this->getBundleChoiceFromEvent($event);
 
-        if ($this->persistenceHelper->isChanged($choice, ['product', 'minQuantity', 'netPrice', 'useOptions', 'hidden'])) {
+        $properties = ['product', 'minQuantity', 'netPrice', 'excludedOptionGroups', 'hidden'];
+        if ($this->persistenceHelper->isChanged($choice, $properties)) {
             $this->scheduleChildPriceChangeEvent($choice->getSlot()->getBundle());
         }
 

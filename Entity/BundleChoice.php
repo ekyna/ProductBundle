@@ -46,6 +46,11 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $useOptions;
 
     /**
+     * @var array
+     */
+    protected $excludedOptionGroups;
+
+    /**
      * @var float
      */
     protected $netPrice;
@@ -69,6 +74,7 @@ class BundleChoice implements Model\BundleChoiceInterface
         $this->minQuantity = 1;
         $this->maxQuantity = 1;
         $this->useOptions = true;
+        $this->excludedOptionGroups = [];
         $this->hidden = false;
         $this->rules = new ArrayCollection();
     }
@@ -182,17 +188,17 @@ class BundleChoice implements Model\BundleChoiceInterface
     /**
      * @inheritDoc
      */
-    public function isUseOptions()
+    public function getExcludedOptionGroups()
     {
-        return $this->useOptions;
+        return $this->excludedOptionGroups;
     }
 
     /**
      * @inheritDoc
      */
-    public function setUseOptions($use)
+    public function setExcludedOptionGroups(array $ids)
     {
-        $this->useOptions = (bool)$use;
+        $this->excludedOptionGroups = $ids;
 
         return $this;
     }

@@ -44,4 +44,10 @@ define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-ui'],
     });
 
     new StockUnits('stock-units-view');
+
+    $('.show-product-configurable [data-toggle="popover"], .show-product-bundle [data-toggle="popover"]').popover({
+        trigger: 'hover',
+        placement: 'top',
+        html: true
+    })
 });

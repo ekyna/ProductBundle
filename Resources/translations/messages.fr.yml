@@ -142,7 +142,6 @@ ekyna_product:
             plural: Choix
         field:
             hidden: Masqué
-            use_options: Options
         button:
             add: Ajouter un choix
 

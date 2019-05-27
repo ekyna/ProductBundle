@@ -50,6 +50,7 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     {
         if ($this->id) {
             $this->id = null;
+            $this->slug = null;
         }
     }
 

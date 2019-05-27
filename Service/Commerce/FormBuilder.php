@@ -179,7 +179,7 @@ class FormBuilder
     public function buildBundleChoiceForm(FormInterface $form, Model\BundleChoiceInterface $bundleChoice)
     {
         // TODO Disable fields for non selected bundle choices.
-        $this->buildProductForm($form, $bundleChoice->getProduct(), false, $bundleChoice->isUseOptions());
+        $this->buildProductForm($form, $bundleChoice->getProduct(), false, $bundleChoice->getExcludedOptionGroups());
 
         // TODO Use packaging format (+ integer/number field type)
 
@@ -300,11 +300,11 @@ class FormBuilder
      *
      * @param Model\ProductInterface|null $variant
      * @param bool                        $root
-     * @param bool                        $options
+     * @param array                       $exclude The option groups ids to exclude
      *
      * @return array
      */
-    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true, bool $options = true)
+    public function variantChoiceAttr(Model\ProductInterface $variant = null, bool $root = true, array $exclude = [])
     {
         if (null === $variant) {
             return [];
@@ -313,7 +313,7 @@ class FormBuilder
         $config = [
             // TODO discounts/taxes flags (private item)
             'pricing'      => $this->priceCalculator->buildProductPricing($variant, $this->context),
-            'groups'       => $options ? $this->buildOptionsGroupsConfig($variant) : [],
+            'groups'       => $this->buildOptionsGroupsConfig($variant, $exclude),
             'thumb'        => $this->getProductImagePath($variant),
             'image'        => $this->getProductImagePath($variant, 'media_front'),
             'availability' => $this->availabilityHelper->getAvailability($variant, $root)->toArray(),
@@ -358,17 +358,18 @@ class FormBuilder
      * Returns the option choice attributes.
      *
      * @param Model\OptionInterface|null $option
+     * @param array                      $exclude The option groups ids to exclude
      *
      * @return array
      */
-    public function optionChoiceAttr(Model\OptionInterface $option = null)
+    public function optionChoiceAttr(Model\OptionInterface $option = null, array $exclude = [])
     {
         if (null === $option) {
             return [];
         }
 
         return [
-            'data-config' => $this->buildOptionConfig($option),
+            'data-config' => $this->buildOptionConfig($option, $exclude),
         ];
     }
 
@@ -489,16 +490,16 @@ class FormBuilder
     /**
      * Builds the product form.
      *
-     * @param FormInterface          $form
-     * @param Model\ProductInterface $product
-     * @param bool                   $root
-     * @param bool                   $options
+     * @param FormInterface          $form    The form
+     * @param Model\ProductInterface $product The product
+     * @param bool                   $root    Whether this is a root sale item
+     * @param array                  $exclude The option groups ids to exclude
      */
     protected function buildProductForm(
         FormInterface $form,
         Model\ProductInterface $product,
         bool $root = true,
-        bool $options = true
+        array $exclude = []
     ) {
         $repository = $this->productProvider->getRepository();
 
@@ -510,9 +511,9 @@ class FormBuilder
             $repository->loadVariants($variable);
 
             $form->add('variant', Pr\SaleItem\VariantChoiceType::class, [
-                'variable'    => $variable,
-                'root_item'   => $root,
-                'use_options' => $options,
+                'variable'        => $variable,
+                'root_item'       => $root,
+                'exclude_options' => $exclude,
             ]);
 
         } // Configurable : add configuration form
@@ -528,21 +529,22 @@ class FormBuilder
             $form->add('configuration', Pr\SaleItem\ConfigurableSlotsType::class);
         }
 
-        if ($options) {
-            $repository->loadOptions($product);
-            $form->add('options', Pr\SaleItem\OptionGroupsType::class);
-        }
+        $repository->loadOptions($product);
+        $form->add('options', Pr\SaleItem\OptionGroupsType::class, [
+            'exclude_options' => $exclude,
+        ]);
     }
 
     /**
      * Builds the option config.
      *
-     * @param Model\OptionInterface $option
-     * @param bool                  $allowCascade
+     * @param Model\OptionInterface $option  The option
+     * @param array                 $exclude The option group ids to exclude
+     * @param bool                  $cascade Whether to allow option cascading
      *
      * @return array
      */
-    protected function buildOptionConfig(Model\OptionInterface $option, bool $allowCascade = true)
+    protected function buildOptionConfig(Model\OptionInterface $option, array $exclude = [], $cascade = true)
     {
         $config = [];
 
@@ -550,8 +552,8 @@ class FormBuilder
             $config['availability'] = $this->availabilityHelper->getAvailability($product, false)->toArray();
             $config['thumb'] = $this->getProductImagePath($product);
             $config['image'] = $this->getProductImagePath($product, 'media_front');
-            if ($allowCascade && $option->isCascade()) {
-                $config['groups'] = $this->buildOptionsGroupsConfig($product, false);
+            if ($cascade && $option->isCascade()) {
+                $config['groups'] = $this->buildOptionsGroupsConfig($product, $exclude, false);
             }
         }
 
@@ -564,16 +566,17 @@ class FormBuilder
     /**
      * Builds the product options groups config.
      *
-     * @param Model\ProductInterface $product
-     * @param bool                   $allowCascade
+     * @param Model\ProductInterface $product The product
+     * @param array                  $exclude The option group ids to exclude
+     * @param bool                   $cascade Whether to allow option cascading
      *
      * @return array
      */
-    protected function buildOptionsGroupsConfig(Model\ProductInterface $product, bool $allowCascade = true)
+    protected function buildOptionsGroupsConfig(Model\ProductInterface $product, array $exclude = [], $cascade = true)
     {
         $groups = [];
 
-        $optionGroups = $this->productFilter->getOptionGroups($product);
+        $optionGroups = $this->productFilter->getOptionGroups($product, $exclude);
 
         /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($optionGroups as $optionGroup) {
@@ -584,7 +587,7 @@ class FormBuilder
                 $options[] = [
                     'id'     => $option->getId(),
                     'label'  => $this->optionChoiceLabel($option),
-                    'config' => $this->buildOptionConfig($option, $allowCascade),
+                    'config' => $this->buildOptionConfig($option, $exclude, $cascade),
                 ];
             }
             $groups[] = [

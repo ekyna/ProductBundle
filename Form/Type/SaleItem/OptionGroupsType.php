@@ -37,7 +37,7 @@ class OptionGroupsType extends Form\AbstractType
      */
     public function buildForm(Form\FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new OptionsGroupsListener($this->itemBuilder));
+        $builder->addEventSubscriber(new OptionsGroupsListener($this->itemBuilder, $options['exclude_options']));
     }
 
     /**
@@ -63,10 +63,12 @@ class OptionGroupsType extends Form\AbstractType
                 'compound'      => true,
                 'property_path' => 'children',
                 'data_class'    => 'Doctrine\Common\Collections\Collection',
+                'exclude_options'        => [],
                 'attr'          => [
                     'class' => 'sale-item-options',
                 ],
-            ]);
+            ])
+            ->setAllowedTypes('exclude_options', 'array');
     }
 
     /**

@@ -6,9 +6,13 @@ use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
+use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -56,13 +60,6 @@ class BundleChoiceType extends ResourceFormType
                     ProductTypes::TYPE_VARIANT,
                     ProductTypes::TYPE_BUNDLE,
                 ],
-            ])
-            ->add('useOptions', Type\CheckboxType::class, [
-                'label'    => 'ekyna_product.bundle_choice.field.use_options',
-                'required' => false,
-                'attr'     => [
-                    'align_with_widget' => true,
-                ],
             ]);
 
         if ($options['configurable']) {
@@ -100,6 +97,27 @@ class BundleChoiceType extends ResourceFormType
                     ],
                 ]);
         }
+
+        $formModifier = function(FormInterface $form, ProductInterface $product = null) {
+            $form->add('excludedOptionGroups', BundleChoiceOptionsType::class, [
+                'product' => $product,
+            ]);
+        };
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) use ($formModifier) {
+            /** @var BundleChoiceInterface $data */
+            $data = $event->getData();
+
+            $formModifier($event->getForm(), $data->getProduct());
+        });
+
+        $builder->get('product')
+            ->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) use ($formModifier) {
+                /** @var ProductInterface $data */
+                $data = $event->getForm()->getData();
+
+                $formModifier($event->getForm()->getParent(), $data);
+            });
     }
 
     /**

@@ -154,43 +154,44 @@ class PriceCalculator
      * Calculates the product's minimum price.
      *
      * @param Model\ProductInterface $product
-     * @param bool                   $withOptions Whether to add required option groups's cheaper options.
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
      * @return float|int
      */
-    public function calculateMinPrice(Model\ProductInterface $product, $withOptions = true)
+    public function calculateMinPrice(Model\ProductInterface $product, $exclude = [])
     {
         if (Model\ProductTypes::isConfigurableType($product)) {
-            return $this->calculateConfigurableMinPrice($product, $withOptions);
+            return $this->calculateConfigurableMinPrice($product, $exclude);
         }
 
         if (Model\ProductTypes::isBundleType($product)) {
-            return $this->calculateBundleMinPrice($product, $withOptions);
+            return $this->calculateBundleMinPrice($product, $exclude);
         }
 
         if (Model\ProductTypes::isVariableType($product)) {
-            return $this->calculateVariableMinPrice($product, $withOptions);
+            return $this->calculateVariableMinPrice($product, $exclude);
         }
 
-        return $this->calculateProductMinPrice($product, $withOptions);
+        return $this->calculateProductMinPrice($product, $exclude);
     }
 
     /**
      * Calculates the product min options price.
      *
      * @param Model\ProductInterface $product
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
      * @return float|int
      */
-    public function calculateMinOptionsPrice(Model\ProductInterface $product)
+    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = [])
     {
+        if (true === $exclude) {
+            return 0;
+        }
+
         $price = 0;
 
-        $optionGroups = $product->getOptionGroups()->toArray();
-
-        if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
-            $optionGroups = array_merge($optionGroups, $product->getParent()->getOptionGroups()->toArray());
-        }
+        $optionGroups = $product->resolveOptionGroups($exclude);
 
         // For each option groups
         /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
@@ -226,12 +227,12 @@ class PriceCalculator
      * Calculates the (simple or variant) product min price.
      *
      * @param Model\ProductInterface $product
-     * @param bool                   $withOptions Whether to add options min price.
-     * @param float                  $price       Price override.
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param float                  $price   Price override.
      *
      * @return float|int
      */
-    public function calculateProductMinPrice(Model\ProductInterface $product, $withOptions = true, $price = null)
+    public function calculateProductMinPrice(Model\ProductInterface $product, $exclude = [], $price = null)
     {
         Model\ProductTypes::assertChildType($product);
 
@@ -239,9 +240,7 @@ class PriceCalculator
             $price = $product->getNetPrice();
         }
 
-        if ($withOptions) {
-            $price += $this->calculateMinOptionsPrice($product);
-        }
+        $price += $this->calculateMinOptionsPrice($product, $exclude);
 
         return $price;
     }
@@ -250,12 +249,12 @@ class PriceCalculator
      * Calculates the variable product min price.
      *
      * @param Model\ProductInterface $variable
-     * @param bool                   $withOptions Whether to add options min price.
-     * @param float                  $override    Price override.
+     * @param bool|array             $exclude  The option group ids to exclude, true to exclude all
+     * @param float                  $override Price override.
      *
      * @return float|int
      */
-    public function calculateVariableMinPrice(Model\ProductInterface $variable, $withOptions = true, $override = null)
+    public function calculateVariableMinPrice(Model\ProductInterface $variable, $exclude = [], float $override = null)
     {
         Model\ProductTypes::assertVariable($variable);
 
@@ -264,7 +263,7 @@ class PriceCalculator
                 continue;
             }
 
-            $variantPrice = $this->calculateProductMinPrice($variant, $withOptions, $override);
+            $variantPrice = $this->calculateProductMinPrice($variant, $exclude, $override);
 
             if (null === $override || $variantPrice < $override) {
                 $override = $variantPrice;
@@ -282,14 +281,14 @@ class PriceCalculator
      * Calculates the bundle product min price.
      *
      * @param Model\ProductInterface $bundle
-     * @param bool                   $withOptions Whether to add options min price.
-     * @param float                  $price       Price override.
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param float                  $price   Price override.
      *
      * @return float|int
      *
      * @todo The product (bundle) min price should be processed and persisted during update (flush)
      */
-    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $withOptions = true, $price = null)
+    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $exclude = [], $price = null)
     {
         Model\ProductTypes::assertBundle($bundle);
 
@@ -299,15 +298,23 @@ class PriceCalculator
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
                 $childProduct = $choice->getProduct();
-                $choiceOptions = $withOptions && $choice->isUseOptions();
                 $choicePrice = $choice->getNetPrice();
 
-                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                    $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceOptions, $choicePrice);
-                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                    $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceOptions, $choicePrice);
+                if (true === $exclude) {
+                    $choiceExclude = $exclude;
                 } else {
-                    $childPrice = $this->calculateProductMinPrice($childProduct, $choiceOptions, $choicePrice);
+                    $choiceExclude = array_unique(array_merge(
+                        is_array($exclude) ? $exclude : [],
+                        $choice->getExcludedOptionGroups()
+                    ));
+                }
+
+                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                    $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceExclude, $choicePrice);
+                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                    $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceExclude, $choicePrice);
+                } else {
+                    $childPrice = $this->calculateProductMinPrice($childProduct, $choiceExclude, $choicePrice);
                 }
 
                 // TODO Use packaging format
@@ -315,9 +322,7 @@ class PriceCalculator
             }
         }
 
-        if ($withOptions) {
-            $price += $this->calculateMinOptionsPrice($bundle);
-        }
+        $price += $this->calculateMinOptionsPrice($bundle, $exclude);
 
         return $price;
     }
@@ -326,13 +331,13 @@ class PriceCalculator
      * Calculates the configurable product min price.
      *
      * @param Model\ProductInterface $configurable
-     * @param bool                   $withOptions Whether to add options min price.
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
      * @return float|int
      *
      * @todo The product (configurable) min price should be processed and persisted during update (flush)
      */
-    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $withOptions = true)
+    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = [])
     {
         Model\ProductTypes::assertConfigurable($configurable);
 
@@ -350,14 +355,21 @@ class PriceCalculator
             // For each slot choices
             foreach ($slot->getChoices() as $choice) {
                 $childProduct = $choice->getProduct();
-                $choiceOptions = $withOptions && $choice->isUseOptions();
+                if (true === $exclude) {
+                    $choiceExclude = $exclude;
+                } else {
+                    $choiceExclude = array_unique(array_merge(
+                        is_array($exclude) ? $exclude : [],
+                        $choice->getExcludedOptionGroups()
+                    ));
+                }
 
                 if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                    $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceOptions);
+                    $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceExclude);
                 } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                    $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceOptions);
+                    $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceExclude);
                 } else {
-                    $childPrice = $this->calculateProductMinPrice($childProduct, $choiceOptions);
+                    $childPrice = $this->calculateProductMinPrice($childProduct, $choiceExclude);
                 }
 
                 // TODO Use packaging format
@@ -371,9 +383,7 @@ class PriceCalculator
             $price += $lowestPrice;
         }
 
-        if ($withOptions) {
-            $price += $this->calculateMinOptionsPrice($configurable);
-        }
+        $price += $this->calculateMinOptionsPrice($configurable, $exclude);
 
         return $price;
     }
@@ -656,7 +666,7 @@ class PriceCalculator
                     'offers' => [],
                 ];
 
-                if ($product->isVisible() && !$choice->isHidden() && !($choice->isUseOptions() && $product->hasRequiredOptionGroup())) {
+                if ($product->isVisible() && !$choice->isHidden() && $product->hasRequiredOptionGroup($choice->getExcludedOptionGroups())) {
                     $visible = true;
                     $child['offers'] = $this->mergeOffers(
                         $offers,

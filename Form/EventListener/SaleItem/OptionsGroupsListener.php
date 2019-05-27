@@ -25,15 +25,21 @@ class OptionsGroupsListener implements EventSubscriberInterface
      */
     private $itemBuilder;
 
+    /**
+     * @var array
+     */
+    private $exclude;
 
     /**
      * Constructor.
      *
      * @param ItemBuilder $itemBuilder
+     * @param array       $exclude The option groups ids to exclude
      */
-    public function __construct(ItemBuilder $itemBuilder)
+    public function __construct(ItemBuilder $itemBuilder, array $exclude)
     {
         $this->itemBuilder = $itemBuilder;
+        $this->exclude = $exclude;
     }
 
     /**
@@ -63,13 +69,13 @@ class OptionsGroupsListener implements EventSubscriberInterface
      *
      * @param SaleItemInterface $item
      * @param array             $data The submitted data
-     * @param bool              $optionCascade
+     * @param bool              $cascade
      *
      * @return array
      */
-    private function buildTreeMap(SaleItemInterface $item, array $data = null, bool $optionCascade = true)
+    private function buildTreeMap(SaleItemInterface $item, array $data = null, bool $cascade = true)
     {
-        $groups = $this->itemBuilder->getOptionGroups($item);
+        $groups = $this->itemBuilder->getOptionGroups($item, $this->exclude);
 
         $groupIds = array_map(function (OptionGroupInterface $group) {
             return $group->getId();
@@ -86,32 +92,18 @@ class OptionsGroupsListener implements EventSubscriberInterface
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $this->itemBuilder->getProvider()->resolve($item);
 
-        // Ids of bundle slots having choices with options.
-        $bundleSlotIds = [];
-        if ($product->getType() === ProductTypes::TYPE_BUNDLE) {
-            foreach ($product->getBundleSlots() as $slot) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
-                $bundleChoice = $slot->getChoices()->first();
-                if (!$bundleChoice->isUseOptions()) {
-                    continue;
-                }
-
-                $bundleSlotIds[] = (int)$slot->getId();
-            }
-        }
-
         foreach ($item->getChildren() as $index => $child) {
             // Bundle slot lookup
             if (0 < $slotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID))) {
-                if (in_array($slotId, $bundleSlotIds, true)) {
+                if ($product->getType() === ProductTypes::TYPE_BUNDLE) {
                     $childMap = $this->buildTreeMap($child, $data);
 
-                    // Skip when no groups or children
-                    if (!(empty($childMap['groups']) && empty($childMap['children']))) {
+                    // Add map if groups or children
+                    if (!empty($childMap['groups']) || !empty($childMap['children'])) {
                         $childMap['slot_id'] = $slotId;
                         $map['children'][] = $childMap;
 
-                        continue;
+                        continue; // TODO Really ?
                     }
                 }
             }
@@ -145,13 +137,13 @@ class OptionsGroupsListener implements EventSubscriberInterface
 
                         $found = true;
 
-                        if ($optionCascade && $option->isCascade() && !is_null($p = $option->getProduct())) {
+                        if ($cascade && $option->isCascade() && !is_null($p = $option->getProduct())) {
                             $this->itemBuilder->buildFromOption($child, $option, count($options));
 
                             $childMap = $this->buildTreeMap($child, $data, false);
 
-                            // Skip when no groups or children
-                            if (!(empty($childMap['groups']) && empty($childMap['children']))) {
+                            // Add map if groups or children
+                            if (!empty($childMap['groups']) || !empty($childMap['children'])) {
                                 $childMap['group_id'] = $groupId;
                                 $map['children'][] = $childMap;
                             }
@@ -409,9 +401,10 @@ class OptionsGroupsListener implements EventSubscriberInterface
             }
 
             $form->add($name, OptionGroupType::class, [
-                'label'         => $optionGroup->getTitle(),
-                'property_path' => $propertyPath,
-                'option_group'  => $optionGroup,
+                'label'           => $optionGroup->getTitle(),
+                'property_path'   => $propertyPath,
+                'option_group'    => $optionGroup,
+                'exclude_options' => $this->exclude,
             ]);
         }
     }

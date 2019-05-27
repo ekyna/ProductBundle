@@ -94,39 +94,39 @@ class VariantChoiceType extends AbstractType
 
         $resolver
             ->setDefaults([
-                'label'         => 'ekyna_product.sale_item_configure.variant',
-                'property_path' => 'data[' . ItemBuilder::VARIANT_ID . ']',
-                'constraints'   => [
+                'label'           => 'ekyna_product.sale_item_configure.variant',
+                'property_path'   => 'data[' . ItemBuilder::VARIANT_ID . ']',
+                'constraints'     => [
                     new NotNull(),
                 ],
-                'select2'       => false,
-                'attr'          => [
+                'select2'         => false,
+                'attr'            => [
                     'class' => 'sale-item-variant',
                 ],
-                'root_item'     => true,
-                'use_options'   => true,
-                'choices'       => $choices,
-                'choice_value'  => 'id',
-                'choice_label'  => function (Model\ProductInterface $variant) {
+                'root_item'       => true,
+                'exclude_options' => [],
+                'choices'         => $choices,
+                'choice_value'    => 'id',
+                'choice_label'    => function (Model\ProductInterface $variant) {
                     return $this->formBuilder->variantChoiceLabel($variant);
                 },
-                'choice_attr'   => function (Options $options, $value) {
+                'choice_attr'     => function (Options $options, $value) {
                     if ($value) {
                         return $value;
                     }
 
                     $root = $options['root_item'];
-                    $useOptions = $options['root_item'];
+                    $exclude = $options['exclude_options'];
 
-                    return function (Model\ProductInterface $variant) use ($root, $useOptions) {
-                        return $this->formBuilder->variantChoiceAttr($variant, $root, $useOptions);
+                    return function (Model\ProductInterface $variant) use ($root, $exclude) {
+                        return $this->formBuilder->variantChoiceAttr($variant, $root, $exclude);
                     };
                 },
             ])
             ->setRequired(['variable'])
             ->setAllowedTypes('variable', Model\ProductInterface::class)
             ->setAllowedTypes('root_item', 'bool')
-            ->setAllowedTypes('use_options', 'bool')
+            ->setAllowedTypes('exclude_options', 'array')
             ->setAllowedValues('variable', function (Model\ProductInterface $variable) {
                 return $variable->getType() === Model\ProductTypes::TYPE_VARIABLE;
             });

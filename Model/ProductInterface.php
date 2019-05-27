@@ -195,9 +195,21 @@ interface ProductInterface extends
     /**
      * Returns whether the product has at least one required option group.
      *
+     * @param array $exclude The excluded option group ids.
+     *
      * @return bool
      */
-    public function hasRequiredOptionGroup();
+    public function hasRequiredOptionGroup(array $exclude = []): bool;
+
+    /**
+     * Returns the resolved option groups.
+     *
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $bundle  Whether the return bundle slots option groups.
+     *
+     * @return OptionGroupInterface[]
+     */
+    public function resolveOptionGroups($exclude = [], bool $bundle = false): array;
 
     /**
      * Returns the bundle slots.

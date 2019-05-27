@@ -572,10 +572,16 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritDoc
      */
-    public function hasRequiredOptionGroup()
+    public function hasRequiredOptionGroup(array $exclude = []): bool
     {
+        // TODO Use $this->resolveOptionGroups() ?
+
         // All types
         foreach ($this->optionGroups as $optionGroup) {
+            if (in_array($optionGroup->getId(), $exclude)) {
+                continue;
+            }
+
             if ($optionGroup->isRequired()) {
                 return true;
             }
@@ -584,6 +590,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         // A variant inherits options from his parent
         if ($this->parent) {
             foreach ($this->parent->getOptionGroups() as $optionGroup) {
+                if (in_array($optionGroup->getId(), $exclude)) {
+                    continue;
+                }
+
                 if ($optionGroup->isRequired()) {
                     return true;
                 }
@@ -591,6 +601,53 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function resolveOptionGroups($exclude = [], bool $bundle = false): array
+    {
+        if (true === $exclude) {
+            return [];
+        } elseif (!is_array($exclude)) {
+            $exclude = [];
+        }
+
+        $groups = [];
+
+        if (Model\ProductTypes::isVariantType($this)) {
+            foreach ($this->parent->getOptionGroups() as $group) {
+                if (in_array($group->getId(), $exclude)) {
+                    continue;
+                }
+
+                $groups[] = $group;
+            }
+        }
+        elseif (Model\ProductTypes::isBundleType($this) && $bundle) {
+            foreach ($this->bundleSlots as $slot) {
+                /** @var Model\BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
+                foreach ($choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups()) as $group) {
+                    if (in_array($group->getId(), $exclude)) {
+                        continue;
+                    }
+
+                    $groups[] = $group;
+                }
+            }
+        }
+
+        foreach ($this->getOptionGroups() as $group) {
+            if (in_array($group->getId(), $exclude)) {
+                continue;
+            }
+
+            $groups[] = $group;
+        }
+
+        return $groups;
     }
 
     /**

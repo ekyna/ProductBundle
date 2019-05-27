@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Ekyna\Bundle\ProductBundle\Entity\BundleChoice;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 
@@ -78,20 +79,20 @@ interface BundleChoiceInterface extends ResourceInterface, SortableInterface
     public function setMaxQuantity($quantity);
 
     /**
-     * Returns whether the choice's product options should be used.
+     * Returns the excluded option groups ids.
      *
-     * @return boolean
+     * @return array
      */
-    public function isUseOptions();
+    public function getExcludedOptionGroups();
 
     /**
-     * Sets whether the choice's product options should be used.
+     * Sets the excluded option groups ids.
      *
-     * @param boolean $use
+     * @param array $ids
      *
      * @return $this|BundleChoiceInterface
      */
-    public function setUseOptions($use);
+    public function setExcludedOptionGroups(array $ids);
 
     /**
      * Returns the net price.

@@ -142,7 +142,6 @@ ekyna_product:
             plural: Choice
         field:
             hidden: Hidden
-            use_options: Options
         button:
             add: Add a choice
 
