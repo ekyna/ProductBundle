@@ -53,6 +53,9 @@ class BundleSlotsType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         FormUtil::addClass($view, 'product-bundle-slots');
+        if ($options['configurable']) {
+            FormUtil::addClass($view, 'configurable');
+        }
     }
 
     /**
