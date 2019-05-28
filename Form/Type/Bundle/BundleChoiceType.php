@@ -106,7 +106,9 @@ class BundleChoiceType extends ResourceFormType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) use ($formModifier) {
             /** @var BundleChoiceInterface $data */
-            $data = $event->getData();
+            if (null === $data = $event->getData()) {
+                return;
+            }
 
             $formModifier($event->getForm(), $data->getProduct());
         });
