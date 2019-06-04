@@ -107,7 +107,7 @@ class ProductController extends AbstractSubjectController
 
             $supplierProduct = $this
                 ->get('ekyna_commerce.supplier_product.repository')
-                ->findBySubjectAndSupplier($product, $supplier);
+                ->findOneBySubjectAndSupplier($product, $supplier);
 
             if (null === $supplierProduct) {
                 return $this->redirectToRoute('ekyna_commerce_supplier_product_admin_new', [

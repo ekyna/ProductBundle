@@ -127,12 +127,12 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     /**
      * @inheritDoc
      */
-    /*public function setTitle($title)
+    public function setTitle(string $title)
     {
         $this->translate()->setTitle($title);
 
         return $this;
-    }*/
+    }
 
     /**
      * @inheritDoc
@@ -145,12 +145,12 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     /**
      * @inheritDoc
      */
-    /*public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->translate()->setDescription($description);
 
         return $this;
-    }*/
+    }
 
     /**
      * @inheritDoc

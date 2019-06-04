@@ -82,6 +82,16 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     /**
      * @inheritdoc
      */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDescription()
     {
         return $this->translate()->getDescription();
@@ -90,9 +100,29 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     /**
      * @inheritdoc
      */
+    public function setDescription(string $description)
+    {
+        $this->translate()->setDescription($description);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSlug()
     {
         return $this->translate()->getSlug();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug(string $slug)
+    {
+        $this->translate()->setSlug($slug);
+
+        return $this;
     }
 
     /**

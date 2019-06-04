@@ -29,6 +29,4 @@ default:
                 - Ekyna\Behat\Context\ResetContext
                 - Ekyna\Behat\Context\SecurityContext
                 - Ekyna\Bundle\ResourceBundle\Behat\Context\ResourceContext
-                - Ekyna\Bundle\ProductBundle\Behat\Context\BrandContext
-                - Ekyna\Bundle\ProductBundle\Behat\Context\CategoryContext
-                - Ekyna\Bundle\ProductBundle\Behat\Context\ProductContext
+                - Ekyna\Bundle\ProductBundle\Behat\Context\CartContext

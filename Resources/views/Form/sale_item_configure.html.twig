@@ -65,7 +65,8 @@
             <div class="item-gallery" id="{{ itemForm.vars.id }}_gallery">
                 <a href="{{ asset(itemForm.vars.choice_image) }}"
                    title="{{ itemForm.vars.choice_brand ~ ' ' ~ itemForm.vars.choice_product }}">
-                    <img src="{{ asset(itemForm.vars.choice_thumb) }}">
+                    <img alt="{{ itemForm.vars.choice_brand ~ ' ' ~ itemForm.vars.choice_product }}"
+                         src="{{ asset(itemForm.vars.choice_thumb) }}">
                 </a>
                 <div class="item-gallery-children"></div>
             </div>
@@ -96,7 +97,8 @@
                 <li>
                     {{- form_widget(child, {'attr': {'data-index': loop.index0}}) -}}
                     <label for="{{ child.vars.id }}" title="{{ child.vars.choice_brand }} {{ child.vars.choice_product }}">
-                        <img src="{{ asset(child.vars.choice_image) }}" width="42" height="42">
+                        <img alt="{{ child.vars.choice_brand }} {{ child.vars.choice_product }}"
+                             src="{{ asset(child.vars.choice_image) }}" width="42" height="42">
                     </label>
                 </li>
                 {%- endfor -%}
@@ -197,14 +199,12 @@
             <div class="sale-item-bundle">
                 <p>{{ 'ekyna_product.sale_item_configure.bundle'|trans }}</p>
                 <table class="table table-condensed">
-                    <colgroup>
-                        <col width="0%"/>
-                        <col width="100%"/>
-                        <col width="0%"/>
-                    </colgroup>
                     {% for bundle_product in bundle_products -%}
                     <tr>
-                        <td>{{- bundle_product.quantity|localizednumber -}}x</td>
+                        <td class="quantity">{{- bundle_product.quantity|localizednumber -}}x</td>
+                        <td class="reference" data-clipboard-copy="{{ bundle_product.product.reference }}">
+                            {{- bundle_product.product.reference -}}
+                        </td>
                         <td class="designation">
                             {% set path = bundle_product.product|subject_public_url -%}
                             {% if path is not empty -%}
@@ -212,9 +212,6 @@
                             {%- endif -%}
                                 {{- bundle_product.product.fullDesignation(true) -}}
                             {% if path is not empty %}</a>{% endif -%}
-                        </td>
-                        <td class="hidden-xs" data-clipboard-copy="{{ bundle_product.product.reference }}">
-                            {{- bundle_product.product.reference -}}
                         </td>
                     </tr>
                     {%- endfor %}
@@ -271,7 +268,8 @@
                 <div class="item-gallery" id="{{ form.vars.id }}_gallery">
                     <a href="{{ asset(form.vars.image) }}"
                        title="{{ form.vars.brand ~ ' ' ~ form.vars.product }}">
-                        <img src="{{ asset(form.vars.thumb) }}">
+                        <img alt="{{ form.vars.brand ~ ' ' ~ form.vars.product }}"
+                             src="{{ asset(form.vars.thumb) }}">
                     </a>
                     <div class="item-gallery-children"></div>
                 </div>

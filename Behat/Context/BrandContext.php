@@ -50,6 +50,7 @@ class BrandContext implements Context, KernelAwareContext
             $brand = $repository->createNew();
             $brand
                 ->setName($hash['name'])
+                ->setVisible(true)
                 ->translate()
                     ->setTitle($hash['name']);
 

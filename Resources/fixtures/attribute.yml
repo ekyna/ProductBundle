@@ -1,0 +1,83 @@
+Ekyna\Bundle\ProductBundle\Model\AttributeInterface:
+    attribute_color:
+        __factory: { '@ekyna_product.attribute.repository::createNew': [] }
+        name: Couleur
+        title: Couleur
+        type: select
+        config: {multiple: false}
+    attribute_ram:
+        __factory: { '@ekyna_product.attribute.repository::createNew': [] }
+        name: Ram
+        title: Ram
+        type: select
+        config: {multiple: false}
+    attribute_network:
+        __factory: { '@ekyna_product.attribute.repository::createNew': [] }
+        name: Réseau
+        title: Réseau
+        type: select
+        config: {multiple: false}
+
+Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface:
+    attribute_choice_white:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_color'
+        name: Blanc
+        title: Blanc
+    attribute_choice_black:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_color'
+        name: Noir
+        title: Noir
+    attribute_choice_16go:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_ram'
+        name: 16 Go
+        title: 16 Go
+    attribute_choice_32go:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_ram'
+        name: 32 Go
+        title: 32 Go
+    attribute_choice_wifi:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_network'
+        name: WiFi
+        title: WiFi
+    attribute_choice_3g:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_network'
+        name: 3G
+        title: 3G
+    attribute_choice_4g:
+        __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
+        attribute: '@attribute_network'
+        name: 4G
+        title: 4G
+
+Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface:
+    attribute_set_tablet:
+        __factory: { '@ekyna_product.attribute_set.repository::createNew': [] }
+        name: Tablette
+    attribute_set_borne:
+        __factory: { '@ekyna_product.attribute_set.repository::createNew': [] }
+        name: Borne
+
+Ekyna\Bundle\ProductBundle\Entity\AttributeSlot:
+    attribute_slot_tablet_1:
+        set: '@attribute_set_tablet'
+        attribute: '@attribute_network'
+        required: true
+        naming: true
+    attribute_slot_tablet_2:
+        set: '@attribute_set_tablet'
+        attribute: '@attribute_ram'
+        naming: true
+    attribute_slot_tablet_3:
+        set: '@attribute_set_tablet'
+        attribute: '@attribute_color'
+        naming: true
+    attribute_slot_borne_1:
+        set: '@attribute_set_borne'
+        attribute: '@attribute_color'
+        naming: true

@@ -40,7 +40,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     /**
      * @var bool
      */
-    protected $cascade;
+    protected $cascade = false;
 
     /**
      * @var string
@@ -209,6 +209,16 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     public function getTitle()
     {
         return $this->translate()->getTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
     }
 
     /**

@@ -299,16 +299,13 @@ class ResupplyCommand extends ContainerAwareCommand
             }
         }
 
-        $event = $this->resupply->resupply($reference, $diff, null, $supplierOrder);
+        $supplierOrder = $this->resupply->resupply($reference, $diff, null, $supplierOrder);
 
-        if ($event->hasErrors()) {
+        if (null === $supplierOrder) {
             $output->writeln('<error>failed</error>');
 
             return;
         }
-
-        /** @var SupplierOrderInterface $supplierOrder */
-        $supplierOrder = $event->getResource();
 
         if (!in_array($supplierOrder->getId(), $this->supplierOrderIds, true)) {
             $this->supplierOrderIds[] = $supplierOrder->getId();

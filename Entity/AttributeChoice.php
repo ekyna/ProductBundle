@@ -129,6 +129,16 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     /**
      * @inheritdoc
      */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function getTranslationClass()
     {
         return AttributeChoiceTranslation::class;

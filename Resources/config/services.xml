@@ -85,9 +85,15 @@
         </service>
         <service id="ekyna_product.resupply"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Resupply">
+            <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_product.operator"/>
             <argument type="service" id="ekyna_commerce.supplier_order.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_order_item.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_order.operator"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery_item.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery.operator"/>
+            <argument type="service" id="ekyna_commerce.subject_helper"/>
         </service>
         <service id="ekyna_product.inventory.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">

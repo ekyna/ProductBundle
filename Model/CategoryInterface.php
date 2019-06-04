@@ -99,6 +99,15 @@ interface CategoryInterface extends
     public function getTitle();
 
     /**
+     * Sets the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|CategoryInterface
+     */
+    public function setTitle(string $title);
+
+    /**
      * Returns the (translated) description.
      *
      * @return string
@@ -106,9 +115,27 @@ interface CategoryInterface extends
     public function getDescription();
 
     /**
+     * Sets the (translated) description.
+     *
+     * @param string $description
+     *
+     * @return $this|CategoryInterface
+     */
+    public function setDescription(string $description);
+
+    /**
      * Returns the (translated) slug.
      *
      * @return string
      */
     public function getSlug();
+
+    /**
+     * Sets the (translated) slug.
+     *
+     * @param string $slug
+     *
+     * @return $this|CategoryInterface
+     */
+    public function setSlug(string $slug);
 }

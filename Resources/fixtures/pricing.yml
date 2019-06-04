@@ -1,0 +1,38 @@
+Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface:
+    pricing_1_rule_1:
+        __factory: { '@ekyna_product.pricing_rule.repository::createNew': [] }
+        minQuantity: 1
+        percent: 20
+    pricing_1_rule_2:
+        __factory: { '@ekyna_product.pricing_rule.repository::createNew': [] }
+        minQuantity: 20
+        percent: 22
+    pricing_1_rule_3:
+        __factory: { '@ekyna_product.pricing_rule.repository::createNew': [] }
+        minQuantity: 50
+        percent: 25
+    pricing_1_rule_4:
+        __factory: { '@ekyna_product.pricing_rule.repository::createNew': [] }
+        minQuantity: 100
+        percent: 30
+    pricing_1_rule_5:
+        __factory: { '@ekyna_product.pricing_rule.repository::createNew': [] }
+        minQuantity: 500
+        percent: 32
+
+Ekyna\Bundle\ProductBundle\Model\PricingInterface:
+    pricing_1:
+        __factory: { '@ekyna_product.pricing.repository::createNew': [] }
+        name: Tarifs revendeur
+        groups:
+            - <customerGroup(true)>
+        countries:
+            - <countryByCode('FR')>
+        brands:
+            - '@brand_tablette_store'
+        rules:
+            - '@pricing_1_rule_1'
+            - '@pricing_1_rule_2'
+            - '@pricing_1_rule_3'
+            - '@pricing_1_rule_4'
+            - '@pricing_1_rule_5'

@@ -21,7 +21,7 @@ class CategoryContext implements Context, KernelAwareContext
      *
      * @param TableNode $table
      */
-    public function createCategorys(TableNode $table)
+    public function createCategories(TableNode $table)
     {
         $categories = $this->castCategoriesTable($table);
 
@@ -50,6 +50,7 @@ class CategoryContext implements Context, KernelAwareContext
             $category = $repository->createNew();
             $category
                 ->setName($hash['name'])
+                ->setVisible(true)
                 ->translate()
                     ->setTitle($hash['name']);
 

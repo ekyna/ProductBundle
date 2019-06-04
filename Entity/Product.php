@@ -1077,7 +1077,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setType($type)
+    public function setType(string $type)
     {
         $this->type = $type;
 
@@ -1095,6 +1095,16 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSubTitle()
     {
         return $this->translate()->getSubTitle();
@@ -1103,9 +1113,31 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function setSubTitle(string $subTitle)
+    {
+        $this->translate()->setSubTitle($subTitle);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAttributesTitle()
     {
         return $this->translate()->getAttributesTitle();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributesTitle(string $attributesTitle)
+    {
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT) {
+            $this->translate()->setAttributesTitle($attributesTitle);
+        }
+
+        return $this;
     }
 
     /**
@@ -1145,9 +1177,31 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function setDescription(string $description)
+    {
+        if ($this->type !== Model\ProductTypes::TYPE_VARIANT) {
+            $this->translate()->setDescription($description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSlug()
     {
         return $this->translate()->getSlug();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug(string $slug)
+    {
+        $this->translate()->setSlug($slug);
+
+        return $this;
     }
 
     /**

@@ -68,4 +68,13 @@ interface AttributeChoiceInterface extends MediaSubjectInterface, RM\SortableInt
      * @return string
      */
     public function getTitle();
+
+    /**
+     * Returns the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|AttributeChoiceInterface
+     */
+    public function setTitle(string $title);
 }

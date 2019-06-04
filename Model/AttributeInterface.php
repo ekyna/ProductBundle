@@ -70,6 +70,15 @@ interface AttributeInterface extends RM\SortableInterface, RM\TranslatableInterf
     public function getTitle();
 
     /**
+     * Returns the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|AttributeInterface
+     */
+    public function setTitle(string $title);
+
+    /**
      * Returns the attributes.
      *
      * @return ArrayCollection|AttributeChoiceInterface[]

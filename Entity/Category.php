@@ -37,7 +37,7 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     protected $name;
 
     /**
-     * @var \Doctrine\Common\Collections\ArrayCollection
+     * @var ArrayCollection
      */
     protected $children;
 
@@ -164,6 +164,16 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     /**
      * @inheritdoc
      */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDescription()
     {
         return $this->translate()->getDescription();
@@ -172,9 +182,29 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     /**
      * @inheritdoc
      */
+    public function setDescription(string $description)
+    {
+        $this->translate()->setDescription($description);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSlug()
     {
         return $this->translate()->getSlug();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSlug(string $slug)
+    {
+        $this->translate()->setSlug($slug);
+
+        return $this;
     }
 
     /**

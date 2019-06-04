@@ -102,6 +102,15 @@ interface OptionInterface extends RM\TranslatableInterface, RM\SortableInterface
     public function getTitle();
 
     /**
+     * Returns the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|OptionInterface
+     */
+    public function setTitle(string $title);
+
+    /**
      * Returns the weight.
      *
      * @return float

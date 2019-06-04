@@ -46,7 +46,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
      *
      * @return $this|BundleSlotInterface
      */
-    //public function setTitle($title);
+    public function setTitle(string $title);
 
     /**
      * Returns the description.
@@ -62,7 +62,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
      *
      * @return $this|BundleSlotInterface
      */
-    //public function setDescription($description);
+    public function setDescription(string $description);
 
     /**
      * Returns the choices.

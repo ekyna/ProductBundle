@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Controller\Test;
 
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -43,19 +42,19 @@ class ProductController extends Controller
         if (null !== $event = $cartHelper->handleAddSubjectToCartForm($form, $request)) {
             $this->addFlash($event->getMessage(), 'info');
 
-            return $this->redirectToRoute('app_product_detail', [
-                'productSlug' => $product->getSlug(),
+            return $this->redirectToRoute('ekyna_product_front_product_detail', [
+                'productId' => $product->getId(),
             ]);
         }
 
+        // TODO Resource locale switcher
+
         $view = $form->createView();
 
-        $response = $this->render('@EkynaProduct/Test/Product/detail.html.twig', [
+        return $this->render('@EkynaProduct/Test/Product/detail.html.twig', [
             'product' => $product,
             'form'    => $view,
         ]);
-
-        return $this->configureSharedCache($response, $product->getEntityTags());
     }
 
     public function dumpAction($productId)

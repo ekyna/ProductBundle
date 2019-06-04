@@ -21,9 +21,9 @@ class ProductContext implements Context, KernelAwareContext
      *
      * @param TableNode $table
      */
-    public function createBrands(TableNode $table)
+    public function createProducts(TableNode $table)
     {
-        $products = $this->castBrandsTable($table);
+        $products = $this->castProductsTable($table);
 
         $manager = $this->getContainer()->get('ekyna_product.product.manager');
 
@@ -40,7 +40,7 @@ class ProductContext implements Context, KernelAwareContext
      *
      * @return array
      */
-    private function castBrandsTable(TableNode $table)
+    private function castProductsTable(TableNode $table)
     {
         $repository = $this->getContainer()->get('ekyna_product.product.repository');
         $taxGroup = $this->getContainer()->get('ekyna_commerce.tax_group.repository')->findDefault();
@@ -75,19 +75,51 @@ class ProductContext implements Context, KernelAwareContext
     }
 
     /**
-     * @Given /^The product with reference "(?P<reference>[^"]+)" is in stock for "(?P<quantity>[^"]+)" quantity$/
+     * @Given The following products are resupplied:
      *
-     * @param string    $reference
-     * @param int $quantity
+     * @param TableNode $table
      */
-    public function productIsInStock($reference, $quantity)
+    public function supplierResupplyProducts(TableNode $table)
     {
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
-        $product = $this
-            ->getContainer()
-            ->get('ekyna_product.product.repository')
-            ->findOneBy(['reference' => $reference]);
+        $supplierRepository = $this->getContainer()->get('ekyna_commerce.supplier.repository');
+        $productRepository = $this->getContainer()->get('ekyna_product.product.repository');
+        $resupply = $this->getContainer()->get('ekyna_product.resupply');
 
-        // TODO Create supplier order and delivery ...
+        $orders = [];
+        foreach ($table->getHash() as $hash) {
+            /** @var \Ekyna\Component\Commerce\Supplier\Model\SupplierInterface $supplier */
+            if (null === $supplier = $supplierRepository->findOneBy(['name' => $hash['supplier']])) {
+                throw new \Exception("Supplier with name '{$hash['supplier']}' not found.");
+            }
+
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+            if (null === $product = $productRepository->findOneBy(['reference' => $hash['reference']])) {
+                throw new \Exception("Product with reference '{$hash['reference']}' not found.");
+            }
+
+            if (null === $reference = $resupply->findOrCreateReference($product, $supplier)) {
+                throw new \Exception("Failed to find or create supplier reference");
+            }
+
+            if (null === $order = $resupply->resupply($reference, $hash['quantity'])) {
+                throw new \Exception("Failed to resupply supplier reference");
+            }
+
+            if (!in_array($order, $orders)) {
+                $orders[] = $order;
+            }
+        }
+
+        foreach ($orders as $order) {
+            if (null === $resupply->submitOrder($order, new \DateTime('+2 days'))) {
+                throw new \Exception("Failed to submit order");
+            }
+        }
+
+        foreach ($orders as $order) {
+            if (null === $resupply->deliverOrder($order)) {
+                throw new \Exception("Failed to deliver order");
+            }
+        }
     }
 }

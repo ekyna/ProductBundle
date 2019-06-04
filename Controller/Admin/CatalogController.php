@@ -66,7 +66,7 @@ class CatalogController extends ResourceController
         $context = $this->loadContext($request);
 
         $resourceName = $this->config->getResourceName();
-        /** @var \Ekyna\Bundle\ProductBundle\Entity\Catalog $catalog */
+        /** @var Catalog $catalog */
         $catalog = $context->getResource($resourceName);
 
         $this->isGranted('VIEW', $catalog);
@@ -113,7 +113,7 @@ class CatalogController extends ResourceController
         $type = $request->attributes->get('type');
         $id = $request->attributes->get('id');
 
-        /** @var \Ekyna\Component\Commerce\Common\Model\SaleInterface $sale */
+        /** @var SaleInterface $sale */
         $sale = $this->get('ekyna_commerce.' . $type . '.repository')->find($id);
 
         if (!$sale) {
@@ -122,7 +122,7 @@ class CatalogController extends ResourceController
 
         $loader = new SaleItemChoiceLoader($sale);
 
-        /** @var \Ekyna\Bundle\ProductBundle\Entity\Catalog $catalog */
+        /** @var Catalog $catalog */
         $catalog = $this->getRepository()->createNew();
         $catalog
             ->setContext(
@@ -231,6 +231,7 @@ class CatalogController extends ResourceController
             'admin_mode'        => true,
             '_redirect_enabled' => true,
             'sale'              => $sale,
+            'validation_groups' => ['CatalogFromSale']
         ]);
 
         $this->createFormFooter($form, $context, [

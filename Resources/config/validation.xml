@@ -308,18 +308,38 @@
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Catalog">
         <property name="title">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>Default</value>
+                    <value>Catalog</value>
+                </option>
+            </constraint>
             <constraint name="Length">
+                <option name="groups">
+                    <value>Default</value>
+                    <value>Catalog</value>
+                    <value>CatalogFromSale</value>
+                </option>
                 <option name="max">64</option>
             </constraint>
         </property>
         <property name="theme">
-            <constraint name="NotBlank"/>
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>Default</value>
+                    <value>Catalog</value>
+                    <value>CatalogFromSale</value>
+                </option>
+            </constraint>
             <!-- TODO validate choice -->
         </property>
         <property name="pages">
             <constraint name="Valid"/>
             <constraint name="Count">
+                <option name="groups">
+                    <value>Default</value>
+                    <value>Catalog</value>
+                </option>
                 <option name="min">1</option>
             </constraint>
         </property>

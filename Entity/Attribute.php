@@ -134,6 +134,16 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     /**
      * @inheritdoc
      */
+    public function setTitle(string $title)
+    {
+        $this->translate()->setTitle($title);
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getChoices()
     {
         return $this->choices;

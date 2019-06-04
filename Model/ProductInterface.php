@@ -538,7 +538,7 @@ interface ProductInterface extends
      *
      * @return $this|ProductInterface
      */
-    public function setType($type);
+    public function setType(string $type);
 
     /**
      * Returns the (translated) title.
@@ -548,6 +548,15 @@ interface ProductInterface extends
     public function getTitle();
 
     /**
+     * Returns the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|ProductInterface
+     */
+    public function setTitle(string $title);
+
+    /**
      * Returns the (translated) sub title.
      *
      * @return string
@@ -555,11 +564,29 @@ interface ProductInterface extends
     public function getSubTitle();
 
     /**
+     * Returns the (translated) subTitle.
+     *
+     * @param string $subTitle
+     *
+     * @return $this|ProductInterface
+     */
+    public function setSubTitle(string $subTitle);
+
+    /**
      * Returns the (translated) attributes title.
      *
      * @return string
      */
     public function getAttributesTitle();
+
+    /**
+     * Returns the (translated) attributesTitle.
+     *
+     * @param string $attributesTitle
+     *
+     * @return $this|ProductInterface
+     */
+    public function setAttributesTitle(string $attributesTitle);
 
     /**
      * Returns the (translated) full title.
@@ -578,11 +605,29 @@ interface ProductInterface extends
     public function getDescription();
 
     /**
+     * Returns the (translated) description.
+     *
+     * @param string $description
+     *
+     * @return $this|ProductInterface
+     */
+    public function setDescription(string $description);
+
+    /**
      * Returns the (translated) slug.
      *
      * @return string
      */
     public function getSlug();
+
+    /**
+     * Returns the (translated) slug.
+     *
+     * @param string $slug
+     *
+     * @return $this|ProductInterface
+     */
+    public function setSlug(string $slug);
 
     /**
      * Sets the designation.

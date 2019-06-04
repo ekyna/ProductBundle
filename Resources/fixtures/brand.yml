@@ -1,0 +1,19 @@
+Ekyna\Bundle\ProductBundle\Model\BrandInterface:
+    brand_apple:
+        __factory: { '@ekyna_product.brand.repository::createNew': [] }
+        name: Apple
+        title: Apple
+        description: "<identity('<p>Fabriquant de tablettes tactiles.</p>')>"
+        visible: true
+    brand_samsung:
+        __factory: { '@ekyna_product.brand.repository::createNew': [] }
+        name: Samsung
+        title: Samsung
+        description: "<identity('<p>Fabriquant de tablettes tactiles.</p>')>"
+        visible: true
+    brand_tablette_store:
+        __factory: { '@ekyna_product.brand.repository::createNew': [] }
+        name: Tablette Store
+        title: Tablette Store
+        description: "<identity('<p>Équipementier tablettes tactiles.</p>')>"
+        visible: true

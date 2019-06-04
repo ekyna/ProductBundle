@@ -1,0 +1,125 @@
+Ekyna\Bundle\ProductBundle\Model\ProductInterface:
+    product_bundle_1:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_tablette_store'
+        categories: ['@category_accessory']
+        type: bundle
+        designation: 'Pack borne 1'
+        reference: BUND-BORN-1
+        taxGroup: <defaultTaxGroup()>
+        title: Pack borne 1
+        description: "<identity('<p>Le pack borne 1.</p>')>"
+        visible: true
+    product_configurable_1:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_tablette_store'
+        categories: ['@category_accessory']
+        type: configurable
+        designation: 'Configurable borne 1'
+        reference: CONF-BORN-1
+        taxGroup: <defaultTaxGroup()>
+        title: Borne configurable 1
+        description: "<identity('<p>Configurez votre borne 2.</p>')>"
+        visible: true
+
+Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface:
+    # product_bundle_1 slots
+    bundle_slot_1_1:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_bundle_1'
+    bundle_slot_1_2:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_bundle_1'
+    bundle_slot_1_3:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_bundle_1'
+    bundle_slot_1_4:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_bundle_1'
+    # product_configurable_1 slots
+    configurable_slot_1_1:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_configurable_1'
+        title: La coque
+        description: "<identity('<p>Choisissez votre coque&hellip;</p>')>"
+    configurable_slot_1_2:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_configurable_1'
+        title: Le(s) manchon(s)
+        description: "<identity('<p>Choisissez votre manchon&hellip;</p>')>"
+    configurable_slot_1_3:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_configurable_1'
+        title: Le socle
+        description: "<identity('<p>Choisissez votre socle&hellip;</p>')>"
+    configurable_slot_1_4:
+        __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
+        bundle: '@product_configurable_1'
+        title: La tablette
+        description: "<identity('<p>Choisissez votre tablette&hellip;</p>')>"
+
+Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface:
+    # product_bundle_1 choices
+    bundle_choice_1_1_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@bundle_slot_1_1'
+        product: '@product_coque_1'
+        minQuantity: 1
+    bundle_choice_1_2_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@bundle_slot_1_2'
+        product: '@product_manchon_1'
+        minQuantity: 2
+    bundle_choice_1_3_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@bundle_slot_1_3'
+        product: '@product_socle_1'
+        minQuantity: 1
+    bundle_choice_1_4_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@bundle_slot_1_4'
+        product: '@product_hand'
+        minQuantity: 0.33333
+    # product_configurable_1 choices
+    configurable_choice_1_1_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_1'
+        product: '@product_coque_1'
+        minQuantity: 1
+        maxQuantity: 1
+    configurable_choice_1_1_2:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_1'
+        product: '@product_coque_2'
+        minQuantity: 1
+        maxQuantity: 1
+    configurable_choice_1_2_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_2'
+        product: '@product_manchon_1'
+        minQuantity: 1
+        maxQuantity: 3
+    configurable_choice_1_2_2:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_2'
+        product: '@product_manchon_2'
+        minQuantity: 2
+        maxQuantity: 4
+    configurable_choice_1_3_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_3'
+        product: '@product_socle_1'
+        minQuantity: 1
+        maxQuantity: 1
+    configurable_choice_1_3_2:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_3'
+        product: '@product_socle_2'
+        minQuantity: 1
+        maxQuantity: 1
+    configurable_choice_1_4_1:
+        __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
+        slot: '@configurable_slot_1_4'
+        product: '@product_tablet_1'
+        minQuantity: 1
+        maxQuantity: 1

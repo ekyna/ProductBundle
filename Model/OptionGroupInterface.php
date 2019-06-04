@@ -54,6 +54,15 @@ interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInte
     public function getTitle();
 
     /**
+     * Returns the (translated) title.
+     *
+     * @param string $title
+     *
+     * @return $this|OptionGroupInterface
+     */
+    public function setTitle(string $title);
+
+    /**
      * Returns the required.
      *
      * @return boolean
@@ -83,7 +92,7 @@ interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInte
      *
      * @return $this|OptionGroupInterface
      */
-    public function setFullTitle($full);
+    public function setFullTitle(bool $full);
 
     /**
      * Returns the options.

@@ -3,7 +3,9 @@
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection;
 
 use Ekyna\Bundle\ResourceBundle\DependencyInjection\AbstractExtension;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 /**
  * Class EkynaProductExtension
@@ -71,5 +73,10 @@ class EkynaProductExtension extends AbstractExtension
         $container
             ->getDefinition('ekyna_product.pricing.renderer')
             ->replaceArgument(7, $config['pricing']);
+
+        if (in_array($container->getParameter('kernel.environment'), ['dev', 'test'], true)) {
+            $loader = new XmlFileLoader($container, new FileLocator($this->getConfigurationDirectory()));
+            $loader->load('services_dev_test.xml');
+        }
     }
 }

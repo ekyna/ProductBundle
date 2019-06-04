@@ -275,7 +275,7 @@ class InventoryController extends Controller
 
                 $resupply = $this->get('ekyna_product.resupply');
 
-                $event = $resupply->resupply(
+                $supplierOrder = $resupply->resupply(
                     $supplierProduct,
                     $quantity,
                     $netPrice,
@@ -283,8 +283,8 @@ class InventoryController extends Controller
                     $estimatedDateOfArrival
                 );
 
-                if ($event->hasErrors()) {
-                    foreach ($event->getErrors() as $error) {
+                if (null === $supplierOrder) {
+                    foreach ($resupply->getEvent()->getErrors() as $error) {
                         $form->addError(new FormError($error->getMessage()));
                     }
                 } else {
