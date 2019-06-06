@@ -224,7 +224,7 @@ class StatUpdater
                 }
 
                 $from = new \DateTime($date);
-                $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59);
+                $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
 
                 $this->updateCount($group, $from, $to);
                 $this->updateCross($group, $from, $to);

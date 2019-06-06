@@ -416,7 +416,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $qb = $this->createQueryBuilder('p');
 
         $today = new \DateTime();
-        $today->setTime(0, 0, 0);
+        $today->setTime(0, 0, 0, 0);
 
         return $qb
             ->andWhere($qb->expr()->in('p.type', ':types'))

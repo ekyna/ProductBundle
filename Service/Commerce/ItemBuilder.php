@@ -274,7 +274,7 @@ class ItemBuilder
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
             ->setConfigurable(true)
-            ->setPrivate(!$product->isVisible());
+            ->setPrivate(false);
 
         // Filter bundle slots
         $bundlesSlots = $this->filter->getBundleSlots($product);
@@ -334,6 +334,13 @@ class ItemBuilder
         }
 
         $this->cleanUpBundleSlots($item, $bundleSlotIds);
+
+        // Direct children must be public as they are user choices.
+        foreach ($item->getChildren() as $child) {
+            if ($child->hasData(self::BUNDLE_SLOT_ID)) {
+                $child->setPrivate(false);
+            }
+        }
     }
 
     /**

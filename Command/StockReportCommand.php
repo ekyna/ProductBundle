@@ -129,7 +129,7 @@ class StockReportCommand extends Command
             'title'    => $title,
             'mode'     => $mode,
             'products' => $products,
-            'today'    => (new \DateTime())->setTime(0, 0, 0),
+            'today'    => (new \DateTime())->setTime(0, 0, 0, 0),
             'locale'   => $this->translator->getLocale(),
         ]);
 
