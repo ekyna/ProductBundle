@@ -131,9 +131,10 @@ class ProductFilter implements ProductFilterInterface
         $variants = [];
         foreach ($product->getVariants() as $variant) {
             // Skip if variant is not visible and user is not admin
-            if (!$variant->isVisible() && !$this->context->isAdmin()) {
+            // TODO temporary disabled: Sometimes we need invisible variants in bundle slot choices
+            /*if (!$variant->isVisible() && !$this->context->isAdmin()) {
                 continue;
-            }
+            }*/
             if ($this->isProductAvailable($variant)) {
                 $variants[] = $variant;
             }
@@ -311,7 +312,6 @@ class ProductFilter implements ProductFilterInterface
     protected function clearCache()
     {
         $this->productCache = [];
-        $this->variantCache = [];
         $this->slotCache = [];
         $this->choiceCache = [];
         $this->groupCache = [];
