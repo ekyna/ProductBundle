@@ -289,6 +289,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->eq($as . '.brand', ':brand'))
             ->andWhere($qb->expr()->in($as . '.type', ':types'))
+            ->addOrderBy($as . '.visibility', 'DESC')
             ->getQuery()
             ->useQueryCache(true);
 
@@ -326,6 +327,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
             ->andWhere($qb->expr()->isMemberOf(':categories', $as . '.categories'))
             ->andWhere($qb->expr()->in($as . '.type', ':types'))
+            ->addOrderBy($as . '.visibility', 'DESC')
             ->getQuery()
             ->useQueryCache(true);
 

@@ -161,7 +161,7 @@ ekyna_product:
             add_condition: Ajouter une condition
 
     cart:
-        success: Cette article a bien été ajouté à votre panier.
+        success: Cet article a bien été ajouté à votre panier.
 
     catalog:
         label:
