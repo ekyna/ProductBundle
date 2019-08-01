@@ -531,8 +531,12 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 }
             } else {
                 this.toggleRequired(false);
-                this.hide();
-                changed = true;
+                if (0 < this.$radio.length) {
+                    this.hide();
+                    changed = true;
+                } else {
+                    this.show();
+                }
             }
 
             if (changed && this.$radio.filter(':checked').eq(0).is(':disabled')) {

@@ -656,15 +656,20 @@
             <td>{{ rule|bundle_rule_type }}</td>
             <td>
             {%- for cond in rule.conditions -%}
-                [{{ cond['slot'] }}.{{ cond['choice'] }}]&nbsp;
-                {%- set product = cond|bundle_condition_product(bundle) -%}
-                {%- if product is null -%}
-                    <strong class="text-danger">Not found</strong>
+                {%- if cond['choice'] is same as(null) -%}
+                    [{{ cond['slot'] }}.X]&nbsp;
+                    <em>{{ 'ekyna_core.value.none'|trans }}</em>
                 {%- else -%}
-                    <a href="{{ admin_resource_path(product) }}" data-summary='{{ {
-                        'route': 'ekyna_product_product_admin_summary',
-                        'parameters': {'productId': product.id}
-                    }|json_encode }}'>{{ product }}</a>
+                    [{{ cond['slot'] }}.{{ cond['choice'] }}]&nbsp;
+                    {%- set product = cond|bundle_condition_product(bundle) -%}
+                    {%- if product is null -%}
+                        <strong class="text-danger">Not found</strong>
+                    {%- else -%}
+                        <a href="{{ admin_resource_path(product) }}" data-summary='{{ {
+                            'route': 'ekyna_product_product_admin_summary',
+                            'parameters': {'productId': product.id}
+                        }|json_encode }}'>{{ product }}</a>
+                    {%- endif -%}
                 {%- endif -%}
                 <br>
             {%- endfor -%}
@@ -714,6 +719,7 @@
                             {{- show_row(slot.required, 'boolean', {
                                 'label': 'ekyna_core.field.required',
                                 'id': slot_id ~ 'required',
+                                'color': true,
                                 'label_col': 4
                             }) -}}
                         </div>
