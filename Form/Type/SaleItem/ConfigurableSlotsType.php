@@ -2,8 +2,10 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\ConfigurableSlotsListener;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Bundle\ProductBundle\Validator\Constraints\SaleItemConfigurable;
 use Symfony\Component\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -57,7 +59,8 @@ class ConfigurableSlotsType extends Form\AbstractType
             ->setDefaults([
                 'label'         => false,
                 'property_path' => 'children',
-                'data_class'    => 'Doctrine\Common\Collections\Collection',
+                'data_class'    => Collection::class,
+                'constraints'   => [new SaleItemConfigurable()],
             ]);
     }
 

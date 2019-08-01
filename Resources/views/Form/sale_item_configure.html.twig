@@ -95,7 +95,7 @@
             <ul class="slot-buttons">
                 {%- for child in form.choice -%}
                 <li>
-                    {{- form_widget(child, {'attr': {'data-index': loop.index0}}) -}}
+                    {{- form_widget(child, {'attr': {'data-index': child.vars.index}}) -}}
                     <label for="{{ child.vars.id }}" title="{{ child.vars.choice_brand }} {{ child.vars.choice_product }}">
                         <img alt="{{ child.vars.choice_brand }} {{ child.vars.choice_product }}"
                              src="{{ asset(child.vars.choice_image) }}" width="42" height="42">
@@ -104,7 +104,8 @@
                 {%- endfor -%}
             </ul>
             {%- else -%}
-            {{- form_widget(form.choice.children|first, {'attr': {'data-index': 0}}) -}}
+            {% set child = form.choice.children|first %}
+            {{- form_widget(child, {'attr': {'data-index': child.vars.index}}) -}}
             {%- endif -%}
             <h4 class="slot-title">{{ form.vars.slot_title }}</h4>
             <div class="slot-description">{{ form.vars.slot_description|raw }}</div>

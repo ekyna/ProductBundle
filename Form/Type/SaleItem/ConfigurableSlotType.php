@@ -4,13 +4,12 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 
 use Ekyna\Bundle\ProductBundle\Form\DataTransformer\IdToChoiceObjectTransformer;
 use Ekyna\Bundle\ProductBundle\Form\EventListener\SaleItem\ConfigurableSlotListener;
+use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
-use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Form;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -52,13 +51,6 @@ class ConfigurableSlotType extends Form\AbstractType
         /** @var Model\BundleSlotInterface $bundleSlot */
         $bundleSlot = $options['bundle_slot'];
 
-        $required = false;
-        $constraints = [];
-        if ($bundleSlot->isRequired()) {
-            $constraints[] = new NotNull();
-            $required = true;
-        }
-
         $bundleChoices = $this->itemBuilder->getFilter()->getSlotChoices($bundleSlot);
 
         $transformer = new IdToChoiceObjectTransformer($bundleChoices);
@@ -70,12 +62,17 @@ class ConfigurableSlotType extends Form\AbstractType
             return $this->formBuilder->bundleChoiceAttr($choice);
         };
 
+        $constraints = [];
+        if ($bundleSlot->isRequired()) {
+            $constraints[] = new NotNull();
+        }
+
         $field = $builder
             ->create('choice', Type\ChoiceType::class, [
                 'label'         => false,
                 'property_path' => 'data[' . ItemBuilder::BUNDLE_CHOICE_ID . ']',
                 'placeholder'   => 'ekyna_product.sale_item_configure.choose_option',
-                'required'      => $required,
+                'required'      => $bundleSlot->isRequired(),
                 'constraints'   => $constraints,
                 'select2'       => false,
                 'expanded'      => true,
@@ -118,19 +115,23 @@ class ConfigurableSlotType extends Form\AbstractType
         }
 
         // Add image to each subject choice radio buttons vars
+        $index = 0;
         foreach ($view->children['choice']->children as $subjectChoiceView) {
             /** @var Model\BundleChoiceInterface $bundleChoice */
             if (null !== $bundleChoice = $transformer->transform($subjectChoiceView->vars['value'])) {
                 $product = $bundleChoice->getProduct();
                 $path = $this->formBuilder->getProductImagePath($product, 'slot_choice_btn');
+                $subjectChoiceView->vars['index'] = $index;
                 $subjectChoiceView->vars['choice_image'] = $path;
                 $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
                 $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
             } else {
+                $subjectChoiceView->vars['index'] = 'null';
                 $subjectChoiceView->vars['choice_image'] = '/bundles/ekynaproduct/img/no-slot-choice.gif';
                 $subjectChoiceView->vars['choice_brand'] = '';
                 $subjectChoiceView->vars['choice_product'] = 'Ignorer cet article';
             }
+            $index++;
         }
 
         // Builds each slot choice's form
