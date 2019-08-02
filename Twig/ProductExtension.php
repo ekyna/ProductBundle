@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
+use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 
@@ -43,6 +44,11 @@ class ProductExtension extends \Twig_Extension
     private $productRepository;
 
     /**
+     * @var Features
+     */
+    private $features;
+
+    /**
      * @var string
      */
     private $defaultImage;
@@ -56,6 +62,7 @@ class ProductExtension extends \Twig_Extension
      * @param AttributeTypeRegistryInterface $attributeTypeRegistry
      * @param LocaleProviderInterface        $localeProvider
      * @param ProductRepositoryInterface     $productRepository
+     * @param Features                          $features
      * @param string                         $defaultImage
      */
     public function __construct(
@@ -64,13 +71,15 @@ class ProductExtension extends \Twig_Extension
         AttributeTypeRegistryInterface $attributeTypeRegistry,
         LocaleProviderInterface $localeProvider,
         ProductRepositoryInterface $productRepository,
-        $defaultImage = '/bundles/ekynaproduct/img/no-image.gif'
+        Features $features,
+        string $defaultImage = '/bundles/ekynaproduct/img/no-image.gif'
     ) {
         $this->constantHelper = $constantHelper;
         $this->priceRenderer = $priceRenderer;
         $this->attributeTypeRegistry = $attributeTypeRegistry;
         $this->localeProvider = $localeProvider;
         $this->productRepository = $productRepository;
+        $this->features = $features;
         $this->defaultImage = $defaultImage;
     }
 
@@ -125,6 +134,10 @@ class ProductExtension extends \Twig_Extension
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
+                'product_components_total_price',
+                [$this->priceRenderer, 'getComponentsPrice']
+            ),
+            new \Twig_SimpleFilter(
                 'product_bundle_total_price',
                 [$this->priceRenderer, 'getBundlePrice']
             ),
@@ -168,6 +181,10 @@ class ProductExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction(
+                'product_feature',
+                [$this->features, 'isEnabled']
+            ),
+            new \Twig_SimpleFunction(
                 'product_default_image',
                 [$this, 'getDefaultImage']
             ),
@@ -204,13 +221,13 @@ class ProductExtension extends \Twig_Extension
     public function getTests()
     {
         return [
-            new \Twig_SimpleTest('simple_product',       [Model\ProductTypes::class, 'isSimpleType']),
-            new \Twig_SimpleTest('variable_product',     [Model\ProductTypes::class, 'isVariableType']),
-            new \Twig_SimpleTest('variant_product',      [Model\ProductTypes::class, 'isVariantType']),
-            new \Twig_SimpleTest('bundle_product',       [Model\ProductTypes::class, 'isBundleType']),
+            new \Twig_SimpleTest('simple_product', [Model\ProductTypes::class, 'isSimpleType']),
+            new \Twig_SimpleTest('variable_product', [Model\ProductTypes::class, 'isVariableType']),
+            new \Twig_SimpleTest('variant_product', [Model\ProductTypes::class, 'isVariantType']),
+            new \Twig_SimpleTest('bundle_product', [Model\ProductTypes::class, 'isBundleType']),
             new \Twig_SimpleTest('configurable_product', [Model\ProductTypes::class, 'isConfigurableType']),
-            new \Twig_SimpleTest('child_product',        [Model\ProductTypes::class, 'isChildType']),
-            new \Twig_SimpleTest('parent_product',       [Model\ProductTypes::class, 'isParentType']),
+            new \Twig_SimpleTest('child_product', [Model\ProductTypes::class, 'isChildType']),
+            new \Twig_SimpleTest('parent_product', [Model\ProductTypes::class, 'isParentType']),
         ];
     }
 
@@ -295,8 +312,10 @@ class ProductExtension extends \Twig_Extension
      *
      * @return Model\ProductInterface
      */
-    public function getBundleRuleConditionProduct(array $condition, Model\ProductInterface $bundle): ? Model\ProductInterface
-    {
+    public function getBundleRuleConditionProduct(
+        array $condition,
+        Model\ProductInterface $bundle
+    ): ?Model\ProductInterface {
         foreach ($bundle->getBundleSlots() as $si => $slot) {
             if ($si != $condition['slot']) {
                 continue;

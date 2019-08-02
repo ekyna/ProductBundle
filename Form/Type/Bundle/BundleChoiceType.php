@@ -63,7 +63,6 @@ class BundleChoiceType extends ResourceFormType
             ]);
 
         if ($options['configurable']) {
-            // TODO options ( + fixed/user defined)
             $builder
                 ->add('rules', BundleRulesType::class, [
                     'entry_type'     => BundleChoiceRuleType::class,

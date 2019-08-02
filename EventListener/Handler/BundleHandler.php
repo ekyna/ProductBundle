@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater;
+use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -40,6 +41,11 @@ class BundleHandler extends AbstractHandler
     private $priceInvalidator;
 
     /**
+     * @var StockSubjectUpdaterInterface
+     */
+    private $stockUpdater;
+
+    /**
      * @var BundleUpdater
      */
     private $bundleUpdater;
@@ -48,21 +54,24 @@ class BundleHandler extends AbstractHandler
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param ProductRepositoryInterface $productRepository
-     * @param PriceCalculator            $priceCalculator
-     * @param PriceInvalidator           $priceInvalidator
+     * @param PersistenceHelperInterface   $persistenceHelper
+     * @param ProductRepositoryInterface   $productRepository
+     * @param PriceCalculator              $priceCalculator
+     * @param PriceInvalidator             $priceInvalidator
+     * @param StockSubjectUpdaterInterface $stockUpdater
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
-        PriceInvalidator $priceInvalidator
+        PriceInvalidator $priceInvalidator,
+        StockSubjectUpdaterInterface $stockUpdater
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->priceInvalidator = $priceInvalidator;
+        $this->stockUpdater = $stockUpdater;
     }
 
     /**
@@ -76,7 +85,7 @@ class BundleHandler extends AbstractHandler
 
         $updater = $this->getBundleUpdater();
 
-        $changed = $updater->updateStock($bundle);
+        $changed = $this->stockUpdater->update($bundle);
 
         $changed |= $updater->updateAvailability($bundle);
 
@@ -102,7 +111,7 @@ class BundleHandler extends AbstractHandler
         $changed = false;
 
         // TODO remove : stock should only change from children
-        if ($updater->updateStock($bundle)) {
+        if ($this->stockUpdater->update($bundle)) {
             $events[] = ProductEvents::CHILD_STOCK_CHANGE;
             $changed = true;
         }
@@ -172,7 +181,7 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        if ($this->getBundleUpdater()->updateStock($bundle)) {
+        if ($this->stockUpdater->update($bundle)) {
             $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_STOCK_CHANGE]);
 
             return true;

@@ -190,6 +190,18 @@ class PriceRenderer
     }
 
     /**
+     * Returns the product's components total price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     */
+    public function getComponentsPrice(Model\ProductInterface $product)
+    {
+        return $this->priceCalculator->calculateComponentsPrice($product);
+    }
+
+    /**
      * Returns the product purchase cost.
      *
      * @param Model\ProductInterface $product

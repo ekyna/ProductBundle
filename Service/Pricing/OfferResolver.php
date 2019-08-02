@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
 
@@ -24,19 +25,27 @@ class OfferResolver
      */
     protected $specialOfferRepository;
 
+    /**
+     * @var PriceCalculator
+     */
+    protected $priceCalculator;
+
 
     /**
      * Constructor.
      *
      * @param PricingRepositoryInterface      $pricingRepository
      * @param SpecialOfferRepositoryInterface $specialOfferRepository
+     * @param PriceCalculator                 $priceCalculator
      */
     public function __construct(
         PricingRepositoryInterface $pricingRepository,
-        SpecialOfferRepositoryInterface $specialOfferRepository
+        SpecialOfferRepositoryInterface $specialOfferRepository,
+        PriceCalculator $priceCalculator
     ) {
         $this->pricingRepository = $pricingRepository;
         $this->specialOfferRepository = $specialOfferRepository;
+        $this->priceCalculator = $priceCalculator;
     }
 
     /**
@@ -61,7 +70,7 @@ class OfferResolver
         }
 
         // Stacking special offers rules
-        $stackingOffers = array_filter($specialOffers, function($o) {
+        $stackingOffers = array_filter($specialOffers, function ($o) {
             return $o['stack'];
         });
 
@@ -72,7 +81,8 @@ class OfferResolver
         foreach ($stackingOffers as $stacking) {
             foreach ($discounts as &$discount) {
                 if (rule_apply_to($stacking, $discount)) {
-                    $discount['percent'] = round((1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100, 5);
+                    $discount['percent'] = round((1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100,
+                        5);
                     $discount['special_offer_id'] = $stacking['special_offer_id'];
                     $discount['details'][Offer::TYPE_SPECIAL] = $stacking['percent'];
                 }
@@ -88,9 +98,13 @@ class OfferResolver
         usort($offers, __NAMESPACE__ . '\rule_sort');
 
         // Set net prices
+        $netPrice = $product->getNetPrice();
+        if (ProductTypes::isVariantType($product)) {
+            $netPrice += $this->priceCalculator->calculateComponentsPrice($product->getParent());
+        }
         foreach ($offers as &$data) {
             unset($data['stack']);
-            $data['net_price'] = round($product->getNetPrice() * (1 - $data['percent'] / 100), 5);
+            $data['net_price'] = round($netPrice * (1 - $data['percent'] / 100), 5);
         }
 
         return $offers;

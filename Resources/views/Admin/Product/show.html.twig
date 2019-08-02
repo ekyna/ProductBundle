@@ -8,25 +8,25 @@
 {% endblock title %}
 
 {% block actions %}
-    {% if product is variant_product %}
+    {%- if product is variant_product -%}
         {{ ui_button('ekyna_product.product.field.parent', {
             'type': 'link',
             'icon': 'arrow-up',
             'path': admin_resource_path(product.parent)
         }) }}
-    {% endif %}
-    {{ admin_resource_btn(product, 'list') }}
-    {{ macros.new_product_button() }}
+    {%- endif -%}
+    {{- admin_resource_btn(product, 'list') -}}
+    {{- macros.new_product_button() -}}
 {% endblock actions %}
 
 {% block main %}
     <div class="main-header">
         <div class="infos">
-            {{ product|product_type_badge }}
-            {{ product|cms_tags({'text': false}) }}
+            {{- product|product_type_badge }}
+            {{ product|cms_tags({'text': false}) -}}
         </div>
         <div class="actions">
-            {% if product is simple_product or product is variant_product %}
+            {% if product is simple_product or product is variant_product -%}
                 {{ ui_button('ekyna_commerce.button.print_label', {
                     'type': 'link',
                     'icon': 'barcode',
@@ -35,7 +35,7 @@
                         'id': [product.id],
                     }),
                 }, {'target': '_blank'}) }}
-            {% endif %}
+            {%- endif %}
             {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}{# TODO temp lock #}
                 {{ ui_button('ekyna_core.button.duplicate', {

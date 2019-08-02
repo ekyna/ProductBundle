@@ -24,8 +24,8 @@
 
         <field name="excludedOptionGroups" column="excluded_option_groups" type="simple_array" nullable="true"/>
         <field name="hidden" column="hidden" type="boolean" nullable="false"/>
-        <field name="minQuantity" column="min_quantity" type="decimal" precision="7" scale="5" nullable="false"/>
-        <field name="maxQuantity" column="max_quantity" type="decimal" precision="7" scale="5" nullable="true"/>
+        <field name="minQuantity" column="min_quantity" type="decimal" precision="8" scale="5" nullable="false"/>
+        <field name="maxQuantity" column="max_quantity" type="decimal" precision="8" scale="5" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
 
         <field name="position" type="integer" column="position">
@@ -51,9 +51,6 @@
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
             <join-column name="product_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
         </many-to-one>
-        <!--<many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\OptionValueInterface" field="optionValue">
-            <join-column name="option_value_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
-        </many-to-one>-->
 
     </mapped-superclass>
 

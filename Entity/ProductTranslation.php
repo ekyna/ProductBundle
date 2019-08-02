@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface;
 use Ekyna\Component\Resource\Model\AbstractTranslation;
 
@@ -9,6 +10,8 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  * Class ProductTranslation
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @method ProductInterface getTranslatable()
  */
 class ProductTranslation extends AbstractTranslation implements ProductTranslationInterface
 {
@@ -50,7 +53,6 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     {
         if ($this->id) {
             $this->id = null;
-            $this->slug = null;
         }
     }
 

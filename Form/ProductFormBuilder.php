@@ -16,6 +16,7 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
 use Ekyna\Component\Commerce\Common\Model\Units;
@@ -29,6 +30,11 @@ use Symfony\Component\Form\FormInterface;
  */
 class ProductFormBuilder
 {
+    /**
+     * @var Features
+     */
+    private $features;
+
     /**
      * @var string
      */
@@ -53,11 +59,13 @@ class ProductFormBuilder
     /**
      * Constructor.
      *
-     * @param string $productClass
-     * @param string $mediaClass
+     * @param Features $features
+     * @param string   $productClass
+     * @param string   $mediaClass
      */
-    public function __construct($productClass, $mediaClass)
+    public function __construct(Features $features, string $productClass, string $mediaClass)
     {
+        $this->features = $features;
         $this->productClass = $productClass;
         $this->mediaClass = $mediaClass;
     }
@@ -171,17 +179,9 @@ class ProductFormBuilder
     {
         ProductTypes::assertChildType($this->product);
 
-        $attr = [];
-        if ($this->product->getType() === ProductTypes::TYPE_SIMPLE && null === $this->product->getAttributeSet()) {
-            $attr['class'] = 'product-attributes';
-            $attr['data-set-field'] = '.product-attribute-set';
-        }
-
         $options = array_replace([
             'label'         => 'ekyna_product.attribute.label.plural',
             'attribute_set' => $attributeSet,
-            'required'      => $attributeSet && $attributeSet->hasRequiredSlot(),
-            'attr'          => $attr,
         ], $options);
 
         $this->form->add('attributes', PR\ProductAttributesType::class, $options);
@@ -243,6 +243,24 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('categories', PR\Category\CategoryChoiceType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the components field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addComponentsField(array $options = [])
+    {
+        if (!$this->features->isEnabled(Features::COMPONENT)) {
+            return $this;
+        }
+
+        $this->form->add('components', PR\Component\ComponentsType::class, $options);
 
         return $this;
     }

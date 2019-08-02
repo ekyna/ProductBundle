@@ -8,8 +8,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -61,8 +61,9 @@ class UpdateMinPriceCommand extends Command
     {
         $this
             ->setName('ekyna:product:update:min_price')
-            ->setDescription('Updates the variable, bundle or configurable min price')
-            ->addArgument('id', InputArgument::OPTIONAL, 'The product identifier to update the price of.');
+            ->setDescription('Updates the product(s) min price')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'The product identifier to update the price of.')
+            ->addOption('type', null, InputOption::VALUE_REQUIRED, 'The products type to update the price of.');
     }
 
     /**
@@ -70,8 +71,17 @@ class UpdateMinPriceCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Single product case
-        if (0 < $id = intval($input->getArgument('id'))) {
+        $id = intval($input->getArgument('id'));
+        $type = $input->getArgument('type');
+
+        if ($id && $type) {
+            $output->writeln("<error>You must provider either 'id' or 'type' option but not both.</error>");
+
+            return;
+        }
+
+        // By id
+        if (0 < $id) {
             /** @var ProductInterface $product */
             $product = $this->repository->find($id);
             if (null === $product) {
@@ -86,8 +96,10 @@ class UpdateMinPriceCommand extends Command
             return;
         }
 
-        // All products case
-        foreach (ProductTypes::getTypes() as $type) {
+        $types = $type ? [$type] : ProductTypes::getTypes();
+
+        // By type(s)
+        foreach ($types as $type) {
             $title = strtoupper($type);
             $output->writeln("");
             $output->writeln(str_pad(" $title ", 80, '-', STR_PAD_BOTH));
@@ -97,7 +109,7 @@ class UpdateMinPriceCommand extends Command
             do {
                 $products = (array)$this->repository->findBy([
                     'type' => $type,
-                ], null, 20, $offset*20)->getIterator();
+                ], null, 20, $offset * 20)->getIterator();
 
                 if (empty($products)) {
                     continue 2;
@@ -118,7 +130,7 @@ class UpdateMinPriceCommand extends Command
                 $this->manager->clear();
 
                 $offset++;
-            } while(!empty($products));
+            } while (!empty($products));
         }
     }
 

@@ -238,15 +238,15 @@ class PriceUpdater
                 ->setDetails($data['details']);
 
             if (!is_null($data['group_id'])) {
-                $price->setGroup(
-                    $this->manager->getReference($this->customerGroupClass, $data['group_id'])
-                );
+                /** @var \Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface $group */
+                $group = $this->manager->getReference($this->customerGroupClass, $data['group_id']);
+                $price->setGroup($group );
             }
 
             if (!is_null($data['country_id'])) {
-                $price->setCountry(
-                    $this->manager->getReference($this->countryClass, $data['country_id'])
-                );
+                /** @var \Ekyna\Component\Commerce\Common\Model\CountryInterface $country */
+                $country = $this->manager->getReference($this->countryClass, $data['country_id']);
+                $price->setCountry($country);
             }
 
             $this->manager->persist($price);

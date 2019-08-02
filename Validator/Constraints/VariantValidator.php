@@ -68,6 +68,10 @@ class VariantValidator extends ConstraintValidator
 
         // Parent attribute set is mandatory
         if (null === $attributeSet = $parent->getAttributeSet()) {
+            if ($this->context->getGroup() === 'convert_variant') {
+                return;
+            }
+
             throw new RuntimeException("Variant's parent attribute set must be defined.");
         }
 

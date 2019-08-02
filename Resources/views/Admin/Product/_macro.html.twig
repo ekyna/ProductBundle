@@ -1,8 +1,8 @@
-{% macro new_product_button() %}
+{%- macro new_product_button() -%}
 <div class="btn-group btn-group-sm">
     <a href="{{ admin_resource_path('ekyna_product.product', 'new', {'type': product_create_types()|first}) }}"
        class="btn btn-primary">
-        {{ 'ekyna_product.product.button.new'|trans }}
+        {{- 'ekyna_product.product.button.new'|trans -}}
     </a>
     <button type="button" class="btn btn-primary dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -10,23 +10,23 @@
         <span class="sr-only">Toggle Dropdown</span>
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
-    {% for type in product_create_types() %}
+    {% for type in product_create_types() -%}
         <li>
             <a href="{{ admin_resource_path('ekyna_product.product', 'new', {'type': type}) }}">
-                {{ type|product_type_label|trans }}
+                {{- type|product_type_label|trans -}}
             </a>
         </li>
-    {% endfor %}
+    {%- endfor %}
     </ul>
 </div>
-{% endmacro %}
+{%- endmacro -%}
 
-{% macro convert_product_button(product) %}
-    {% set types = product_convert_types(product) %}
-    {% if types is not empty %}
+{%- macro convert_product_button(product) -%}
+    {%- set types = product_convert_types(product) -%}
+    {%- if types is not empty -%}
     <div class="btn-group btn-group-sm">
         <span class="btn btn-default disabled">
-            {{ 'ekyna_product.product.button.convert'|trans }}
+            {{- 'ekyna_product.product.button.convert'|trans -}}
         </span>
         <button type="button" class="btn btn-default dropdown-toggle"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -34,14 +34,14 @@
             <span class="sr-only">Toggle Dropdown</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
-        {% for type in types %}
+        {%- for type in types -%}
             <li>
                 <a href="{{ admin_resource_path(product, 'convert', {'type': type}) }}">
-                    {{ type|product_type_label|trans }}
+                    {{- type|product_type_label|trans -}}
                 </a>
             </li>
-        {% endfor %}
+        {%- endfor -%}
         </ul>
     </div>
-    {% endif %}
-{% endmacro %}
+    {%- endif -%}
+{%- endmacro -%}

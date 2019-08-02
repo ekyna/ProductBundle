@@ -87,6 +87,14 @@
             </order-by>
         </one-to-many>
 
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Entity\Component"
+                     field="components" mapped-by="parent" orphan-removal="true">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+        </one-to-many>
+
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface"
                      field="medias" mapped-by="product" orphan-removal="true">
             <cascade>

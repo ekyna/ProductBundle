@@ -6,6 +6,7 @@ use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
+use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 
 /**
@@ -20,15 +21,30 @@ class VariableHandler extends AbstractVariantHandler
      */
     private $priceInvalidator;
 
+    /**
+     * @var StockSubjectUpdaterInterface
+     */
+    private $stockUpdater;
+
 
     /**
      * Sets the price invalidator.
      *
      * @param PriceInvalidator $invalidator
      */
-    public function setPriceInvalidator($invalidator)
+    public function setPriceInvalidator($invalidator): void
     {
         $this->priceInvalidator = $invalidator;
+    }
+
+    /**
+     * Sets the stock updater.
+     *
+     * @param StockSubjectUpdaterInterface $updater
+     */
+    public function setStockUpdater(StockSubjectUpdaterInterface $updater): void
+    {
+        $this->stockUpdater = $updater;
     }
 
     /**
@@ -41,6 +57,8 @@ class VariableHandler extends AbstractVariantHandler
         $updater = $this->getVariableUpdater();
 
         $changed = $updater->updateAvailability($variable);
+
+        $changed |= $updater->updateNetPrice($variable);
 
         $changed |= $updater->updateMinPrice($variable);
 
@@ -64,27 +82,27 @@ class VariableHandler extends AbstractVariantHandler
             }
         };
 
-        $variantUpdater = $this->getVariantUpdater();
+        $updater = $this->getVariantUpdater();
 
         $changeSet = $this->persistenceHelper->getChangeSet($variable);
 
         if (isset($changeSet['taxGroup'])) {
             foreach ($variable->getVariants() as $variant) {
-                if ($variantUpdater->updateTaxGroup($variant)) {
+                if ($updater->updateTaxGroup($variant)) {
                     $addVariant($variant);
                 }
             }
         }
         if (isset($changeSet['unit'])) {
             foreach ($variable->getVariants() as $variant) {
-                if ($variantUpdater->updateUnit($variant)) {
+                if ($updater->updateUnit($variant)) {
                     $addVariant($variant);
                 }
             }
         }
         if (isset($changeSet['brand'])) {
             foreach ($variable->getVariants() as $variant) {
-                if ($variantUpdater->updateBrand($variant)) {
+                if ($updater->updateBrand($variant)) {
                     $addVariant($variant);
                 }
             }
@@ -149,13 +167,16 @@ class VariableHandler extends AbstractVariantHandler
 
         $this->priceInvalidator->invalidateByProduct($variable);
 
-        if ($this->getVariableUpdater()->updateMinPrice($variable)) {
-            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_PRICE_CHANGE]);
+        $updater = $this->getVariableUpdater();
 
-            return true;
+        $changed = $updater->updateNetPrice($variable);
+        $changed |= $updater->updateMinPrice($variable);
+
+        if ($changed) {
+            $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_PRICE_CHANGE]);
         }
 
-        return false;
+        return $changed;
     }
 
     /**
@@ -165,9 +186,12 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        $changed = $this->getVariableUpdater()->updateAvailability($variable);
-        $changed |= $this->getVariableUpdater()->updateMinPrice($variable);
-        $changed |= $this->getVariableUpdater()->updateVisibility($variable);
+        $updater = $this->getVariableUpdater();
+
+        $changed = $updater->updateAvailability($variable);
+        $changed |= $updater->updateNetPrice($variable);
+        $changed |= $updater->updateMinPrice($variable);
+        $changed |= $updater->updateVisibility($variable);
 
         if ($changed) {
             $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
@@ -183,7 +207,7 @@ class VariableHandler extends AbstractVariantHandler
     {
         $variable = $this->getProductFromEvent($event, ProductTypes::TYPE_VARIABLE);
 
-        if ($this->getVariableUpdater()->updateStock($variable)) {
+        if ($this->stockUpdater->update($variable)) {
             $this->scheduleChildChangeEvents($variable, [ProductEvents::CHILD_STOCK_CHANGE]);
 
             return true;

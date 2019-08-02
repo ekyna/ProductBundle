@@ -43,6 +43,11 @@ class ProductFilter implements ProductFilterInterface
     private $optionCache;
 
     /**
+     * @var array
+     */
+    private $componentCache;
+
+    /**
      * @var ContextInterface
      */
     private $context;
@@ -316,6 +321,7 @@ class ProductFilter implements ProductFilterInterface
         $this->choiceCache = [];
         $this->groupCache = [];
         $this->optionCache = [];
+        $this->componentCache = [];
     }
 }
 

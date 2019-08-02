@@ -131,6 +131,9 @@
                         </div>
                     </div>
                 {%- endblock pricing_content -%}
+                {%- if product_feature('component') and product is variable_product -%}{# TODO (?) or product is bundle_product #}
+                {{ macros.show_components(product) }}
+                {%- endif -%}
                 {{ macros.show_option_groups(product) }}
                 </div>
             {%- endblock pricing_pane -%}
@@ -170,13 +173,17 @@
             {%- if optionParents is not empty or bundleParents is not empty -%}
             <div class="tab-pane" id="product-relations">
             {%- block relations_content -%}
-                {% if optionParents is not empty -%}
-                    <p class="h4">{{ 'ekyna_product.product.field.option_parents'|trans }}</p>
-                    {{ macros.show_relations(optionParents) }}
-                {%- endif %}
                 {% if bundleParents is not empty -%}
                     <p class="h4">{{ 'ekyna_product.product.field.bundle_parents'|trans }}</p>
                     {{ macros.show_relations(bundleParents) }}
+                {%- endif %}
+                {% if componentParents is not empty -%}
+                    <p class="h4">{{ 'ekyna_product.product.field.component_parents'|trans }}</p>
+                    {{ macros.show_relations(componentParents) }}
+                {%- endif %}
+                {% if optionParents is not empty -%}
+                    <p class="h4">{{ 'ekyna_product.product.field.option_parents'|trans }}</p>
+                    {{ macros.show_relations(optionParents) }}
                 {%- endif %}
             {%- endblock relations_content -%}
             </div>

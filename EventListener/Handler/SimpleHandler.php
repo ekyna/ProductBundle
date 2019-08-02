@@ -105,13 +105,9 @@ class SimpleHandler extends AbstractHandler
         $changed = false;
         $childEvents = [];
 
-        $stockProperties = ['inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
-        if ($this->persistenceHelper->isChanged($product, 'stockMode')) {
+        $stockProperties = ['stockMode', 'inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
+        if ($this->persistenceHelper->isChanged($product, $stockProperties)) {
             $changed |= $this->stockUpdater->update($product);
-
-            $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
-        } elseif ($this->persistenceHelper->isChanged($product, $stockProperties)) {
-            $changed |= $this->stockUpdater->updateStockState($product);
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         } elseif ($this->persistenceHelper->isChanged($product, 'stockState')) {
@@ -162,6 +158,22 @@ class SimpleHandler extends AbstractHandler
      * @inheritdoc
      */
     public function handleStockUnitRemoval(SubjectStockUnitEvent $event)
+    {
+        $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
+
+        if ($this->stockUpdater->update($product)) {
+            $this->scheduleChildChangeEvents($product, [ProductEvents::CHILD_STOCK_CHANGE]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handleChildStockChange(ResourceEventInterface $event)
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
@@ -241,6 +253,13 @@ class SimpleHandler extends AbstractHandler
         }
 
         $parents = $this->productRepository->findParentsByBundled($child);
+        foreach ($parents as $parent) {
+            foreach ($events as $event) {
+                $this->persistenceHelper->scheduleEvent($event, $parent);
+            }
+        }
+
+        $parents = $this->productRepository->findParentsByComponent($child);
         foreach ($parents as $parent) {
             foreach ($events as $event) {
                 $this->persistenceHelper->scheduleEvent($event, $parent);

@@ -9,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
  * @package Ekyna\Bundle\ProductBundle\Service\Updater
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-abstract class AbstractUpdater implements UpdaterInterface
+abstract class AbstractUpdater
 {
     /**
      * @var PriceCalculator

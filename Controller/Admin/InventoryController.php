@@ -6,6 +6,7 @@ use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
+use Ekyna\Component\Commerce\Common\Util\Money;
 use Ekyna\Component\Commerce\Order\Model\OrderStates;
 use Ekyna\Component\Commerce\Shipment\Model\ShipmentStates;
 use Symfony\Component\Form\FormError;
@@ -330,10 +331,11 @@ class InventoryController extends Controller
     public function exportUnitsAction()
     {
         $repository = $this->get('ekyna_product.product_stock_unit.repository');
+        $defaultCurrency = $this->getParameter('ekyna_commerce.default.currency');
 
         $response = new StreamedResponse();
 
-        $response->setCallback(function () use ($repository) {
+        $response->setCallback(function () use ($repository, $defaultCurrency) {
             if (false === $handle = fopen('php://output', 'w+')) {
                 throw new \RuntimeException("Failed to open output stream.");
             }
@@ -345,8 +347,10 @@ class InventoryController extends Controller
                 'designation',
                 'reference',
                 'stock',
-                'buy price',
                 'geocode',
+                'buy price',
+                'currency',
+                'valorization',
             ], ';', '"');
 
             /** @var \Ekyna\Component\Commerce\Stock\Model\StockUnitInterface $stockUnit */
@@ -357,14 +361,26 @@ class InventoryController extends Controller
 
                 /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
                 $product = $stockUnit->getSubject();
+                $value = $price = $stockUnit->getNetPrice();
+
+                $currency = $stockUnit->getCurrency();
+                $rate = $stockUnit->getExchangeRate();
+
+                if ($currency && $rate) {
+                    $value = $value / $rate;
+                }
+
+                $value = Money::round($value * $inStock, $defaultCurrency);
 
                 $data = [
                     $product->getId(),
                     (string)$product,
                     $product->getReference(),
                     $inStock,
-                    $stockUnit->getNetPrice(),
                     implode(', ', $stockUnit->getGeocodes()),
+                    $stockUnit->getNetPrice(),
+                    $currency,
+                    $value
                 ];
 
                 fputcsv($handle, $data, ';', '"');

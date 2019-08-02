@@ -137,7 +137,6 @@ class ProductType extends ResourceTableType
             ])
             ->addColumn('netPrice', BType\Column\PriceType::class, [
                 'label'    => 'ekyna_commerce.field.net_price',
-                'currency' => 'EUR', // TODO
                 'position' => 50,
             ])
             ->addColumn('weight', CType\Column\NumberType::class, [

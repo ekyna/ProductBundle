@@ -535,13 +535,14 @@
                         <th class="text-right">{{ 'ekyna_commerce.sale.field.margin'|trans }}</th>
                     </tr>
                     {%- set total_weight = 0 -%}
+                    {%- set total_price = 0 -%}
+                    {%- set total_purchase = 0 -%}
                     {%- for slot in product.bundleSlots -%}
-                    {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
+                        {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
+                        {%- set choice = slot.choices|first -%}
+                        {%- set choice_product = choice.product -%}
                     <tr>
                         <td id="{{ slot_id ~ 'choice_0_product' }}">
-                            {%- set choice = (slot.choices|first) -%}
-                            {%- set choice_product = choice.product -%}
-                            {%- set total_weight = total_weight + choice_product.weight * choice.minQuantity -%}
                             <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
                                 data-summary='{{ {
                                     'route': 'ekyna_product_product_admin_summary',
@@ -578,11 +579,13 @@
                             {{ choice|bundle_choice_option_groups }}
                         </td>
                         <td id="{{ slot_id ~ 'minQuantity' }}" class="text-right">
-                            {# TODO Packgaging format #}
+                            {# TODO Packaging format #}
                             {{- choice.minQuantity|localizednumber -}}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_weight' }}" class="text-right">
-                            {{- (choice_product.weight * choice.minQuantity)|localizednumber -}}
+                            {% set weight = choice_product.weight * choice.minQuantity %}
+                            {{- weight|localizednumber -}}
+                            {% set total_weight = total_weight + weight %}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_netPrice' }}" class="text-right">
                             {% if choice.netPrice is not null %}
@@ -592,10 +595,12 @@
                                 {% set price = choice_product.netPrice * choice.minQuantity %}
                             {% endif %}
                             {{- price|localizedcurrency(commerce_default_currency) -}}
+                            {% set total_price = total_price + price %}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_buyPrice' }}" class="text-right">
                             {% set purchase = choice_product|product_purchase_cost(false) * choice.minQuantity %}
                             {{- purchase|localizedcurrency(commerce_default_currency) -}}
+                            {% set total_purchase = total_purchase + purchase %}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_margin' }}" class="text-right">
                         {%- if 0 < purchase  -%}
@@ -618,11 +623,9 @@
                             {{- total_weight|localizednumber -}}
                         </td>
                         <td class="text-right">
-                            {% set total_price = product|product_bundle_total_price(false) %}
                             {{- total_price|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td class="text-right">
-                            {% set total_purchase = product|product_purchase_cost(false) %}
                             {{- total_purchase|localizedcurrency(commerce_default_currency) -}}
                         </td>
                         <td class="text-right">
@@ -678,6 +681,115 @@
     {%- endfor -%}
     </table>
 {%- endmacro show_bundle_rules -%}
+
+
+{%- macro show_components(product) -%}
+<div class="row show-row">
+    <div class="col-md-2 show-label">
+        {{- 'ekyna_product.component.label.plural'|trans -}}
+    </div>
+    <div class="col-md-10">
+        <div class="show-widget show-widget-sm show-product-configurable">
+            <table class="table table-stripped table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+                    <th>{{ 'ekyna_core.field.reference'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_core.field.quantity'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}&nbsp;(kg)</th>
+                    <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_commerce.field.buy_net_price'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_commerce.sale.field.margin'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {%- set total_weight = 0 -%}
+                {%- set total_price = 0 -%}
+                {%- set total_purchase = 0 -%}
+                {%- for component in product.components -%}
+                    {%- set component_id = 'product_components_' ~ loop.index0 ~ '_' -%}
+                <tr>
+                    <td id="{{ component_id ~ 'designation' }}">
+                        <a href="{{ admin_resource_path(component.child) }}" data-summary='{{ {
+                            'route': 'ekyna_product_product_admin_summary',
+                            'parameters': {'productId': component.child.id}
+                        }|json_encode }}'>{{ component.child }}</a>
+                    </td>
+                    <td>
+                        <span data-clipboard-copy="{{ component.child.reference }}">{{ component.child.reference }}</span>
+                    </td>
+                    <td id="{{ component_id ~ 'quantity' }}" class="text-right">
+                        {# TODO Packaging format #}
+                        {{- component.quantity|localizednumber -}}
+                    </td>
+                    <td id="{{ component_id ~ 'weight' }}" class="text-right">
+                        {% set weight = component.child.weight * component.quantity %}
+                        {{- weight|localizednumber -}}
+                        {%- set total_weight = total_weight + weight -%}
+                    </td>
+                    <td id="{{ component_id ~ 'netPrice' }}" class="text-right">
+                        {%- if component.netPrice is not same as(null) -%}
+                            {% set price = component.netPrice * component.quantity %}
+                            <del>{{ (component.child.netPrice * component.quantity)|localizedcurrency(commerce_default_currency) }}</del>
+                        {%- else -%}
+                            {% set price = component.child.netPrice * component.quantity %}
+                        {%- endif -%}
+                        {{- price|localizedcurrency(commerce_default_currency) -}}
+                        {% set total_price = total_price + price %}
+                    </td>
+                    <td id="{{ component_id ~ 'buyPrice' }}" class="text-right">
+                        {% set purchase = component.child|product_purchase_cost(false) * component.quantity %}
+                        {{- purchase|localizedcurrency(commerce_default_currency) -}}
+                        {% set total_purchase = total_purchase + purchase %}
+                    </td>
+                    <td id="{{ component_id ~ 'margin' }}" class="text-right">
+                        {%- if 0 < purchase  -%}
+                            {%- if 0 < price -%}
+                                {{ ((price - purchase) / price * 100)|round(2)|localizednumber }}%
+                            {%- else -%}
+                                <span class="text-red">&dash;&infin;</span>
+                            {%- endif -%}
+                        {%- else -%}
+                            &dash;
+                        {%- endif -%}
+                    </td>
+                </tr>
+                {%- else -%}
+                <tr>
+                    <td colspan="7" class="text-center"><em>{{ 'ekyna_core.value.no_item'|trans }}</em></td>
+                </tr>
+                {%- endfor -%}
+                <tr>
+                    <td colspan="3" class="text-right">
+                        <strong>{{ 'ekyna_core.field.total'|trans }}</strong>
+                    </td>
+                    <td class="text-right">
+                        {{- total_weight|localizednumber -}}
+                    </td>
+                    <td class="text-right">
+                        {{- total_price|localizedcurrency(commerce_default_currency) -}}
+                    </td>
+                    <td class="text-right">
+                        {{- total_purchase|localizedcurrency(commerce_default_currency) -}}
+                    </td>
+                    <td class="text-right">
+                        {%- if 0 < total_purchase  -%}
+                            {%- if 0 < total_price -%}
+                                {{ ((total_price - total_purchase) / total_price * 100)|round(2)|localizednumber }}%
+                            {%- else -%}
+                                <span class="text-red">-&infin;</span>
+                            {%- endif -%}
+                        {%- else -%}
+                            -
+                        {%- endif -%}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{%- endmacro show_components -%}
 
 
 {%- macro show_configurable_composition(product, options = {}) -%}

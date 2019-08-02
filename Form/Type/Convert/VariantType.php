@@ -22,12 +22,9 @@ class VariantType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $attributeSet = $options['attribute_set'];
-
         $builder->add('attributes', ProductAttributesType::class, [
             'label'         => 'ekyna_product.attribute_choice.label.plural',
-            'attribute_set' => $attributeSet,
-            'required'      => $attributeSet && $attributeSet->hasRequiredSlot(),
+            'attribute_set' => $options['attribute_set'],
         ]);
     }
 
@@ -40,8 +37,8 @@ class VariantType extends AbstractType
             ->setDefaults([
                 'attribute_set'     => null,
                 'data_class'        => ProductInterface::class,
-                'validation_groups' => ['Default', ProductTypes::TYPE_VARIANT],
+                'validation_groups' => ['convert_' . ProductTypes::TYPE_VARIANT],
             ])
-            ->setAllowedTypes('attribute_set', AttributeSetInterface::class);
+            ->setAllowedTypes('attribute_set', ['null', AttributeSetInterface::class]);
     }
 }

@@ -1,15 +1,15 @@
-{% if product is simple_product %}
+{%- if product is simple_product -%}
     {% include '@EkynaProduct/Admin/Product/Form/simple.html.twig' %}
-{% elseif product is variable_product %}
+{%- elseif product is variable_product -%}
     {% include '@EkynaProduct/Admin/Product/Form/variable.html.twig' %}
-{% elseif product is variant_product %}
+{%- elseif product is variant_product -%}
     {% include '@EkynaProduct/Admin/Product/Form/variant.html.twig' %}
-{% elseif product is bundle_product %}
+{%- elseif product is bundle_product -%}
     {% include '@EkynaProduct/Admin/Product/Form/bundle.html.twig' %}
-{% elseif product is configurable_product %}
+{%- elseif product is configurable_product -%}
     {% include '@EkynaProduct/Admin/Product/Form/configurable.html.twig' %}
-{% else %}
+{%- else -%}
     <div class="panel-body form-body">
         <p>Unexpected product type.</p>
     </div>
-{% endif %}
+{%- endif -%}

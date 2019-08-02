@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection;
 
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
+use Ekyna\Bundle\ProductBundle\Service\Features;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -23,6 +24,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('ekyna_product');
 
         $this->addDefaultSection($rootNode);
+        $this->addFeatureSection($rootNode);
         $this->addCatalogSection($rootNode);
         $this->addEditorSection($rootNode);
         $this->addPricingSection($rootNode);
@@ -60,6 +62,25 @@ class Configuration implements ConfigurationInterface
                         ->integerNode('cache_ttl')
                             ->defaultValue(3600)
                         ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds `feature` section.
+     *
+     * @param ArrayNodeDefinition $node
+     */
+    private function addFeatureSection(ArrayNodeDefinition $node)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        $node
+            ->children()
+                ->arrayNode('feature')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode(Features::COMPONENT)->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end();
@@ -426,6 +447,13 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                 ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('component')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Component')->end()
+                                ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()
                             ->end()
                         ->end()
                         ->arrayNode('option')

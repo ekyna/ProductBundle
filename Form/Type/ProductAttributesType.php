@@ -9,6 +9,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -50,7 +52,7 @@ class ProductAttributesType extends AbstractType
             new ProductAttributesTransformer($this->productAttributeClass, $options['attribute_set'])
         );
 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function(FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
             $data = $form->getNormData();
 
@@ -73,10 +75,30 @@ class ProductAttributesType extends AbstractType
     /**
      * @inheritDoc
      */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['attr'] = array_merge($view->vars['attr'], [
+            'class'          => 'product-attributes',
+            'data-set-field' => '.product-attribute-set',
+            'data-parent-name' => $view->parent->vars['full_name'],
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setRequired('attribute_set')
+            ->setDefaults([
+                'attribute_set' => 'null',
+                'required'      => function (OptionsResolver $options, $value) {
+                    /** @var Model\AttributeSetInterface $set */
+                    $attributeSet = $options['attribute_set'];
+
+                    return $attributeSet && $attributeSet->hasRequiredSlot();
+                },
+            ])
             ->setAllowedTypes('attribute_set', [Model\AttributeSetInterface::class, 'null']);
     }
 

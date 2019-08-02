@@ -59,7 +59,7 @@ class PriceCalculator
         OfferRepositoryInterface $offerRepository,
         TaxResolverInterface $taxResolver,
         CurrencyConverterInterface $currencyConverter,
-        $defaultCurrency
+        string $defaultCurrency
     ) {
         $this->priceRepository = $priceRepository;
         $this->offerRepository = $offerRepository;
@@ -209,7 +209,7 @@ class PriceCalculator
                     $optionPrice = $option->getProduct()->getNetPrice();
                 }
 
-                if (null === $lowestOption || $optionPrice < $lowestOption) {
+                if (is_null($lowestOption) || $optionPrice < $lowestOption) {
                     $lowestOption = $optionPrice;
                 }
             }
@@ -218,6 +218,28 @@ class PriceCalculator
             if (null !== $lowestOption) {
                 $price += $lowestOption;
             }
+        }
+
+        return $price;
+    }
+
+    /**
+     * Calculates the components total price.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float
+     */
+    public function calculateComponentsPrice(Model\ProductInterface $product): float
+    {
+        $price = 0;
+
+        foreach ($product->getComponents() as $component) {
+            if (is_null($p = $component->getNetPrice())) {
+                $p = $component->getChild()->getNetPrice();
+            }
+
+            $price += $p * $component->getQuantity();
         }
 
         return $price;
@@ -242,6 +264,8 @@ class PriceCalculator
 
         $price += $this->calculateMinOptionsPrice($product, $exclude);
 
+        $price += $this->calculateComponentsPrice($product);
+
         return $price;
     }
 
@@ -249,32 +273,43 @@ class PriceCalculator
      * Calculates the variable product min price.
      *
      * @param Model\ProductInterface $variable
-     * @param bool|array             $exclude  The option group ids to exclude, true to exclude all
-     * @param float                  $override Price override.
+     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param float                  $price   Price override.
      *
      * @return float|int
      */
-    public function calculateVariableMinPrice(Model\ProductInterface $variable, $exclude = [], float $override = null)
+    public function calculateVariableMinPrice(Model\ProductInterface $variable, $exclude = [], float $price = null)
     {
         Model\ProductTypes::assertVariable($variable);
 
+        if (!is_null($price)) {
+            return $price + $this->calculateMinOptionsPrice($variable, $exclude);
+        }
+
+        $lowestVariant = null;
         foreach ($variable->getVariants() as $variant) {
+            $variantPrice = $this->calculateProductMinPrice($variant, $exclude);
+
+            if (null === $lowestVariant || $variantPrice < $lowestVariant) {
+                $lowestVariant = $variantPrice;
+            }
+
             if (!$variant->isVisible()) {
                 continue;
             }
 
-            $variantPrice = $this->calculateProductMinPrice($variant, $exclude, $override);
-
-            if (null === $override || $variantPrice < $override) {
-                $override = $variantPrice;
+            if (null === $price || $variantPrice < $price) {
+                $price = $variantPrice;
             }
         }
 
-        if (is_null($override)) {
-            $override = 0;
+        if (is_null($price)) {
+            $price = $lowestVariant;
         }
 
-        return $override;
+        $price += $this->calculateComponentsPrice($variable);
+
+        return $price;
     }
 
     /**
@@ -385,6 +420,8 @@ class PriceCalculator
 
         $price += $this->calculateMinOptionsPrice($configurable, $exclude);
 
+        $price += $this->calculateComponentsPrice($configurable);
+
         return $price;
     }
 
@@ -406,6 +443,10 @@ class PriceCalculator
     ) {
         // Net price (bundle : min price without options)
         $amount = $product->getNetPrice();
+
+        if (Model\ProductTypes::isVariantType($product)) {
+            $amount += $product->getParent()->getNetPrice();
+        }
 
         // Currency
         $currency = $context->getCurrency()->getCode();

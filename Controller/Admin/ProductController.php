@@ -2,15 +2,14 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
-use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
+use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\CommerceBundle\Controller\Admin\AbstractSubjectController;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
-use Ekyna\Bundle\ProductBundle\Service\Updater;
-use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
+use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -290,7 +289,7 @@ class ProductController extends AbstractSubjectController
         }
 
         // Form
-        $form = $this->get('form.factory')->createNamed('product', FormType::class, $product, [
+        $form = $this->get('form.factory')->createNamed('FORM__NAME', FormType::class, $product, [
             'block_name' => 'product',
         ]);
 
@@ -344,14 +343,15 @@ class ProductController extends AbstractSubjectController
                     'form_template' => $formTemplate,
                 ])
             );
-        } elseif ($result instanceof ProductInterface) {
-            $event = $this->getOperator()->create($result);
-            $event->toFlashes($this->getFlashBag());
+        }
 
-            if ($event->hasErrors()) {
-                return $this->redirect($this->generateResourcePath($resource));
-            }
+        if ($result instanceof ResourceEventInterface) {
+            $result->toFlashes($this->getFlashBag());
 
+            return $this->redirect($this->generateResourcePath($resource));
+        }
+
+        if ($result instanceof ProductInterface) {
             $this->addFlash('ekyna_product.convert.variable_success', 'warning');
 
             return $this->redirect($this->generateResourcePath($result));
@@ -400,7 +400,6 @@ class ProductController extends AbstractSubjectController
             }
         }
 
-
         return $this->redirect($this->generateResourcePath($variable));
     }
 
@@ -445,44 +444,6 @@ class ProductController extends AbstractSubjectController
         }
 
         return $this->redirect($this->generateResourcePath($variable));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function updateStock(SubjectInterface $subject)
-    {
-        if (!$subject instanceof ProductInterface) {
-            return parent::updateStock($subject);
-        }
-
-        switch ($subject->getType()) {
-            case ProductTypes::TYPE_CONFIGURABLE:
-                $calculator = $this->get('ekyna_product.pricing.price_calculator');
-                $updater = new Updater\ConfigurableUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            case ProductTypes::TYPE_BUNDLE:
-                $calculator = $this->get('ekyna_product.pricing.price_calculator');
-                $updater = new Updater\BundleUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            case ProductTypes::TYPE_VARIABLE:
-                $calculator = $this->get('ekyna_product.pricing.price_calculator');
-                $updater = new Updater\VariableUpdater($calculator);
-                $changed = $updater->updateStock($subject);
-                $changed |= $updater->updateAvailability($subject);
-                break;
-
-            default:
-                $changed = parent::updateStock($subject);
-        }
-
-        return $changed;
     }
 
     /**
@@ -562,8 +523,9 @@ class ProductController extends AbstractSubjectController
         /** @var \Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface $repository */
         $repository = $this->getRepository();
 
-        $data['optionParents'] = $repository->findParentsByOptionProduct($product);
         $data['bundleParents'] = $repository->findParentsByBundled($product);
+        $data['optionParents'] = $repository->findParentsByOptionProduct($product);
+        $data['componentParents'] = $repository->findParentsByComponent($product);
         $data['offers_list'] = $this->getOffersList($product);
         $data['prices_list'] = $this->getPricesList($product);
 
@@ -633,7 +595,7 @@ class ProductController extends AbstractSubjectController
 
             if (!isset($list[$key])) {
                 $list[$key] = [
-                    'title' => sprintf(
+                    'title'  => sprintf(
                         "%s / %s",
                         $group ? $group->getName() : $allGroups,
                         $country ? $region->getCountryName($country->getCode(), $locale) : $allCountries
@@ -687,7 +649,7 @@ class ProductController extends AbstractSubjectController
 
             if (!isset($list[$key])) {
                 $list[$key] = [
-                    'title' => sprintf(
+                    'title'  => sprintf(
                         "%s / %s",
                         $group ? $group->getName() : $allGroups,
                         $country ? $region->getCountryName($country->getCode(), $locale) : $allCountries

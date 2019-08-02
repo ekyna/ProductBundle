@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model as Media;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
@@ -11,6 +12,7 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model as Pricing;
+use Ekyna\Component\Commerce\Stock\Model\StockComponent;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
 use Ekyna\Component\Resource\Model as RM;
 
@@ -20,6 +22,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
  * @method Model\ProductTranslationInterface translate($locale = null, $create = false)
+ * @method Collection|Model\ProductTranslationInterface[] getTranslations()
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
@@ -45,7 +48,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $parent;
 
     /**
-     * @var ArrayCollection|Model\ProductInterface[]
+     * @var Collection|Model\ProductInterface[]
      */
     protected $variants;
 
@@ -55,27 +58,32 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $attributeSet;
 
     /**
-     * @var ArrayCollection|Model\ProductAttributeInterface[]
+     * @var Collection|Model\ProductAttributeInterface[]
      */
     protected $attributes;
 
     /**
-     * @var ArrayCollection|Model\OptionGroupInterface[]
+     * @var Collection|Model\OptionGroupInterface[]
      */
     protected $optionGroups;
 
     /**
-     * @var ArrayCollection|Model\BundleSlotInterface[]
+     * @var Collection|Model\BundleSlotInterface[]
      */
     protected $bundleSlots;
 
     /**
-     * @var ArrayCollection|Model\SpecialOfferInterface[]
+     * @var Collection|Model\ComponentInterface[]
+     */
+    protected $components;
+
+    /**
+     * @var Collection|Model\SpecialOfferInterface[]
      */
     protected $specialOffers;
 
     /**
-     * @var ArrayCollection|Model\PricingInterface[]
+     * @var Collection|Model\PricingInterface[]
      */
     protected $pricings;
 
@@ -85,22 +93,22 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $brand;
 
     /**
-     * @var ArrayCollection|Model\CategoryInterface[]
+     * @var Collection|Model\CategoryInterface[]
      */
     protected $categories;
 
     /**
-     * @var ArrayCollection|CustomerGroupInterface[]
+     * @var Collection|CustomerGroupInterface[]
      */
     protected $customerGroups;
 
     /**
-     * @var ArrayCollection|Model\ProductMediaInterface[]
+     * @var Collection|Model\ProductMediaInterface[]
      */
     protected $medias;
 
     /**
-     * @var ArrayCollection|Model\ProductReferenceInterface[]
+     * @var Collection|Model\ProductReferenceInterface[]
      */
     protected $references;
 
@@ -157,7 +165,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var string
      */
-    protected $unit = Common\Units::PIECE; // TODO move to StockSubjectTrait
+    protected $unit = Common\Units::PIECE;
 
     /**
      * @var bool
@@ -199,6 +207,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         $this->attributes = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
+        $this->components = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->optionGroups = new ArrayCollection();
@@ -239,6 +248,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $this->bundleSlots = new ArrayCollection();
             foreach ($bundleSlots as $bundleSlot) {
                 $this->addBundleSlot(clone $bundleSlot);
+            }
+
+            // Components
+            $components = $this->components->toArray();
+            $this->components = new ArrayCollection();
+            foreach ($components as $component) {
+                $this->addComponent(clone $component);
             }
 
             // Medias
@@ -496,7 +512,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    /*public function setAttributes(ArrayCollection $attributes)
+    /*public function setAttributes(Collection $attributes)
     {
         $this->attributes = $attributes;
 
@@ -556,7 +572,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setOptionGroups(ArrayCollection $optionGroups)
+    public function setOptionGroups(Collection $optionGroups)
     {
         foreach ($this->optionGroups as $group) {
             $this->removeOptionGroup($group);
@@ -624,12 +640,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
                 $groups[] = $group;
             }
-        }
-        elseif (Model\ProductTypes::isBundleType($this) && $bundle) {
+        } elseif (Model\ProductTypes::isBundleType($this) && $bundle) {
             foreach ($this->bundleSlots as $slot) {
                 /** @var Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
-                foreach ($choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups(), true) as $group) {
+                foreach ($choice->getProduct()->resolveOptionGroups($choice->getExcludedOptionGroups(),
+                    true) as $group) {
                     if (in_array($group->getId(), $exclude)) {
                         continue;
                     }
@@ -695,7 +711,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setBundleSlots(ArrayCollection $slots)
+    public function setBundleSlots(Collection $slots)
     {
         foreach ($this->bundleSlots as $slot) {
             $this->removeBundleSlot($slot);
@@ -703,6 +719,72 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         foreach ($slots as $slot) {
             $this->addBundleSlot($slot);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getComponents()
+    {
+        return $this->components;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasComponents()
+    {
+        return 0 < $this->components->count();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasComponent(Model\ComponentInterface $component)
+    {
+        return $this->components->contains($component);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addComponent(Model\ComponentInterface $component)
+    {
+        if (!$this->hasComponent($component)) {
+            $this->components->add($component);
+            $component->setParent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeComponent(Model\ComponentInterface $component)
+    {
+        if ($this->hasComponent($component)) {
+            $this->components->removeElement($component);
+            $component->setParent(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setComponents(Collection $components)
+    {
+        foreach ($this->components as $component) {
+            $this->removeComponent($component);
+        }
+
+        foreach ($components as $component) {
+            $this->addComponent($component);
         }
 
         return $this;
@@ -753,7 +835,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setSpecialOffers(ArrayCollection $offers)
+    public function setSpecialOffers(Collection $offers)
     {
         foreach ($this->specialOffers as $offer) {
             $this->removeSpecialOffer($offer);
@@ -811,7 +893,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setPricings(ArrayCollection $pricings)
+    public function setPricings(Collection $pricings)
     {
         foreach ($this->pricings as $pricing) {
             $this->removePricing($pricing);
@@ -885,7 +967,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setCategories(ArrayCollection $categories)
+    public function setCategories(Collection $categories)
     {
         foreach ($this->categories as $category) {
             $this->removeCategory($category);
@@ -941,7 +1023,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function setCustomerGroups(ArrayCollection $customerGroups)
+    public function setCustomerGroups(Collection $customerGroups)
     {
         foreach ($this->customerGroups as $group) {
             $this->removeCustomerGroup($group);
@@ -1561,27 +1643,55 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null)
+    public function getImages($withChildren = true, $limit = 5)
     {
-        if (null === $images) {
-            $images = new ArrayCollection();
+        return $this->gatherMedias(Media\MediaTypes::IMAGE, $withChildren, $limit);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFiles($withChildren = false, $limit = 5)
+    {
+        return $this->gatherMedias(Media\MediaTypes::FILE, $withChildren, $limit);
+    }
+
+    /**
+     * Gathers medias
+     *
+     * @param string $type
+     * @param bool $recurse
+     * @param int $limit
+     * @param ArrayCollection|null $collection
+     *
+     * @return ArrayCollection
+     */
+    private function gatherMedias(
+        string $type,
+        bool $recurse = true,
+        int &$limit = 5,
+        ArrayCollection $collection = null
+    ) {
+        if (null === $collection) {
+            $collection = new ArrayCollection();
         }
 
         foreach ($this->medias as $pm) {
             $media = $pm->getMedia();
-            if ($media->getType() === Media\MediaTypes::IMAGE && !$images->contains($media)) {
-                $images->add($media);
-                if ($limit <= $images->count()) {
+            if ($media->getType() === $type && !$collection->contains($media)) {
+                $collection->add($media);
+                $limit--;
+                if (0 >= $limit) {
                     break;
                 }
             }
         }
 
-        if ($withChildren && $limit > $images->count()) {
+        if ($recurse && $limit) {
             if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
                 /** @var Product $variant TODO */
                 foreach ($this->variants as $variant) {
-                    $variant->getImages(false, $limit, $images);
+                    $variant->gatherMedias($type, false, $limit, $collection);
                 }
             } elseif (in_array($this->type, [Model\ProductTypes::TYPE_BUNDLE, Model\ProductTypes::TYPE_CONFIGURABLE])) {
                 foreach ($this->bundleSlots as $slot) {
@@ -1591,9 +1701,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                         if (0 < $product->getMedias()->count()) {
                             foreach ($product->getMedias() as $pm) {
                                 $media = $pm->getMedia();
-                                if ($media->getType() === Media\MediaTypes::IMAGE && !$images->contains($media)) {
-                                    $images->add($media);
-                                    if ($limit <= $images->count()) {
+                                if ($media->getType() === $type && !$collection->contains($media)) {
+                                    $collection->add($media);
+                                    $limit--;
+                                    if (0 >= $limit) {
                                         break 3;
                                     }
                                     break;
@@ -1601,7 +1712,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                             }
                         } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
                             foreach ($product->getVariants() as $variant) {
-                                $variant->getImages(false, $limit, $images);
+                                $variant->gatherMedias($type, false, $limit, $collection);
                             }
                         }
                     }
@@ -1609,74 +1720,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             }
         }
 
-        return $images;
-    }
-
-    public function getFiles($withChildren = false, $limit = 5, ArrayCollection $files = null)
-    {
-        if (null === $files) {
-            $files = new ArrayCollection();
-        }
-
-        foreach ($this->medias as $pm) {
-            $media = $pm->getMedia();
-            if ($media->getType() === Media\MediaTypes::FILE && !$files->contains($media)) {
-                $files->add($media);
-                if ($limit <= $files->count()) {
-                    break;
-                }
-            }
-        }
-
-        if ($withChildren && $limit > $files->count()) {
-            if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
-                /** @var Product $variant TODO */
-                foreach ($this->variants as $variant) {
-                    $variant->getFiles(false, $limit, $files);
-                }
-            } elseif (in_array($this->type, [Model\ProductTypes::TYPE_BUNDLE, Model\ProductTypes::TYPE_CONFIGURABLE])) {
-                foreach ($this->bundleSlots as $slot) {
-                    $choices = $slot->getChoices();
-                    foreach ($choices as $choice) {
-                        $product = $choice->getProduct();
-                        if (0 < $product->getMedias()->count()) {
-                            foreach ($product->getMedias() as $pm) {
-                                $media = $pm->getMedia();
-                                if ($media->getType() === Media\MediaTypes::FILE && !$files->contains($media)) {
-                                    $files->add($media);
-                                    if ($limit <= $files->count()) {
-                                        break 3;
-                                    }
-                                    break;
-                                }
-                            }
-                        } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                            foreach ($product->getVariants() as $variant) {
-                                $variant->getFiles(false, $limit, $files);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $files;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function isStockCompound()
-    {
-        return Model\ProductTypes::isParentType($this->type);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function hasDimensions()
-    {
-        return !empty($this->width) && !empty($this->height) && !empty($this->depth);
+        return $collection;
     }
 
     /**
@@ -1721,9 +1765,62 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public static function getStockUnitClass()
+    public static function getStockUnitClass(): string
     {
         return ProductStockUnit::class;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isStockCompound(): bool
+    {
+        return Model\ProductTypes::isParentType($this->type);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasDimensions()
+    {
+        return !empty($this->width) && !empty($this->height) && !empty($this->depth);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStockComposition(): array
+    {
+        $composition = [];
+
+        if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
+            // Variants as choices
+            $composition[] = array_map(function (Model\ProductInterface $variant) {
+                return new StockComponent($variant, 1); // TODO Deal with units
+            }, $this->variants->toArray());
+        } elseif ($this->type === Model\ProductTypes::TYPE_BUNDLE) {
+            // Slots choice as composition
+            $composition = array_map(function (Model\BundleSlotInterface $slot) {
+                /** @var Model\BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
+
+                return new StockComponent($choice->getProduct(), $choice->getMinQuantity());
+            }, $this->bundleSlots->toArray());
+        } elseif ($this->type === Model\ProductTypes::TYPE_CONFIGURABLE) {
+            /** @var Model\BundleSlotInterface $slot */
+            foreach ($this->bundleSlots->toArray() as $slot) {
+                $composition[] = array_map(function (Model\BundleChoiceInterface $choice) {
+                    return new StockComponent($choice->getProduct(), $choice->getMinQuantity());
+                }, $slot->getChoices()->toArray());
+            }
+        }
+
+        // Components
+        foreach ($this->components as $component) {
+            $composition[] = new StockComponent($component->getChild(), $component->getQuantity());
+        }
+
+        return $composition;
     }
 
     /**

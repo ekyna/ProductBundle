@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection;
 
+use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ResourceBundle\DependencyInjection\AbstractExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,10 +36,14 @@ class EkynaProductExtension extends AbstractExtension
         $accountConfig = [
             'catalog' => $config['catalog']['enabled'] && $config['catalog']['account'],
         ];
-
         $container
             ->getDefinition('ekyna_product.add_to_cart.event_subscriber')
             ->replaceArgument(1, $config['default']['cart_success_template']);
+
+        // Features
+        $container
+            ->getDefinition(Features::class)
+            ->replaceArgument(0, $config['feature']);
 
         // Catalog
         $container->setParameter('ekyna_product.catalog_enabled', $config['catalog']['enabled']);

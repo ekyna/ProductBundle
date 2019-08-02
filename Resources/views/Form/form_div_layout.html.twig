@@ -204,6 +204,26 @@
 {%- endblock ekyna_product_catalog_slot_widget -%}
 
 
+{%- block ekyna_product_component_widget -%}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
+    <div class="ekyna-collection-item">
+        {{- form_errors(form) -}}
+        {{- form_row(form.child, {'label_col': 2, 'widget_col': 10}) -}}
+        <div class="row">
+            <div class="col-md-6">
+                {{- form_row(form.quantity, {'label_col': 4, 'widget_col': 8}) -}}
+            </div>
+            <div class="col-md-6">
+                {{- form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) -}}
+            </div>
+        </div>
+        {{- form_rest(form) -}}
+    </div>
+    {{- bootstrap_restore_form_settings() -}}
+{%- endblock ekyna_product_component_widget -%}
+
+
 {%- block ekyna_product_option_widget -%}
     {{- bootstrap_backup_form_settings() -}}
     {{- bootstrap_set_sizing('sm') -}}

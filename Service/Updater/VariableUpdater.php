@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
 /**
@@ -14,9 +13,35 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 class VariableUpdater extends AbstractUpdater
 {
     /**
-     * @inheritdoc
+     * Updates the variable product min price.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return bool
      */
-    public function updateMinPrice(Model\ProductInterface $variable)
+    public function updateNetPrice(Model\ProductInterface $variable): bool
+    {
+        Model\ProductTypes::assertVariable($variable);
+
+        $netPrice = $this->priceCalculator->calculateComponentsPrice($variable);
+
+        if (is_null($variable->getNetPrice()) || 0 !== bccomp($variable->getNetPrice(), $netPrice, 5)) {
+            $variable->setNetPrice($netPrice);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates the variable product min price.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return bool
+     */
+    public function updateMinPrice(Model\ProductInterface $variable): bool
     {
         Model\ProductTypes::assertVariable($variable);
 
@@ -32,106 +57,13 @@ class VariableUpdater extends AbstractUpdater
     }
 
     /**
-     * @inheritdoc
+     * Updates the variable availability.
+     *
+     * @param Model\ProductInterface $variable
+     *
+     * @return bool
      */
-    public function updateStock(Model\ProductInterface $variable)
-    {
-        Model\ProductTypes::assertVariable($variable);
-
-        // Resolve best variants and copy its data
-
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $bestVariant */
-        $bestVariant = null;
-
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface[] $variants */
-        $variants = $variable->getVariants()->getIterator();
-        foreach ($variants as $variant) {
-            if (null === $bestVariant) {
-                $bestVariant = $variant;
-                continue;
-            }
-
-            if (Stock\StockSubjectModes::isBetterMode($variant->getStockMode(), $bestVariant->getStockMode())) {
-                $bestVariant = $variant;
-                continue;
-            }
-
-            if (Stock\StockSubjectStates::isBetterState($variant->getStockState(), $bestVariant->getStockState())) {
-                $bestVariant = $variant;
-                continue;
-            }
-
-            if ($bestVariant->getAvailableStock() < $variant->getAvailableStock()) {
-                $bestVariant = $variant;
-                continue;
-            }
-
-            if (0 < $virtualStock = $variant->getVirtualStock()) {
-                if (null !== $eda = $variant->getEstimatedDateOfArrival()) {
-                    $bestEda = $bestVariant->getEstimatedDateOfArrival();
-                    if ((null === $bestVariant) || $bestEda > $eda) {
-                        $bestVariant = $variant;
-                    }
-                } elseif ($bestVariant->getVirtualStock() < $virtualStock) {
-                    $bestVariant = $variant;
-                    continue;
-                }
-            }
-        }
-
-        $mode = Stock\StockSubjectModes::MODE_AUTO;
-        $state = Stock\StockSubjectStates::STATE_OUT_OF_STOCK;
-        $inStock = $availableStock = $virtualStock = 0;
-        $eda = null;
-
-        if ($bestVariant) {
-            $mode = $bestVariant->getStockMode();
-            $state = $bestVariant->getStockState();
-            $inStock = $bestVariant->getInStock();
-            $availableStock = $bestVariant->getAvailableStock();
-            $virtualStock = $bestVariant->getVirtualStock();
-            $eda = $bestVariant->getEstimatedDateOfArrival();
-        }
-
-        $changed = false;
-
-        if ($variable->getInStock() !== $inStock) {
-            $variable->setInStock($inStock);
-            $changed = true;
-        }
-
-        if ($variable->getAvailableStock() !== $availableStock) {
-            $variable->setAvailableStock($availableStock);
-            $changed = true;
-        }
-
-        if ($variable->getVirtualStock() !== $virtualStock) {
-            $variable->setVirtualStock($virtualStock);
-            $changed = true;
-        }
-
-        if ($variable->getEstimatedDateOfArrival() !== $eda) {
-            $variable->setEstimatedDateOfArrival($eda);
-            $changed = true;
-        }
-
-        if ($variable->getStockMode() !== $mode) {
-            $variable->setStockMode($mode);
-            $changed = true;
-        }
-
-        if ($variable->getStockState() !== $state) {
-            $variable->setStockState($state);
-            $changed = true;
-        }
-
-        return $changed;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function updateAvailability(Model\ProductInterface $variable)
+    public function updateAvailability(Model\ProductInterface $variable): bool
     {
         Model\ProductTypes::assertVariable($variable);
 
@@ -179,7 +111,7 @@ class VariableUpdater extends AbstractUpdater
      *
      * @return bool
      */
-    public function updateVisibility(Model\ProductInterface $variable)
+    public function updateVisibility(Model\ProductInterface $variable): bool
     {
         Model\ProductTypes::assertVariable($variable);
 
@@ -208,13 +140,15 @@ class VariableUpdater extends AbstractUpdater
     /**
      * Indexes the variable's variants position.
      *
-     * @param Model\ProductInterface     $variable
+     * @param Model\ProductInterface $variable
      * @param PersistenceHelperInterface $helper
      *
      * @return bool
      */
-    public function indexVariantsPositions(Model\ProductInterface $variable, PersistenceHelperInterface $helper = null)
-    {
+    public function indexVariantsPositions(
+        Model\ProductInterface $variable,
+        PersistenceHelperInterface $helper = null
+    ): bool {
         Model\ProductTypes::assertVariable($variable);
 
         $variants = $variable->getVariants()->getIterator();

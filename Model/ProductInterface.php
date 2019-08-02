@@ -2,13 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
-use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -17,6 +16,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
  * @method ProductTranslationInterface translate($locale = null, $create = false)
+ * @method Collection|ProductTranslationInterface[] getTranslations()
  */
 interface ProductInterface extends
     VisibilityInterface,
@@ -29,8 +29,7 @@ interface ProductInterface extends
     RM\TaggedEntityInterface,
     AdjustableInterface,
     TaxableInterface,
-    StockSubjectInterface,
-    SubjectInterface
+    StockSubjectInterface
 {
     /**
      * Returns the parent.
@@ -51,7 +50,7 @@ interface ProductInterface extends
     /**
      * Returns the variants.
      *
-     * @return ArrayCollection|ProductInterface[]
+     * @return Collection|ProductInterface[]
      */
     public function getVariants();
 
@@ -101,7 +100,7 @@ interface ProductInterface extends
     /**
      * Returns the attributes.
      *
-     * @return ArrayCollection|ProductAttributeInterface[]
+     * @return Collection|ProductAttributeInterface[]
      */
     public function getAttributes();
 
@@ -135,16 +134,16 @@ interface ProductInterface extends
     /**
      * Sets the attributes.
      *
-     * @param ArrayCollection|ProductAttributeInterface[] $attributes
+     * @param Collection|ProductAttributeInterface[] $attributes
      *
      * @return $this|ProductInterface
      */
-    //public function setAttributes(ArrayCollection $attributes);
+    //public function setAttributes(Collection $attributes);
 
     /**
      * Returns the option groups.
      *
-     * @return ArrayCollection|OptionGroupInterface[]
+     * @return Collection|OptionGroupInterface[]
      */
     public function getOptionGroups();
 
@@ -185,12 +184,12 @@ interface ProductInterface extends
     /**
      * Sets the option groups.
      *
-     * @param ArrayCollection|OptionGroupInterface[] $options
+     * @param Collection|OptionGroupInterface[] $options
      *
      * @return $this|ProductInterface
      * @internal
      */
-    public function setOptionGroups(ArrayCollection $options);
+    public function setOptionGroups(Collection $options);
 
     /**
      * Returns whether the product has at least one required option group.
@@ -205,7 +204,7 @@ interface ProductInterface extends
      * Returns the resolved option groups.
      *
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
-     * @param bool       $bundle  Whether the return bundle slots option groups.
+     * @param bool       $bundle  Whether to return bundle slots option groups.
      *
      * @return OptionGroupInterface[]
      */
@@ -214,7 +213,7 @@ interface ProductInterface extends
     /**
      * Returns the bundle slots.
      *
-     * @return ArrayCollection|BundleSlotInterface[]
+     * @return Collection|BundleSlotInterface[]
      */
     public function getBundleSlots();
 
@@ -248,17 +247,68 @@ interface ProductInterface extends
     /**
      * Sets the bundle slots.
      *
-     * @param ArrayCollection|BundleSlotInterface[] $slots
+     * @param Collection|BundleSlotInterface[] $slots
      *
      * @return $this|ProductInterface
      * @internal
      */
-    public function setBundleSlots(ArrayCollection $slots);
+    public function setBundleSlots(Collection $slots);
+
+    /**
+     * Returns the components.
+     *
+     * @return Collection|ComponentInterface[]
+     */
+    public function getComponents();
+
+    /**
+     * Returns whether this product has components.
+     *
+     * @return bool
+     */
+    public function hasComponents();
+
+    /**
+     * Returns whether the product has the given component or not.
+     *
+     * @param ComponentInterface $component
+     *
+     * @return bool
+     */
+    public function hasComponent(ComponentInterface $component);
+
+    /**
+     * Adds the component.
+     *
+     * @param ComponentInterface $component
+     *
+     * @return $this|ProductInterface
+     */
+    public function addComponent(ComponentInterface $component);
+
+    /**
+     * Removes the component.
+     *
+     * @param ComponentInterface $component
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeComponent(ComponentInterface $component);
+
+    /**
+     * Sets the components.
+     *
+     * @param Collection|ComponentInterface[] $components
+     *
+     * @return $this|ProductInterface
+     * @internal
+     */
+    public function setComponents(Collection $components);
 
     /**
      * Returns the special offers.
      *
-     * @return ArrayCollection|SpecialOfferInterface[]
+     * @return Collection|SpecialOfferInterface[]
      */
     public function getSpecialOffers();
 
@@ -292,17 +342,17 @@ interface ProductInterface extends
     /**
      * Sets the special offers.
      *
-     * @param ArrayCollection|SpecialOfferInterface[] $offers
+     * @param Collection|SpecialOfferInterface[] $offers
      *
      * @return $this|ProductInterface
      * @internal
      */
-    public function setSpecialOffers(ArrayCollection $offers);
+    public function setSpecialOffers(Collection $offers);
 
     /**
      * Returns the pricings.
      *
-     * @return ArrayCollection|PricingInterface[]
+     * @return Collection|PricingInterface[]
      */
     public function getPricings();
 
@@ -336,12 +386,12 @@ interface ProductInterface extends
     /**
      * Sets the pricings.
      *
-     * @param ArrayCollection|PricingInterface[] $pricings
+     * @param Collection|PricingInterface[] $pricings
      *
      * @return $this|ProductInterface
      * @internal
      */
-    public function setPricings(ArrayCollection $pricings);
+    public function setPricings(Collection $pricings);
 
     /**
      * Returns the brand.
@@ -362,7 +412,7 @@ interface ProductInterface extends
     /**
      * Returns the categories.
      *
-     * @return ArrayCollection|CategoryInterface[]
+     * @return Collection|CategoryInterface[]
      */
     public function getCategories();
 
@@ -396,16 +446,16 @@ interface ProductInterface extends
     /**
      * Sets the categories.
      *
-     * @param ArrayCollection|CategoryInterface[] $categories
+     * @param Collection|CategoryInterface[] $categories
      *
      * @return $this|ProductInterface
      */
-    public function setCategories(ArrayCollection $categories);
+    public function setCategories(Collection $categories);
 
     /**
      * Returns the customer groups.
      *
-     * @return ArrayCollection|CustomerGroupInterface[]
+     * @return Collection|CustomerGroupInterface[]
      */
     public function getCustomerGroups();
 
@@ -439,11 +489,11 @@ interface ProductInterface extends
     /**
      * Sets the customer groups.
      *
-     * @param ArrayCollection|CustomerGroupInterface[] $groups
+     * @param Collection|CustomerGroupInterface[] $groups
      *
      * @return $this|ProductInterface
      */
-    public function setCustomerGroups(ArrayCollection $groups);
+    public function setCustomerGroups(Collection $groups);
 
     /**
      * Returns whether or not the product has the given media.
@@ -459,7 +509,7 @@ interface ProductInterface extends
      *
      * @param array $types
      *
-     * @return ArrayCollection|ProductMediaInterface[]
+     * @return Collection|ProductMediaInterface[]
      */
     public function getMedias(array $types = []);
 
@@ -511,7 +561,7 @@ interface ProductInterface extends
     /**
      * Returns the references.
      *
-     * @return ArrayCollection|ProductReferenceInterface[]
+     * @return Collection|ProductReferenceInterface[]
      */
     public function getReferences();
 
@@ -841,24 +891,22 @@ interface ProductInterface extends
     /**
      * Returns the product images.
      *
-     * @param bool                 $withChildren
-     * @param int                  $limit
-     * @param ArrayCollection|null $images
+     * @param bool $withChildren
+     * @param int  $limit
      *
-     * @return ArrayCollection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     * @return Collection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
      */
-    public function getImages($withChildren = true, $limit = 5, ArrayCollection $images = null);
+    public function getImages(bool $withChildren = true, int $limit = 5);
 
     /**
      * Returns the product files.
      *
-     * @param bool                 $withChildren
-     * @param int                  $limit
-     * @param ArrayCollection|null $images
+     * @param bool $withChildren
+     * @param int  $limit
      *
-     * @return ArrayCollection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     * @return Collection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
      */
-    public function getFiles($withChildren = false, $limit = 5, ArrayCollection $images = null);
+    public function getFiles(bool $withChildren = false, int $limit = 5);
 
     /**
      * Returns the variant uniqueness signature.

@@ -57,7 +57,7 @@ class VariantUpdater
      * @return bool Whether the variant has been changed or not.
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
-    public function updateAttributesDesignationAndTitle(Model\ProductInterface $variant)
+    public function updateAttributesDesignationAndTitle(Model\ProductInterface $variant): bool
     {
         $this->assertVariantWithParent($variant);
 
@@ -155,14 +155,14 @@ class VariantUpdater
     }
 
     /**
-     * Updates the tax group regarding to his parent/variable product.
+     * Updates the tax group regarding to its parent/variable product.
      *
      * @param Model\ProductInterface $variant
      *
      * @return bool Whether the variant has been changed or not.
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
-    public function updateTaxGroup(Model\ProductInterface $variant)
+    public function updateTaxGroup(Model\ProductInterface $variant): bool
     {
         $this->assertVariantWithParent($variant);
 
@@ -177,14 +177,14 @@ class VariantUpdater
     }
 
     /**
-     * Updates the quantity unit regarding to his parent/variable product.
+     * Updates the quantity unit regarding to its parent/variable product.
      *
      * @param Model\ProductInterface $variant
      *
      * @return bool Whether the variant has been changed or not.
      * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
      */
-    public function updateUnit(Model\ProductInterface $variant)
+    public function updateUnit(Model\ProductInterface $variant): bool
     {
         $this->assertVariantWithParent($variant);
 
@@ -199,7 +199,7 @@ class VariantUpdater
     }
 
     /**
-     * Updates the brand regarding to his parent/variable product.
+     * Updates the brand regarding to its parent/variable product.
      *
      * @param Model\ProductInterface $variant
      *
@@ -227,7 +227,7 @@ class VariantUpdater
      *
      * @return bool
      */
-    public function updateAvailability(Model\ProductInterface $variant)
+    public function updateAvailability(Model\ProductInterface $variant): bool
     {
         Model\ProductTypes::assertVariant($variant);
 
@@ -254,9 +254,9 @@ class VariantUpdater
     /**
      * Persists and recomputes the translation.
      *
-     * @param $translation
+     * @param Model\ProductTranslationInterface $translation
      */
-    protected function persistTranslation($translation)
+    protected function persistTranslation(Model\ProductTranslationInterface $translation)
     {
         $manager = $this->persistenceHelper->getManager();
         $uow = $manager->getUnitOfWork();

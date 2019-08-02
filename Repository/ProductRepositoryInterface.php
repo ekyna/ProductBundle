@@ -113,6 +113,15 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findParentsByOptionProduct(Model\ProductInterface $product, $requiredGroups = false);
 
     /**
+     * Finds the products having the given product as component.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    public function findParentsByComponent(Model\ProductInterface $product);
+
+    /**
      * Finds the "out of stock" products for the given mode.
      *
      * @param string $mode
@@ -145,6 +154,32 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * @return Model\ProductInterface
      */
     public function findOneByPendingPrices(string $type);
+
+    /**
+     * Finds a duplicate by reference.
+     *
+     * @param Model\ProductInterface   $product
+     * @param Model\ProductInterface[] $ignore
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findDuplicateByReference(
+        Model\ProductInterface $product,
+        array $ignore = []
+    ): ?Model\ProductInterface;
+
+    /**
+     * Finds a duplicate by designation and reference.
+     *
+     * @param Model\ProductInterface   $product
+     * @param Model\ProductInterface[] $ignore
+     *
+     * @return Model\ProductInterface|null
+     */
+    public function findDuplicateByDesignationAndBrand(
+        Model\ProductInterface $product,
+        array $ignore = []
+    ): ?Model\ProductInterface;
 
     /**
      * Loads the product's medias.

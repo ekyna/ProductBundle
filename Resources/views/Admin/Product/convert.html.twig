@@ -12,6 +12,13 @@
     {{ macros.new_product_button() }}
 {% endblock actions %}
 
+{% block main %}
+    <div class="alert alert-danger">
+        <p>{{ 'ekyna_product.convert.warning'|trans|raw }}</p>
+    </div>
+    {{ parent() }}
+{% endblock main %}
+
 {#{% block side %}
     {{ parent() }}
     <h3>{{ source }}</h3>

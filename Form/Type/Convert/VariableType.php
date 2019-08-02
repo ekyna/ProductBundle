@@ -2,12 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
-use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Braincrafted\Bundle\BootstrapBundle\Form\Type\FormActionsType;
 use Ekyna\Bundle\AdminBundle\Helper\ResourceHelper;
-use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType;
-use Ekyna\Bundle\ProductBundle\Form\Type\ProductTranslationType;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -57,22 +54,11 @@ class VariableType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('designation', Type\TextType::class, [
-                'label' => 'ekyna_core.field.designation',
-            ])
-            ->add('translations', TranslationsFormsType::class, [
-                'form_type'      => ProductTranslationType::class,
-                'label'          => false,
-                'error_bubbling' => false,
-                'attr'           => [
-                    'label_col'  => 0,
-                    'widget_col' => 12,
-                ],
-            ])
-            ->add('seo', SeoType::class)
             ->add('attributeSet', AttributeSetChoiceType::class, [
-                'disabled'  => $options['lock_attribute_set'],
                 'allow_new' => true,
+                'attr'      => [
+                    'class' => 'product-attribute-set',
+                ],
             ])
             ->add('actions', FormActionsType::class, [
                 'buttons' => [
@@ -100,24 +86,22 @@ class VariableType extends AbstractType
                 ],
             ]);
 
-        if ($options['lock_attribute_set']) {
-            // Pre set data
-            $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-                /** @var ProductInterface $data */
-                $data = $event->getData();
+        // Post set data
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            /** @var ProductInterface $data */
+            $data = $event->getData();
 
-                $this->addVariantForm($event->getForm(), $data->getAttributeSet());
-            });
-        } else {
-            // Pre submit
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-                $data = $event->getData();
+            $this->addVariantForm($event->getForm(), $data->getAttributeSet());
+        });
 
-                $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
+        // Pre submit
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
 
-                $this->addVariantForm($event->getForm(), $attributeSet);
-            });
-        }
+            $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
+
+            $this->addVariantForm($event->getForm(), $attributeSet);
+        });
     }
 
     /**
@@ -128,18 +112,6 @@ class VariableType extends AbstractType
      */
     private function addVariantForm(FormInterface $form, AttributeSetInterface $attributeSet = null)
     {
-        if (null === $attributeSet) {
-            return;
-        }
-
-        $form->add('variant', VariantType::class, [
-            'property_path' => 'variants[0]',
-            'attribute_set' => $attributeSet,
-            'constraints'   => [
-                new Valid(),
-            ],
-        ]);
-
         /** @var ProductInterface $variable */
         $variable = $form->getData();
         /** @var ProductInterface $variant */
@@ -162,6 +134,14 @@ class VariableType extends AbstractType
                 'tags' => $tags,
             ]);
         }
+
+        $form->add('variant', VariantType::class, [
+            'property_path' => 'variants[0]',
+            'attribute_set' => $attributeSet,
+            'constraints'   => [
+                new Valid(),
+            ],
+        ]);
     }
 
     /**
@@ -172,12 +152,10 @@ class VariableType extends AbstractType
         $resolver
             ->setDefaults([
                 'data_class'         => ProductInterface::class,
-                'lock_attribute_set' => false,
                 'attr'               => [
                     'class' => 'form-horizontal',
                 ],
-                'validation_groups'  => ['Default', ProductTypes::TYPE_VARIABLE],
-            ])
-            ->setAllowedTypes('lock_attribute_set', 'bool');
+                'validation_groups'  => ['convert_' . ProductTypes::TYPE_VARIABLE],
+            ]);
     }
 }

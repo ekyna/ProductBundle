@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
@@ -411,6 +412,28 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
+    public function findParentsByComponent(Model\ProductInterface $product)
+    {
+        if (is_null($product->getId())) {
+            return [];
+        }
+
+        $as = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+        $qb
+            ->leftJoin($as . '.components', 'c')
+            ->andWhere($qb->expr()->eq('c.child', ':product'));
+
+        return $qb
+            ->getQuery()
+            //->useQueryCache(true)
+            ->setParameter('product', $product)
+            ->getResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function findOutOfStockProducts($mode)
     {
         BStockModes::isValid($mode, true);
@@ -492,6 +515,97 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
                 'flag' => true,
             ])
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findDuplicateByReference(
+        Model\ProductInterface $product,
+        array $ignore = []
+    ): ?Model\ProductInterface {
+        if (empty($reference = $product->getReference())) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->andWhere($qb->expr()->eq('p.reference', ':reference'))
+            ->setParameter('reference', $reference);
+
+        array_push($ignore, $product);
+        if (!empty($ids = $this->ignoreToIds($ignore))) {
+            $qb
+                ->andWhere($qb->expr()->notIn('p.id', ':ids'))
+                ->setParameter('ids', $ids);
+        }
+
+        return $qb
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findDuplicateByDesignationAndBrand(
+        Model\ProductInterface $product,
+        array $ignore = []
+    ): ?Model\ProductInterface {
+        if (empty($designation = $product->getDesignation())) {
+            return null;
+        }
+        if (is_null($brand = $product->getBrand())) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->andWhere($qb->expr()->eq('p.designation', ':designation'))
+            ->andWhere($qb->expr()->eq('p.brand', ':brand'))
+            ->setParameter('designation', $designation)
+            ->setParameter('brand', $brand);
+
+        array_push($ignore, $product);
+        if (!empty($ids = $this->ignoreToIds($ignore))) {
+            $qb
+                ->andWhere($qb->expr()->notIn('p.id', ':ids'))
+                ->setParameter('ids', $ids);
+        }
+
+        return $qb
+            ->setMaxResults(1)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @param array $ignore
+     *
+     * @return array
+     */
+    private function ignoreToIds(array $ignore): array
+    {
+        $ids = [];
+
+        foreach ($ignore as $id) {
+            if ($id instanceof Model\ProductInterface) {
+                if (null === $id = $id->getId()) {
+                    continue;
+                }
+            }
+
+            if (!is_int($id)) {
+                throw new UnexpectedTypeException($id, ['int', Model\ProductInterface::class]);
+            }
+
+            $ids[] = $id;
+        }
+
+        return array_unique($ids);
     }
 
     /**

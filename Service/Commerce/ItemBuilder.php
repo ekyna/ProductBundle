@@ -20,6 +20,7 @@ class ItemBuilder
     const BUNDLE_CHOICE_ID = 'bundle_choice_id';
     const OPTION_GROUP_ID  = 'option_group_id';
     const OPTION_ID        = 'option_id';
+    const COMPONENT_ID     = 'component_id';
 
     /**
      * @var ProductProvider
@@ -73,7 +74,7 @@ class ItemBuilder
     {
         $product = $this->provider->resolve($item);
 
-        $this->buildFromProduct($item, $product);
+        $this->buildFromProduct($item, $product, []);
     }
 
     /**
@@ -85,7 +86,7 @@ class ItemBuilder
      *
      * @throws Exception\InvalidArgumentException If product type is not supported
      */
-    protected function buildFromProduct(SaleItemInterface $item, ProductInterface $product, array $exclude = [])
+    protected function buildFromProduct(SaleItemInterface $item, ProductInterface $product, array $exclude = null)
     {
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -107,7 +108,11 @@ class ItemBuilder
                 throw new Exception\InvalidArgumentException('Unexpected product type');
         }
 
-        $this->buildOptions($item, $exclude);
+        if (!is_null($exclude)) {
+            $this->buildOptions($item, $exclude);
+        }
+
+        $this->buildComponents($item);
     }
 
     /**
@@ -154,7 +159,7 @@ class ItemBuilder
             throw new Exception\LogicException("Variable product must have at least one variant.");
         }
 
-        if (0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
+        if (0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {
             foreach ($variants as $v) {
                 if ($variantId == $v->getId()) {
                     $variant = $v;
@@ -185,7 +190,7 @@ class ItemBuilder
 
         $this->buildFromSimple($item, $variant);
 
-        $item->setData(static::VARIANT_ID, $variant->getId());
+        $item->setData(self::VARIANT_ID, $variant->getId());
     }
 
     /**
@@ -195,7 +200,7 @@ class ItemBuilder
      * @param ProductInterface  $product
      * @param array             $exclude The option groups ids to exclude
      */
-    protected function buildFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude)
+    protected function buildFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude = null)
     {
         ProductTypes::assertBundle($product);
 
@@ -227,7 +232,7 @@ class ItemBuilder
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID));
+                $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
@@ -261,7 +266,7 @@ class ItemBuilder
      * @param ProductInterface  $product
      * @param array             $exclude
      */
-    protected function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product, array $exclude)
+    protected function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product, array $exclude = null)
     {
         ProductTypes::assertConfigurable($product);
 
@@ -292,7 +297,7 @@ class ItemBuilder
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID));
+                $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
@@ -305,7 +310,7 @@ class ItemBuilder
                 $bundleSlotIds[] = $bundleSlotId;
 
                 // Resolve choice
-                if (0 < $bundleChoiceId = intval($childItem->getData(static::BUNDLE_CHOICE_ID))) {
+                if (0 < $bundleChoiceId = intval($childItem->getData(self::BUNDLE_CHOICE_ID))) {
                     foreach ($choices as $choice) {
                         if ($bundleChoiceId === $choice->getId()) {
                             $bundleChoice = $choice;
@@ -353,11 +358,13 @@ class ItemBuilder
     protected function buildFromBundleChoice(
         SaleItemInterface $item,
         Model\BundleChoiceInterface $choice,
-        array $exclude
+        array $exclude = null
     ) {
-        $this->buildFromProduct($item, $choice->getProduct(),
-            array_unique(array_merge($exclude, $choice->getExcludedOptionGroups()))
-        );
+        if (!is_null($exclude)) {
+             $exclude = array_unique(array_merge($exclude, $choice->getExcludedOptionGroups()));
+        }
+
+        $this->buildFromProduct($item, $choice->getProduct(), $exclude);
 
         // TODO Use packaging format
 
@@ -378,8 +385,8 @@ class ItemBuilder
         }
 
         $item
-            ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
-            ->setData(static::BUNDLE_CHOICE_ID, $choice->getId())
+            ->setData(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setData(self::BUNDLE_CHOICE_ID, $choice->getId())
             ->setImmutable(true);
     }
 
@@ -418,7 +425,7 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Check option group id
-                    $optionGroupId = intval($child->getData(static::OPTION_GROUP_ID));
+                    $optionGroupId = intval($child->getData(self::OPTION_GROUP_ID));
                     if ($optionGroupId != $optionGroup->getId()) {
                         continue;
                     }
@@ -436,7 +443,7 @@ class ItemBuilder
 
                     // Check option choice
                     $found = false;
-                    if (0 < $optionId = intval($child->getData(static::OPTION_ID))) {
+                    if (0 < $optionId = intval($child->getData(self::OPTION_ID))) {
                         foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
@@ -448,7 +455,7 @@ class ItemBuilder
                         }
                         // Not Found => unset choice
                         if (!$found) {
-                            $child->unsetData(static::OPTION_ID);
+                            $child->unsetData(self::OPTION_ID);
                         }
                     }
 
@@ -483,7 +490,7 @@ class ItemBuilder
         $item->setNetPrice(0);
 
         if (null !== $product = $option->getProduct()) {
-            $this->buildFromProduct($item, $product); // TODO Cascade / exclude
+            $this->buildFromProduct($item, $product, []); // TODO Cascade / exclude
             $item->unsetData(self::VARIANT_ID); // Not a variant choice
         } else {
             $designation = sprintf(
@@ -505,8 +512,8 @@ class ItemBuilder
         }
 
         $item
-            ->setData(static::OPTION_GROUP_ID, $option->getGroup()->getId())
-            ->setData(static::OPTION_ID, $option->getId())
+            ->setData(self::OPTION_GROUP_ID, $option->getGroup()->getId())
+            ->setData(self::OPTION_ID, $option->getId())
             ->setQuantity(1)
             ->setImmutable(true)
             ->setConfigurable(false);
@@ -518,15 +525,94 @@ class ItemBuilder
     }
 
     /**
+     * Builds the item from component.
+     *
+     * @param SaleItemInterface        $item
+     * @param Model\ComponentInterface $component
+     */
+    protected function buildFromComponent(SaleItemInterface $item, Model\ComponentInterface $component)
+    {
+        $this->buildFromProduct($item, $component->getChild(), null);
+
+        $item
+            ->setQuantity($component->getQuantity())
+            ->setPrivate(true)
+            ->setImmutable(true)
+            ->setConfigurable(false);
+
+        if (!is_null($price = $component->getNetPrice())) {
+            $item->setNetPrice($price);
+        }
+    }
+
+    /**
+     * Builds the item's components.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @throws Exception\SubjectException
+     */
+    protected function buildComponents(SaleItemInterface $item)
+    {
+        $product = $this->provider->resolve($item);
+
+        // TODO (?) $components = $this->filter->getComponents($product);
+        $components = $product->getComponents()->toArray();
+        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
+            foreach ($product->getParent()->getComponents() as $component) {
+                $components[] = $component;
+            }
+        }
+
+        if (empty($components)) {
+            $this->cleanUpComponents($item);
+
+            return;
+        }
+
+        $componentIds = [];
+        foreach ($components as $component) {
+            // Find option group matching item
+            foreach ($item->getChildren() as $child) {
+                $componentId = intval($child->getData(self::COMPONENT_ID));
+
+                // Component id match
+                if ($componentId != $component->getId()) {
+                    continue; // Next child
+                }
+
+                if (in_array($componentId, $componentIds)) {
+                    // Remove component duplicate
+                    $item->removeChild($child);
+                    continue; // Next child
+                }
+
+                $componentIds[] = $componentId;
+
+                $this->buildFromComponent($child, $component);
+
+                continue 2; // Next component
+            }
+
+            // Not found -> create it
+            $child = $item->createChild();
+
+            $this->buildFromComponent($child, $component);
+        }
+
+        $this->cleanUpComponents($item, $componentIds);
+    }
+
+    /**
      * Removes irrelevant bundle slot child items.
      *
      * @param SaleItemInterface $item
-     * @param array             $bundleSlotIds
+     * @param array             $bundleSlotIds The bundle slots ids to keep
      */
     private function cleanUpBundleSlots(SaleItemInterface $item, array $bundleSlotIds = [])
     {
         foreach ($item->getChildren() as $childItem) {
-            if (0 < $bundleSlotId = intval($childItem->getData(static::BUNDLE_SLOT_ID))) {
+            if (0 < $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID))) {
                 if (!in_array($bundleSlotId, $bundleSlotIds)) {
                     $item->removeChild($childItem);
                 }
@@ -538,13 +624,30 @@ class ItemBuilder
      * Removes irrelevant option groups child item.
      *
      * @param SaleItemInterface $item
-     * @param array             $optionGroupIds
+     * @param array             $optionGroupIds The option groups ids to keep
      */
     private function cleanUpOptionGroups(SaleItemInterface $item, array $optionGroupIds = [])
     {
         foreach ($item->getChildren() as $childItem) {
-            if (0 < $optionGroupId = intval($childItem->getData(static::OPTION_GROUP_ID))) {
+            if (0 < $optionGroupId = intval($childItem->getData(self::OPTION_GROUP_ID))) {
                 if (!in_array($optionGroupId, $optionGroupIds)) {
+                    $item->removeChild($childItem);
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes irrelevant component child item.
+     *
+     * @param SaleItemInterface $item
+     * @param array             $componentIds The components ids to keep
+     */
+    private function cleanUpComponents(SaleItemInterface $item, array $componentIds = [])
+    {
+        foreach ($item->getChildren() as $childItem) {
+            if (0 < $componentId = intval($childItem->getData(self::COMPONENT_ID))) {
+                if (!in_array($componentId, $componentIds)) {
                     $item->removeChild($childItem);
                 }
             }
@@ -562,11 +665,12 @@ class ItemBuilder
         $product = $this->provider->resolve($item);
 
         // Clear identifiers vars
-        $item->unsetData(static::VARIANT_ID);
-        $item->unsetData(static::BUNDLE_SLOT_ID);
-        $item->unsetData(static::BUNDLE_CHOICE_ID);
-        $item->unsetData(static::OPTION_GROUP_ID);
-        $item->unsetData(static::OPTION_ID);
+        $item->unsetData(self::VARIANT_ID);
+        $item->unsetData(self::BUNDLE_SLOT_ID);
+        $item->unsetData(self::BUNDLE_CHOICE_ID);
+        $item->unsetData(self::OPTION_GROUP_ID);
+        $item->unsetData(self::OPTION_ID);
+        $item->unsetData(self::COMPONENT_ID);
 
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -628,7 +732,7 @@ class ItemBuilder
     {
         ProductTypes::assertVariant($product);
 
-        $item->setData(static::VARIANT_ID, $product->getId());
+        $item->setData(self::VARIANT_ID, $product->getId());
 
         $this->initializeFromSimple($item, $product);
     }
@@ -685,7 +789,7 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Check bundle slot id
-                    $bundleSlotId = intval($child->getData(static::BUNDLE_SLOT_ID));
+                    $bundleSlotId = intval($child->getData(self::BUNDLE_SLOT_ID));
                     if ($bundleSlotId != $bundleSlot->getId()) {
                         continue;
                     }
@@ -720,7 +824,7 @@ class ItemBuilder
             if ($bundleSlot->isRequired()) {
                 $this->initializeFromBundleChoice($child, $defaultChoice, $exclude);
             } else {
-                $child->setData(static::BUNDLE_SLOT_ID, $bundleSlot->getId());
+                $child->setData(self::BUNDLE_SLOT_ID, $bundleSlot->getId());
             }
         }
     }
@@ -750,8 +854,8 @@ class ItemBuilder
         $item
             ->setQuantity($choice->getMinQuantity())
             ->setPosition($choice->getSlot()->getPosition())
-            ->setData(static::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
-            ->setData(static::BUNDLE_CHOICE_ID, $choice->getId());
+            ->setData(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setData(self::BUNDLE_CHOICE_ID, $choice->getId());
     }
 
     /**
@@ -777,12 +881,12 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Skip if item has no option group data
-                    if (!$child->hasData(static::OPTION_GROUP_ID)) {
+                    if (!$child->hasData(self::OPTION_GROUP_ID)) {
                         continue;
                     }
 
                     // Check option group data
-                    $optionGroupId = intval($child->getData(static::OPTION_GROUP_ID));
+                    $optionGroupId = intval($child->getData(self::OPTION_GROUP_ID));
                     if ($optionGroupId != $optionGroup->getId()) {
                         continue;
                     }
@@ -800,7 +904,7 @@ class ItemBuilder
 
                     // Check option choice
                     $found = false;
-                    if (0 < $optionId = intval($child->getData(static::OPTION_ID))) {
+                    if (0 < $optionId = intval($child->getData(self::OPTION_ID))) {
                         foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
@@ -811,13 +915,13 @@ class ItemBuilder
 
                     // Not Found
                     if (!$found) {
-                        $child->unsetData(static::OPTION_ID);
+                        $child->unsetData(self::OPTION_ID);
 
                         // Default choice if required
                         if ($optionGroup->isRequired()) {
                             /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
                             if ($option = current($options)) {
-                                $child->setData(static::OPTION_ID, $option->getId());
+                                $child->setData(self::OPTION_ID, $option->getId());
                             }
                         }
                     }
@@ -843,7 +947,7 @@ class ItemBuilder
     public function initializeFromOptionGroup(SaleItemInterface $item, Model\OptionGroupInterface $optionGroup)
     {
         $item
-            ->setData(static::OPTION_GROUP_ID, $optionGroup->getId())
+            ->setData(self::OPTION_GROUP_ID, $optionGroup->getId())
             ->setQuantity(1)
             ->setPosition($optionGroup->getPosition());
 
@@ -857,7 +961,7 @@ class ItemBuilder
 
             /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
             if ($option = current($options)) {
-                $item->setData(static::OPTION_ID, $option->getId());
+                $item->setData(self::OPTION_ID, $option->getId());
             }
         }
     }
@@ -919,7 +1023,7 @@ class ItemBuilder
                 throw new Exception\InvalidArgumentException("Variable product must have at least one variant.");
             }
 
-            if ($item && 0 < ($variantId = intval($item->getData(static::VARIANT_ID)))) {
+            if ($item && 0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {
                 foreach ($variants as $v) {
                     if ($variantId == $v->getId()) {
                         return $v;

@@ -220,7 +220,16 @@ ekyna_product:
         alert:
             no_item: No category configured
 
+    component:
+        label:
+            singular: Component
+            plural: Components
+        button:
+            add: Add a component
+
     convert:
+        warning: >
+            <strong>Warning!</strong> This operation is <strong>not reversible</strong>.
         help:
             tag_choice: |
                 Select the <strong>variable</strong> product tags.
@@ -396,6 +405,7 @@ ekyna_product:
             composition: Composition
             option_parents: This product is an option of the following products
             bundle_parents: This product is included in the following bundles
+            component_parents: This product is a component of the following products
         alert:
             no_item: No product configured
             pending_offers: |

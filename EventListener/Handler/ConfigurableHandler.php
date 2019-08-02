@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\ConfigurableUpdater;
+use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
@@ -33,6 +34,11 @@ class ConfigurableHandler extends AbstractHandler
     private $priceInvalidator;
 
     /**
+     * @var StockSubjectUpdaterInterface
+     */
+    private $stockUpdater;
+
+    /**
      * @var ConfigurableUpdater
      */
     private $configurableUpdater;
@@ -41,18 +47,21 @@ class ConfigurableHandler extends AbstractHandler
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param PriceCalculator            $priceCalculator
-     * @param PriceInvalidator           $priceInvalidator
+     * @param PersistenceHelperInterface   $persistenceHelper
+     * @param PriceCalculator              $priceCalculator
+     * @param PriceInvalidator             $priceInvalidator
+     * @param StockSubjectUpdaterInterface $stockUpdater
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         PriceCalculator $priceCalculator,
-        PriceInvalidator $priceInvalidator
+        PriceInvalidator $priceInvalidator,
+        StockSubjectUpdaterInterface $stockUpdater
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->priceCalculator = $priceCalculator;
         $this->priceInvalidator = $priceInvalidator;
+        $this->stockUpdater = $stockUpdater;
     }
 
     /**
@@ -64,7 +73,7 @@ class ConfigurableHandler extends AbstractHandler
 
         $updater = $this->getConfigurableUpdater();
 
-        $changed = $updater->updateStock($bundle);
+        $changed = $this->stockUpdater->update($bundle);
 
         $changed |= $updater->updateAvailability($bundle);
 
@@ -82,8 +91,7 @@ class ConfigurableHandler extends AbstractHandler
 
         $updater = $this->getConfigurableUpdater();
 
-        // TODO remove : stock should only change from children
-        $changed = $updater->updateStock($bundle);
+        $changed = $this->stockUpdater->update($bundle);
 
         $changed |= $updater->updateAvailability($bundle);
 
@@ -121,7 +129,7 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        return $this->getConfigurableUpdater()->updateStock($bundle);
+        return $this->stockUpdater->update($bundle);
     }
 
     /**

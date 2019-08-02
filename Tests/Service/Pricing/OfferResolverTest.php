@@ -5,6 +5,8 @@ namespace Ekyna\Bundle\ProductBundle\Tests\Service\Pricing;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferResolver;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,36 +22,45 @@ class OfferResolverTest extends TestCase
     private $resolver;
 
     /**
-     * @var Repository\PricingRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var Repository\PricingRepository|MockObject
      */
     private $pricingRepository;
 
     /**
-     * @var Repository\SpecialOfferRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var Repository\SpecialOfferRepository|MockObject
      */
     private $specialOfferRepository;
 
+    /**
+     * @var PriceCalculator|MockObject
+     */
+    private $priceCalculator;
 
     /**
      * @inheritDoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pricingRepository = $this->createMock(Repository\PricingRepository::class);
         $this->specialOfferRepository = $this->createMock(Repository\SpecialOfferRepository::class);
-        $this->resolver = new OfferResolver($this->pricingRepository, $this->specialOfferRepository);
+        $this->priceCalculator = $this->createMock(PriceCalculator::class);
+        $this->resolver = new OfferResolver(
+            $this->pricingRepository,
+            $this->specialOfferRepository,
+            $this->priceCalculator
+        );
     }
 
     /**
      * @inheritDoc
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->pricingRepository = null;
         $this->specialOfferRepository = null;
+        $this->priceCalculator = null;
         $this->resolver = null;
     }
-
 
     /**
      * @param array $pricing
@@ -60,7 +71,7 @@ class OfferResolverTest extends TestCase
      */
     public function testResolve($pricing, $specialOffer, $expected)
     {
-        /** @var Model\ProductInterface|\PHPUnit_Framework_MockObject_MockObject $product */
+        /** @var Model\ProductInterface|MockObject $product */
         $product = $this->createMock(Model\ProductInterface::class);
         $product
             ->method('getNetPrice')
@@ -88,6 +99,8 @@ class OfferResolverTest extends TestCase
      */
     public function resolveDataProvider()
     {
+        // TODO Components
+
         return [
             // Special offer has higher percentage than pricing rule
             // -> keep special offer
@@ -96,7 +109,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -119,7 +139,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 10,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -142,7 +169,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 10,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -176,7 +210,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -199,7 +240,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 10, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => 1,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 10,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -222,7 +270,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => 1,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -256,7 +311,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => 1, 'min_qty' => 1, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 10,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -290,7 +352,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => 1, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -313,7 +382,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => 1, 'min_qty' => 1, 'percent' => 10, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => 1,
+                        'min_qty'          => 1,
+                        'percent'          => 10,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -336,7 +412,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => null, 'country_id' => null, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => 1, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => 1,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -370,7 +453,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 10],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => null, 'country_id' => 1, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => null,
+                        'country_id'       => 1,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -406,7 +496,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 3, 'group_id' => 1, 'country_id' => null, 'min_qty' => 30, 'percent' => 15],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 15, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => 1,
+                        'country_id'       => null,
+                        'min_qty'          => 15,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -445,7 +542,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 6, 'group_id' => 2, 'country_id' => null, 'min_qty' => 30, 'percent' => 20],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 1, 'percent' => 20, 'stack' => 0],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => 1,
+                        'country_id'       => null,
+                        'min_qty'          => 1,
+                        'percent'          => 20,
+                        'stack'            => 0,
+                    ],
                 ],
                 'offers'        => [
                     [
@@ -507,7 +611,14 @@ class OfferResolverTest extends TestCase
                     ['pricing_id' => 6, 'group_id' => 2, 'country_id' => null, 'min_qty' => 30, 'percent' => 19],
                 ],
                 'special_offer' => [
-                    ['special_offer_id' => 1, 'group_id' => 1, 'country_id' => null, 'min_qty' => 15, 'percent' => 10, 'stack' => 1],
+                    [
+                        'special_offer_id' => 1,
+                        'group_id'         => 1,
+                        'country_id'       => null,
+                        'min_qty'          => 15,
+                        'percent'          => 10,
+                        'stack'            => 1,
+                    ],
                 ],
                 'offers'        => [
                     [

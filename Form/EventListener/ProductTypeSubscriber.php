@@ -197,6 +197,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // Pricing
             ->addNetPriceField(['disabled' => true])
             ->addTaxGroupField()
+            ->addComponentsField()
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
@@ -294,6 +295,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addNetPriceField(['disabled' => true])
             ->addTaxGroupField()
             ->addBundleSlotsField()
+            // TODO (?) ->addComponentsField()
             ->addOptionGroupsField()
             ->addSpecialOffersField()
             ->addPricingsField()

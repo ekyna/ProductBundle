@@ -409,6 +409,25 @@
         </property>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\Component">
+        <property name="child">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="quantity">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Component"/>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
         <group-sequence-provider />
         <property name="group">
@@ -763,6 +782,7 @@
             <constraint name="NotNull">
                 <option name="groups">
                     <value>variable</value>
+                    <value>convert_variable</value>>
                 </option>
             </constraint>
             <constraint name="IsNull">
@@ -814,6 +834,20 @@
             <constraint name="Count">
                 <option name="min">1</option>
                 <option name="groups">
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+            <constraint name="Valid"/>
+        </property>
+
+        <!-- Components -->
+        <property name="components">
+            <constraint name="Count">
+                <option name="max">0</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
                     <value>bundle</value>
                     <value>configurable</value>
                 </option>
@@ -963,19 +997,14 @@
 
         <!-- Variant (attributes) validation -->
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Variant">
-            <option name="groups">variant</option>
-        </constraint>
-
-        <!-- Product validation -->
-        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Product">
             <option name="groups">
-                <value>simple</value>
                 <value>variant</value>
-                <value>variable</value>
-                <value>bundle</value>
-                <value>configurable</value>
+                <value>convert_variant</value>
             </option>
         </constraint>
+
+        <!-- Product uniqueness -->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductUnique"/>
 
         <!-- Bundle (or configurable) validation -->
         <!-- TODO At least one required slot -->
@@ -989,24 +1018,6 @@
                 <value>bundle</value>
                 <value>configurable</value>
             </option>
-        </constraint>
-
-        <!-- Unique constraints -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">reference</option>
-        </constraint>
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>designation</value>
-                <value>brand</value>
-            </option>
-            <option name="groups">
-                <value>simple</value>
-                <value>variable</value>
-                <value>bundle</value>
-                <value>configurable</value>
-            </option>
-            <option name="message">ekyna_product.product.duplicate_designation</option>
         </constraint>
     </class>
 

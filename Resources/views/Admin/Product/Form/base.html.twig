@@ -97,6 +97,9 @@
                 </div>
             </div>
             {% endblock pricing_content %}
+            {% if form.components is defined -%}
+                {{ form_row(form.components) }}
+            {%- endif %}
             {{ form_row(form.optionGroups) }}
         </div>
         {% endblock pricing_pane %}

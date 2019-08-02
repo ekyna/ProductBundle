@@ -57,26 +57,17 @@ class Builder
         $tree->setOffers($this->resolveOffers($product));
 
         if (Types::TYPE_BUNDLE === $product->getType()) {
-            foreach ($product->getBundleSlots() as $slot) {
-                /** @var Model\BundleChoiceInterface $choice */
-                $choice = $slot->getChoices()->first();
-                $choiceProduct = $choice->getProduct();
-
-                $child = $this->build(
-                    $choiceProduct,
-                    $visible && $choiceProduct->isVisible() && !$choice->isHidden(),
-                    array_unique(array_merge($exclude, $choice->getExcludedOptionGroups())),
-                    $choice->getNetPrice()
-                );
-
-                $child->setQuantity($choice->getMinQuantity());
-
-                $tree->addChild($child);
-            }
+            $this->buildBundleSlots($tree, $product, $visible, $exclude);
+            $this->buildComponents($tree, $product);
         } elseif (!is_null($netPrice)) {
             $tree->addNetPrice($netPrice);
         } else {
             $tree->addNetPrice($product->getNetPrice());
+            if (Model\ProductTypes::isVariantType($product)) {
+                $this->buildComponents($tree, $product->getParent());
+            } else {
+                $this->buildComponents($tree, $product);
+            }
         }
 
         if ($exclude) {
@@ -93,6 +84,62 @@ class Builder
     }
 
     /**
+     * Builds the product's bundle slots tree children.
+     *
+     * @param Tree                   $tree
+     * @param Model\ProductInterface $product
+     * @param bool                   $visible
+     * @param array                  $exclude
+     */
+    private function buildBundleSlots(
+        Tree $tree,
+        Model\ProductInterface $product,
+        bool $visible = true,
+        array $exclude = []
+    ): void {
+        foreach ($product->getBundleSlots() as $slot) {
+            /** @var Model\BundleChoiceInterface $choice */
+            $choice = $slot->getChoices()->first();
+            $choiceProduct = $choice->getProduct();
+
+            $child = $this->build(
+                $choiceProduct,
+                $visible && $choiceProduct->isVisible() && !$choice->isHidden(),
+                array_unique(array_merge($exclude, $choice->getExcludedOptionGroups())),
+                $choice->getNetPrice()
+            );
+
+            $child->setQuantity($choice->getMinQuantity());
+
+            $tree->addChild($child);
+        }
+    }
+
+    /**
+     * Builds the product's components tree children.
+     *
+     * @param Tree                   $tree
+     * @param Model\ProductInterface $product
+     */
+    private function buildComponents(Tree $tree, Model\ProductInterface $product): void
+    {
+        foreach ($product->getComponents() as $component) {
+            $price = is_null($component->getNetPrice())
+                ? $component->getChild()->getNetPrice()
+                : $component->getNetPrice();
+
+            $child = new Tree();
+            $child
+                ->setVisible(false)
+                ->setNetPrice($price)
+                ->setOffers($this->resolveOffers($component->getChild()))
+                ->setQuantity($component->getQuantity());
+
+            $tree->addChild($child);
+        }
+    }
+
+    /**
      * Flattens the given tree regarding to the given key.
      *
      * @param Tree   $tree
@@ -100,7 +147,7 @@ class Builder
      *
      * @return Result
      */
-    public function flatten(Tree $tree, string $key)
+    public function flatten(Tree $tree, string $key): Result
     {
         $flat = new Result($key);
 
@@ -132,7 +179,7 @@ class Builder
         return $flat;
     }
 
-    protected function flattenTree(Result $flat, Tree $tree)
+    protected function flattenTree(Result $flat, Tree $tree): bool
     {
         $visible = $tree->getVisible();
 
@@ -240,7 +287,7 @@ class Builder
      * @param Tree                         $tree
      * @param Model\OptionGroupInterface[] $optionGroups
      */
-    protected function buildOptionGroups(Tree $tree, array $optionGroups)
+    protected function buildOptionGroups(Tree $tree, array $optionGroups): void
     {
         /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($optionGroups as $optionGroup) {
@@ -277,7 +324,7 @@ class Builder
      *
      * @return array
      */
-    protected function resolveOffers(Model\ProductInterface $product)
+    protected function resolveOffers(Model\ProductInterface $product): array
     {
         $offers = [];
 
@@ -299,7 +346,7 @@ class Builder
      *
      * @return string
      */
-    protected function getKey(array $data)
+    protected function getKey(array $data): string
     {
         return sprintf('%d-%d', $data['group_id'], $data['country_id']);
     }

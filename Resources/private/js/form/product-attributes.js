@@ -15,6 +15,8 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
                 return;
             }
 
+            var form_name = $attributes.data('parent-name');
+
             function loadAttributesForm() {
                 if (xhr) {
                     xhr.abort();
@@ -46,7 +48,7 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
                         return;
                     }
 
-                    $attributes.append($($form.text()).children());
+                    $attributes.append($($form.text().replace(/FORM__NAME/g, form_name)).children());
 
                     var form = Form.create($attributes);
                     form.init();

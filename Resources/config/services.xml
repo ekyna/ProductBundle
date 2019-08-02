@@ -20,6 +20,11 @@
 
     <services>
 
+        <!-- Features -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Features">
+            <argument type="collection"/><!-- Replaced by DI extension -->
+        </service>
+
         <!-- Account dashboard event subscriber -->
         <service id="ekyna_product.account.dashboard_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber">
@@ -272,6 +277,13 @@
             <tag name="form.type"/>
         </service>
 
+        <!-- Component event listener -->
+        <service id="ekyna_product.component.listener"
+                 class="Ekyna\Bundle\ProductBundle\EventListener\ComponentListener">
+            <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Sale item configurable/slots form types -->
         <service id="ekyna_product.sale_item.configurable_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
@@ -341,6 +353,7 @@
         <!-- Product form type builder -->
         <service id="ekyna_product.product.form_type.builder"
                  class="%ekyna_product.product.form_type.builder.class%">
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Service\Features"/>
             <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
         </service>
@@ -452,6 +465,7 @@
                  class="Ekyna\Bundle\ProductBundle\Service\Pricing\OfferResolver">
             <argument type="service" id="ekyna_product.pricing.repository"/>
             <argument type="service" id="ekyna_product.special_offer.repository"/>
+            <argument type="service" id="ekyna_product.pricing.price_calculator"/>
         </service>
 
         <!-- Offer updater -->
@@ -655,6 +669,9 @@
             <call method="setPriceInvalidator">
                 <argument type="service" id="ekyna_product.price.invalidator"/>
             </call>
+            <call method="setStockUpdater">
+                <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            </call>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Bundle product event handler -->
@@ -665,6 +682,7 @@
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
+            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->
@@ -674,6 +692,7 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
+            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
 
@@ -728,9 +747,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <!-- Product constraint validator -->
-        <service id="ekyna_product.validator.product_validator"
-                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator">
+        <!-- Product unique constraint validator -->
+        <service id="ekyna_product.validator.product_unique_validator"
+                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductUniqueValidator">
             <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="validator.constraint_validator"/>
         </service>
@@ -761,8 +780,11 @@
         <service id="ekyna_product.product.product_converter"
                  class="Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter">
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="form.factory"/>
-            <argument type="service" id="request_stack"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
+            <argument type="service" id="ekyna_product.product.operator"/>
+            <argument type="service" id="Symfony\Component\Form\FormFactoryInterface"/>
+            <argument type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
+            <argument type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
         </service>
 
         <!-- Product convert form type -->
@@ -772,7 +794,6 @@
             <argument type="service" id="ekyna_product.attribute_set.repository"/>
             <tag name="form.type"/>
         </service>
-
 
         <!-- CMS Editor plugins -->
         <service id="ekyna_product.editor.block_plugin.product_thumb"
@@ -952,6 +973,7 @@
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Service\Features"/>
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>
         </service>
