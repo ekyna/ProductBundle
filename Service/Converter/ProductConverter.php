@@ -3,12 +3,13 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
 use Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
-use Ekyna\Component\Resource\Event\ResourceEvent;
+use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
@@ -54,6 +55,11 @@ class ProductConverter
      */
     private $validator;
 
+    /**
+     * @var ResourceEventDispatcherInterface
+     */
+    private $eventDispatcher;
+
 
     /**
      * Constructor.
@@ -64,6 +70,7 @@ class ProductConverter
      * @param FormFactoryInterface       $formFactory
      * @param RequestStack               $requestStack
      * @param ValidatorInterface         $validator
+     * @param ResourceEventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -71,7 +78,8 @@ class ProductConverter
         ResourceOperatorInterface $productOperator,
         FormFactoryInterface $formFactory,
         RequestStack $requestStack,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        ResourceEventDispatcherInterface $eventDispatcher
     ) {
         $this->productRepository = $productRepository;
         $this->productManager = $productManager;
@@ -79,6 +87,7 @@ class ProductConverter
         $this->formFactory = $formFactory;
         $this->requestStack = $requestStack;
         $this->validator = $validator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -120,7 +129,7 @@ class ProductConverter
      *
      * @param ProductInterface $product
      *
-     * @return FormInterface|ResourceEventInterface|ProductInterface
+     * @return FormInterface|ResourceEventInterface|ProductInterface|null
      */
     protected function convertSimpleToVariable(ProductInterface $product)
     {
@@ -144,6 +153,12 @@ class ProductConverter
 
         // Add variant to variable
         $variable->addVariant($product);
+
+        $event = new ConvertEvent('simple_to_variable', $product, $variable);
+        $this->eventDispatcher->dispatch(ConvertEvent::FORM_DATA, $event);
+        if ($event->isPropagationStopped()) {
+            return $event;
+        }
 
         // Form
         $form = $this->formFactory->create(VariableType::class, $variable);
@@ -188,6 +203,11 @@ class ProductConverter
                     $translationClass = get_class($translation);
                 }
                 $slugs[$translation->getId()] = $translation->getSlug();
+            }
+
+            $this->eventDispatcher->dispatch(ConvertEvent::PRE_CONVERT, $event);
+            if ($event->isPropagationStopped()) {
+                return $event;
             }
 
             $this->productManager->beginTransaction();
@@ -290,11 +310,14 @@ class ProductConverter
                 }
             }
 
+            $this->eventDispatcher->dispatch(ConvertEvent::POST_CONVERT, $event);
+            if ($event->isPropagationStopped()) {
+                return $event;
+            }
+
             $variableViolations = $this->validator->validate($variable, null, ['Default', ProductTypes::TYPE_VARIABLE]);
             $variantViolations = $this->validator->validate($product, null, ['Default', ProductTypes::TYPE_VARIANT]);
             if (0 < $variableViolations->count() || 0 < $variantViolations->count()) {
-                $event = new ResourceEvent();
-                // TODO Message
                 $event->addMessage(new ResourceMessage('Failure', ResourceMessage::TYPE_ERROR));
             } else {
                 // Persist both variable and variant

@@ -345,19 +345,17 @@ class ProductController extends AbstractSubjectController
             );
         }
 
-        if ($result instanceof ResourceEventInterface) {
-            $result->toFlashes($this->getFlashBag());
-
-            return $this->redirect($this->generateResourcePath($resource));
-        }
-
         if ($result instanceof ProductInterface) {
             $this->addFlash('ekyna_product.convert.variable_success', 'warning');
 
             return $this->redirect($this->generateResourcePath($result));
         }
 
-        throw new \LogicException("Unexpected result.");
+        if ($result instanceof ResourceEventInterface) {
+            $result->toFlashes($this->getFlashBag());
+        }
+
+        return $this->redirect($this->generateResourcePath($resource));
     }
 
     /**
