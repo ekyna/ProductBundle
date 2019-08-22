@@ -307,9 +307,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addGeocodeField(['disabled' => true])
             ->addStockFloor(['disabled' => true])
             ->addReplenishmentTime(['disabled' => true])
-            ->addMinimumOrderQuantity(['disabled' => true])
-            ->addQuoteOnlyField(['disabled' => true])
-            ->addEndOfLifeField(['disabled' => true]);
+            ->addMinimumOrderQuantity()
+            ->addQuoteOnlyField()
+            ->addEndOfLifeField();
     }
 
     /**
@@ -347,9 +347,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addGeocodeField(['disabled' => true])
             ->addStockFloor(['disabled' => true])
             ->addReplenishmentTime(['disabled' => true])
-            ->addMinimumOrderQuantity(['disabled' => true])
-            ->addQuoteOnlyField(['disabled' => true])
-            ->addEndOfLifeField(['disabled' => true]);
+            ->addMinimumOrderQuantity()
+            ->addQuoteOnlyField()
+            ->addEndOfLifeField();
     }
 
     /**

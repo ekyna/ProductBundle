@@ -198,6 +198,10 @@ class ProductController extends AbstractSubjectController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            foreach ($target->getTranslations() as $translation) {
+                $translation->setSlug(null);
+            }
+
             // TODO use ResourceManager
             $event = $this->getOperator()->create($target);
             if (!$isXhr) {

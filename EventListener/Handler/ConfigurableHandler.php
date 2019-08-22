@@ -75,8 +75,6 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateAvailability($bundle);
-
         $changed |= $updater->updateMinPrice($bundle);
 
         return $changed;
@@ -93,8 +91,6 @@ class ConfigurableHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateAvailability($bundle);
-
         $changed |= $updater->updateMinPrice($bundle);
 
         return $changed;
@@ -110,16 +106,6 @@ class ConfigurableHandler extends AbstractHandler
         $this->priceInvalidator->invalidateByProduct($bundle);
 
         return $this->getConfigurableUpdater()->updateMinPrice($bundle);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function handleChildAvailabilityChange(ResourceEventInterface $event)
-    {
-        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
-
-        return $this->getConfigurableUpdater()->updateAvailability($bundle);
     }
 
     /**

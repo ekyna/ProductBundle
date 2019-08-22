@@ -78,7 +78,7 @@ class PurchaseCostCalculator
      *
      * @return float|int
      */
-    public function calculateMinOptionsPurchaseCost(Model\ProductInterface $product, $exclude = [])
+    protected function calculateMinOptionsPurchaseCost(Model\ProductInterface $product, $exclude = [])
     {
         $cost = 0;
 
@@ -119,6 +119,25 @@ class PurchaseCostCalculator
     }
 
     /**
+     * Calculates the product component's purchase cost.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return float|int
+     */
+    protected function calculateComponentsPurchaseCost(Model\ProductInterface $product)
+    {
+        $cost = 0;
+
+        foreach ($product->getComponents() as $component) {
+            $cost += $this->costGuesser->guess($component->getChild(), $this->defaultCurrency)
+                * $component->getQuantity();
+        }
+
+        return $cost;
+    }
+
+    /**
      * Calculates the simple/variant product minimum purchase cost.
      *
      * @param Model\ProductInterface $product
@@ -133,6 +152,8 @@ class PurchaseCostCalculator
         $price = $this->costGuesser->guess($product, $this->defaultCurrency);
 
         $price += $this->calculateMinOptionsPurchaseCost($product, $exclude);
+
+        $price += $this->calculateComponentsPurchaseCost($product);
 
         return $price;
     }
@@ -164,7 +185,8 @@ class PurchaseCostCalculator
         }
 
         if ($lowestVariant) {
-            return $this->calculateProductPurchaseCost($lowestVariant, $exclude);
+            return $this->calculateProductPurchaseCost($lowestVariant, $exclude)
+                + $this->calculateComponentsPurchaseCost($variable);
         }
 
         return 0;
@@ -196,10 +218,12 @@ class PurchaseCostCalculator
             }
 
             $price += $this->calculateMinPurchaseCost($choice->getProduct(), $choiceExclude)
-                    * $choice->getMinQuantity(); // TODO Use packaging format
+                * $choice->getMinQuantity(); // TODO Use packaging format
         }
 
         $price += $this->calculateMinOptionsPurchaseCost($bundle, $exclude);
+
+        $price += $this->calculateComponentsPurchaseCost($bundle);
 
         return $price;
     }
@@ -267,11 +291,13 @@ class PurchaseCostCalculator
                 }
 
                 $price += $this->calculateMinPurchaseCost($lowestChoice->getProduct(), $choiceExclude)
-                        * $lowestChoice->getMinQuantity(); // TODO Use packaging format
+                    * $lowestChoice->getMinQuantity(); // TODO Use packaging format
             }
         }
 
         $price += $this->calculateMinOptionsPurchaseCost($configurable, $exclude);
+
+        $price += $this->calculateComponentsPurchaseCost($configurable);
 
         return $price;
     }

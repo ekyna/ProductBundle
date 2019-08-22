@@ -87,8 +87,6 @@ class BundleHandler extends AbstractHandler
 
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed |= $updater->updateAvailability($bundle);
-
         $changed |= $updater->updateNetPrice($bundle);
 
         $changed |= $updater->updateMinPrice($bundle);
@@ -113,10 +111,6 @@ class BundleHandler extends AbstractHandler
         // TODO remove : stock should only change from children
         if ($this->stockUpdater->update($bundle)) {
             $events[] = ProductEvents::CHILD_STOCK_CHANGE;
-            $changed = true;
-        }
-        if ($updater->updateAvailability($bundle)) {
-            $events[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
             $changed = true;
         }
         if ($updater->updateNetPrice($bundle)) {
@@ -156,22 +150,6 @@ class BundleHandler extends AbstractHandler
         }
 
         return $changed;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function handleChildAvailabilityChange(ResourceEventInterface $event)
-    {
-        $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
-
-        if ($this->getBundleUpdater()->updateAvailability($bundle)) {
-            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

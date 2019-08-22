@@ -1010,15 +1010,7 @@
         <!-- TODO At least one required slot -->
 
         <!-- Stock subject validation -->
-        <constraint name="Ekyna\Component\Commerce\Bridge\Symfony\Validator\Constraints\StockSubject">
-            <option name="groups">
-                <value>simple</value>
-                <value>variant</value>
-                <value>variable</value>
-                <value>bundle</value>
-                <value>configurable</value>
-            </option>
-        </constraint>
+        <constraint name="Ekyna\Component\Commerce\Bridge\Symfony\Validator\Constraints\StockSubject"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAdjustment">
@@ -1081,6 +1073,18 @@
                 <option name="max">128</option>
             </constraint>
         </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>title</value>
+                <value>locale</value>
+            </option>
+            <option name="groups">
+                <value>simple</value>
+                <value>variable</value>
+                <value>bundle</value>
+                <value>configurable</value>
+            </option>
+        </constraint>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">

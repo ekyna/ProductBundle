@@ -71,8 +71,8 @@ class UpdateMinPriceCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $id = intval($input->getArgument('id'));
-        $type = $input->getArgument('type');
+        $id = intval($input->getOption('id'));
+        $type = $input->getOption('type');
 
         if ($id && $type) {
             $output->writeln("<error>You must provider either 'id' or 'type' option but not both.</error>");
@@ -144,7 +144,7 @@ class UpdateMinPriceCommand extends Command
      */
     private function doUpdate(ProductInterface $product, OutputInterface $output)
     {
-        $name = sprintf('[%d] %s', $product->getId(), $product->getTitle());
+        $name = sprintf('[%d] %s', $product->getId(), $product->getFullDesignation());
 
         $output->write(sprintf('<comment>%s</comment> %s ',
             $name,
