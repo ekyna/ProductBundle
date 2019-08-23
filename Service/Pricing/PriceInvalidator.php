@@ -39,7 +39,7 @@ class PriceInvalidator
     /**
      * Clears the products and brands ids.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->productIds = [];
     }
@@ -49,7 +49,7 @@ class PriceInvalidator
      *
      * @param EntityManagerInterface $manager
      */
-    public function flush(EntityManagerInterface $manager)
+    public function flush(EntityManagerInterface $manager): void
     {
         if (!empty($this->productIds)) {
             $qb = $manager->createQueryBuilder();
@@ -75,7 +75,7 @@ class PriceInvalidator
      *
      * @param Model\ProductInterface $product
      */
-    public function invalidateParentsPrices(Model\ProductInterface $product)
+    public function invalidateParentsPrices(Model\ProductInterface $product): void
     {
         if (Model\ProductTypes::isConfigurableType($product)) {
             return;
@@ -85,14 +85,19 @@ class PriceInvalidator
             $this->invalidateByProductId($product->getParent()->getId());
         }
 
-        $bundleParents = $this->productRepository->findParentsByBundled($product);
-        foreach ($bundleParents as $b) {
-            $this->invalidateByProductId($b->getId());
+        $parents = $this->productRepository->findParentsByBundled($product);
+        foreach ($parents as $parent) {
+            $this->invalidateByProductId($parent->getId());
         }
 
-        $optionParents = $this->productRepository->findParentsByOptionProduct($product);
-        foreach ($optionParents as $o) {
-            $this->invalidateByProductId($o->getId());
+        $parents = $this->productRepository->findParentsByOptionProduct($product);
+        foreach ($parents as $parent) {
+            $this->invalidateByProductId($parent->getId());
+        }
+
+        $parents = $this->productRepository->findParentsByComponent($product);
+        foreach ($parents as $parent) {
+            $this->invalidateByProductId($parent->getId());
         }
     }
 
@@ -101,7 +106,7 @@ class PriceInvalidator
      *
      * @param Model\ProductInterface $product
      */
-    public function invalidateByProduct(Model\ProductInterface $product)
+    public function invalidateByProduct(Model\ProductInterface $product): void
     {
         $this->invalidateByProductId($product->getId());
     }
@@ -111,7 +116,7 @@ class PriceInvalidator
      *
      * @param int $id
      */
-    public function invalidateByProductId($id)
+    public function invalidateByProductId(int $id): void
     {
         if (!in_array($id, $this->productIds)) {
             $this->productIds[] = $id;

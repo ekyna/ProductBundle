@@ -64,7 +64,7 @@ class PriceRenderer
      * Constructor.
      *
      * @param PriceCalculator          $priceCalculator
-     * @param PurchaseCostCalculator $purchaseCostCalculator
+     * @param PurchaseCostCalculator   $purchaseCostCalculator
      * @param LocaleProviderInterface  $localeProvider
      * @param ContextProviderInterface $contextProvider
      * @param FormatterFactory         $formatterFactory
@@ -106,8 +106,11 @@ class PriceRenderer
      *
      * @return Model\PriceDisplay
      */
-    public function getProductPrice(Model\ProductInterface $product, ContextInterface $context = null, $discount = true)
-    {
+    public function getProductPrice(
+        Model\ProductInterface $product,
+        ContextInterface $context = null,
+        $discount = true
+    ): Model\PriceDisplay {
         // Do not display price for configurable products
         /*if (Model\ProductTypes::isConfigurableType($product)) {
             return new Model\PriceDisplay(0, '', '', 'NC'); // TODO translation
@@ -169,9 +172,9 @@ class PriceRenderer
      * @param Model\ProductInterface $bundle
      * @param bool                   $withOptions Whether to add options min price.
      *
-     * @return float|int
+     * @return float
      */
-    public function getBundlePrice(Model\ProductInterface $bundle, $withOptions = true)
+    public function getBundlePrice(Model\ProductInterface $bundle, $withOptions = true): float
     {
         return $this->priceCalculator->calculateBundleMinPrice($bundle, !$withOptions);
     }
@@ -182,9 +185,9 @@ class PriceRenderer
      * @param Model\ProductInterface $configurable
      * @param bool                   $withOptions Whether to add options min price.
      *
-     * @return float|int
+     * @return float
      */
-    public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true)
+    public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true): float
     {
         return $this->priceCalculator->calculateConfigurableMinPrice($configurable, !$withOptions);
     }
@@ -194,9 +197,9 @@ class PriceRenderer
      *
      * @param Model\ProductInterface $product
      *
-     * @return float|int
+     * @return float
      */
-    public function getComponentsPrice(Model\ProductInterface $product)
+    public function getComponentsPrice(Model\ProductInterface $product): float
     {
         return $this->priceCalculator->calculateComponentsPrice($product);
     }
@@ -209,7 +212,7 @@ class PriceRenderer
      *
      * @return float|int
      */
-    public function getPurchaseCost(Model\ProductInterface $product, $withOptions = true)
+    public function getPurchaseCost(Model\ProductInterface $product, $withOptions = true): float
     {
         return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions);
     }

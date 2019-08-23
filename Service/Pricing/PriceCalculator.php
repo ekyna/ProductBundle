@@ -76,7 +76,7 @@ class PriceCalculator
      *
      * @return array
      */
-    public function getPrice(Model\ProductInterface $product, ContextInterface $context)
+    public function getPrice(Model\ProductInterface $product, ContextInterface $context): array
     {
         // Price lookup
         $price = $this
@@ -139,7 +139,7 @@ class PriceCalculator
      *
      * @return float
      */
-    private function addTaxes(float $base, array $taxes, string $currency)
+    private function addTaxes(float $base, array $taxes, string $currency): float
     {
         $total = $base;
 
@@ -156,9 +156,9 @@ class PriceCalculator
      * @param Model\ProductInterface $product
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    public function calculateMinPrice(Model\ProductInterface $product, $exclude = [])
+    public function calculateMinPrice(Model\ProductInterface $product, $exclude = []): float
     {
         if (Model\ProductTypes::isConfigurableType($product)) {
             return $this->calculateConfigurableMinPrice($product, $exclude);
@@ -181,9 +181,9 @@ class PriceCalculator
      * @param Model\ProductInterface $product
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = [])
+    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = []): float
     {
         if (true === $exclude) {
             return 0;
@@ -252,9 +252,9 @@ class PriceCalculator
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      * @param float                  $price   Price override.
      *
-     * @return float|int
+     * @return float
      */
-    public function calculateProductMinPrice(Model\ProductInterface $product, $exclude = [], $price = null)
+    public function calculateProductMinPrice(Model\ProductInterface $product, $exclude = [], $price = null): float
     {
         Model\ProductTypes::assertChildType($product);
 
@@ -276,10 +276,13 @@ class PriceCalculator
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      * @param float                  $price   Price override.
      *
-     * @return float|int
+     * @return float
      */
-    public function calculateVariableMinPrice(Model\ProductInterface $variable, $exclude = [], float $price = null)
-    {
+    public function calculateVariableMinPrice(
+        Model\ProductInterface $variable,
+        $exclude = [],
+        float $price = null
+    ): float {
         Model\ProductTypes::assertVariable($variable);
 
         if (!is_null($price)) {
@@ -319,11 +322,11 @@ class PriceCalculator
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      * @param float                  $price   Price override.
      *
-     * @return float|int
+     * @return float
      *
      * @todo The product (bundle) min price should be processed and persisted during update (flush)
      */
-    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $exclude = [], $price = null)
+    public function calculateBundleMinPrice(Model\ProductInterface $bundle, $exclude = [], $price = null): float
     {
         Model\ProductTypes::assertBundle($bundle);
 
@@ -368,11 +371,11 @@ class PriceCalculator
      * @param Model\ProductInterface $configurable
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      *
      * @todo The product (configurable) min price should be processed and persisted during update (flush)
      */
-    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = [])
+    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = []): float
     {
         Model\ProductTypes::assertConfigurable($configurable);
 
@@ -440,7 +443,7 @@ class PriceCalculator
         ContextInterface $context,
         bool $withOffers = true,
         bool $withTaxes = true
-    ) {
+    ): array {
         // Net price (bundle : min price without options)
         $amount = $product->getNetPrice();
 
@@ -499,7 +502,7 @@ class PriceCalculator
      *
      * @return array
      */
-    public function getPricingGrid(Model\ProductInterface $product, ContextInterface $context)
+    public function getPricingGrid(Model\ProductInterface $product, ContextInterface $context): array
     {
         $offers = $this->getOffers($product, $context);
 
@@ -551,7 +554,7 @@ class PriceCalculator
         ContextInterface $context,
         bool $withOffers = true,
         bool $withTaxes = true
-    ) {
+    ): array {
         if (null !== $product = $option->getProduct()) {
             $pricing = $this->buildProductPricing($product, $context, $withOffers, $withTaxes);
 
@@ -594,7 +597,7 @@ class PriceCalculator
      *
      * @return float[]
      */
-    public function getTaxesRates(TaxableInterface $taxable, ContextInterface $context)
+    public function getTaxesRates(TaxableInterface $taxable, ContextInterface $context): array
     {
         $taxes = [];
 
@@ -614,7 +617,7 @@ class PriceCalculator
      *
      * @return array
      */
-    protected function getOffers(Model\ProductInterface $product, ContextInterface $context)
+    protected function getOffers(Model\ProductInterface $product, ContextInterface $context): array
     {
         $offers = $this->offerRepository->findByProductAndContext($product, $context);
 
@@ -684,7 +687,7 @@ class PriceCalculator
         ContextInterface $context,
         array $offers,
         $qty = 1
-    ) {
+    ): bool {
         Model\ProductTypes::assertBundle($bundle);
 
         $visible = false;
@@ -732,7 +735,7 @@ class PriceCalculator
      *
      * @return array
      */
-    protected function mergeOffers(array $a, array $b)
+    protected function mergeOffers(array $a, array $b): array
     {
         $offers = [];
 

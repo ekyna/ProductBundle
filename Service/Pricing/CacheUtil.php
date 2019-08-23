@@ -20,7 +20,7 @@ final class CacheUtil
      * @param array  $list
      * @param string $key
      */
-    public static function addKeyToList(array &$list, string $key)
+    public static function addKeyToList(array &$list, string $key): void
     {
         if (!in_array($key, $list, true)) {
             $list[] = $key;
@@ -46,7 +46,7 @@ final class CacheUtil
         CountryInterface $country,
         float $quantity = null,
         bool $multiple = true
-    ) {
+    ): string {
         return self::buildOfferKeyByIds(
             $product->getId(),
             $group->getId(),
@@ -75,7 +75,7 @@ final class CacheUtil
         int $countryId,
         float $quantity = null,
         bool $multiple = true
-    ) {
+    ): string {
         $id = sprintf(
             'product_offer%s_%d_%d_%d',
             $multiple ? 's' : '',
@@ -106,7 +106,7 @@ final class CacheUtil
         ProductInterface $product,
         CustomerGroupInterface $group,
         CountryInterface $country
-    ) {
+    ): string {
         return self::buildPriceKeyByIds(
             $product->getId(),
             $group->getId(),
@@ -129,7 +129,7 @@ final class CacheUtil
         int $productId,
         int $groupId,
         int $countryId
-    ) {
+    ): string {
         return sprintf(
             'product_price_%d_%d_%d',
             $productId,

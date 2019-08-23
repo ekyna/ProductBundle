@@ -81,8 +81,8 @@ class OfferResolver
         foreach ($stackingOffers as $stacking) {
             foreach ($discounts as &$discount) {
                 if (rule_apply_to($stacking, $discount)) {
-                    $discount['percent'] = round((1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100,
-                        5);
+                    $percent = (1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100;
+                    $discount['percent'] = round($percent, 5);
                     $discount['special_offer_id'] = $stacking['special_offer_id'];
                     $discount['details'][Offer::TYPE_SPECIAL] = $stacking['percent'];
                 }
@@ -116,7 +116,7 @@ class OfferResolver
  *
  * @param array $rules
  */
-function rules_purge(array &$rules)
+function rules_purge(array &$rules): void
 {
     foreach ($rules as $ak => $ad) {
         foreach ($rules as $bk => $bd) {
@@ -140,7 +140,7 @@ function rules_purge(array &$rules)
  *
  * @return bool
  */
-function rule_is_better(array $a, array $b)
+function rule_is_better(array $a, array $b): bool
 {
     return rule_apply_to($a, $b) && $a['percent'] >= $b['percent'];
 }
@@ -153,7 +153,7 @@ function rule_is_better(array $a, array $b)
  *
  * @return bool
  */
-function rule_apply_to(array $a, array $b)
+function rule_apply_to(array $a, array $b): bool
 {
     return (is_null($a['group_id']) || $a['group_id'] == $b['group_id'])
         && (is_null($a['country_id']) || $a['country_id'] == $b['country_id'])
@@ -168,7 +168,7 @@ function rule_apply_to(array $a, array $b)
  *
  * @return int
  */
-function rule_sort(array $a, array $b)
+function rule_sort(array $a, array $b): int
 {
     if ($a['group_id'] == $b['group_id']) {
         if ($a['country_id'] == $b['country_id']) {

@@ -30,7 +30,7 @@ class Tree extends Item
      *
      * @return Tree
      */
-    public function getRoot()
+    public function getRoot(): Tree
     {
         $root = $this;
 
@@ -46,7 +46,7 @@ class Tree extends Item
      *
      * @return Tree
      */
-    public function getParent()
+    public function getParent(): ?Tree
     {
         return $this->parent;
     }
@@ -58,7 +58,7 @@ class Tree extends Item
      *
      * @return Tree
      */
-    public function setParent(Tree $parent)
+    public function setParent(Tree $parent): self
     {
         $this->parent = $parent;
 
@@ -70,7 +70,7 @@ class Tree extends Item
      *
      * @return bool
      */
-    public function hasParent()
+    public function hasParent(): bool
     {
         return !is_null($this->parent);
     }
@@ -82,7 +82,7 @@ class Tree extends Item
      *
      * @return $this
      */
-    public function addChild(Tree $child)
+    public function addChild(Tree $child): self
     {
         $child->setParent($this);
 
@@ -96,7 +96,7 @@ class Tree extends Item
      *
      * @return Tree[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -108,7 +108,7 @@ class Tree extends Item
      *
      * @return $this
      */
-    public function addOptionGroup(OptionGroup $group)
+    public function addOptionGroup(OptionGroup $group): self
     {
         $this->optionGroups[] = $group;
 
@@ -120,7 +120,7 @@ class Tree extends Item
      *
      * @return OptionGroup[]
      */
-    public function getOptionGroups()
+    public function getOptionGroups(): array
     {
         return $this->optionGroups;
     }
@@ -130,7 +130,7 @@ class Tree extends Item
      *
      * @return float
      */
-    public function getTotalQuantity()
+    public function getTotalQuantity(): float
     {
         $qty = $this->quantity;
 
@@ -149,7 +149,7 @@ class Tree extends Item
      *
      * @return array|null
      */
-    public function getBestOffer(string $key)
+    public function getBestOffer(string $key): ?array
     {
         $offer = null;
         $item = $this;
@@ -171,7 +171,7 @@ class Tree extends Item
      *
      * @return array
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         $keys = array_keys($this->offers);
 

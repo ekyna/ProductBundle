@@ -50,12 +50,12 @@ class PriceUpdater
     /**
      * Constructor.
      *
-     * @param EntityManager              $manager
-     * @param OfferResolver              $offerResolver
-     * @param PriceRepositoryInterface   $priceRepository
-     * @param PriceInvalidator           $priceInvalidator
-     * @param string                     $customerGroupClass
-     * @param string                     $countryClass
+     * @param EntityManager            $manager
+     * @param OfferResolver            $offerResolver
+     * @param PriceRepositoryInterface $priceRepository
+     * @param PriceInvalidator         $priceInvalidator
+     * @param string                   $customerGroupClass
+     * @param string                   $countryClass
      */
     public function __construct(
         EntityManager $manager,
@@ -80,7 +80,7 @@ class PriceUpdater
      *
      * @return bool Whether this product offers has been updated
      */
-    public function updateByProduct(Model\ProductInterface $product)
+    public function updateByProduct(Model\ProductInterface $product): bool
     {
         switch ($product->getType()) {
             case Types::TYPE_SIMPLE:
@@ -108,7 +108,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function updateChildProduct(Model\ProductInterface $product)
+    protected function updateChildProduct(Model\ProductInterface $product): bool
     {
         $builder = new Config\Builder($this->offerResolver);
 
@@ -119,7 +119,11 @@ class PriceUpdater
         $newPrices = [];
 
         foreach ($keys as $key) {
-            $newPrices[$key] = $builder->flatten($config, $key)->toArray();
+            if (null === $price = $builder->flatten($config, $key)->toArray()) {
+                continue;
+            }
+
+            $newPrices[$key] = $price;
         }
 
         return $this->update($product, $newPrices);
@@ -132,7 +136,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function updateVariableProduct(Model\ProductInterface $product)
+    protected function updateVariableProduct(Model\ProductInterface $product): bool
     {
         $newPrices = [];
 
@@ -166,7 +170,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function updateBundleProduct(Model\ProductInterface $product)
+    protected function updateBundleProduct(Model\ProductInterface $product): bool
     {
         $builder = new Config\Builder($this->offerResolver);
 
@@ -177,7 +181,11 @@ class PriceUpdater
         $newPrices = [];
 
         foreach ($keys as $key) {
-            $newPrices[$key] = $builder->flatten($config, $key)->toArray();
+            if (null === $price = $builder->flatten($config, $key)->toArray()) {
+                continue;
+            }
+
+            $newPrices[$key] = $price;
         }
 
         return $this->update($product, $newPrices);
@@ -190,7 +198,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function updateConfigurableProduct(Model\ProductInterface $product)
+    protected function updateConfigurableProduct(Model\ProductInterface $product): bool
     {
         $newOffers = [];
 
@@ -205,7 +213,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function update(Model\ProductInterface $product, array $newPrices)
+    protected function update(Model\ProductInterface $product, array $newPrices): bool
     {
         // Old prices
         $oldPrices = $this->priceRepository->findByProduct($product, true);
@@ -240,7 +248,7 @@ class PriceUpdater
             if (!is_null($data['group_id'])) {
                 /** @var \Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface $group */
                 $group = $this->manager->getReference($this->customerGroupClass, $data['group_id']);
-                $price->setGroup($group );
+                $price->setGroup($group);
             }
 
             if (!is_null($data['country_id'])) {
@@ -268,29 +276,7 @@ class PriceUpdater
      *
      * @return array
      */
-    protected function resolveOffers(Model\ProductInterface $product)
-    {
-        $offers = [];
-
-        foreach ($this->offerResolver->resolve($product) as &$offer) {
-            if (1 != $offer['min_qty']) {
-                continue;
-            }
-
-            $offers[$this->getPriceKey($offer)] = $offer;
-        }
-
-        return $offers;
-    }
-
-    /**
-     * Resolves the product offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
-     */
-    protected function resolvePrices(Model\ProductInterface $product)
+    protected function resolvePrices(Model\ProductInterface $product): array
     {
         $prices = [];
 
@@ -311,7 +297,7 @@ class PriceUpdater
      *
      * @return bool
      */
-    protected function hasDiff(array $oldPrices, array $newPrices)
+    protected function hasDiff(array $oldPrices, array $newPrices): bool
     {
         if (count($oldPrices) != count($newPrices)) {
             return true;
@@ -351,7 +337,7 @@ class PriceUpdater
      *
      * @return string
      */
-    protected function getPriceKey(array $price)
+    protected function getPriceKey(array $price): string
     {
         return sprintf('%d-%d', $price['group_id'], $price['country_id']);
     }

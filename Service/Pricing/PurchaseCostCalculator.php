@@ -51,9 +51,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $product
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    public function calculateMinPurchaseCost(Model\ProductInterface $product, $exclude = [])
+    public function calculateMinPurchaseCost(Model\ProductInterface $product, $exclude = []): float
     {
         if (Model\ProductTypes::isConfigurableType($product)) {
             return $this->calculateConfigurablePurchaseCost($product, $exclude);
@@ -76,9 +76,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $product
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateMinOptionsPurchaseCost(Model\ProductInterface $product, $exclude = [])
+    protected function calculateMinOptionsPurchaseCost(Model\ProductInterface $product, $exclude = []): float
     {
         $cost = 0;
 
@@ -123,9 +123,9 @@ class PurchaseCostCalculator
      *
      * @param Model\ProductInterface $product
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateComponentsPurchaseCost(Model\ProductInterface $product)
+    protected function calculateComponentsPurchaseCost(Model\ProductInterface $product): float
     {
         $cost = 0;
 
@@ -143,9 +143,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $product
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateProductPurchaseCost(Model\ProductInterface $product, $exclude = [])
+    protected function calculateProductPurchaseCost(Model\ProductInterface $product, $exclude = []): float
     {
         Model\ProductTypes::assertChildType($product);
 
@@ -164,9 +164,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $variable
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateVariablePurchaseCost(Model\ProductInterface $variable, $exclude = [])
+    protected function calculateVariablePurchaseCost(Model\ProductInterface $variable, $exclude = []): float
     {
         Model\ProductTypes::assertVariable($variable);
 
@@ -198,9 +198,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $bundle
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateBundlePurchaseCost(Model\ProductInterface $bundle, $exclude = [])
+    protected function calculateBundlePurchaseCost(Model\ProductInterface $bundle, $exclude = []): float
     {
         Model\ProductTypes::assertBundle($bundle);
 
@@ -234,9 +234,9 @@ class PurchaseCostCalculator
      * @param Model\ProductInterface $configurable
      * @param bool|array             $exclude The option group ids to exclude, true to exclude all
      *
-     * @return float|int
+     * @return float
      */
-    protected function calculateConfigurablePurchaseCost(Model\ProductInterface $configurable, $exclude = [])
+    protected function calculateConfigurablePurchaseCost(Model\ProductInterface $configurable, $exclude = []): float
     {
         Model\ProductTypes::assertConfigurable($configurable);
 

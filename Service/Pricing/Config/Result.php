@@ -61,7 +61,7 @@ class Result
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -73,7 +73,7 @@ class Result
      *
      * @return $this
      */
-    public function addOriginalPrice(float $amount)
+    public function addOriginalPrice(float $amount): self
     {
         $this->originalPrice += $amount;
 
@@ -85,7 +85,7 @@ class Result
      *
      * @return float
      */
-    public function getOriginalPrice()
+    public function getOriginalPrice(): float
     {
         return $this->originalPrice;
     }
@@ -97,7 +97,7 @@ class Result
      *
      * @return $this
      */
-    public function addBasePrice(float $amount)
+    public function addBasePrice(float $amount): self
     {
         $this->basePrice += $amount;
 
@@ -109,7 +109,7 @@ class Result
      *
      * @return float
      */
-    public function getBasePrice()
+    public function getBasePrice(): float
     {
         return $this->basePrice;
     }
@@ -121,7 +121,7 @@ class Result
      *
      * @return $this
      */
-    public function addSellPrice(float $amount)
+    public function addSellPrice(float $amount): self
     {
         $this->sellPrice += $amount;
 
@@ -133,7 +133,7 @@ class Result
      *
      * @return float
      */
-    public function getSellPrice()
+    public function getSellPrice(): float
     {
         return $this->sellPrice;
     }
@@ -146,7 +146,7 @@ class Result
      *
      * @return $this
      */
-    public function addDiscount(string $type, float $amount)
+    public function addDiscount(string $type, float $amount): self
     {
         $this->discounts[$type] += $amount;
 
@@ -160,7 +160,7 @@ class Result
      *
      * @return float
      */
-    public function getDiscount(string $type)
+    public function getDiscount(string $type): float
     {
         return $this->discounts[$type];
     }
@@ -168,9 +168,9 @@ class Result
     /**
      * Returns the array result.
      *
-     * @return array
+     * @return array|null
      */
-    public function toArray()
+    public function toArray(): ?array
     {
         // Build price for this group/country couple
         list($group, $country) = explode('-', $this->key);
@@ -198,14 +198,18 @@ class Result
             $percent = round(($this->originalPrice - $this->sellPrice) * 100 / $this->originalPrice, 2);
         }
 
-        return [
-            'details'        => $details,
-            'starting_from'  => true,
-            'original_price' => $this->originalPrice,
-            'sell_price'     => $this->sellPrice,
-            'percent'        => $percent,
-            'group_id'       => $group,
-            'country_id'     => $country,
-        ];
+        if (0 < $percent) {
+            return [
+                'details'        => $details,
+                'starting_from'  => true,
+                'original_price' => $this->originalPrice,
+                'sell_price'     => $this->sellPrice,
+                'percent'        => $percent,
+                'group_id'       => $group,
+                'country_id'     => $country,
+            ];
+        }
+
+        return null;
     }
 }

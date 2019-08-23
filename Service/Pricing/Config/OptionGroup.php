@@ -22,7 +22,7 @@ class OptionGroup
      *
      * @return $this
      */
-    public function addOption(Item $option)
+    public function addOption(Item $option): self
     {
         $this->options[] = $option;
 
@@ -34,7 +34,7 @@ class OptionGroup
      *
      * @return Item[]
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

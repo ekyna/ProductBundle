@@ -95,7 +95,7 @@ class OfferUpdater
      *
      * @return bool Whether this product offers has been updated
      */
-    public function updateByProduct(ProductInterface $product)
+    public function updateByProduct(ProductInterface $product): bool
     {
         if (in_array($product->getType(), [Types::TYPE_VARIABLE, Types::TYPE_CONFIGURABLE], true)) {
             $newOffers = [];
@@ -137,24 +137,28 @@ class OfferUpdater
                 ->setDetails($data['details']);
 
             if (!is_null($data['group_id'])) {
+                /** @noinspection PhpParamsInspection */
                 $offer->setGroup(
                     $this->manager->getReference($this->customerGroupClass, $data['group_id'])
                 );
             }
 
             if (!is_null($data['country_id'])) {
+                /** @noinspection PhpParamsInspection */
                 $offer->setCountry(
                     $this->manager->getReference($this->countryClass, $data['country_id'])
                 );
             }
 
             if (isset($data['pricing_id'])) {
+                /** @noinspection PhpParamsInspection */
                 $offer->setPricing(
                     $this->manager->getReference($this->pricingClass, $data['pricing_id'])
                 );
             }
 
             if (isset($data['special_offer_id'])) {
+                /** @noinspection PhpParamsInspection */
                 $offer->setSpecialOffer(
                     $this->manager->getReference($this->specialOfferClass, $data['special_offer_id'])
                 );
@@ -182,7 +186,7 @@ class OfferUpdater
      *
      * @return bool
      */
-    protected function hasDiff(array $oldOffers, array $newOffers)
+    protected function hasDiff(array $oldOffers, array $newOffers): bool
     {
         if (count($oldOffers) != count($newOffers)) {
             return true;
@@ -212,17 +216,5 @@ class OfferUpdater
         }
 
         return false;
-    }
-
-    /**
-     * Returns the offer key (<group_id>-<country_id>).
-     *
-     * @param array $offer
-     *
-     * @return string
-     */
-    protected function getOfferKey(array $offer)
-    {
-        return sprintf('%d-%d', $offer['group_id'], $offer['country_id']);
     }
 }

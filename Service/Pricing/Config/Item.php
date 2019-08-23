@@ -47,7 +47,7 @@ class Item
      *
      * @return float
      */
-    public function getNetPrice()
+    public function getNetPrice(): float
     {
         return $this->netPrice;
     }
@@ -59,7 +59,7 @@ class Item
      *
      * @return $this
      */
-    public function setNetPrice(float $price)
+    public function setNetPrice(float $price): self
     {
         $this->netPrice = $price;
 
@@ -73,7 +73,7 @@ class Item
      *
      * @return $this
      */
-    public function addNetPrice(float $price)
+    public function addNetPrice(float $price): self
     {
         $this->netPrice += $price;
 
@@ -85,7 +85,7 @@ class Item
      *
      * @return float
      */
-    public function getQuantity()
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
@@ -97,7 +97,7 @@ class Item
      *
      * @return $this
      */
-    public function setQuantity($quantity)
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
@@ -109,7 +109,7 @@ class Item
      *
      * @return bool
      */
-    public function getVisible()
+    public function getVisible(): bool
     {
         return $this->visible;
     }
@@ -121,7 +121,7 @@ class Item
      *
      * @return $this
      */
-    public function setVisible(bool $visible)
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
 
@@ -133,7 +133,7 @@ class Item
      *
      * @return array
      */
-    public function getOffers()
+    public function getOffers(): array
     {
         return $this->offers;
     }
@@ -145,7 +145,7 @@ class Item
      *
      * @return array|null
      */
-    public function getOffer(string $key)
+    public function getOffer(string $key): ?array
     {
         list($group, $country) = explode('-', $key);
 
@@ -167,7 +167,7 @@ class Item
      *
      * @return $this
      */
-    public function setOffers(array $offers)
+    public function setOffers(array $offers): self
     {
         $this->offers = $offers;
 

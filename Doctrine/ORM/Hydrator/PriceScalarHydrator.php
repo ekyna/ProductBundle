@@ -38,7 +38,7 @@ class PriceScalarHydrator extends AbstractHydrator
         foreach ($data as $key => $value) {
             $alias = $this->_rsm->getScalarAlias($key);
 
-            switch($alias) {
+            switch ($alias) {
                 case 'id':
                 case 'group_id':
                 case 'country_id':
@@ -48,7 +48,7 @@ class PriceScalarHydrator extends AbstractHydrator
                     break;
 
                 case 'starting_from':
-                    $value = (bool) $value;
+                    $value = (bool)$value;
                     break;
 
                 case 'original_price':

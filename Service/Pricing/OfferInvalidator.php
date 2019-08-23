@@ -45,7 +45,7 @@ class OfferInvalidator
     /**
      * Clears the products and brands ids.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->productIds = [];
         $this->brandIds = [];
@@ -56,7 +56,7 @@ class OfferInvalidator
      *
      * @param EntityManagerInterface $manager
      */
-    public function flush(EntityManagerInterface $manager)
+    public function flush(EntityManagerInterface $manager): void
     {
         if (!empty($this->productIds)) {
             $qb = $manager->createQueryBuilder();
@@ -103,7 +103,7 @@ class OfferInvalidator
      *
      * @param PricingInterface $pricing
      */
-    public function invalidatePricing(PricingInterface $pricing)
+    public function invalidatePricing(PricingInterface $pricing): void
     {
         if (null !== $product = $pricing->getProduct()) {
             $this->invalidateByProductId($product->getId());
@@ -121,7 +121,7 @@ class OfferInvalidator
      *
      * @param SpecialOfferInterface $specialOffer
      */
-    public function invalidateSpecialOffer(SpecialOfferInterface $specialOffer)
+    public function invalidateSpecialOffer(SpecialOfferInterface $specialOffer): void
     {
         if (null !== $product = $specialOffer->getProduct()) {
             $this->invalidateByProductId($product->getId());
@@ -143,7 +143,7 @@ class OfferInvalidator
      *
      * @param int $id
      */
-    public function invalidateByProductId($id)
+    public function invalidateByProductId(int $id): void
     {
         if (!in_array($id, $this->productIds)) {
             $this->productIds[] = $id;
@@ -155,7 +155,7 @@ class OfferInvalidator
      *
      * @param int $id
      */
-    public function invalidateByBrandId($id)
+    public function invalidateByBrandId(int $id): void
     {
         if (!in_array($id, $this->brandIds)) {
             $this->brandIds[] = $id;

@@ -46,7 +46,7 @@ class Builder
         bool $visible = true,
         array $exclude = [],
         float $netPrice = null
-    ) {
+    ): Tree {
         $tree = new Tree();
         $tree->setVisible($visible);
 

@@ -215,12 +215,12 @@ class OfferUpdateCommand extends ContainerAwareCommand
      */
     protected function productName(ProductInterface $product, OutputInterface $output)
     {
-        $name = sprintf(
-            '[%d] (%s) %s',
-            $product->getId(),
-            $product->getType(),
-            $product->getFullDesignation()
-        );
+        $name = sprintf('[%d] (%s) %s', $product->getId(), $product->getType(), $product->getFullDesignation());
+
+        if (77 < $tmp = mb_strlen($name)) {
+            $name = mb_substr($name, 0, 77);
+        }
+
         $output->write(sprintf('<comment>%s</comment> %s ',
             $name,
             str_pad('.', 80 - mb_strlen($name), '.', STR_PAD_LEFT)
