@@ -26,16 +26,14 @@
             {{ product|cms_tags({'text': false}) -}}
         </div>
         <div class="actions">
-            {% if product is simple_product or product is variant_product -%}
-                {{ ui_button('ekyna_commerce.button.print_label', {
-                    'type': 'link',
-                    'icon': 'barcode',
-                    'path': path('ekyna_product_product_admin_label', {
-                        'format': 'large',
-                        'id': [product.id],
-                    }),
-                }, {'target': '_blank'}) }}
-            {%- endif %}
+            {{ ui_button('ekyna_commerce.button.print_label', {
+                'type': 'link',
+                'icon': 'barcode',
+                'path': path('ekyna_product_product_admin_label', {
+                    'format': 'large',
+                    'id': [product.id],
+                }),
+            }, {'target': '_blank'}) }}
             {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}{# TODO temp lock #}
                 {{ ui_button('ekyna_core.button.duplicate', {
