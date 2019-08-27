@@ -450,8 +450,8 @@
         <!-- Offer repository -->
         <service id="ekyna_product.offer.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\OfferRepository">
-            <factory service="doctrine" method="getRepository"/>
-            <argument>%ekyna_product.offer.class%</argument>
+            <argument type="service" id="ekyna_product.offer.manager"/>
+            <argument type="service" id="ekyna_product.offer.metadata"/>
             <call method="setCachedCountryCodes">
                 <argument>%ekyna_commerce.cache.countries%</argument>
             </call>
@@ -490,8 +490,8 @@
         <!-- Price repository -->
         <service id="ekyna_product.price.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\PriceRepository">
-            <factory service="doctrine" method="getRepository"/>
-            <argument>%ekyna_product.price.class%</argument>
+            <argument type="service" id="ekyna_product.price.manager"/>
+            <argument type="service" id="ekyna_product.price.metadata"/>
             <call method="setCachedCountryCodes">
                 <argument>%ekyna_commerce.cache.countries%</argument>
             </call>
