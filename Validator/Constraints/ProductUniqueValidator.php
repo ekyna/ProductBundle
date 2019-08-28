@@ -91,7 +91,7 @@ class ProductUniqueValidator extends ConstraintValidator
 
         $this
             ->context
-            ->buildViolation('ekyna_product.product.duplicate_reference', [
+            ->buildViolation('ekyna_product.product.duplicate_designation', [
                 'reference' => $duplicate->getReference(),
             ])
             ->atPath('designation')
@@ -105,7 +105,7 @@ class ProductUniqueValidator extends ConstraintValidator
      */
     private function validateVariantDesignation(Model\ProductInterface $product): void
     {
-        if (empty($product->getDescription())) {
+        if (empty($product->getDesignation())) {
             return;
         }
 
