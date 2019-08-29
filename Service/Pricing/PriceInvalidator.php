@@ -108,7 +108,11 @@ class PriceInvalidator
      */
     public function invalidateByProduct(Model\ProductInterface $product): void
     {
-        $this->invalidateByProductId($product->getId());
+        if (null === $id = $product->getId()) {
+            return;
+        }
+
+        $this->invalidateByProductId($id);
     }
 
     /**
