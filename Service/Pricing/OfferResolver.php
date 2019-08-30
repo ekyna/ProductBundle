@@ -98,10 +98,7 @@ class OfferResolver
         usort($offers, __NAMESPACE__ . '\rule_sort');
 
         // Set net prices
-        $netPrice = $product->getNetPrice();
-        if (ProductTypes::isVariantType($product)) {
-            $netPrice += $this->priceCalculator->calculateComponentsPrice($product->getParent());
-        }
+        $netPrice = $product->getMinPrice();
         foreach ($offers as &$data) {
             unset($data['stack']);
             $data['net_price'] = round($netPrice * (1 - $data['percent'] / 100), 5);

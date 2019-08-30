@@ -455,8 +455,8 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     that.choice = that.$choice.data('saleItem');
                 } else {
                     that.choice = undefined;
-                    that.parentItem.$element.trigger('child_change');
                 }
+                that.parentItem.$element.trigger('child_change');
                 that.$choice.show().fadeIn(250);
                 that.busy = false;
             };

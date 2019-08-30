@@ -70,14 +70,8 @@ class Builder
             }
         }
 
-        if ($exclude) {
-            $optionGroups = $product->getOptionGroups()->toArray();
-            if (Types::TYPE_VARIANT === $product->getType()) {
-                $optionGroups = array_merge($optionGroups, $product->getParent()->getOptionGroups()->toArray());
-            }
-            if (!empty($optionGroups)) {
-                $this->buildOptionGroups($tree, $optionGroups);
-            }
+        if (!empty($optionGroups = $product->resolveOptionGroups($exclude, true))) {
+            $this->buildOptionGroups($tree, $optionGroups);
         }
 
         return $tree;
@@ -91,7 +85,7 @@ class Builder
      * @param bool                   $visible
      * @param array                  $exclude
      */
-    private function buildBundleSlots(
+    protected function buildBundleSlots(
         Tree $tree,
         Model\ProductInterface $product,
         bool $visible = true,
@@ -121,7 +115,7 @@ class Builder
      * @param Tree                   $tree
      * @param Model\ProductInterface $product
      */
-    private function buildComponents(Tree $tree, Model\ProductInterface $product): void
+    protected function buildComponents(Tree $tree, Model\ProductInterface $product): void
     {
         foreach ($product->getComponents() as $component) {
             $price = is_null($component->getNetPrice())
@@ -138,6 +132,76 @@ class Builder
             $tree->addChild($child);
         }
     }
+
+    /**
+     * Builds the options groups.
+     *
+     * @param Tree                         $tree
+     * @param Model\OptionGroupInterface[] $optionGroups
+     */
+    protected function buildOptionGroups(Tree $tree, array $optionGroups): void
+    {
+        /** @var Model\OptionGroupInterface $optionGroup */
+        foreach ($optionGroups as $optionGroup) {
+            if (!$optionGroup->isRequired()) {
+                continue;
+            }
+
+            $og = new OptionGroup();
+
+            foreach ($optionGroup->getOptions() as $option) {
+                $item = new Item(0);
+
+                if (null !== $product = $option->getProduct()) {
+                    $item->setOffers($this->resolveOffers($product));
+                    $item->setNetPrice($product->getNetPrice());
+                }
+
+                if (null !== $option->getNetPrice()) {
+                    $item->setNetPrice($option->getNetPrice());
+                }
+
+                $og->addOption($item);
+            }
+
+            $tree->addOptionGroup($og);
+        }
+    }
+
+    /**
+     * Resolves the product offers.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return array
+     */
+    protected function resolveOffers(Model\ProductInterface $product): array
+    {
+        $offers = [];
+
+        foreach ($this->offerResolver->resolve($product) as &$offer) {
+            if (1 != $offer['min_qty']) {
+                continue;
+            }
+
+            $offers[$this->getKey($offer)] = $offer;
+        }
+
+        return $offers;
+    }
+
+    /**
+     * Returns the key (<group_id>-<country_id>).
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    protected function getKey(array $data): string
+    {
+        return sprintf('%d-%d', $data['group_id'], $data['country_id']);
+    }
+
 
     /**
      * Flattens the given tree regarding to the given key.
@@ -279,75 +343,5 @@ class Builder
         }
 
         return $visible;
-    }
-
-    /**
-     * Builds the options groups.
-     *
-     * @param Tree                         $tree
-     * @param Model\OptionGroupInterface[] $optionGroups
-     */
-    protected function buildOptionGroups(Tree $tree, array $optionGroups): void
-    {
-        /** @var Model\OptionGroupInterface $optionGroup */
-        foreach ($optionGroups as $optionGroup) {
-            if (!$optionGroup->isRequired()) {
-                continue;
-            }
-
-            $og = new OptionGroup();
-
-            foreach ($optionGroup->getOptions() as $option) {
-                $item = new Item(0);
-
-                if (null !== $product = $option->getProduct()) {
-                    $item->setOffers($this->resolveOffers($product));
-                    $item->setNetPrice($product->getNetPrice());
-                }
-
-                if (null !== $option->getNetPrice()) {
-                    $item->setNetPrice($option->getNetPrice());
-                }
-
-                $og->addOption($item);
-            }
-
-            $tree->addOptionGroup($og);
-        }
-    }
-
-
-    /**
-     * Resolves the product offers.
-     *
-     * @param Model\ProductInterface $product
-     *
-     * @return array
-     */
-    protected function resolveOffers(Model\ProductInterface $product): array
-    {
-        $offers = [];
-
-        foreach ($this->offerResolver->resolve($product) as &$offer) {
-            if (1 != $offer['min_qty']) {
-                continue;
-            }
-
-            $offers[$this->getKey($offer)] = $offer;
-        }
-
-        return $offers;
-    }
-
-    /**
-     * Returns the key (<group_id>-<country_id>).
-     *
-     * @param array $data
-     *
-     * @return string
-     */
-    protected function getKey(array $data): string
-    {
-        return sprintf('%d-%d', $data['group_id'], $data['country_id']);
     }
 }
