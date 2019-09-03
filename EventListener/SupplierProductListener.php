@@ -70,7 +70,7 @@ class SupplierProductListener implements EventSubscriberInterface
 
         $supplierProduct
             ->setDesignation($product->getFullDesignation(true))
-            ->setWeight($product->getWeight())
+            ->setWeight($product->getPackageWeight())
             ->getSubjectIdentity()
             ->setIdentifier($product->getId())
             ->setProvider(ProductProvider::NAME)

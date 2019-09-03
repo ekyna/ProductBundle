@@ -68,7 +68,7 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
         if (!empty($description)) {
             $schema->description($description);
         }
-        if (0 < $weight = $object->getWeight()) {
+        if (0 < $weight = $object->getPackageWeight()) {
             if (1 > $weight) {
                 $schema->weight(
                     Schema::quantitativeValue()
@@ -84,11 +84,11 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
             }
         }
 
-        if ($object->hasDimensions()) {
+        if ($object->hasPackageDimensions()) {
             $schema
-                ->width(Schema::quantitativeValue()->value($object->getWidth())->unitCode('MMT'))
-                ->height(Schema::quantitativeValue()->value($object->getHeight())->unitCode('MMT'))
-                ->depth(Schema::quantitativeValue()->value($object->getDepth())->unitCode('MMT'));
+                ->width(Schema::quantitativeValue()->value($object->getPackageWidth())->unitCode('MMT'))
+                ->height(Schema::quantitativeValue()->value($object->getPackageHeight())->unitCode('MMT'))
+                ->depth(Schema::quantitativeValue()->value($object->getPackageDepth())->unitCode('MMT'));
         }
 
         if (null !== $date = $object->getReleasedAt()) {

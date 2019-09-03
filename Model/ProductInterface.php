@@ -680,15 +680,6 @@ interface ProductInterface extends
     public function setSlug(string $slug);
 
     /**
-     * Sets the designation.
-     *
-     * @param string $designation
-     *
-     * @return $this|ProductInterface
-     */
-    public function setDesignation($designation);
-
-    /**
      * Returns the attributes (auto-generated) designation.
      *
      * @return string
@@ -714,24 +705,6 @@ interface ProductInterface extends
     public function getFullDesignation($withBrand = false);
 
     /**
-     * Sets the reference.
-     *
-     * @param string $reference
-     *
-     * @return $this|ProductInterface
-     */
-    public function setReference($reference);
-
-    /**
-     * Sets the net price.
-     *
-     * @param float $netPrice
-     *
-     * @return $this|ProductInterface
-     */
-    public function setNetPrice($netPrice);
-
-    /**
      * Returns the minimum price.
      *
      * @return float
@@ -746,51 +719,6 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setMinPrice($minPrice);
-
-    /**
-     * Sets the weight (kilograms).
-     *
-     * @param float $weight
-     *
-     * @return $this|ProductInterface
-     */
-    public function setWeight($weight);
-
-    /**
-     * Sets the height (millimeters).
-     *
-     * @param int $height
-     *
-     * @return $this|ProductInterface
-     */
-    public function setHeight($height);
-
-    /**
-     * Sets the width (millimeters).
-     *
-     * @param int $width
-     *
-     * @return $this|ProductInterface
-     */
-    public function setWidth($width);
-
-    /**
-     * Sets the depth (millimeters).
-     *
-     * @param int $depth
-     *
-     * @return $this|ProductInterface
-     */
-    public function setDepth($depth);
-
-    /**
-     * Sets the quantity unit.
-     *
-     * @param string $unit
-     *
-     * @return $this|ProductInterface
-     */
-    public function setUnit($unit);
 
     /**
      * Returns whether offers update is needed.

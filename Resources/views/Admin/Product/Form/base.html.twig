@@ -67,34 +67,22 @@
         <div class="tab-pane" id="product-pricing">
             {% block pricing_content %}
             <div class="row">
-                <div class="col-md-4">
-                    {{ form_row(form.reference, {'label_col': 6, 'widget_col': 6}) }}
-                </div>
-                <div class="col-md-4">
-                    {{ form_row(form.unit, {'label_col': 6, 'widget_col': 6}) }}
-                </div>
-                <div class="col-md-4">
-                    {{ form_row(form.weight, {'label_col': 6, 'widget_col': 6}) }}
-                </div>
-            </div>
-            <div class="row">
                 <div class="col-md-6">
                     {{ form_row(form.netPrice, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
+                    {{ form_row(form.reference, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
-                    {{ form_row(form.width, {'label_col': 6, 'widget_col': 6}) }}
+                <div class="col-md-6">
+                    {{ form_row(form.taxGroup, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
-                <div class="col-md-4">
-                    {{ form_row(form.height, {'label_col': 6, 'widget_col': 6}) }}
+                {% if form.customerGroups is defined -%}
+                <div class="col-md-6">
+                    {{ form_row(form.customerGroups, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
-                <div class="col-md-4">
-                    {{ form_row(form.depth, {'label_col': 6, 'widget_col': 6}) }}
-                </div>
+                {%- endif %}
             </div>
             {% endblock pricing_content %}
             {% if form.components is defined -%}
@@ -125,15 +113,40 @@
                     {{ form_row(form.stockMode, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.geocode, {'label_col': 4, 'widget_col': 8}) }}
+                    {{ form_row(form.unit, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
-                    {{ form_row(form.stockFloor, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.geocode, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
-                <div class="col-md-6">
-                    {{ form_row(form.replenishmentTime, {'label_col': 4, 'widget_col': 8}) }}
+                <div class="col-md-4">
+                    {{ form_row(form.weight, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.packageWeight, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.stockFloor, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.width, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.packageWidth, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.replenishmentTime, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.height, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.packageHeight, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
             </div>
             <div class="row">
@@ -141,10 +154,18 @@
                     {{ form_row(form.minimumOrderQuantity, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
                 <div class="col-md-4">
-                    {{ form_row(form.quoteOnly, {'label_col': 6, 'widget_col': 6}) }}
+                    {{ form_row(form.depth, {'label_col': 6, 'widget_col': 6}) }}
                 </div>
                 <div class="col-md-4">
-                    {{ form_row(form.endOfLife, {'label_col': 6, 'widget_col': 6}) }}
+                    {{ form_row(form.packageDepth, {'label_col': 6, 'widget_col': 6}) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.quoteOnly, {'label_col': 4, 'widget_col': 8}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.endOfLife, {'label_col': 4, 'widget_col': 8}) }}
                 </div>
             </div>
             {% endblock stock_content %}

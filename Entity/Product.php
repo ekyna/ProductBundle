@@ -11,9 +11,7 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
-use Ekyna\Component\Commerce\Pricing\Model as Pricing;
-use Ekyna\Component\Commerce\Stock\Model\StockComponent;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectTrait;
+use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -34,8 +32,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         RM\SortableTrait,
         RM\TimestampableTrait,
         RM\TaggedEntityTrait,
-        Pricing\TaxableTrait,
-        StockSubjectTrait;
+        Stock\StockSubjectTrait;
 
     /**
      * @var int
@@ -120,52 +117,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @var string
      */
-    protected $designation;
-
-    /**
-     * @var string
-     */
     protected $attributesDesignation;
-
-    /**
-     * @var string
-     */
-    protected $reference;
-
-    /**
-     * @var float
-     */
-    protected $netPrice = 0;
 
     /**
      * @var float
      */
     protected $minPrice = 0;
-
-    /**
-     * @var float
-     */
-    protected $weight = 0;
-
-    /**
-     * @var int
-     */
-    protected $height = 0;
-
-    /**
-     * @var int
-     */
-    protected $width = 0;
-
-    /**
-     * @var int
-     */
-    protected $depth = 0;
-
-    /**
-     * @var string
-     */
-    protected $unit = Common\Units::PIECE;
 
     /**
      * @var bool
@@ -1289,24 +1246,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getDesignation()
-    {
-        return $this->designation;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDesignation($designation)
-    {
-        $this->designation = $designation;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getAttributesDesignation()
     {
         return $this->attributesDesignation;
@@ -1345,42 +1284,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    public function getReference()
-    {
-        return $this->reference;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setReference($reference)
-    {
-        $this->reference = $reference;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getNetPrice()
-    {
-        return $this->netPrice;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setNetPrice($netPrice)
-    {
-        $this->netPrice = $netPrice;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getMinPrice()
     {
         return $this->minPrice;
@@ -1392,96 +1295,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setMinPrice($minPrice)
     {
         $this->minPrice = $minPrice;
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setHeight($height)
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getWidth()
-    {
-        return $this->width;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setWidth($width)
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDepth()
-    {
-        return $this->depth;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setDepth($depth)
-    {
-        $this->depth = $depth;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getUnit()
-    {
-        return $this->unit;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setUnit($unit)
-    {
-        $this->unit = $unit;
 
         return $this;
     }
@@ -1781,14 +1594,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritDoc
      */
-    public function hasDimensions()
-    {
-        return !empty($this->width) && !empty($this->height) && !empty($this->depth);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getStockComposition(): array
     {
         $composition = [];
@@ -1796,7 +1601,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
             // Variants as choices
             $composition[] = array_map(function (Model\ProductInterface $variant) {
-                return new StockComponent($variant, 1); // TODO Deal with units
+                return new Stock\StockComponent($variant, 1); // TODO Deal with units
             }, $this->variants->toArray());
         } elseif ($this->type === Model\ProductTypes::TYPE_BUNDLE) {
             // Slots choice as composition
@@ -1804,20 +1609,20 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 /** @var Model\BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
 
-                return new StockComponent($choice->getProduct(), $choice->getMinQuantity());
+                return new Stock\StockComponent($choice->getProduct(), $choice->getMinQuantity());
             }, $this->bundleSlots->toArray());
         } elseif ($this->type === Model\ProductTypes::TYPE_CONFIGURABLE) {
             /** @var Model\BundleSlotInterface $slot */
             foreach ($this->bundleSlots->toArray() as $slot) {
                 $composition[] = array_map(function (Model\BundleChoiceInterface $choice) {
-                    return new StockComponent($choice->getProduct(), $choice->getMinQuantity());
+                    return new Stock\StockComponent($choice->getProduct(), $choice->getMinQuantity());
                 }, $slot->getChoices()->toArray());
             }
         }
 
         // Components
         foreach ($this->components as $component) {
-            $composition[] = new StockComponent($component->getChild(), $component->getQuantity());
+            $composition[] = new Stock\StockComponent($component->getChild(), $component->getQuantity());
         }
 
         return $composition;
@@ -1834,7 +1639,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    static public function getProviderName()
+    static public function getProviderName(): string
     {
         return ProductProvider::NAME;
     }

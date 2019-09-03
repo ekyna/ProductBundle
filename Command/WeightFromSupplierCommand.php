@@ -107,7 +107,7 @@ class WeightFromSupplierCommand extends ContainerAwareCommand
                 continue;
             }
 
-            $manager->persist($product->setWeight($weight));
+            $manager->persist($product->setPackageWeight($weight));
 
             $output->writeln('<info>' . round($weight, 3) . '</info>');
 

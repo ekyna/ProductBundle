@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
-use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
+use Ekyna\Bundle\CommerceBundle\Form\SubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 use Symfony\Component\Form\AbstractType;
@@ -21,9 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class QuickEditType extends AbstractType
 {
     /**
-     * @var ProductFormBuilder
+     * @var SubjectFormBuilder
      */
-    private $productBuilder;
+    private $subjectBuilder;
 
     /**
      * @var StockSubjectFormBuilder
@@ -39,16 +39,16 @@ class QuickEditType extends AbstractType
     /**
      * Constructor.
      *
-     * @param ProductFormBuilder $productBuilder
+     * @param SubjectFormBuilder $subjectBuilder
      * @param StockSubjectFormBuilder $stockBuilder
      * @param TaxResolverInterface $taxResolver
      */
     public function __construct(
-        ProductFormBuilder $productBuilder,
+        SubjectFormBuilder $subjectBuilder,
         StockSubjectFormBuilder $stockBuilder,
         TaxResolverInterface $taxResolver
     ) {
-        $this->productBuilder = $productBuilder;
+        $this->subjectBuilder = $subjectBuilder;
         $this->stockBuilder = $stockBuilder;
         $this->taxResolver = $taxResolver;
     }
@@ -63,7 +63,7 @@ class QuickEditType extends AbstractType
             $product = $event->getData();
             $form = $event->getForm();
 
-            $this->productBuilder->initialize($product, $form);
+            $this->subjectBuilder->initialize($form);
             $this->stockBuilder->initialize($form);
 
             $rates = [];
@@ -72,19 +72,28 @@ class QuickEditType extends AbstractType
                 $rates[] = $tax->getRate() / 100;
             }
 
-            $this->productBuilder
+            $this->subjectBuilder
                 ->addNetPriceField([
                     'rates' => $rates,
-                ])
-                ->addWeightField();
+                ]);
 
             $this->stockBuilder
                 ->addGeocodeField()
                 ->addStockFloor()
                 ->addStockMode()
                 ->addReplenishmentTime()
+                ->addMinimumOrderQuantity()
                 ->addEndOfLifeField()
-                ->addQuoteOnlyField();
+                ->addQuoteOnlyField()
+                ->addWeightField()
+                ->addWidthField()
+                ->addHeightField()
+                ->addDepthField()
+                ->addUnitField()
+                ->addPackageWeightField()
+                ->addPackageWidthField()
+                ->addPackageHeightField()
+                ->addPackageDepthField();
         });
     }
 
@@ -96,7 +105,7 @@ class QuickEditType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => ProductInterface::class,
             'validation_groups' => function (FormInterface $form) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+                /** @var ProductInterface $product */
                 $product = $form->getData();
 
                 if (!strlen($type = $product->getType())) {

@@ -634,69 +634,33 @@
 
         <!-- Weight -->
         <property name="weight">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
+            <constraint name="NotNull"/>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
             </constraint>
         </property>
 
         <!-- Height -->
         <property name="height">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
+            <constraint name="NotNull"/>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
             </constraint>
         </property>
 
         <!-- Width -->
         <property name="width">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
+            <constraint name="NotNull"/>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
             </constraint>
         </property>
 
         <!-- Depth -->
         <property name="depth">
-            <constraint name="NotNull">
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
-            </constraint>
+            <constraint name="NotNull"/>
             <constraint name="GreaterThanOrEqual">
                 <option name="value">0</option>
-                <option name="groups">
-                    <value>simple</value>
-                    <value>variant</value>
-                </option>
             </constraint>
         </property>
 
@@ -728,6 +692,38 @@
                     <value>variable</value>
                     <value>variant</value>
                 </option>
+            </constraint>
+        </property>
+
+        <!-- Package Weight -->
+        <property name="packageWeight">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+
+        <!-- Package Height -->
+        <property name="packageHeight">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+
+        <!-- Package Width -->
+        <property name="packageWidth">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+
+        <!-- Package Depth -->
+        <property name="packageDepth">
+            <constraint name="NotNull"/>
+            <constraint name="GreaterThanOrEqual">
+                <option name="value">0</option>
             </constraint>
         </property>
 

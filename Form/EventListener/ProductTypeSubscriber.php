@@ -3,7 +3,9 @@
 namespace Ekyna\Bundle\ProductBundle\Form\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
+use Ekyna\Bundle\CommerceBundle\Form\SubjectFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductAdjustmentType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepositoryInterface;
@@ -24,6 +26,11 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     private $productBuilder;
 
     /**
+     * @var SubjectFormBuilder
+     */
+    private $subjectBuilder;
+
+    /**
      * @var StockSubjectFormBuilder
      */
     private $stockBuilder;
@@ -38,15 +45,18 @@ class ProductTypeSubscriber implements EventSubscriberInterface
      * Constructor.
      *
      * @param ProductFormBuilder          $productBuilder
+     * @param SubjectFormBuilder          $subjectBuilder
      * @param StockSubjectFormBuilder     $stockBuilder
      * @param ResourceRepositoryInterface $attributeSetRepository
      */
     public function __construct(
         ProductFormBuilder $productBuilder,
+        SubjectFormBuilder $subjectBuilder,
         StockSubjectFormBuilder $stockBuilder,
         ResourceRepositoryInterface $attributeSetRepository
     ) {
         $this->productBuilder = $productBuilder;
+        $this->subjectBuilder = $subjectBuilder;
         $this->stockBuilder = $stockBuilder;
         $this->attributeSetRepository = $attributeSetRepository;
     }
@@ -62,6 +72,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $product = $event->getData();
 
         $this->productBuilder->initialize($product, $event->getForm());
+        $this->subjectBuilder->initialize($event->getForm());
         $this->stockBuilder->initialize($event->getForm());
 
         $type = $product->getType();
@@ -131,34 +142,34 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $product = $this->getProductBuilder()->getProduct();
 
         $this->productBuilder
-            ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
             ->addVisibilityField()
             ->addBestSellerField()
             ->addCrossSellingField()
             ->addCategoriesField()
-            ->addCustomerGroupsField()
             ->addReleasedAtField()
             ->addReferenceField()
-            ->addWeightField()
-            ->addHeightField()
-            ->addWidthField()
-            ->addDepthField()
-            ->addUnitField()
             ->addTagsField()
             ->addReferencesField()
             ->addTranslationsField()
             ->addAttributeSetField()
             ->addAttributesField($product->getAttributeSet())
             ->addMediasField()
-            ->addNetPriceField()
-            ->addTaxGroupField()
-            ->addAdjustmentsField()
             ->addOptionGroupsField()
             ->addSpecialOffersField()
             ->addPricingsField()
             ->addSeoField();
+
+        $this->subjectBuilder
+            ->addDesignationField()
+            ->addCustomerGroupsField()
+            ->addNetPriceField()
+            ->addTaxGroupField()
+            ->addAdjustmentsField([
+                'prototype_name' => '__product_adjustment__',
+                'entry_type'     => ProductAdjustmentType::class,
+            ]);
 
         $this->stockBuilder
             ->addStockMode()
@@ -167,7 +178,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReplenishmentTime()
             ->addMinimumOrderQuantity()
             ->addQuoteOnlyField()
-            ->addEndOfLifeField();
+            ->addEndOfLifeField()
+            ->addWeightField()
+            ->addWidthField()
+            ->addHeightField()
+            ->addDepthField()
+            ->addUnitField()
+            ->addPackageWeightField()
+            ->addPackageWidthField()
+            ->addPackageHeightField()
+            ->addPackageDepthField();
     }
 
 
@@ -178,7 +198,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     {
         $this->productBuilder
             // General
-            ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
             ->addVisibilityField()
@@ -186,21 +205,19 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField(['disabled' => true])
-            ->addHeightField(['disabled' => true])
-            ->addWidthField(['disabled' => true])
-            ->addDepthField(['disabled' => true])
-            ->addUnitField()
             ->addTranslationsField()
             ->addAttributeSetField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField(['disabled' => true])
-            ->addTaxGroupField()
             ->addComponentsField()
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
+
+        $this->subjectBuilder
+            ->addDesignationField()
+            ->addNetPriceField(['disabled' => true])
+            ->addTaxGroupField();
 
         $this->stockBuilder
             ->addStockMode(['disabled' => true])
@@ -209,7 +226,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReplenishmentTime(['disabled' => true])
             ->addMinimumOrderQuantity(['disabled' => true])
             ->addQuoteOnlyField()
-            ->addEndOfLifeField();
+            ->addEndOfLifeField()
+            ->addWeightField(['disabled' => true])
+            ->addWidthField(['disabled' => true])
+            ->addHeightField(['disabled' => true])
+            ->addDepthField(['disabled' => true])
+            ->addUnitField()
+            ->addPackageWeightField(['disabled' => true])
+            ->addPackageWidthField(['disabled' => true])
+            ->addPackageHeightField(['disabled' => true])
+            ->addPackageDepthField(['disabled' => true]);
     }
 
     /**
@@ -221,21 +247,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $this->productBuilder
             // General
-            ->addDesignationField([
-                'required' => false,
-                'attr'     => [
-                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
-                ],
-            ])
             ->addVisibleField()
-            ->addCustomerGroupsField()
             ->addReleasedAtField()
             ->addReferenceField()
-            ->addWeightField()
-            ->addHeightField()
-            ->addWidthField()
-            ->addDepthField()
-            ->addUnitField(['disabled' => true])
             ->addTagsField()
             ->addTranslationsField([
                 'required'     => false,
@@ -248,16 +262,28 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addAttributesField($product->getParent()->getAttributeSet())
             ->addMediasField()
             // Pricing
+            ->addOptionGroupsField()
+            ->addSpecialOffersField()
+            ->addPricingsField();
+
+        $this->subjectBuilder
+            ->addDesignationField([
+                'required' => false,
+                'attr'     => [
+                    'help_text' => 'ekyna_product.leave_blank_to_auto_generate',
+                ],
+            ])
+            ->addCustomerGroupsField()
             ->addNetPriceField()
             ->addTaxGroupField([
                 'allow_new' => false,
                 'required'  => false,
                 'disabled'  => true,
             ])
-            ->addAdjustmentsField()
-            ->addOptionGroupsField()
-            ->addSpecialOffersField()
-            ->addPricingsField();
+            ->addAdjustmentsField([
+                'prototype_name' => '__product_adjustment__',
+                'entry_type'     => ProductAdjustmentType::class,
+            ]);
 
         $this->stockBuilder
             ->addStockMode()
@@ -266,7 +292,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReplenishmentTime()
             ->addMinimumOrderQuantity()
             ->addQuoteOnlyField()
-            ->addEndOfLifeField();
+            ->addEndOfLifeField()
+            ->addWeightField()
+            ->addWidthField()
+            ->addHeightField()
+            ->addDepthField()
+            ->addUnitField(['disabled' => true])
+            ->addPackageWeightField()
+            ->addPackageWidthField()
+            ->addPackageHeightField()
+            ->addPackageDepthField();
     }
 
     /**
@@ -276,7 +311,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     {
         $this->productBuilder
             // General
-            ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
             ->addVisibilityField()
@@ -284,16 +318,9 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField(['disabled' => true])
-            ->addHeightField(['disabled' => true])
-            ->addWidthField(['disabled' => true])
-            ->addDepthField(['disabled' => true])
-            ->addUnitField(['disabled' => true])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField(['disabled' => true])
-            ->addTaxGroupField()
             ->addBundleSlotsField()
             // TODO (?) ->addComponentsField()
             ->addOptionGroupsField()
@@ -302,6 +329,11 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // Seo
             ->addSeoField();
 
+        $this->subjectBuilder
+            ->addDesignationField()
+            ->addNetPriceField(['disabled' => true])
+            ->addTaxGroupField();
+
         $this->stockBuilder
             ->addStockMode(['disabled' => true])
             ->addGeocodeField(['disabled' => true])
@@ -309,7 +341,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReplenishmentTime(['disabled' => true])
             ->addMinimumOrderQuantity()
             ->addQuoteOnlyField()
-            ->addEndOfLifeField();
+            ->addEndOfLifeField()
+            ->addWeightField(['disabled' => true])
+            ->addWidthField(['disabled' => true])
+            ->addHeightField(['disabled' => true])
+            ->addDepthField(['disabled' => true])
+            ->addUnitField(['disabled' => true])
+            ->addPackageWeightField(['disabled' => true])
+            ->addPackageWidthField(['disabled' => true])
+            ->addPackageHeightField(['disabled' => true])
+            ->addPackageDepthField(['disabled' => true]);
     }
 
     /**
@@ -319,7 +360,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     {
         $this->productBuilder
             // General
-            ->addDesignationField()
             ->addBrandField()
             ->addVisibleField()
             ->addVisibilityField()
@@ -327,20 +367,18 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addCrossSellingField()
             ->addCategoriesField()
             ->addReferenceField()
-            ->addWeightField(['disabled' => true])
-            ->addHeightField(['disabled' => true])
-            ->addWidthField(['disabled' => true])
-            ->addDepthField(['disabled' => true])
-            ->addUnitField(['disabled' => true])
             ->addTranslationsField()
             ->addMediasField()
             // Pricing
-            ->addNetPriceField(['disabled' => true])
-            ->addTaxGroupField()
             ->addBundleSlotsField(['configurable' => true])
             ->addOptionGroupsField()
             // Seo
             ->addSeoField();
+
+        $this->subjectBuilder
+            ->addDesignationField()
+            ->addNetPriceField(['disabled' => true])
+            ->addTaxGroupField();
 
         $this->stockBuilder
             ->addStockMode(['disabled' => true])
@@ -349,7 +387,16 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addReplenishmentTime(['disabled' => true])
             ->addMinimumOrderQuantity()
             ->addQuoteOnlyField()
-            ->addEndOfLifeField();
+            ->addEndOfLifeField()
+            ->addWeightField(['disabled' => true])
+            ->addWidthField(['disabled' => true])
+            ->addHeightField(['disabled' => true])
+            ->addDepthField(['disabled' => true])
+            ->addUnitField(['disabled' => true])
+            ->addPackageWeightField(['disabled' => true])
+            ->addPackageWidthField(['disabled' => true])
+            ->addPackageHeightField(['disabled' => true])
+            ->addPackageDepthField(['disabled' => true]);
     }
 
     /**
@@ -373,7 +420,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     static public function getSubscribedEvents()
     {

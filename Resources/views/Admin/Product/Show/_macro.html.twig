@@ -90,50 +90,6 @@
 {%- endmacro show_reference -%}
 
 
-{%- macro show_weight(product, options = {}) -%}
-    {{- show_row(product.weight, 'number', {
-        'label': 'ekyna_core.field.weight',
-        'id': 'product_weight',
-        'append': ' kg'
-    }|merge(options)) -}}
-{%- endmacro show_weight -%}
-
-
-{%- macro show_height(product, options = {}) -%}
-    {{- show_row(product.height, 'number', {
-        'label': 'ekyna_core.field.height',
-        'id': 'product_height',
-        'append': ' mm'
-    }|merge(options)) -}}
-{%- endmacro show_height -%}
-
-
-{%- macro show_width(product, options = {}) -%}
-    {{- show_row(product.width, 'number', {
-        'label': 'ekyna_core.field.width',
-        'id': 'product_width',
-        'append': ' mm'
-    }|merge(options)) -}}
-{%- endmacro show_width -%}
-
-
-{%- macro show_depth(product, options = {}) -%}
-    {{- show_row(product.depth, 'number', {
-        'label': 'ekyna_core.field.depth',
-        'id': 'product_depth',
-        'append': ' mm'
-    }|merge(options)) -}}
-{%- endmacro show_depth -%}
-
-
-{%- macro show_unit(product, options = {}) -%}
-    {{- show_row(product.unit, 'unit', {
-        'label': 'ekyna_commerce.unit.label',
-        'id': 'product_unit'
-    }|merge(options)) -}}
-{%- endmacro show_unit -%}
-
-
 {%- macro show_translations(product, options = {}) -%}
     {{- show_row(product.translations, 'translations', {
         'id': 'product_translations',

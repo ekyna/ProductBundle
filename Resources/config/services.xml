@@ -108,7 +108,7 @@
         </service>
         <service id="ekyna_product.inventory_quick_edit.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
-            <argument type="service" id="ekyna_product.product.form_type.builder"/>
+            <argument type="service" id="ekyna_commerce.subject.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.pricing.tax_resolver"/>
             <tag name="form.type"/>
@@ -362,6 +362,7 @@
         <service id="ekyna_product.product.form_type.event_subscriber"
                  class="%ekyna_product.product.form_type.event_subscriber.class%">
             <argument type="service" id="ekyna_product.product.form_type.builder"/>
+            <argument type="service" id="ekyna_commerce.subject.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
             <argument type="service" id="ekyna_product.attribute_set.repository"/>
         </service>

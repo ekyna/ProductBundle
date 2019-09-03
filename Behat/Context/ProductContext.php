@@ -60,7 +60,7 @@ class ProductContext implements Context, KernelAwareContext
                 ->setDesignation($hash['designation'])
                 ->setReference($hash['reference'])
                 ->setNetPrice($hash['netPrice'])
-                ->setWeight($hash['weight'])
+                ->setPackageWeight($hash['weight'])
                 ->setBrand($brand)
                 ->addCategory($category)
                 ->setTaxGroup($taxGroup)

@@ -6,7 +6,6 @@ use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
-use Ekyna\Bundle\CommerceBundle\Form\Type as CO;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
@@ -17,9 +16,6 @@ use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Features;
-use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
-use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
-use Ekyna\Component\Commerce\Common\Model\Units;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormInterface;
 
@@ -104,32 +100,6 @@ class ProductFormBuilder
     public function getProduct()
     {
         return $this->product;
-    }
-
-    /**
-     * Adds the adjustments field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addAdjustmentsField(array $options = [])
-    {
-        $options = array_replace([
-            'label'                 => 'ekyna_commerce.adjustment.label.plural',
-            'prototype_name'        => '__product_adjustment__',
-            'entry_type'            => PR\ProductAdjustmentType::class,
-            'add_button_text'       => 'ekyna_commerce.sale.form.add_item_adjustment',
-            'delete_button_confirm' => 'ekyna_commerce.sale.form.remove_item_adjustment',
-            'attr'                  => ['label_col' => 2, 'widget_col' => 10],
-            'modes'                 => [AdjustmentModes::MODE_FLAT],
-            'types'                 => [AdjustmentTypes::TYPE_INCLUDED],
-            'required'              => false,
-        ], $options);
-
-        $this->form->add('adjustments', CO\Common\AdjustmentsType::class, $options);
-
-        return $this;
     }
 
     /**
@@ -266,44 +236,6 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the customer groups field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addCustomerGroupsField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.customer_group.label.plural',
-            'multiple' => true,
-            'required' => false,
-        ], $options);
-
-        $this->form->add('customerGroups', CO\Customer\CustomerGroupChoiceType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the designation field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addDesignationField(array $options = [])
-    {
-        $options = array_replace([
-            'label' => 'ekyna_core.field.designation',
-        ], $options);
-
-        $this->form->add('designation', SF\TextType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the medias field.
      *
      * @param array $options
@@ -326,25 +258,6 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('medias', MediaCollectionType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the net price field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addNetPriceField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.field.net_price',
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('netPrice', CO\Pricing\PriceType::class, $options);
 
         return $this;
     }
@@ -533,24 +446,6 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the tax group field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addTaxGroupField(array $options = [])
-    {
-        /*$options = array_replace([
-            'allow_new' => true,
-        ], $options);*/
-
-        $this->form->add('taxGroup', CO\Pricing\TaxGroupChoiceType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the translations field.
      *
      * @param array $options
@@ -674,121 +569,6 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('crossSelling', SF\ChoiceType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the weight field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addWeightField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_core.field.weight',
-            'scale'    => 3,
-            'attr'     => [
-                'placeholder' => 'ekyna_core.field.weight',
-                'input_group' => ['append' => Units::getSymbol(Units::KILOGRAM)],
-            ],
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('weight', SF\NumberType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the height field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addHeightField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_core.field.height',
-            'attr'     => [
-                'placeholder' => 'ekyna_core.field.height',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
-            ],
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('height', SF\IntegerType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the width field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addWidthField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_core.field.width',
-            'attr'     => [
-                'placeholder' => 'ekyna_core.field.width',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
-            ],
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('width', SF\IntegerType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the depth field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addDepthField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_core.field.depth',
-            'attr'     => [
-                'placeholder' => 'ekyna_core.field.depth',
-                'input_group' => ['append' => Units::getSymbol(Units::MILLIMETER)],
-            ],
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('depth', SF\IntegerType::class, $options);
-
-        return $this;
-    }
-
-    /**
-     * Adds the quantity unit field.
-     *
-     * @param array $options
-     *
-     * @return self
-     */
-    public function addUnitField(array $options = [])
-    {
-        $options = array_replace([
-            'label'    => 'ekyna_commerce.unit.label',
-            'attr'     => [
-                'placeholder' => 'ekyna_commerce.unit.label',
-            ],
-            'required' => !(isset($options['disabled']) && $options['disabled']),
-        ], $options);
-
-        $this->form->add('unit', CO\Common\UnitChoiceType::class, $options);
 
         return $this;
     }

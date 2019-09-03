@@ -131,7 +131,7 @@ class ItemBuilder
             ->setDesignation((string)$product)
             ->setReference($product->getReference())
             ->setNetPrice($product->getNetPrice())
-            ->setWeight($product->getWeight())
+            ->setWeight($product->getPackageWeight())
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(false)
             ->setConfigurable(false)
