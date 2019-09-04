@@ -115,13 +115,12 @@ class ConfigurableSlotType extends Form\AbstractType
         }
 
         // Add image to each subject choice radio buttons vars
-        $index = 0;
         foreach ($view->children['choice']->children as $subjectChoiceView) {
             /** @var Model\BundleChoiceInterface $bundleChoice */
             if (null !== $bundleChoice = $transformer->transform($subjectChoiceView->vars['value'])) {
                 $product = $bundleChoice->getProduct();
                 $path = $this->formBuilder->getProductImagePath($product, 'slot_choice_btn');
-                $subjectChoiceView->vars['index'] = $index;
+                $subjectChoiceView->vars['index'] = $bundleChoice->getPosition();
                 $subjectChoiceView->vars['choice_image'] = $path;
                 $subjectChoiceView->vars['choice_brand'] = $product->getBrand()->getTitle();
                 $subjectChoiceView->vars['choice_product'] = $product->getFullTitle();
@@ -131,7 +130,6 @@ class ConfigurableSlotType extends Form\AbstractType
                 $subjectChoiceView->vars['choice_brand'] = '';
                 $subjectChoiceView->vars['choice_product'] = 'Ignorer cet article';
             }
-            $index++;
         }
 
         // Builds each slot choice's form

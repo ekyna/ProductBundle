@@ -765,6 +765,7 @@
                 {%- for slot in product.bundleSlots -%}
                 {%- set slot_id = 'product_slots_' ~ loop.index0 ~ '_' -%}
                 <div class="slot collection-item">
+                    <span class="bundle-slot-index">{{ slot.position }}</span>
                     {{- show_row(slot.translations, 'translations', {
                         'id': slot_id ~ 'translations',
                         'fields': {
@@ -807,6 +808,7 @@
                     {%- endif -%}
                     <table class="table table-stripped table-condensed table-hover">
                         <tr>
+                            <th>&nbsp;</th>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
                             <th>{{ 'ekyna_core.field.reference'|trans }}</th>
                             <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
@@ -821,6 +823,7 @@
                         {%- set choice_id = slot_id ~ '_choice_' ~ loop.index0 ~ '_' -%}
                         {%- set choice_product = choice.product -%}
                         <tr>
+                            <td style="font-size: 11px">[{{ slot.position }}.{{ choice.position }}]</td>
                             <td id="{{ choice_id ~ 'product' }}">
                                 <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
                                    data-summary='{{ {
@@ -864,7 +867,7 @@
                         </tr>
                         {%- if choice.rules is not empty -%}
                         <tr>
-                            <td colspan="9" class="bundle-rules">
+                            <td colspan="10" class="bundle-rules">
                                 {{- macros.show_bundle_rules(choice.rules, product) -}}
                             </td>
                         </tr>
