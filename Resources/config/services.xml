@@ -535,7 +535,7 @@
             <argument id="ekyna_product.price.repository" type="service"/>
             <argument id="ekyna_product.offer.repository" type="service"/>
             <argument id="ekyna_commerce.pricing.tax_resolver" type="service"/>
-            <argument id="ekyna_commerce.currency.converter" type="service"/>
+            <argument id="Ekyna\Component\Commerce\Common\Currency\CurrencyConverterInterface" type="service"/>
             <argument>%ekyna_commerce.default.currency%</argument>
         </service>
 
@@ -748,23 +748,26 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <!-- Product unique constraint validator -->
-        <service id="ekyna_product.validator.product_unique_validator"
-                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductUniqueValidator">
+        <!-- Product constraint validator -->
+        <service id="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator">
             <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="validator.constraint_validator"/>
         </service>
 
+        <!-- Product translation constraint validator -->
+        <service id="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductTranslationValidator">
+            <argument type="service" id="ekyna_product.product_translation.repository"/>
+            <tag name="validator.constraint_validator"/>
+        </service>
+
         <!-- Variant constraint validator -->
-        <service id="ekyna_product.validator.variant_validator"
-                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
+        <service id="Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator">
             <argument type="service" id="ekyna_resource.locale_provider"/>
             <tag name="validator.constraint_validator"/>
         </service>
 
         <!-- Product attribute constraint validator -->
-        <service id="ekyna_product.validator.product_attribute_validator"
-                 class="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductAttributeValidator">
+        <service id="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductAttributeValidator">
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
             <tag name="validator.constraint_validator"/>
         </service>
@@ -773,8 +776,13 @@
         <service id="ekyna_product.product.reference_generator"
                  class="Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGenerator">
             <argument>%kernel.data_dir%/product_reference</argument>
-            <argument>ym</argument>
             <argument>8</argument>
+            <argument>ym</argument>
+        </service>
+
+        <!-- External Reference generator -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator">
+            <argument type="service" id="ekyna_product.product_reference.repository"/>
         </service>
 
         <!-- Product converter -->

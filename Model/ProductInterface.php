@@ -306,6 +306,57 @@ interface ProductInterface extends
     public function setComponents(Collection $components);
 
     /**
+     * Returns the cross sellings.
+     *
+     * @return Collection|CrossSellingInterface[]
+     */
+    public function getCrossSellings();
+
+    /**
+     * Returns whether this product has cross sellings.
+     *
+     * @return bool
+     */
+    public function hasCrossSellings();
+
+    /**
+     * Returns whether the product has the given cross selling or not.
+     *
+     * @param CrossSellingInterface $crossSelling
+     *
+     * @return bool
+     */
+    public function hasCrossSelling(CrossSellingInterface $crossSelling);
+
+    /**
+     * Adds the cross selling.
+     *
+     * @param CrossSellingInterface $crossSelling
+     *
+     * @return $this|ProductInterface
+     */
+    public function addCrossSelling(CrossSellingInterface $crossSelling);
+
+    /**
+     * Removes the cross selling.
+     *
+     * @param CrossSellingInterface $crossSelling
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeCrossSelling(CrossSellingInterface $crossSelling);
+
+    /**
+     * Sets the cross sellings.
+     *
+     * @param Collection|CrossSellingInterface[] $crossSellings
+     *
+     * @return $this|ProductInterface
+     * @internal
+     */
+    public function setCrossSellings(Collection $crossSellings);
+
+    /**
      * Returns the special offers.
      *
      * @return Collection|SpecialOfferInterface[]

@@ -244,6 +244,16 @@ ekyna_product:
             Conversion réussie. Veuillez vérifier les informations du produit variable
             <strong>ET</strong> de la variante créée.
 
+    cross_selling:
+        label:
+            singular: Vente croisée
+            plural: Ventes croisées
+        field:
+            source: Source
+            target: Cible
+        button:
+            add: Ajouter une vente croisée
+
     highlight:
         title: Mise en valeur
         mode:
@@ -410,10 +420,12 @@ ekyna_product:
             component_parents: Ce produit est un composant des produits suivants
         alert:
             no_item: Aucun produit configuré
-            pending_offers: |
+            pending_offers: >
                 Les offres de ce produit sont en attente de mise à jour.
-            supplier_product_exists: |
+            supplier_product_exists: >
                 Une référence fournisseur existe déjà pour le fournisseur <strong>%name%</strong>.
+            generate_gtin_13: >
+                Ce produit n'a pas de code EAN 13. <a href="%url%">Cliquez ici pour générer un code EAN 13</a>
 
     product_media:
         label:

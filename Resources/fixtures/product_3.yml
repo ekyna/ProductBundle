@@ -167,39 +167,39 @@ Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_1'
         type: ean13
-        number: "0885909466580"
+        code: "0885909466580"
     product_tablet_1_variant_1_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_1'
         type: manufacturer
-        number: MC773NF/A
+        code: MC773NF/A
     product_tablet_1_variant_2_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_2'
         type: ean13
-        number: "0885909470877"
+        code: "0885909470877"
     product_tablet_1_variant_2_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_2'
         type: manufacturer
-        number: MC982NF/A
+        code: MC982NF/A
     product_tablet_1_variant_3_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_3'
         type: ean13
-        number: "0885909466887"
+        code: "0885909466887"
     product_tablet_1_variant_3_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_3'
         type: manufacturer
-        number: MC774NF/A
+        code: MC774NF/A
     product_tablet_1_variant_4_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_4'
         type: ean13
-        number: "0885909471218"
+        code: "0885909471218"
     product_tablet_1_variant_4_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_tablet_1_variant_4'
         type: manufacturer
-        number: MC983NF/A
+        code: MC983NF/A

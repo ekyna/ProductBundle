@@ -5,11 +5,11 @@ namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Class ProductUnique
+ * Class ProductTranslation
  * @package Ekyna\Bundle\ProductBundle\Validator\Constraints
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductUnique extends Constraint
+class ProductTranslation extends Constraint
 {
     /**
      * @inheritDoc

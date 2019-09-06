@@ -30,7 +30,7 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @var string
      */
-    protected $number;
+    protected $code;
 
 
     /**
@@ -55,7 +55,7 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @inheritdoc
      */
-    public function getProduct()
+    public function getProduct(): ?ProductInterface
     {
         return $this->product;
     }
@@ -63,7 +63,7 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @inheritdoc
      */
-    public function setProduct(ProductInterface $product = null)
+    public function setProduct(ProductInterface $product = null): ProductReferenceInterface
     {
         if ($this->product !== $product) {
             if ($previous = $this->product) {
@@ -82,7 +82,7 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @inheritdoc
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -90,7 +90,7 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @inheritdoc
      */
-    public function setType($type)
+    public function setType(string $type): ProductReferenceInterface
     {
         $this->type = $type;
 
@@ -100,17 +100,17 @@ class ProductReference implements ProductReferenceInterface
     /**
      * @inheritdoc
      */
-    public function getNumber()
+    public function getCode(): ?string
     {
-        return $this->number;
+        return $this->code;
     }
 
     /**
      * @inheritdoc
      */
-    public function setNumber($number)
+    public function setCode(string $code): ProductReferenceInterface
     {
-        $this->number = (string)$number;
+        $this->code = (string)$code;
 
         return $this;
     }

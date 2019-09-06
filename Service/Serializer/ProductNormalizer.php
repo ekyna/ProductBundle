@@ -142,7 +142,7 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
 
             // References
             $data['references'] = array_map(function (Model\ProductReferenceInterface $r) {
-                return $r->getNumber();
+                return $r->getCode();
             }, $product->getReferences()->toArray());
 
             // Option groups

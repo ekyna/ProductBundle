@@ -224,6 +224,18 @@
 {%- endblock ekyna_product_component_widget -%}
 
 
+{%- block ekyna_product_cross_selling_widget -%}
+    {{- bootstrap_backup_form_settings() -}}
+    {{- bootstrap_set_sizing('sm') -}}
+    <div class="ekyna-collection-item">
+        {{- form_errors(form) -}}
+        {{- form_row(form.target, {'label_col': 2, 'widget_col': 10}) -}}
+        {{- form_rest(form) -}}
+    </div>
+    {{- bootstrap_restore_form_settings() -}}
+{%- endblock ekyna_product_cross_selling_widget -%}
+
+
 {%- block ekyna_product_option_widget -%}
     {{- bootstrap_backup_form_settings() -}}
     {{- bootstrap_set_sizing('sm') -}}
@@ -334,8 +346,8 @@
             {{- form_errors(form.type) -}}
         </div>
         <div class="col-md-6">
-            {{- form_widget(form.number, {'sizing': 'sm'}) -}}
-            {{- form_errors(form.number) -}}
+            {{- form_widget(form.code, {'sizing': 'sm'}) -}}
+            {{- form_errors(form.code) -}}
         </div>
     </div>
     {{- form_rest(form) -}}

@@ -27,10 +27,10 @@ class ProductReferenceType extends ResourceFormType
                 'placeholder' => 'ekyna_core.field.type',
                 'select2'     => false,
             ])
-            ->add('number', TextType::class, [
-                'label'  => 'ekyna_core.field.number',
+            ->add('code', TextType::class, [
+                'label'  => 'ekyna_core.field.code',
                 'attr'   => [
-                    'placeholder' => 'ekyna_core.field.number',
+                    'placeholder' => 'ekyna_core.field.code',
                 ],
             ]);
     }

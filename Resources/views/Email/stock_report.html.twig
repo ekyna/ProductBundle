@@ -77,7 +77,7 @@
                 {{- product.virtualStock|localizednumber -}}
             </td>
             {% if product.estimatedDateOfArrival is not empty -%}
-            <td class="right{% if product.estimatedDateOfArrival < today %} alert{% endif %}">
+            <td class="right{% if product.estimatedDateOfArrival <= today %} alert{% endif %}">
                 {{- product.estimatedDateOfArrival|localizeddate('short', 'none', locale) -}}
             </td>
             {%- else -%}

@@ -75,6 +75,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $components;
 
     /**
+     * @var Collection|Model\CrossSellingInterface[]
+     */
+    protected $crossSellings;
+
+    /**
      * @var Collection|Model\SpecialOfferInterface[]
      */
     protected $specialOffers;
@@ -165,6 +170,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->attributes = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
         $this->components = new ArrayCollection();
+        $this->specialOffers = new ArrayCollection();
+        $this->pricings = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->optionGroups = new ArrayCollection();
@@ -750,6 +757,72 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function getCrossSellings()
+    {
+        return $this->crossSellings;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasCrossSellings()
+    {
+        return 0 < $this->crossSellings->count();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasCrossSelling(Model\CrossSellingInterface $crossSelling)
+    {
+        return $this->crossSellings->contains($crossSelling);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addCrossSelling(Model\CrossSellingInterface $crossSelling)
+    {
+        if (!$this->hasCrossSelling($crossSelling)) {
+            $this->crossSellings->add($crossSelling);
+            $crossSelling->setSource($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeCrossSelling(Model\CrossSellingInterface $crossSelling)
+    {
+        if ($this->hasCrossSelling($crossSelling)) {
+            $this->crossSellings->removeElement($crossSelling);
+            $crossSelling->setSource(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCrossSellings(Collection $crossSellings)
+    {
+        foreach ($this->crossSellings as $crossSelling) {
+            $this->removeCrossSelling($crossSelling);
+        }
+
+        foreach ($crossSellings as $crossSelling) {
+            $this->addCrossSelling($crossSelling);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSpecialOffers()
     {
         return $this->specialOffers;
@@ -1098,7 +1171,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         foreach ($this->references as $reference) {
             if ($reference->getType() === $type) {
-                return $reference->getNumber();
+                return $reference->getCode();
             }
         }
 

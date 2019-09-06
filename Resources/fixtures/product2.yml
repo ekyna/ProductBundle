@@ -87,19 +87,19 @@ Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_coque_1'
         type: ean13
-        number: "0886541171030"
+        code: "0886541171030"
     product_coque_1_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_coque_1'
         type: manufacturer
-        number: LE.RHC03.007
+        code: LE.RHC03.007
     product_coque_2_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_coque_2'
         type: ean13
-        number: "0885909496662"
+        code: "0885909496662"
     product_coque_2_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_coque_2'
         type: manufacturer
-        number: MD098ZM/A
+        code: MD098ZM/A

@@ -173,7 +173,7 @@
                     <dl class="dl-horizontal">
                         {%- for reference in product.references -%}
                             <dt>{{ reference|product_reference_type_label }}</dt>
-                            <dd data-clipboard-copy="{{ reference.number }}">{{ reference.number }}</dd>
+                            <dd data-clipboard-copy="{{ reference.code }}">{{ reference.code }}</dd>
                         {%- endfor -%}
                     </dl>
                 {%- else -%}
@@ -664,7 +664,7 @@
                 {%- set total_price = 0 -%}
                 {%- set total_purchase = 0 -%}
                 {%- for component in product.components -%}
-                    {%- set component_id = 'product_components_' ~ loop.index0 ~ '_' -%}
+                    {%- set component_id = 'product_component_' ~ loop.index0 ~ '_' -%}
                 <tr>
                     <td id="{{ component_id ~ 'designation' }}">
                         <a href="{{ admin_resource_path(component.child) }}" data-summary='{{ {
@@ -747,6 +747,51 @@
     </div>
 </div>
 {%- endmacro show_components -%}
+
+
+{%- macro show_cross_sellings(product) -%}
+<div class="row show-row">
+    <div class="col-md-2 show-label">
+        {{- 'ekyna_product.component.label.plural'|trans -}}
+    </div>
+    <div class="col-md-10">
+        <div class="show-widget show-widget-sm show-product-configurable">
+            <table class="table table-stripped table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>{{ 'ekyna_core.field.designation'|trans }}</th>
+                    <th>{{ 'ekyna_core.field.reference'|trans }}</th>
+                    <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {%- for crossSelling in product.crossSellings -%}
+                    {%- set crossSelling_id = 'product_crossSelling_' ~ loop.index0 ~ '_' -%}
+                <tr>
+                    <td id="{{ crossSelling_id ~ 'designation' }}">
+                        <a href="{{ admin_resource_path(crossSelling.target) }}" data-summary='{{ {
+                            'route': 'ekyna_product_product_admin_summary',
+                            'parameters': {'productId': crossSelling.target.id}
+                        }|json_encode }}'>{{ crossSelling.target }}</a>
+                    </td>
+                    <td>
+                        <span data-clipboard-copy="{{ crossSelling.target.reference }}">{{ crossSelling.target.reference }}</span>
+                    </td>
+                    <td id="{{ crossSelling_id ~ 'netPrice' }}" class="text-right">
+                        {{- crossSelling.target.netPrice|localizedcurrency(commerce_default_currency) -}}
+                    </td>
+                </tr>
+                {%- else -%}
+                <tr>
+                    <td colspan="3" class="text-center"><em>{{ 'ekyna_core.value.no_item'|trans }}</em></td>
+                </tr>
+                {%- endfor -%}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{%- endmacro show_cross_sellings -%}
 
 
 {%- macro show_configurable_composition(product, options = {}) -%}

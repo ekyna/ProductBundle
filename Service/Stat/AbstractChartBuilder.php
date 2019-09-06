@@ -24,7 +24,15 @@ abstract class AbstractChartBuilder
         '#795548',
         '#607d8b',
         '#000000',
-        '#ff5722',
+        '#E91E63',
+        '#673AB7',
+        '#2196F3',
+        '#00BCD4',
+        '#4CAF50',
+        '#CDDC39',
+        '#FFC107',
+        '#FF5722',
+        '#9E9E9E',
     ];
 
     /**

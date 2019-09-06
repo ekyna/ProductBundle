@@ -225,26 +225,25 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * Finds one product by external reference.
      *
-     * @param string   $reference The product reference number
-     * @param string[] $types     To filter references types
-     * @param bool     $visible   Whether to fetch visible products only
+     * @param string   $code    The product reference code
+     * @param string[] $types   To filter references types
+     * @param bool     $visible Whether to fetch visible products only
      *
      * @return Model\ProductInterface|null
      */
-    public function findOneByExternalReference($reference, $types = [], $visible = true)
+    public function findOneByExternalReference(string $code, array $types = [], bool $visible = true)
     {
         foreach ($types as $type) {
             Model\ProductReferenceTypes::isValid($type);
         }
 
         $qb = $this->getQueryBuilder('p');
-
         $qb
             ->join('p.references', 'r')
-            ->andWhere($qb->expr()->eq('r.number', ':reference'));
+            ->andWhere($qb->expr()->eq('r.code', ':code'));
 
         $parameters = [
-            'reference' => $reference,
+            'code' => $code,
         ];
 
         if ($visible) {
@@ -447,16 +446,16 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->eq('p.stockMode', ':mode'))
             ->andWhere($qb->expr()->orX(
-                $qb->expr()->lt('p.virtualStock', 'p.stockFloor'),
+                $qb->expr()->lte('p.virtualStock', 'p.stockFloor'),
                 $qb->expr()->andX(
                     $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
-                    $qb->expr()->lt('p.estimatedDateOfArrival', ':today')
+                    $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
                 )
             ))
             ->getQuery()
             ->setParameter('mode', $mode)
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
-            ->setParameter('today', $today, Type::DATETIME)
+            ->setParameter('today', $today, Type::DATE)
             ->getResult();
     }
 

@@ -4,6 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\DependencyInjection;
 
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
 use Ekyna\Bundle\ProductBundle\Service\Features;
+use Ekyna\Bundle\ProductBundle\Service\Generator\Gtin13Generator;
+use Ekyna\Component\Commerce\Common\Generator\GeneratorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -80,7 +82,35 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('feature')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode(Features::COMPONENT)->defaultFalse()->end()
+                        ->arrayNode(Features::COMPONENT)
+                            ->canBeEnabled()
+                        ->end()
+                        /* TODO ->arrayNode(Features::COMPATIBILITY)
+                            ->canBeEnabled()
+                        ->end()*/
+                        ->arrayNode(Features::GTIN13_GENERATOR)
+                            ->canBeEnabled()
+                            ->children()
+                                ->scalarNode('manufacturer')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('class')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue(Gtin13Generator::class)
+                                    ->validate()
+                                        ->ifTrue(function($value) {
+                                            return !is_subclass_of($value, GeneratorInterface::class);
+                                        })
+                                        ->thenInvalid("Class %s must implements " . GeneratorInterface::class)
+                                    ->end()
+                                ->end()
+                                ->scalarNode('path')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('%kernel.data_dir%/gtin13_number')
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
@@ -453,6 +483,15 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\Component')->end()
+                                ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\Component\ComponentType')->end()
+                                ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('cross_selling')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\CrossSelling')->end()
+                                ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\CrossSelling\CrossSellingType')->end()
                                 ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()
                             ->end()
                         ->end()
@@ -561,7 +600,7 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\ProductTranslation')->end()
-                                        ->scalarNode('repository')->end()
+                                        ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\ProductTranslationRepository')->end()
                                         ->arrayNode('fields')
                                             ->prototype('scalar')->end()
                                             ->defaultValue(['title', 'subTitle', 'attributesTitle', 'description', 'slug'])
@@ -596,6 +635,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('entity')->defaultValue('Ekyna\Bundle\ProductBundle\Entity\ProductReference')->end()
+                                ->scalarNode('repository')->defaultValue('Ekyna\Bundle\ProductBundle\Repository\ProductReferenceRepository')->end()
                                 ->scalarNode('form')->defaultValue('Ekyna\Bundle\ProductBundle\Form\Type\ProductReferenceType')->end()
                                 ->scalarNode('parent')->defaultValue('ekyna_product.product')->end()
                             ->end()

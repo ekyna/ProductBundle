@@ -16,7 +16,7 @@ interface ProductReferenceInterface extends ResourceInterface
      *
      * @return ProductInterface
      */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
 
     /**
      * Sets the product.
@@ -25,14 +25,14 @@ interface ProductReferenceInterface extends ResourceInterface
      *
      * @return $this|ProductReferenceInterface
      */
-    public function setProduct(ProductInterface $product = null);
+    public function setProduct(ProductInterface $product = null): ProductReferenceInterface;
 
     /**
      * Returns the type.
      *
      * @return string
      */
-    public function getType();
+    public function getType(): ?string;
 
     /**
      * Sets the type.
@@ -41,21 +41,21 @@ interface ProductReferenceInterface extends ResourceInterface
      *
      * @return $this|ProductReferenceInterface
      */
-    public function setType($type);
+    public function setType(string $type): ProductReferenceInterface;
 
     /**
-     * Returns the number.
+     * Returns the code.
      *
      * @return string
      */
-    public function getNumber();
+    public function getCode(): ?string;
 
     /**
-     * Sets the number.
+     * Sets the code.
      *
-     * @param string $number
+     * @param string $code
      *
      * @return $this|ProductReferenceInterface
      */
-    public function setNumber($number);
+    public function setCode(string $code): ProductReferenceInterface;
 }

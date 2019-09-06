@@ -5,9 +5,14 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\CommerceBundle\Controller\Admin\AbstractSubjectController;
+use Ekyna\Bundle\ProductBundle\Exception\ProductExceptionInterface;
+use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Features;
+use Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -449,6 +454,43 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
+     * Generates the product external reference.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function generateReference(Request $request): Response
+    {
+        $context = $this->loadContext($request);
+        /** @var ProductInterface $product */
+        $product = $context->getResource();
+
+        $this->isGranted('EDIT', $product);
+
+        $type = $request->attributes->get('type');
+
+        switch ($type) {
+            case ProductReferenceTypes::TYPE_EAN_13:
+                try {
+                    $this->get(ExternalReferenceGenerator::class)->generateGtin13($product);
+                } catch (ProductExceptionInterface $exception) {
+                    $this->addFlash($exception->getMessage(), 'danger');
+                }
+
+                $event = $this->getOperator()->update($product);
+                $event->toFlashes($this->getFlashBag());
+
+                break;
+
+            default:
+                throw new RuntimeException("Unsupported reference type.");
+        }
+
+        return $this->redirect($this->generateResourcePath($product, 'show'));
+    }
+
+    /**
      * @inheritdoc
      */
     protected function createNew(Context $context)
@@ -520,6 +562,16 @@ class ProductController extends AbstractSubjectController
             $data['newSupplierProductForm'] = $this
                 ->createNewSupplierProductForm($product)
                 ->createView();
+
+            if (null === $product->getReferenceByType(ProductReferenceTypes::TYPE_EAN_13)) {
+                if ($this->get(Features::class)->isEnabled(Features::GTIN13_GENERATOR)) {
+                    $this->addFlash($this->getTranslator()->trans('ekyna_product.product.alert.generate_gtin_13', [
+                        '%url%' => $this->generateResourcePath($product, 'generate_reference', [
+                            'type' => ProductReferenceTypes::TYPE_EAN_13,
+                        ]),
+                    ]), 'warning');
+                }
+            }
         }
 
         /** @var \Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface $repository */

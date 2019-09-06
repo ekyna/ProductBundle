@@ -9,11 +9,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * Class ProductUniqueValidator
+ * Class ProductValidator
  * @package Ekyna\Bundle\ProductBundle\Validator\Constraints
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductUniqueValidator extends ConstraintValidator
+class ProductValidator extends ConstraintValidator
 {
     /**
      * @var ProductRepositoryInterface
@@ -39,8 +39,8 @@ class ProductUniqueValidator extends ConstraintValidator
         if (!$product instanceof Model\ProductInterface) {
             throw new InvalidArgumentException("Expected instance of " . Model\ProductInterface::class);
         }
-        if (!$constraint instanceof ProductUnique) {
-            throw new InvalidArgumentException("Expected instance of " . ProductUnique::class);
+        if (!$constraint instanceof Product) {
+            throw new InvalidArgumentException("Expected instance of " . Product::class);
         }
 
         $this->validateReference($product);
@@ -68,7 +68,7 @@ class ProductUniqueValidator extends ConstraintValidator
         $this
             ->context
             ->buildViolation('ekyna_product.product.duplicate_reference', [
-                'designation' => $duplicate->getFullDesignation(),
+                '%designation%' => $duplicate->getFullDesignation(),
             ])
             ->atPath('reference')
             ->addViolation();
@@ -92,7 +92,7 @@ class ProductUniqueValidator extends ConstraintValidator
         $this
             ->context
             ->buildViolation('ekyna_product.product.duplicate_designation', [
-                'reference' => $duplicate->getReference(),
+                '%reference%' => $duplicate->getReference(),
             ])
             ->atPath('designation')
             ->addViolation();

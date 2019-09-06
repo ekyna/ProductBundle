@@ -6,9 +6,9 @@ use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Generator\ReferenceGeneratorInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
+use Ekyna\Component\Commerce\Common\Generator\GeneratorInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Resource\Event\QueueEvents;
@@ -34,7 +34,7 @@ class ProductListener implements EventSubscriberInterface
     protected $handlerRegistry;
 
     /**
-     * @var ReferenceGeneratorInterface
+     * @var GeneratorInterface
      */
     protected $referenceGenerator;
 
@@ -57,17 +57,17 @@ class ProductListener implements EventSubscriberInterface
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface  $persistenceHelper
-     * @param Handler\HandlerRegistry     $registry
-     * @param ReferenceGeneratorInterface $referenceGenerator
-     * @param OfferInvalidator            $offerInvalidator
-     * @param PriceInvalidator            $priceInvalidator
-     * @param array                       $stockDefaults
+     * @param PersistenceHelperInterface $persistenceHelper
+     * @param Handler\HandlerRegistry    $registry
+     * @param GeneratorInterface         $referenceGenerator
+     * @param OfferInvalidator           $offerInvalidator
+     * @param PriceInvalidator           $priceInvalidator
+     * @param array                      $stockDefaults
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
         Handler\HandlerRegistry $registry,
-        ReferenceGeneratorInterface $referenceGenerator,
+        GeneratorInterface $referenceGenerator,
         OfferInvalidator $offerInvalidator,
         PriceInvalidator $priceInvalidator,
         array $stockDefaults
@@ -333,13 +333,13 @@ class ProductListener implements EventSubscriberInterface
      */
     protected function generateReference(ProductInterface $product)
     {
-        if (0 == strlen($product->getReference())) {
-            $this->referenceGenerator->generate($product);
-
-            return true;
+        if (!empty($product->getReference())) {
+            return false;
         }
 
-        return false;
+        $product->setReference($this->referenceGenerator->generate($product));
+
+        return true;
     }
 
     /**

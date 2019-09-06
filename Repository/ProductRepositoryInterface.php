@@ -67,11 +67,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     /**
      * Finds one product by external reference.
      *
-     * @param string $reference
+     * @param string   $code    The product reference code
+     * @param string[] $types   To filter references types
+     * @param bool     $visible Whether to fetch visible products only
      *
      * @return Model\ProductInterface|null
      */
-    public function findOneByExternalReference($reference);
+    public function findOneByExternalReference(string $code, array $types = [], bool $visible = true);
 
     /**
      * Finds products by brand.

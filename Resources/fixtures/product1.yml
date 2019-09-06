@@ -72,39 +72,39 @@ Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_manchon_1'
         type: ean13
-        number: "0885909683994"
+        code: "0885909683994"
     product_manchon_1_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_manchon_1'
         type: manufacturer
-        number: ME186ZM/A
+        code: ME186ZM/A
     product_manchon_2_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_manchon_2'
         type: ean13
-        number: "0885909533190"
+        code: "0885909533190"
     product_manchon_2_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_manchon_2'
         type: manufacturer
-        number: MD310ZM/A
+        code: MD310ZM/A
     product_socle_1_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_socle_1'
         type: ean13
-        number: "0885909532841"
+        code: "0885909532841"
     product_socle_1_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_socle_1'
         type: manufacturer
-        number: MD301ZM/A
+        code: MD301ZM/A
     product_socle_2_reference_1:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_socle_2'
         type: ean13
-        number: "0885909533114"
+        code: "0885909533114"
     product_socle_2_reference_2:
         __factory: { '@ekyna_product.product_reference.repository::createNew': [] }
         product: '@product_socle_2'
         type: manufacturer
-        number: MD308ZM/A
+        code: MD308ZM/A

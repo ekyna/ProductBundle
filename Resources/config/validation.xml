@@ -428,6 +428,31 @@
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Component"/>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\CrossSelling">
+        <property name="source">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="target">
+            <constraint name="NotNull"/>
+            <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductType">
+                <option name="types">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Option">
         <group-sequence-provider />
         <property name="group">
@@ -999,8 +1024,8 @@
             </option>
         </constraint>
 
-        <!-- Product uniqueness -->
-        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductUnique"/>
+        <!-- Product (uniqueness) -->
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Product"/>
 
         <!-- Bundle (or configurable) validation -->
         <!-- TODO At least one required slot -->
@@ -1081,6 +1106,7 @@
                 <value>configurable</value>
             </option>
         </constraint>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductTranslation"/>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">
@@ -1091,15 +1117,16 @@
                 <value>isValid</value>
             </constraint>
         </property>
-        <property name="number">
+        <property name="code">
             <constraint name="NotBlank"/>
             <!-- TODO validate regarding to the type -->
         </property>
 
-        <!-- Unique number constraint -->
+        <!-- Unique code/type constraint -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
-                <value>number</value>
+                <value>code</value>
+                <value>type</value>
             </option>
             <option name="groups">
                 <value>Default</value>

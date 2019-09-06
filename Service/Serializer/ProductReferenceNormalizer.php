@@ -25,9 +25,9 @@ class ProductReferenceNormalizer implements NormalizerInterface, DenormalizerInt
     public function normalize($reference, $format = null, array $context = [])
     {
         return [
-            'id'     => $reference->getId(),
-            'type'   => $reference->getType(),
-            'number' => $reference->getNumber(),
+            'id'   => $reference->getId(),
+            'type' => $reference->getType(),
+            'code' => $reference->getCode(),
         ];
     }
 

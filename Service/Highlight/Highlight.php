@@ -202,16 +202,39 @@ class Highlight
             $limit = $this->config['cross_selling']['limit'];
         }
 
+        $result = [];
         $cartProductIds = $this->getCartProductIds();
 
-        $crossSelling = $this->productRepository->findCrossSelling($limit, $cartProductIds);
+        if ($product) {
+            foreach ($product->getCrossSellings() as $crossSelling) {
+                $target = $crossSelling->getTarget();
+                if (!in_array($target->getId(), $cartProductIds)) {
+                    $result[] = $target;
+                    $limit--;
+                    if (0 >= $limit) {
+                        break;
+                    }
+                }
+            }
+        }
 
-        if ($limit > $count = count($crossSelling)) {
+        if (0 < $limit) {
+            $products = $this->productRepository->findCrossSelling($limit, $cartProductIds);
+            foreach ($products as $product) {
+                $result[] = $product;
+                $limit--;
+                if (0 >= $limit) {
+                    break;
+                }
+            }
+        }
+
+        if (0 < $limit) {
             if (null === $product) {
                 $product = $cartProductIds;
             }
             if (empty($product)) {
-                return $crossSelling;
+                return $result;
             }
 
             if (false === $group) {
@@ -229,14 +252,14 @@ class Highlight
 
             $products = $this
                 ->crossRepository
-                ->findProducts($product, $group, new \DateTime($from), $limit - $count, $cartProductIds);
+                ->findProducts($product, $group, new \DateTime($from), $limit, $cartProductIds);
 
             foreach ($products as $p) {
-                $crossSelling[] = $p;
+                $result[] = $p;
             }
         }
 
-        return $crossSelling;
+        return $result;
     }
 
     /**

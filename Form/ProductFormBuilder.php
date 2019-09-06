@@ -236,6 +236,24 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the cross sellings field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addCrossSellingsField(array $options = [])
+    {
+        /*if (!$this->features->isEnabled(Features::CROSS_SELLING)) {
+            return $this;
+        }*/
+
+        $this->form->add('crossSellings', PR\CrossSelling\CrossSellingsType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the medias field.
      *
      * @param array $options

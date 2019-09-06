@@ -2,11 +2,10 @@
 
 namespace Ekyna\Bundle\ProductBundle\Form\Type\Component;
 
+use Ekyna\Bundle\AdminBundle\Form\Type\ResourceFormType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Pricing\PriceType;
-use Ekyna\Bundle\ProductBundle\Entity\Component;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ComponentType extends AbstractType
+class ComponentType extends ResourceFormType
 {
     /**
      * @inheritDoc
@@ -46,9 +45,9 @@ class ComponentType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver
-            ->setDefault('data_class', Component::class)
-            ->setDefault('empty_data', new Component());
+        parent::configureOptions($resolver);
+
+        $resolver->setDefault('empty_data', new $this->dataClass);
     }
 
     /**

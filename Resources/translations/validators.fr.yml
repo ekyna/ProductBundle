@@ -20,15 +20,16 @@ ekyna_product:
         brands_must_be_empty: Les listes des marques associées doit être vide.
         at_least_one_brand: Veuillez sélectionner au moins une marque.
     product:
-        duplicate_designation: Un autre produit existe déjà avec cette désignation pour la même marque ({{reference}}).
+        duplicate_designation: Un autre produit existe déjà avec cette désignation pour la même marque (%reference%).
         duplicate_variant_designation: Une autre variante existe déjà avec cette désignation pour le même parent (produit variable).
-        duplicate_reference: Un autre produit existe déjà avec cette référence ({{designation}}).
+        duplicate_reference: Un autre produit existe déjà avec cette référence (%designation%).
         slot_attribute_is_mandatory: Veuillez sélectionner un attribut pour le groupe "%group_name%".
         slot_has_too_many_attributes: Le groupe "%group_name%" ne peut avoir plus d'un attribut sélectionné.
         unexpected_attribute: L'attribut "%attribute_name%" ne correspond à aucun groupe du modèle d'attributs.
         variant_is_not_unique: Une autre variante existe déjà avec cette configuration d'attributs.
         designation_needed: La désignation ne peut être générée automatiquement sans attributs, veuillez la saisir.
         translation_title_needed: Le titre ne peut être généré automatiquement sans attributs, veuillez le saisir.
+        duplicate_translation: Une traduction existe déjà avec ce titre (%reference%).
     option:
         recursive_choice: Un produit ne peut pas être une option de lui-même.
     special_offer:

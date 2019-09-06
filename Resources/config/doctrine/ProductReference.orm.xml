@@ -9,12 +9,12 @@
             table="product_product_reference">
 
         <indexes>
-            <index columns="number" name="idx_product_reference_number" />
+            <index columns="code,type" name="idx_product_reference_code_type" />
             <index columns="product_id,type" name="idx_product_reference_product_type" />
         </indexes>
 
         <unique-constraints>
-            <unique-constraint columns="number" name="unique_product_reference_number" />
+            <unique-constraint columns="code,type" name="unique_product_reference_code_type" />
             <unique-constraint columns="product_id,type" name="unique_product_reference_product_type" />
         </unique-constraints>
 
@@ -23,7 +23,7 @@
         </id>
 
         <field name="type" column="type" type="string" length="16" nullable="false"/>
-        <field name="number" column="number" type="string" length="32" nullable="false"/>
+        <field name="code" column="code" type="string" length="32" nullable="false"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      inversed-by="references" field="product">

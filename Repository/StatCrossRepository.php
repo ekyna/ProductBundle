@@ -2,11 +2,11 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCross;
-use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -76,16 +76,16 @@ class StatCrossRepository extends EntityRepository
         } elseif (is_int($source)) {
             $source = [$source];
         } elseif (!is_array($source)) {
-            throw new InvalidArgumentException("Expected instance " . Product::class . ", int or array of int.");
+            throw new UnexpectedTypeException($source, [Product::class, 'int', 'array']);
         }
 
         $parameters = [
-            'source'      => $source,
-            'from'        => $from->format('Y-m'),
-            'mode'        => HighlightModes::MODE_NEVER,
-            'type'        => ProductTypes::TYPE_CONFIGURABLE,
-            'stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
-            'visible'     => true,
+            'source'          => $source,
+            'from'            => $from->format('Y-m'),
+            'not_mode'        => HighlightModes::MODE_NEVER,
+            'not_type'        => ProductTypes::TYPE_CONFIGURABLE,
+            'not_stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
+            'visible'         => true,
         ];
 
         $qb = $this->createQueryBuilder('s');
@@ -99,9 +99,9 @@ class StatCrossRepository extends EntityRepository
             ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
             ->andWhere($ex->in('IDENTITY(s.source)', ':source'))
             ->andWhere($ex->gte('s.date', ':from'))
-            ->andWhere($ex->neq('p.type', ':type'))
-            ->andWhere($ex->neq('p.stockState', ':stock_state'))
-            ->andWhere($ex->neq('p.bestSeller', ':mode'))
+            ->andWhere($ex->neq('p.type', ':not_type'))
+            ->andWhere($ex->neq('p.stockState', ':not_stock_state'))
+            ->andWhere($ex->neq('p.bestSeller', ':not_mode'))
             ->andWhere($ex->eq('p.visible', ':visible'))
             ->andWhere($ex->eq('b.visible', ':visible'))
             ->andWhere($ex->eq('c.visible', ':visible'))

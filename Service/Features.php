@@ -11,8 +11,10 @@ use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
  */
 class Features
 {
-    public const COMPONENT     = 'component';
-    public const COMPATIBILITY = 'compatibility'; // TODO
+    public const COMPONENT        = 'component';
+    public const GTIN13_GENERATOR = 'gtin13_generator';
+    //public const COMPATIBILITY  = 'compatibility'; // TODO
+    //public const CROSS_SELLING  = 'compatibility'; // TODO
 
     /**
      * @var array
@@ -28,7 +30,13 @@ class Features
     public function __construct(array $config)
     {
         $this->config = array_replace([
-            self::COMPONENT => false,
+            self::COMPONENT        => [
+                'enabled' => false,
+            ],
+            self::GTIN13_GENERATOR => [
+                'enabled'      => false,
+                'manufacturer' => null,
+            ],
         ], $config);
     }
 
@@ -45,6 +53,6 @@ class Features
             throw new UnexpectedValueException("Unknown feature '$feature'.");
         }
 
-        return $this->config[$feature];
+        return $this->config[$feature]['enabled'];
     }
 }

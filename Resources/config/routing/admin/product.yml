@@ -113,6 +113,14 @@ ekyna_product_product_admin_remove:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_generate_reference:
+    path: /{productId}/generate-reference/{type}
+    defaults: { _controller: "ekyna_product.product.controller:generateReference" }
+    methods: [GET]
+    requirements:
+        productId: \d+
+        type: "[a-z0-9]+"
+
 ekyna_product_product_admin_search:
     path: /search
     defaults: { _controller: "ekyna_product.product.controller:searchAction" }

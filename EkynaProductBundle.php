@@ -42,6 +42,7 @@ class EkynaProductBundle extends AbstractBundle
             Model\BundleSlotRuleInterface::class    => 'ekyna_product.bundle_slot_rule.class',
             Model\CategoryInterface::class          => 'ekyna_product.category.class',
             Model\ComponentInterface::class         => 'ekyna_product.component.class',
+            Model\CrossSellingInterface::class      => 'ekyna_product.cross_selling.class',
             Model\OptionInterface::class            => 'ekyna_product.option.class',
             Model\OptionGroupInterface::class       => 'ekyna_product.option_group.class',
             Model\PricingInterface::class           => 'ekyna_product.pricing.class',

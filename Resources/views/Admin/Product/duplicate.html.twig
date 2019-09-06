@@ -51,7 +51,7 @@
         <dd>
             {% if source.references is not empty %}
                 {% for reference in source.references %}
-                    <em>{{ reference|product_reference_type_label }}</em> : {{ reference.number }}<br>
+                    <em>{{ reference|product_reference_type_label }}</em> : {{ reference.code }}<br>
                 {% endfor %}
             {% else %}
                 <em>{{ 'ekyna_core.value.none'|trans }}</em>
