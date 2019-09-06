@@ -1698,6 +1698,23 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $composition[] = new Stock\StockComponent($component->getChild(), $component->getQuantity());
         }
 
+        // Options
+        foreach ($this->optionGroups as $group) {
+            if (!$group->isRequired()) {
+                continue;
+            }
+
+            $options = [];
+            foreach ($group->getOptions() as $option) {
+                if (!$product = $option->getProduct()) {
+                    continue;
+                }
+                $options[] = new Stock\StockComponent($product, 1);
+            }
+
+            $composition[] = $options;
+        }
+
         return $composition;
     }
 
