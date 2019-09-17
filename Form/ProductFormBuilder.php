@@ -10,6 +10,7 @@ use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
@@ -17,6 +18,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Symfony\Component\Form\Extension\Core\Type as SF;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -42,7 +44,7 @@ class ProductFormBuilder
     private $mediaClass;
 
     /**
-     * @var FormInterface
+     * @var FormInterface|FormBuilderInterface
      */
     private $form;
 
@@ -69,13 +71,17 @@ class ProductFormBuilder
     /**
      * Initializes the builder.
      *
-     * @param ProductInterface $product
-     * @param FormInterface    $form
+     * @param ProductInterface                   $product
+     * @param FormInterface|FormBuilderInterface $form
      *
      * @return ProductFormBuilder
      */
-    public function initialize(ProductInterface $product, FormInterface $form)
+    public function initialize(ProductInterface $product, $form)
     {
+        if (!($form instanceof FormInterface || $form instanceof FormBuilderInterface)) {
+            throw new UnexpectedTypeException($form, [FormInterface::class,FormBuilderInterface::class]);
+        }
+
         $this->product = $product;
         $this->form = $form;
 
@@ -85,7 +91,7 @@ class ProductFormBuilder
     /**
      * Returns the form.
      *
-     * @return FormInterface
+     * @return FormInterface|FormBuilderInterface
      */
     protected function getForm()
     {

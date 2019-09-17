@@ -213,7 +213,7 @@
         </div>
         <div class="col-md-10">
             <div class="show-widget show-widget-block" id="product_adjustments">
-                <table class="table table-stripped table-condensed table-hover">
+                <table class="table table-stripped table-condensed table-hover table-alt-head">
                     <tr>
                         <th>{{ 'ekyna_core.field.designation'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
@@ -286,7 +286,7 @@
                         </div>
                         <div class="col-md-10">
                             <div class="show-widget">
-                                <table class="table table-stripped table-condensed table-hover">
+                                <table class="table table-stripped table-condensed table-hover table-alt-head">
                                     <tr>
                                         <th>{{ 'ekyna_core.field.designation'|trans }}</th>
                                         <th>{{ 'ekyna_core.field.reference'|trans }}</th>
@@ -355,7 +355,7 @@
         <div class="col-md-10">
             {%- if product.specialOffers is not empty -%}
             <div class="show-widget show-widget-sm">
-                <table class="table table-stripped table-condensed">
+                <table class="table table-stripped table-condensed table-alt-head">
                     <tr>
                         <th>{{ 'ekyna_core.field.name'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
@@ -427,7 +427,7 @@
         <div class="col-md-10">
             {%- if product.pricings is not empty -%}
             <div class="show-widget show-widget-sm">
-                <table class="table table-stripped table-condensed">
+                <table class="table table-stripped table-condensed table-alt-head">
                     <tr>
                         <th>{{ 'ekyna_core.field.name'|trans }}</th>
                         <th>{{ 'ekyna_product.pricing_rule.label.plural'|trans }}</th>
@@ -439,7 +439,7 @@
                             {{- pricing.name -}}
                         </td>
                         <td id="{{ pricingId ~ 'rules' }}">
-                            <table class="table table-condensed">
+                            <table class="table table-condensed table-alt-head">
                                 <tr>
                                     <th class="text-right">{{ 'ekyna_product.common.min_quantity'|trans }}</th>
                                     {%- for rule in pricing.rules -%}
@@ -476,7 +476,7 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-bundle">
             {%- if product is bundle_product -%}
-                <table class="table table-stripped table-condensed table-hover">
+                <table class="table table-stripped table-condensed table-hover table-alt-head">
                     <tr>
                         <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
                         <th>{{ 'ekyna_core.field.reference'|trans }}</th>
@@ -610,7 +610,7 @@
 
 
 {%- macro show_bundle_rules(rules, bundle) -%}
-    <table class="table table-stripped table-condensed table-hover">
+    <table class="table table-stripped table-condensed table-hover table-alt-head">
     {%- for rule in rules -%}
         <tr>
             <td>{{ rule|bundle_rule_type }}</td>
@@ -647,7 +647,7 @@
     </div>
     <div class="col-md-10">
         <div class="show-widget show-widget-sm show-product-configurable">
-            <table class="table table-stripped table-condensed table-hover">
+            <table class="table table-stripped table-condensed table-hover table-alt-head">
                 <thead>
                 <tr>
                     <th>{{ 'ekyna_core.field.designation'|trans }}</th>
@@ -756,7 +756,7 @@
     </div>
     <div class="col-md-10">
         <div class="show-widget show-widget-sm show-product-configurable">
-            <table class="table table-stripped table-condensed table-hover">
+            <table class="table table-stripped table-condensed table-hover table-alt-head">
                 <thead>
                 <tr>
                     <th>{{ 'ekyna_core.field.designation'|trans }}</th>
@@ -851,7 +851,7 @@
                         </div>
                     </div>
                     {%- endif -%}
-                    <table class="table table-stripped table-condensed table-hover">
+                    <table class="table table-stripped table-condensed table-hover table-alt-head">
                         <tr>
                             <th>&nbsp;</th>
                             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
@@ -933,7 +933,7 @@
 
 
 {%- macro show_relations(products) -%}
-    <table class="table table-stripped table-condensed table-hover">
+    <table class="table table-stripped table-condensed table-hover table-alt-head">
         <tr>
             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
             <th>{{ 'ekyna_core.field.reference'|trans }}</th>

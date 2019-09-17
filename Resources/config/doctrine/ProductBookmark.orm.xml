@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\ProductBookmark"
+            repository-class="Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository"
+            table="product_bookmark">
+
+        <unique-constraints>
+            <unique-constraint columns="user_id,product_id" name="product_bookmark_unique"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <many-to-one target-entity="Ekyna\Bundle\AdminBundle\Model\UserInterface" field="user">
+            <join-column name="user_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        </many-to-one>
+
+    </entity>
+
+</doctrine-mapping>

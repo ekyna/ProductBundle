@@ -267,9 +267,11 @@ ekyna_product:
         title: Inventory
         field:
             profile: Profile
+            bookmark: Favoris
         button:
             export_units: Export stock units
             export_products: Export products
+            batch_edit: Edit products
         modal:
             orders: Customer orders
             resupply: Resupply
@@ -278,6 +280,9 @@ ekyna_product:
             treatment: Treatment
             resupply: Resupply
             out_of_stock: Out of stock
+        message:
+            batch_edit_warning: >
+                Check the fields whose value will be applied to the following products
 
     offer:
         label:

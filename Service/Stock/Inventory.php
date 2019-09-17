@@ -3,8 +3,11 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use Doctrine\ORM\QueryBuilder;
+use Ekyna\Bundle\AdminBundle\Model\UserInterface;
+use Ekyna\Bundle\AdminBundle\Service\Security\UserProviderInterface;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates as BStockStates;
+use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType;
 use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
@@ -13,8 +16,8 @@ use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Util\FormatterAwareTrait;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
-use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
+use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 use Symfony\Component\Form\FormFactory;
@@ -52,6 +55,13 @@ class Inventory
     AND _table_.product = p.id
 ) AS _alias_";
 
+    const BOOKMARK_SUB_DQL = "(
+    SELECT 1
+    FROM _class_ bm
+    WHERE bm.user = _user_id_
+    AND bm.product = p.id
+) AS bookmark";
+
     const SESSION_KEY = 'inventory_context';
 
     /**
@@ -83,6 +93,11 @@ class Inventory
      * @var SessionInterface
      */
     private $session;
+
+    /**
+     * @var UserProviderInterface
+     */
+    private $userProvider;
 
     /**
      * @var string
@@ -120,6 +135,7 @@ class Inventory
      * @param FormFactory           $formFactory
      * @param SessionInterface      $session
      * @param FormatterFactory      $formatterFactory
+     * @param UserProviderInterface $userProvider
      * @param string                $supplierOrderItemClass
      * @param string                $stockUnitClass
      */
@@ -131,6 +147,7 @@ class Inventory
         FormFactory $formFactory,
         SessionInterface $session,
         FormatterFactory $formatterFactory,
+        UserProviderInterface $userProvider,
         $supplierOrderItemClass,
         $stockUnitClass
     ) {
@@ -141,9 +158,12 @@ class Inventory
         $this->formFactory = $formFactory;
         $this->session = $session;
         $this->formatterFactory = $formatterFactory;
+        $this->userProvider = $userProvider;
 
         $this->supplierOrderItemClass = $supplierOrderItemClass;
         $this->stockUnitClass = $stockUnitClass;
+
+        $this->loadConfig();
     }
 
     /**
@@ -203,10 +223,8 @@ class Inventory
      *
      * @return array
      */
-    public function listProducts(Request $request)
+    public function listProducts(Request $request): array
     {
-        $this->loadConfig();
-
         // Form
         $form = $this->getForm();
         $form->handleRequest($request);
@@ -214,22 +232,57 @@ class Inventory
             $this->saveContext();
         }
 
-        $formatter = $this->getFormatter();
-
         // Context
         $context = $this->getContext();
 
         // Products
-        $pQb = $this->getProductsQueryBuilder();
-        $this->applyContextToQueryBuilder($pQb, $context);
+        $qb = $this->getProductsQueryBuilder();
+        $this->applyContextToQueryBuilder($qb, $context);
 
         $page = intval($request->query->get('page', 0));
 
-        $products = $pQb
+        $products = $qb
             ->getQuery()
             ->setFirstResult(30 * $page)
             ->setMaxResults(30)
             ->getScalarResult();
+
+        return $this->normalizeProducts($products);
+    }
+
+    /**
+     * Finds the products by ids.
+     *
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function findProducts(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->getProductsQueryBuilder();
+
+        $products = $qb
+            ->andWhere($qb->expr()->in('p.id', $ids))
+            ->getQuery()
+            ->getScalarResult();
+
+        return $this->normalizeProducts($products);
+    }
+
+    /**
+     * Normalizes the products.
+     *
+     * @param array $products
+     *
+     * @return array
+     */
+    protected function normalizeProducts(array $products): array
+    {
+        $formatter = $this->getFormatter();
 
         foreach ($products as &$product) {
             // Designation (for variant)
@@ -253,6 +306,18 @@ class Inventory
 
             // Format weight
             $product['weight'] = $formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
+
+            // Visible
+            $product['visible_label'] = $this->config['bool'][$product['visible']]['label'];
+            $product['visible_theme'] = $this->config['bool'][$product['visible']]['theme'];
+
+            // Quote only
+            $product['quote_only_label'] = $this->config['bool'][$product['quote_only']]['label'];
+            $product['quote_only_theme'] = $this->config['bool'][$product['quote_only']]['theme'];
+
+            // End of life
+            $product['end_of_life_label'] = $this->config['bool'][$product['end_of_life']]['label'];
+            $product['end_of_life_theme'] = $this->config['bool'][$product['end_of_life']]['theme'];
 
             // Format stock
             $product['stock_floor'] = $formatter->number((float)$product['stock_floor']);
@@ -318,6 +383,9 @@ class Inventory
                 'p.designation',
                 'p.attributesDesignation as attributes_designation',
                 'p.geocode',
+                'p.visible',
+                'p.quoteOnly as quote_only',
+                'p.endOfLife as end_of_life',
                 'p.stockMode as stock_mode',
                 'p.stockState as stock_state',
                 'p.stockFloor as stock_floor',
@@ -337,17 +405,20 @@ class Inventory
             ->leftJoin('p.brand', 'b')
             ->leftJoin('p.parent', 'parent')
             ->andWhere($pQb->expr()->in('p.type', ':types'))
-            ->andWhere($pQb->expr()->not($pQb->expr()->andX(
+            /*->andWhere($pQb->expr()->not($pQb->expr()->andX(
                 $pQb->expr()->eq('p.endOfLife', ':end_of_life'),
                 $pQb->expr()->gte('p.virtualStock', ':virtual_stock')
-
-            )))
+            )))*/
             ->setParameters([
                 'types'         => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
                 'provider'      => ProductProvider::NAME,
-                'end_of_life'   => true,
-                'virtual_stock' => 0,
+                //'end_of_life'   => true,
+                //'virtual_stock' => 0,
             ]);
+
+        if ($this->userProvider->hasUser()) {
+            $pQb->addSelect($this->buildBookmarkSubQuery($this->userProvider->getUser()));
+        }
 
         return $pQb;
     }
@@ -400,6 +471,27 @@ class Inventory
                 ->setParameter('geocode', '%' . $geocode . '%');
         }
 
+        // Visible
+        if (!is_null($value = $context->isVisible())) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.visible', ':visible'))
+                ->setParameter('visible', $value);
+        }
+
+        // Quote only
+        if (!is_null($value = $context->isQuoteOnly())) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.quoteOnly', ':quote_only'))
+                ->setParameter('quote_only', $value);
+        }
+
+        // End of life
+        if (!is_null($value = $context->isEndOfLife())) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.endOfLife', ':end_of_life'))
+                ->setParameter('end_of_life', $value);
+        }
+
         // Mode filter
         if (0 < strlen($mode = $context->getMode())) {
             $qb
@@ -412,6 +504,17 @@ class Inventory
             $qb
                 ->andWhere($expr->eq('p.stockState', ':state'))
                 ->setParameter('state', $state);
+        }
+
+        // Bookmark
+        if (!is_null($bookmark = $context->isBookmark()) && $this->userProvider->hasUser()) {
+            if ($bookmark) {
+                $qb
+                    ->andHaving($qb->expr()->eq('bookmark', ':bookmark'))
+                    ->setParameter('bookmark', 1);
+            } else {
+                $qb->andHaving($qb->expr()->isNull('bookmark'));
+            }
         }
 
         // Profile
@@ -441,8 +544,11 @@ class Inventory
             } else {
                 $by = 'p.' . $by;
             }
-            $qb->addOrderBy($by, $dir);
+        } else {
+            $by = 'p.id';
+            $dir = 'DESC';
         }
+        $qb->addOrderBy($by, $dir);
     }
 
     /**
@@ -452,7 +558,7 @@ class Inventory
      *
      * @return string
      */
-    private function getPendingSubQuery()
+    private function getPendingSubQuery(): string
     {
         return strtr(static::PENDING_DQL, [
             '_class_' => $this->supplierOrderItemClass,
@@ -469,7 +575,7 @@ class Inventory
      *
      * @return string
      */
-    private function buildStockSubQuery($field, $fieldAlias, $tableAlias)
+    private function buildStockSubQuery(string $field, string $fieldAlias, string $tableAlias): string
     {
         return strtr(static::STOCK_SUB_DQL, [
             '_field_' => $field,
@@ -481,11 +587,26 @@ class Inventory
     }
 
     /**
+     * Builds the bookmark sub query.
+     *
+     * @param UserInterface $user
+     *
+     * @return string
+     */
+    private function buildBookmarkSubQuery(UserInterface $user): string
+    {
+        return strtr(static::BOOKMARK_SUB_DQL, [
+            '_class_'   => ProductBookmark::class,
+            '_user_id_' => $user->getId(),
+        ]);
+    }
+
+    /**
      * Builds the supplier sub query.
      *
      * @return string
      */
-    private function buildSupplierSubQuery()
+    private function buildSupplierSubQuery(): string
     {
         $sQb = $this->supplierProductRepository->createQueryBuilder('sp');
         $sQb
@@ -499,7 +620,7 @@ class Inventory
     /**
      * Loads the config.
      */
-    private function loadConfig()
+    private function loadConfig(): void
     {
         if ($this->config) {
             return;
@@ -508,6 +629,16 @@ class Inventory
         $config = [
             'stock_modes'  => [],
             'stock_states' => [],
+            'bool'         => [
+                true  => [
+                    'label' => $this->translator->trans('ekyna_core.value.yes'),
+                    'theme' => 'success',
+                ],
+                false => [
+                    'label' => $this->translator->trans('ekyna_core.value.no'),
+                    'theme' => 'danger',
+                ],
+            ],
         ];
 
         foreach (BStockModes::getConfig() as $mode => $c) {

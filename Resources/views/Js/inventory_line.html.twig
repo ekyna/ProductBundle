@@ -2,43 +2,48 @@
     'route': 'ekyna_product_product_admin_summary',
     'parameters': {'productId': id}
 }|json_encode }}'>
-    <td>{{ brand }}</td>
-    <td><a href="{{ url }}">{{ designation }}</a></td>
-    <td>{{ reference }}</td>
-    <td class="text-right">{{ net_price }}</td>
-    <td class="text-right">{{ weight }}</td>
-    <td>{{ geocode }}</td>
-    <td><span class="label label-{{ stock_mode_theme }}">{{ stock_mode_label }}</span></td>
-    <td><span class="label label-{{ stock_state_theme }}">{{ stock_state_label }}</span></td>
-    <td class="text-right">{{ stock_floor }}</td>
-    <td class="text-right">{{ replenishment }}</td>
-    <td class="text-right">{{ in_stock }}</td>
-    <td class="text-right">{{ available_stock }}</td>
-    <td class="text-right">{{ virtual_stock }}</td>
-    <td class="text-right">{{ eda }}</td>
-    <td class="text-right">{{ ordered }}{% if pending is not empty %} (+{{ pending }}){% endif %}</td>
-    <td class="text-right">{{ received }}</td>
-    <td class="text-right">{{ adjusted }}</td>
-    <td class="text-right{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
-    <td class="text-right">{{ shipped }}</td>
-    <td class="text-right">
+    <td class="input"><input name="id[]" type="checkbox" value="{{ id }}"></td>
+    <td class="input">
+        <a href="javascript: void(0)" class="fa fa-bookmark{% if not bookmark %}-o{% endif %} bookmark" title="Bookmark"></a>
+    </td>
+    <td class="text">{{ brand }}</td>
+    <td class="designation"><a href="{{ url }}" target="_blank">{{ designation }}</a></td>
+    <td class="text2" data-clipboard-copy="{{ reference }}">{{ reference }}</td>
+    <td class="text text-right">{{ net_price }}</td>
+    <td class="text text-right">{{ weight }}</td>
+    <td class="text2">{{ geocode }}</td>
+    <td class="boolean"><span class="label label-{{ visible_theme }}">{{ visible_label }}</span></td>
+    <td class="boolean"><span class="label label-{{ quote_only_theme }}">{{ quote_only_label }}</span></td>
+    <td class="boolean"><span class="label label-{{ end_of_life_theme }}">{{ end_of_life_label }}</span></td>
+    <td class="number">{{ stock_floor }}</td>
+    <td class="number">{{ replenishment }}</td>
+    <td class="state"><span class="label label-{{ stock_mode_theme }}">{{ stock_mode_label }}</span></td>
+    <td class="state"><span class="label label-{{ stock_state_theme }}">{{ stock_state_label }}</span></td>
+    <td class="number">{{ in_stock }}</td>
+    <td class="number">{{ available_stock }}</td>
+    <td class="number">{{ virtual_stock }}</td>
+    <td class="text text-right">{{ eda }}</td>
+    <td class="number">{{ ordered }}{% if pending is not empty %} (+{{ pending }}){% endif %}</td>
+    <td class="number">{{ received }}</td>
+    <td class="number">{{ adjusted }}</td>
+    <td class="number{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
+    <td class="number">{{ shipped }}</td>
+    <td class="action">
         {# TODO translations #}
-        <div class="btn-group btn-group-xs">
-            <a href="javascript: void(0)" class="btn btn-default quick-edit" title="Modifier">
-                <i class="fa fa-pencil"></i>
-            </a>
-            <a href="javascript: void(0)" class="btn btn-default print-label" title="Étiquette">
-                <i class="fa fa-barcode"></i>
-            </a>
-            <a href="javascript: void(0)" class="btn btn-default stock-units" title="Unités de stock">
-                <i class="fa fa-tasks"></i>
-            </a>
-            <a href="javascript: void(0)" class="btn btn-default treatment" title="Commandes client">
-                <i class="fa fa-user"></i>
-            </a>
-            <a href="javascript: void(0)" class="btn btn-default resupply" title="Commandes fournisseur">
-                <i class="fa fa-truck"></i>
-            </a>
-        </div>
+        <a href="javascript: void(0)" class="btn btn-xs btn-default quick-edit" title="Edit">
+            <i class="fa fa-pencil"></i>
+        </a>
+        <a href="javascript: void(0)" class="btn btn-xs btn-default print-label" title="Print label">
+            <i class="fa fa-barcode"></i>
+        </a>
+        <a href="javascript: void(0)" class="btn btn-xs btn-default stock-units" title="Stock units">
+            <i class="fa fa-tasks"></i>
+        </a>
+        <a href="javascript: void(0)" class="btn btn-xs btn-default treatment" title="Customer orders">
+            <i class="fa fa-user"></i>
+        </a>
+        <a href="javascript: void(0)" class="btn btn-xs btn-default resupply" title="Supplier orders">
+            <i class="fa fa-truck"></i>
+        </a>
     </td>
 </tr>

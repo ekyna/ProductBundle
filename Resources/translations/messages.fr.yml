@@ -267,9 +267,11 @@ ekyna_product:
         title: Inventaire
         field:
             profile: Profil
+            bookmark: Favoris
         button:
             export_units: Exporter les unités de stock
             export_products: Exporter les produits
+            batch_edit: Modifier les produits
         modal:
             orders: Commandes clients
             resupply: Réassort
@@ -278,6 +280,9 @@ ekyna_product:
             treatment: Traitement
             resupply: Réapprovisionnement
             out_of_stock: Rupture
+        message:
+            batch_edit_warning: >
+                Cochez les champs dont la valeur sera appliquée aux produits suivant
 
     offer:
         label:

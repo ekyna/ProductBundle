@@ -1,11 +1,12 @@
 define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal'], function ($, Router, Dispatcher, Templates, Modal) {
 
     var $window = $(window),
-        $list = $('#inventory_list'),
-        $wait = $('#inventory_wait'),
-        $none = $('#inventory_none'),
-        $sort = $('#inventory_sort'),
-        $form = $('form[name="inventory"]'),
+        $head = $('#inventory thead'),
+        $body = $('#inventory tbody'),
+        $foot = $('#inventory tfoot'),
+        $wait = $('#inventory_wait').detach(),
+        $none = $('#inventory_none').detach(),
+        $contextForm = $('form[name="inventory"]'),
         busy = false,
         productsXhr;
 
@@ -15,17 +16,28 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
      * @returns object
      */
     function getContext() {
-        var array = $form.serializeArray();
+        var array = $contextForm.serializeArray();
 
         var context = {};
         for (var i = 0; i < array.length; i++) {
-            context[array[i]['name']] = array[i]['value'];
+            if (array[i]['value']) {
+                context[array[i]['name']] = array[i]['value'];
+            }
         }
 
         return context;
     }
 
-    var eol = false, page = -1;
+    /**
+     * Clears the context form data.
+     */
+    function clearContext() {
+        $contextForm.find('table input').val(null).attr('value', null);
+        $contextForm.find('table select').val(null).find('option').prop('selected', false);
+    }
+
+    var eol = false,
+        page = -1;
 
     /**
      * Refreshes the inventory list.
@@ -35,9 +47,7 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
             productsXhr.abort();
         }
 
-        $list.empty();
-        $wait.show();
-        $none.hide();
+        $body.empty();
 
         eol = false;
         page = -1;
@@ -59,6 +69,9 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
 
         busy = true;
 
+        $none.detach();
+        $wait.appendTo($body);
+
         page++;
 
         productsXhr = $.ajax({
@@ -68,61 +81,24 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
             data: getContext()
         });
 
-        productsXhr.done(function (data) {
-            if (data.products === undefined || 0 === data.products.length) {
-                if (page === 0) {
-                    $none.show();
-                }
-                $wait.hide();
-                eol = true;
-            } else {
-                // TODO Ugly. Need data.count value.
-                if (30 > data.products.length) {
-                    $wait.hide();
-                    eol = true;
-                }
-                $.each(data.products, function (index, product) {
-                    $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)).appendTo($list);
-                });
-            }
-        });
+        productsXhr.done(handleResponse);
 
         productsXhr.always(function () {
             busy = false;
         });
     }
 
-    $window.on('scroll', function () {
-        if (busy || eol) {
-            return;
+    function updateListHeight() {
+        var height = $window.height() - $contextForm.outerHeight() - $head.outerHeight() - $foot.outerHeight();
+        if (0 > height) {
+            height = 0;
         }
+        $body.height(height);
+    }
 
-        if (($window.scrollTop() + $window.height()) > $wait.offset().top) {
-            nextList();
-        }
-    });
+    function request(event, route, parameters, method, handler) {
+        method = method || 'GET';
 
-    /**
-     * Context form submit.
-     */
-    $form.on('submit', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        refreshList();
-
-        return false;
-    });
-
-    /**
-     * Context form reset.
-     */
-    $form.on('reset', function () {
-        refreshList();
-    });
-
-
-    function request(event, route) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -132,16 +108,55 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
 
         busy = true;
 
-        var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
-        if (!productId) {
-            console.log('Undefined product id.');
+        parameters = parameters || {};
+
+        if (true === parameters) {
+            var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
+            if (!productId) {
+                console.log('Undefined product id.');
+                return false;
+            }
+            parameters = {productId: productId};
+        }
+
+        var xhr = $.ajax({
+            url: Router.generate(route, parameters),
+            method: method
+        });
+
+        xhr.done(handler || handleResponse);
+
+        xhr.always(function() {
+            busy = false
+        });
+    }
+
+    function requestModal(event, route, parameters, handler) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (busy) {
             return false;
+        }
+
+        busy = true;
+
+        parameters = parameters || {};
+        handler = handler || handleResponse;
+
+        if (true === parameters) {
+            var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
+            if (!productId) {
+                console.log('Undefined product id.');
+                return false;
+            }
+            parameters = {productId: productId};
         }
 
         try {
             var modal = new Modal();
             modal.load({
-                url: Router.generate(route, {productId: productId}),
+                url: Router.generate(route, parameters),
                 method: 'GET'
             });
             $(modal).on('ekyna.modal.response', function (modalEvent) {
@@ -150,12 +165,16 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
                 if (modalEvent.contentType === 'json') {
                     modalEvent.preventDefault();
 
-                    if (modalEvent.content.success) {
+                    handler(modalEvent.content);
+                    /*if (modalEvent.content.success) {
                         refreshList();
-                    }
+                    }*/
 
                     modalEvent.modal.close();
                 }
+            });
+            $(modal).on('ekyna.modal.load_fail', function() {
+                busy = false;
             });
         } catch (exception) {
             console.log(exception);
@@ -165,11 +184,73 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
         return false;
     }
 
+    function handleResponse(data) {
+        if (!data.hasOwnProperty('products') || 0 === data.products.length) {
+            if (page === 0) {
+                $none.appendTo($body);
+            }
+            eol = true;
+            return;
+        }
+
+        if (!data.update) {
+            $wait.detach();
+        }
+
+        $.each(data.products, function (index, product) {
+            var $new = $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)),
+                $old = $body.find('tr[data-id=' + product.id + ']');
+
+            if (1 === $old.length) {
+                $old.replaceWith($new);
+            } else {
+                $new.appendTo($body);
+            }
+        });
+
+        if (data.update) {
+            return;
+        }
+
+        // TODO Ugly. Need data.count value.
+        if (30 > data.products.length) {
+            eol = true;
+            return;
+        }
+
+        $wait.appendTo($body);
+    }
+
+    /**
+     * Line's bookmark buttons click handler
+     */
+    $body.on('click', 'a.bookmark', function (e) {
+        var $icon = $(e.currentTarget).closest('a'),
+            value = $icon.hasClass('fa-bookmark-o'),
+            route = value
+                ? 'ekyna_product_product_bookmark_admin_add'
+                : 'ekyna_product_product_bookmark_admin_remove';
+
+        return request(e, route, true, value ? 'POST' : 'DELETE', function() {
+            if (value) {
+                $icon.removeClass('fa-bookmark-o').addClass('fa-bookmark');
+            } else {
+                $icon.removeClass('fa-bookmark').addClass('fa-bookmark-o');
+            }
+        });
+    });
+
+    /**
+     * Line's quick edit buttons click handler
+     */
+    $body.on('click', 'a.quick-edit', function (e) {
+        return requestModal(e, 'ekyna_product_inventory_admin_quick_edit', true);
+    });
 
     /**
      * Line's print label buttons click handler
      */
-    $list.on('click', 'a.print-label', function (e) {
+    $body.on('click', 'a.print-label', function (e) {
         var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
         if (!productId) {
             console.log('Undefined product id.');
@@ -185,39 +266,73 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
         win.focus();
     });
 
+    /**
+     * Context form submit.
+     */
+    $contextForm.on('submit', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        refreshList();
+
+        return false;
+    });
+
+    /**
+     * Context form reset.
+     */
+    $contextForm.on('reset', function () {
+        clearContext();
+        refreshList();
+    });
 
     /**
      * Line's quick edit buttons click handler
      */
-    $list.on('click', 'a.quick-edit', function (e) {
-        return request(e, 'ekyna_product_inventory_admin_quick_edit');
+    $body.on('click', 'a.quick-edit', function (e) {
+        return requestModal(e, 'ekyna_product_inventory_admin_quick_edit', true);
     });
 
     /**
      * Line's stock unit buttons click handler
      */
-    $list.on('click', 'a.stock-units', function (e) {
-        return request(e, 'ekyna_product_inventory_admin_stock_units');
+    $body.on('click', 'a.stock-units', function (e) {
+        return requestModal(e, 'ekyna_product_inventory_admin_stock_units', true);
     });
 
     /**
      * Line's stock unit buttons click handler
      */
-    $list.on('click', 'a.treatment', function (e) {
-        return request(e, 'ekyna_product_inventory_admin_customer_orders');
+    $body.on('click', 'a.treatment', function (e) {
+        return requestModal(e, 'ekyna_product_inventory_admin_customer_orders', true);
     });
 
     /**
      * Line's resupply buttons click handler
      */
-    $list.on('click', 'a.resupply', function (e) {
-        return request(e, 'ekyna_product_inventory_admin_resupply');
+    $body.on('click', 'a.resupply', function (e) {
+        return requestModal(e, 'ekyna_product_inventory_admin_resupply', true);
+    });
+
+    $('button[name="batch_submit"]').on('click', function(e) {
+        var ids = [];
+        $('#inventory').serializeArray().forEach(function(obj) {
+            ids.push(obj.value);
+        });
+
+        if (1 >= ids.length) {
+            alert('Please select some products');
+
+            return false;
+        }
+
+        return requestModal(e, 'ekyna_product_inventory_admin_batch_edit', {id: ids});
     });
 
     /**
      * List sort headers click handler
      */
-    $sort.on('click', 'th.sort a', function (e) {
+    $head.on('click', 'th.sort a', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -230,18 +345,18 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
             sortDir = 'desc';
         }
 
-        $sort.find('th.sort a').removeClass('asc desc').addClass('none');
+        $head.find('th.sort a').removeClass('asc desc').addClass('none');
 
         if (sortDir !== 'none') {
             $a.removeClass('none').addClass(sortDir);
-            $form.find('input[name="inventory[sortBy]"]').val($a.data('by'));
-            $form.find('input[name="inventory[sortDir]"]').val(sortDir);
+            $contextForm.find('input[name="inventory[sortBy]"]').val($a.data('by'));
+            $contextForm.find('input[name="inventory[sortDir]"]').val(sortDir);
         } else {
-            $form.find('input[name="inventory[sortBy]"]').val(null);
-            $form.find('input[name="inventory[sortDir]"]').val(null);
+            $contextForm.find('input[name="inventory[sortBy]"]').val(null);
+            $contextForm.find('input[name="inventory[sortDir]"]').val(null);
         }
 
-        $form.trigger('submit');
+        $contextForm.trigger('submit');
 
         return false;
     });
@@ -249,7 +364,19 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
     Dispatcher.on('ekyna_commerce.stock_units.change', function() {
         refreshList();
     });
-
     refreshList();
+
+    $window.on('resize', updateListHeight);
+    updateListHeight();
+
+    $body.on('scroll', function () {
+        if (busy || eol) {
+            return;
+        }
+
+        if ($wait.offset().top < $body.height() + $contextForm.outerHeight() + $head.outerHeight()) {
+            nextList();
+        }
+    });
 });
 

@@ -1,4 +1,4 @@
-{% extends '@EkynaAdmin/Entity/layout.html.twig' %}
+{% extends '@EkynaAdmin/base.html.twig' %}
 
 {% macro sortLinkAttribute(data, field) %}
 {% spaceless %}
@@ -16,7 +16,7 @@
     {{ 'ekyna_product.inventory.title'|trans }} - {{ parent() }}
 {% endblock page_title %}
 
-{% block title %}
+{#{% block title %}
     <h1>{{ 'ekyna_product.inventory.title'|trans }}</h1>
 {% endblock title %}
 
@@ -31,147 +31,196 @@
         'type': 'link',
         'icon': 'download'
     }) }}
-{% endblock actions %}
+{% endblock actions %}#}
 
-{% block main %}
+{% block body %}
 {% spaceless %}
-    <div id="inventory">
 
-        {{ form_start(form) }}
-        {{ bootstrap_set_col_size('md') }}
-        {{ bootstrap_set_sizing('sm') }}
-        {% set fields = ['brand', 'supplier', 'designation', 'reference', 'geocode', 'mode', 'state', 'profile'] %}
-        <table id="inventory_filters">
+    {{ form_start(form) }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ bootstrap_set_sizing('sm') }}
+    {% set fields = [
+        'brand', 'supplier', 'designation', 'reference', 'geocode', 'visible',
+        'quoteOnly', 'endOfLife', 'mode', 'state', 'bookmark', 'profile'
+    ] %}
+    <table>
+        <thead>
+        <tr>
+            {%- for field in fields -%}
+            <th>{{ form_label(form[field]) }}</th>
+            {%- endfor -%}
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {%- for field in fields -%}
+            <td>{{ form_widget(form[field]) }}{{ form_errors(form[field]) }}</td>
+            {%- endfor %}
+            <td>{{ form_widget(form.submit) }}</td>
+            <td>{{ form_widget(form.reset) }}</td>
+        </tr>
+        </tbody>
+    </table>
+    {{ form_errors(form) }}
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+
+    <form id="inventory" action="{{ path('ekyna_product_inventory_admin_batch_edit') }}" class="table-responsive" method="GET">
+        <table class="table table-striped table-condensed table-hover">
             <thead>
-            <tr>
-                {%- for field in fields -%}
-                <th>{{ form_label(form[field]) }}</th>
-                {%- endfor -%}
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-            </tr>
+                <tr>
+                    <th class="text-center" style="width:46%" colspan="9">Article</th>
+                    <th class="text-center" style="width:23%" colspan="5">Configuration</th>
+                    <th class="text-center" style="width:24%" colspan="5">État stock</th>
+                    <th class="text-center" style="width:20%" colspan="5">Unités de stock</th>
+                    <th class="action">&nbsp;</th>
+                </tr>
+                <tr>
+                    {# Product #}
+                    <th class="input">&nbsp;</th>
+                    <th class="input">&nbsp;</th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'brand') }}>
+                            {{- 'ekyna_product.brand.label.singular'|trans -}}
+                        </a>
+                    </th>
+                    <th class="designation sort">
+                        <a {{ macro.sortLinkAttribute(data, 'designation') }}>
+                            {{- 'ekyna_core.field.designation'|trans -}}
+                        </a>
+                    </th>
+                    <th class="text2 sort">
+                        <a {{ macro.sortLinkAttribute(data, 'reference') }}>
+                            {{- 'ekyna_core.field.reference'|trans -}}
+                        </a>
+                    </th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'netPrice') }}>
+                            {{- 'ekyna_commerce.field.net_price'|trans -}}
+                        </a>
+                    </th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'weight') }}>
+                            {{- 'ekyna_core.field.weight'|trans -}}
+                        </a>
+                    </th>
+                    <th class="text2 sort">
+                        <a {{ macro.sortLinkAttribute(data, 'geocode') }}>
+                            {{- 'ekyna_commerce.field.geocode'|trans -}}
+                        </a>
+                    </th>
+                    <th class="boolean">
+                        <span>Visible</span>
+                    </th>
+                    {# Configuration #}
+                    <th class="boolean">
+                        <span>Devis</span>
+                    </th>
+                    <th class="boolean">
+                        <span>Vie</span>
+                    </th>
+                    <th class="number">
+                        <span>Rupture</span>
+                        {#{{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Réassort</span>
+                        {#{{- 'ekyna_commerce.stock_subject.field.replenishment_time'|trans -}}#}
+                    </th>
+                    <th class="state">
+                        <span>{{- 'ekyna_core.field.mode'|trans -}}</span>
+                    </th>
+                    {# State #}
+                    <th class="state">
+                        <span>{{- 'ekyna_core.field.status'|trans -}}</span>
+                    </th>
+                    <th class="number">
+                        <span>Réel</span>
+                        {#{{- 'ekyna_commerce.field.in_stock'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Dispo</span>
+{#                            {{- 'ekyna_commerce.field.available_stock'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Prévisionel</span>
+{#                            {{- 'ekyna_commerce.field.virtual_stock'|trans -}}#}
+                    </th>
+                    <th class="text">
+                        <span>Réassort</span>
+{#                            {{- 'ekyna_commerce.field.replenishment_eda'|trans -}}#}
+                    </th>
+                    {# Units #}
+                    <th class="number">
+                        <span>Commandé</span>
+                        {#{{- 'ekyna_commerce.stock_unit.field.ordered_quantity'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Reçu</span>
+                        {#{{- 'ekyna_commerce.stock_unit.field.received_quantity'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Ajusté</span>
+                        {#{{- 'ekyna_commerce.stock_unit.field.adjusted_quantity'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Vendu</span>
+                        {#{{- 'ekyna_commerce.stock_unit.field.sold_quantity'|trans -}}#}
+                    </th>
+                    <th class="number">
+                        <span>Expédié</span>
+                        {#{{- 'ekyna_commerce.stock_unit.field.shipped_quantity'|trans -}}#}
+                    </th>
+                    <th class="action">&nbsp;</th>
+                </tr>
             </thead>
             <tbody>
-            <tr>
-                {%- for field in fields -%}
-                <td>{{ form_widget(form[field]) }}{{ form_errors(form[field]) }}</td>
-                {%- endfor %}
-                <td>{{ form_widget(form.submit) }}</td>
-                <td>{{ form_widget(form.reset) }}</td>
-            </tr>
+                <tr id="inventory_wait">
+                    <td colspan="25">
+                        <p class="text-center">
+                            Please wait&hellip;
+                        </p>
+                    </td>
+                </tr>
+                <tr id="inventory_none" style="display:none">
+                    <td colspan="25">
+                        <p class="text-center">
+                            Aucun résultat.
+                        </p>
+                    </td>
+                </tr>
             </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="17">
+                    <button type="submit" name="batch_submit" class="btn-sm btn btn-primary btn-sm">
+                        {{- 'ekyna_product.inventory.button.batch_edit'|trans -}}
+                    </button>
+                </td>
+                <td colspan="18" style="text-align: right">
+                    {{ ui_button('ekyna_product.inventory.button.export_products', {
+                        'path': path('ekyna_product_inventory_admin_export_products'),
+                        'type': 'link',
+                        'icon': 'download'
+                    }) }}
+                    {{ ui_button('ekyna_product.inventory.button.export_units', {
+                        'path': path('ekyna_product_inventory_admin_export_units'),
+                        'type': 'link',
+                        'icon': 'download'
+                    }) }}
+                </td>
+            </tr>
+            </tfoot>
         </table>
-        {{ form_errors(form) }}
-        {{ form_rest(form) }}
-        {{ form_end(form) }}
-
-
-        <div class="table-responsive">
-            <table class="table table-striped table-condensed table-hover">
-                <thead id="inventory_sort">
-                    <tr>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'brand') }}>
-                                {{- 'ekyna_product.brand.label.singular'|trans -}}
-                            </a>
-                        </th>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'designation') }}>
-                                {{- 'ekyna_core.field.designation'|trans -}}
-                            </a>
-                        </th>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'reference') }}>
-                                {{- 'ekyna_core.field.reference'|trans -}}
-                            </a>
-                        </th>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'netPrice') }}>
-                                {{- 'ekyna_commerce.field.net_price'|trans -}}
-                            </a>
-                        </th>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'weight') }}>
-                                {{- 'ekyna_core.field.weight'|trans -}}
-                            </a>
-                        </th>
-                        <th class="sort">
-                            <a {{ macro.sortLinkAttribute(data, 'geocode') }}>
-                                {{- 'ekyna_commerce.field.geocode'|trans -}}
-                            </a>
-                        </th>
-                        <th>
-                            {{- 'ekyna_core.field.mode'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_core.field.status'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_subject.field.replenishment_time'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.field.in_stock'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.field.available_stock'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.field.virtual_stock'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.field.replenishment_eda'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_unit.field.ordered_quantity'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_unit.field.received_quantity'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_unit.field.adjusted_quantity'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_unit.field.sold_quantity'|trans -}}
-                        </th>
-                        <th>
-                            {{- 'ekyna_commerce.stock_unit.field.shipped_quantity'|trans -}}
-                        </th>
-                        <th>
-                            &nbsp;
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="inventory_list"></tbody>
-                <tbody>
-                    <tr id="inventory_wait">
-                        <td colspan="20">
-                            <p class="text-center">
-                                Please wait&hellip;
-                            </p>
-                        </td>
-                    </tr>
-                    <tr id="inventory_none" style="display:none">
-                        <td colspan="20">
-                            <p class="text-center">
-                                Aucun résultat.
-                            </p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-    </div>
+    </form>
 {% endspaceless %}
-{% endblock main %}
+{% endblock body %}
 
 
 {% block javascripts %}
-    {{ parent() }}
+{#    {{ parent() }}#}
     <script type="text/javascript">require(['ekyna-product/admin/inventory']);</script>
 {% endblock javascripts %}
 

@@ -80,6 +80,33 @@ class InventoryType extends AbstractType
                 'label'    => 'ekyna_commerce.field.geocode',
                 'required' => false,
             ])
+            ->add('visible', Type\ChoiceType::class, [
+                'label'    => 'ekyna_core.field.visible',
+                'choices'  => [
+                    'ekyna_core.value.yes' => 1,
+                    'ekyna_core.value.no'  => 0,
+                ],
+                'required' => false,
+                'select2'  => false,
+            ])
+            ->add('quoteOnly', Type\ChoiceType::class, [
+                'label'    => 'ekyna_commerce.stock_subject.field.quote_only',
+                'choices'  => [
+                    'ekyna_core.value.yes' => 1,
+                    'ekyna_core.value.no'  => 0,
+                ],
+                'required' => false,
+                'select2'  => false,
+            ])
+            ->add('endOfLife', Type\ChoiceType::class, [
+                'label'    => 'ekyna_commerce.stock_subject.field.end_of_life',
+                'choices'  => [
+                    'ekyna_core.value.yes' => 1,
+                    'ekyna_core.value.no'  => 0,
+                ],
+                'required' => false,
+                'select2'  => false,
+            ])
             ->add('mode', Type\ChoiceType::class, [
                 'label'    => 'ekyna_commerce.stock_subject.field.mode',
                 'choices'  => StockSubjectModes::getChoices(),
@@ -92,10 +119,19 @@ class InventoryType extends AbstractType
                 'required' => false,
                 'select2'  => false,
             ])
-            ->add('profile', Type\ChoiceType::class, [
-                'label'    => 'ekyna_product.inventory.field.profile',
-                'choices'  => InventoryProfiles::getChoices(),
+            ->add('bookmark', Type\ChoiceType::class, [
+                'label'    => 'ekyna_product.inventory.field.bookmark',
+                'choices'  => [
+                    'ekyna_core.value.yes' => 1,
+                    'ekyna_core.value.no'  => 0,
+                ],
+                'required' => false,
                 'select2'  => false,
+            ])
+            ->add('profile', Type\ChoiceType::class, [
+                'label'   => 'ekyna_product.inventory.field.profile',
+                'choices' => InventoryProfiles::getChoices(),
+                'select2' => false,
             ])
             ->add('sortBy', Type\HiddenType::class)
             ->add('sortDir', Type\HiddenType::class)

@@ -25,6 +25,21 @@
             <argument type="collection"/><!-- Replaced by DI extension -->
         </service>
 
+        <!-- Product bookmark repository -->
+        <service id="Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository"
+                 public="false">
+            <factory service="doctrine" method="getRepository"/>
+            <argument>Ekyna\Bundle\ProductBundle\Entity\ProductBookmark</argument>
+        </service>
+
+        <!-- Product bookmark controller -->
+        <service id="Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController">
+            <argument type="service" id="ekyna_admin.security.user_provider"/>
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository"/>
+            <argument type="service" id="doctrine"/>
+        </service>
+
         <!-- Account dashboard event subscriber -->
         <service id="ekyna_product.account.dashboard_subscriber"
                  class="Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber">
@@ -85,6 +100,7 @@
             <argument type="service" id="form.factory"/>
             <argument type="service" id="session"/>
             <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
+            <argument type="service" id="ekyna_admin.security.user_provider"/>
             <argument>%ekyna_commerce.supplier_order_item.class%</argument>
             <argument>%ekyna_product.product_stock_unit.class%</argument>
         </service>
@@ -100,28 +116,30 @@
             <argument type="service" id="ekyna_commerce.supplier_delivery.operator"/>
             <argument type="service" id="ekyna_commerce.subject_helper"/>
         </service>
-        <service id="ekyna_product.inventory.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">
+        <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">
             <argument type="service" id="ekyna_product.brand.repository"/>
             <argument type="service" id="ekyna_commerce.supplier.repository"/>
             <tag name="form.type"/>
         </service>
-        <service id="ekyna_product.inventory_quick_edit.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
+        <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType">
             <argument type="service" id="ekyna_commerce.subject.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
             <argument type="service" id="ekyna_commerce.pricing.tax_resolver"/>
             <tag name="form.type"/>
         </service>
-        <service id="ekyna_product.inventory_resupply.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType">
+        <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\BatchEditType">
+            <argument type="service" id="ekyna_commerce.stock_subject.form_type.builder"/>
+            <tag name="form.type"/>
+            <tag name="form.js" selector="form[name=batch_edit]"
+                 path="ekyna-product/form/batch-edit"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType">
             <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
             <tag name="form.type"/>
             <tag name="form.js" selector="form[name=ekyna_product_inventory_resupply]"
                  path="ekyna-product/form/resupply"/>
         </service>
-        <service id="ekyna_product.inventory_resupply_product.form_type"
-                 class="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyProductType">
+        <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyProductType">
             <argument type="service" id="ekyna_commerce.supplier_order.repository"/>
             <tag name="form.type"/>
         </service>

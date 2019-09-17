@@ -1054,6 +1054,21 @@
         </property>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\ProductBookmark">
+        <property name="user">
+            <constraint name="NotNull"/>
+        </property>
+        <property name="product">
+            <constraint name="NotNull"/>
+        </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>user</value>
+                <value>product</value>
+            </option>
+        </constraint>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductAttribute">
         <property name="product">
             <constraint name="NotNull"/>

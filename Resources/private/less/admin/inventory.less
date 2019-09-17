@@ -1,50 +1,145 @@
-#inventory {
+html, body {
+    overflow: hidden;
+}
 
-    .inventory-suppliers {
-        margin-bottom: 30px;
+form[name=inventory] {
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 15px;
 
-        > h4 {
-            margin-bottom: 10px;
-        }
-
-        > div {
-            > .input-group {
-                display: inline-block;
-                margin: 0 10px 6px 0;
-
-                > .input-group-addon,
-                > .input-group-btn {
-                    width: auto;
-                }
-            }
-        }
-    }
-
-    form[name=inventory] {
+    > table {
         width: 100%;
-        border: 1px solid #ccc;
-        margin-bottom: 30px;
-        padding: 15px 0;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        border-radius: 4px;
 
-        > table {
-            width: 100%;
+        th, td {
+            padding: 0 10px;
 
-            th, td {
-                padding: 0 10px;
-
-                .btn-group {
-                    min-width: 83px;
-                }
+            .btn-group {
+                min-width: 83px;
             }
         }
     }
 }
 
-#inventory_list {
-    > tr > td > div.btn-group {
-        width: 112px;
+#inventory {
+    margin: 0;
+
+    th, td {
+        padding: 5px;
+
+        &.input { // 1
+            width: 2%;
+        }
+
+        &.text { // 2
+            width: 5%;
+        }
+
+        &.text2 { // 2
+            width: 6%;
+        }
+
+        &.designation { // 1
+            width: 10%;
+        }
+
+        &.boolean { // 3
+            width: 4%;
+        }
+
+        &.number { // 3
+            width: 4%;
+        }
+
+        &.state { // 3
+            width: 7%;
+        }
+
+        // &.action { // 3
+        //}
+    }
+
+    thead, tbody, tfoot {
+        width: 100%;
+
+        > tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+    }
+
+    thead {
+        > tr {
+            > th {
+                border-right: 1px solid #eee;
+                overflow: hidden;
+                position: relative;
+
+                &:last-child {
+                    border-right: none;
+                }
+
+                &.action {
+                    width: 122px;
+                }
+
+
+                > a, > span {
+                    display: inline-block;
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    &:hover {
+                        display: block;
+                        top: 6px;
+                        left: 5px;
+                        width: auto;
+                        position: absolute;
+                        text-overflow: initial;
+                    }
+                }
+            }
+        }
+    }
+
+    tbody {
+        display: block;
+        height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        > tr {
+            > td {
+                &.input {
+                    text-align: center;
+                }
+
+                &.number {
+                    text-align: right;
+                }
+
+                &.action { // 3
+                    width: 106px;
+                    text-align: left;
+
+                    > a {
+                        margin: 0 3px 3px 0;
+                    }
+                }
+            }
+        }
+    }
+
+    tfoot {
+        a {
+            margin-left: 10px;
+
+            > span {
+                margin-right: 5px;
+            }
+        }
     }
 }

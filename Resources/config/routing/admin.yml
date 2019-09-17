@@ -26,6 +26,10 @@ ekyna_product_pricing_admin:
     resource: admin/pricing.yml
     prefix:   /pricings
 
+ekyna_product_product_bookmark_admin:
+    resource: admin/product_bookmark.yml
+    prefix: /product-bookmark
+
 ekyna_product_special_offer_admin:
     resource: admin/special_offer.yml
     prefix:   /special-offers

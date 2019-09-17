@@ -35,6 +35,21 @@ class InventoryContext
     private $geocode;
 
     /**
+     * @var bool
+     */
+    private $visible;
+
+    /**
+     * @var bool
+     */
+    private $quoteOnly;
+
+    /**
+     * @var bool
+     */
+    private $endOfLife;
+
+    /**
      * @var string
      */
     private $mode;
@@ -43,6 +58,11 @@ class InventoryContext
      * @var string
      */
     private $state;
+
+    /**
+     * @var bool
+     */
+    private $bookmark;
 
     /**
      * @var string
@@ -65,6 +85,7 @@ class InventoryContext
      */
     public function __construct()
     {
+        $this->bookmark = null;
         $this->profile = InventoryProfiles::NONE;
     }
 
@@ -87,7 +108,7 @@ class InventoryContext
      */
     public function setBrand($brand)
     {
-        $this->brand = $brand;
+        $this->brand = (int)$brand;
 
         return $this;
     }
@@ -111,7 +132,7 @@ class InventoryContext
      */
     public function setSupplier($supplier)
     {
-        $this->supplier = $supplier;
+        $this->supplier = (int)$supplier;
 
         return $this;
     }
@@ -135,7 +156,7 @@ class InventoryContext
      */
     public function setReference($reference)
     {
-        $this->reference = $reference;
+        $this->reference = (string)$reference;
 
         return $this;
     }
@@ -159,7 +180,7 @@ class InventoryContext
      */
     public function setDesignation($designation)
     {
-        $this->designation = $designation;
+        $this->designation = (string)$designation;
 
         return $this;
     }
@@ -183,7 +204,91 @@ class InventoryContext
      */
     public function setGeocode($geocode)
     {
-        $this->geocode = $geocode;
+        $this->geocode = (string)$geocode;
+
+        return $this;
+    }
+
+    /**
+     * Returns the visible.
+     *
+     * @return bool
+     */
+    public function isVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    /**
+     * Sets the visible.
+     *
+     * @param bool $visible
+     *
+     * @return InventoryContext
+     */
+    public function setVisible($visible): InventoryContext
+    {
+        if (is_null($visible) || ("" === (string)$visible)) {
+            $this->visible = null;
+        } else {
+            $this->visible = (bool)$visible;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the quoteOnly.
+     *
+     * @return bool
+     */
+    public function isQuoteOnly(): ?bool
+    {
+        return $this->quoteOnly;
+    }
+
+    /**
+     * Sets the quoteOnly.
+     *
+     * @param bool $quoteOnly
+     *
+     * @return InventoryContext
+     */
+    public function setQuoteOnly($quoteOnly): InventoryContext
+    {
+        if (is_null($quoteOnly) || ("" === (string)$quoteOnly)) {
+            $this->quoteOnly = null;
+        } else {
+            $this->quoteOnly = (bool)$quoteOnly;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the endOfLife.
+     *
+     * @return bool
+     */
+    public function isEndOfLife(): ?bool
+    {
+        return $this->endOfLife;
+    }
+
+    /**
+     * Sets the endOfLife.
+     *
+     * @param bool $endOfLife
+     *
+     * @return InventoryContext
+     */
+    public function setEndOfLife($endOfLife): InventoryContext
+    {
+        if (is_null($endOfLife) || ("" === (string)$endOfLife)) {
+            $this->endOfLife = null;
+        } else {
+            $this->endOfLife = (bool)$endOfLife;
+        }
 
         return $this;
     }
@@ -207,7 +312,7 @@ class InventoryContext
      */
     public function setMode($mode)
     {
-        $this->mode = $mode;
+        $this->mode = (string)$mode;
 
         return $this;
     }
@@ -231,7 +336,35 @@ class InventoryContext
      */
     public function setState($state)
     {
-        $this->state = $state;
+        $this->state = (string)$state;
+
+        return $this;
+    }
+
+    /**
+     * Returns the bookmark.
+     *
+     * @return bool
+     */
+    public function isBookmark(): ?bool
+    {
+        return $this->bookmark;
+    }
+
+    /**
+     * Sets the bookmark.
+     *
+     * @param bool $bookmark
+     *
+     * @return InventoryContext
+     */
+    public function setBookmark($bookmark): InventoryContext
+    {
+        if (is_null($bookmark) || ("" === (string)$bookmark)) {
+            $this->bookmark = null;
+        } else {
+            $this->bookmark = (bool)$bookmark;
+        }
 
         return $this;
     }
@@ -255,7 +388,7 @@ class InventoryContext
      */
     public function setProfile($profile)
     {
-        $this->profile = $profile;
+        $this->profile = (string)$profile;
 
         return $this;
     }
@@ -279,7 +412,7 @@ class InventoryContext
      */
     public function setSortBy($sortBy)
     {
-        $this->sortBy = $sortBy;
+        $this->sortBy = (string)$sortBy;
 
         return $this;
     }
@@ -303,7 +436,7 @@ class InventoryContext
      */
     public function setSortDir($sortDir)
     {
-        $this->sortDir = $sortDir;
+        $this->sortDir = (string)$sortDir;
 
         return $this;
     }
@@ -327,7 +460,7 @@ class InventoryContext
                 $this->profile,
                 $this->sortBy,
                 $this->sortDir
-            ) = $array;
+                ) = $array;
         }
     }
 

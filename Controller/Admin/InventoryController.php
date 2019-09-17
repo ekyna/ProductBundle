@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
+use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\BatchEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\QuickEditType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\ResupplyType;
 use Ekyna\Component\Commerce\Common\Util\Money;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class InventoryController
@@ -86,11 +88,11 @@ class InventoryController extends Controller
             throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
         }
 
-        $product = $this->findProductByRequest($request);
+        $product = $this->findProductById($id = $request->attributes->get('productId'));
 
         $form = $this->createForm(QuickEditType::class, $product, [
             'action' => $this->generateUrl('ekyna_product_inventory_admin_quick_edit', [
-                'productId' => $product->getId(),
+                'productId' => $id,
             ]),
             'attr'   => [
                 'class' => 'form-horizontal',
@@ -107,9 +109,7 @@ class InventoryController extends Controller
                     $form->addError(new FormError($error->getMessage()));
                 }
             } else {
-                return new JsonResponse([
-                    'success' => true,
-                ]);
+                return $this->respond([$id]);
             }
         }
 
@@ -142,6 +142,108 @@ class InventoryController extends Controller
     }
 
     /**
+     * Batch edit action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function batchEditAction(Request $request): Response
+    {
+        if (!$request->isXmlHttpRequest() && !$this->getParameter('kernel.debug')) {
+            throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
+        }
+
+        $ids = $request->query->get('id');
+        if (!is_array($ids) || empty($ids)) {
+            return $this->respond([]);
+        }
+
+        $products = $this->findProductsById($ids);
+        if (empty($products)) {
+            return $this->respond([]);
+        }
+
+        $form = $this->createForm(BatchEditType::class, null, [
+            'action' => $this->generateUrl('ekyna_product_inventory_admin_batch_edit', [
+                'id' => $ids,
+            ]),
+            'attr'   => [
+                'class' => 'form-horizontal',
+            ],
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $validator = $this->getValidator();
+            $accessor = PropertyAccess::createPropertyAccessor();
+
+            $error = false;
+            foreach ($products as $product) {
+                $fields = [
+                    'stockMode',
+                    'quoteOnly',
+                    'endOfLife',
+                    'stockFloor',
+                    'replenishmentTime',
+                    'minimumOrderQuantity',
+                ];
+                foreach ($fields as $field) {
+                    if ($form->get($field . 'Chk')->getData()) {
+                        $accessor->setValue($product, $field, $form->get($field)->getData());
+                    }
+                }
+
+                $violations = $validator->validate($product, null, ['Default', $product->getType()]);
+                if ($violations->count()) {
+                    /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
+                    foreach ($violations as $violation) {
+                        $form->addError(new FormError($violation->getMessage()));
+                        $error = true;
+                    }
+                }
+            }
+
+            if (!$error) {
+                $manager = $this
+                    ->getDoctrine()
+                    ->getManagerForClass($this->getParameter('ekyna_product.product.class'));
+
+                foreach ($products as $product) {
+                    $manager->persist($product);
+                }
+                $manager->flush();
+
+                return $this->respond($ids);
+            }
+        }
+
+        $title = $this->getTranslator()->trans('ekyna_product.inventory.button.batch_edit');
+
+        $modal = new Modal($title, $form->createView(), [
+            [
+                'id'       => 'submit',
+                'label'    => 'ekyna_core.button.save',
+                'icon'     => 'glyphicon glyphicon-ok',
+                'cssClass' => 'btn-success',
+                'autospin' => true,
+            ],
+            [
+                'id'       => 'close',
+                'label'    => 'ekyna_core.button.cancel',
+                'icon'     => 'glyphicon glyphicon-remove',
+                'cssClass' => 'btn-default',
+            ],
+        ]);
+        $modal->setVars([
+            'form_template' => '@EkynaProduct/Admin/Inventory/_batch_edit_form.html.twig',
+            'products'      => $products,
+        ]);
+
+        return $this->get('ekyna_core.modal')->render($modal);
+    }
+
+    /**
      * Inventory stock units action.
      *
      * @param Request $request
@@ -154,7 +256,7 @@ class InventoryController extends Controller
             throw $this->createNotFoundException('Only XHR is supported.');
         }
 
-        $product = $this->findProductByRequest($request);
+        $product = $this->findProductById($request->attributes->get('productId'));
 
         $list = $this
             ->get('ekyna_commerce.stock.stock_renderer')
@@ -194,7 +296,7 @@ class InventoryController extends Controller
             throw $this->createNotFoundException('Only XHR is supported.');
         }
 
-        $product = $this->findProductByRequest($request);
+        $product = $this->findProductById($request->attributes->get('productId'));
 
         $orderConfig = $this->get('ekyna_commerce.order.configuration');
 
@@ -203,7 +305,11 @@ class InventoryController extends Controller
             ->createTable($orderConfig->getResourceName(), $orderConfig->getTableType(), [
                 'subject'       => $product,
                 'state'         => [OrderStates::STATE_ACCEPTED],
-                'shipmentState' => [ShipmentStates::STATE_NEW, ShipmentStates::STATE_PENDING, ShipmentStates::STATE_PARTIAL],
+                'shipmentState' => [
+                    ShipmentStates::STATE_NEW,
+                    ShipmentStates::STATE_PENDING,
+                    ShipmentStates::STATE_PARTIAL,
+                ],
                 // TODO limit => 100 (no paggging)
                 // TODO summary
             ]);
@@ -243,11 +349,11 @@ class InventoryController extends Controller
             throw $this->createNotFoundException('Not yet implemented. Only XHR is supported.');
         }*/
 
-        $product = $this->findProductByRequest($request);
+        $product = $this->findProductById($id = $request->attributes->get('productId'));
 
         $form = $this->createForm(ResupplyType::class, [], [
             'action'  => $this->generateUrl('ekyna_product_inventory_admin_resupply', [
-                'productId' => $product->getId(),
+                'productId' => $id,
             ]),
             'product' => $product,
             'attr'    => [
@@ -289,9 +395,7 @@ class InventoryController extends Controller
                         $form->addError(new FormError($error->getMessage()));
                     }
                 } else {
-                    return new JsonResponse([
-                        'success' => true,
-                    ]);
+                    return $this->respond([$id]);
                 }
             } else {
                 $form->addError(new FormError('Veuillez choisir une référence fournisseur.'));
@@ -380,7 +484,7 @@ class InventoryController extends Controller
                     implode(', ', $stockUnit->getGeocodes()),
                     $stockUnit->getNetPrice(),
                     $currency,
-                    $value
+                    $value,
                 ];
 
                 fputcsv($handle, $data, ';', '"');
@@ -448,23 +552,59 @@ class InventoryController extends Controller
     }
 
     /**
+     * Respond to ajax requests.
+     *
+     * @param array $ids
+     *
+     * @return Response
+     */
+    private function respond(array $ids): Response
+    {
+        $products = $this
+            ->get('ekyna_product.inventory')
+            ->findProducts($ids);
+
+        $data = [
+            'products' => $products,
+            'update'   => true,
+        ];
+
+        return new JsonResponse($data);
+    }
+
+    /**
      * Finds the product by request.
      *
-     * @param Request $request
+     * @param int $id
      *
      * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface
      */
-    private function findProductByRequest(Request $request)
+    private function findProductById(int $id)
     {
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
         $product = $this
             ->get('ekyna_product.product.repository')
-            ->find($request->attributes->get('productId'));
+            ->find($id);
 
         if (null === $product) {
             throw $this->createNotFoundException('Product not found.');
         }
 
         return $product;
+    }
+
+    /**
+     * Finds the product by request.
+     *
+     * @param int[] $ids
+     *
+     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     */
+    private function findProductsById(array $ids)
+    {
+        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        return $this
+            ->get('ekyna_product.product.repository')
+            ->findBy(['id' => $ids]);
     }
 }
