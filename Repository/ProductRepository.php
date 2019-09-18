@@ -582,6 +582,25 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * @inheritDoc
+     */
+    public function findBySkuOrReferences(string $code): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        return $qb
+            ->leftJoin('p.references', 'r')
+            ->where($ex->orX(
+                $ex->eq('p.reference', ':code'),
+                $ex->eq('r.code', ':code')
+            ))
+            ->getQuery()
+            ->setParameter('code', $code)
+            ->getResult();
+    }
+
+    /**
      * @param array $ignore
      *
      * @return array

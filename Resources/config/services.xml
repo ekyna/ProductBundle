@@ -90,6 +90,13 @@
             <tag name="ekyna_product.attribute_type" alias="unit"/>
         </service>
 
+        <!-- Barcode -->
+        <service id="Ekyna\Bundle\ProductBundle\EventListener\BarcodeListener">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="Symfony\Component\Routing\Generator\UrlGeneratorInterface"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Inventory -->
         <service id="ekyna_product.inventory"
                  class="Ekyna\Bundle\ProductBundle\Service\Stock\Inventory">
@@ -912,6 +919,7 @@
         <!-- Stat count repository -->
         <service id="ekyna_product.stat_count.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
+            <!-- TODO Remove factory : it potentially injects the wrong entity manager -->
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCount</argument>
             <call method="setLocaleProvider">
@@ -921,6 +929,7 @@
         <!-- Stat cross repository -->
         <service id="ekyna_product.stat_cross.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
+            <!-- TODO Remove factory : it potentially injects the wrong entity manager -->
             <factory service="doctrine" method="getRepository"/>
             <argument>Ekyna\Bundle\ProductBundle\Entity\StatCross</argument>
             <call method="setLocaleProvider">

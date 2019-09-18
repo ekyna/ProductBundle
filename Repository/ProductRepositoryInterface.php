@@ -184,6 +184,15 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     ): ?Model\ProductInterface;
 
     /**
+     * Finds by sku or references.
+     *
+     * @param string $code
+     *
+     * @return Model\ProductInterface
+     */
+    public function findBySkuOrReferences(string $code): array;
+
+    /**
      * Loads the product's medias.
      *
      * @param Model\ProductInterface $product
