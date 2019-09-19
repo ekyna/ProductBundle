@@ -235,19 +235,25 @@ class Inventory
         // Context
         $context = $this->getContext();
 
+        // Reference code
+        if (null !== $code = $request->query->get('referenceCode')) {
+            $context->setReferenceCode($code);
+        }
+
         // Products
         $qb = $this->getProductsQueryBuilder();
+
         $this->applyContextToQueryBuilder($qb, $context);
 
-        $page = intval($request->query->get('page', 0));
+        if (null !== $page = $request->query->get('page')) {
+            $qb
+                ->setFirstResult(30 * intval($page))
+                ->setMaxResults(30);
+        }
 
-        $products = $qb
-            ->getQuery()
-            ->setFirstResult(30 * $page)
-            ->setMaxResults(30)
-            ->getScalarResult();
-
-        return $this->normalizeProducts($products);
+        return $this->normalizeProducts(
+            $qb->getQuery()->getScalarResult()
+        );
     }
 
     /**
@@ -432,6 +438,15 @@ class Inventory
     private function applyContextToQueryBuilder(QueryBuilder $qb, InventoryContext $context)
     {
         $expr = $qb->expr();
+
+        if (!empty($code = $context->getReferenceCode())) {
+            $qb
+                ->join('p.references', 'r')
+                ->andWhere($qb->expr()->eq('r.code', ':code'))
+                ->setParameter('code', $code);
+
+            return;
+        }
 
         // Brand filter
         if (0 < $brand = $context->getBrand()) {

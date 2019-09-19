@@ -1,4 +1,6 @@
-define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal'], function ($, Router, Dispatcher, Templates, Modal) {
+define(
+    ['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner'],
+    function ($, Router, Dispatcher, Templates, Modal, Scanner) {
 
     var $window = $(window),
         $head = $('#inventory thead'),
@@ -220,6 +222,38 @@ define(['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'eky
 
         $wait.appendTo($body);
     }
+
+    Scanner.init({
+        //debug: true
+    });
+    Scanner.addListener(function(barcode) {
+        if (productsXhr) {
+            productsXhr.abort();
+        }
+
+        $body.empty();
+        $none.detach();
+        $wait.appendTo($body);
+
+        eol = false;
+        busy = true;
+        page = 0;
+
+        productsXhr = $.ajax({
+            url: Router.generate('ekyna_product_inventory_admin_products', {page: page}),
+            method: 'GET',
+            dataType: 'json',
+            data: {
+                referenceCode: barcode
+            }
+        });
+
+        productsXhr.done(handleResponse);
+
+        productsXhr.always(function () {
+            busy = false;
+        });
+    });
 
     /**
      * Line's bookmark buttons click handler

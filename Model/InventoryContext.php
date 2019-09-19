@@ -67,6 +67,11 @@ class InventoryContext
     /**
      * @var string
      */
+    private $referenceCode;
+
+    /**
+     * @var string
+     */
     private $profile;
 
     /**
@@ -337,6 +342,30 @@ class InventoryContext
     public function setState($state)
     {
         $this->state = (string)$state;
+
+        return $this;
+    }
+
+    /**
+     * Returns the (external) reference code.
+     *
+     * @return string
+     */
+    public function getReferenceCode(): ?string
+    {
+        return $this->referenceCode;
+    }
+
+    /**
+     * Sets the (external) reference code.
+     *
+     * @param string $code
+     *
+     * @return InventoryContext
+     */
+    public function setReferenceCode(string $code = null): InventoryContext
+    {
+        $this->referenceCode = $code;
 
         return $this;
     }
