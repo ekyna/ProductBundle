@@ -834,6 +834,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             'type'        => Model\ProductTypes::TYPE_CONFIGURABLE,
             'stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
             'visible'     => true,
+            'quote_only'  => false,
+            'end_of_life' => false,
         ];
 
         $as = $this->getAlias();
@@ -851,6 +853,8 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($ex->eq($as . '.visible', ':visible'))
             ->andWhere($ex->eq('b.visible', ':visible'))
             ->andWhere($ex->eq('c.visible', ':visible'))
+            ->andWhere($ex->eq($as . '.quoteOnly', ':quote_only'))
+            ->andWhere($ex->eq($as . '.endOfLife', ':end_of_life'))
             ->addOrderBy('p.visibility', 'DESC');
 
         if (!empty($exclude)) {

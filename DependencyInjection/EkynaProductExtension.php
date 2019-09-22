@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Service\Generator\Gtin13Generator;
 use Ekyna\Bundle\ResourceBundle\DependencyInjection\AbstractExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -94,10 +93,11 @@ class EkynaProductExtension extends AbstractExtension
      */
     private function configureFeatures(array $config, ContainerBuilder $container)
     {
-        // Features service
-        $container
-            ->getDefinition(Features::class)
-            ->replaceArgument(0, $config);
+        // Set features parameter
+        $container->setParameter('ekyna_product.features', $config);
+
+        // Set service config
+        $container->getDefinition(Features::class)->replaceArgument(0, $config);
 
         // Gtin 13 generator
         if ($config[Features::GTIN13_GENERATOR]['enabled']) {

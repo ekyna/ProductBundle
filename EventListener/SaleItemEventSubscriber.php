@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
+use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
@@ -15,6 +16,7 @@ use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SaleItemEventSubscriber
@@ -43,6 +45,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      */
     protected $offerRepository;
 
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
 
     /**
      * Constructor.
@@ -51,17 +58,20 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
      * @param ItemBuilder              $itemBuilder
      * @param FormBuilder              $formBuilder
      * @param OfferRepositoryInterface $offerRepository
+     * @param TranslatorInterface      $translator
      */
     public function __construct(
         ContextProviderInterface $contextProvider,
         ItemBuilder $itemBuilder,
         FormBuilder $formBuilder,
-        OfferRepositoryInterface $offerRepository
+        OfferRepositoryInterface $offerRepository,
+        TranslatorInterface $translator
     ) {
         $this->contextProvider = $contextProvider;
         $this->itemBuilder = $itemBuilder;
         $this->formBuilder = $formBuilder;
         $this->offerRepository = $offerRepository;
+        $this->translator = $translator;
     }
 
     /**
@@ -141,12 +151,21 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $type = 0 < $offer['special_offer_id'] ? 'Promotion' : 'Reduction'; // TODO translation
+        if (0 < $offer['special_offer_id']) {
+            $type = $this->translator->trans('ekyna_product.special_offer.label.singular');
+            $source = 'special_offer:' . $offer['special_offer_id'];
+        } elseif (0 < $offer['pricing_id']) {
+            $type = $this->translator->trans('ekyna_product.pricing.label.singular');
+            $source = 'pricing_id:' . $offer['pricing_id'];
+        } else {
+            throw new RuntimeException("Unexpected offer type.");
+        }
 
         $event->addAdjustmentData(new AdjustmentData(
             AdjustmentModes::MODE_PERCENT,
             sprintf('%s %s%%', $type, $offer['percent']),
-            $offer['percent'] // TODO number_format
+            $offer['percent'], // TODO number_format
+            $source
         ));
     }
 
