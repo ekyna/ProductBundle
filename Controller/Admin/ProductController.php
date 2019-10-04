@@ -135,38 +135,6 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function searchAction(Request $request)
-    {
-        //$callback = $request->query->get('callback');
-        $limit = intval($request->query->get('limit'));
-        $query = trim($request->query->get('query'));
-        $types = $request->query->get('types');
-
-        $repository = $this->get('fos_elastica.manager')->getRepository($this->config->getResourceClass());
-        if (!$repository instanceOf ProductRepository) {
-            throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
-        }
-
-        if (empty($types)) {
-            $results = $repository->defaultSearch($query, $limit);
-        } else {
-            $results = $repository->searchByTypes($query, $types, $limit);
-        }
-
-        $data = $this->container->get('serializer')->serialize([
-            'results'     => $results,
-            'total_count' => count($results),
-        ], 'json', ['groups' => ['Search']]);
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'text/javascript');
-
-        return $response;
-    }
-
-    /**
      * Product duplicate action.
      *
      * @param Request $request
@@ -584,6 +552,22 @@ class ProductController extends AbstractSubjectController
         $data['prices_list'] = $this->getPricesList($product);
 
         return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function createSearchQuery(Request $request): \Elastica\Query
+    {
+        $repository = $this->get('fos_elastica.manager')->getRepository($this->config->getResourceClass());
+        if (!$repository instanceOf ProductRepository) {
+            throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
+        }
+
+        $query = trim($request->query->get('query'));
+        $types = $request->query->get('types');
+
+        return $repository->createSearchQuery($query, $types);
     }
 
     /**

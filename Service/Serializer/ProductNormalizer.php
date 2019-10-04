@@ -114,9 +114,6 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             $data['option_groups'] = $this->normalizeOptionGroups($product);
 
         } elseif ($this->contextHasGroup('Search', $context)) {
-
-            // TODO This group seems not used ... See ProductController::searchAction
-
             // Brand
             if (null !== $brand = $product->getBrand()) {
                 $data['brand'] = [
@@ -127,9 +124,9 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
             }
 
             // Seo
-            if (null !== $seo = $product->getSeo()) {
+            /*if (null !== $seo = $product->getSeo()) {
                 $data['seo'] = $this->normalizeObject($seo, $format, $context);
-            }
+            }*/
 
             // Categories
             $data['categories'] = array_map(function (Model\CategoryInterface $c) {

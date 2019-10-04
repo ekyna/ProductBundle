@@ -1,101 +1,189 @@
+# TODO With Elastica 7.x, use "search-as-you-type" mappings.
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/search-as-you-type.html
 fos_elastica:
     indexes:
-        search:
+        ekyna_product_product:
+            settings:
+                index:
+                    analysis:
+                        tokenizer:
+                            ngram: { type: ngram, min_gram: 3, max_gram: 8, token_chars: [digit] }
+                            edge: { type: edge_ngram, min_gram: 3, max_gram: 10, token_chars: [letter, digit] }
+                        filter:
+                            en_stop: { type: stop, stopwords: [_english_], ignore_case: true }
+                            en_stemmer: { type: stemmer, language: english }
+                            en_positive_stemmer: { type: stemmer, language: possessive_english }
+                            fr_elision: { type: elision, articles_case: true, articles: [l, m, t, qu, n, s, j, d, c, jusqu, quoiqu, lorsqu, puisqu] }
+                            fr_stop: { type: stop, stopwords: [_french_], ignore_case: true }
+                            fr_stemmer: { type: stemmer, language: light_french }
+                        analyzer:
+                            default: { tokenizer: standard, filter: [icu_folding] }
+                            ngram: { tokenizer: ngram, filter: [icu_folding] }
+                            edge: { tokenizer: edge, filter: [icu_folding] }
+                            search: { tokenizer: standard, filter: [icu_folding] }
+                            en_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [icu_folding] }
+                            en_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [en_positive_stemmer, icu_folding, en_stop, en_stemmer] }
+                            fr_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding] }
+                            fr_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding, fr_stop, fr_stemmer] }
             types:
-                ekyna_product_product:
+                doc:
                     serializer:
                         groups: [Search]
-                    mappings:
-                        reference: {type: string, search_analyzer: search, index_analyzer: index}
-                        references: {type: string, search_analyzer: search, index_analyzer: index}
+                    properties:
+                        id: { type: integer }
+                        text: { type: text }
+                        designation: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                        type: { type: keyword }
+                        stock_state: { type: keyword }
+                        visible: { type: boolean }
+                        net_price: { type: float }
+                        min_price: { type: float }
+                        reference: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                        references: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                        brand.id: { type: integer }
+                        brand.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                        brand.visible: { type: boolean }
+                        categories.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
+                        categories.visible: { type: boolean }
+                        option_groups.id: { type: integer }
+                        option_groups.name: { type: text }
+                        option_groups.required: { type: boolean }
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string
                             path_match: "*.en.title"
-                            mapping: {type: string, boost: 3, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_title:
                             match_mapping_type: string
                             path_match: "*.fr.title"
-                            mapping: {type: string, boost: 3, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         en_default:
                             match_mapping_type: string
                             path_match: "*.en.*"
-                            mapping: {type: string, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_default:
                             match_mapping_type: string
                             path_match: "*.fr.*"
-                            mapping: {type: string, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         default:
                             match_mapping_type: string
-                            mapping: {type: string, search_analyzer: search, index_analyzer: index}
+                            mapping: { type: text, analyzer: default }
                     persistence:
                         driver: orm
                         model: "%ekyna_product.product.class%"
-                        provider:
-                            batch_size: 25
+                        provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
                         repository: "%ekyna_product.product.search_repository.class%"
-                ekyna_product_brand:
+        ekyna_product_brand:
+            settings:
+                index:
+                    analysis:
+                        tokenizer:
+                            edge: { type: edge_ngram, min_gram: 3, max_gram: 10, token_chars: [letter, digit] }
+                        filter:
+                            en_stop: { type: stop, stopwords: [_english_], ignore_case: true }
+                            en_stemmer: { type: stemmer, language: english }
+                            en_positive_stemmer: { type: stemmer, language: possessive_english }
+                            fr_elision: { type: elision, articles_case: true, articles: [l, m, t, qu, n, s, j, d, c, jusqu, quoiqu, lorsqu, puisqu] }
+                            fr_stop: { type: stop, stopwords: [_french_], ignore_case: true }
+                            fr_stemmer: { type: stemmer, language: light_french }
+                        analyzer:
+                            default: { tokenizer: standard, filter: [icu_folding] }
+                            edge: { tokenizer: edge, filter: [icu_folding] }
+                            search: { tokenizer: standard, filter: [icu_folding] }
+                            en_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [icu_folding] }
+                            en_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [en_positive_stemmer, icu_folding, en_stop, en_stemmer] }
+                            fr_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding] }
+                            fr_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding, fr_stop, fr_stemmer] }
+            types:
+                doc:
                     serializer:
                         groups: [Search]
+                    properties:
+                        id: { type: integer }
+                        text: { type: text }
+                        name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string
                             path_match: "*.en.title"
-                            mapping: {type: string, boost: 3, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_title:
                             match_mapping_type: string
                             path_match: "*.fr.title"
-                            mapping: {type: string, boost: 3, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         en_default:
                             match_mapping_type: string
                             path_match: "*.en.*"
-                            mapping: {type: string, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_default:
                             match_mapping_type: string
                             path_match: "*.fr.*"
-                            mapping: {type: string, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         default:
                             match_mapping_type: string
-                            mapping: {type: string, search_analyzer: search, index_analyzer: index}
+                            mapping: { type: text, analyzer: default }
                     persistence:
                         driver: orm
                         model: "%ekyna_product.brand.class%"
-                        provider:
-                            batch_size: 25
+                        provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
                         repository: "%ekyna_product.brand.search_repository.class%"
-                ekyna_product_category:
+        ekyna_product_category:
+            settings:
+                index:
+                    analysis:
+                        tokenizer:
+                            edge: { type: edge_ngram, min_gram: 3, max_gram: 10, token_chars: [letter, digit] }
+                        filter:
+                            en_stop: { type: stop, stopwords: [_english_], ignore_case: true }
+                            en_stemmer: { type: stemmer, language: english }
+                            en_positive_stemmer: { type: stemmer, language: possessive_english }
+                            fr_elision: { type: elision, articles_case: true, articles: [l, m, t, qu, n, s, j, d, c, jusqu, quoiqu, lorsqu, puisqu] }
+                            fr_stop: { type: stop, stopwords: [_french_], ignore_case: true }
+                            fr_stemmer: { type: stemmer, language: light_french }
+                        analyzer:
+                            default: { tokenizer: standard, filter: [icu_folding] }
+                            edge: { tokenizer: edge, filter: [icu_folding] }
+                            search: { tokenizer: standard, filter: [icu_folding] }
+                            en_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [icu_folding] }
+                            en_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [en_positive_stemmer, icu_folding, en_stop, en_stemmer] }
+                            fr_light: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding] }
+                            fr_heavy: { char_filter: [html_strip], tokenizer: icu_tokenizer, filter: [fr_elision, icu_folding, fr_stop, fr_stemmer] }
+            types:
+                doc:
                     serializer:
                         groups: [Search]
+                    properties:
+                        id: { type: integer }
+                        text: { type: text }
+                        name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                     dynamic_templates:
                         en_title:
                             match_mapping_type: string
                             path_match: "*.en.title"
-                            mapping: {type: string, boost: 3, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_title:
                             match_mapping_type: string
                             path_match: "*.fr.title"
-                            mapping: {type: string, boost: 3, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         en_default:
                             match_mapping_type: string
                             path_match: "*.en.*"
-                            mapping: {type: string, search_analyzer: en_search, index_analyzer: en_index}
+                            mapping: { type: text, analyzer: en_light, fields: { analyzed: { type: text, analyzer: en_heavy } } }
                         fr_default:
                             match_mapping_type: string
                             path_match: "*.fr.*"
-                            mapping: {type: string, search_analyzer: fr_search, index_analyzer: fr_index}
+                            mapping: { type: text, analyzer: fr_light, fields: { analyzed: { type: text, analyzer: fr_heavy } } }
                         default:
                             match_mapping_type: string
-                            mapping: {type: string, search_analyzer: search, index_analyzer: index}
+                            mapping: { type: text, analyzer: default }
                     persistence:
                         driver: orm
                         model: "%ekyna_product.category.class%"
-                        provider:
-                            batch_size: 25
+                        provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
                         repository: "%ekyna_product.category.search_repository.class%"
-

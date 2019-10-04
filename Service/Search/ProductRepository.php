@@ -16,57 +16,54 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
     use Locale\LocaleProviderAwareTrait;
 
     /**
-     * Search products having the given types.
+     * Creates the search query.
      *
-     * @param string       $expression
-     * @param string|array $types
-     * @param int          $limit
+     * @param string $expression
+     * @param array  $types
      *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     * @return Query
      */
-    public function searchByTypes($expression, $types, $limit = 10)
+    public function createSearchQuery(string $expression, array $types): Query
     {
-        if (!is_array($types)) {
-            $types = [$types];
+        $match = new Query\MultiMatch();
+        $match
+            ->setQuery($expression)
+            ->setFields($this->getDefaultMatchFields())
+            ->setType(Query\MultiMatch::TYPE_CROSS_FIELDS);
+
+        if (empty($types)) {
+            return Query::create($match);
         }
 
-        $boolQuery = new Query\BoolQuery();
+        $terms = new Query\Terms();
+        $terms->setTerms('type', $types);
 
-        $locale = $this->localeProvider->getCurrentLocale();
+        $bool = new Query\BoolQuery();
+        $bool
+            ->addMust($match)
+            ->addMust($terms);
 
-        $matchQuery = new Query\MultiMatch();
-        $matchQuery->setQuery($expression)->setFields([
-            'designation^6',
-            'reference^4',
-            'translations.' . $locale . '.title',
-            'brand.name',
-        ]);
-        $boolQuery->addMust($matchQuery);
-
-        $typesQuery = new Query\Terms();
-        $typesQuery->setTerms('type', $types);
-        $boolQuery->addMust($typesQuery);
-
-        return $this->find($boolQuery, $limit);
+        return Query::create($bool);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getDefaultMatchFields()
+    protected function getDefaultMatchFields(): array
     {
         $locale = $this->localeProvider->getCurrentLocale();
 
         return [
-            'designation^6',
             'reference^4',
-            'translations.' . $locale . '.title',
-            'references',
+            'reference.analyzed',
+            'references^3',
+            'references.analyzed',
+            'designation^3',
+            'designation.analyzed',
+            'translations.' . $locale . '.title^2',
+            'translations.' . $locale . '.title.analyzed',
             'brand.name',
-            //'categories.name',
-            //'translations.' . $locale . '.description',
-            //'seo.translations.' . $locale . '.title',
-            //'seo.translations.' . $locale . '.description',
+            'brand.name.analyzed',
         ];
     }
 }

@@ -17,7 +17,7 @@ class CategoryRepository extends ResourceRepository implements Locale\LocaleProv
     /**
      * @inheritdoc
      */
-    protected function getDefaultMatchFields()
+    protected function getDefaultMatchFields(): array
     {
         $locale = $this->localeProvider->getCurrentLocale();
 

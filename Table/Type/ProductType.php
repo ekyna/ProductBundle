@@ -103,6 +103,7 @@ class ProductType extends ResourceTableType
                 ->setExportable(true)
                 ->setConfigurable(true)
                 ->setProfileable(true)
+                ->addDefaultSort('id', ColumnSort::DESC)
                 ->addColumn('type', ProductTypeType::class, [
                     'label'    => 'ekyna_core.field.type',
                     'position' => 10,

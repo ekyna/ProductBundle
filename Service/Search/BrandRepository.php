@@ -17,7 +17,7 @@ class BrandRepository extends ResourceRepository implements Locale\LocaleProvide
     /**
      * @inheritdoc
      */
-    protected function getDefaultMatchFields()
+    protected function getDefaultMatchFields(): array
     {
         $locale = $this->localeProvider->getCurrentLocale();
 
