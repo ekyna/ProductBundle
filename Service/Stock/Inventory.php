@@ -38,31 +38,31 @@ class Inventory
 {
     use FormatterAwareTrait;
 
-    const PENDING_DQL = "(
+    private const PENDING_DQL = "(
   SELECT SUM(nsoi.quantity) 
   FROM _class_ nsoi
   JOIN nsoi.product nsp
   JOIN nsoi.order nso
   WHERE nsp.subjectIdentity.provider = :provider
     AND nsp.subjectIdentity.identifier = p.id
-    AND nso.state = '_state_'
+    AND (nso.state = '_state_new_' OR nso.state = '_state_ordered_')
 ) AS pending";
 
-    const STOCK_SUB_DQL = "(
+    private const STOCK_SUB_DQL = "(
     SELECT SUM(_table_._field_)
     FROM _class_ _table_
     WHERE _table_.state <> '_state_'
     AND _table_.product = p.id
 ) AS _alias_";
 
-    const BOOKMARK_SUB_DQL = "(
+    private const BOOKMARK_SUB_DQL = "(
     SELECT 1
     FROM _class_ bm
     WHERE bm.user = _user_id_
     AND bm.product = p.id
 ) AS bookmark";
 
-    const SESSION_KEY = 'inventory_context';
+    private const SESSION_KEY = 'inventory_context';
 
     /**
      * @var ProductRepository
@@ -416,8 +416,8 @@ class Inventory
                 $pQb->expr()->gte('p.virtualStock', ':virtual_stock')
             )))*/
             ->setParameters([
-                'types'         => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
-                'provider'      => ProductProvider::NAME,
+                'types'    => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
+                'provider' => ProductProvider::NAME,
                 //'end_of_life'   => true,
                 //'virtual_stock' => 0,
             ]);
@@ -576,8 +576,9 @@ class Inventory
     private function getPendingSubQuery(): string
     {
         return strtr(static::PENDING_DQL, [
-            '_class_' => $this->supplierOrderItemClass,
-            '_state_' => SupplierOrderStates::STATE_NEW,
+            '_class_'         => $this->supplierOrderItemClass,
+            '_state_new_'     => SupplierOrderStates::STATE_NEW,
+            '_state_ordered_' => SupplierOrderStates::STATE_ORDERED,
         ]);
     }
 

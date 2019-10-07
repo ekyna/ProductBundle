@@ -446,7 +446,16 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->eq('p.stockMode', ':mode'))
             ->andWhere($qb->expr()->orX(
-                $qb->expr()->lte('p.virtualStock', 'p.stockFloor'),
+                $qb->expr()->orX(
+                    $qb->expr()->andX(
+                        $qb->expr()->gt('p.stockFloor', 0),
+                        $qb->expr()->lte('p.virtualStock', 'p.stockFloor')
+                    ),
+                    $qb->expr()->andX(
+                        $qb->expr()->eq('p.stockFloor', 0),
+                        $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
+                    )
+                ),
                 $qb->expr()->andX(
                     $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
                     $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
