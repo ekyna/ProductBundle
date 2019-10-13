@@ -20,10 +20,11 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
      *
      * @param string $expression
      * @param array  $types
+     * @param bool   $private
      *
      * @return Query
      */
-    public function createSearchQuery(string $expression, array $types): Query
+    public function createSearchQuery(string $expression, array $types, bool $private): Query
     {
         $match = new Query\MultiMatch();
         $match
@@ -31,17 +32,19 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
             ->setFields($this->getDefaultMatchFields())
             ->setType(Query\MultiMatch::TYPE_CROSS_FIELDS);
 
-        if (empty($types)) {
-            return Query::create($match);
+        $bool = new Query\BoolQuery();
+        $bool->addMust($match);
+
+        if (!empty($types)) {
+            $bool->addMust((new Query\Terms())->setTerms('type', $types));
         }
 
-        $terms = new Query\Terms();
-        $terms->setTerms('type', $types);
-
-        $bool = new Query\BoolQuery();
-        $bool
-            ->addMust($match)
-            ->addMust($terms);
+        if (!$private) {
+            $bool
+                ->addMust((new Query\Term())->setTerm('visible', true))
+                ->addMust((new Query\Term())->setTerm('quote_only', false))
+                ->addMust((new Query\Term())->setTerm('end_of_life', false));
+        }
 
         return Query::create($bool);
     }

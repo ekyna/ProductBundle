@@ -144,6 +144,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
 
             // Option groups
             $data['option_groups'] = $this->normalizeOptionGroups($product);
+            $data['quote_only'] = $product->isQuoteOnly();
+            $data['end_of_life'] = $product->isEndOfLife();
 
         } elseif ($this->contextHasGroup('Summary', $context)) {
 

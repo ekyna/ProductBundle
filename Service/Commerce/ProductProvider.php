@@ -141,6 +141,13 @@ class ProductProvider implements SubjectProviderInterface
      */
     public function getSearchRouteAndParameters($context)
     {
+        if ($context === static::CONTEXT_ACCOUNT) {
+            return [
+                'route'      => 'ekyna_product_account_product_search',
+                'parameters' => [],
+            ];
+        }
+
         $result = [
             'route'      => 'ekyna_product_product_admin_search',
             'parameters' => [],
@@ -150,10 +157,10 @@ class ProductProvider implements SubjectProviderInterface
             $result['parameters'] = [
                 'types' => [
                     ProductTypes::TYPE_SIMPLE,
-                    ProductTypes::TYPE_VARIANT
+                    ProductTypes::TYPE_VARIANT,
                 ],
             ];
-        } else if ($context === static::CONTEXT_ITEM) {
+        } elseif ($context === static::CONTEXT_ITEM) {
             $result['parameters'] = [
                 'types' => [
                     ProductTypes::TYPE_SIMPLE,
@@ -162,7 +169,7 @@ class ProductProvider implements SubjectProviderInterface
                     ProductTypes::TYPE_CONFIGURABLE,
                 ],
             ];
-        } else if ($context === static::CONTEXT_SALE) {
+        } elseif ($context === static::CONTEXT_SALE) {
             $result['parameters'] = [
                 'types' => [
                     ProductTypes::TYPE_SIMPLE,

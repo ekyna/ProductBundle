@@ -565,9 +565,9 @@ class ProductController extends AbstractSubjectController
         }
 
         $query = trim($request->query->get('query'));
-        $types = $request->query->get('types');
+        $types = $request->query->get('types', []);
 
-        return $repository->createSearchQuery($query, $types);
+        return $repository->createSearchQuery($query, $types, true);
     }
 
     /**

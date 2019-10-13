@@ -9,6 +9,8 @@ fos_elastica:
                         type: { type: keyword }
                         stock_state: { type: keyword }
                         visible: { type: boolean }
+                        quote_only: { type: boolean }
+                        end_of_life: { type: boolean }
                         net_price: { type: float }
                         min_price: { type: float }
                         reference: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
