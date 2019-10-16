@@ -1,6 +1,7 @@
 fos_elastica:
     indexes:
         ekyna_product_product:
+            index_name: "%elasticsearch.name%_product_product"
             types:
                 doc:
                     serializer: { groups: [Search] }
@@ -31,6 +32,7 @@ fos_elastica:
                         finder: ~
                         repository: "%ekyna_product.product.search_repository.class%"
         ekyna_product_brand:
+            index_name: "%elasticsearch.name%_product_brand"
             types:
                 doc:
                     serializer: { groups: [Search] }
@@ -44,6 +46,7 @@ fos_elastica:
                         finder: ~
                         repository: "%ekyna_product.brand.search_repository.class%"
         ekyna_product_category:
+            index_name: "%elasticsearch.name%_product_category"
             types:
                 doc:
                     serializer: { groups: [Search] }
