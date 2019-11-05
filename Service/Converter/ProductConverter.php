@@ -353,6 +353,8 @@ class ProductConverter
                 return $event;
             }
 
+            $this->eventDispatcher->dispatch(ConvertEvent::DONE_CONVERT, $event);
+
             return $variable;
         }
 

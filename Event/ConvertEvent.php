@@ -13,8 +13,9 @@ use Ekyna\Component\Resource\Event\ResourceEvent;
 class ConvertEvent extends ResourceEvent
 {
     const FORM_DATA = 'ekyna_product.convert.form_data';
-    const PRE_CONVERT = 'ekyna_product.convert.form_data';
-    const POST_CONVERT = 'ekyna_product.convert.form_data';
+    const PRE_CONVERT = 'ekyna_product.convert.pre_convert';
+    const POST_CONVERT = 'ekyna_product.convert.post_convert';
+    const DONE_CONVERT = 'ekyna_product.convert.done_convert';
 
     /**
      * @var string
