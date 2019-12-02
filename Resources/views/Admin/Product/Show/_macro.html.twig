@@ -100,8 +100,11 @@
             'description': {
                 'label': 'ekyna_core.field.description',
                 'type': 'tinymce',
-                'value': path('ekyna_product_product_admin_tinymce', {'productId': product.id}),
-                'options': {'height': 150}
+                'options': {
+                    'height': 150,
+                    'route': 'ekyna_product_product_admin_tinymce',
+                    'route_params': {'productId': product.id},
+                }
             }
         }
     }|merge(options)) -}}

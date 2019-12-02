@@ -91,12 +91,15 @@ ekyna_product_product_admin_new_supplier_product:
         productId: \d+
 
 ekyna_product_product_admin_tinymce:
-    path: /{productId}/tinymce
-    defaults: { _controller: "ekyna_product.product.controller:tinymceAction", field: description }
+    path: /{productId}/tinymce/{_locale}/{field}
+    controller: "ekyna_product.product.controller:tinymceAction"
     methods: [GET]
     requirements:
         field: "[a-zA-Z0-9]+"
         productId: \d+
+    defaults:
+        _locale: "%locale%"
+        field: description
 
 ekyna_product_product_admin_toggle:
     path: /{productId}/toggle/{field}

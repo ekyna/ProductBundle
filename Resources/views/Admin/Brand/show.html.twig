@@ -45,8 +45,11 @@
                         'description': {
                             'label': 'ekyna_core.field.description',
                             'type': 'tinymce',
-                            'value': path('ekyna_product_brand_admin_tinymce', {'brandId': brand.id}),
-                            'options': {'height': 150}
+                            'options': {
+                                'height': 150,
+                                'route': 'ekyna_product_brand_admin_tinymce',
+                                'route_params': identifiers|merge({'brandId': notice.id}),
+                            }
                         }
                     }
                 }) }}

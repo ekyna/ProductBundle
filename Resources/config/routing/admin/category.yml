@@ -35,12 +35,15 @@ ekyna_product_category_admin_edit:
         categoryId: \d+
 
 ekyna_product_category_admin_tinymce:
-    path: /{categoryId}/tinymce
-    defaults: { _controller: "ekyna_product.category.controller:tinymceAction", field: description }
+    path: /{categoryId}/tinymce/{_locale}/{field}
+    controller: "ekyna_product.category.controller:tinymceAction"
     methods: [GET]
     requirements:
         field: "[a-zA-Z0-9]+"
         categoryId: \d+
+    defaults:
+        _locale: "%locale%"
+        field: description
 
 ekyna_product_category_admin_move_up:
     path: /{categoryId}/moveup

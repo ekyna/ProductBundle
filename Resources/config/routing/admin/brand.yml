@@ -28,12 +28,15 @@ ekyna_product_brand_admin_edit:
         brandId: \d+
 
 ekyna_product_brand_admin_tinymce:
-    path: /{brandId}/tinymce
-    defaults: { _controller: "ekyna_product.brand.controller:tinymceAction", field: description }
+    path: /{brandId}/tinymce/{_locale}/{field}
+    controller: "ekyna_product.brand.controller:tinymceAction"
     methods: [GET]
     requirements:
         field: "[a-zA-Z0-9]+"
         brandId: \d+
+    defaults:
+        _locale: "%locale%"
+        field: description
 
 ekyna_product_brand_admin_move_up:
     path: /{brandId}/moveup
