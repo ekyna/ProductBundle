@@ -42,7 +42,7 @@
         {%- endblock stock_tab -%}
 
         {%- block relations_tab -%}
-        {%- if optionParents is not empty or bundleParents is not empty -%}
+        {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
         <li>
             <a href="#product-relations" id="toggle-product-relations" data-toggle="tab">
                 {{ 'ekyna_product.product.field.relations'|trans }}
@@ -153,7 +153,7 @@
             {%- endblock stock_pane -%}
 
             {%- block relations_pane -%}
-            {%- if optionParents is not empty or bundleParents is not empty -%}
+            {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
             <div class="tab-pane" id="product-relations">
             {%- block relations_content -%}
                 {% if bundleParents is not empty -%}

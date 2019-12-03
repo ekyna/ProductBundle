@@ -23,6 +23,10 @@ class ProductTypeValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, ProductType::class);
         }
 
+        if (is_null($typeOrProduct)) {
+            return;
+        }
+
         $type = $typeOrProduct instanceof ProductInterface ? $typeOrProduct->getType() : $typeOrProduct;
 
         /* @var string $type */
@@ -32,7 +36,7 @@ class ProductTypeValidator extends ConstraintValidator
 
         if (!in_array($type, $constraint->types)) {
             $this->context
-                ->buildViolation($constraint->invalidProductType)
+                ->buildViolation($constraint->invalidType)
                 ->addViolation();
         }
     }

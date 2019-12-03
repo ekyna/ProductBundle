@@ -4,7 +4,6 @@ ekyna_product:
             suffix_is_mandatory: Veuillez saisir un suffixe.
     attribute_slot:
         duplicate_attribute: Cet attribut est déjà utilisé.
-    invalid_product_type: Type de produit non valide.
     bundle_choice:
         invalid_quantity_range: La quantité maximum doit être supérieure à la quantité minimum.
         rules_should_be_empty: La liste des règles doit être vide.
@@ -30,6 +29,7 @@ ekyna_product:
         designation_needed: La désignation ne peut être générée automatiquement sans attributs, veuillez la saisir.
         translation_title_needed: Le titre ne peut être généré automatiquement sans attributs, veuillez le saisir.
         duplicate_translation: Une traduction existe déjà avec ce titre (%reference%).
+        invalid_type: Ce type de produit n'est pas autorisé.
     option:
         recursive_choice: Un produit ne peut pas être une option de lui-même.
     special_offer:

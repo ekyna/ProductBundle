@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class ProductType extends Constraint
 {
-    public $invalidProductType = 'ekyna_product.invalid_product_type';
+    public $invalidType = 'ekyna_product.product.invalid_type';
 
     /**
      * @var array

@@ -57,6 +57,11 @@ class ProductType extends ResourceTableType
     /**
      * @var string
      */
+    protected $attributeSetClass;
+
+    /**
+     * @var string
+     */
     protected $taxGroupClass;
 
     /**
@@ -73,13 +78,19 @@ class ProductType extends ResourceTableType
      * @param string                 $productClass
      * @param string                 $brandClass
      * @param string                 $categoryClass
+     * @param string                 $attributeSetClass
      * @param string                 $taxGroupClass
      * @param string                 $tagClass
      */
     public function __construct(
         SubjectHelperInterface $subjectHelper,
         UrlGeneratorInterface $urlGenerator,
-        $productClass, $brandClass, $categoryClass, $taxGroupClass, $tagClass
+        string $productClass,
+        string $brandClass,
+        string $categoryClass,
+        string $attributeSetClass,
+        string $taxGroupClass,
+        string $tagClass
     ) {
         parent::__construct($productClass);
 
@@ -87,6 +98,7 @@ class ProductType extends ResourceTableType
         $this->urlGenerator = $urlGenerator;
         $this->brandClass = $brandClass;
         $this->categoryClass = $categoryClass;
+        $this->attributeSetClass = $attributeSetClass;
         $this->taxGroupClass = $taxGroupClass;
         $this->tagClass = $tagClass;
     }
@@ -344,11 +356,17 @@ class ProductType extends ResourceTableType
                     'entity_label' => 'name',
                     'position'     => 210,
                 ])
+                ->addFilter('attributeSet', DType\Filter\EntityType::class, [
+                    'label'        => 'ekyna_product.attribute_set.label.singular',
+                    'class'        => $this->attributeSetClass,
+                    'entity_label' => 'name',
+                    'position'     => 220,
+                ])
                 ->addFilter('taxGroup', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_commerce.tax_group.label.singular',
                     'class'        => $this->taxGroupClass,
                     'entity_label' => 'name',
-                    'position'     => 220,
+                    'position'     => 230,
                 ])
                 ->addFilter('tags', DType\Filter\EntityType::class, [
                     'label'        => 'ekyna_cms.tag.label.plural',
