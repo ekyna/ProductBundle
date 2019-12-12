@@ -3,5 +3,6 @@
 {% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
 
 {% block actions %}
+    {{ macros.export_products_button() }}
     {{ macros.new_product_button() }}
 {% endblock actions %}

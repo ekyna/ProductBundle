@@ -22,7 +22,11 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      *
      * @return array [['min_qty' => (float), 'percent' => (float), 'price' => (float)]]
      */
-    public function findByProductAndContext(ProductInterface $product, ContextInterface $context, $useCache = true);
+    public function findByProductAndContext(
+        ProductInterface $product,
+        ContextInterface $context,
+        bool $useCache = true
+    ): array;
 
     /**
      * Find one offer for the given product, context and quantity.
@@ -32,14 +36,14 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      * @param float            $quantity
      * @param bool             $useCache
      *
-     * @return array ['percent' => (float), 'special_offer_id' => (int), 'pricing_id' => (int)]
+     * @return null|array ['percent' => (float), 'special_offer_id' => (int), 'pricing_id' => (int)]
      */
     public function findOneByProductAndContextAndQuantity(
         ProductInterface $product,
         ContextInterface $context,
-        $quantity = 1.0,
-        $useCache = true
-    );
+        float $quantity = 1.0,
+        bool $useCache = true
+    ): ?array;
 
     /**
      * Finds offers by product.
@@ -49,5 +53,5 @@ interface OfferRepositoryInterface extends ResourceRepositoryInterface
      *
      * @return \Ekyna\Bundle\ProductBundle\Entity\Offer[]|array[]
      */
-    public function findByProduct(ProductInterface $product, $asArray = false);
+    public function findByProduct(ProductInterface $product, bool $asArray = false): array;
 }

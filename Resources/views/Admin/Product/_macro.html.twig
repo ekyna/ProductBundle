@@ -21,6 +21,14 @@
 </div>
 {%- endmacro -%}
 
+{%- macro export_products_button() -%}
+    {{- admin_resource_btn('ekyna_product.product', 'export', {
+        'label': 'ekyna_core.button.export',
+        'theme': 'default',
+        'icon': 'download'
+    }) -}}
+{%- endmacro -%}
+
 {%- macro convert_product_button(product) -%}
     {%- set types = product_convert_types(product) -%}
     {%- if types is not empty -%}

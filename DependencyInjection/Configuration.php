@@ -43,7 +43,6 @@ class Configuration implements ConfigurationInterface
      */
     private function addDefaultSection(ArrayNodeDefinition $node)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         $node
             ->children()
                 ->arrayNode('default')
@@ -76,7 +75,6 @@ class Configuration implements ConfigurationInterface
      */
     private function addFeatureSection(ArrayNodeDefinition $node)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         $node
             ->children()
                 ->arrayNode('feature')
@@ -177,7 +175,6 @@ class Configuration implements ConfigurationInterface
      */
     private function addEditorSection(ArrayNodeDefinition $node)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         $node
             ->children()
                 ->arrayNode('editor')
@@ -204,7 +201,6 @@ class Configuration implements ConfigurationInterface
      */
     private function addHighlightSection(ArrayNodeDefinition $node)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         $node
             ->children()
                 ->arrayNode('highlight')
@@ -259,7 +255,6 @@ class Configuration implements ConfigurationInterface
      */
     private function addPricingSection(ArrayNodeDefinition $node)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         $node
             ->children()
                 ->arrayNode('pricing')
@@ -577,6 +572,7 @@ class Configuration implements ConfigurationInterface
                                 ->variableNode('templates')->defaultValue([
                                     '_form.html'     => '@EkynaProduct/Admin/Product/_form.html',
                                     'list.html'      => '@EkynaProduct/Admin/Product/list.html',
+                                    'export.html'    => '@EkynaProduct/Admin/Product/export.html',
                                     'new.html'       => '@EkynaProduct/Admin/Product/new.html',
                                     'show.html'      => '@EkynaProduct/Admin/Product/show.html',
                                     'edit.html'      => '@EkynaProduct/Admin/Product/edit.html',

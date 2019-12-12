@@ -2,25 +2,32 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
+use Braincrafted\Bundle\BootstrapBundle\Form\Type\FormActionsType;
 use Ekyna\Bundle\AdminBundle\Controller\Context;
 use Ekyna\Bundle\AdminBundle\Controller\Resource as RC;
 use Ekyna\Bundle\CommerceBundle\Controller\Admin\AbstractSubjectController;
 use Ekyna\Bundle\ProductBundle\Exception\ProductExceptionInterface;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
+use Ekyna\Bundle\ProductBundle\Form\Type\ExportConfigType;
 use Ekyna\Bundle\ProductBundle\Form\Type\NewSupplierProductType;
+use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -47,7 +54,7 @@ class ProductController extends AbstractSubjectController
         }
 
         $context = $this->loadContext($request);
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var ProductInterface $product */
         $product = $context->getResource();
 
         $this->isGranted('VIEW', $product);
@@ -57,7 +64,7 @@ class ProductController extends AbstractSubjectController
         $response->setExpires(new \DateTime('+3 min'));
         //$response->setLastModified($product->getUpdatedAt());
 
-        $html = false;
+        $html   = false;
         $accept = $request->getAcceptableContentTypes();
 
         if (in_array('application/json', $accept, true)) {
@@ -97,7 +104,7 @@ class ProductController extends AbstractSubjectController
             throw $this->createNotFoundException('Not yet implemented.');
         }
 
-        $context = $this->loadContext($request);
+        $context      = $this->loadContext($request);
         $resourceName = $this->config->getResourceName();
         /** @var ProductInterface $product */
         $product = $context->getResource($resourceName);
@@ -149,7 +156,7 @@ class ProductController extends AbstractSubjectController
             throw $this->createNotFoundException('Not yet implemented.');
         }
 
-        $context = $this->loadContext($request);
+        $context      = $this->loadContext($request);
         $resourceName = $this->config->getResourceName();
 
         // Source
@@ -191,7 +198,6 @@ class ProductController extends AbstractSubjectController
                 }
 
                 $redirectPath = null;
-                /** @noinspection PhpUndefinedMethodInspection */
                 if ($form->get('actions')->has('saveAndList') && $form->get('actions')->get('saveAndList')->isClicked()) {
                     $redirectPath = $this->generateResourcePath($target, 'list');
                 } elseif (null === $redirectPath = $form->get('_redirect')->getData()) {
@@ -252,7 +258,7 @@ class ProductController extends AbstractSubjectController
         // Product
         // TODO Find the product if edit
         $context = $this->loadContext($request);
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var ProductInterface $product */
         $product = parent::createNew($context);
         $product->setType(ProductTypes::TYPE_SIMPLE);
 
@@ -266,7 +272,7 @@ class ProductController extends AbstractSubjectController
         }
 
         // Form
-        $form = $this->get('form.factory')->createNamed('FORM__NAME', FormType::class, $product, [
+        $form = $this->get('form.factory')->createNamed('FORM__NAME', Type\FormType::class, $product, [
             'block_name' => 'product',
         ]);
 
@@ -459,6 +465,119 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
+     * Products export action.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function exportAction(Request $request): Response
+    {
+        $this->isGranted('VIEW');
+
+        $context = $this->loadContext($request);
+
+        $config = new ExportConfig(
+            $this->get('ekyna_commerce.common.context_provider')->getContext()
+        );
+
+        $form = $this->createExportForm($config, $request);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $path = null;
+            try {
+                $path = $this->get(ProductExporter::class)->export($config);
+            } catch (ProductExceptionInterface $e) {
+                $this->addFlash($e->getMessage(), 'danger');
+            }
+
+            if ($path) {
+                clearstatcache(true, $path);
+
+                $stream   = new Stream($path);
+                $response = new BinaryFileResponse($stream);
+
+                // TODO Regarding to config format
+                $response->headers->set('Content-Type', 'text/csv');
+                $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'products.csv');
+                $response->headers->set('Content-Disposition', $disposition);
+
+                return $response;
+            }
+        }
+
+        $this->appendBreadcrumb(
+            sprintf('%s_export', $context->getConfiguration()->getResourceName()),
+            'ekyna_product.product.button.export'
+        );
+
+        return $this->render(
+            $this->config->getTemplate('export.html'),
+            $context->getTemplateVars([
+                'form' => $form->createView(),
+            ])
+        );
+    }
+
+    /**
+     * Creates the export form.
+     *
+     * @param ExportConfig $data
+     * @param Request      $request
+     *
+     * @return FormInterface
+     */
+    private function createExportForm(ExportConfig $data, Request $request): FormInterface
+    {
+        $action = $this->generateResourcePath($this->getConfiguration()->getResourceId(), 'export');
+
+        $form = $this->createForm(ExportConfigType::class, $data, [
+            'action'            => $action,
+            'method'            => 'POST',
+            'attr'              => ['class' => 'form-horizontal'],
+            'admin_mode'        => true,
+            '_redirect_enabled' => true,
+        ]);
+
+        $referer = $request->headers->get('referer');
+        if (0 < strlen($referer) && false === strpos($referer, $action)) {
+            $cancel = $referer;
+        } else {
+            $cancel = $this->generateResourcePath($this->getConfiguration()->getResourceId(), 'list');
+        }
+
+        $form->add('actions', FormActionsType::class, [
+            'buttons' => [
+                'remove' => [
+                    'type'    => Type\SubmitType::class,
+                    'options' => [
+                        'button_class' => 'success',
+                        'label'        => 'ekyna_core.button.export',
+                        'attr'         => ['icon' => 'ok'],
+                    ],
+                ],
+                'cancel' => [
+                    'type'    => Type\ButtonType::class,
+                    'options' => [
+                        'label'        => 'ekyna_core.button.cancel',
+                        'button_class' => 'default',
+                        'as_link'      => true,
+                        'attr'         => [
+                            'class' => 'form-cancel-btn',
+                            'icon'  => 'remove',
+                            'href'  => $cancel,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        return $form;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function createNew(Context $context)
@@ -545,11 +664,11 @@ class ProductController extends AbstractSubjectController
         /** @var \Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface $repository */
         $repository = $this->getRepository();
 
-        $data['bundleParents'] = $repository->findParentsByBundled($product);
-        $data['optionParents'] = $repository->findParentsByOptionProduct($product);
+        $data['bundleParents']    = $repository->findParentsByBundled($product);
+        $data['optionParents']    = $repository->findParentsByOptionProduct($product);
         $data['componentParents'] = $repository->findParentsByComponent($product);
-        $data['offers_list'] = $this->getOffersList($product);
-        $data['prices_list'] = $this->getPricesList($product);
+        $data['offers_list']      = $this->getOffersList($product);
+        $data['prices_list']      = $this->getPricesList($product);
 
         return null;
     }
@@ -613,13 +732,13 @@ class ProductController extends AbstractSubjectController
             ->get('ekyna_product.offer.repository')
             ->findByProduct($product);
 
-        $translator = $this->get('translator');
-        $allGroups = $translator->trans('ekyna_commerce.customer_group.message.all');
+        $translator   = $this->get('translator');
+        $allGroups    = $translator->trans('ekyna_commerce.customer_group.message.all');
         $allCountries = $translator->trans('ekyna_commerce.country.message.all');
 
         $list = [];
         foreach ($offers as $offer) {
-            $group = $offer->getGroup();
+            $group   = $offer->getGroup();
             $country = $offer->getCountry();
 
             $key = sprintf(
@@ -667,13 +786,13 @@ class ProductController extends AbstractSubjectController
             ->get('ekyna_product.price.repository')
             ->findByProduct($product);
 
-        $translator = $this->get('translator');
-        $allGroups = $translator->trans('ekyna_commerce.customer_group.message.all');
+        $translator   = $this->get('translator');
+        $allGroups    = $translator->trans('ekyna_commerce.customer_group.message.all');
         $allCountries = $translator->trans('ekyna_commerce.country.message.all');
 
         $list = [];
         foreach ($prices as $price) {
-            $group = $price->getGroup();
+            $group   = $price->getGroup();
             $country = $price->getCountry();
 
             $key = sprintf(

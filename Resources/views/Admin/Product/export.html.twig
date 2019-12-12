@@ -1,0 +1,63 @@
+{% extends '@EkynaAdmin/Entity/sided.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+
+{% block page_title %}{{ 'ekyna_product.product.label.plural'|trans|raw }} - {{ parent() }}{% endblock page_title %}
+
+{% block title %}
+    <h1>{{ 'ekyna_product.product.header.export'|trans|raw }}</h1>
+{% endblock title %}
+
+{% block actions %}
+    {{ admin_resource_btn(resource_id, 'list') }}
+    {{ macros.new_product_button() }}
+{% endblock actions %}
+
+{% block main %}
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ form_start(form) }}
+    <div class="form-body">
+        {{ form_row(form.format) }}
+        {{ form_row(form.columns) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.brands, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.visible, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.context.customerGroup, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.context.vatDisplayMode, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.context.deliveryCountry, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.context.invoiceCountry, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.context.currency, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.context.date, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.validUntil, {'label_col': 4, 'widget_col': 8}) }}
+            </div>
+        </div>
+        {{ form_rest(form) }}
+    </div>
+    {{ form_end(form) }}
+{% endblock main %}

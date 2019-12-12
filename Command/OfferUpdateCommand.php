@@ -66,8 +66,6 @@ class OfferUpdateCommand extends ContainerAwareCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->timeout = time() + $input->getOption('max_execution_time');
-
         $container = $this->getContainer();
 
         $this->repository = $container->get('ekyna_product.product.repository');
@@ -83,6 +81,8 @@ class OfferUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->timeout = time() + $input->getOption('max_execution_time');
+
         if (0 < $id = intval($input->getArgument('id'))) {
             /** @var ProductInterface $product */
             $product = $this->repository->find($id);

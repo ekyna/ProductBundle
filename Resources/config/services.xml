@@ -815,6 +815,11 @@
             <argument>ym</argument>
         </service>
 
+        <!-- Public url listener -->
+        <service id="Ekyna\Bundle\ProductBundle\EventListener\UrlEventSubscriber">
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- External Reference generator -->
         <service id="Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator">
             <argument type="service" id="ekyna_product.product_reference.repository"/>
@@ -871,6 +876,14 @@
             <argument>%ekyna_product.product.class%</argument>
             <tag name="ekyna_cms.wide_search.provider"/>
         </service>-->
+
+        <!-- Exporter -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.pricing.price_calculator"/>
+            <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="Symfony\Component\Translation\TranslatorInterface"/>
+        </service>
 
         <!-- Catalog services -->
         <service id="ekyna_product.catalog.registry"

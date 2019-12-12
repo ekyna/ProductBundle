@@ -254,6 +254,12 @@ ekyna_product:
         button:
             add: Ajouter une vente croisée
 
+    export:
+        column:
+            net_price: Prix publique
+            buy_price: Prix d'achat
+            valid_until: Valide jusqu'au
+
     highlight:
         title: Mise en valeur
         mode:
@@ -387,6 +393,7 @@ ekyna_product:
             plural: Produits
         header:
             list: Produits <small>Liste des produits</small>
+            export: Produits <small>Catalogue et tarifs</small>
             show: Détail du produit <small>%name%</small>
             new: Créer un nouveau produit
             duplicate: Dupliquer le produit <small>%name%</small>
@@ -395,6 +402,7 @@ ekyna_product:
             remove: Supprimer le produit <small>%name%</small>
         button:
             list: Liste des produits
+            export: Export catalogue
             show: Détail du produit
             new: Nouveau produit
             edit: Modifier le produit

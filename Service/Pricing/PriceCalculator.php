@@ -115,6 +115,13 @@ class PriceCalculator
                     ->currencyConverter
                     ->convert($amount, $this->defaultCurrency, $currency, $date);
             }
+        } else {
+            if (0 < $amount = $price['original_price']) {
+                $price['original_price'] = Money::round($amount, $currency);
+            }
+            if (0 < $amount = $price['sell_price']) {
+                $price['sell_price'] = Money::round($amount, $currency);
+            }
         }
 
         // Taxation

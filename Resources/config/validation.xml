@@ -1203,4 +1203,32 @@
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\SpecialOffer"/>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Model\ExportConfig">
+        <property name="format">
+            <constraint name="NotBlank"/>
+            <constraint name="Choice">
+                <option name="callback">getFormatChoices</option>
+            </constraint>
+        </property>
+        <property name="columns">
+            <constraint name="Count">
+                <option name="min">1</option>
+            </constraint>
+            <constraint name="Choice">
+                <option name="callback">getColumnsChoices</option>
+                <option name="multiple">true</option>
+            </constraint>
+        </property>
+        <property name="separator">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="enclosure">
+            <constraint name="NotBlank"/>
+        </property>
+        <property name="context">
+            <constraint name="NotNull"/>
+            <constraint name="Valid"/>
+        </property>
+    </class>
+
 </constraint-mapping>

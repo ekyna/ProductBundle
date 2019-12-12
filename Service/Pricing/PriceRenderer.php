@@ -32,7 +32,7 @@ class PriceRenderer
     /**
      * @var LocaleProviderInterface
      */
-    private $localeProvider;
+    private $localeProvider; // TODO remove as not used.
 
     /**
      * @var ContextProviderInterface
@@ -125,7 +125,7 @@ class PriceRenderer
         $currency = $context->getCurrency()->getCode();
         $mode = $context->getVatDisplayMode();
 
-        $formatter = $this->formatterFactory->create($this->localeProvider->getCurrentLocale(), $currency);
+        $formatter = $this->formatterFactory->create($context->getLocale(), $currency);
 
         // From
         $fromLabel = $this->options['price_with_from'] && $price['starting_from']

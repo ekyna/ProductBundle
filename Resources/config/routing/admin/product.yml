@@ -1,16 +1,21 @@
 ekyna_product_product_admin_home:
     path: ""
-    defaults: { _controller: "ekyna_product.product.controller:homeAction" }
+    controller: "ekyna_product.product.controller:homeAction"
     methods: [GET]
 
 ekyna_product_product_admin_list:
     path: /list
-    defaults: { _controller: "ekyna_product.product.controller:listAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:listAction"
+    methods: [GET, POST]
+
+ekyna_product_product_admin_export:
+    path: /export
+    controller: "ekyna_product.product.controller:exportAction"
+    methods: [GET, POST]
 
 ekyna_product_product_admin_attributes_form:
     path: /attributes-form/{attributeSetId}
-    defaults: { _controller: "ekyna_product.product.controller:attributesFormAction" }
+    controller: "ekyna_product.product.controller:attributesFormAction"
     methods: [GET]
     requirements:
         attributeSetId: \d+
@@ -19,21 +24,21 @@ ekyna_product_product_admin_attributes_form:
 
 ekyna_product_product_admin_new:
     path: /new/{type}
-    defaults: { _controller: "ekyna_product.product.controller:newAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:newAction"
+    methods: [GET, POST]
     requirements:
         type: '^[a-z]+$'
 
 ekyna_product_product_admin_show:
     path: /{productId}/show
-    defaults: { _controller: "ekyna_product.product.controller:showAction" }
+    controller: "ekyna_product.product.controller:showAction"
     methods: [GET]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_summary:
     path: /{productId}/summary
-    defaults: { _controller: "ekyna_product.product.controller:summaryAction" }
+    controller: "ekyna_product.product.controller:summaryAction"
     methods: [GET]
     requirements:
         productId: \d+
@@ -42,50 +47,50 @@ ekyna_product_product_admin_summary:
 
 ekyna_product_product_admin_edit:
     path: /{productId}/edit
-    defaults: { _controller: "ekyna_product.product.controller:editAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:editAction"
+    methods: [GET, POST]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_move_up:
     path: /{productId}/move-up
-    defaults: { _controller: "ekyna_product.product.controller:moveUpAction" }
+    controller: "ekyna_product.product.controller:moveUpAction"
     methods: [GET]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_move_down:
     path: /{productId}/move-down
-    defaults: { _controller: "ekyna_product.product.controller:moveDownAction" }
+    controller: "ekyna_product.product.controller:moveDownAction"
     methods: [GET]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_duplicate:
     path: /{productId}/duplicate
-    defaults: { _controller: "ekyna_product.product.controller:duplicateAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:duplicateAction"
+    methods: [GET, POST]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_convert:
     path: /{productId}/convert/{type}
-    defaults: { _controller: "ekyna_product.product.controller:convertAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:convertAction"
+    methods: [GET, POST]
     requirements:
         productId: \d+
         type: '^[a-z]+$'
 
 ekyna_product_product_admin_refresh_stock:
     path: /{productId}/refresh-stock
-    defaults: { _controller: "ekyna_product.product.controller:refreshStockAction" }
+    controller: "ekyna_product.product.controller:refreshStockAction"
     methods: [GET]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_new_supplier_product:
     path: /{productId}/new-supplier-product
-    defaults: { _controller: "ekyna_product.product.controller:newSupplierProductAction" }
+    controller: "ekyna_product.product.controller:newSupplierProductAction"
     methods: [POST]
     requirements:
         productId: \d+
@@ -103,7 +108,9 @@ ekyna_product_product_admin_tinymce:
 
 ekyna_product_product_admin_toggle:
     path: /{productId}/toggle/{field}
-    defaults: { _controller: "ekyna_product.product.controller:toggleAction", field: visible }
+    controller: "ekyna_product.product.controller:toggleAction"
+    defaults:
+        field: visible
     methods: [GET]
     requirements:
         productId: \d+
@@ -111,14 +118,14 @@ ekyna_product_product_admin_toggle:
 
 ekyna_product_product_admin_remove:
     path: /{productId}/remove
-    defaults: { _controller: "ekyna_product.product.controller:removeAction" }
-    methods: [GET|POST]
+    controller: "ekyna_product.product.controller:removeAction"
+    methods: [GET, POST]
     requirements:
         productId: \d+
 
 ekyna_product_product_admin_generate_reference:
     path: /{productId}/generate-reference/{type}
-    defaults: { _controller: "ekyna_product.product.controller:generateReference" }
+    controller: "ekyna_product.product.controller:generateReference"
     methods: [GET]
     requirements:
         productId: \d+
@@ -126,21 +133,23 @@ ekyna_product_product_admin_generate_reference:
 
 ekyna_product_product_admin_search:
     path: /search
-    defaults: { _controller: "ekyna_product.product.controller:searchAction" }
+    controller: "ekyna_product.product.controller:searchAction"
     methods: [GET]
     options:
         expose: true
 
 ekyna_product_product_admin_label:
     path: /label/{format}.pdf
-    defaults: { _controller: "ekyna_product.product.controller:labelAction", format: large }
+    controller: "ekyna_product.product.controller:labelAction"
+    defaults:
+        format: large
     methods: [GET]
     options:
         expose: true
 
 ekyna_product_product_admin_find:
     path: /find
-    defaults: { _controller: "ekyna_product.product.controller:findAction" }
+    controller: "ekyna_product.product.controller:findAction"
     methods: [GET]
     options:
         expose: true

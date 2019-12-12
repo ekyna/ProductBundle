@@ -254,6 +254,12 @@ ekyna_product:
         button:
             add: Add cross selling
 
+    export:
+        column:
+            net_price: Prix publique
+            buy_price: Prix d'achat
+            valid_until: Valide jusqu'au
+
     highlight:
         title: Highlight
         mode:
@@ -386,6 +392,7 @@ ekyna_product:
             plural: Product
         header:
             list: Products <small>List of the products</small>
+            export: Products <small>Catalog and pricing</small>
             show: Product details <small>%name%</small>
             new: Create a new product
             duplicate: Duplicate the product <small>%name%</small>
@@ -394,6 +401,7 @@ ekyna_product:
             remove: Remove the product <small>%name%</small>
         button:
             list: Products list
+            export: Catalog export
             show: Product details
             new: New product
             edit: Edit the product

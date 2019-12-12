@@ -16,6 +16,7 @@
         }) }}
     {%- endif -%}
     {{- admin_resource_btn(product, 'list') -}}
+    {{ macros.export_products_button() }}
     {{- macros.new_product_button() -}}
 {% endblock actions %}
 
