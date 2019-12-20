@@ -143,9 +143,9 @@ class OfferInvalidator
      *
      * @param int $id
      */
-    public function invalidateByProductId(int $id): void
+    public function invalidateByProductId(int $id = null): void
     {
-        if (!in_array($id, $this->productIds)) {
+        if ($id && !in_array($id, $this->productIds)) {
             $this->productIds[] = $id;
         }
     }
@@ -155,9 +155,9 @@ class OfferInvalidator
      *
      * @param int $id
      */
-    public function invalidateByBrandId(int $id): void
+    public function invalidateByBrandId(int $id = null): void
     {
-        if (!in_array($id, $this->brandIds)) {
+        if ($id && !in_array($id, $this->brandIds)) {
             $this->brandIds[] = $id;
         }
     }

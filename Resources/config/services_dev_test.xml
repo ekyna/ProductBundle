@@ -5,9 +5,14 @@
 
     <services>
 
-        <service id="Ekyna\Bundle\ProductBundle\DataFixtures\ORM\ProductProvider">
-            <argument type="service" id="ekyna_product.product.repository"/>
+        <service id="Ekyna\Bundle\ProductBundle\DataFixtures\ProductProcessor" public="false">
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator"/>
             <argument type="service" id="ekyna_media.media.repository"/>
+            <tag name="fidry_alice_data_fixtures.processor"/>
+        </service>
+
+        <service id="Ekyna\Bundle\ProductBundle\DataFixtures\ORM\ProductProvider" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="nelmio_alice.faker.provider"/>
         </service>
 

@@ -29,7 +29,7 @@ Ekyna\Bundle\ProductBundle\Model\PricingInterface:
         countries:
             - <countryByCode('FR')>
         brands:
-            - '@brand_tablette_store'
+            - '@brand_acme'
         rules:
             - '@pricing_1_rule_1'
             - '@pricing_1_rule_2'

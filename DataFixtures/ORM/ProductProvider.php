@@ -2,9 +2,6 @@
 
 namespace Ekyna\Bundle\ProductBundle\DataFixtures\ORM;
 
-use Ekyna\Bundle\MediaBundle\Entity\MediaRepository;
-use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
-use Ekyna\Bundle\ProductBundle\Entity\ProductMedia;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 
@@ -20,22 +17,15 @@ class ProductProvider
      */
     private $productRepository;
 
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
 
     /**
      * Constructor.
      *
      * @param ProductRepositoryInterface $productRepository
-     * @param MediaRepository $mediaRepository
      */
-    public function __construct(ProductRepositoryInterface $productRepository, MediaRepository $mediaRepository)
+    public function __construct(ProductRepositoryInterface $productRepository)
     {
         $this->productRepository = $productRepository;
-        $this->mediaRepository = $mediaRepository;
     }
 
     /**
@@ -51,19 +41,5 @@ class ProductProvider
         return $this->productRepository->findOneBy([
             'reference' => $reference,
         ]);
-    }
-
-    /**
-     * Generates the product medias.
-     *
-     * @param ProductInterface $product
-     */
-    public function generateProductMedias(ProductInterface $product)
-    {
-        $images = $this->mediaRepository->findRandomBy(['type' => MediaTypes::IMAGE], rand(2, 4));
-
-        foreach ($images as $image) {
-            $product->addMedia((new ProductMedia())->setMedia($image));
-        }
     }
 }

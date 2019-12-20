@@ -120,9 +120,9 @@ class PriceInvalidator
      *
      * @param int $id
      */
-    public function invalidateByProductId(int $id): void
+    public function invalidateByProductId(int $id = null): void
     {
-        if (!in_array($id, $this->productIds)) {
+        if ($id && !in_array($id, $this->productIds)) {
             $this->productIds[] = $id;
         }
     }

@@ -1,0 +1,177 @@
+Ekyna\Bundle\ProductBundle\Model\ProductInterface:
+    product_hawk:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        designation: Hand work
+        reference: HAWK
+        netPrice: 30
+        weight: 0.0
+        # TODO unit
+        stockMode: disabled
+        minimumOrderQuantity: 0.1
+        taxGroup: <defaultTaxGroup()>
+        visible: false
+        title: Hand work
+        description: "<identity('<p>Hand work</p>')>"
+    product_nfcr:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        designation: NFC Reader
+        reference: NFCR
+        netPrice: 20
+        weight: 0.2
+        taxGroup: <defaultTaxGroup()>
+        title: NFC Reader
+        description: "<identity('<p>NFC Reader</p>')>"
+        visible: false
+    product_musb:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        designation: Micro USB Connector
+        reference: MUSB
+        netPrice: 10
+        weight: 0.05
+        taxGroup: <defaultTaxGroup()>
+        title: Micro USB Connector
+        description: "<identity('<p>Micro USB Connector</p>')>"
+        visible: false
+    product_typc:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        designation: Type-C Connector
+        reference: TYPC
+        netPrice: 10
+        weight: 0.05
+        taxGroup: <defaultTaxGroup()>
+        title: Type-C Connector
+        description: "<identity('<p>Type-C Connector</p>')>"
+        visible: false
+    product_bk9:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        attributeSet: '@attribute_set_blocking_kit'
+        designation: Blocking kit 9 inches
+        reference: BK9
+        netPrice: 10
+        weight: 0.05
+        taxGroup: <defaultTaxGroup()>
+        title: Blocking kit 9 inches
+        description: "<identity('<p>Blocking kit 9 inches</p>')>"
+        visible: false
+    product_bk11:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        attributeSet: '@attribute_set_blocking_kit'
+        designation: Blocking kit 11 inches
+        reference: BK11
+        netPrice: 10
+        weight: 0.05
+        taxGroup: <defaultTaxGroup()>
+        title: Blocking kit 11 inches
+        description: "<identity('<p>Blocking kit 11 inches</p>')>"
+        visible: false
+    product_hub:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_accessory']
+        type: simple
+        designation: Hub
+        reference: HUB
+        netPrice: 60
+        weight: 0.15
+        taxGroup: <defaultTaxGroup()>
+        title: Hub
+        description: "<identity('<p>Hub</p>')>"
+        visible: false
+    product_taba:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_samsung'
+        categories: ['@category_accessory']
+        type: simple
+        attributeSet: '@attribute_set_device'
+        designation: Tablet A
+        reference: TABA
+        netPrice: 60
+        weight: 0.15
+        taxGroup: <defaultTaxGroup()>
+        title: Tablet A
+        description: "<identity('<p>Tablet A</p>')>"
+        visible: false
+
+Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface:
+    product_musb_attribute_1:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_musb'
+        attributeSlot: '@attribute_slot_connector_connector'
+        choices: ['@attribute_choice_micro_usb']
+    product_typc_attribute_1:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_typc'
+        attributeSlot: '@attribute_slot_connector_connector'
+        choices: ['@attribute_choice_type_c']
+    product_bk9_attribute_1:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_bk9'
+        attributeSlot: '@attribute_slot_blocking_kit_diagonal'
+        value: 9
+    product_bk11_attribute_1:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_bk11'
+        attributeSlot: '@attribute_slot_blocking_kit_diagonal'
+        value: 11
+    product_taba_attribute_1:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_taba'
+        attributeSlot: '@attribute_slot_device_network'
+        choices: ['@attribute_choice_wifi']
+    product_taba_attribute_2:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_taba'
+        attributeSlot: '@attribute_slot_device_capacity'
+        choices: ['@attribute_choice_16go']
+    product_taba_attribute_3:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_taba'
+        attributeSlot: '@attribute_slot_device_color'
+        choices: ['@attribute_choice_white']
+    product_taba_attribute_4:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_taba'
+        attributeSlot: '@attribute_slot_device_diagonal'
+        value: 9
+    product_taba_attribute_5:
+        __factory: { '@ekyna_product.product_attribute.repository::createNew': [] }
+        product: '@product_taba'
+        attributeSlot: '@attribute_slot_device_connector'
+        choices: ['@attribute_choice_micro_usb']
+
+Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface:
+    product_hub_group_connector:
+        __factory: { '@ekyna_product.option_group.repository::createNew': [] }
+        product: '@product_hub'
+        name: Connector
+        title: Connector
+        required: true
+        fullTitle: true
+
+Ekyna\Bundle\ProductBundle\Model\OptionInterface:
+    product_hub_group_connector_option_musb:
+        __factory: { '@ekyna_product.option.repository::createNew': [] }
+        group: '@product_hub_group_connector'
+        product: '@product_musb'
+    product_hub_group_connector_option_typc:
+        __factory: { '@ekyna_product.option.repository::createNew': [] }
+        group: '@product_hub_group_connector'
+        product: '@product_typc'

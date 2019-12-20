@@ -11,9 +11,23 @@ Ekyna\Bundle\ProductBundle\Model\BrandInterface:
         title: Samsung
         description: "<identity('<p>Fabriquant de tablettes tactiles.</p>')>"
         visible: true
-    brand_tablette_store:
+    brand_acme:
         __factory: { '@ekyna_product.brand.repository::createNew': [] }
-        name: Tablette Store
-        title: Tablette Store
+        name: Acme
+        title: Acme
         description: "<identity('<p>Équipementier tablettes tactiles.</p>')>"
+        visible: true
+
+Ekyna\Bundle\ProductBundle\Model\CategoryInterface:
+    category_device:
+        __factory: { '@ekyna_product.category.repository::createNew': [] }
+        name: Tablets and smartphones
+        title: Tablets and smartphones
+        description: "<identity('<p>Tablets and smartphones.</p>')>"
+        visible: true
+    category_accessory:
+        __factory: { '@ekyna_product.category.repository::createNew': [] }
+        name: Accessories
+        title: Accessories
+        description: "<identity('<p>Accessories.</p>')>"
         visible: true
