@@ -429,6 +429,7 @@ ekyna_product:
             option_parents: This product is an option of the following products
             bundle_parents: This product is included in the following bundles
             component_parents: This product is a component of the following products
+            brand_naming: Include brand in title and designation
         alert:
             no_item: No product configured
             pending_offers: >

@@ -143,6 +143,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $this->productBuilder
             ->addBrandField()
+            ->addBrandNamingField()
             ->addVisibleField()
             ->addVisibilityField()
             ->addBestSellerField()
@@ -200,6 +201,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->productBuilder
             // General
             ->addBrandField()
+            ->addBrandNamingField()
             ->addVisibleField()
             ->addVisibilityField()
             ->addBestSellerField()
@@ -314,6 +316,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->productBuilder
             // General
             ->addBrandField()
+            ->addBrandNamingField()
             ->addVisibleField()
             ->addVisibilityField()
             ->addBestSellerField()
@@ -364,6 +367,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->productBuilder
             // General
             ->addBrandField()
+            ->addBrandNamingField()
             ->addVisibleField()
             ->addVisibilityField()
             ->addBestSellerField()

@@ -125,6 +125,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $attributesDesignation;
 
     /**
+     * @var bool
+     */
+    protected $brandNaming = true; // Include brand name in designation and title
+
+    /**
      * @var float
      */
     protected $minPrice = 0;
@@ -1266,11 +1271,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 $title = $this->getAttributesTitle();
             }
 
-            $title = sprintf('%s %s', $this->parent->getTitle(), $title);
+            return sprintf('%s %s', $this->parent->getFullTitle($withBrand), $title);
         }
 
         // Prepend the brand
-        return $withBrand ? sprintf('%s %s', $this->brand->getTitle(), $title) : $title;
+        return $withBrand && $this->brandNaming ? sprintf('%s %s', $this->brand->getTitle(), $title) : $title;
     }
 
     /**
@@ -1337,6 +1342,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
+    public function isBrandNaming(): bool
+    {
+        return $this->brandNaming;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBrandNaming(bool $naming): Model\ProductInterface
+    {
+        $this->brandNaming = $naming;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getFullDesignation($withBrand = false)
     {
         $designation = $this->getDesignation();
@@ -1347,11 +1370,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 // Fallback to auto-generated designation
                 $designation = $this->getAttributesDesignation();
             }
-            $designation = sprintf('%s %s', $this->parent->getDesignation(), $designation);
+
+            return sprintf('%s %s', $this->parent->getFullDesignation($withBrand), $designation);
         }
 
         // Prepend the brand
-        return $withBrand ? sprintf('%s %s', $this->brand->getName(), $designation) : $designation;
+        return $withBrand && $this->brandNaming
+            ? sprintf('%s %s', $this->brand->getName(), $designation)
+            : $designation;
     }
 
     /**
@@ -1545,9 +1571,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * Gathers medias
      *
-     * @param string $type
-     * @param bool $recurse
-     * @param int $limit
+     * @param string               $type
+     * @param bool                 $recurse
+     * @param int                  $limit
      * @param ArrayCollection|null $collection
      *
      * @return ArrayCollection

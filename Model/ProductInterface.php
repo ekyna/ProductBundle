@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
+use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
@@ -745,6 +746,22 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setAttributesDesignation($attributesDesignation);
+
+    /**
+     * Returns whether to include brand in full designation an title.
+     *
+     * @return bool
+     */
+    public function isBrandNaming(): bool;
+
+    /**
+     * Sets whether to include brand in full designation an title.
+     *
+     * @param bool $naming
+     *
+     * @return $this|ProductInterface
+     */
+    public function setBrandNaming(bool $naming): ProductInterface;
 
     /**
      * Returns the full designation.

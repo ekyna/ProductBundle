@@ -13,15 +13,18 @@
             {{ macros.show_brand(product, {'label_col': 4}) }}
         </div>
         <div class="col-md-6">
-            {{ macros.show_released_at(product, {'label_col': 4}) }}
+            {{ macros.show_brandNaming(product, {'label_col': 4}) }}
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
-            {{ macros.show_visible(product, {'label_col': 4}) }}
+        <div class="col-md-4">
+            {{ macros.show_released_at(product, {'label_col': 6}) }}
         </div>
-        <div class="col-md-6">
-            {{ macros.show_visibility(product, {'label_col': 4}) }}
+        <div class="col-md-4">
+            {{ macros.show_visible(product, {'label_col': 6}) }}
+        </div>
+        <div class="col-md-4">
+            {{ macros.show_visibility(product, {'label_col': 6}) }}
         </div>
     </div>
     <div class="row">

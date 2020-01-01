@@ -49,6 +49,15 @@
 {%- endmacro show_brand -%}
 
 
+{%- macro show_brandNaming(product, options = {}) -%}
+    {{- show_row(product.brandNaming, 'boolean', {
+        'label': 'ekyna_product.product.field.brand_naming',
+        'id': 'product_brandNaming',
+        'color': true,
+        'false_class': 'label label-default'
+    }|merge(options)) -}}
+{%- endmacro show_brandNaming -%}
+
 {%- macro show_categories(product, options = {}) -%}
     {{- show_row(product.categories, 'entity', {
         'label': 'ekyna_product.category.label.plural',

@@ -897,7 +897,7 @@
             <argument type="service" id="templating"/>
             <argument type="service" id="knp_snappy.pdf"/>
             <argument type="service" id="ekyna_commerce.subject_helper"/>
-            <argument>%ekyna_commerce.company_logo%</argument>
+            <argument>%ekyna_commerce.default.company_logo%</argument>
             <argument>%kernel.debug%</argument>
         </service>
 

@@ -185,6 +185,28 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the brand naming field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addBrandNamingField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.brand_naming',
+            'required' => false,
+            'attr'     => [
+                'align_with_widget' => true,
+            ],
+        ], $options);
+
+        $this->form->add('brandNaming', SF\CheckboxType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the bundle slots field.
      *
      * @param array $options
