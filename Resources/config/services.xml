@@ -942,9 +942,7 @@
         <!-- Stat count repository -->
         <service id="ekyna_product.stat_count.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
-            <!-- TODO Remove factory : it potentially injects the wrong entity manager -->
-            <factory service="doctrine" method="getRepository"/>
-            <argument>Ekyna\Bundle\ProductBundle\Entity\StatCount</argument>
+            <argument type="service" id="Symfony\Bridge\Doctrine\RegistryInterface"/>
             <call method="setLocaleProvider">
                 <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>
@@ -952,9 +950,7 @@
         <!-- Stat cross repository -->
         <service id="ekyna_product.stat_cross.repository"
                  class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
-            <!-- TODO Remove factory : it potentially injects the wrong entity manager -->
-            <factory service="doctrine" method="getRepository"/>
-            <argument>Ekyna\Bundle\ProductBundle\Entity\StatCross</argument>
+            <argument type="service" id="Symfony\Bridge\Doctrine\RegistryInterface"/>
             <call method="setLocaleProvider">
                 <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>

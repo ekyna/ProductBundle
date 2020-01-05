@@ -2,7 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCross;
@@ -19,7 +20,7 @@ use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class StatCrossRepository extends EntityRepository
+class StatCrossRepository extends ServiceEntityRepository
 {
     use LocaleAwareRepositoryTrait;
 
@@ -50,6 +51,14 @@ class StatCrossRepository extends EntityRepository
 
 
     /**
+     * Constructor.
+     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, StatCross::class);
+    }
+
+    /**
      * Finds cross selling products.
      *
      * @param Product|int|array $source
@@ -58,7 +67,7 @@ class StatCrossRepository extends EntityRepository
      * @param int               $limit
      * @param array             $exclude The product ids to exclude
      *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     * @return Product[]
      */
     public function findProducts(
         $source,
@@ -155,7 +164,7 @@ class StatCrossRepository extends EntityRepository
      * @param Group   $group
      * @param string  $date
      *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\StatCross|null
+     * @return StatCross|null
      */
     public function findOne(Product $source, Product $target, Group $group, string $date)
     {

@@ -2,8 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
@@ -18,7 +19,7 @@ use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class StatCountRepository extends EntityRepository
+class StatCountRepository extends ServiceEntityRepository
 {
     use LocaleAwareRepositoryTrait;
 
@@ -39,6 +40,14 @@ class StatCountRepository extends EntityRepository
 
 
     /**
+     * Constructor.
+     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, StatCount::class);
+    }
+
+    /**
      * Finds best sellers products.
      *
      * @param Group|null $group
@@ -46,7 +55,7 @@ class StatCountRepository extends EntityRepository
      * @param int        $limit
      * @param array      $exclude
      *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     * @return Product[]
      */
     public function findProducts(Group $group = null, \DateTime $from = null, int $limit = 8, array $exclude = [])
     {
@@ -127,7 +136,7 @@ class StatCountRepository extends EntityRepository
      * @param Group   $group
      * @param string  $date
      *
-     * @return \Ekyna\Bundle\ProductBundle\Entity\StatCount|null
+     * @return StatCount|null
      */
     public function findOne(Product $product, Group $group, string $date)
     {
