@@ -50,13 +50,14 @@ class AttributeType extends ResourceFormType
                 'label'    => 'ekyna_core.field.type',
                 'choices'  => $this->typeRegistry->getChoices(),
                 'disabled' => true,
+                'select2'  => false,
             ])
             ->add('translations', TranslationsFormsType::class, [
                 'form_type'      => AttributeTranslationType::class,
                 'label'          => false,
                 'error_bubbling' => false,
             ])
-            ->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $event) {
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                 /** @var AttributeInterface $attribute */
                 $attribute = $event->getData();
 

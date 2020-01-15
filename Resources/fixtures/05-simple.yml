@@ -2,7 +2,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_hawk:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_component']
         type: simple
         designation: Hand work
         reference: HAWK
@@ -12,13 +12,13 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         stockMode: disabled
         minimumOrderQuantity: 0.1
         taxGroup: <defaultTaxGroup()>
-        visible: false
         title: Hand work
         description: "<identity('<p>Hand work</p>')>"
+        visible: false
     product_nfcr:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_component']
         type: simple
         designation: NFC Reader
         reference: NFCR
@@ -31,8 +31,9 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_musb:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_component']
         type: simple
+        attributeSet: '@attribute_set_connector'
         designation: Micro USB Connector
         reference: MUSB
         netPrice: 10
@@ -44,8 +45,9 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_typc:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_component']
         type: simple
+        attributeSet: '@attribute_set_connector'
         designation: Type-C Connector
         reference: TYPC
         netPrice: 10
@@ -54,10 +56,23 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         title: Type-C Connector
         description: "<identity('<p>Type-C Connector</p>')>"
         visible: false
+    product_hub:
+        __factory: { '@ekyna_product.product.repository::createNew': [] }
+        brand: '@brand_acme'
+        categories: ['@category_component']
+        type: simple
+        designation: Hub
+        reference: HUB
+        netPrice: 60
+        weight: 0.15
+        taxGroup: <defaultTaxGroup()>
+        title: Hub
+        description: "<identity('<p>Hub</p>')>"
+        visible: true
     product_bk9:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_component']
         type: simple
         attributeSet: '@attribute_set_blocking_kit'
         designation: Blocking kit 9 inches
@@ -71,7 +86,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_bk11:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: simple
         attributeSet: '@attribute_set_blocking_kit'
         designation: Blocking kit 11 inches
@@ -82,33 +97,20 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         title: Blocking kit 11 inches
         description: "<identity('<p>Blocking kit 11 inches</p>')>"
         visible: false
-    product_hub:
-        __factory: { '@ekyna_product.product.repository::createNew': [] }
-        brand: '@brand_acme'
-        categories: ['@category_accessory']
-        type: simple
-        designation: Hub
-        reference: HUB
-        netPrice: 60
-        weight: 0.15
-        taxGroup: <defaultTaxGroup()>
-        title: Hub
-        description: "<identity('<p>Hub</p>')>"
-        visible: false
     product_taba:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_samsung'
-        categories: ['@category_accessory']
+        categories: ['@category_device']
         type: simple
         attributeSet: '@attribute_set_device'
         designation: Tablet A
         reference: TABA
-        netPrice: 60
-        weight: 0.15
+        netPrice: 240
+        weight: 0.6
         taxGroup: <defaultTaxGroup()>
         title: Tablet A
         description: "<identity('<p>Tablet A</p>')>"
-        visible: false
+        visible: true
 
 Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface:
     product_musb_attribute_1:

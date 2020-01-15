@@ -21,13 +21,25 @@ Ekyna\Bundle\ProductBundle\Model\BrandInterface:
 Ekyna\Bundle\ProductBundle\Model\CategoryInterface:
     category_device:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
-        name: Tablets and smartphones
-        title: Tablets and smartphones
-        description: "<identity('<p>Tablets and smartphones.</p>')>"
+        name: Devices
+        title: Devices
+        description: "<identity('<p>Devices.</p>')>"
         visible: true
-    category_accessory:
+    category_kiosk:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
-        name: Accessories
-        title: Accessories
-        description: "<identity('<p>Accessories.</p>')>"
+        name: Kiosks
+        title: Kiosks
+        description: "<identity('<p>Kiosks.</p>')>"
         visible: true
+    category_case:
+        __factory: { '@ekyna_product.category.repository::createNew': [] }
+        name: Cases
+        title: Cases
+        description: "<identity('<p>Cases.</p>')>"
+        visible: true
+    category_component:
+        __factory: { '@ekyna_product.category.repository::createNew': [] }
+        name: Components
+        title: Components
+        description: "<identity('<p>Components.</p>')>"
+        visible: false

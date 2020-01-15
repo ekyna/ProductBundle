@@ -2,7 +2,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_nrke:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: bundle
         designation: NFC Reader Kiosk Extension
         reference: NRKE
@@ -13,9 +13,9 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_kico:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: configurable
-        designation: 'Kiosk configurator'
+        designation: Kiosk configurator
         reference: KICO
         taxGroup: <defaultTaxGroup()>
         title: Kiosk configurator
@@ -60,7 +60,7 @@ Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface:
         __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
         slot: '@product_nrke_slot_2'
         product: '@product_hub'
-        minQuantity: 2
+        minQuantity: 1
     # product_kico
     product_kico_slot_1_choice_1:
         __factory: { '@ekyna_product.bundle_choice.repository::createNew': [] }
@@ -122,3 +122,4 @@ Ekyna\Bundle\ProductBundle\Model\OptionInterface:
         __factory: { '@ekyna_product.option.repository::createNew': [] }
         group: '@product_kico_group_1'
         product: '@product_hawk'
+        # TODO title: Yes

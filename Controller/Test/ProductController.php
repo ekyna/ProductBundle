@@ -25,7 +25,7 @@ class ProductController extends Controller
         /** @var \Ekyna\Bundle\ProductBundle\Entity\Product $product */
         $product = $this
             ->get('ekyna_product.product.repository')
-            ->findOneById($request->attributes->get('productId'));
+            ->findOneByReference($request->attributes->get('reference'));
 
         if (null === $product) {
             throw $this->createNotFoundException("Product not found.");
@@ -43,7 +43,7 @@ class ProductController extends Controller
             $this->addFlash($event->getMessage(), 'info');
 
             return $this->redirectToRoute('ekyna_product_front_product_detail', [
-                'productId' => $product->getId(),
+                'reference' => $product->getReference(),
             ]);
         }
 

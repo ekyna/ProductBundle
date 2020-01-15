@@ -34,13 +34,13 @@ Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface:
     attribute_choice_white:
         __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
         attribute: '@attribute_color'
-        name: Blanc
-        title: Blanc
+        name: White
+        title: White
     attribute_choice_black:
         __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
         attribute: '@attribute_color'
-        name: Noir
-        title: Noir
+        name: Black
+        title: Black
     attribute_choice_16go:
         __factory: { '@ekyna_product.attribute_choice.repository::createNew': [] }
         attribute: '@attribute_capacity'

@@ -52,6 +52,7 @@ EOT
             window.hasOwnProperty('jQuery') && jQuery('.bundle-slot').eq($slot).find('.slot-buttons > li').eq($choice).find('label').click() 
 EOT
         );
+        $this->getJavascriptDriver()->wait(1000, 'false');
     }
 
     /**

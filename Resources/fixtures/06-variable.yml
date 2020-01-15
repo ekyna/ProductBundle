@@ -25,7 +25,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         type: variant
         parent: '@product_tabb'
         reference: TABB-B
-        netPrice: 300
+        netPrice: 340
         weight: 0.8
         visible: true
         position: 1
@@ -46,7 +46,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         type: variant
         parent: '@product_tabc'
         reference: TABC-W
-        netPrice: 300
+        netPrice: 320
         weight: 0.8
         visible: true
         position: 0
@@ -55,14 +55,14 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         type: variant
         parent: '@product_tabc'
         reference: TABC-B
-        netPrice: 300
+        netPrice: 360
         weight: 0.8
         visible: true
         position: 1
     product_kes:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_color'
         designation: Kiosk Extension Shell
@@ -92,7 +92,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_swc:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_color'
         designation: Switch Cuff
@@ -122,7 +122,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_roc:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_color'
         designation: Rotate Cuff
@@ -152,7 +152,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_kdb:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_color'
         designation: Kiosk Desk Base
@@ -182,7 +182,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_ksb:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_color'
         designation: Kiosk Stand Base
@@ -212,7 +212,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_sha:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_kiosk'
         designation: Kiosk Shell A
@@ -242,7 +242,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
     product_shb:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
         brand: '@brand_acme'
-        categories: ['@category_accessory']
+        categories: ['@category_kiosk']
         type: variable
         attributeSet: '@attribute_set_kiosk'
         designation: Kiosk Shell B
@@ -269,6 +269,8 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.35
         visible: true
         position: 1
+
+# TODO Cases
 
 Ekyna\Bundle\ProductBundle\Model\ComponentInterface:
     product_sha_component_1:

@@ -26,7 +26,7 @@ default:
         front_cart_features:
             paths:    [ "%paths.base%/features/front/cart" ]
             contexts:
+                - Ekyna\Behat\Context\BaseContext
                 - Ekyna\Behat\Context\ResetContext
                 - Ekyna\Behat\Context\SecurityContext
-                - Ekyna\Bundle\ResourceBundle\Behat\Context\ResourceContext
                 - Ekyna\Bundle\ProductBundle\Behat\Context\CartContext
