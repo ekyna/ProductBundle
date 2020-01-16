@@ -3,13 +3,15 @@
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Ekyna\Bundle\ProductBundle\Service\Stat\ChartRenderer;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Class StatExtension
  * @package Ekyna\Bundle\ProductBundle\Twig
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class StatExtension extends \Twig_Extension
+class StatExtension extends AbstractExtension
 {
     /**
      * @var ChartRenderer
@@ -33,12 +35,12 @@ class StatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_stat_count_chart',
                 [$this->renderer, 'renderProductCountChart'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_stat_cross_chart',
                 [$this->renderer, 'renderProductCrossChart'],
                 ['is_safe' => ['html']]

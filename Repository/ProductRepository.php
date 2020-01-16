@@ -112,7 +112,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->joinBrand($qb)
             ->joinSeo($qb);
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var Model\ProductInterface $product */
         $product = $qb
             ->andWhere($qb->expr()->eq($as . '.id', ':id'))
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -155,7 +155,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->joinBrand($qb)
             ->joinSeo($qb);
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var Model\ProductInterface $product */
         $product = $qb
             ->leftJoin($as . '.translations', 't', Expr\Join::WITH, $this->getLocaleCondition('t'))
             ->addSelect('t')
@@ -196,7 +196,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->joinBrand($qb)
             ->joinSeo($qb);
 
-        /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+        /** @var Model\ProductInterface $product */
         $product = $qb
             ->andWhere($qb->expr()->eq($as . '.reference', ':reference'))
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
@@ -812,29 +812,30 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     /**
      * @inheritdoc
      */
-    public function findBestSellers(int $limit = 8, array $exclude = [])
+    public function findBestSellers(int $limit = 8, array $exclude = [], bool $idOnly = false)
     {
-        return $this->findHighlight('bestSeller', $limit, $exclude);
+        return $this->findHighlight('bestSeller', $limit, $exclude, $idOnly);
     }
 
     /**
      * @inheritdoc
      */
-    public function findCrossSelling(int $limit = 8, array $exclude = [])
+    public function findCrossSelling(int $limit = 8, array $exclude = [], bool $idOnly = false)
     {
-        return $this->findHighlight('crossSelling', $limit, $exclude);
+        return $this->findHighlight('crossSelling', $limit, $exclude, $idOnly);
     }
 
     /**
      * Returns the highlighted products.
      *
-     * @param string $type
-     * @param int    $limit
-     * @param array  $exclude
+     * @param string $type    The typy of highlight
+     * @param int    $limit   The number of products to return
+     * @param array  $exclude Product ids to exclude
+     * @param bool   $idOnly  Whether to return only the product ids.
      *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
+     * @return Model\ProductInterface[]|int[]
      */
-    protected function findHighlight(string $type, int $limit, array $exclude = [])
+    protected function findHighlight(string $type, int $limit, array $exclude = [], bool $idOnly = false)
     {
         Model\HighlightModes::isValidType($type);
 
@@ -855,6 +856,10 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->joinCategories($qb)
             ->joinBrand($qb);
 
+        if ($idOnly) {
+            $qb->select($as . '.id');
+        }
+
         $qb
             ->andWhere($ex->eq($as . '.' . $type, ':mode'))
             ->andWhere($ex->neq($as . '.type', ':type'))
@@ -873,11 +878,16 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         $this->filterFindHighlight($qb, $parameters, $type);
 
-        return $qb
+        $query = $qb
             ->getQuery()
             ->setParameters($parameters)
-            ->setMaxResults($limit)
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($idOnly) {
+            return array_column($query->getScalarResult(), 'id');
+        }
+
+        return $query->getResult();
     }
 
     /**

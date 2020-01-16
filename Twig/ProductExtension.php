@@ -10,13 +10,17 @@ use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
 /**
  * Class ProductExtension
  * @package Ekyna\Bundle\ProductBundle\Twig
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class ProductExtension extends \Twig_Extension
+class ProductExtension extends AbstractExtension
 {
     /**
      * @var ConstantsHelper
@@ -89,84 +93,84 @@ class ProductExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'bundle_rule_type',
                 [$this->constantHelper, 'renderBundleRuleTypeLabel'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_type_label',
                 [$this->constantHelper, 'renderProductTypeLabel'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_type_badge',
                 [$this->constantHelper, 'renderProductTypeBadge'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_reference_type_label',
                 [$this->constantHelper, 'renderProductReferenceTypeLabel'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_attribute_type_label',
                 [$this->constantHelper, 'renderAttributeTypeLabel']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_best_seller_badge',
                 [$this->constantHelper, 'renderProductBestSellerBadge'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_cross_selling_badge',
                 [$this->constantHelper, 'renderProductCrossSellingBadge'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_price',
                 [$this->priceRenderer, 'getProductPrice'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_pricing_grid',
                 [$this->priceRenderer, 'renderPricingGrid'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_components_total_price',
                 [$this->priceRenderer, 'getComponentsPrice']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_bundle_total_price',
                 [$this->priceRenderer, 'getBundlePrice']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_configurable_total_price',
                 [$this->priceRenderer, 'getConfigurablePrice']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_purchase_cost',
                 [$this->priceRenderer, 'getPurchaseCost']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_attribute',
                 [$this, 'renderProductAttribute'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'product_image',
                 [$this, 'getProductImagePath']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'bundle_visible_products',
                 [$this, 'getBundleVisibleProducts']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'bundle_condition_product',
                 [$this, 'getBundleRuleConditionProduct']
             ),
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'bundle_choice_option_groups',
                 [$this, 'renderBundleChoiceOptionGroups'],
                 ['is_safe' => ['html']]
@@ -180,35 +184,35 @@ class ProductExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_feature',
                 [$this->features, 'isEnabled']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_default_image',
                 [$this, 'getDefaultImage']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_types',
                 [Model\ProductTypes::class, 'getTypes']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_create_types',
                 [Model\ProductTypes::class, 'getCreateTypes']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'product_convert_types',
                 [Model\ProductTypes::class, 'getConversionTypes']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'attribute_create_types',
                 [$this->attributeTypeRegistry, 'getChoices']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'get_product_by_id',
                 [$this->productRepository, 'findOneById']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'get_product_by_reference',
                 [$this->productRepository, 'findOneByReference']
             ),
@@ -221,13 +225,13 @@ class ProductExtension extends \Twig_Extension
     public function getTests()
     {
         return [
-            new \Twig_SimpleTest('simple_product', [Model\ProductTypes::class, 'isSimpleType']),
-            new \Twig_SimpleTest('variable_product', [Model\ProductTypes::class, 'isVariableType']),
-            new \Twig_SimpleTest('variant_product', [Model\ProductTypes::class, 'isVariantType']),
-            new \Twig_SimpleTest('bundle_product', [Model\ProductTypes::class, 'isBundleType']),
-            new \Twig_SimpleTest('configurable_product', [Model\ProductTypes::class, 'isConfigurableType']),
-            new \Twig_SimpleTest('child_product', [Model\ProductTypes::class, 'isChildType']),
-            new \Twig_SimpleTest('parent_product', [Model\ProductTypes::class, 'isParentType']),
+            new TwigTest('simple_product', [Model\ProductTypes::class, 'isSimpleType']),
+            new TwigTest('variable_product', [Model\ProductTypes::class, 'isVariableType']),
+            new TwigTest('variant_product', [Model\ProductTypes::class, 'isVariantType']),
+            new TwigTest('bundle_product', [Model\ProductTypes::class, 'isBundleType']),
+            new TwigTest('configurable_product', [Model\ProductTypes::class, 'isConfigurableType']),
+            new TwigTest('child_product', [Model\ProductTypes::class, 'isChildType']),
+            new TwigTest('parent_product', [Model\ProductTypes::class, 'isParentType']),
         ];
     }
 
@@ -386,6 +390,7 @@ class ProductExtension extends \Twig_Extension
             $popover = " data-toggle=\"popover\" data-content='$popover'";
         }
 
+        /** @noinspection HtmlUnknownAttribute */
         return sprintf(
             '<span class="label label-%s"%s>%s</span>',
             $theme, $popover, $icon

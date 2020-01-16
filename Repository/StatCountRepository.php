@@ -54,11 +54,17 @@ class StatCountRepository extends ServiceEntityRepository
      * @param \DateTime  $from
      * @param int        $limit
      * @param array      $exclude
+     * @param bool       $idOnly
      *
      * @return Product[]
      */
-    public function findProducts(Group $group = null, \DateTime $from = null, int $limit = 8, array $exclude = [])
-    {
+    public function findProducts(
+        Group $group = null,
+        \DateTime $from = null,
+        int $limit = 8,
+        array $exclude = [],
+        bool $idOnly = false
+    ): array {
         if (null === $from) {
             $from = new \DateTime('-1 year');
         }
@@ -75,7 +81,7 @@ class StatCountRepository extends ServiceEntityRepository
         $ex = $qb->expr();
 
         $qb
-            ->select('s as stat', 'SUM(s.count) as count_sum', 'p', 'b', 'b_t')
+            ->select('s as stat', 'SUM(s.count) as count_sum')
             ->join('s.product', 'p')
             ->join('p.brand', 'b')
             ->join('p.categories', 'c')
@@ -88,9 +94,15 @@ class StatCountRepository extends ServiceEntityRepository
             ->andWhere($ex->eq('b.visible', ':visible'))
             ->andWhere($ex->eq('c.visible', ':visible'))
             ->addGroupBy('s.product')
-            ->andHaving($ex->gt('SUM(s.count)', 0))
+            ->andHaving($ex->gt('count_sum', 0))
             ->addOrderBy('count_sum', 'DESC')
             ->addOrderBy('p.visibility', 'DESC');
+
+        if ($idOnly) {
+            $qb->addSelect('p.id as pid');
+        } else {
+            $qb->addSelect('p', 'b', 'b_t');
+        }
 
         if ($group) {
             $qb->andWhere($ex->eq('s.customerGroup', ':group'));
@@ -104,18 +116,21 @@ class StatCountRepository extends ServiceEntityRepository
 
         $this->filterFindProducts($qb, $parameters);
 
-        $results = $qb
+        $query = $qb
             ->getQuery()
             ->setParameters($parameters)
-            ->setMaxResults($limit)
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($idOnly) {
+            return array_column($query->getScalarResult(), 'pid');
+        }
 
         return array_map(function ($r) {
             /** @var StatCount $s */
             $s = $r['stat'];
 
             return $s->getProduct();
-        }, $results);
+        }, $query->getResult());
     }
 
     /**
@@ -169,7 +184,7 @@ class StatCountRepository extends ServiceEntityRepository
 
         if ($group) {
             $parameters['group'] = $group;
-            $query = $this->getFindByProductAndPeriodAndGroupQuery();
+            $query               = $this->getFindByProductAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindByProductAndPeriodQuery();
         }

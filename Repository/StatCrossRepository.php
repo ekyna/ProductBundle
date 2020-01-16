@@ -66,6 +66,7 @@ class StatCrossRepository extends ServiceEntityRepository
      * @param \DateTime         $from
      * @param int               $limit
      * @param array             $exclude The product ids to exclude
+     * @param bool              $idOnly  Whether to return only product ids
      *
      * @return Product[]
      */
@@ -74,7 +75,8 @@ class StatCrossRepository extends ServiceEntityRepository
         Group $group = null,
         \DateTime $from = null,
         int $limit = 8,
-        array $exclude = []
+        array $exclude = [],
+        bool $idOnly = false
     ) {
         if (null === $from) {
             $from = new \DateTime('-1 year');
@@ -101,7 +103,7 @@ class StatCrossRepository extends ServiceEntityRepository
         $ex = $qb->expr();
 
         $qb
-            ->select('s as stat', 'SUM(s.count) as score', 'p', 'b', 'b_t')
+            ->select('s as stat', 'SUM(s.count) as score')
             ->join('s.target', 'p')
             ->join('p.brand', 'b')
             ->join('p.categories', 'c')
@@ -119,6 +121,12 @@ class StatCrossRepository extends ServiceEntityRepository
             ->addOrderBy('score', 'DESC')
             ->addOrderBy('p.visibility', 'DESC');
 
+        if ($idOnly) {
+            $qb->addSelect('p.id as pid');
+        } else {
+            $qb->addSelect('p', 'b', 'b_t');
+        }
+
         if ($group) {
             $qb->andWhere($ex->eq('s.customerGroup', ':group'));
             $parameters['group'] = $group;
@@ -131,18 +139,21 @@ class StatCrossRepository extends ServiceEntityRepository
 
         $this->filterFindProducts($qb, $parameters);
 
-        $results = $qb
+        $query = $qb
             ->getQuery()
             ->setParameters($parameters)
-            ->setMaxResults($limit)
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($idOnly) {
+            return array_column($query->getScalarResult(), 'pid');
+        }
 
         return array_map(function ($r) {
             /** @var StatCross $s */
             $s = $r['stat'];
 
             return $s->getTarget();
-        }, $results);
+        }, $query->getResult());
     }
 
     /**
@@ -199,7 +210,7 @@ class StatCrossRepository extends ServiceEntityRepository
 
         if ($group) {
             $parameters['group'] = $group;
-            $query = $this->getFindBestByProductAndPeriodAndGroupQuery();
+            $query               = $this->getFindBestByProductAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindBestByProductAndPeriodQuery();
         }
@@ -236,7 +247,7 @@ class StatCrossRepository extends ServiceEntityRepository
 
         if ($group) {
             $parameters['group'] = $group;
-            $query = $this->getFindByProductAndTargetAndPeriodAndGroupQuery();
+            $query               = $this->getFindByProductAndTargetAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindByProductAndTargetAndPeriodQuery();
         }

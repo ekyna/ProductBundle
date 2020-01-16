@@ -17,7 +17,7 @@
         </p>
     </div>
 </div>
-{% set products = get_cross_selling(product, {'limit': 3}) %}
+{% set products = get_cross_selling({'product': product, 'limit': 3}) %}
 {% if products is not empty %}
 <div class="row">
     <div class="col-md-12">

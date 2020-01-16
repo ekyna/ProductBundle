@@ -75,12 +75,12 @@ class Highlight
         EngineInterface $templating,
         array $config = []
     ) {
-        $this->contextProvider = $contextProvider;
-        $this->cartProvider = $cartProvider;
+        $this->contextProvider   = $contextProvider;
+        $this->cartProvider      = $cartProvider;
         $this->productRepository = $productRepository;
-        $this->countRepository = $countRepository;
-        $this->crossRepository = $crossRepository;
-        $this->templating = $templating;
+        $this->countRepository   = $countRepository;
+        $this->crossRepository   = $crossRepository;
+        $this->templating        = $templating;
 
         $this->config = array_replace([
             'thumb_template' => '@EkynaProduct/Highlight/thumb.html.twig',
@@ -102,11 +102,12 @@ class Highlight
      *
      * @param CustomerGroupInterface|false|null $group
      * @param int                               $limit
-     * @param string                            $from
+     * @param string                            $from   The start date
+     * @param bool                              $idOnly Whether to return product ids only
      *
-     * @return ProductInterface[]
+     * @return ProductInterface[]|int[]
      */
-    public function getBestSellers($group = null, int $limit = null, string $from = null)
+    public function getBestSellers($group = null, int $limit = null, string $from = null, bool $idOnly = false): array
     {
         if (!$this->config['enabled']) {
             return [];
@@ -118,7 +119,7 @@ class Highlight
 
         $cartProductIds = $this->getCartProductIds();
 
-        $bestSellers = $this->productRepository->findBestSellers($limit, $cartProductIds);
+        $bestSellers = $this->productRepository->findBestSellers($limit, $cartProductIds, $idOnly);
 
         if ($limit > $count = count($bestSellers)) {
             if (false === $group) {
@@ -136,7 +137,7 @@ class Highlight
 
             $products = $this
                 ->countRepository
-                ->findProducts($group, new \DateTime($from), $limit - $count, $cartProductIds);
+                ->findProducts($group, new \DateTime($from), $limit - $count, $cartProductIds, $idOnly);
 
             foreach ($products as $p) {
                 $bestSellers[] = $p;
@@ -181,10 +182,11 @@ class Highlight
     /**
      * Returns the cross selling products.
      *
-     * @param ProductInterface|null             $product
-     * @param CustomerGroupInterface|false|null $group
-     * @param int                               $limit
-     * @param string                            $from
+     * @param ProductInterface|null             $product The reference product
+     * @param CustomerGroupInterface|false|null $group   The customer group
+     * @param int                               $limit   The number od products to return
+     * @param string                            $from    The start date
+     * @param bool                              $idOnly  Whether to return product ids only
      *
      * @return ProductInterface[]
      */
@@ -192,8 +194,9 @@ class Highlight
         ProductInterface $product = null,
         $group = null,
         int $limit = null,
-        string $from = null
-    ) {
+        string $from = null,
+        bool $idOnly = false
+    ): array {
         if (!$this->config['enabled']) {
             return [];
         }
@@ -202,14 +205,14 @@ class Highlight
             $limit = $this->config['cross_selling']['limit'];
         }
 
-        $result = [];
+        $result         = [];
         $cartProductIds = $this->getCartProductIds();
 
         if ($product) {
             foreach ($product->getCrossSellings() as $crossSelling) {
                 $target = $crossSelling->getTarget();
                 if (!in_array($target->getId(), $cartProductIds)) {
-                    $result[] = $target;
+                    $result[] = $idOnly ? $target->getId() : $target;
                     $limit--;
                     if (0 >= $limit) {
                         break;
@@ -219,9 +222,9 @@ class Highlight
         }
 
         if (0 < $limit) {
-            $products = $this->productRepository->findCrossSelling($limit, $cartProductIds);
-            foreach ($products as $product) {
-                $result[] = $product;
+            $products = $this->productRepository->findCrossSelling($limit, $cartProductIds, $idOnly);
+            foreach ($products as $p) {
+                $result[] = $p;
                 $limit--;
                 if (0 >= $limit) {
                     break;
@@ -252,7 +255,7 @@ class Highlight
 
             $products = $this
                 ->crossRepository
-                ->findProducts($product, $group, new \DateTime($from), $limit, $cartProductIds);
+                ->findProducts($product, $group, new \DateTime($from), $limit, $cartProductIds, $idOnly);
 
             foreach ($products as $p) {
                 $result[] = $p;

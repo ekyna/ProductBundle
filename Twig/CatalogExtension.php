@@ -5,13 +5,15 @@ namespace Ekyna\Bundle\ProductBundle\Twig;
 use Ekyna\Bundle\ProductBundle\Entity\Catalog;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
  * Class CatalogExtension
  * @package Ekyna\Bundle\ProductBundle\Twig
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CatalogExtension extends \Twig_Extension
+class CatalogExtension extends AbstractExtension
 {
     /**
      * @var CatalogRegistry
@@ -35,10 +37,10 @@ class CatalogExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('catalog_theme_label',         [$this, 'getCatalogThemeLabel']),
-            new \Twig_SimpleFilter('catalog_theme_stylesheet',    [$this, 'getCatalogThemeStylesheet']),
-            new \Twig_SimpleFilter('catalog_page_template_label', [$this, 'getPageTemplateLabel']),
-            new \Twig_SimpleFilter('catalog_page_template_path',  [$this, 'getPageTemplatePath']),
+            new TwigFilter('catalog_theme_label',         [$this, 'getCatalogThemeLabel']),
+            new TwigFilter('catalog_theme_stylesheet',    [$this, 'getCatalogThemeStylesheet']),
+            new TwigFilter('catalog_page_template_label', [$this, 'getPageTemplateLabel']),
+            new TwigFilter('catalog_page_template_path',  [$this, 'getPageTemplatePath']),
         ];
     }
 

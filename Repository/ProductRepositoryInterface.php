@@ -239,20 +239,22 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     /**
      * Returns the visible products with best seller mode set to 'always'.
      *
-     * @param int   $limit
-     * @param array $exclude
+     * @param int   $limit   The number of products to return
+     * @param array $exclude The product ids to exclude
+     * @param bool  $idOnly  Whether to return only the product ids.
      *
      * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
      */
-    public function findBestSellers(int $limit = 8, array $exclude = []);
+    public function findBestSellers(int $limit = 8, array $exclude = [], bool $idOnly = false);
 
     /**
      * Returns the visible products with cross selling mode set to 'always'.
      *
-     * @param int   $limit
-     * @param array $exclude
+     * @param int   $limit   The number of products to return
+     * @param array $exclude The product ids to exclude
+     * @param bool  $idOnly  Whether to return only the product ids.
      *
      * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
      */
-    public function findCrossSelling(int $limit = 8, array $exclude = []);
+    public function findCrossSelling(int $limit = 8, array $exclude = [], bool $idOnly = false);
 }
