@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Subject\Repository\SubjectRepositoryInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepositoryInterface;
@@ -257,4 +258,17 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
      */
     public function findCrossSelling(int $limit = 8, array $exclude = [], bool $idOnly = false);
+
+    /**
+     * Joins prices for sorting.
+     *
+     * Adds 'sellPrice' select to the given query builder.
+     * Both 'customer_group' and 'invoice_country' must be set.
+     *
+     * @param QueryBuilder $qb    The product query builder.
+     * @param string|null  $alias The product alias.
+     *
+     * @return $this|ProductRepositoryInterface
+     */
+    public function joinPrice(QueryBuilder $qb, string $alias = null): ProductRepositoryInterface;
 }

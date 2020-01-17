@@ -36,7 +36,7 @@ class BrandRepository extends TranslatableResourceRepository
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, Brand::getEntityTagPrefix() . '[slug=' . $slug . ']')
+            // TODO ->enableResultCache(3600, Brand::getEntityTagPrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'visible' => true,
                 'slug'    => $slug,

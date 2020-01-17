@@ -3,11 +3,12 @@
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
+use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
@@ -121,7 +122,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'id'               => $id,
                 'visible'          => true,
@@ -166,7 +167,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'visible'          => true,
                 'brand_visible'    => true,
@@ -205,7 +206,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'reference'        => $reference,
                 'visible'          => true,
@@ -464,7 +465,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->getQuery()
             ->setParameter('mode', $mode)
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
-            ->setParameter('today', $today, Type::DATE)
+            ->setParameter('today', $today, Types::DATE_MUTABLE)
             ->getResult();
     }
 
@@ -802,7 +803,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameter('endOfLife', false);
 
         if (!is_null($maxDate)) {
-            $query->setParameter('max_date', $maxDate, Type::DATETIME);
+            $query->setParameter('max_date', $maxDate, Types::DATETIME_MUTABLE);
         }
 
         return $query
@@ -957,15 +958,37 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * @inheritDoc
+     */
+    public function joinPrice(QueryBuilder $qb, string $alias = null): ProductRepositoryInterface
+    {
+        $alias = $alias ?: $this->getAlias();
+
+        $ex = $qb->expr();
+
+        $qb2 = $this->getEntityManager()->createQueryBuilder();
+        $qb2
+            ->select('pri.sellPrice')
+            ->from(Price::class, 'pri')
+            ->andWhere($ex->eq('IDENTITY(pri.product)', $alias . '.id'))
+            ->andWhere($ex->orX($ex->eq('pri.group', ':customer_group'), $ex->isNull('pri.group')))
+            ->andWhere($ex->orX($ex->eq('pri.country', ':invoice_country'), $ex->isNull('pri.country')));
+
+        $qb->addSelect("IFNULL(({$qb2->getQuery()->getDQL()}), $alias.minPrice) AS sellPrice");
+
+        return $this;
+    }
+
+    /**
      * Adds the join parts for brand to the query builder.
      *
      * @param QueryBuilder $qb
      * @param string       $alias
      * @param bool         $withTranslations
      *
-     * @return ProductRepository
+     * @return $this|ProductRepositoryInterface
      */
-    protected function joinBrand(QueryBuilder $qb, $alias = null, $withTranslations = true)
+    protected function joinBrand(QueryBuilder $qb, $alias = null, $withTranslations = true): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
@@ -987,10 +1010,13 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param string       $alias
      * @param bool         $withTranslations
      *
-     * @return ProductRepository
+     * @return $this|ProductRepositoryInterface
      */
-    protected function joinCategories(QueryBuilder $qb, $alias = null, $withTranslations = false)
-    {
+    protected function joinCategories(
+        QueryBuilder $qb,
+        $alias = null,
+        $withTranslations = false
+    ): ProductRepositoryInterface {
         $alias = $alias ?: $this->getAlias();
 
         $qb->leftJoin($alias . '.categories', 'c');
@@ -1010,9 +1036,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param QueryBuilder $qb
      * @param string       $alias
      *
-     * @return ProductRepository
+     * @return $this|ProductRepositoryInterface
      */
-    protected function joinMedias(QueryBuilder $qb, $alias = null)
+    protected function joinMedias(QueryBuilder $qb, $alias = null): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
@@ -1031,9 +1057,9 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param QueryBuilder $qb
      * @param string       $alias
      *
-     * @return ProductRepository
+     * @return $this|ProductRepositoryInterface
      */
-    protected function joinSeo(QueryBuilder $qb, $alias = null)
+    protected function joinSeo(QueryBuilder $qb, $alias = null): ProductRepositoryInterface
     {
         $alias = $alias ?: $this->getAlias();
 
@@ -1052,10 +1078,13 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      * @param bool         $andOptions
      * @param string       $alias
      *
-     * @return ProductRepository
+     * @return $this|ProductRepositoryInterface
      */
-    protected function joinOptionGroups(QueryBuilder $qb, $andOptions = false, $alias = null)
-    {
+    protected function joinOptionGroups(
+        QueryBuilder $qb,
+        $andOptions = false,
+        $alias = null
+    ): ProductRepositoryInterface {
         $alias = $alias ?: $this->getAlias();
 
         $qb
@@ -1080,7 +1109,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
      *
      * @TODO Move in a AbstractResource or ResourceUtil class ? (search 'isInitialized' usages ...)
      */
-    protected function isInitializedCollection(Collection $collection = null)
+    protected function isInitializedCollection(Collection $collection = null): bool
     {
         return (null !== $collection)
             && method_exists($collection, 'isInitialized')

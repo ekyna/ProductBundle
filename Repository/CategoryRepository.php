@@ -41,7 +41,7 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
+            // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
             ->setParameters([
                 'visible' => true,
                 'slug'    => $slug,
@@ -66,7 +66,7 @@ class CategoryRepository extends NestedTreeRepository implements TranslatableRes
             ->addOrderBy($as . '.id', 'ASC')
             ->getQuery()
             ->useQueryCache(true)
-            // TODO ->useResultCache(true, 3600, $this->getCachePrefix() . '.menu')
+            // TODO ->enableResultCache(3600, $this->getCachePrefix() . '.menu')
             ->setParameters([
                 'visible' => true,
                 'level'   => 0,

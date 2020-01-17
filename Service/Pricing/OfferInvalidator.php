@@ -48,7 +48,7 @@ class OfferInvalidator
     public function clear(): void
     {
         $this->productIds = [];
-        $this->brandIds = [];
+        $this->brandIds   = [];
     }
 
     /**
@@ -66,7 +66,7 @@ class OfferInvalidator
                 ->andWhere($qb->expr()->in('p.id', ':product_ids'))
                 ->getQuery()
                 ->useQueryCache(false)
-                ->useResultCache(false)
+                ->disableResultCache()
                 ->setParameters([
                     'flag'        => 1,
                     'product_ids' => $this->productIds,
@@ -83,7 +83,7 @@ class OfferInvalidator
                 ->andWhere($qb->expr()->in('IDENTITY(p.brand)', ':brand_ids'))
                 ->getQuery()
                 ->useQueryCache(false)
-                ->useResultCache(false)
+                ->disableResultCache()
                 ->setParameters([
                     'flag'      => 1,
                     'brand_ids' => $this->brandIds,

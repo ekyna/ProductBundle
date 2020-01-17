@@ -73,9 +73,9 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
         $query = $this->getFindByProductAndContextQuery();
 
         if ($useCache && $this->isCachedCountry($country)) {
-            $query->useResultCache(true, $this->cacheTtl, CacheUtil::buildOfferKey($product, $group, $country));
+            $query->enableResultCache($this->cacheTtl, CacheUtil::buildOfferKey($product, $group, $country));
         } else {
-            $query->useResultCache(false);
+            $query->disableResultCache();
         }
 
         $offers = $query
@@ -120,9 +120,9 @@ class OfferRepository extends ResourceRepository implements OfferRepositoryInter
 
         if ($useCache && (1 === $quantity) && $this->isCachedCountry($country)) {
             $key = CacheUtil::buildOfferKey($product, $group, $country, $quantity, false);
-            $query->useResultCache(true, $this->cacheTtl, $key);
+            $query->enableResultCache($this->cacheTtl, $key);
         } else {
-            $query->useResultCache(false);
+            $query->disableResultCache();
         }
 
         return $query

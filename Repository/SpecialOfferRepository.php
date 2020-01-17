@@ -2,7 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\ResourceRepository;
 
@@ -32,7 +32,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
                 'now'     => new \DateTime(),
                 'enabled' => true,
             ])
-            ->setParameter('now', new \DateTime(), Type::DATE)
+            ->setParameter('now', new \DateTime(), Types::DATE_MUTABLE)
             ->getScalarResult();
     }
 
@@ -43,7 +43,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
      */
     public function findStartingTodayOrEndingYesterday()
     {
-        $today = new \DateTime();
+        $today     = new \DateTime();
         $yesterday = new \DateTime('-1 day');
 
         $qb = $this->createQueryBuilder('s');
@@ -56,8 +56,8 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
             ))
             ->getQuery()
             ->setParameter('enabled', true)
-            ->setParameter('today', $today, Type::DATE)
-            ->setParameter('yesterday', $yesterday, Type::DATE)
+            ->setParameter('today', $today, Types::DATE_MUTABLE)
+            ->setParameter('yesterday', $yesterday, Types::DATE_MUTABLE)
             ->getResult();
     }
 

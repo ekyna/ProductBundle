@@ -59,7 +59,7 @@ class PriceInvalidator
                 ->andWhere($qb->expr()->in('p.id', ':product_ids'))
                 ->getQuery()
                 ->useQueryCache(false)
-                ->useResultCache(false)
+                ->disableResultCache()
                 ->setParameters([
                     'flag'        => 1,
                     'product_ids' => $this->productIds,
