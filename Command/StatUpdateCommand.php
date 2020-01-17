@@ -15,10 +15,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StatUpdateCommand extends Command
 {
+    protected static $defaultName = 'ekyna:product:stat:update';
+
     /**
      * @var StatUpdater
      */
     private $updater;
+
 
     /**
      * Constructor.
@@ -38,7 +41,6 @@ class StatUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:stat:update')
             ->setDescription('Updates the products stats')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Whether to force update')
             ->addOption('purge', null, InputOption::VALUE_NONE, 'Whether to purge stats first')

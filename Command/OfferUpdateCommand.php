@@ -9,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferUpdater;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceUpdater;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,8 +21,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class OfferUpdateCommand extends ContainerAwareCommand
+class OfferUpdateCommand extends Command
 {
+    protected static $defaultName = 'ekyna:product:offer:update';
+
     /**
      * @var ProductRepository
      */
@@ -50,12 +52,33 @@ class OfferUpdateCommand extends ContainerAwareCommand
 
 
     /**
+     * Constructor.
+     *
+     * @param ProductRepository      $repository
+     * @param OfferUpdater           $offerUpdater
+     * @param PriceUpdater           $priceUpdater
+     * @param EntityManagerInterface $manager
+     */
+    public function __construct(
+        ProductRepository $repository,
+        OfferUpdater $offerUpdater,
+        PriceUpdater $priceUpdater,
+        EntityManagerInterface $manager
+    ) {
+        parent::__construct();
+
+        $this->repository   = $repository;
+        $this->offerUpdater = $offerUpdater;
+        $this->priceUpdater = $priceUpdater;
+        $this->manager      = $manager;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:offer:update')
             ->setDescription('Updates the product(s) offers')
             ->addArgument('id', InputArgument::OPTIONAL, 'The product identifier to update the offers of.')
             ->addOption('max_execution_time', 't', InputOption::VALUE_OPTIONAL, 'Max execution time in seconds', 59);
@@ -64,23 +87,10 @@ class OfferUpdateCommand extends ContainerAwareCommand
     /**
      * @inheritDoc
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $container = $this->getContainer();
-
-        $this->repository = $container->get('ekyna_product.product.repository');
-        $this->offerUpdater = $container->get('ekyna_product.offer.updater');
-        $this->priceUpdater = $container->get('ekyna_product.price.updater');
-        $this->manager = $container->get('doctrine.orm.default_entity_manager');
-
-        // TODO Disable some loggers
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
+
         $this->timeout = time() + $input->getOption('max_execution_time');
 
         if (0 < $id = intval($input->getArgument('id'))) {
@@ -91,7 +101,7 @@ class OfferUpdateCommand extends ContainerAwareCommand
             }
 
             $confirm = new ConfirmationQuestion("Do you want to continue ?");
-            $helper = $this->getHelper('question');
+            $helper  = $this->getHelper('question');
             if (!$helper->ask($input, $output, $confirm)) {
                 $output->writeln('Abort by user.');
 
@@ -104,7 +114,7 @@ class OfferUpdateCommand extends ContainerAwareCommand
         }
 
         $confirm = new ConfirmationQuestion("Do you want to continue ?");
-        $helper = $this->getHelper('question');
+        $helper  = $this->getHelper('question');
         if (!$helper->ask($input, $output, $confirm)) {
             $output->writeln('Abort by user.');
 

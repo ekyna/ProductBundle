@@ -2,6 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,13 +15,32 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StockUpdateCommand extends AbstractStockCommand
 {
+    protected static $defaultName = 'ekyna:product:stock:update';
+
+    /**
+     * @var ResourceOperatorInterface
+     */
+    private $operator;
+
+
+    /**
+     * Constructor.
+     *
+     * @param ProductRepositoryInterface $repository
+     */
+    public function __construct(ProductRepositoryInterface $repository, ResourceOperatorInterface $operator)
+    {
+        parent::__construct($repository);
+
+        $this->operator = $operator;
+    }
+
     /**
      * @inheritDoc
      */
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:stock:update')
             ->setDescription("Updates the product stock.")
             ->addArgument('id', InputArgument::REQUIRED, "The product's id to update.");
     }
@@ -33,7 +54,7 @@ class StockUpdateCommand extends AbstractStockCommand
 
         $product->setInStock(0);
 
-        $this->getContainer()->get('ekyna_product.product.operator')->update($product);
+        $this->operator->update($product);
 
         $this->stockTable($output, [$product]);
     }

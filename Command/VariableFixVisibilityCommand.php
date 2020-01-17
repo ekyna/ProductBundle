@@ -8,13 +8,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class VariantFixPositionCommand
+ * Class VariableFixVisibilityCommand
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariantFixPositionCommand extends AbstractVariableCommand
+class VariableFixVisibilityCommand extends AbstractVariableCommand
 {
-    protected static $defaultName = 'ekyna:product:variant:fix_position';
+    protected static $defaultName = 'ekyna:product:variable:fix_visibility';
 
     /**
      * @inheritDoc
@@ -23,7 +23,7 @@ class VariantFixPositionCommand extends AbstractVariableCommand
     {
         parent::configure();
 
-        $this->setDescription('Fixes the variants positions');
+        $this->setDescription('Fixes the variables visibility');
     }
 
     /**
@@ -33,9 +33,9 @@ class VariantFixPositionCommand extends AbstractVariableCommand
     {
         $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        $updater = new VariableUpdater($this->calculator);
-
         $variables = $this->getVariables($input);
+
+        $updater = new VariableUpdater($this->calculator);
 
         $count = 0;
         /** @var ProductInterface $variable */
@@ -45,7 +45,7 @@ class VariantFixPositionCommand extends AbstractVariableCommand
                 $name,
                 str_pad('.', 80 - mb_strlen($name), '.', STR_PAD_LEFT)
             ));
-            if (!$updater->indexVariantsPositions($variable)) {
+            if (!$updater->updateVisibility($variable)) {
                 $output->writeln('<comment>passed</comment>');
                 continue;
             }

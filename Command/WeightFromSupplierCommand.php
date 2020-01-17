@@ -2,12 +2,13 @@
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Updater\VariableUpdater;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,15 +18,51 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class WeightFromSupplierCommand extends ContainerAwareCommand
+class WeightFromSupplierCommand extends Command
 {
+    protected static $defaultName = 'ekyna:product:weight_from_supplier';
+
+    /**
+     * @var EntityRepository
+     */
+    private $productRepository;
+
+    /**
+     * @var EntityRepository
+     */
+    private $supplierProductRepository;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $manager;
+
+
+    /**
+     * Constructor.
+     *
+     * @param EntityRepository       $productRepository
+     * @param EntityRepository       $supplierProductRepository
+     * @param EntityManagerInterface $manager
+     */
+    public function __construct(
+        EntityRepository $productRepository,
+        EntityRepository $supplierProductRepository,
+        EntityManagerInterface $manager
+    ) {
+        parent::__construct();
+
+        $this->productRepository         = $productRepository;
+        $this->supplierProductRepository = $supplierProductRepository;
+        $this->manager                   = $manager;
+    }
+
     /**
      * @inheritDoc
      */
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:weight_from_supplier')
             ->setDescription('Updates the products weights from the supplier references')
             ->addArgument('productId', InputArgument::OPTIONAL, 'The product identifier to update the weight.');
     }
@@ -35,11 +72,9 @@ class WeightFromSupplierCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $qb = $this
-            ->getContainer()
-            ->get('ekyna_product.product.repository')
-            ->createQueryBuilder('p');
+        $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
+        $qb = $this->productRepository->createQueryBuilder('p');
         $qb
             ->andWhere($qb->expr()->in('p.type', ':types'))
             ->andWhere($qb->expr()->orX(
@@ -68,8 +103,7 @@ class WeightFromSupplierCommand extends ContainerAwareCommand
         }
 
         $referenceQuery = $this
-            ->getContainer()
-            ->get('ekyna_commerce.supplier_product.repository')
+            ->supplierProductRepository
             ->createQueryBuilder('r')
             ->select('r.weight')
             ->andWhere($qb->expr()->eq('r.subjectIdentity.provider', ':provider'))
@@ -83,9 +117,7 @@ class WeightFromSupplierCommand extends ContainerAwareCommand
                 'weight'   => 0,
             ]);
 
-        $manager = $this->getContainer()->get('ekyna_product.product.manager');
-
-        $count = 0;
+        $count  = 0;
         $nCount = 0;
 
         /** @var ProductInterface $product */
@@ -107,18 +139,18 @@ class WeightFromSupplierCommand extends ContainerAwareCommand
                 continue;
             }
 
-            $manager->persist($product->setPackageWeight($weight));
+            $this->manager->persist($product->setPackageWeight($weight));
 
             $output->writeln('<info>' . round($weight, 3) . '</info>');
 
             $count++;
             if ($count % 20 == 0) {
-                $manager->flush();
+                $this->manager->flush();
             }
         }
 
         if ($count % 20 != 0) {
-            $manager->flush();
+            $this->manager->flush();
         }
 
         $output->writeln("");

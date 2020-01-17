@@ -2,7 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,8 +13,26 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-abstract class AbstractStockCommand extends ContainerAwareCommand
+abstract class AbstractStockCommand extends Command
 {
+    /**
+     * @var ProductRepositoryInterface
+     */
+    private $repository;
+
+
+    /**
+     * Constructor.
+     *
+     * @param ProductRepositoryInterface $repository
+     */
+    public function __construct(ProductRepositoryInterface $repository)
+    {
+        parent::__construct();
+
+        $this->repository = $repository;
+    }
+
     /**
      * Finds the product for the given id.
      *
@@ -29,7 +48,7 @@ abstract class AbstractStockCommand extends ContainerAwareCommand
         }
 
         /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
-        $product = $this->getContainer()->get('ekyna_product.product.repository')->find($productId);
+        $product = $this->repository->find($productId);
         if (null === $product) {
             throw new InvalidArgumentException("Product with id $productId not found.");
         }

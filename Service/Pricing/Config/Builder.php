@@ -276,71 +276,75 @@ class Builder
             }
         }
 
-        if (!empty($optionGroups = $tree->getOptionGroups())) {
-            $visible = true;
+        if (empty($optionGroups = $tree->getOptionGroups())) {
+            return $visible;
+        }
 
-            foreach ($tree->getOptionGroups() as $group) {
-                $bestOChild = $bestOPrice = null;
-                $bestSChild = $bestSPrice = null;
-                $bestDiscounts = [];
+        $visible = true;
+        $flat->setStartingFrom(true);
 
-                // Find best option
-                foreach ($group->getOptions() as $option) {
-                    $oPrice = $option->getNetPrice() * $tree->getTotalQuantity();
+        foreach ($tree->getOptionGroups() as $group) {
+            $bestOChild = $bestOPrice = null;
+            $bestSChild = $bestSPrice = null;
+            $bestDiscounts = [];
 
-                    // Best original price
-                    if (is_null($bestOChild) || $bestOPrice > $oPrice) {
-                        $bestOChild = $option;
-                        $bestOPrice = $oPrice;
-                    }
+            // Find best option
+            foreach ($group->getOptions() as $option) {
+                $oPrice = $option->getNetPrice() * $tree->getTotalQuantity();
 
-                    // If option has no offers for this group/country couple, continue to next option
-                    if (null === $offer = $option->getOffer($flat->getKey())) {
-                        continue;
-                    }
+                // Best original price
+                if (is_null($bestOChild) || $bestOPrice > $oPrice) {
+                    $bestOChild = $option;
+                    $bestOPrice = $oPrice;
+                }
 
-                    // TODO compare with tree root offer
+                // If option has no offers for this group/country couple, continue to next option
+                if (null === $offer = $option->getOffer($flat->getKey())) {
+                    continue;
+                }
 
-                    // If option has the best sell price
-                    $sPrice = round($oPrice * (1 - $offer['percent'] / 100), 5);
-                    if (is_null($bestSChild) || $bestSPrice > $sPrice) {
-                        $bestSChild = $option;
-                        $bestSPrice = $sPrice;
+                // TODO compare with tree root offer
 
-                        $bestDiscounts = [];
+                // If option has the best sell price
+                $sPrice = round($oPrice * (1 - $offer['percent'] / 100), 5);
+                if (is_null($bestSChild) || $bestSPrice > $sPrice) {
+                    $bestSChild = $option;
+                    $bestSPrice = $sPrice;
 
-                        // Store discount amount for each type
-                        $base = $oPrice;
-                        foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
-                            if (!isset($offer['details'][$type])) {
-                                continue;
-                            }
+                    $bestDiscounts = [];
 
-                            $discount = round($oPrice * $offer['details'][$type] / 100, 5);
-                            $bestDiscounts[$type] = $discount;
-                            $base -= $discount;
+                    // Store discount amount for each type
+                    $base = $oPrice;
+                    foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+                        if (!isset($offer['details'][$type])) {
+                            continue;
                         }
-                    }
-                }
 
-                if (is_null($bestOPrice)) {
-                    $bestOPrice = 0;
-                }
-                if (is_null($bestSPrice)) {
-                    $bestSPrice = $bestOPrice;
-                }
-
-                $flat->addOriginalPrice($bestOPrice);
-                $flat->addSellPrice($bestSPrice);
-
-                // Add best option's discount amount for each types
-                foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
-                    if (isset($bestDiscounts[$type])) {
-                        $flat->addDiscount($type, $bestDiscounts[$type]);
+                        $discount = round($oPrice * $offer['details'][$type] / 100, 5);
+                        $bestDiscounts[$type] = $discount;
+                        $base -= $discount;
                     }
                 }
             }
+
+            if (is_null($bestOPrice)) {
+                $bestOPrice = 0;
+            }
+            if (is_null($bestSPrice)) {
+                $bestSPrice = $bestOPrice;
+            }
+
+            $flat->addOriginalPrice($bestOPrice);
+            $flat->addSellPrice($bestSPrice);
+
+            // Add best option's discount amount for each types
+            foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
+                if (isset($bestDiscounts[$type])) {
+                    $flat->addDiscount($type, $bestDiscounts[$type]);
+                }
+            }
         }
+
 
         return $visible;
     }

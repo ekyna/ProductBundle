@@ -9,8 +9,11 @@ use Ekyna\Bundle\ProductBundle\Service\Stock\Resupply;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierDeliveryInterface;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierDeliveryItemInterface;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderInterface;
+use Ekyna\Component\Commerce\Supplier\Repository\SupplierDeliveryItemRepositoryInterface;
+use Ekyna\Component\Commerce\Supplier\Repository\SupplierDeliveryRepositoryInterface;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Ekyna\Component\Resource\Operator\ResourceOperatorInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,8 +25,10 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ResupplyCommand extends ContainerAwareCommand
+class ResupplyCommand extends Command
 {
+    protected static $defaultName = 'ekyna:product:resupply';
+
     /**
      * @var ProductRepositoryInterface
      */
@@ -33,6 +38,26 @@ class ResupplyCommand extends ContainerAwareCommand
      * @var SupplierProductRepositoryInterface
      */
     private $referenceRepository;
+
+    /**
+     * @var ResourceOperatorInterface
+     */
+    private $orderOperator;
+
+    /**
+     * @var SupplierDeliveryRepositoryInterface
+     */
+    private $deliveryRepository;
+
+    /**
+     * @var SupplierDeliveryItemRepositoryInterface
+     */
+    private $deliveryItemRepository;
+
+    /**
+     * @var ResourceOperatorInterface
+     */
+    private $deliveryOperator;
 
     /**
      * @var Resupply
@@ -51,12 +76,42 @@ class ResupplyCommand extends ContainerAwareCommand
 
 
     /**
+     * Constructor.
+     *
+     * @param ProductRepositoryInterface              $productRepository
+     * @param SupplierProductRepositoryInterface      $referenceRepository
+     * @param ResourceOperatorInterface               $orderOperator
+     * @param SupplierDeliveryRepositoryInterface     $deliveryRepository
+     * @param SupplierDeliveryItemRepositoryInterface $deliveryItemRepository
+     * @param ResourceOperatorInterface               $deliveryOperator
+     * @param Resupply                                $resupply
+     */
+    public function __construct(
+        ProductRepositoryInterface $productRepository,
+        SupplierProductRepositoryInterface $referenceRepository,
+        ResourceOperatorInterface $orderOperator,
+        SupplierDeliveryRepositoryInterface $deliveryRepository,
+        SupplierDeliveryItemRepositoryInterface $deliveryItemRepository,
+        ResourceOperatorInterface $deliveryOperator,
+        Resupply $resupply
+    ) {
+        parent::__construct();
+
+        $this->productRepository      = $productRepository;
+        $this->referenceRepository    = $referenceRepository;
+        $this->orderOperator          = $orderOperator;
+        $this->deliveryRepository     = $deliveryRepository;
+        $this->deliveryItemRepository = $deliveryItemRepository;
+        $this->deliveryOperator       = $deliveryOperator;
+        $this->resupply               = $resupply;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:resupply')
             ->setDescription('Resupply a product')
             ->addArgument('id', InputArgument::REQUIRED, 'The product id')
             ->addArgument('quantity', InputArgument::REQUIRED, 'The quantity');
@@ -65,21 +120,9 @@ class ResupplyCommand extends ContainerAwareCommand
     /**
      * @inheritDoc
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $container = $this->getContainer();
-
-        $this->productRepository = $container->get('ekyna_product.product.repository');
-        $this->referenceRepository = $container->get('ekyna_commerce.supplier_product.repository');
-        $this->resupply = $container->get('ekyna_product.resupply');
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $id = intval($input->getArgument('id'));
+        $id       = intval($input->getArgument('id'));
         $quantity = intval($input->getArgument('quantity'));
 
         if (0 >= $id || 1 > $quantity) {
@@ -91,7 +134,7 @@ class ResupplyCommand extends ContainerAwareCommand
         $output->writeln('<comment>This command should not be used in a production environment.</comment>');
         $output->writeln('');
 
-        $helper = $this->getHelper('question');
+        $helper   = $this->getHelper('question');
         $question = new ConfirmationQuestion(
             "Resupply '{$product->getFullTitle()}' for '{$quantity}' quantity ?", false
         );
@@ -100,7 +143,7 @@ class ResupplyCommand extends ContainerAwareCommand
         }
 
         $this->supplierOrderIds = [];
-        $this->supplierOrders = [];
+        $this->supplierOrders   = [];
 
         $output->writeln('');
         $output->writeln('### Creating supplier orders');
@@ -134,8 +177,6 @@ class ResupplyCommand extends ContainerAwareCommand
      */
     private function submitOrders(OutputInterface $output)
     {
-        $operator = $this->getContainer()->get('ekyna_commerce.supplier_order.operator');
-
         foreach ($this->supplierOrders as $order) {
             $name = $order->getNumber();
 
@@ -146,7 +187,7 @@ class ResupplyCommand extends ContainerAwareCommand
 
             $order->setOrderedAt(new \DateTime());
 
-            $event = $operator->update($order);
+            $event = $this->orderOperator->update($order);
 
             if ($event->hasErrors()) {
                 $output->writeln('<error>failed</error>');
@@ -167,10 +208,6 @@ class ResupplyCommand extends ContainerAwareCommand
      */
     private function createDeliveries(OutputInterface $output)
     {
-        $deliveryRepository = $this->getContainer()->get('ekyna_commerce.supplier_delivery.repository');
-        $itemRepository = $this->getContainer()->get('ekyna_commerce.supplier_delivery_item.repository');
-        $operator = $this->getContainer()->get('ekyna_commerce.supplier_delivery.operator');
-
         foreach ($this->supplierOrders as $order) {
             $name = $order->getNumber();
 
@@ -180,12 +217,12 @@ class ResupplyCommand extends ContainerAwareCommand
             ));
 
             /** @var SupplierDeliveryInterface $delivery */
-            $delivery = $deliveryRepository->createNew();
+            $delivery = $this->deliveryRepository->createNew();
             $delivery->setOrder($order);
 
             foreach ($order->getItems() as $orderItem) {
                 /** @var SupplierDeliveryItemInterface $deliveryItem */
-                $deliveryItem = $itemRepository->createNew();
+                $deliveryItem = $this->deliveryItemRepository->createNew();
 
                 $deliveryItem
                     ->setOrderItem($orderItem)
@@ -195,7 +232,7 @@ class ResupplyCommand extends ContainerAwareCommand
                 $delivery->addItem($deliveryItem);
             }
 
-            $event = $operator->create($delivery);
+            $event = $this->deliveryOperator->create($delivery);
 
             if ($event->hasErrors()) {
                 $output->writeln('<error>failed</error>');
@@ -309,7 +346,7 @@ class ResupplyCommand extends ContainerAwareCommand
 
         if (!in_array($supplierOrder->getId(), $this->supplierOrderIds, true)) {
             $this->supplierOrderIds[] = $supplierOrder->getId();
-            $this->supplierOrders[] = $supplierOrder;
+            $this->supplierOrders[]   = $supplierOrder;
         }
 
         $output->writeln('<info>success</info>');

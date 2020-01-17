@@ -940,20 +940,20 @@
         </service>
 
         <!-- Stat count repository -->
-        <service id="ekyna_product.stat_count.repository"
-                 class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
+        <service id="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository">
             <argument type="service" id="Symfony\Bridge\Doctrine\RegistryInterface"/>
             <call method="setLocaleProvider">
                 <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>
+            <tag name="doctrine.repository_service"/>
         </service>
         <!-- Stat cross repository -->
-        <service id="ekyna_product.stat_cross.repository"
-                 class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
+        <service id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository">
             <argument type="service" id="Symfony\Bridge\Doctrine\RegistryInterface"/>
             <call method="setLocaleProvider">
                 <argument type="service" id="ekyna_resource.locale_provider"/>
             </call>
+            <tag name="doctrine.repository_service"/>
         </service>
 
         <!-- Stat updater -->
@@ -968,8 +968,8 @@
         <!-- Stat chart builder factory -->
         <service id="ekyna_product.stat.chart_builder_factory"
                  class="Ekyna\Bundle\ProductBundle\Service\Stat\ChartBuilderFactory">
-            <argument type="service" id="ekyna_product.stat_count.repository"/>
-            <argument type="service" id="ekyna_product.stat_cross.repository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="translator"/>
@@ -989,8 +989,8 @@
             <argument type="service" id="ekyna_commerce.common.context_provider"/>
             <argument type="service" id="ekyna_commerce.cart.session_provider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_product.stat_count.repository"/>
-            <argument type="service" id="ekyna_product.stat_cross.repository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"/>
             <argument type="service" id="templating"/>
             <argument type="collection"/><!-- Replaced by DI extesion -->
         </service>
@@ -1050,25 +1050,72 @@
         </service>
 
         <!-- Commands -->
-        <service id="ekyna_product.command.stock_report"
-                 class="Ekyna\Bundle\ProductBundle\Command\StockReportCommand">
-            <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="templating"/>
-            <argument type="service" id="ekyna_setting.manager"/>
-            <argument type="service" id="translator"/>
-            <argument type="service" id="mailer"/>
+        <service id="Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand" public="false">
+            <argument type="service" id="ekyna_product.special_offer.repository"/>
+            <argument type="service" id="ekyna_product.offer.invalidator"/>
+            <argument type="service" id="ekyna_product.special_offer.manager"/>
             <tag name="console.command"/>
         </service>
-        <service id="ekyna_product.command.update_min_price"
-                 class="Ekyna\Bundle\ProductBundle\Command\UpdateMinPriceCommand">
+        <service id="Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.offer.updater"/>
+            <argument type="service" id="ekyna_product.price.updater"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\ResupplyCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_order.operator"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery_item.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_delivery.operator"/>
+            <argument type="service" id="ekyna_product.resupply"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand" public="false">
+            <argument type="service" id="ekyna_product.stat.updater"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\StockReportCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="Symfony\Component\Templating\EngineInterface"/>
+            <argument type="service" id="ekyna_setting.manager"/>
+            <argument type="service" id="Symfony\Component\Translation\TranslatorInterface"/>
+            <argument type="service" id="Swift_Mailer"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\StockShowCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\StockUpdateCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product.operator"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\UpdateMinPriceCommand" public="false">
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.product.manager"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <tag name="console.command"/>
         </service>
-        <service id="ekyna_product.command.stat_update"
-                 class="Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand">
-            <argument type="service" id="ekyna_product.stat.updater"/>
+        <service id="Ekyna\Bundle\ProductBundle\Command\VariableFixVisibilityCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
+            <argument type="service" id="ekyna_product.pricing.price_calculator"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\VariantFixPositionCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
+            <argument type="service" id="ekyna_product.pricing.price_calculator"/>
+            <tag name="console.command"/>
+        </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\WeightFromSupplierCommand" public="false">
+            <argument type="service" id="ekyna_product.product.repository"/>
+            <argument type="service" id="ekyna_commerce.supplier_product.repository"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
             <tag name="console.command"/>
         </service>
 

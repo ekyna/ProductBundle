@@ -17,6 +17,11 @@ class Result
     protected $key;
 
     /**
+     * @var bool
+     */
+    protected $startingFrom = false;
+
+    /**
      * @var float
      */
     protected $originalPrice;
@@ -46,6 +51,7 @@ class Result
     {
         $this->key = $key;
 
+        $this->startingFrom = false;
         $this->originalPrice = 0;
         $this->basePrice = 0;
         $this->sellPrice = 0;
@@ -64,6 +70,30 @@ class Result
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    /**
+     * Sets the starting from.
+     *
+     * @param bool $from
+     *
+     * @return Result
+     */
+    public function setStartingFrom(bool $from): self
+    {
+        $this->startingFrom = $from;
+
+        return $this;
+    }
+
+    /**
+     * Returns the starting from.
+     *
+     * @return bool
+     */
+    public function isStartingFrom(): bool
+    {
+        return $this->startingFrom;
     }
 
     /**
@@ -173,7 +203,7 @@ class Result
     public function toArray(): ?array
     {
         // Build price for this group/country couple
-        list($group, $country) = explode('-', $this->key);
+        [$group, $country] = explode('-', $this->key);
         if (0 === $group = intval($group)) {
             $group = null;
         }
@@ -201,7 +231,7 @@ class Result
         if (0 < $percent) {
             return [
                 'details'        => $details,
-                'starting_from'  => true,
+                'starting_from'  => $this->startingFrom,
                 'original_price' => $this->originalPrice,
                 'sell_price'     => $this->sellPrice,
                 'percent'        => $percent,

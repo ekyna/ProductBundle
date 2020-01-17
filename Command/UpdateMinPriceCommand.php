@@ -71,6 +71,8 @@ class UpdateMinPriceCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
+
         $id = intval($input->getOption('id'));
         $type = $input->getOption('type');
 

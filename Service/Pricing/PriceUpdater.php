@@ -141,7 +141,8 @@ class PriceUpdater
         $newPrices = [];
 
         // Gather best offers for each group/country couples
-        foreach ($product->getVariants() as $variant) {
+        $variants = $product->getVariants();
+        foreach ($variants as $variant) {
             $prices = $this->resolvePrices($variant);
 
             foreach ($prices as $key => $price) {
@@ -157,7 +158,9 @@ class PriceUpdater
         }
 
         foreach ($newPrices as &$price) {
-            $price['starting_from'] = true;
+            if (!$price['starting_from'] && 1 < $variants->count()) {
+                $price['starting_from'] = true;
+            }
         }
 
         return $this->update($product, $newPrices);
@@ -200,9 +203,7 @@ class PriceUpdater
      */
     protected function updateConfigurableProduct(Model\ProductInterface $product): bool
     {
-        $newOffers = [];
-
-        return $this->update($product, $newOffers);
+        return $this->update($product, []);
     }
 
     /**

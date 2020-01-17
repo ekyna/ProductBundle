@@ -2,7 +2,10 @@
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -11,16 +14,51 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Ekyna\Bundle\ProductBundle\Command
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class OfferInvalidateCommand extends ContainerAwareCommand
+class OfferInvalidateCommand extends Command
 {
+    protected static $defaultName = 'ekyna:product:offer:invalidate';
+
+    /**
+     * @var SpecialOfferRepositoryInterface
+     */
+    private $repository;
+
+    /**
+     * @var OfferInvalidator
+     */
+    private $invalidator;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $manager;
+
+
+    /**
+     * Constructor.
+     *
+     * @param SpecialOfferRepositoryInterface $repository
+     * @param OfferInvalidator                $invalidator
+     * @param EntityManagerInterface          $manager
+     */
+    public function __construct(
+        SpecialOfferRepositoryInterface $repository,
+        OfferInvalidator $invalidator,
+        EntityManagerInterface $manager
+    ) {
+        parent::__construct();
+
+        $this->repository  = $repository;
+        $this->invalidator = $invalidator;
+        $this->manager     = $manager;
+    }
+
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this
-            ->setName('ekyna:product:offer:invalidate')
-            ->setDescription('Invalidates the obsolete offers');
+        $this->setDescription('Invalidates the obsolete offers');
     }
 
     /**
@@ -28,22 +66,18 @@ class OfferInvalidateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        $offers = $container
-            ->get('ekyna_product.special_offer.repository')
-            ->findStartingTodayOrEndingYesterday();
+        $offers = $this->repository->findStartingTodayOrEndingYesterday();
 
         if (empty($offers)) {
             return;
         }
 
-        $invalidator = $container->get('ekyna_product.offer.invalidator');
-
         foreach ($offers as $offer) {
-            $invalidator->invalidateSpecialOffer($offer);
+            $this->invalidator->invalidateSpecialOffer($offer);
         }
 
-        $invalidator->flush($container->get('doctrine.orm.default_entity_manager'));
+        $this->invalidator->flush($this->manager);
     }
 }

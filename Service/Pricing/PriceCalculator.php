@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
@@ -86,9 +87,11 @@ class PriceCalculator
         if (null === $price) {
             $amount = $product->getMinPrice();
 
-            $from = Model\ProductTypes::isChildType($product->getType())
-                ? $product->hasRequiredOptionGroup()
-                : true;
+            if (in_array($product->getType(), [Types::TYPE_CONFIGURABLE, Types::TYPE_VARIABLE], true)) {
+                $from = true;
+            } else {
+                $from = $product->hasRequiredOptionGroup();
+            }
 
             $price = [
                 'starting_from'  => $from,
@@ -167,15 +170,15 @@ class PriceCalculator
      */
     public function calculateMinPrice(Model\ProductInterface $product, $exclude = []): float
     {
-        if (Model\ProductTypes::isConfigurableType($product)) {
+        if (Types::isConfigurableType($product)) {
             return $this->calculateConfigurableMinPrice($product, $exclude);
         }
 
-        if (Model\ProductTypes::isBundleType($product)) {
+        if (Types::isBundleType($product)) {
             return $this->calculateBundleMinPrice($product, $exclude);
         }
 
-        if (Model\ProductTypes::isVariableType($product)) {
+        if (Types::isVariableType($product)) {
             return $this->calculateVariableMinPrice($product, $exclude);
         }
 
@@ -263,7 +266,7 @@ class PriceCalculator
      */
     public function calculateProductMinPrice(Model\ProductInterface $product, $exclude = [], $price = null): float
     {
-        Model\ProductTypes::assertChildType($product);
+        Types::assertChildType($product);
 
         if (is_null($price)) {
             $price = $product->getNetPrice();
@@ -290,7 +293,7 @@ class PriceCalculator
         $exclude = [],
         float $price = null
     ): float {
-        Model\ProductTypes::assertVariable($variable);
+        Types::assertVariable($variable);
 
         if (!is_null($price)) {
             return $price + $this->calculateMinOptionsPrice($variable, $exclude);
@@ -335,7 +338,7 @@ class PriceCalculator
      */
     public function calculateBundleMinPrice(Model\ProductInterface $bundle, $exclude = [], $price = null): float
     {
-        Model\ProductTypes::assertBundle($bundle);
+        Types::assertBundle($bundle);
 
         if (is_null($price)) {
             $price = 0;
@@ -354,9 +357,9 @@ class PriceCalculator
                     ));
                 }
 
-                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                if ($childProduct->getType() === Types::TYPE_BUNDLE) {
                     $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceExclude, $choicePrice);
-                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                } elseif ($childProduct->getType() === Types::TYPE_VARIABLE) {
                     $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceExclude, $choicePrice);
                 } else {
                     $childPrice = $this->calculateProductMinPrice($childProduct, $choiceExclude, $choicePrice);
@@ -384,7 +387,7 @@ class PriceCalculator
      */
     public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = []): float
     {
-        Model\ProductTypes::assertConfigurable($configurable);
+        Types::assertConfigurable($configurable);
 
         $price = 0;
 
@@ -409,9 +412,9 @@ class PriceCalculator
                     ));
                 }
 
-                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
+                if ($childProduct->getType() === Types::TYPE_BUNDLE) {
                     $childPrice = $this->calculateBundleMinPrice($childProduct, $choiceExclude);
-                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                } elseif ($childProduct->getType() === Types::TYPE_VARIABLE) {
                     $childPrice = $this->calculateVariableMinPrice($childProduct, $choiceExclude);
                 } else {
                     $childPrice = $this->calculateProductMinPrice($childProduct, $choiceExclude);
@@ -454,7 +457,7 @@ class PriceCalculator
         // Net price (bundle : min price without options)
         $amount = $product->getNetPrice();
 
-        if (Model\ProductTypes::isVariantType($product)) {
+        if (Types::isVariantType($product)) {
             $amount += $product->getParent()->getNetPrice();
         }
 
@@ -628,7 +631,7 @@ class PriceCalculator
     {
         $offers = $this->offerRepository->findByProductAndContext($product, $context);
 
-        if (!Model\ProductTypes::isBundleType($product)) {
+        if (!Types::isBundleType($product)) {
             return $offers;
         }
 
@@ -695,7 +698,7 @@ class PriceCalculator
         array $offers,
         $qty = 1
     ): bool {
-        Model\ProductTypes::assertBundle($bundle);
+        Types::assertBundle($bundle);
 
         $visible = false;
 
@@ -704,7 +707,7 @@ class PriceCalculator
             $choice = $slot->getChoices()->first();
             $product = $choice->getProduct();
 
-            if (Model\ProductTypes::isBundleType($product)) {
+            if (Types::isBundleType($product)) {
                 $offers = $this->mergeOffers(
                     $offers,
                     $this->offerRepository->findByProductAndContext($product, $context)

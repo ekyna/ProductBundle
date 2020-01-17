@@ -111,11 +111,6 @@ class PriceRenderer
         ContextInterface $context = null,
         $discount = true
     ): Model\PriceDisplay {
-        // Do not display price for configurable products
-        /*if (Model\ProductTypes::isConfigurableType($product)) {
-            return new Model\PriceDisplay(0, '', '', 'NC'); // TODO translation
-        }*/
-
         if (null === $context) {
             $context = $this->contextProvider->getContext();
         }
@@ -128,7 +123,7 @@ class PriceRenderer
         $formatter = $this->formatterFactory->create($context->getLocale(), $currency);
 
         // From
-        $fromLabel = $this->options['price_with_from'] && $price['starting_from']
+        $fromLabel = ($this->options['price_with_from'] && $price['starting_from'])
             ? $this->translator->trans('ekyna_commerce.subject.price_from') . '&nbsp;'
             : '';
 

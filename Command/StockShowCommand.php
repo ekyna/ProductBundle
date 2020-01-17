@@ -13,13 +13,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class StockShowCommand extends AbstractStockCommand
 {
+    protected static $defaultName = 'ekyna:product:stock:show';
+
+
     /**
      * @inheritDoc
      */
     protected function configure()
     {
         $this
-            ->setName('ekyna:product:stock:show')
             ->setDescription("Shows the product stock.")
             ->addArgument('id', InputArgument::REQUIRED, "The product's id to update.");
     }

@@ -559,8 +559,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function hasRequiredOptionGroup(array $exclude = []): bool
     {
-        // TODO Use $this->resolveOptionGroups() ?
-
         // All types
         foreach ($this->optionGroups as $optionGroup) {
             if (in_array($optionGroup->getId(), $exclude)) {
@@ -580,6 +578,14 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 }
 
                 if ($optionGroup->isRequired()) {
+                    return true;
+                }
+            }
+        } elseif ($this->type === Model\ProductTypes::TYPE_BUNDLE) {
+            foreach ($this->bundleSlots as $slot) {
+                /** @var Model\BundleChoiceInterface $choice */
+                $choice = $slot->getChoices()->first();
+                if ($choice->getProduct()->hasRequiredOptionGroup($choice->getExcludedOptionGroups())) {
                     return true;
                 }
             }
