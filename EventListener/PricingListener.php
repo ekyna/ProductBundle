@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -31,17 +32,27 @@ class PricingListener implements EventSubscriberInterface
      */
     protected $offerInvalidator;
 
+    /**
+     * @var PriceInvalidator
+     */
+    protected $priceInvalidator;
+
 
     /**
      * Constructor.
      *
      * @param PersistenceHelperInterface $persistenceHelper
      * @param OfferInvalidator           $offerInvalidator
+     * @param PriceInvalidator           $priceInvalidator
      */
-    public function __construct(PersistenceHelperInterface $persistenceHelper, OfferInvalidator $offerInvalidator)
-    {
+    public function __construct(
+        PersistenceHelperInterface $persistenceHelper,
+        OfferInvalidator $offerInvalidator,
+        PriceInvalidator $priceInvalidator
+    ) {
         $this->persistenceHelper = $persistenceHelper;
-        $this->offerInvalidator = $offerInvalidator;
+        $this->offerInvalidator  = $offerInvalidator;
+        $this->priceInvalidator  = $priceInvalidator;
     }
 
     /**
@@ -75,13 +86,7 @@ class PricingListener implements EventSubscriberInterface
 
         $this->buildName($pricing);
 
-        // Brands association changes
-        foreach ($pricing->getInsertedIds(Pricing::REL_BRANDS) as $id) {
-            $this->offerInvalidator->invalidateByBrandId($id);
-        }
-        foreach ($pricing->getRemovedIds(Pricing::REL_BRANDS) as $id) {
-            $this->offerInvalidator->invalidateByBrandId($id);
-        }
+        $this->invalidate($pricing);
 
         return $pricing;
     }
@@ -99,9 +104,47 @@ class PricingListener implements EventSubscriberInterface
 
         $this->buildName($pricing);
 
+        $this->invalidate($pricing, true);
+
         $this->offerInvalidator->invalidatePricing($pricing);
 
+        // As offers are deleted by DBMS (On delete FK constraint),
+        // we need to invalidate product prices here.
+        $this->priceInvalidator->invalidatePricing($pricing);
+
         return $pricing;
+    }
+
+    /**
+     * Invalidates product offers related to this pricing.
+     *
+     * @param PricingInterface $pricing
+     * @param bool             $andPrices
+     */
+    protected function invalidate(PricingInterface $pricing, bool $andPrices = false)
+    {
+        $productCs = $this->persistenceHelper->getChangeSet($pricing, 'product');
+
+        // Product
+        if (!empty($productCs)) {
+            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+            foreach ([0, 1] as $key) {
+                if (($product = $productCs[$key]) && ($id = $product->getId())) {
+                    $this->offerInvalidator->invalidateByProductId($id);
+                    if ($andPrices) {
+                        $this->offerInvalidator->invalidateByProductId($id);
+                    }
+                }
+            }
+        }
+
+        // Brands association changes
+        foreach ($pricing->getInsertedIds(Pricing::REL_BRANDS) as $id) {
+            $this->offerInvalidator->invalidateByBrandId($id);
+        }
+        foreach ($pricing->getRemovedIds(Pricing::REL_BRANDS) as $id) {
+            $this->offerInvalidator->invalidateByBrandId($id);
+        }
     }
 
     /**

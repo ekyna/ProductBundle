@@ -317,6 +317,12 @@
             <tag name="resource.event_subscriber"/>
         </service>
 
+        <!-- Customer group event listener -->
+        <service id="Ekyna\Bundle\ProductBundle\EventListener\CustomerGroupListener">
+            <argument type="service" id="ekyna_product.price.invalidator"/>
+            <tag name="resource.event_subscriber"/>
+        </service>
+
         <!-- Sale item configurable/slots form types -->
         <service id="ekyna_product.sale_item.configurable_slots.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\SaleItem\ConfigurableSlotsType">
@@ -611,6 +617,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <argument type="service" id="translator"/>
             <tag name="resource.event_subscriber"/>
         </service>
@@ -620,6 +627,7 @@
                  class="Ekyna\Bundle\ProductBundle\EventListener\PricingListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
+            <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="resource.event_subscriber"/>
         </service>
 

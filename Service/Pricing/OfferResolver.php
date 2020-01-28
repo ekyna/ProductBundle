@@ -4,7 +4,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
 
@@ -43,9 +42,9 @@ class OfferResolver
         SpecialOfferRepositoryInterface $specialOfferRepository,
         PriceCalculator $priceCalculator
     ) {
-        $this->pricingRepository = $pricingRepository;
+        $this->pricingRepository      = $pricingRepository;
         $this->specialOfferRepository = $specialOfferRepository;
-        $this->priceCalculator = $priceCalculator;
+        $this->priceCalculator        = $priceCalculator;
     }
 
     /**
@@ -82,8 +81,9 @@ class OfferResolver
             foreach ($discounts as &$discount) {
                 if (rule_apply_to($stacking, $discount)) {
                     $percent = (1 - (1 - $stacking['percent'] / 100) * (1 - $discount['percent'] / 100)) * 100;
-                    $discount['percent'] = round($percent, 5);
-                    $discount['special_offer_id'] = $stacking['special_offer_id'];
+
+                    $discount['percent']                      = round($percent, 5);
+                    $discount['special_offer_id']             = $stacking['special_offer_id'];
                     $discount['details'][Offer::TYPE_SPECIAL] = $stacking['percent'];
                 }
             }

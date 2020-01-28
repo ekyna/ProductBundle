@@ -59,14 +59,14 @@ class OfferUpdater
     /**
      * Constructor.
      *
-     * @param EntityManager              $manager
-     * @param OfferResolver              $offerResolver
-     * @param OfferRepositoryInterface   $offerRepository
-     * @param PriceInvalidator           $priceInvalidator
-     * @param string                     $customerGroupClass
-     * @param string                     $countryClass
-     * @param string                     $pricingClass
-     * @param string                     $specialOfferClass
+     * @param EntityManager            $manager
+     * @param OfferResolver            $offerResolver
+     * @param OfferRepositoryInterface $offerRepository
+     * @param PriceInvalidator         $priceInvalidator
+     * @param string                   $customerGroupClass
+     * @param string                   $countryClass
+     * @param string                   $pricingClass
+     * @param string                   $specialOfferClass
      */
     public function __construct(
         EntityManager $manager,
@@ -78,14 +78,14 @@ class OfferUpdater
         string $pricingClass,
         string $specialOfferClass
     ) {
-        $this->manager = $manager;
-        $this->offerResolver = $offerResolver;
-        $this->offerRepository = $offerRepository;
-        $this->priceInvalidator = $priceInvalidator;
+        $this->manager            = $manager;
+        $this->offerResolver      = $offerResolver;
+        $this->offerRepository    = $offerRepository;
+        $this->priceInvalidator   = $priceInvalidator;
         $this->customerGroupClass = $customerGroupClass;
-        $this->countryClass = $countryClass;
-        $this->pricingClass = $pricingClass;
-        $this->specialOfferClass = $specialOfferClass;
+        $this->countryClass       = $countryClass;
+        $this->pricingClass       = $pricingClass;
+        $this->specialOfferClass  = $specialOfferClass;
     }
 
     /**
@@ -108,10 +108,7 @@ class OfferUpdater
 
         // Abort if no diff
         if (!$this->hasDiff($oldOffers, $newOffers)) {
-            $product
-                ->setPendingOffers(false)
-                //->setPendingPrices(false)
-            ;
+            $product->setPendingOffers(false);
 
             $this->manager->persist($product);
 
