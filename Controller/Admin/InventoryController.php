@@ -467,14 +467,13 @@ class InventoryController extends Controller
                 $product = $stockUnit->getSubject();
                 $value = $price = $stockUnit->getNetPrice();
 
-                $currency = $stockUnit->getCurrency();
-                $rate = $stockUnit->getExchangeRate();
+                $currency = $stockUnit->getCurrency() ?? $defaultCurrency;
 
-                if ($currency && $rate) {
+                if ($rate = $stockUnit->getExchangeRate()) {
                     $value = $value / $rate;
                 }
 
-                $value = Money::round($value * $inStock, $defaultCurrency);
+                $value = Money::round($value * $inStock, $currency);
 
                 $data = [
                     $product->getId(),

@@ -251,7 +251,7 @@ class StatUpdater
     private function updateCount(Group $group, \DateTime $from, \DateTime $to)
     {
         // Count
-        $quantity = $this->calculator->calculateCount($this->product, $group, $from, $to);
+        $quantity = $this->calculator->calculateCountByGroup($this->product, $group, $from, $to);
 
         // TODO Remove existing StatCount that do no longer match result
 
@@ -279,7 +279,7 @@ class StatUpdater
      */
     private function updateCross(Group $group, \DateTime $from, \DateTime $to)
     {
-        $data = $this->calculator->calculateCross($this->product, $group, $from, $to);
+        $data = $this->calculator->calculateCrossByGroup($this->product, $group, $from, $to);
 
         // TODO Remove existing StatCross that do no longer match result
 

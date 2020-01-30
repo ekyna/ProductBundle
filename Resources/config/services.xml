@@ -8,10 +8,6 @@
     <parameters>
         <parameter key="ekyna_product.attribute_slot.class">Ekyna\Bundle\ProductBundle\Entity\AttributeSlot</parameter>
 
-        <parameter key="ekyna_product.product.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository</parameter>
-        <parameter key="ekyna_product.brand.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository</parameter>
-        <parameter key="ekyna_product.category.search_repository.class">Ekyna\Bundle\ProductBundle\Service\Search\CategoryRepository</parameter>
-
         <!-- TODO Remove ? (can be overridden by compiler pass) -->
         <parameter key="ekyna_product.product.form_type.class">Ekyna\Bundle\ProductBundle\Form\Type\ProductType</parameter>
         <parameter key="ekyna_product.product.form_type.builder.class">Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder</parameter>
@@ -865,25 +861,33 @@
         </service>
 
         <!-- Search -->
-        <!-- TODO Handle wide_search tag in \Ekyna\Bundle\ResourceBundle\Elastica\RepositoryManager
-        <service id="ekyna_product.category.search_repository"
-                 class="%ekyna_product.category.search_repository.class%">
-            <factory service="fos_elastica.manager" method="getRepository"/>
-            <argument>%ekyna_product.category.class%</argument>
-            <tag name="ekyna_cms.wide_search.provider"/>
+        <service id="ekyna_product.category.search"
+                 class="Ekyna\Bundle\ProductBundle\Service\Search\CategoryRepository">
+            <argument type="service" id="fos_elastica.index.ekyna_product_category.doc"/>
+            <argument type="service" id="fos_elastica.elastica_to_model_transformer.ekyna_product_category.doc"/>
+            <call method="setLocaleProvider">
+                <argument type="service" id="Ekyna\Component\Resource\Locale\LocaleProviderInterface"/>
+            </call>
+            <tag name="ekyna_resource.search" resource="ekyna_product.category"/>
         </service>
-        <service id="ekyna_product.brand.search_repository"
-                 class="%ekyna_product.brand.search_repository.class%">
-            <factory service="fos_elastica.manager" method="getRepository"/>
-            <argument>%ekyna_product.brand.class%</argument>
-            <tag name="ekyna_cms.wide_search.provider"/>
+        <service id="ekyna_product.brand.search"
+                 class="Ekyna\Bundle\ProductBundle\Service\Search\BrandRepository">
+            <argument type="service" id="fos_elastica.index.ekyna_product_brand.doc"/>
+            <argument type="service" id="fos_elastica.elastica_to_model_transformer.ekyna_product_brand.doc"/>
+            <call method="setLocaleProvider">
+                <argument type="service" id="Ekyna\Component\Resource\Locale\LocaleProviderInterface"/>
+            </call>
+            <tag name="ekyna_resource.search" resource="ekyna_product.brand"/>
         </service>
-        <service id="ekyna_product.product.search_repository"
-                 class="%ekyna_product.product.search_repository.class%">
-            <factory service="fos_elastica.manager" method="getRepository"/>
-            <argument>%ekyna_product.product.class%</argument>
-            <tag name="ekyna_cms.wide_search.provider"/>
-        </service>-->
+        <service id="ekyna_product.product.search"
+                 class="Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository">
+            <argument type="service" id="fos_elastica.index.ekyna_product_product.doc"/>
+            <argument type="service" id="fos_elastica.elastica_to_model_transformer.ekyna_product_product.doc"/>
+            <call method="setLocaleProvider">
+                <argument type="service" id="Ekyna\Component\Resource\Locale\LocaleProviderInterface"/>
+            </call>
+            <tag name="ekyna_resource.search" resource="ekyna_product.product"/>
+        </service>
 
         <!-- Exporter -->
         <service id="Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter">

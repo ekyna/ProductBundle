@@ -17,8 +17,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator;
-use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
+use Ekyna\Component\Resource\Search\Request as SearchRequest;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -501,7 +501,9 @@ class ProductController extends AbstractSubjectController
 
                 // TODO Regarding to config format
                 $response->headers->set('Content-Type', 'text/csv');
-                $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'products.csv');
+                $disposition = $response->headers->makeDisposition(
+                    ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'products.csv'
+                );
                 $response->headers->set('Content-Disposition', $disposition);
 
                 return $response;
@@ -676,17 +678,13 @@ class ProductController extends AbstractSubjectController
     /**
      * @inheritDoc
      */
-    protected function createSearchQuery(Request $request): \Elastica\Query
+    protected function createSearchRequest(Request $request): SearchRequest
     {
-        $repository = $this->get('fos_elastica.manager')->getRepository($this->config->getResourceClass());
-        if (!$repository instanceOf ProductRepository) {
-            throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
-        }
+        $searchRequest = parent::createSearchRequest($request);
 
-        $query = trim($request->query->get('query'));
-        $types = $request->query->get('types', []);
+        $searchRequest->setParameter('types', (array)$request->query->get('types'));
 
-        return $repository->createSearchQuery($query, $types, true);
+        return $searchRequest;
     }
 
     /**

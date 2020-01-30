@@ -30,7 +30,6 @@ fos_elastica:
                         provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
-                        repository: "%ekyna_product.product.search_repository.class%"
         ekyna_product_brand:
             index_name: "%elasticsearch.name%_product_brand"
             types:
@@ -44,7 +43,6 @@ fos_elastica:
                         provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
-                        repository: "%ekyna_product.brand.search_repository.class%"
         ekyna_product_category:
             index_name: "%elasticsearch.name%_product_category"
             types:
@@ -58,4 +56,3 @@ fos_elastica:
                         provider: { batch_size: 25 }
                         listener: ~
                         finder: ~
-                        repository: "%ekyna_product.category.search_repository.class%"

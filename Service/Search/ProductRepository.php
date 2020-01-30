@@ -2,8 +2,12 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Search;
 
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Resource\Exception\UnexpectedTypeException;
 use Ekyna\Component\Resource\Locale;
 use Ekyna\Component\Resource\Search\Elastica\ResourceRepository;
+use Ekyna\Component\Resource\Search\Request;
+use Ekyna\Component\Resource\Search\Result;
 use Elastica\Query;
 
 /**
@@ -15,44 +19,65 @@ class ProductRepository extends ResourceRepository implements Locale\LocaleProvi
 {
     use Locale\LocaleProviderAwareTrait;
 
+
     /**
-     * Creates the search query.
-     *
-     * @param string $expression
-     * @param array  $types
-     * @param bool   $private
-     *
-     * @return Query
+     * @inheritDoc
      */
-    public function createSearchQuery(string $expression, array $types, bool $private): Query
+    protected function createQuery(Request $request): Query\AbstractQuery
     {
-        $match = new Query\MultiMatch();
-        $match
-            ->setQuery($expression)
-            ->setFields($this->getDefaultMatchFields())
-            ->setType(Query\MultiMatch::TYPE_CROSS_FIELDS);
+        $query = parent::createQuery($request);
 
-        $bool = new Query\BoolQuery();
-        $bool->addMust($match);
-
-        if (!empty($types)) {
-            $bool->addMust((new Query\Terms())->setTerms('type', $types));
+        if (empty($types = $request->getParameter('types'))) {
+            $types = [
+                ProductTypes::TYPE_SIMPLE,
+                ProductTypes::TYPE_VARIABLE,
+                ProductTypes::TYPE_BUNDLE,
+                ProductTypes::TYPE_CONFIGURABLE,
+            ];
         }
 
-        if (!$private) {
+        $bool = new Query\BoolQuery();
+        $bool->addMust($query);
+        $bool->addMust((new Query\Terms())->setTerms('type', $types));
+
+        if (!$request->isPrivate()) {
             $bool
                 ->addMust((new Query\Term())->setTerm('visible', true))
                 ->addMust((new Query\Term())->setTerm('quote_only', false))
                 ->addMust((new Query\Term())->setTerm('end_of_life', false));
         }
 
-        return Query::create($bool);
+        return $bool;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function createResult($source, Request $request): ?Result
+    {
+        if (!$request->isPrivate()) {
+            return null;
+        }
+
+        if (!is_array($source)) {
+            throw new UnexpectedTypeException($source, 'array');
+        }
+
+        $result = new Result();
+
+        $reference = is_array($source['reference']) ? current($source['reference']) : $source['reference'];
+
+        return $result
+            ->setTitle(sprintf('[%s] %s', $reference, $source['text']))
+            ->setIcon('fa fa-cube')
+            ->setRoute('ekyna_product_product_admin_show')
+            ->setParameters(['productId' => $source['id']]);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getDefaultMatchFields(): array
+    protected function getDefaultFields(): array
     {
         $locale = $this->localeProvider->getCurrentLocale();
 
