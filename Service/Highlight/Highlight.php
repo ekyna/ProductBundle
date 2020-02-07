@@ -100,162 +100,123 @@ class Highlight
     /**
      * Returns the best sellers products.
      *
-     * @param CustomerGroupInterface|false|null $group
-     * @param int                               $limit
-     * @param string                            $from   The start date
-     * @param bool                              $idOnly Whether to return product ids only
+     * @param array $parameters
      *
      * @return ProductInterface[]|int[]
      */
-    public function getBestSellers($group = null, int $limit = null, string $from = null, bool $idOnly = false): array
+    public function getBestSellers(array $parameters = []): array
     {
         if (!$this->config['enabled']) {
             return [];
         }
 
-        if (0 >= $limit) {
-            $limit = $this->config['best_seller']['limit'];
+        $parameters = array_replace($this->countRepository->getFindProductsDefaultParameters(), [
+            'from'  => $this->config['best_seller']['from'],
+            'limit' => $this->config['best_seller']['limit'],
+        ], $parameters);
+
+        if (empty($parameters['exclude'])) {
+            $parameters['exclude'] = $this->getCartProductIds();
         }
 
-        $cartProductIds = $this->getCartProductIds();
-
-        $bestSellers = $this->productRepository->findBestSellers($limit, $cartProductIds, $idOnly);
-
-        if ($limit > $count = count($bestSellers)) {
-            if (false === $group) {
-                $group = null;
-            } elseif (!$group instanceof CustomerGroupInterface) {
-                $group = $this
-                    ->contextProvider
-                    ->getContext()
-                    ->getCustomerGroup();
-            }
-
-            if (empty($from)) {
-                $from = $this->config['best_seller']['from'];
-            }
-
-            $products = $this
-                ->countRepository
-                ->findProducts($group, new \DateTime($from), $limit - $count, $cartProductIds, $idOnly);
-
-            foreach ($products as $p) {
-                $bestSellers[] = $p;
-            }
+        if (false === $parameters['group']) {
+            $parameters['group'] = null;
+        } elseif (!$parameters['group'] instanceof CustomerGroupInterface) {
+            $parameters['group'] = $this
+                ->contextProvider
+                ->getContext()
+                ->getCustomerGroup();
         }
 
-        return $bestSellers;
+        return $this->countRepository->findProducts($parameters);
     }
 
     /**
      * Renders the best sellers products.
      *
+     * @param array $parameters
      * @param array $options
      *
      * @return string
      */
-    public function renderBestSellers(array $options = [])
+    public function renderBestSellers(array $parameters = [], array $options = [])
     {
-        $options = array_replace(
-            $this->config['best_seller'],
-            [
-                'thumb_template' => $this->config['thumb_template'],
-                'group'          => null,
-                'nb_per_row'     => 4,
-            ],
-            $options
-        );
-
-        $products = $this->getBestSellers($options['group'], $options['limit'], $options['from']);
+        $products = $this->getBestSellers($parameters);
 
         if (empty($products)) {
             return '';
         }
 
-        return $this->templating->render($options['template'], [
-            'products'       => $products,
-            'thumb_template' => $options['thumb_template'],
-            'nb_per_row'     => $options['nb_per_row'],
-        ]);
+        $options = array_replace(
+            [
+                'template'       => $this->config['best_seller']['template'],
+                'thumb_template' => $this->config['thumb_template'],
+                'nb_per_row'     => 4,
+            ],
+            $options,
+            [
+                'products' => $products,
+            ]
+        );
+
+        return $this->templating->render($options['template'], $options);
     }
 
     /**
      * Returns the cross selling products.
      *
-     * @param ProductInterface|null             $product The reference product
-     * @param CustomerGroupInterface|false|null $group   The customer group
-     * @param int                               $limit   The number od products to return
-     * @param string                            $from    The start date
-     * @param bool                              $idOnly  Whether to return product ids only
+     * @param array $parameters
      *
      * @return ProductInterface[]
      */
-    public function getCrossSelling(
-        ProductInterface $product = null,
-        $group = null,
-        int $limit = null,
-        string $from = null,
-        bool $idOnly = false
-    ): array {
+    public function getCrossSelling(array $parameters = []): array
+    {
         if (!$this->config['enabled']) {
             return [];
         }
 
-        if (0 >= $limit) {
-            $limit = $this->config['cross_selling']['limit'];
+        $parameters = array_replace($this->crossRepository->getFindProductsDefaultParameters(), [
+            'from'  => $this->config['cross_selling']['from'],
+            'limit' => $this->config['cross_selling']['limit'],
+        ], $parameters);
+
+        if (empty($parameters['exclude'])) {
+            $parameters['exclude'] = $this->getCartProductIds();
         }
 
-        $result         = [];
-        $cartProductIds = $this->getCartProductIds();
+        $result = [];
 
-        if ($product) {
-            foreach ($product->getCrossSellings() as $crossSelling) {
+        if ($parameters['source'] instanceof ProductInterface) {
+            foreach ($parameters['source']->getCrossSellings() as $crossSelling) {
                 $target = $crossSelling->getTarget();
-                if (!in_array($target->getId(), $cartProductIds)) {
-                    $result[] = $idOnly ? $target->getId() : $target;
-                    $limit--;
-                    if (0 >= $limit) {
+                if (!in_array($target->getId(), $parameters['exclude'])) {
+                    $result[] = $parameters['id_only'] ? $target->getId() : $target;
+                    $parameters['limit']--;
+                    if (0 >= $parameters['limit']) {
                         break;
                     }
                 }
             }
         }
 
-        if (0 < $limit) {
-            $products = $this->productRepository->findCrossSelling($limit, $cartProductIds, $idOnly);
-            foreach ($products as $p) {
-                $result[] = $p;
-                $limit--;
-                if (0 >= $limit) {
-                    break;
-                }
+        if (0 < $parameters['limit']) {
+            if (null === $parameters['source']) {
+                $parameters['source'] = $parameters['exclude'];
             }
-        }
-
-        if (0 < $limit) {
-            if (null === $product) {
-                $product = $cartProductIds;
-            }
-            if (empty($product)) {
+            if (empty($parameters['source'])) {
                 return $result;
             }
 
-            if (false === $group) {
-                $group = null;
-            } elseif (!$group instanceof CustomerGroupInterface) {
-                $group = $this
+            if (false === $parameters['group']) {
+                $parameters['group'] = null;
+            } elseif (!$parameters['group'] instanceof CustomerGroupInterface) {
+                $parameters['group'] = $this
                     ->contextProvider
                     ->getContext()
                     ->getCustomerGroup();
             }
 
-            if (empty($from)) {
-                $from = $this->config['cross_selling']['from'];
-            }
-
-            $products = $this
-                ->crossRepository
-                ->findProducts($product, $group, new \DateTime($from), $limit, $cartProductIds, $idOnly);
+            $products = $this->crossRepository->findProducts($parameters);
 
             foreach ($products as $p) {
                 $result[] = $p;
@@ -268,34 +229,32 @@ class Highlight
     /**
      * Renders the cross selling products.
      *
-     * @param ProductInterface $product
-     * @param array            $options
+     * @param array $parameters
+     * @param array $options
      *
      * @return string
      */
-    public function renderCrossSelling(ProductInterface $product = null, array $options = [])
+    public function renderCrossSelling(array $parameters = [], array $options = [])
     {
-        $options = array_replace(
-            $this->config['cross_selling'],
-            [
-                'thumb_template' => $this->config['thumb_template'],
-                'group'          => null,
-                'nb_per_row'     => 4,
-            ],
-            $options
-        );
-
-        $products = $this->getCrossSelling($product, $options['group'], $options['limit'], $options['from']);
+        $products = $this->getCrossSelling($parameters);
 
         if (empty($products)) {
             return '';
         }
 
-        return $this->templating->render($options['template'], [
-            'products'       => $products,
-            'thumb_template' => $options['thumb_template'],
-            'nb_per_row'     => $options['nb_per_row'],
-        ]);
+        $options = array_replace(
+            [
+                'template'       => $this->config['cross_selling']['template'],
+                'thumb_template' => $this->config['thumb_template'],
+                'nb_per_row'     => 4,
+            ],
+            $options,
+            [
+                'products' => $products,
+            ]
+        );
+
+        return $this->templating->render($options['template'], $options);
     }
 
     /**

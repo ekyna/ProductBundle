@@ -1005,6 +1005,7 @@
             <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"/>
             <argument type="service" id="templating"/>
             <argument type="collection"/><!-- Replaced by DI extesion -->
+            <tag name="twig.runtime"/>
         </service>
 
         <!-- Checkout event listener -->
@@ -1034,8 +1035,7 @@
         </service>
 
         <!-- Twig extensions -->
-        <service id="ekyna_product.twig.product_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\ProductExtension">
+        <service id="Ekyna\Bundle\ProductBundle\Twig\ProductExtension" public="false">
             <argument type="service" id="ekyna_product.constants_helper"/>
             <argument type="service" id="ekyna_product.pricing.renderer"/>
             <argument type="service" id="ekyna_product.attribute.type_registry"/>
@@ -1045,18 +1045,14 @@
             <argument>%ekyna_product.default.no_image%</argument>
             <tag name="twig.extension"/>
         </service>
-        <service id="ekyna_product.twig.catalog_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension">
+        <service id="Ekyna\Bundle\ProductBundle\Twig\CatalogExtension" public="false">
             <argument type="service" id="ekyna_product.catalog.registry"/>
             <tag name="twig.extension"/>
         </service>
-        <service id="ekyna_product.twig.highlight_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\HighlightExtension">
-            <argument type="service" id="ekyna_product.highlight"/>
+        <service id="Ekyna\Bundle\ProductBundle\Twig\HighlightExtension" public="false">
             <tag name="twig.extension"/>
         </service>
-        <service id="ekyna_product.twig.stat_extension"
-                 class="Ekyna\Bundle\ProductBundle\Twig\StatExtension">
+        <service id="Ekyna\Bundle\ProductBundle\Twig\StatExtension" public="false">
             <argument type="service" id="ekyna_product.stat.chart_renderer"/>
             <tag name="twig.extension"/>
         </service>

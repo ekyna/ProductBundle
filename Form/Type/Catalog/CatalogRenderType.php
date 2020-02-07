@@ -51,7 +51,6 @@ class CatalogRenderType extends AbstractType
 
             $builder->add('context', ContextType::class, [
                 'label'      => false,
-                'admin_mode' => $options['admin_mode'],
             ]);
 
             return;

@@ -41,7 +41,7 @@ class CheckoutEventSubscriber implements EventSubscriberInterface
         if (is_null($cart) || !$cart->hasItems()) {
             $event->setContent($this->highlight->renderBestSellers());
         } else {
-            $event->setContent($this->highlight->renderCrossSelling(null, ['limit' => 4]));
+            $event->setContent($this->highlight->renderCrossSelling(['limit' => 4]));
         }
     }
 

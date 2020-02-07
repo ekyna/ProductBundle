@@ -309,8 +309,8 @@ class InventoryController extends Controller
                     ShipmentStates::STATE_NEW,
                     ShipmentStates::STATE_PENDING,
                     ShipmentStates::STATE_PARTIAL,
+                    ShipmentStates::STATE_PREPARATION,
                 ],
-                // TODO limit => 100 (no paggging)
                 // TODO summary
             ]);
 

@@ -12,7 +12,6 @@ use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Doctrine\ORM\TranslatableResourceRepository;
 
 /**
@@ -335,7 +334,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $categories = [$category];
         if ($recursive) {
             $categories = array_merge($categories, $category->getChildren()->toArray());
-        };
+        }
 
         return $query
             ->setParameters([
@@ -808,99 +807,6 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
 
         return $query
             ->getOneOrNullResult();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findBestSellers(int $limit = 8, array $exclude = [], bool $idOnly = false)
-    {
-        return $this->findHighlight('bestSeller', $limit, $exclude, $idOnly);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function findCrossSelling(int $limit = 8, array $exclude = [], bool $idOnly = false)
-    {
-        return $this->findHighlight('crossSelling', $limit, $exclude, $idOnly);
-    }
-
-    /**
-     * Returns the highlighted products.
-     *
-     * @param string $type    The typy of highlight
-     * @param int    $limit   The number of products to return
-     * @param array  $exclude Product ids to exclude
-     * @param bool   $idOnly  Whether to return only the product ids.
-     *
-     * @return Model\ProductInterface[]|int[]
-     */
-    protected function findHighlight(string $type, int $limit, array $exclude = [], bool $idOnly = false)
-    {
-        Model\HighlightModes::isValidType($type);
-
-        $parameters = [
-            'mode'        => Model\HighlightModes::MODE_ALWAYS,
-            'type'        => Model\ProductTypes::TYPE_CONFIGURABLE,
-            'stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
-            'visible'     => true,
-            'quote_only'  => false,
-            'end_of_life' => false,
-        ];
-
-        $as = $this->getAlias();
-        $qb = $this->createQueryBuilder('p');
-        $ex = $qb->expr();
-
-        $this
-            ->joinCategories($qb)
-            ->joinBrand($qb);
-
-        if ($idOnly) {
-            $qb->select($as . '.id');
-        }
-
-        $qb
-            ->andWhere($ex->eq($as . '.' . $type, ':mode'))
-            ->andWhere($ex->neq($as . '.type', ':type'))
-            ->andWhere($ex->neq($as . '.stockState', ':stock_state'))
-            ->andWhere($ex->eq($as . '.visible', ':visible'))
-            ->andWhere($ex->eq('b.visible', ':visible'))
-            ->andWhere($ex->eq('c.visible', ':visible'))
-            ->andWhere($ex->eq($as . '.quoteOnly', ':quote_only'))
-            ->andWhere($ex->eq($as . '.endOfLife', ':end_of_life'))
-            ->addOrderBy('p.visibility', 'DESC');
-
-        if (!empty($exclude)) {
-            $qb->andWhere($ex->notIn($as . '.id', ':exclude'));
-            $parameters['exclude'] = $exclude;
-        }
-
-        $this->filterFindHighlight($qb, $parameters, $type);
-
-        $query = $qb
-            ->getQuery()
-            ->setParameters($parameters)
-            ->setMaxResults($limit);
-
-        if ($idOnly) {
-            return array_column($query->getScalarResult(), 'id');
-        }
-
-        return $query->getResult();
-    }
-
-    /**
-     * Apply custom filtering to findHighlight method.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     * @param string       $type
-     */
-    protected function filterFindHighlight(QueryBuilder $qb, array &$parameters, string $type)
-    {
-
     }
 
     /**

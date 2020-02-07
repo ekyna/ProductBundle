@@ -539,7 +539,6 @@ class ProductController extends AbstractSubjectController
             'action'            => $action,
             'method'            => 'POST',
             'attr'              => ['class' => 'form-horizontal'],
-            'admin_mode'        => true,
             '_redirect_enabled' => true,
         ]);
 

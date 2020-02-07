@@ -1,6 +1,6 @@
 define(
-    ['jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner'],
-    function ($, Router, Dispatcher, Templates, Modal, Scanner) {
+    ['require', 'jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner', 'ekyna-clipboard-copy'],
+    function (require, $, Router, Dispatcher, Templates, Modal, Scanner) {
 
     var $window = $(window),
         $head = $('#inventory thead'),
@@ -411,6 +411,20 @@ define(
         if ($wait.offset().top < $body.height() + $contextForm.outerHeight() + $head.outerHeight()) {
             nextList();
         }
+    });
+
+    /* -----------------------------------------------------------------------------------------------------------------
+     * Resource summary
+     */
+    require(['ekyna-admin/summary'], function(Summary) {
+        Summary.init();
+    });
+
+    /* -----------------------------------------------------------------------------------------------------------------
+     * Resource side detail
+     */
+    require(['ekyna-admin/side-detail'], function(SideDetail) {
+        SideDetail.init();
     });
 });
 

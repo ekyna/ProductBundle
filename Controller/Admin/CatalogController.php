@@ -228,7 +228,6 @@ class CatalogController extends ResourceController
             'action'            => $action,
             'attr'              => ['class' => 'form-horizontal'],
             'method'            => 'POST',
-            'admin_mode'        => true,
             '_redirect_enabled' => true,
             'sale'              => $sale,
             'validation_groups' => ['CatalogFromSale']

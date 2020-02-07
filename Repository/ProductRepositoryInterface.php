@@ -189,7 +189,7 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      *
      * @param string $code
      *
-     * @return Model\ProductInterface
+     * @return Model\ProductInterface[]
      */
     public function findBySkuOrReferences(string $code): array;
 
@@ -236,28 +236,6 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
      * @return Model\ProductInterface|null
      */
     public function findNextStatUpdate(\DateTime $maxDate = null);
-
-    /**
-     * Returns the visible products with best seller mode set to 'always'.
-     *
-     * @param int   $limit   The number of products to return
-     * @param array $exclude The product ids to exclude
-     * @param bool  $idOnly  Whether to return only the product ids.
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
-     */
-    public function findBestSellers(int $limit = 8, array $exclude = [], bool $idOnly = false);
-
-    /**
-     * Returns the visible products with cross selling mode set to 'always'.
-     *
-     * @param int   $limit   The number of products to return
-     * @param array $exclude The product ids to exclude
-     * @param bool  $idOnly  Whether to return only the product ids.
-     *
-     * @return \Ekyna\Bundle\ProductBundle\Model\ProductInterface[]
-     */
-    public function findCrossSelling(int $limit = 8, array $exclude = [], bool $idOnly = false);
 
     /**
      * Joins prices for sorting.

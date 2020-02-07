@@ -2,169 +2,62 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCross;
-use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StatCrossRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class StatCrossRepository extends ServiceEntityRepository
+class StatCrossRepository extends AbstractStatRepository
 {
     use LocaleAwareRepositoryTrait;
 
+
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findOneQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findBestByProductAndPeriodQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findBestByProductAndPeriodAndGroupQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findByProductAndTargetAndPeriodQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findByProductAndTargetAndPeriodAndGroupQuery;
 
 
     /**
      * Constructor.
+     *
+     * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, StatCross::class);
-    }
-
-    /**
-     * Finds cross selling products.
-     *
-     * @param Product|int|array $source
-     * @param Group|null        $group
-     * @param \DateTime         $from
-     * @param int               $limit
-     * @param array             $exclude The product ids to exclude
-     * @param bool              $idOnly  Whether to return only product ids
-     *
-     * @return Product[]
-     */
-    public function findProducts(
-        $source,
-        Group $group = null,
-        \DateTime $from = null,
-        int $limit = 8,
-        array $exclude = [],
-        bool $idOnly = false
-    ) {
-        if (null === $from) {
-            $from = new \DateTime('-1 year');
-        }
-
-        if ($source instanceof Product) {
-            $source = [$source->getId()];
-        } elseif (is_int($source)) {
-            $source = [$source];
-        } elseif (!is_array($source)) {
-            throw new UnexpectedTypeException($source, [Product::class, 'int', 'array']);
-        }
-
-        $parameters = [
-            'source'          => $source,
-            'from'            => $from->format('Y-m'),
-            'not_mode'        => HighlightModes::MODE_NEVER,
-            'not_type'        => ProductTypes::TYPE_CONFIGURABLE,
-            'not_stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
-            'visible'         => true,
-        ];
-
-        $qb = $this->createQueryBuilder('s');
-        $ex = $qb->expr();
-
-        $qb
-            ->select('s as stat', 'SUM(s.count) as score')
-            ->join('s.target', 'p')
-            ->join('p.brand', 'b')
-            ->join('p.categories', 'c')
-            ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
-            ->andWhere($ex->in('IDENTITY(s.source)', ':source'))
-            ->andWhere($ex->gte('s.date', ':from'))
-            ->andWhere($ex->neq('p.type', ':not_type'))
-            ->andWhere($ex->neq('p.stockState', ':not_stock_state'))
-            ->andWhere($ex->neq('p.bestSeller', ':not_mode'))
-            ->andWhere($ex->eq('p.visible', ':visible'))
-            ->andWhere($ex->eq('b.visible', ':visible'))
-            ->andWhere($ex->eq('c.visible', ':visible'))
-            ->addGroupBy('s.target')
-            ->andHaving($ex->gt('SUM(s.count)', 0))
-            ->addOrderBy('score', 'DESC')
-            ->addOrderBy('p.visibility', 'DESC');
-
-        if ($idOnly) {
-            $qb->addSelect('p.id as pid');
-        } else {
-            $qb->addSelect('p', 'b', 'b_t');
-        }
-
-        if ($group) {
-            $qb->andWhere($ex->eq('s.customerGroup', ':group'));
-            $parameters['group'] = $group;
-        }
-
-        if (!empty($exclude)) {
-            $qb->andWhere($qb->expr()->notIn('p.id', ':exclude'));
-            $parameters['exclude'] = $exclude;
-        }
-
-        $this->filterFindProducts($qb, $parameters);
-
-        $query = $qb
-            ->getQuery()
-            ->setParameters($parameters)
-            ->setMaxResults($limit);
-
-        if ($idOnly) {
-            return array_column($query->getScalarResult(), 'pid');
-        }
-
-        return array_map(function ($r) {
-            /** @var StatCross $s */
-            $s = $r['stat'];
-
-            return $s->getTarget();
-        }, $query->getResult());
-    }
-
-    /**
-     * Applies custom filtering to findProducts() method.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     */
-    protected function filterFindProducts(QueryBuilder $qb, array &$parameters)
-    {
-
     }
 
     /**
@@ -177,7 +70,7 @@ class StatCrossRepository extends ServiceEntityRepository
      *
      * @return StatCross|null
      */
-    public function findOne(Product $source, Product $target, Group $group, string $date)
+    public function findOne(Product $source, Product $target, Group $group, string $date): ?StatCross
     {
         return $this
             ->getFindOneQuery()
@@ -199,7 +92,7 @@ class StatCrossRepository extends ServiceEntityRepository
      *
      * @return int[]
      */
-    public function findBestByProductAndPeriod(Product $source, \DatePeriod $period, Group $group = null)
+    public function findBestByProductAndPeriod(Product $source, \DatePeriod $period, Group $group = null): array
     {
         $parameters = [
             'source'  => $source,
@@ -237,7 +130,7 @@ class StatCrossRepository extends ServiceEntityRepository
         Product $target,
         \DatePeriod $period,
         Group $group = null
-    ) {
+    ): array {
         $parameters = [
             'source' => $source,
             'target' => $target,
@@ -263,9 +156,94 @@ class StatCrossRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @inheritDoc
      */
-    private function getFindBestByProductAndPeriodQuery()
+    public function getFindProductsDefaultParameters(): array
+    {
+        return array_replace(parent::getFindProductsDefaultParameters(), [
+            'source' => null,
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getFindProductsResults(Query $query, array $parameters): array
+    {
+        if ($parameters['id_only']) {
+            return array_column($query->getScalarResult(), 'pid');
+        }
+
+        return array_map(function ($r) {
+            /** @var StatCross $s */
+            $s = $r['stat'];
+
+            return $s->getTarget();
+        }, $query->getResult());
+    }
+
+    /**
+     * Creates the "find products" query builder.
+     *
+     * @return QueryBuilder
+     */
+    protected function createFindProductsQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        return $qb
+            ->join('s.target', 'p')
+            ->addGroupBy('s.target')
+            ->andWhere($qb->expr()->in('IDENTITY(s.source)', ':source'))
+            ->andWhere($qb->expr()->neq('p.crossSelling', ':not_mode'));
+    }
+
+    /**
+     * Configures the "find products" query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param array        $parameters
+     */
+    protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
+    {
+        $qb
+            ->setParameter('source', $parameters['source'])
+            ->setParameter('not_mode', HighlightModes::MODE_NEVER);
+    }
+
+    /**
+     * Configures the "find products" parameters resolver.
+     *
+     * @param OptionsResolver $resolver
+     */
+    protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setRequired('source')
+            ->setAllowedTypes('source', [Product::class, 'int', 'array'])
+            ->setNormalizer('source', function (Options $options, $source) {
+                if (!is_array($source)) {
+                    $source = [$source];
+                }
+
+                return array_map(function ($s) {
+                    if ($s instanceof Product) {
+                        return $s->getId();
+                    }
+                    if (is_int($s)) {
+                        return $s;
+                    }
+                    throw new InvalidOptionsException(
+                        "Invalid option 'source': expected ProductInterface, integer or array of those."
+                    );
+                }, $source);
+            });
+    }
+
+    /**
+     * @return Query
+     */
+    private function getFindBestByProductAndPeriodQuery(): Query
     {
         if ($this->findBestByProductAndPeriodQuery) {
             return $this->findBestByProductAndPeriodQuery;
@@ -290,9 +268,9 @@ class StatCrossRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindBestByProductAndPeriodAndGroupQuery()
+    private function getFindBestByProductAndPeriodAndGroupQuery(): Query
     {
         if ($this->findBestByProductAndPeriodAndGroupQuery) {
             return $this->findBestByProductAndPeriodAndGroupQuery;
@@ -318,9 +296,9 @@ class StatCrossRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindByProductAndTargetAndPeriodQuery()
+    private function getFindByProductAndTargetAndPeriodQuery(): Query
     {
         if ($this->findByProductAndTargetAndPeriodQuery) {
             return $this->findByProductAndTargetAndPeriodQuery;
@@ -341,9 +319,9 @@ class StatCrossRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindByProductAndTargetAndPeriodAndGroupQuery()
+    private function getFindByProductAndTargetAndPeriodAndGroupQuery(): Query
     {
         if ($this->findByProductAndTargetAndPeriodAndGroupQuery) {
             return $this->findByProductAndTargetAndPeriodAndGroupQuery;
@@ -364,9 +342,9 @@ class StatCrossRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindOneQuery()
+    private function getFindOneQuery(): Query
     {
         if ($this->findOneQuery) {
             return $this->findOneQuery;

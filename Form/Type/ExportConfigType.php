@@ -47,7 +47,6 @@ class ExportConfigType extends AbstractType
             ])
             ->add('context', ContextType::class, [
                 'label'      => false,
-                'admin_mode' => $options['admin_mode'],
             ])
             ->add('validUntil', DateTimeType::class, [
                 'label'  => 'ekyna_product.export.column.valid_until',

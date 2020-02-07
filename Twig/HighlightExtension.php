@@ -14,22 +14,6 @@ use Twig\TwigFunction;
 class HighlightExtension extends AbstractExtension
 {
     /**
-     * @var Highlight
-     */
-    private $service;
-
-
-    /**
-     * Constructor.
-     *
-     * @param Highlight $service
-     */
-    public function __construct(Highlight $service)
-    {
-        $this->service = $service;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getFunctions()
@@ -37,58 +21,22 @@ class HighlightExtension extends AbstractExtension
         return [
             new TwigFunction(
                 'product_best_sellers',
-                [$this->service, 'renderBestSellers'],
+                [Highlight::class, 'renderBestSellers'],
                 ['is_safe' => ['html']]
             ),
             new TwigFunction(
                 'get_best_sellers',
-                [$this, 'getBestSellers']
+                [Highlight::class, 'getBestSellers']
             ),
             new TwigFunction(
                 'render_cross_selling',
-                [$this->service, 'renderCrossSelling'],
+                [Highlight::class, 'renderCrossSelling'],
                 ['is_safe' => ['html']]
             ),
             new TwigFunction(
                 'get_cross_selling',
-                [$this, 'getCrossSelling']
+                [Highlight::class, 'getCrossSelling']
             ),
         ];
-    }
-
-    public function getBestSellers(array $options = []): array
-    {
-        $options = array_replace([
-            'group'   => null,
-            'limit'   => null,
-            'from'    => null,
-            'id_only' => false,
-        ], $options);
-
-        return $this->service->getBestSellers(
-            $options['group'],
-            $options['limit'],
-            $options['from'],
-            $options['id_only']
-        );
-    }
-
-    public function getCrossSelling(array $options = []): array
-    {
-        $options = array_replace([
-            'product' => null,
-            'group'   => null,
-            'limit'   => null,
-            'from'    => null,
-            'id_only' => false,
-        ], $options);
-
-        return $this->service->getCrossSelling(
-            $options['product'],
-            $options['group'],
-            $options['limit'],
-            $options['from'],
-            $options['id_only']
-        );
     }
 }

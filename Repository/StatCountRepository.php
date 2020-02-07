@@ -2,146 +2,50 @@
 
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StatCountRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class StatCountRepository extends ServiceEntityRepository
+class StatCountRepository extends AbstractStatRepository
 {
     use LocaleAwareRepositoryTrait;
 
+
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findOneQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findByProductAndPeriodQuery;
 
     /**
-     * @var \Doctrine\ORM\Query
+     * @var Query
      */
     private $findByProductAndPeriodAndGroupQuery;
 
 
     /**
      * Constructor.
+     *
+     * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, StatCount::class);
-    }
-
-    /**
-     * Finds best sellers products.
-     *
-     * @param Group|null $group
-     * @param \DateTime  $from
-     * @param int        $limit
-     * @param array      $exclude
-     * @param bool       $idOnly
-     *
-     * @return Product[]
-     */
-    public function findProducts(
-        Group $group = null,
-        \DateTime $from = null,
-        int $limit = 8,
-        array $exclude = [],
-        bool $idOnly = false
-    ): array {
-        if (null === $from) {
-            $from = new \DateTime('-1 year');
-        }
-
-        $parameters = [
-            'from'        => $from->format('Y-m'),
-            'mode'        => HighlightModes::MODE_NEVER,
-            'type'        => ProductTypes::TYPE_CONFIGURABLE,
-            'stock_state' => StockSubjectStates::STATE_OUT_OF_STOCK,
-            'visible'     => true,
-        ];
-
-        $qb = $this->createQueryBuilder('s');
-        $ex = $qb->expr();
-
-        $qb
-            ->select('s as stat', 'SUM(s.count) as count_sum')
-            ->join('s.product', 'p')
-            ->join('p.brand', 'b')
-            ->join('p.categories', 'c')
-            ->leftJoin('b.translations', 'b_t', Expr\Join::WITH, $this->getLocaleCondition('b_t'))
-            ->andWhere($ex->gte('s.date', ':from'))
-            ->andWhere($ex->neq('p.type', ':type'))
-            ->andWhere($ex->neq('p.stockState', ':stock_state'))
-            ->andWhere($ex->neq('p.bestSeller', ':mode'))
-            ->andWhere($ex->eq('p.visible', ':visible'))
-            ->andWhere($ex->eq('b.visible', ':visible'))
-            ->andWhere($ex->eq('c.visible', ':visible'))
-            ->addGroupBy('s.product')
-            ->andHaving($ex->gt('count_sum', 0))
-            ->addOrderBy('count_sum', 'DESC')
-            ->addOrderBy('p.visibility', 'DESC');
-
-        if ($idOnly) {
-            $qb->addSelect('p.id as pid');
-        } else {
-            $qb->addSelect('p', 'b', 'b_t');
-        }
-
-        if ($group) {
-            $qb->andWhere($ex->eq('s.customerGroup', ':group'));
-            $parameters['group'] = $group;
-        }
-
-        if (!empty($exclude)) {
-            $qb->andWhere($ex->notIn('p.id', ':exclude'));
-            $parameters['exclude'] = $exclude;
-        }
-
-        $this->filterFindProducts($qb, $parameters);
-
-        $query = $qb
-            ->getQuery()
-            ->setParameters($parameters)
-            ->setMaxResults($limit);
-
-        if ($idOnly) {
-            return array_column($query->getScalarResult(), 'pid');
-        }
-
-        return array_map(function ($r) {
-            /** @var StatCount $s */
-            $s = $r['stat'];
-
-            return $s->getProduct();
-        }, $query->getResult());
-    }
-
-    /**
-     * Applies custom filtering to findProducts() method.
-     *
-     * @param QueryBuilder $qb
-     * @param array        $parameters
-     */
-    protected function filterFindProducts(QueryBuilder $qb, array &$parameters)
-    {
-
     }
 
     /**
@@ -153,7 +57,7 @@ class StatCountRepository extends ServiceEntityRepository
      *
      * @return StatCount|null
      */
-    public function findOne(Product $product, Group $group, string $date)
+    public function findOne(Product $product, Group $group, string $date): ?StatCount
     {
         return $this
             ->getFindOneQuery()
@@ -172,9 +76,9 @@ class StatCountRepository extends ServiceEntityRepository
      * @param \DatePeriod $period
      * @param Group       $group
      *
-     * @return array
+     * @return int[]
      */
-    public function findByProductAndPeriodAndGroup(Product $product, \DatePeriod $period, Group $group = null)
+    public function findByProductAndPeriodAndGroup(Product $product, \DatePeriod $period, Group $group = null): array
     {
         $parameters = [
             'product' => $product,
@@ -200,9 +104,45 @@ class StatCountRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * Creates the "find products" query builder.
+     *
+     * @return QueryBuilder
      */
-    private function getFindByProductAndPeriodQuery()
+    protected function createFindProductsQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('s');
+
+        return $qb
+            ->join('s.product', 'p')
+            ->addGroupBy('s.product')
+            ->andWhere($qb->expr()->neq('p.bestSeller', ':not_mode'));
+    }
+
+    /**
+     * Configures the "find products" query builder.
+     *
+     * @param QueryBuilder $qb
+     * @param array        $parameters
+     */
+    protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
+    {
+        $qb->setParameter('not_mode', HighlightModes::MODE_NEVER);
+    }
+
+    /**
+     * Configures the "find products" parameters resolver.
+     *
+     * @param OptionsResolver $resolver
+     */
+    protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
+    {
+
+    }
+
+    /**
+     * @return Query
+     */
+    private function getFindByProductAndPeriodQuery(): Query
     {
         if ($this->findByProductAndPeriodQuery) {
             return $this->findByProductAndPeriodQuery;
@@ -223,9 +163,9 @@ class StatCountRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindByProductAndPeriodAndGroupQuery()
+    private function getFindByProductAndPeriodAndGroupQuery(): Query
     {
         if ($this->findByProductAndPeriodAndGroupQuery) {
             return $this->findByProductAndPeriodAndGroupQuery;
@@ -246,9 +186,9 @@ class StatCountRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return \Doctrine\ORM\Query
+     * @return Query
      */
-    private function getFindOneQuery()
+    private function getFindOneQuery(): Query
     {
         if ($this->findOneQuery) {
             return $this->findOneQuery;
