@@ -58,6 +58,7 @@
     }|merge(options)) -}}
 {%- endmacro show_brandNaming -%}
 
+
 {%- macro show_categories(product, options = {}) -%}
     {{- show_row(product.categories, 'entity', {
         'label': 'ekyna_product.category.label.plural',
@@ -146,6 +147,17 @@
         'id': 'product_medias'
     }|merge(options)) -}}
 {%- endmacro show_medias -%}
+
+
+{%- macro show_notContractual(product, options = {}) -%}
+    {{- show_row(product.notContractual, 'boolean', {
+        'label': 'ekyna_product.product.field.not_contractual',
+        'id': 'product_notContractual',
+        'color': true,
+        'true_class': 'label label-warning',
+        'false_class': 'label label-default'
+    }|merge(options)) -}}
+{%- endmacro show_notContractual -%}
 
 
 {%- macro show_min_price(product, options = {}) -%}

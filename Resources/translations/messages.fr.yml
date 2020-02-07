@@ -432,6 +432,7 @@ ekyna_product:
             bundle_parents: Ce produit est inclus dans les packs suivants
             component_parents: Ce produit est un composant des produits suivants
             brand_naming: Inclure la marque dans le titre et la désignation
+            not_contractual: Visuels non contractuels
         alert:
             no_item: Aucun produit configuré
             pending_offers: >

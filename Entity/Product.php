@@ -110,6 +110,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected $medias;
 
     /**
+     * @var bool
+     */
+    protected $notContractual = false;
+
+    /**
      * @var Collection|Model\ProductReferenceInterface[]
      */
     protected $references;
@@ -317,6 +322,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $this->geocode = null;
             $this->references = new ArrayCollection();
             $this->visible = false;
+            $this->notContractual = true;
             //$this->netPrice = 0;
             //$this->weight = 0;
             //$this->releasedAt = null;
@@ -1129,6 +1135,24 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return $this->medias;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isNotContractual(): bool
+    {
+        return $this->notContractual;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNotContractual(bool $notContractual): Model\ProductInterface
+    {
+        $this->notContractual = $notContractual;
+
+        return $this;
     }
 
     /**

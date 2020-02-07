@@ -45,9 +45,8 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
         $qb = $this->createFindProductsQueryBuilder();
         $ex = $qb->expr();
 
-        $qb->select('s as stat', '(SUM(s.count) * p.netPrice) as score');
-
         $qb
+            ->select('s as stat', '(SUM(s.count) * p.netPrice) as score')
             ->join('p.brand', 'b')
             ->join('p.categories', 'c')
             ->andWhere($ex->gte('s.date', ':from'))
@@ -83,10 +82,10 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
                 ->setParameter('group', $parameters['group']);
         }
 
-        if (!empty($exclude)) {
+        if (!empty($parameters['exclude'])) {
             $qb
                 ->andWhere($qb->expr()->notIn('p.id', ':exclude'))
-                ->setParameter('exclude', $exclude);
+                ->setParameter('exclude', $parameters['exclude']);
         }
 
         if ($parameters['id_only']) {

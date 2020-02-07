@@ -309,6 +309,28 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the "not contractual" field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addNotContractualField(array $options = [])
+    {
+        $options = array_replace([
+            'label'    => 'ekyna_product.product.field.not_contractual',
+            'required' => false,
+            'attr'     => [
+                'align_with_widget' => true,
+            ],
+        ], $options);
+
+        $this->form->add('notContractual', SF\CheckboxType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the option groups field.
      *
      * @param array $options

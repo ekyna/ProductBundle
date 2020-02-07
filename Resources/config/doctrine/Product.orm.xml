@@ -29,6 +29,11 @@
                 <option name="default">1</option>
             </options>
         </field>
+        <field name="notContractual" column="not_contractual" type="boolean" nullable="false">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
         <field name="minPrice" column="min_price" type="decimal" precision="10" scale="5" nullable="true"/>
 
         <field name="pendingOffers" column="pending_offers" type="boolean" nullable="false"/>

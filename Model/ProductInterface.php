@@ -584,6 +584,22 @@ interface ProductInterface extends
     public function removeMedia(ProductMediaInterface $media);
 
     /**
+     * Returns whether the medias are not contractual.
+     *
+     * @return bool
+     */
+    public function isNotContractual(): bool;
+
+    /**
+     * Sets whether the medias are not contractual.
+     *
+     * @param bool $notContractual
+     *
+     * @return $this|ProductInterface
+     */
+    public function setNotContractual(bool $notContractual): ProductInterface;
+
+    /**
      * Returns whether or not the product has the given reference.
      *
      * @param ProductReferenceInterface $reference

@@ -430,6 +430,7 @@ ekyna_product:
             bundle_parents: This product is included in the following bundles
             component_parents: This product is a component of the following products
             brand_naming: Include brand in title and designation
+            not_contractual: Non-contractual photos
         alert:
             no_item: No product configured
             pending_offers: >
