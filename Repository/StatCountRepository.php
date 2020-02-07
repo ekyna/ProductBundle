@@ -10,7 +10,6 @@ use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StatCountRepository
@@ -127,16 +126,6 @@ class StatCountRepository extends AbstractStatRepository
     protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
     {
         $qb->setParameter('not_mode', HighlightModes::MODE_NEVER);
-    }
-
-    /**
-     * Configures the "find products" parameters resolver.
-     *
-     * @param OptionsResolver $resolver
-     */
-    protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
-    {
-
     }
 
     /**

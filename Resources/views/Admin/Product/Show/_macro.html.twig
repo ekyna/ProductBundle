@@ -16,7 +16,7 @@
 
 
 {%- macro show_visibility(product, options = {}) -%}
-    {{- show_row(product.visible, 'number', {
+    {{- show_row(product.visibility, 'number', {
         'label': 'ekyna_product.common.visibility',
         'id': 'product_visibility'
     }|merge(options)) -}}
