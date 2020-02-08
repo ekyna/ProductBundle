@@ -1,5 +1,7 @@
 {% extends '@EkynaAdmin/Entity/Default/new.html.twig' %}
 
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+
 {% block title %}
     {{ parent() }} {{ product|product_type_badge }}
 {% endblock title %}

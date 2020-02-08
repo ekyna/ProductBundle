@@ -8,9 +8,11 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\AbstractBundleRule">
         <property name="type">
             <constraint name="NotBlank"/>
-            <constraint name="Callback">
-                <value>Ekyna\Bundle\ProductBundle\Model\BundleRuleTypes</value>
-                <value>isValid</value>
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Bundle\ProductBundle\Model\BundleRuleTypes</value>
+                    <value>getConstants</value>
+                </option>
             </constraint>
         </property>
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleRule"/>
@@ -603,9 +605,11 @@
         <!-- Type -->
         <property name="type">
             <constraint name="NotBlank"/>
-            <constraint name="Callback">
-                <value>Ekyna\Bundle\ProductBundle\Model\ProductTypes</value>
-                <value>isValid</value>
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Bundle\ProductBundle\Model\ProductTypes</value>
+                    <value>getConstants</value>
+                </option>
             </constraint>
         </property>
 
@@ -1127,9 +1131,11 @@
     <class name="Ekyna\Bundle\ProductBundle\Entity\ProductReference">
         <property name="type">
             <constraint name="NotBlank"/>
-            <constraint name="Callback">
-                <value>Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes</value>
-                <value>isValid</value>
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes</value>
+                    <value>getConstants</value>
+                </option>
             </constraint>
         </property>
         <property name="code">

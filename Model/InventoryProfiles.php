@@ -20,7 +20,7 @@ class InventoryProfiles extends AbstractConstants
     /**
      * @inheritdoc
      */
-    public static function getConfig()
+    public static function getConfig(): array
     {
         $prefix = 'ekyna_product.inventory.profile.';
 
@@ -30,5 +30,13 @@ class InventoryProfiles extends AbstractConstants
             static::RESUPPLY     => [$prefix . static::RESUPPLY],
             static::OUT_OF_STOCK => [$prefix . static::OUT_OF_STOCK],
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getTheme(string $constant): ?string
+    {
+        return null;
     }
 }

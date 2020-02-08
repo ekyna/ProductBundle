@@ -18,7 +18,7 @@ final class ProductReferenceTypes extends AbstractConstants
     /**
      * @inheritDoc
      */
-    public static function getConfig()
+    public static function getConfig(): array
     {
         $prefix = 'ekyna_product.product_reference.type.';
 
@@ -27,5 +27,13 @@ final class ProductReferenceTypes extends AbstractConstants
             static::TYPE_EAN_13       => [$prefix . static::TYPE_EAN_13],
             static::TYPE_MANUFACTURER => [$prefix . static::TYPE_MANUFACTURER],
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getTheme(string $constant): ?string
+    {
+        return null;
     }
 }

@@ -22,7 +22,7 @@ final class HighlightModes extends AbstractConstants
     /**
      * @inheritdoc
      */
-    public static function getConfig()
+    public static function getConfig(): array
     {
         $prefix = 'ekyna_product.highlight.mode';
 
@@ -31,20 +31,6 @@ final class HighlightModes extends AbstractConstants
             self::MODE_ALWAYS => [$prefix . '.always', 'success'],
             self::MODE_NEVER  => [$prefix . '.never',  'danger'],
         ];
-    }
-
-    /**
-     * Returns the theme for the given mode.
-     *
-     * @param int $mode
-     *
-     * @return string
-     */
-    public static function getTheme(int $mode)
-    {
-        self::isValid($mode, true);
-
-        return self::getConfig()[$mode][1];
     }
 
     /**
@@ -66,12 +52,5 @@ final class HighlightModes extends AbstractConstants
         }
 
         return false;
-    }
-
-    /**
-     * Disabled constructor.
-     */
-    private function __construct()
-    {
     }
 }

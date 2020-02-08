@@ -40,7 +40,7 @@ class ProductTypes extends AbstractConstants
     /**
      * {@inheritdoc}
      */
-    static public function getConfig()
+    static public function getConfig(): array
     {
         $prefix = 'ekyna_product.product.type.';
 
@@ -67,20 +67,6 @@ class ProductTypes extends AbstractConstants
             self::TYPE_BUNDLE,
             self::TYPE_CONFIGURABLE,
         ];
-    }
-
-    /**
-     * Returns the theme for the given state.
-     *
-     * @param string $state
-     *
-     * @return string
-     */
-    static public function getTheme($state)
-    {
-        self::isValid($state, true);
-
-        return self::getConfig()[$state][1];
     }
 
     /**

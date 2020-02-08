@@ -22,7 +22,7 @@ class BundleRuleTypes extends AbstractConstants
     /**
      * @inheritDoc
      */
-    public static function getConfig()
+    public static function getConfig(): array
     {
         $prefix = 'ekyna_product.bundle_rule.type.';
 
@@ -34,6 +34,14 @@ class BundleRuleTypes extends AbstractConstants
             self::REQUIRED_IF_ALL => [$prefix . self::REQUIRED_IF_ALL],
             self::REQUIRED_IF_ANY => [$prefix . self::REQUIRED_IF_ANY],
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getTheme(string $constant): ?string
+    {
+        return null;
     }
 
     /**
