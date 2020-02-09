@@ -23,6 +23,16 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class StatUpdater
 {
     /**
+     * @var StatCountRepository
+     */
+    private $countRepository;
+
+    /**
+     * @var StatCrossRepository
+     */
+    private $crossRepository;
+
+    /**
      * @var ProductRepositoryInterface
      */
     private $productRepository;
@@ -58,16 +68,6 @@ class StatUpdater
     private $maxUpdateDate;
 
     /**
-     * @var StatCountRepository
-     */
-    private $countRepository;
-
-    /**
-     * @var StatCrossRepository
-     */
-    private $crossRepository;
-
-    /**
      * @var StatCalculator
      */
     private $calculator;
@@ -91,18 +91,24 @@ class StatUpdater
     /**
      * Constructor.
      *
+     * @param StatCountRepository              $countRepository
+     * @param StatCrossRepository              $crossRepository
      * @param ProductRepositoryInterface       $productRepository
      * @param CustomerGroupRepositoryInterface $groupRepository
      * @param EntityManagerInterface           $entityManager
      */
     public function __construct(
+        StatCountRepository $countRepository,
+        StatCrossRepository $crossRepository,
         ProductRepositoryInterface $productRepository,
         CustomerGroupRepositoryInterface $groupRepository,
         EntityManagerInterface $entityManager
     ) {
+        $this->countRepository = $countRepository;
+        $this->crossRepository = $crossRepository;
         $this->productRepository = $productRepository;
-        $this->groupRepository = $groupRepository;
-        $this->entityManager = $entityManager;
+        $this->groupRepository   = $groupRepository;
+        $this->entityManager     = $entityManager;
 
         $this->calculator = new StatCalculator($entityManager->getConnection());
     }
@@ -209,7 +215,7 @@ class StatUpdater
             $this->writeln(" - Group <comment>{$group->getName()}</comment>");
 
             $orderDates = $this->calculator->getOrderDates($this->product, $group);
-            $statDates = $this->calculator->getStatCountDates($this->product, $group);
+            $statDates  = $this->calculator->getStatCountDates($this->product, $group);
 
             foreach ($orderDates as $date => $updated) {
                 $this->write(sprintf(
@@ -224,7 +230,7 @@ class StatUpdater
                 }
 
                 $from = new \DateTime($date);
-                $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
+                $to   = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
 
                 $this->updateCount($group, $from, $to);
                 $this->updateCross($group, $from, $to);
@@ -257,7 +263,7 @@ class StatUpdater
 
         $date = $from->format('Y-m');
 
-        if (null === $stat = $this->getCountRepository()->findOne($this->product, $group, $date)) {
+        if (null === $stat = $this->countRepository->findOne($this->product, $group, $date)) {
             $stat = new StatCount();
             $stat
                 ->setProduct($this->product)
@@ -289,7 +295,7 @@ class StatUpdater
             /** @var Product $target */
             $target = $this->entityManager->getReference($this->productRepository->getClassName(), $targetId);
 
-            if (null === $stat = $this->getCrossRepository()->findOne($this->product, $target, $group, $date)) {
+            if (null === $stat = $this->crossRepository->findOne($this->product, $target, $group, $date)) {
                 $stat = new StatCross();
                 $stat
                     ->setSource($this->product)
@@ -328,34 +334,6 @@ class StatUpdater
     private function findNextProduct()
     {
         return $this->productRepository->findNextStatUpdate($this->maxUpdateDate);
-    }
-
-    /**
-     * Returns the countRepository.
-     *
-     * @return StatCountRepository
-     */
-    private function getCountRepository()
-    {
-        if ($this->countRepository) {
-            return $this->countRepository;
-        }
-
-        return $this->countRepository = $this->entityManager->getRepository(StatCount::class);
-    }
-
-    /**
-     * Returns the crossRepository.
-     *
-     * @return StatCrossRepository
-     */
-    private function getCrossRepository()
-    {
-        if ($this->crossRepository) {
-            return $this->crossRepository;
-        }
-
-        return $this->crossRepository = $this->entityManager->getRepository(StatCross::class);
     }
 
     /**

@@ -6,7 +6,6 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="Ekyna\Bundle\ProductBundle\Entity\StatCross"
-            repository-class="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"
             table="product_stat_cross">
 
         <indexes>

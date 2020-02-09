@@ -6,7 +6,6 @@
                             http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="Ekyna\Bundle\ProductBundle\Entity\StatCount"
-            repository-class="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository"
             table="product_stat_count">
 
         <indexes>

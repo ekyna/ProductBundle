@@ -972,6 +972,8 @@
         <service id="ekyna_product.stat.updater"
                  class="Ekyna\Bundle\ProductBundle\Service\Stat\StatUpdater"
                  public="false">
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCountRepository"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
             <argument type="service" id="doctrine.orm.default_entity_manager"/>
