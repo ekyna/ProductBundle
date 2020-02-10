@@ -150,7 +150,7 @@ class PriceRenderer
             ]);
         }
 
-        $endsAt = $price['ends_at'] ? $formatter->date($price['ends_at']) : '';
+        $endsAt = $price['ends_at'] ? $formatter->date(new \DateTime($price['ends_at'])) : '';
 
         // Result
         $display = new Model\PriceDisplay($final, $fromLabel, $originalLabel, $finalLabel, $endsAt);

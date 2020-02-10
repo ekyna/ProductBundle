@@ -29,7 +29,7 @@
         <span class="field">{{ 'ekyna_core.field.reference'|trans }}</span>&nbsp;
         <span class="reference">{{ product.reference }}</span><br>
         {% if catalog.displayPrices -%}
-            <span class="price">{{ product|product_price(null, false) }}</span>
+            <span class="price">{{ product|product_price({'discount': false}) }}</span>
         {%- endif %}
     </p>
     <p>

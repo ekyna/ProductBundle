@@ -13,7 +13,7 @@
     </a>
     <p class="status">
         {{- product|stock_subject_availability|raw -}}<br>
-        {{- product|product_price -}}
+        {{- product|product_price|raw -}}
     </p>
     <a href="{{ product_path }}" class="btn btn-sm btn-default read-more">
         Read more

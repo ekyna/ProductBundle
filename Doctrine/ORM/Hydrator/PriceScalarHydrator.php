@@ -57,10 +57,6 @@ class PriceScalarHydrator extends AbstractHydrator
                     $value = floatval($value);
                     break;
 
-                case 'ends_at':
-                    $value = $value ? new \DateTime($value) : null;
-                    break;
-
                 case 'details':
                     $value = json_decode($value, true);
                     break;
