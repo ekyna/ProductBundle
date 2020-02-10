@@ -103,13 +103,15 @@ class PriceRenderer
      * @param Model\ProductInterface $product
      * @param ContextInterface       $context
      * @param bool                   $discount
+     * @param bool                   $extended
      *
      * @return Model\PriceDisplay
      */
     public function getProductPrice(
         Model\ProductInterface $product,
         ContextInterface $context = null,
-        $discount = true
+        bool $discount = true,
+        bool $extended = false
     ): Model\PriceDisplay {
         if (null === $context) {
             $context = $this->contextProvider->getContext();
@@ -124,7 +126,7 @@ class PriceRenderer
 
         // From
         $fromLabel = ($this->options['price_with_from'] && $price['starting_from'])
-            ? $this->translator->trans('ekyna_commerce.subject.price_from') . '&nbsp;'
+            ? $this->translator->trans('ekyna_product.price.display.starting_from') . '&nbsp;'
             : '';
 
         $mode = $this->translator->trans(VatDisplayModes::getLabel($mode));
@@ -148,14 +150,41 @@ class PriceRenderer
             ]);
         }
 
-        // Result
-        $display = new Model\PriceDisplay($final, $fromLabel, $originalLabel, $finalLabel);
+        $endsAt = $price['ends_at'] ? $formatter->date($price['ends_at']) : '';
 
-        if (isset($price['details'][Offer::TYPE_SPECIAL]) && 0 < $price['details'][Offer::TYPE_SPECIAL]) {
-            $display->setSpecialPercent($formatter->percent($price['details'][Offer::TYPE_SPECIAL]));
+        // Result
+        $display = new Model\PriceDisplay($final, $fromLabel, $originalLabel, $finalLabel, $endsAt);
+
+        if ($extended && $endsAt) {
+            $display->addMention($this->translator->trans('ekyna_product.price.display.valid_until', [
+                '%date%' => $endsAt,
+            ]));
         }
+
+        // Special offer
+        if (isset($price['details'][Offer::TYPE_SPECIAL]) && 0 < $price['details'][Offer::TYPE_SPECIAL]) {
+            $display->setSpecialPercent($percent = $formatter->percent($price['details'][Offer::TYPE_SPECIAL]));
+
+            if ($extended) {
+                $display->setSpecialLabel($this->translator->trans('ekyna_product.price.display.special_offer', [
+                    '%percent%' => $percent,
+                ]));
+            }
+        }
+
+        // Pricing
         if (isset($price['details'][Offer::TYPE_PRICING]) && 0 < $price['details'][Offer::TYPE_PRICING]) {
-            $display->setPricingPercent($formatter->percent($price['details'][Offer::TYPE_PRICING]));
+            $display->setPricingPercent($percent = $formatter->percent($price['details'][Offer::TYPE_PRICING]));
+
+            if ($extended) {
+                $display->setSpecialLabel($this->translator->trans('ekyna_product.price.display.pricing', [
+                    '%percent%' => $percent,
+                ]));
+            }
+        }
+
+        if ($display->getSpecialPercent() || $display->getPricingPercent()) {
+            $display->addMention($this->translator->trans('ekyna_product.price.display.while_stock'));
         }
 
         return $display;

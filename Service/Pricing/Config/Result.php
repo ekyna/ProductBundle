@@ -41,6 +41,11 @@ class Result
      */
     protected $discounts;
 
+    /**
+     * @var \DateTime
+     */
+    protected $endsAt;
+
 
     /**
      * Constructor.
@@ -51,10 +56,10 @@ class Result
     {
         $this->key = $key;
 
-        $this->startingFrom = false;
+        $this->startingFrom  = false;
         $this->originalPrice = 0;
-        $this->basePrice = 0;
-        $this->sellPrice = 0;
+        $this->basePrice     = 0;
+        $this->sellPrice     = 0;
 
         $this->discounts = [
             Offer::TYPE_SPECIAL => 0,
@@ -196,6 +201,32 @@ class Result
     }
 
     /**
+     * Adds "ends at" date.
+     *
+     * @param \DateTime $date
+     *
+     * @return $this
+     */
+    public function addEndsAt(\DateTime $date): self
+    {
+        if (is_null($this->endsAt) || $date < $this->endsAt) {
+            $this->endsAt = $date;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the "ends at" date.
+     *
+     * @return \DateTime|null
+     */
+    public function getEndsAt(): ?\DateTime
+    {
+        return $this->endsAt;
+    }
+
+    /**
      * Returns the array result.
      *
      * @return array|null
@@ -212,15 +243,15 @@ class Result
         }
 
         $details = [];
-        $base = $this->originalPrice;
+        $base    = $this->originalPrice;
         foreach ([Offer::TYPE_SPECIAL, Offer::TYPE_PRICING] as $type) {
             if (empty($this->discounts[$type])) {
                 continue;
             }
 
-            $discount = $this->discounts[$type];
+            $discount       = $this->discounts[$type];
             $details[$type] = round($discount * 100 / $base, 5);
-            $base -= $discount;
+            $base           -= $discount;
         }
 
         $percent = 0;
@@ -237,6 +268,7 @@ class Result
                 'percent'        => $percent,
                 'group_id'       => $group,
                 'country_id'     => $country,
+                'ends_at'        => $this->endsAt ? $this->endsAt->format('Y-m-d') : null,
             ];
         }
 

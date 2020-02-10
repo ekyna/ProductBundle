@@ -32,12 +32,32 @@ class PriceDisplay
     /**
      * @var string
      */
+    private $endsAt;
+
+    /**
+     * @var string
+     */
     private $specialPercent;
 
     /**
      * @var string
      */
     private $pricingPercent;
+
+    /**
+     * @var string
+     */
+    private $specialLabel;
+
+    /**
+     * @var string
+     */
+    private $pricingLabel;
+
+    /**
+     * @var array
+     */
+    private $mentions;
 
 
     /**
@@ -47,13 +67,20 @@ class PriceDisplay
      * @param string $from
      * @param string $originalPrice
      * @param string $finalPrice
+     * @param string $endsAt
      */
-    public function __construct(float $amount, string $from, string $originalPrice, string $finalPrice)
+    public function __construct(float $amount, string $from, string $originalPrice, string $finalPrice, string $endsAt)
     {
         $this->amount = $amount;
         $this->from = $from;
         $this->originalPrice = $originalPrice;
         $this->finalPrice = $finalPrice;
+        $this->endsAt = $endsAt;
+        $this->specialPercent = '';
+        $this->specialLabel = '';
+        $this->pricingPercent = '';
+        $this->pricingLabel = '';
+        $this->mentions = [];
     }
 
     /**
@@ -69,7 +96,7 @@ class PriceDisplay
      *
      * @return float
      */
-    public function getAmount()
+    public function getAmount(): float
     {
         return $this->amount;
     }
@@ -79,7 +106,7 @@ class PriceDisplay
      *
      * @return string
      */
-    public function getFrom()
+    public function getFrom(): string
     {
         return $this->from;
     }
@@ -89,7 +116,7 @@ class PriceDisplay
      *
      * @return string
      */
-    public function getOriginalPrice()
+    public function getOriginalPrice(): string
     {
         return $this->originalPrice;
     }
@@ -99,29 +126,39 @@ class PriceDisplay
      *
      * @return string
      */
-    public function getFinalPrice()
+    public function getFinalPrice(): string
     {
         return $this->finalPrice;
     }
 
     /**
-     * Returns the special percent.
+     * Returns the endsAt.
      *
      * @return string
      */
-    public function getSpecialPercent()
+    public function getEndsAt(): string
+    {
+        return $this->endsAt;
+    }
+
+    /**
+     * Returns the special offer percentage.
+     *
+     * @return string
+     */
+    public function getSpecialPercent(): string
     {
         return $this->specialPercent;
     }
 
     /**
-     * Sets the special percentage.
+     * Sets the special offer percentage.
      *
      * @param string $percent
      *
      * @return PriceDisplay
      */
-    public function setSpecialPercent($percent)
+    public function setSpecialPercent(string $percent): self
     {
         $this->specialPercent = $percent;
 
@@ -129,26 +166,98 @@ class PriceDisplay
     }
 
     /**
-     * Returns the pricing percentage.
+     * Returns the special offer Label.
      *
      * @return string
      */
-    public function getPricingPercent()
+    public function getSpecialLabel(): string
+    {
+        return $this->specialLabel;
+    }
+
+    /**
+     * Sets the special offer label.
+     *
+     * @param string $label
+     *
+     * @return PriceDisplay
+     */
+    public function setSpecialLabel(string $label): self
+    {
+        $this->specialLabel = $label;
+
+        return $this;
+    }
+
+    /**
+     * Returns the pricing offer percentage.
+     *
+     * @return string
+     */
+    public function getPricingPercent(): string
     {
         return $this->pricingPercent;
     }
 
     /**
-     * Sets the pricing percentage.
+     * Sets the pricing offer percentage.
      *
      * @param string $percent
      *
      * @return PriceDisplay
      */
-    public function setPricingPercent($percent)
+    public function setPricingPercent(string $percent): self
     {
         $this->pricingPercent = $percent;
 
         return $this;
+    }
+
+    /**
+     * Returns the pricing offer label.
+     *
+     * @return string
+     */
+    public function getPricingLabel(): string
+    {
+        return $this->pricingLabel;
+    }
+
+    /**
+     * Sets the pricing offer label.
+     *
+     * @param string $label
+     *
+     * @return PriceDisplay
+     */
+    public function setPricingLabel(string $label): self
+    {
+        $this->pricingLabel = $label;
+
+        return $this;
+    }
+
+    /**
+     * Adds the mentions.
+     *
+     * @param string $mention
+     *
+     * @return $this
+     */
+    public function addMention(string $mention): self
+    {
+        $this->mentions[] = $mention;
+
+        return $this;
+    }
+
+    /**
+     * Returns the mentions.
+     *
+     * @return string[]
+     */
+    public function getMentions(): array
+    {
+        return $this->mentions;
     }
 }

@@ -18,6 +18,7 @@
         <field name="sellPrice" column="sell_price" type="decimal" precision="10" scale="5" nullable="false"/>
         <field name="percent" column="percent" type="decimal" precision="4" scale="2" nullable="false"/>
         <field name="details" column="details" type="json_array" nullable="false"/>
+        <field name="endsAt" column="ends_at" type="date" nullable="true"/>
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
             <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />

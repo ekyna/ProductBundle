@@ -84,6 +84,7 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
                 's.minQuantity as min_qty',
                 's.percent as percent',
                 's.stack as stack',
+                's.endsAt as ends_at'
             ])
             ->leftJoin('s.groups', 'g')
             ->leftJoin('s.countries', 'c')

@@ -317,6 +317,12 @@ ekyna_product:
             plural: Tarifs affichés
         alert:
             no_item: Aucun tarif configuré
+        display:
+            special_offer: Offre spéciale -%percent%
+            pricing: Tarif préférentiel -%percent%
+            starting_from: <small>À partir de</small>
+            valid_until: Offre valable jusqu'au %date%
+            while_stock: Dans la limite des stocks disponibles
 
     pricing:
         label:

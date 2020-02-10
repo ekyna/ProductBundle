@@ -62,11 +62,11 @@ class PriceCalculator
         CurrencyConverterInterface $currencyConverter,
         string $defaultCurrency
     ) {
-        $this->priceRepository = $priceRepository;
-        $this->offerRepository = $offerRepository;
-        $this->taxResolver = $taxResolver;
+        $this->priceRepository   = $priceRepository;
+        $this->offerRepository   = $offerRepository;
+        $this->taxResolver       = $taxResolver;
         $this->currencyConverter = $currencyConverter;
-        $this->defaultCurrency = $defaultCurrency;
+        $this->defaultCurrency   = $defaultCurrency;
     }
 
     /**
@@ -99,12 +99,13 @@ class PriceCalculator
                 'sell_price'     => $amount,
                 'percent'        => 0,
                 'details'        => [],
+                'ends_at'        => null,
             ];
         }
 
-        $mode = $context->getVatDisplayMode();
+        $mode     = $context->getVatDisplayMode();
         $currency = $context->getCurrency()->getCode();
-        $date = $context->getDate();
+        $date     = $context->getDate();
 
         // Currency conversion
         if ($currency !== $this->defaultCurrency) {
@@ -344,9 +345,9 @@ class PriceCalculator
             $price = 0;
             foreach ($bundle->getBundleSlots() as $slot) {
                 /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
-                $choice = $slot->getChoices()->first();
+                $choice       = $slot->getChoices()->first();
                 $childProduct = $choice->getProduct();
-                $choicePrice = $choice->getNetPrice();
+                $choicePrice  = $choice->getNetPrice();
 
                 if (true === $exclude) {
                     $choiceExclude = $exclude;
@@ -704,7 +705,7 @@ class PriceCalculator
 
         foreach ($bundle->getBundleSlots() as $slot) {
             /** @var Model\BundleChoiceInterface $choice */
-            $choice = $slot->getChoices()->first();
+            $choice  = $slot->getChoices()->first();
             $product = $choice->getProduct();
 
             if (Types::isBundleType($product)) {
@@ -720,8 +721,9 @@ class PriceCalculator
                     'offers' => [],
                 ];
 
-                if ($product->isVisible() && !$choice->isHidden() && $product->hasRequiredOptionGroup($choice->getExcludedOptionGroups())) {
-                    $visible = true;
+                if ($product->isVisible() && !$choice->isHidden()
+                    && $product->hasRequiredOptionGroup($choice->getExcludedOptionGroups())) {
+                    $visible         = true;
                     $child['offers'] = $this->mergeOffers(
                         $offers,
                         $this->offerRepository->findByProductAndContext($product, $context)

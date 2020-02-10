@@ -124,6 +124,7 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
                 'p.sellPrice as sell_price',
                 'p.percent as percent',
                 'p.details as details',
+                'p.endsAt as ends_at',
             ])
             ->andWhere($ex->eq('p.product', ':product'))
             ->andWhere($ex->orX($ex->eq('p.group', ':group'), $ex->isNull('p.group')))
@@ -154,6 +155,7 @@ class PriceRepository extends ResourceRepository implements PriceRepositoryInter
                 'p.sellPrice as sell_price',
                 'p.percent as percent',
                 'p.details as details',
+                'p.endsAt as ends_at',
                 'IDENTITY(p.group) as group_id',
                 'IDENTITY(p.country) as country_id',
             ])

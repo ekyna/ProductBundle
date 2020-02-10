@@ -129,8 +129,7 @@ class ProductExtension extends AbstractExtension
             ),
             new TwigFilter(
                 'product_price',
-                [$this->priceRenderer, 'getProductPrice'],
-                ['is_safe' => ['html']]
+                [$this, 'getProductPrice']
             ),
             new TwigFilter(
                 'product_pricing_grid',
@@ -249,6 +248,30 @@ class ProductExtension extends AbstractExtension
         $type = $this->attributeTypeRegistry->getType($attribute->getType());
 
         return $type->render($productAttribute, $this->localeProvider->getCurrentLocale());
+    }
+
+    /**
+     * Returns the product price display.
+     *
+     * @param Model\ProductInterface $product
+     * @param array                  $options
+     *
+     * @return Model\PriceDisplay
+     */
+    public function getProductPrice(Model\ProductInterface $product, array $options = []): Model\PriceDisplay
+    {
+        $options = array_replace([
+            'context' => null,
+            'discount' => true,
+            'extended' => false,
+        ], $options);
+
+        return $this->priceRenderer->getProductPrice(
+            $product,
+            $options['context'],
+            $options['discount'],
+            $options['extended']
+        );
     }
 
     /**

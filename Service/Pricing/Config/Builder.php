@@ -235,6 +235,10 @@ class Builder
                 $discount = round($price * $offer['details'][$type] / 100, 5);
                 $flat->addDiscount($type, $discount);
                 $price -= $discount;
+
+                if (isset($offer['ends_at'])) {
+                    $flat->addEndsAt(new \DateTime($offer['ends_at']));
+                }
             }
         }
 

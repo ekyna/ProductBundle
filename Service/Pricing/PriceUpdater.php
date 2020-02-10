@@ -244,7 +244,8 @@ class PriceUpdater
                 ->setOriginalPrice($data['original_price'])
                 ->setSellPrice($data['sell_price'])
                 ->setPercent($data['percent'])
-                ->setDetails($data['details']);
+                ->setDetails($data['details'])
+                ->setEndsAt($data['ends_at'] ? new \DateTime($data['ends_at']) : null);
 
             if (!is_null($data['group_id'])) {
                 /** @var \Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface $group */
@@ -312,6 +313,7 @@ class PriceUpdater
             'details',
             'group_id',
             'country_id',
+            'ends_at',
         ];
 
         foreach ($newPrices as $new) {

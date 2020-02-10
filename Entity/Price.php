@@ -46,6 +46,11 @@ class Price implements ResourceInterface
     private $details;
 
     /**
+     * @var \DateTime
+     */
+    private $endsAt;
+
+    /**
      * @var ProductInterface
      */
     private $product;
@@ -66,6 +71,10 @@ class Price implements ResourceInterface
      */
     public function __construct()
     {
+        $this->startingFrom = false;
+        $this->originalPrice = 0;
+        $this->sellPrice = 0;
+        $this->percent = 0;
         $this->details = [];
     }
 
@@ -95,7 +104,7 @@ class Price implements ResourceInterface
      *
      * @return bool
      */
-    public function isStartingFrom()
+    public function isStartingFrom(): bool
     {
         return $this->startingFrom;
     }
@@ -107,7 +116,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setStartingFrom(bool $from)
+    public function setStartingFrom(bool $from): self
     {
         $this->startingFrom = $from;
 
@@ -119,7 +128,7 @@ class Price implements ResourceInterface
      *
      * @return float
      */
-    public function getOriginalPrice()
+    public function getOriginalPrice(): float
     {
         return $this->originalPrice;
     }
@@ -131,7 +140,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setOriginalPrice(float $price)
+    public function setOriginalPrice(float $price): self
     {
         $this->originalPrice = $price;
 
@@ -143,7 +152,7 @@ class Price implements ResourceInterface
      *
      * @return float
      */
-    public function getSellPrice()
+    public function getSellPrice(): float
     {
         return $this->sellPrice;
     }
@@ -155,7 +164,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setSellPrice(float $price)
+    public function setSellPrice(float $price): self
     {
         $this->sellPrice = $price;
 
@@ -167,7 +176,7 @@ class Price implements ResourceInterface
      *
      * @return float
      */
-    public function getPercent()
+    public function getPercent(): float
     {
         return $this->percent;
     }
@@ -179,7 +188,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setPercent(float $percent)
+    public function setPercent(float $percent): self
     {
         $this->percent = $percent;
 
@@ -191,7 +200,7 @@ class Price implements ResourceInterface
      *
      * @return array
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
@@ -203,7 +212,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setDetails(array $details)
+    public function setDetails(array $details): self
     {
         foreach ($details as $type => $percent) {
             $this->addDetails((string)$type, (float)$percent);
@@ -220,7 +229,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function addDetails(string $type, float $percent)
+    public function addDetails(string $type, float $percent): self
     {
         if (!in_array($type, [Offer::TYPE_PRICING, Offer::TYPE_SPECIAL], true)) {
             throw new InvalidArgumentException("Unexpected offer type");
@@ -232,11 +241,35 @@ class Price implements ResourceInterface
     }
 
     /**
+     * Returns the "ends at" date.
+     *
+     * @return \DateTime
+     */
+    public function getEndsAt(): ?\DateTime
+    {
+        return $this->endsAt;
+    }
+
+    /**
+     * Sets the "ends at" date.
+     *
+     * @param \DateTime $endsAt
+     *
+     * @return Price
+     */
+    public function setEndsAt(\DateTime $endsAt = null): self
+    {
+        $this->endsAt = $endsAt;
+
+        return $this;
+    }
+
+    /**
      * Returns the product.
      *
      * @return ProductInterface
      */
-    public function getProduct()
+    public function getProduct(): ProductInterface
     {
         return $this->product;
     }
@@ -248,7 +281,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setProduct(ProductInterface $product)
+    public function setProduct(ProductInterface $product): self
     {
         $this->product = $product;
 
@@ -260,7 +293,7 @@ class Price implements ResourceInterface
      *
      * @return CustomerGroupInterface
      */
-    public function getGroup()
+    public function getGroup(): ?CustomerGroupInterface
     {
         return $this->group;
     }
@@ -272,7 +305,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setGroup(CustomerGroupInterface $group = null)
+    public function setGroup(CustomerGroupInterface $group = null): self
     {
         $this->group = $group;
 
@@ -284,7 +317,7 @@ class Price implements ResourceInterface
      *
      * @return CountryInterface
      */
-    public function getCountry()
+    public function getCountry(): ?CountryInterface
     {
         return $this->country;
     }
@@ -296,7 +329,7 @@ class Price implements ResourceInterface
      *
      * @return Price
      */
-    public function setCountry(CountryInterface $country = null)
+    public function setCountry(CountryInterface $country = null): self
     {
         $this->country = $country;
 
@@ -308,7 +341,7 @@ class Price implements ResourceInterface
      *
      * @return float[]
      */
-    public function getDetailedPercents()
+    public function getDetailedPercents(): array
     {
         $percents = [];
 
