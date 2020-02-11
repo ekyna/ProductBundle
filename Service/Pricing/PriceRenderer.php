@@ -183,7 +183,7 @@ class PriceRenderer
             }
         }
 
-        if ($display->getSpecialPercent() || $display->getPricingPercent()) {
+        if ($extended && ($display->getSpecialPercent() || $display->getPricingPercent())) {
             $display->addMention($this->translator->trans('ekyna_product.price.display.while_stock'));
         }
 
