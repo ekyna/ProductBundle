@@ -6,6 +6,7 @@ use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Stock\Entity\AbstractStockUnit;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
+use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
 
 /**
  * Class ProductStockUnit
@@ -23,7 +24,7 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     /**
      * @inheritdoc
      */
-    public function setProduct(Model\ProductInterface $product)
+    public function setProduct(Model\ProductInterface $product): Model\ProductStockUnitInterface
     {
         $this->product = $product;
 
@@ -33,7 +34,7 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     /**
      * @inheritdoc
      */
-    public function getProduct()
+    public function getProduct(): Model\ProductInterface
     {
         return $this->product;
     }
@@ -41,7 +42,7 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     /**
      * @inheritdoc
      */
-    public function setSubject(StockSubjectInterface $subject)
+    public function setSubject(StockSubjectInterface $subject): StockUnitInterface
     {
         if (!$subject instanceof Model\ProductInterface) {
             throw new InvalidArgumentException("Expected instance of ProductInterface.");
@@ -53,7 +54,7 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
     /**
      * @inheritdoc
      */
-    public function getSubject()
+    public function getSubject(): ?StockSubjectInterface
     {
         return $this->getProduct();
     }

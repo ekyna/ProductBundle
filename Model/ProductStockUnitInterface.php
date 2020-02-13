@@ -16,7 +16,7 @@ interface ProductStockUnitInterface extends StockUnitInterface
      *
      * @return ProductInterface
      */
-    public function getProduct();
+    public function getProduct(): ProductInterface;
 
     /**
      * Sets the product.
@@ -25,5 +25,5 @@ interface ProductStockUnitInterface extends StockUnitInterface
      *
      * @return $this|ProductStockUnitInterface
      */
-    public function setProduct(ProductInterface $product);
+    public function setProduct(ProductInterface $product): ProductStockUnitInterface;
 }
