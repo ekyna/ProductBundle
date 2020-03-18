@@ -38,7 +38,7 @@
 
         <!-- Product bookmark controller -->
         <service id="Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController">
-            <argument type="service" id="ekyna_admin.security.user_provider"/>
+            <argument type="service" id="Ekyna\Bundle\AdminBundle\Service\Security\UserProvider"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository"/>
             <argument type="service" id="doctrine"/>
@@ -111,7 +111,7 @@
             <argument type="service" id="form.factory"/>
             <argument type="service" id="session"/>
             <argument type="service" id="ekyna_commerce.util.formatter_factory"/>
-            <argument type="service" id="ekyna_admin.security.user_provider"/>
+            <argument type="service" id="Ekyna\Bundle\AdminBundle\Service\Security\UserProvider"/>
             <argument>%ekyna_commerce.supplier_order_item.class%</argument>
             <argument>%ekyna_product.product_stock_unit.class%</argument>
         </service>

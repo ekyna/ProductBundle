@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
+use Ekyna\Bundle\AdminBundle\Menu\MenuBuilder;
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\CoreBundle\Modal\Modal;
 use Ekyna\Bundle\ProductBundle\Form\Type\Inventory\BatchEditType;
@@ -34,7 +35,7 @@ class InventoryController extends Controller
     {
         $this
             ->container
-            ->get('ekyna_admin.menu.builder')
+            ->get(MenuBuilder::class)
             ->breadcrumbAppend(
                 'ekyna_product_inventory',
                 'ekyna_product.inventory.title',

@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin;
 
+use Ekyna\Bundle\AdminBundle\Menu\MenuBuilder;
 use Ekyna\Bundle\CoreBundle\Controller\Controller;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -25,7 +26,7 @@ class HighlightController extends Controller
     {
         $this
             ->container
-            ->get('ekyna_admin.menu.builder')
+            ->get(MenuBuilder::class)
             ->breadcrumbAppend(
                 'ekyna_product_highlight',
                 'ekyna_product.highlight.title',
