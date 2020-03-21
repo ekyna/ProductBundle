@@ -3,13 +3,13 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Catalog;
 
 use Behat\Transliterator\Transliterator;
+use Ekyna\Bundle\CommerceBundle\Service\Document\PdfGenerator;
 use Ekyna\Bundle\ProductBundle\Entity\Catalog;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
-use Knp\Snappy\GeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -37,7 +37,7 @@ class CatalogRenderer
     protected $templating;
 
     /**
-     * @var GeneratorInterface
+     * @var PdfGenerator
      */
     protected $pdfGenerator;
 
@@ -62,7 +62,7 @@ class CatalogRenderer
      *
      * @param CatalogRegistry        $registry
      * @param EngineInterface        $templating
-     * @param GeneratorInterface     $pdfGenerator
+     * @param PdfGenerator           $pdfGenerator
      * @param SubjectHelperInterface $subjectHelper
      * @param string                 $logoPath
      * @param bool                   $debug
@@ -70,7 +70,7 @@ class CatalogRenderer
     public function __construct(
         CatalogRegistry $registry,
         EngineInterface $templating,
-        GeneratorInterface $pdfGenerator,
+        PdfGenerator $pdfGenerator,
         SubjectHelperInterface $subjectHelper,
         $logoPath,
         $debug = false
@@ -94,7 +94,6 @@ class CatalogRenderer
     {
         $template = 'render';
         $theme = $this->registry->getTheme($catalog->getTheme())['path'];
-        // TODO $template = $catalog->getFormat() === static::FORMAT_EMAIL ? 'email' : 'render';
 
         if (0 === $catalog->getPages()->count()) {
             $this->buildPages($catalog);
@@ -109,13 +108,15 @@ class CatalogRenderer
 
         if ($catalog->getFormat() === static::FORMAT_PDF) {
             $options = [
-                'margin-top'    => "0",
-                'margin-right'  => "0",
-                'margin-bottom' => "0",
-                'margin-left'   => "0",
+                'margins' => [
+                    'top'    => 0,
+                    'right'  => 0,
+                    'bottom' => 0,
+                    'left'   => 0,
+                ],
             ];
 
-            return $this->pdfGenerator->getOutputFromHtml($content, $options);
+            return $this->pdfGenerator->generateFromHtml($content, $options);
         }
 
         return $content;

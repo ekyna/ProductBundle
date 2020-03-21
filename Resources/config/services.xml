@@ -907,7 +907,7 @@
                  class="Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer">
             <argument type="service" id="ekyna_product.catalog.registry"/>
             <argument type="service" id="templating"/>
-            <argument type="service" id="knp_snappy.pdf"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Document\PdfGenerator"/>
             <argument type="service" id="ekyna_commerce.subject_helper"/>
             <argument>%ekyna_commerce.default.company_logo%</argument>
             <argument>%kernel.debug%</argument>
