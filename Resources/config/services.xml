@@ -986,7 +986,6 @@
             <argument type="service" id="Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_commerce.customer_group.repository"/>
-            <argument type="service" id="translator"/>
         </service>
 
         <!-- Stat chart renderer -->
@@ -1101,7 +1100,8 @@
         </service>
         <service id="Ekyna\Bundle\ProductBundle\Command\StockUpdateCommand" public="false">
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_product.product.operator"/>
+            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="ekyna_product.product.manager"/>
             <tag name="console.command"/>
         </service>
         <service id="Ekyna\Bundle\ProductBundle\Command\UpdateMinPriceCommand" public="false">

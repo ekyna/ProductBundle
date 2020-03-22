@@ -1,5 +1,5 @@
 <div class="product-chart">
-    <canvas id="{{ id }}" width="400" height="200"></canvas>
+    <canvas id="{{ id }}" width="400" height="180"></canvas>
     <script type="application/javascript">
         require(['chart'], function(Chart) {
             new Chart(document.getElementById("{{ id }}"), {{ config|json_encode|raw }});

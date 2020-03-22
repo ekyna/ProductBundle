@@ -107,8 +107,8 @@ class StatUpdater
         $this->countRepository = $countRepository;
         $this->crossRepository = $crossRepository;
         $this->productRepository = $productRepository;
-        $this->groupRepository   = $groupRepository;
-        $this->entityManager     = $entityManager;
+        $this->groupRepository = $groupRepository;
+        $this->entityManager = $entityManager;
 
         $this->calculator = new StatCalculator($entityManager->getConnection());
     }
@@ -211,36 +211,44 @@ class StatUpdater
     private function update()
     {
         $count = 0;
-        foreach ($this->getGroups() as $group) {
-            $this->writeln(" - Group <comment>{$group->getName()}</comment>");
+        foreach (StatCount::getSources() as $source) {
+            foreach ($this->getGroups() as $group) {
+                $this->writeln(" - [$source] Group <comment>{$group->getName()}</comment>");
 
-            $orderDates = $this->calculator->getOrderDates($this->product, $group);
-            $statDates  = $this->calculator->getStatCountDates($this->product, $group);
+                $orderDates = $this->calculator->getSourceDates($this->product, $group, $source);
+                $statDates = $this->calculator->getStatCountDates($this->product, $group, $source);
 
-            foreach ($orderDates as $date => $updated) {
-                $this->write(sprintf(
-                    '    - %s %s ',
-                    $date,
-                    str_pad('.', 16 - mb_strlen($date), '.', STR_PAD_LEFT)
-                ));
+                foreach ($orderDates as $date => $updated) {
+                    $this->write(sprintf(
+                        '    - %s %s ',
+                        $date,
+                        str_pad('.', 16 - mb_strlen($date), '.', STR_PAD_LEFT)
+                    ));
 
-                if (!$this->force && isset($statDates[$date]) && $statDates[$date] > $updated) {
-                    $this->writeln('<comment>skipped</comment>');
-                    continue;
+                    if (!$this->force && isset($statDates[$date]) && $statDates[$date] > $updated) {
+                        $this->writeln('<comment>skipped</comment>');
+                        continue;
+                    }
+
+                    $from = new \DateTime($date);
+                    $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
+
+                    $this->updateCount($source, $group, $from, $to);
+                    if ($source === StatCount::SOURCE_ORDER) {
+                        $this->updateCross($group, $from, $to);
+                    }
+
+                    $this->writeln('<info>updated</info>');
+
+                    $count++;
+                    if ($count % 10 === 0) {
+                        $this->entityManager->flush();
+                    }
                 }
+            }
 
-                $from = new \DateTime($date);
-                $to   = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
-
-                $this->updateCount($group, $from, $to);
-                $this->updateCross($group, $from, $to);
-
-                $this->writeln('<info>updated</info>');
-
-                $count++;
-                if ($count % 10 === 0) {
-                    $this->entityManager->flush();
-                }
+            if ($count % 10 === 0) {
+                $this->entityManager->flush();
             }
         }
 
@@ -253,20 +261,24 @@ class StatUpdater
      * @param Group     $group
      * @param \DateTime $from
      * @param \DateTime $to
+     * @param string    $source
      */
-    private function updateCount(Group $group, \DateTime $from, \DateTime $to)
+    private function updateCount(string $source, Group $group, \DateTime $from, \DateTime $to)
     {
         // Count
-        $quantity = $this->calculator->calculateCountByGroup($this->product, $group, $from, $to);
+        $quantity = $this
+            ->calculator
+            ->calculateCountByGroup($this->product, $source, $group, $from, $to);
 
         // TODO Remove existing StatCount that do no longer match result
 
         $date = $from->format('Y-m');
 
-        if (null === $stat = $this->countRepository->findOne($this->product, $group, $date)) {
+        if (null === $stat = $this->countRepository->findOne($this->product, $source, $group, $date)) {
             $stat = new StatCount();
             $stat
                 ->setProduct($this->product)
+                ->setSource($source)
                 ->setDate($date)
                 ->setCustomerGroup($group);
         }

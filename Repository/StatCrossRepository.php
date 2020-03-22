@@ -215,7 +215,8 @@ class StatCrossRepository extends AbstractStatRepository
      * Configures the "find products" parameters resolver.
      *
      * @param OptionsResolver $resolver
-     */
+     *
+     * @noinspection PhpUnusedParameterInspection*/
     protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
     {
         $resolver

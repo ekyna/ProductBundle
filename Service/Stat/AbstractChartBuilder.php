@@ -111,7 +111,7 @@ abstract class AbstractChartBuilder
             $index = $d->format('Y-m');
             if (!isset($data[$index])) {
                 $data[$index] = 0;
-            };
+            }
         }
         ksort($data);
 

@@ -9,18 +9,19 @@
             table="product_stat_count">
 
         <indexes>
-            <index columns="date" name="index_product_stat_date"/>
+            <index columns="source" name="index_product_stat_count_source"/>
+            <index columns="date" name="index_product_stat_count_date"/>
         </indexes>
 
         <unique-constraints>
-            <unique-constraint columns="product_id,date,group_id"
-                               name="unique_product_stat_count"/>
+            <unique-constraint columns="product_id,source,date,group_id" name="unique_product_stat_count"/>
         </unique-constraints>
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
 
+        <field name="source" column="source" type="string" length="6" nullable="false"/>
         <field name="date" column="date" type="string" length="7" nullable="false"/>
         <field name="count" column="count" type="integer" nullable="false"/>
         <field name="updatedAt" column="updated_at" type="datetime" nullable="false"/>

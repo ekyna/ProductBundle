@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StatCountRepository
@@ -51,17 +52,19 @@ class StatCountRepository extends AbstractStatRepository
      * Finds one stat count.
      *
      * @param Product $product
+     * @param string  $source
      * @param Group   $group
      * @param string  $date
      *
      * @return StatCount|null
      */
-    public function findOne(Product $product, Group $group, string $date): ?StatCount
+    public function findOne(Product $product, string $source, Group $group, string $date): ?StatCount
     {
         return $this
             ->getFindOneQuery()
             ->setParameters([
                 'product' => $product,
+                'source'  => $source,
                 'group'   => $group,
                 'date'    => $date,
             ])
@@ -72,22 +75,28 @@ class StatCountRepository extends AbstractStatRepository
      * Finds count stats by product and period (and optionally customer group).
      *
      * @param Product     $product
+     * @param string      $source
      * @param \DatePeriod $period
      * @param Group       $group
      *
      * @return int[]
      */
-    public function findByProductAndPeriodAndGroup(Product $product, \DatePeriod $period, Group $group = null): array
-    {
+    public function findByProductAndPeriodAndGroup(
+        Product $product,
+        string $source,
+        \DatePeriod $period,
+        Group $group = null
+    ): array {
         $parameters = [
             'product' => $product,
+            'source'  => $source,
             'from'    => $period->start->format('Y-m'),
             'to'      => $period->end->format('Y-m'),
         ];
 
         if ($group) {
             $parameters['group'] = $group;
-            $query               = $this->getFindByProductAndPeriodAndGroupQuery();
+            $query = $this->getFindByProductAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindByProductAndPeriodQuery();
         }
@@ -103,6 +112,16 @@ class StatCountRepository extends AbstractStatRepository
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getFindProductsDefaultParameters(): array
+    {
+        return array_replace(parent::getFindProductsDefaultParameters(), [
+            'source' => StatCount::SOURCE_ORDER,
+        ]);
+    }
+
+    /**
      * Creates the "find products" query builder.
      *
      * @return QueryBuilder
@@ -114,6 +133,7 @@ class StatCountRepository extends AbstractStatRepository
         return $qb
             ->join('s.product', 'p')
             ->addGroupBy('s.product')
+            ->andWhere($qb->expr()->eq('s.source', ':source'))
             ->andWhere($qb->expr()->neq('p.bestSeller', ':not_mode'));
     }
 
@@ -125,7 +145,19 @@ class StatCountRepository extends AbstractStatRepository
      */
     protected function configureFindProductsQueryBuilder(QueryBuilder $qb, array $parameters): void
     {
-        $qb->setParameter('not_mode', HighlightModes::MODE_NEVER);
+        $qb
+            ->setParameter('source', $parameters['source'])
+            ->setParameter('not_mode', HighlightModes::MODE_NEVER);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
+    {
+        $resolver
+            ->setDefault('source', StatCount::SOURCE_ORDER)
+            ->setAllowedValues('source', StatCount::getSources());
     }
 
     /**
@@ -143,6 +175,7 @@ class StatCountRepository extends AbstractStatRepository
         return $this->findByProductAndPeriodQuery = $qb
             ->select('s.date', 'SUM(s.count) as nb')
             ->andWhere($ex->eq('s.product', ':product'))
+            ->andWhere($ex->eq('s.source', ':source'))
             ->andWhere($ex->gte('s.date', ':from'))
             ->andWhere($ex->lte('s.date', ':to'))
             ->andHaving($ex->gt('SUM(s.count)', 0))
@@ -166,10 +199,12 @@ class StatCountRepository extends AbstractStatRepository
         return $this->findByProductAndPeriodAndGroupQuery = $qb
             ->select('s.date', 's.count as nb')
             ->andWhere($ex->eq('s.product', ':product'))
+            ->andWhere($ex->eq('s.source', ':source'))
             ->andWhere($ex->eq('s.customerGroup', ':group'))
             ->andWhere($ex->gte('s.date', ':from'))
             ->andWhere($ex->lte('s.date', ':to'))
             ->andHaving($ex->gt('SUM(s.count)', 0))
+            ->addGroupBy('s.date')
             ->getQuery()
             ->useQueryCache(true);
     }
@@ -187,8 +222,9 @@ class StatCountRepository extends AbstractStatRepository
         $ex = $qb->expr();
 
         return $this->findOneQuery = $qb
-            ->andWhere($ex->eq('s.product', ':product'))
+            ->andWhere($ex->eq('s.source', ':source'))
             ->andWhere($ex->eq('s.date', ':date'))
+            ->andWhere($ex->eq('s.product', ':product'))
             ->andWhere($ex->eq('s.customerGroup', ':group'))
             ->getQuery()
             ->useQueryCache(true);

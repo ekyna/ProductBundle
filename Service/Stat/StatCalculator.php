@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
 use Doctrine\DBAL\Connection;
+use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 
@@ -11,7 +12,7 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
  * @package Ekyna\Bundle\ProductBundle\Service\Stat
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @TODO Use ProductProvider::NAME instead of 'product' in queries
+ * @TODO    Use ProductProvider::NAME instead of 'product' in queries
  */
 class StatCalculator
 {
@@ -37,29 +38,31 @@ class StatCalculator
      * @param Product   $product
      * @param \DateTime $from
      * @param \DateTime $to
+     * @param string    $source
      *
      * @return int
      */
-    public function calculateCount(Product $product, \DateTime $from, \DateTime $to)
+    public function calculateCount(Product $product, string $source, \DateTime $from, \DateTime $to)
     {
+        $clause = $this->getAndWhereBySource($source);
+
         $query =
-"WITH RECURSIVE item_quantity (id, parent_id, order_id, total) AS (
-  SELECT id, parent_id, order_id, quantity as total
-  FROM commerce_order_item
+            "WITH RECURSIVE item_quantity (id, parent_id, {$source}_id, total) AS (
+  SELECT id, parent_id, {$source}_id, quantity as total
+  FROM commerce_{$source}_item
   WHERE subject_provider = 'product'
     AND subject_identifier = {$product->getIdentifier()}
   UNION ALL
-  SELECT i1.id, i1.parent_id, i1.order_id, i2.total * i1.quantity
+  SELECT i1.id, i1.parent_id, i1.{$source}_id, i2.total * i1.quantity
   FROM item_quantity AS i2
-  JOIN commerce_order_item AS i1 ON i2.parent_id = i1.id
+  JOIN commerce_{$source}_item AS i1 ON i2.parent_id = i1.id
 )
 SELECT SUM(iq.total) as quantity
 FROM item_quantity AS iq
- JOIN commerce_order o ON iq.order_id = o.id
+ JOIN commerce_{$source} o ON iq.{$source}_id = o.id
 WHERE iq.parent_id IS NULL
   AND o.created_at BETWEEN '{$from->format('Y-m-d H:i:s')}' AND '{$to->format('Y-m-d H:i:s')}'
-  AND o.is_sample=0
-  AND o.state IN ('accepted', 'completed');";
+  $clause";
 
         $statement = $this->connection->query($query);
         if (false !== $data = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -76,30 +79,37 @@ WHERE iq.parent_id IS NULL
      * @param Group     $group
      * @param \DateTime $from
      * @param \DateTime $to
+     * @param string    $source
      *
      * @return int
      */
-    public function calculateCountByGroup(Product $product, Group $group, \DateTime $from, \DateTime $to)
-    {
+    public function calculateCountByGroup(
+        Product $product,
+        string $source,
+        Group $group,
+        \DateTime $from,
+        \DateTime $to
+    ) {
+        $clause = $this->getAndWhereBySource($source);
+
         $query =
-"WITH RECURSIVE item_quantity (id, parent_id, order_id, total) AS (
-  SELECT id, parent_id, order_id, quantity as total
-  FROM commerce_order_item
+            "WITH RECURSIVE item_quantity (id, parent_id, {$source}_id, total) AS (
+  SELECT id, parent_id, {$source}_id, quantity as total
+  FROM commerce_{$source}_item
   WHERE subject_provider = 'product'
     AND subject_identifier = {$product->getIdentifier()}
   UNION ALL
-  SELECT i1.id, i1.parent_id, i1.order_id, i2.total * i1.quantity
+  SELECT i1.id, i1.parent_id, i1.{$source}_id, i2.total * i1.quantity
   FROM item_quantity AS i2
-  JOIN commerce_order_item AS i1 ON i2.parent_id = i1.id
+  JOIN commerce_{$source}_item AS i1 ON i2.parent_id = i1.id
 )
 SELECT SUM(iq.total) as quantity
 FROM item_quantity AS iq
- JOIN commerce_order o ON iq.order_id = o.id
+ JOIN commerce_{$source} o ON iq.{$source}_id = o.id
 WHERE iq.parent_id IS NULL
   AND o.created_at BETWEEN '{$from->format('Y-m-d H:i:s')}' AND '{$to->format('Y-m-d H:i:s')}'
   AND o.customer_group_id = {$group->getId()}
-  AND o.is_sample=0
-  AND o.state IN ('accepted', 'completed');";
+  $clause";
 
         $statement = $this->connection->query($query);
         if (false !== $data = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -121,7 +131,7 @@ WHERE iq.parent_id IS NULL
     public function calculateCross(Product $product, \DateTime $from, \DateTime $to)
     {
         $query =
-"WITH RECURSIVE item_quantity (id, subject_provider, subject_identifier, total) AS (
+            "WITH RECURSIVE item_quantity (id, subject_provider, subject_identifier, total) AS (
   SELECT id, subject_provider, subject_identifier, quantity as total
   FROM commerce_order_item
   WHERE parent_id IS NULL
@@ -184,7 +194,7 @@ LIMIT 24;";
     public function calculateCrossByGroup(Product $product, Group $group, \DateTime $from, \DateTime $to)
     {
         $query =
-"WITH RECURSIVE item_quantity (id, subject_provider, subject_identifier, total) AS (
+            "WITH RECURSIVE item_quantity (id, subject_provider, subject_identifier, total) AS (
   SELECT id, subject_provider, subject_identifier, quantity as total
   FROM commerce_order_item
   WHERE parent_id IS NULL
@@ -236,34 +246,36 @@ LIMIT 24;";
     }
 
     /**
-     * Returns the orders dates.
+     * Returns the source dates.
      *
      * @param Product $product
      * @param Group   $group
+     * @param string  $source
      *
      * @return array
      */
-    public function getOrderDates(Product $product, Group $group)
+    public function getSourceDates(Product $product, Group $group, string $source)
     {
+        $clause = $this->getAndWhereBySource($source);
+
+        /** @noinspection SqlResolve */
         $query = "
 SELECT DATE_FORMAT(o.created_at, '%Y-%m') as date, MAX(o.updated_at) as updated_at FROM (
   SELECT
-    IF(i1.order_id IS NOT NULL, i1.order_id,
-      IF(i2.order_id IS NOT NULL, i2.order_id,
-        IF(i3.order_id IS NOT NULL, i3.order_id,
-          IF(i4.order_id IS NOT NULL, i4.order_id, i5.order_id)))) as order_id
-  FROM commerce_order_item i1
-  LEFT JOIN commerce_order_item i2 ON i2.id = i1.parent_id
-  LEFT JOIN commerce_order_item i3 ON i3.id = i2.parent_id
-  LEFT JOIN commerce_order_item i4 ON i4.id = i3.parent_id
-  LEFT JOIN commerce_order_item i5 ON i5.id = i4.parent_id
+    IF(i1.{$source}_id IS NOT NULL, i1.{$source}_id,
+      IF(i2.{$source}_id IS NOT NULL, i2.{$source}_id,
+        IF(i3.{$source}_id IS NOT NULL, i3.{$source}_id,
+          IF(i4.{$source}_id IS NOT NULL, i4.{$source}_id, i5.{$source}_id)))) as {$source}_id
+  FROM commerce_{$source}_item i1
+  LEFT JOIN commerce_{$source}_item i2 ON i2.id = i1.parent_id
+  LEFT JOIN commerce_{$source}_item i3 ON i3.id = i2.parent_id
+  LEFT JOIN commerce_{$source}_item i4 ON i4.id = i3.parent_id
+  LEFT JOIN commerce_{$source}_item i5 ON i5.id = i4.parent_id
   WHERE i1.subject_provider = 'product'
     AND i1.subject_identifier = {$product->getIdentifier()}
 ) as i
-JOIN commerce_order o ON i.order_id = o.id
-WHERE o.state IN ('accepted', 'completed')
-  AND o.is_sample=0
-  AND o.customer_group_id = {$group->getId()}
+JOIN commerce_{$source} o ON i.{$source}_id = o.id
+WHERE o.customer_group_id = {$group->getId()} $clause
 GROUP BY date;";
 
         // TODO and o.created_at > -1 year
@@ -283,16 +295,20 @@ GROUP BY date;";
      *
      * @param Product $product
      * @param Group   $group
+     * @param string  $source
      *
      * @return array
      */
-    public function getStatCountDates(Product $product, Group $group)
+    public function getStatCountDates(Product $product, Group $group, string $source)
     {
+        StatCount::isValidSource($source);
+
         $query = "
 SELECT s.date, s.updated_at 
 FROM product_stat_count s 
 WHERE product_id = {$product->getIdentifier()} 
-  AND s.group_id = {$group->getId()};";
+  AND s.group_id = {$group->getId()}
+  AND s.source = '{$source}';";
 
         // TODO and s.date >= -1 year
 
@@ -304,5 +320,23 @@ WHERE product_id = {$product->getIdentifier()}
         }
 
         return $dates;
+    }
+
+    /**
+     * Returns the 'and where' clauses by source.
+     *
+     * @param string $source
+     *
+     * @return string
+     */
+    private function getAndWhereBySource(string $source): string
+    {
+        StatCount::isValidSource($source);
+
+        if ($source === StatCount::SOURCE_ORDER) {
+            return "AND o.is_sample=0 AND o.state IN ('accepted', 'completed')";
+        }
+
+        return "";
     }
 }

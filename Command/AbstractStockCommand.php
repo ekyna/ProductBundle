@@ -18,7 +18,7 @@ abstract class AbstractStockCommand extends Command
     /**
      * @var ProductRepositoryInterface
      */
-    private $repository;
+    protected $repository;
 
 
     /**

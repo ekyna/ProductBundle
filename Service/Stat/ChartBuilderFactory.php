@@ -6,7 +6,6 @@ use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\StatCountRepository;
 use Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ChartBuilderFactory
@@ -35,11 +34,6 @@ class ChartBuilderFactory
      */
     private $groupRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
 
     /**
      * Constructor.
@@ -48,20 +42,17 @@ class ChartBuilderFactory
      * @param StatCrossRepository              $crossRepository
      * @param ProductRepositoryInterface       $productRepository
      * @param CustomerGroupRepositoryInterface $groupRepository
-     * @param TranslatorInterface              $translator
      */
     public function __construct(
         StatCountRepository $countRepository,
         StatCrossRepository $crossRepository,
         ProductRepositoryInterface $productRepository,
-        CustomerGroupRepositoryInterface $groupRepository,
-        TranslatorInterface $translator
+        CustomerGroupRepositoryInterface $groupRepository
     ) {
         $this->countRepository = $countRepository;
         $this->crossRepository = $crossRepository;
         $this->productRepository = $productRepository;
         $this->groupRepository = $groupRepository;
-        $this->translator = $translator;
     }
 
     /**
@@ -73,8 +64,7 @@ class ChartBuilderFactory
     {
         $builder = new CountChartBuilder(
             $this->countRepository,
-            $this->groupRepository,
-            $this->translator
+            $this->groupRepository
         );
 
         $to = new \DateTime();
@@ -93,8 +83,7 @@ class ChartBuilderFactory
         $builder = new CrossChartBuilder(
             $this->crossRepository,
             $this->productRepository,
-            $this->groupRepository,
-            $this->translator
+            $this->groupRepository
         );
 
         $to = new \DateTime();

@@ -2,8 +2,9 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
+use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Repository\StatCountRepository;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
 
 /**
@@ -35,8 +36,10 @@ class CountChartBuilder extends AbstractChartBuilder
     /**
      * @inheritdoc
      */
-    public function build()
+    public function build(string $source = null)
     {
+        StatCount::isValidSource($source);
+
         $count = 0;
         $labels = $dataSets = [];
 
@@ -57,12 +60,12 @@ class CountChartBuilder extends AbstractChartBuilder
             'pointStyle'       => 'rectRot',
             'pointRadius'      => 5,
             'pointBorderColor' => 'transparent',
-            'data'             => array_values($this->getProductData()),
+            'data'             => array_values($this->getProductData($source)),
         ];
         $count++;
 
         // By group
-        /** @var CustomerGroupInterface[] $groups */
+        /** @var Group[] $groups */
         $groups = $this->groupRepository->findAll();
         foreach ($groups as $group) {
             $color = self::$colors[$count];
@@ -76,7 +79,7 @@ class CountChartBuilder extends AbstractChartBuilder
                 'pointStyle'       => 'rectRot',
                 'pointRadius'      => 5,
                 'pointBorderColor' => 'transparent',
-                'data'             => array_values($this->getProductData($group)),
+                'data'             => array_values($this->getProductData($source, $group)),
             ];
             $count++;
         }
@@ -115,15 +118,16 @@ class CountChartBuilder extends AbstractChartBuilder
     /**
      * Returns the product data for the given group.
      *
-     * @param CustomerGroupInterface $group
+     * @param string $source
+     * @param Group  $group
      *
      * @return array
      */
-    private function getProductData(CustomerGroupInterface $group = null)
+    private function getProductData(string $source, Group $group = null)
     {
         $data = $this
             ->countRepository
-            ->findByProductAndPeriodAndGroup($this->product, $this->period, $group);
+            ->findByProductAndPeriodAndGroup($this->product, $source, $this->period, $group);
 
         return $this->fillData($data);
     }

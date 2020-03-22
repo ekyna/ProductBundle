@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 
@@ -12,10 +13,19 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
  */
 class StatCount
 {
+    /* Warning : StatCalculator uses these constant values to build queries */
+    public const SOURCE_ORDER = 'order';
+    public const SOURCE_QUOTE = 'quote';
+
     /**
      * @var int
      */
     private $id = 0;
+
+    /**
+     * @var string
+     */
+    private $source;
 
     /***
      * @var string
@@ -44,6 +54,28 @@ class StatCount
 
 
     /**
+     * Returns the sources.
+     *
+     * @return string[]
+     */
+    public static function getSources(): array
+    {
+        return [self::SOURCE_ORDER, self::SOURCE_QUOTE];
+    }
+
+    /**
+     * Validates the given source.
+     *
+     * @param string $source
+     */
+    public static function isValidSource(string $source)
+    {
+        if (!in_array($source, self::getSources(), true)) {
+            throw new InvalidArgumentException("Invalid stat source.");
+        }
+    }
+
+    /**
      * Returns the id.
      *
      * @return int
@@ -51,6 +83,30 @@ class StatCount
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * Returns the source.
+     *
+     * @return string
+     */
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
+    /**
+     * Sets the source.
+     *
+     * @param string $source
+     *
+     * @return StatCount
+     */
+    public function setSource(string $source): StatCount
+    {
+        $this->source = $source;
+
+        return $this;
     }
 
     /**

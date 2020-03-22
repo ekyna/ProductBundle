@@ -1036,18 +1036,34 @@
 {%- macro show_stat_charts(product) -%}
     <div class="panel-group" id="stat_collapse" role="tablist" aria-multiselectable="true">
         <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="count_stat_heading">
+            <div class="panel-heading" role="tab" id="order_count_stat_heading">
                 <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#stat_collapse" href="#collapse_count_chart"
+                    <a role="button" data-toggle="collapse" data-parent="#stat_collapse" href="#collapse_order_count_chart"
                        aria-expanded="true" aria-controls="collapseOne" style="display:block;">
-                        {{- 'ekyna_product.stat.count'|trans -}}
+                        {{- 'ekyna_product.stat.count'|trans }}&nbsp;({{ 'ekyna_commerce.order.label.plural'|trans -}})
                     </a>
                 </h4>
             </div>
-            <div id="collapse_count_chart" class="panel-collapse collapse in" role="tabpanel"
-                 aria-labelledby="count_stat_heading">
+            <div id="collapse_order_count_chart" class="panel-collapse collapse in" role="tabpanel"
+                 aria-labelledby="order_count_stat_heading">
                 <div class="panel-body">
-                    {{- product_stat_count_chart(product) -}}
+                    {{- product_stat_count_chart(product, constant('Ekyna\\Bundle\\ProductBundle\\Entity\\StatCount::SOURCE_ORDER')) -}}
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="quote_count_stat_heading">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#stat_collapse" href="#collapse_quote_count_chart"
+                       aria-expanded="true" aria-controls="collapseOne" style="display:block;">
+                        {{- 'ekyna_product.stat.count'|trans }}&nbsp;({{ 'ekyna_commerce.quote.label.plural'|trans -}})
+                    </a>
+                </h4>
+            </div>
+            <div id="collapse_quote_count_chart" class="panel-collapse collapse" role="tabpanel"
+                 aria-labelledby="quote_count_stat_heading">
+                <div class="panel-body">
+                    {{- product_stat_count_chart(product, constant('Ekyna\\Bundle\\ProductBundle\\Entity\\StatCount::SOURCE_QUOTE')) -}}
                 </div>
             </div>
         </div>
@@ -1060,7 +1076,8 @@
                     </a>
                 </h4>
             </div>
-            <div id="collapse_cross_chart" class="panel-collapse collapse" role="tabpanel" aria-labelledby="cross_stat_heading">
+            <div id="collapse_cross_chart" class="panel-collapse collapse" role="tabpanel"
+                 aria-labelledby="cross_stat_heading">
                 <div class="panel-body">
                     {{- product_stat_cross_chart(product) -}}
                 </div>

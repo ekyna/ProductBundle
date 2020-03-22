@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
+use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -49,19 +50,20 @@ class ChartRenderer
      * Renders the product count chart.
      *
      * @param ProductInterface $product
+     * @param string           $source
      *
      * @return string
      */
-    public function renderProductCountChart(ProductInterface $product)
+    public function renderProductCountChart(ProductInterface $product, string $source = StatCount::SOURCE_ORDER)
     {
         $config = $this
             ->factory
             ->countChartBuilder()
             ->setProduct($product)
-            ->build();
+            ->build($source);
 
         return $this->templating->render($this->config['template'], [
-            'id'     => 'product-count-chart-' . $product->getId(),
+            'id'     => 'product-' . $source . '-count-chart-' . $product->getId(),
             'config' => $config,
         ]);
     }

@@ -9,18 +9,16 @@
             table="product_stat_cross">
 
         <indexes>
-            <index columns="date" name="index_product_stat_date"/>
+            <index columns="date" name="index_product_stat_cross_date"/>
         </indexes>
 
         <unique-constraints>
-            <unique-constraint columns="source_id,target_id,date,group_id"
-                               name="unique_product_stat_cross"/>
+            <unique-constraint columns="source_id,target_id,date,group_id" name="unique_product_stat_cross"/>
         </unique-constraints>
 
         <id name="id" type="integer" column="id">
             <generator strategy="AUTO"/>
         </id>
-
 
         <field name="date" column="date" type="string" length="7" nullable="false"/>
         <field name="count" column="count" type="integer" nullable="false"/>
