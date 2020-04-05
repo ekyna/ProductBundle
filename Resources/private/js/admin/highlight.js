@@ -32,7 +32,7 @@ define(['jquery', 'routing'], function ($, Router) {
         setBusy(true);
 
         var an, bn, callback;
-        if (by === 'id') {
+        if (by === 'id' || by === 'visible' || by === 'visibility' || by === 'bestseller' || by === 'crossselling') {
             callback = function (a, b) {
                 an = parseInt(a.getAttribute('data-' + by));
                 bn = parseInt(b.getAttribute('data-' + by));
@@ -203,6 +203,7 @@ define(['jquery', 'routing'], function ($, Router) {
         .done(function(data) {
             $tr.removeClass('warning danger').addClass('success');
             $tr.data(property, data[property]);
+            $tr.attr('data-' + property, data[property]);
             setTimeout(function() {
                 $tr.removeClass('success');
             }, 1500);

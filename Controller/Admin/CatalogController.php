@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogRenderType;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
+use Ekyna\Component\Commerce\Exception\PdfException;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,9 +85,15 @@ class CatalogController extends ResourceController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this
-                ->get('ekyna_product.catalog.renderer')
-                ->respond($catalog, $request);
+            try {
+                return $this
+                    ->get('ekyna_product.catalog.renderer')
+                    ->respond($catalog, $request);
+            } catch (PdfException $e) {
+                $this->addFlash('ekyna_commerce.document.message.failed_to_generate', 'danger');
+
+                return $this->redirect($this->generateResourcePath($catalog));
+            }
         }
 
         return $this->render(
@@ -138,14 +145,20 @@ class CatalogController extends ResourceController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $response = $this
-                ->get('ekyna_product.catalog.renderer')
-                ->respond($catalog, $request);
+            try {
+                $response = $this
+                    ->get('ekyna_product.catalog.renderer')
+                    ->respond($catalog, $request);
+            } catch (PdfException $e) {
+                $this->addFlash('ekyna_commerce.document.message.failed_to_generate', 'danger');
+
+                return $this->redirect($this->generateResourcePath($sale));
+            }
 
             if ($catalog->isSave()) {
                 $this->saveSaleCatalog($sale, $response->getContent());
 
-                return $this->redirect($this->generateResourcePath($sale, 'show'));
+                return $this->redirect($this->generateResourcePath($sale));
             }
 
             return $response;

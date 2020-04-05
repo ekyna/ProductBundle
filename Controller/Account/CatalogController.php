@@ -7,6 +7,7 @@ use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogRenderType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogType;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
+use Ekyna\Component\Commerce\Exception\PdfException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -214,6 +215,10 @@ class CatalogController extends AbstractController
             ->setDisplayPrices(false)
             ->setFormat(CatalogRenderer::FORMAT_PDF);
 
+        $cancelPath = $this->generateUrl('ekyna_product_account_catalog_show', [
+            'catalogId' => $catalog->getId(),
+        ]);
+
         // TODO not all fields
 
         $form = $this->createForm(CatalogRenderType::class, $catalog, [
@@ -224,18 +229,22 @@ class CatalogController extends AbstractController
         ]);
 
         $this->createFormFooter($form, [
-            'cancel_path'  => $this->generateUrl('ekyna_product_account_catalog_show', [
-                'catalogId' => $catalog->getId(),
-            ]),
+            'cancel_path'  => $cancelPath,
             'submit_label' => 'ekyna_core.button.display',
         ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this
-                ->get('ekyna_product.catalog.renderer')
-                ->respond($catalog, $request);
+            try {
+                return $this
+                    ->get('ekyna_product.catalog.renderer')
+                    ->respond($catalog, $request);
+            } catch (PdfException $e) {
+                $this->addFlash('ekyna_commerce.document.message.failed_to_generate', 'danger');
+
+                return $this->redirect($cancelPath);
+            }
         }
 
         $catalogs = $this->getRepository()->findByCustomer($customer);

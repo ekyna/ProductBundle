@@ -195,7 +195,7 @@ class StatCrossRepository extends AbstractStatRepository
             ->join('s.target', 'p')
             ->addGroupBy('s.target')
             ->andWhere($qb->expr()->in('IDENTITY(s.source)', ':source'))
-            ->andWhere($qb->expr()->neq('p.crossSelling', ':not_mode'));
+            ->andWhere($qb->expr()->eq('p.crossSelling', ':mode'));
     }
 
     /**
@@ -208,7 +208,7 @@ class StatCrossRepository extends AbstractStatRepository
     {
         $qb
             ->setParameter('source', $parameters['source'])
-            ->setParameter('not_mode', HighlightModes::MODE_NEVER);
+            ->setParameter('mode', HighlightModes::MODE_AUTO);
     }
 
     /**

@@ -238,6 +238,24 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findNextStatUpdate(\DateTime $maxDate = null);
 
     /**
+     * Returns the visible products with best seller mode set to 'always'.
+     *
+     * @param array $options The options : limit, exclude (ids), id_only
+     *
+     * @return Model\ProductInterface[]
+     */
+    public function findBestSellers(array $options = []): array;
+
+    /**
+     * Returns the visible products with cross selling mode set to 'always'.
+     *
+     * @param array $options The options : limit, exclude (ids), id_only
+     *
+     * @return Model\ProductInterface[]
+     */
+    public function findCrossSelling(array $options = []): array;
+
+    /**
      * Joins prices for sorting.
      *
      * Adds 'sellPrice' select to the given query builder.

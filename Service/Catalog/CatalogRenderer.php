@@ -89,6 +89,8 @@ class CatalogRenderer
      * @param Catalog $catalog
      *
      * @return string
+     *
+     * @throws \Ekyna\Component\Commerce\Exception\PdfException
      */
     public function render(Catalog $catalog)
     {
@@ -176,6 +178,8 @@ class CatalogRenderer
      * @param Request $request
      *
      * @return Response
+     *
+     * @throws \Ekyna\Component\Commerce\Exception\PdfException
      */
     public function respond(Catalog $catalog, Request $request = null)
     {

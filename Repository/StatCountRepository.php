@@ -134,7 +134,7 @@ class StatCountRepository extends AbstractStatRepository
             ->join('s.product', 'p')
             ->addGroupBy('s.product')
             ->andWhere($qb->expr()->eq('s.source', ':source'))
-            ->andWhere($qb->expr()->neq('p.bestSeller', ':not_mode'));
+            ->andWhere($qb->expr()->eq('p.bestSeller', ':mode'));
     }
 
     /**
@@ -147,7 +147,7 @@ class StatCountRepository extends AbstractStatRepository
     {
         $qb
             ->setParameter('source', $parameters['source'])
-            ->setParameter('not_mode', HighlightModes::MODE_NEVER);
+            ->setParameter('mode', HighlightModes::MODE_AUTO);
     }
 
     /**

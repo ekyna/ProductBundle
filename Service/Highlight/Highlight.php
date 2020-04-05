@@ -75,12 +75,12 @@ class Highlight
         EngineInterface $templating,
         array $config = []
     ) {
-        $this->contextProvider   = $contextProvider;
-        $this->cartProvider      = $cartProvider;
+        $this->contextProvider = $contextProvider;
+        $this->cartProvider = $cartProvider;
         $this->productRepository = $productRepository;
-        $this->countRepository   = $countRepository;
-        $this->crossRepository   = $crossRepository;
-        $this->templating        = $templating;
+        $this->countRepository = $countRepository;
+        $this->crossRepository = $crossRepository;
+        $this->templating = $templating;
 
         $this->config = array_replace([
             'thumb_template' => '@EkynaProduct/Highlight/thumb.html.twig',
@@ -119,6 +119,19 @@ class Highlight
             $parameters['exclude'] = $this->getCartProductIds();
         }
 
+        $results = [];
+
+        // MODE Always
+        foreach ($this->productRepository->findBestSellers($parameters) as $result) {
+            $results[] = $result;
+            $parameters['exclude'][] = $parameters['id_only'] ? $result : $result->getId();
+        }
+        $parameters['limit'] -= count($results);
+        if (0 >= $parameters['limit']) {
+            return $results;
+        }
+
+        // MODE Auto
         if (false === $parameters['group']) {
             $parameters['group'] = null;
         } elseif (!$parameters['group'] instanceof CustomerGroupInterface) {
@@ -127,8 +140,11 @@ class Highlight
                 ->getContext()
                 ->getCustomerGroup();
         }
+        foreach ($this->countRepository->findProducts($parameters) as $result) {
+            $results[] = $result;
+        }
 
-        return $this->countRepository->findProducts($parameters);
+        return $results;
     }
 
     /**
@@ -184,13 +200,23 @@ class Highlight
             $parameters['exclude'] = $this->getCartProductIds();
         }
 
-        $result = [];
+        // MODE Always
+        $results = [];
+        foreach ($this->productRepository->findCrossSelling($parameters) as $result) {
+            $results[] = $result;
+            $parameters['exclude'][] = $parameters['id_only'] ? $result : $result->getId();
+        }
+        $parameters['limit'] -= count($results);
+        if (0 >= $parameters['limit']) {
+            return $results;
+        }
 
+        // PRODUCT configuration
         if ($parameters['source'] instanceof ProductInterface) {
             foreach ($parameters['source']->getCrossSellings() as $crossSelling) {
                 $target = $crossSelling->getTarget();
                 if (!in_array($target->getId(), $parameters['exclude'])) {
-                    $result[] = $parameters['id_only'] ? $target->getId() : $target;
+                    $results[] = $parameters['id_only'] ? $target->getId() : $target;
                     $parameters['limit']--;
                     if (0 >= $parameters['limit']) {
                         break;
@@ -198,32 +224,30 @@ class Highlight
                 }
             }
         }
-
-        if (0 < $parameters['limit']) {
-            if (null === $parameters['source']) {
-                $parameters['source'] = $parameters['exclude'];
-            }
-            if (empty($parameters['source'])) {
-                return $result;
-            }
-
-            if (false === $parameters['group']) {
-                $parameters['group'] = null;
-            } elseif (!$parameters['group'] instanceof CustomerGroupInterface) {
-                $parameters['group'] = $this
-                    ->contextProvider
-                    ->getContext()
-                    ->getCustomerGroup();
-            }
-
-            $products = $this->crossRepository->findProducts($parameters);
-
-            foreach ($products as $p) {
-                $result[] = $p;
-            }
+        if (0 >= $parameters['limit']) {
+            return $results;
         }
 
-        return $result;
+        // MODE Auto
+        if (null === $parameters['source']) {
+            $parameters['source'] = $parameters['exclude'];
+        }
+        if (empty($parameters['source'])) {
+            return $results;
+        }
+        if (false === $parameters['group']) {
+            $parameters['group'] = null;
+        } elseif (!$parameters['group'] instanceof CustomerGroupInterface) {
+            $parameters['group'] = $this
+                ->contextProvider
+                ->getContext()
+                ->getCustomerGroup();
+        }
+        foreach ($this->crossRepository->findProducts($parameters) as $p) {
+            $results[] = $p;
+        }
+
+        return $results;
     }
 
     /**
