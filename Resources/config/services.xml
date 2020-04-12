@@ -1072,6 +1072,12 @@
             <argument type="service" id="ekyna_product.product.manager"/>
             <tag name="console.command"/>
         </service>
+        <service id="Ekyna\Bundle\ProductBundle\Command\ReferenceConvertCommand" public="false">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Swift_Mailer"/>
+            <argument>%error_report_mail%</argument>
+            <tag name="console.command"/>
+        </service>
         <service id="Ekyna\Bundle\ProductBundle\Command\ResupplyCommand" public="false">
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_product.repository"/>

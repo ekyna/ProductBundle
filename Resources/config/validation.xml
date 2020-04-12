@@ -626,6 +626,17 @@
                     <value>configurable</value>
                 </option>
             </constraint>
+            <constraint name="Regex">
+                <option name="pattern">/^[a-zA-Z0-9-_]{2,32}$/</option>
+                <option name="message">ekyna_product.product.invalid_reference</option>
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>variable</value>
+                    <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
         </property>
 
         <!-- Designation -->

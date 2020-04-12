@@ -22,6 +22,7 @@ ekyna_product:
         duplicate_designation: Un autre produit existe déjà avec cette désignation pour la même marque (%reference%).
         duplicate_variant_designation: Une autre variante existe déjà avec cette désignation pour le même parent (produit variable).
         duplicate_reference: Un autre produit existe déjà avec cette référence (%designation%).
+        invalid_reference: Seuls les lettres, chiffres, tirets haut (-) et tirets bas (_) sont autorisés.
         slot_attribute_is_mandatory: Veuillez sélectionner un attribut pour le groupe "%group_name%".
         slot_has_too_many_attributes: Le groupe "%group_name%" ne peut avoir plus d'un attribut sélectionné.
         unexpected_attribute: L'attribut "%attribute_name%" ne correspond à aucun groupe du modèle d'attributs.

@@ -1,0 +1,40 @@
+ekyna_product:
+    attribute:
+        config:
+            suffix_is_mandatory: Please specify a suffix.
+    attribute_slot:
+        duplicate_attribute: This attribute is already used.
+    bundle_choice:
+        invalid_quantity_range: Maximum quantity must be greater than the minimum.
+        rules_should_be_empty: The rules list must be empty.
+        recursive_choice: You cannot compose a product with itself.
+        forbidden_price_override: A pack price cannot be overriden.
+    bundle_slot:
+        duplicate_rule_type: A rule already exists for this type.
+        required_with_rules: A required slot cannot have rules.
+        too_many_choices: Only one product must be configured.
+    component:
+        tax_group_integrity: This component must share the same tax group.
+    pricing:
+        brands_must_be_empty: The associated brand list must be empty.
+        at_least_one_brand: Please select at least one brand.
+    product:
+        duplicate_designation: Another product already exists with this designation for the same brand (%reference%).
+        duplicate_variant_designation: Another variant already exists with this designation for the same parent (variable product).
+        duplicate_reference: Another product already exists with this reference (%designation%).
+        invalid_reference: Only letters, numbers, dashes (-) and underscores (_) are allowed.
+        slot_attribute_is_mandatory: Please select an attribute for the "%group_name%" group .
+        slot_has_too_many_attributes: The "%group_name%" group cannot have more than one selected attribute.
+        unexpected_attribute: The "%attribute_name%" attribute does not match any group if the attribute model.
+        variant_is_not_unique: Another variant already exists with this attributes configuration.
+        designation_needed: The designation cannot be generated automatically, please define it.
+        translation_title_needed: The title cannot be generated without attributes, please define it.
+        duplicate_translation: A translation already exists with this title (%reference%).
+        invalid_type: This product type is not allowed.
+    option:
+        recursive_choice: A choice cannot be an option of itself.
+    special_offer:
+        at_least_one_brand_or_product: Please select at least one product or brand.
+        products_and_brands_must_be_empty: The associated products and brands lists must be empty.
+    sale_item:
+        at_least_one_choice_required: Please select at least one product.
