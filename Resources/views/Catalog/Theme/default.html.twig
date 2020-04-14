@@ -2,7 +2,7 @@
     {% block header -%}
     {% set url = absolute_url('/') %}
     <p>
-        {% set address = commerce_warehouse(catalog.context) -%}
+        {% set address = commerce_warehouse(catalog.context.deliveryCountry) -%}
         {% if address is null -%}
             {% set address = get_setting('general.site_address') %}
         {%- endif -%}
