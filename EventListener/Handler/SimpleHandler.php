@@ -216,7 +216,7 @@ class SimpleHandler extends AbstractHandler
     protected function updateMinPrice(ProductInterface $product)
     {
         $minPrice = $this->calculator->calculateProductMinPrice($product);
-        if (0 !== bccomp($product->getMinPrice(), $minPrice)) {
+        if (0 !== bccomp($product->getMinPrice(), $minPrice, 5)) {
             $product->setMinPrice($minPrice);
 
             return true;
