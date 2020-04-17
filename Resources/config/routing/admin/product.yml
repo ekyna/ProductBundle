@@ -88,6 +88,13 @@ ekyna_product_product_admin_refresh_stock:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_export_orders:
+    path: /{productId}/export-orders
+    controller: "ekyna_product.product.controller:exportOrders"
+    methods: [GET]
+    requirements:
+        productId: \d+
+
 ekyna_product_product_admin_new_supplier_product:
     path: /{productId}/new-supplier-product
     controller: "ekyna_product.product.controller:newSupplierProductAction"
