@@ -3,7 +3,6 @@
 namespace Ekyna\Bundle\ProductBundle\Form;
 
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
-use Ekyna\Bundle\AdminBundle\Form\Type\ResourceType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
@@ -36,11 +35,6 @@ class ProductFormBuilder
     /**
      * @var string
      */
-    private $productClass;
-
-    /**
-     * @var string
-     */
     private $mediaClass;
 
     /**
@@ -58,13 +52,11 @@ class ProductFormBuilder
      * Constructor.
      *
      * @param Features $features
-     * @param string   $productClass
      * @param string   $mediaClass
      */
-    public function __construct(Features $features, string $productClass, string $mediaClass)
+    public function __construct(Features $features, string $mediaClass)
     {
         $this->features = $features;
-        $this->productClass = $productClass;
         $this->mediaClass = $mediaClass;
     }
 
@@ -79,7 +71,7 @@ class ProductFormBuilder
     public function initialize(ProductInterface $product, $form)
     {
         if (!($form instanceof FormInterface || $form instanceof FormBuilderInterface)) {
-            throw new UnexpectedTypeException($form, [FormInterface::class,FormBuilderInterface::class]);
+            throw new UnexpectedTypeException($form, [FormInterface::class, FormBuilderInterface::class]);
         }
 
         $this->product = $product;
@@ -549,14 +541,13 @@ class ProductFormBuilder
         ProductTypes::assertVariant($this->product);
 
         $options = array_replace([
-            'label'         => 'ekyna_product.product.field.parent',
             'property_path' => 'parent',
-            'class'         => $this->productClass,
+            'types'         => [ProductTypes::TYPE_VARIABLE],
             'required'      => false,
             'disabled'      => true,
         ], $options);
 
-        $this->form->add('variable', ResourceType::class, $options);
+        $this->form->add('variable', PR\ProductChoiceType::class, $options);
 
         return $this;
     }

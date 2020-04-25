@@ -13,6 +13,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
 use Ekyna\Bundle\ProductBundle\Table\Column\ReferenceType;
 use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
+use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
@@ -44,31 +45,6 @@ class ProductType extends ResourceTableType
      */
     protected $urlGenerator;
 
-    /**
-     * @var string
-     */
-    protected $brandClass;
-
-    /**
-     * @var string
-     */
-    protected $categoryClass;
-
-    /**
-     * @var string
-     */
-    protected $attributeSetClass;
-
-    /**
-     * @var string
-     */
-    protected $taxGroupClass;
-
-    /**
-     * @var string
-     */
-    protected $tagClass;
-
 
     /**
      * Constructor.
@@ -76,31 +52,16 @@ class ProductType extends ResourceTableType
      * @param SubjectHelperInterface $subjectHelper
      * @param UrlGeneratorInterface  $urlGenerator
      * @param string                 $productClass
-     * @param string                 $brandClass
-     * @param string                 $categoryClass
-     * @param string                 $attributeSetClass
-     * @param string                 $taxGroupClass
-     * @param string                 $tagClass
      */
     public function __construct(
         SubjectHelperInterface $subjectHelper,
         UrlGeneratorInterface $urlGenerator,
-        string $productClass,
-        string $brandClass,
-        string $categoryClass,
-        string $attributeSetClass,
-        string $taxGroupClass,
-        string $tagClass
+        string $productClass
     ) {
         parent::__construct($productClass);
 
         $this->subjectHelper = $subjectHelper;
         $this->urlGenerator = $urlGenerator;
-        $this->brandClass = $brandClass;
-        $this->categoryClass = $categoryClass;
-        $this->attributeSetClass = $attributeSetClass;
-        $this->taxGroupClass = $taxGroupClass;
-        $this->tagClass = $tagClass;
     }
 
     /**
@@ -344,35 +305,25 @@ class ProductType extends ResourceTableType
                     'label'    => 'ekyna_commerce.stock_subject.field.end_of_life',
                     'position' => 100,
                 ])
-                ->addFilter('categories', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_product.category.label.plural',
-                    'class'        => $this->categoryClass,
-                    'entity_label' => 'name',
-                    'position'     => 200,
+                ->addFilter('categories', ResourceType::class, [
+                    'resource' => 'ekyna_product.category',
+                    'position' => 200,
                 ])
-                ->addFilter('brand', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_product.brand.label.singular',
-                    'class'        => $this->brandClass,
-                    'entity_label' => 'name',
-                    'position'     => 210,
+                ->addFilter('brand', ResourceType::class, [
+                    'resource' => 'ekyna_product.brand',
+                    'position' => 210,
                 ])
-                ->addFilter('attributeSet', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_product.attribute_set.label.singular',
-                    'class'        => $this->attributeSetClass,
-                    'entity_label' => 'name',
-                    'position'     => 220,
+                ->addFilter('attributeSet', ResourceType::class, [
+                    'resource' => 'ekyna_product.attribute_set',
+                    'position' => 220,
                 ])
-                ->addFilter('taxGroup', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_commerce.tax_group.label.singular',
-                    'class'        => $this->taxGroupClass,
-                    'entity_label' => 'name',
-                    'position'     => 230,
+                ->addFilter('taxGroup', ResourceType::class, [
+                    'resource' => 'ekyna_commerce.tax_group',
+                    'position' => 230,
                 ])
-                ->addFilter('tags', DType\Filter\EntityType::class, [
-                    'label'        => 'ekyna_cms.tag.label.plural',
-                    'class'        => $this->tagClass,
-                    'entity_label' => 'name',
-                    'position'     => 998,
+                ->addFilter('tags', ResourceType::class, [
+                    'resource' => 'ekyna_cms.tag',
+                    'position' => 998,
                 ]);
         }
     }

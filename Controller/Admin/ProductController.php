@@ -123,7 +123,8 @@ class ProductController extends AbstractSubjectController
             if (null === $supplierProduct) {
                 return $this->redirectToRoute('ekyna_commerce_supplier_product_admin_new', [
                     'supplierId' => $supplier->getId(),
-                    'productId'  => $product->getId(),
+                    'provider'   => $product::getProviderName(),
+                    'identifier' => $product->getIdentifier(),
                 ]);
             }
 

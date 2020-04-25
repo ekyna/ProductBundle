@@ -16,7 +16,7 @@ interface ProductAdjustmentInterface extends AdjustmentInterface
      *
      * @return ProductInterface
      */
-    public function getProduct();
+    public function getProduct(): ?ProductInterface;
 
     /**
      * Sets the product.
@@ -25,5 +25,5 @@ interface ProductAdjustmentInterface extends AdjustmentInterface
      *
      * @return $this|ProductAdjustmentInterface
      */
-    public function setProduct(ProductInterface $product = null);
+    public function setProduct(ProductInterface $product = null): ProductAdjustmentInterface;
 }

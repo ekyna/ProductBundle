@@ -612,9 +612,9 @@ class PriceCalculator
     {
         $taxes = [];
 
-        $config = $this->taxResolver->resolveTaxes($taxable, $context->getDeliveryCountry());
+        $config = $this->taxResolver->resolveTaxes($taxable, $context);
         foreach ($config as $tax) {
-            $taxes[] = (float)$tax->getRate();
+            $taxes[] = $tax->getRate();
         }
 
         return $taxes;

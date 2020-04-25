@@ -87,7 +87,6 @@ class OptionType extends ResourceFormType
                 'required' => false,
             ])
             ->add('taxGroup', TaxGroupChoiceType::class, [
-                'select2'  => false,
                 'required' => false,
             ])
             ->add('position', CollectionPositionType::class);

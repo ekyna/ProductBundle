@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Table\Type\ResourceTableType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
@@ -20,25 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SpecialOfferType extends ResourceTableType
 {
-    /**
-     * @var string
-     */
-    private $brandClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $dataClass
-     * @param string $brandClass
-     */
-    public function __construct(string $dataClass, string $brandClass)
-    {
-        parent::__construct($dataClass);
-
-        $this->brandClass = $brandClass;
-    }
-
     /**
      * @inheritdoc
      */
@@ -138,10 +120,8 @@ class SpecialOfferType extends ResourceTableType
                 'label'    => 'ekyna_product.common.percent',
                 'position' => 20,
             ])
-            ->addFilter('brands', DType\Filter\EntityType::class, [
-                'label'        => 'ekyna_product.brand.label.singular',
-                'class'        => $this->brandClass,
-                'entity_label' => 'name',
+            ->addFilter('brands', ResourceType::class, [
+                'resource'        => 'ekyna_product.brand',
                 'position'     => 30,
             ])
             ->addFilter('startsAt', CType\Filter\DateTimeType::class, [

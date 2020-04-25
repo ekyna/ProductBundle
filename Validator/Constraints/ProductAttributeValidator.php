@@ -70,7 +70,7 @@ class ProductAttributeValidator extends ConstraintValidator
             /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
             foreach ($violationList as $violation) {
                 $this->context
-                    ->buildViolation($violation->getMessage())
+                    ->buildViolation($violation->getMessage(), $violation->getParameters())
                     ->atPath($field)
                     ->addViolation();
             }

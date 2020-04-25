@@ -468,10 +468,10 @@ class InventoryController extends Controller
                 $product = $stockUnit->getSubject();
                 $value = $price = $stockUnit->getNetPrice();
 
-                $currency = $stockUnit->getCurrency() ?? $defaultCurrency;
+                $currency = ($c = $stockUnit->getCurrency()) ? $c->getCode() : $defaultCurrency;
 
                 if ($rate = $stockUnit->getExchangeRate()) {
-                    $value = $value / $rate;
+                    $price = Money::round($price * $rate, $currency);
                 }
 
                 $value = Money::round($value * $inStock, $currency);
@@ -482,7 +482,7 @@ class InventoryController extends Controller
                     $product->getReference(),
                     $inStock,
                     implode(', ', $stockUnit->getGeocodes()),
-                    $stockUnit->getNetPrice(),
+                    $price,
                     $currency,
                     $value,
                 ];

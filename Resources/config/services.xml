@@ -209,13 +209,11 @@
         <service id="ekyna_product.attribute_choice.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeChoiceType">
             <argument>%ekyna_product.attribute_choice.class%</argument>
-            <argument>%ekyna_product.attribute.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.attribute_slot.form_type"
                  class="Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSlotType">
             <argument>%ekyna_product.attribute_slot.class%</argument>
-            <argument>%ekyna_product.attribute.class%</argument>
             <tag name="form.type"/>
         </service>
         <service id="ekyna_product.attribute_set_choice.form_type"
@@ -389,7 +387,6 @@
         <service id="ekyna_product.product.form_type.builder"
                  class="%ekyna_product.product.form_type.builder.class%">
             <argument type="service" id="Ekyna\Bundle\ProductBundle\Service\Features"/>
-            <argument>%ekyna_product.product.class%</argument>
             <argument>%ekyna_product.product_media.class%</argument>
         </service>
 
@@ -449,11 +446,6 @@
             <argument type="service" id="ekyna_commerce.subject_helper"/>
             <argument type="service" id="router"/>
             <argument>%ekyna_product.product.class%</argument>
-            <argument>%ekyna_product.brand.class%</argument>
-            <argument>%ekyna_product.category.class%</argument>
-            <argument>%ekyna_product.attribute_set.class%</argument>
-            <argument>%ekyna_commerce.tax_group.class%</argument>
-            <argument>%ekyna_cms.tag.class%</argument>
             <tag name="table.type"/>
         </service>
         <service id="ekyna_product.brand.table_type"
@@ -468,12 +460,6 @@
             <argument type="service" id="ekyna_admin.helper.resource_helper"/>
             <argument type="service" id="router"/>
             <argument>%ekyna_product.category.class%</argument>
-            <tag name="table.type"/>
-        </service>
-        <service id="ekyna_product.special_offer.table_type"
-                 class="Ekyna\Bundle\ProductBundle\Table\Type\SpecialOfferType">
-            <argument>%ekyna_product.special_offer.class%</argument>
-            <argument>%ekyna_product.brand.class%</argument>
             <tag name="table.type"/>
         </service>
 
@@ -770,14 +756,6 @@
         <service id="ekyna_product.product_translation.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\ProductTranslationListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <tag name="resource.event_subscriber"/>
-        </service>
-
-        <!-- Supplier product event listener -->
-        <service id="ekyna_product.supplier_product.listener"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\SupplierProductListener">
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="ekyna_product.product.repository"/>
             <tag name="resource.event_subscriber"/>
         </service>
 

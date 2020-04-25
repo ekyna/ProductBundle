@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Entity\AbstractAdjustment;
+use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
 
 /**
  * Class ProductAdjustment
@@ -32,7 +33,7 @@ class ProductAdjustment extends AbstractAdjustment implements Model\ProductAdjus
     /**
      * @inheritdoc
      */
-    public function getProduct()
+    public function getProduct(): ?Model\ProductInterface
     {
         return $this->product;
     }
@@ -40,7 +41,7 @@ class ProductAdjustment extends AbstractAdjustment implements Model\ProductAdjus
     /**
      * @inheritdoc
      */
-    public function setProduct(Model\ProductInterface $product = null)
+    public function setProduct(Model\ProductInterface $product = null): Model\ProductAdjustmentInterface
     {
         if ($this->product !== $product) {
             if ($previous = $this->product) {
@@ -59,7 +60,7 @@ class ProductAdjustment extends AbstractAdjustment implements Model\ProductAdjus
     /**
      * @inheritdoc
      */
-    public function getAdjustable()
+    public function getAdjustable(): ?AdjustableInterface
     {
         return $this->product;
     }

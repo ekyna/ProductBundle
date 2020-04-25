@@ -15,34 +15,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 class AttributeSlotType extends ResourceFormType
 {
     /**
-     * @var string
-     */
-    protected $attributeClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $slotClass
-     * @param string $attributeClass
-     */
-    public function __construct($slotClass, $attributeClass)
-    {
-        parent::__construct($slotClass);
-
-        $this->attributeClass = $attributeClass;
-    }
-
-    /**
      * @inheritDoc
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('attribute', ResourceType::class, [
-                'label'     => false,
-                'class'     => $this->attributeClass,
-                'attr'      => [
+                'label'    => false,
+                'resource' => 'ekyna_product.attribute',
+                'attr'     => [
                     'widget_col' => 12,
                 ],
             ])
@@ -53,9 +34,9 @@ class AttributeSlotType extends ResourceFormType
             ->add('naming', Type\CheckboxType::class, [
                 'label'    => 'ekyna_product.attribute_slot.field.naming',
                 'required' => false,
-                'attr' => [
+                'attr'     => [
                     'help_text' => 'ekyna_product.attribute_slot.help.naming',
-                ]
+                ],
             ])
             ->add('position', Type\HiddenType::class, [
                 'attr' => [

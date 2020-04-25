@@ -21,25 +21,6 @@ use Symfony\Component\Form\FormEvents;
 class AttributeChoiceType extends ResourceFormType
 {
     /**
-     * @var string
-     */
-    protected $attributeClass;
-
-
-    /**
-     * Constructor.
-     *
-     * @param string $dataClass
-     * @param string $attributeClass
-     */
-    public function __construct($dataClass, $attributeClass)
-    {
-        parent::__construct($dataClass);
-
-        $this->attributeClass = $attributeClass;
-    }
-
-    /**
      * @inheritDoc
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -71,11 +52,11 @@ class AttributeChoiceType extends ResourceFormType
             $disabled = (null !== $attribute && $attribute->getId());
 
             $form->add('attribute', ResourceType::class, [
-                'label'     => 'ekyna_product.attribute.label.singular',
-                'class'     => $this->attributeClass,
+                'label'    => 'ekyna_product.attribute.label.singular',
+                'resource' => 'ekyna_product.attribute',
                 //'allow_new' => !$disabled,
                 // TODO query_builder => filter attributes by type === 'select'
-                'disabled'  => $disabled,
+                'disabled' => $disabled,
             ]);
         });
     }
