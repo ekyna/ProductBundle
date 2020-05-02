@@ -3,9 +3,9 @@
 namespace Ekyna\Bundle\ProductBundle\Controller\Account;
 
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
+use Ekyna\Component\Resource\Search\Request as SearchRequest;
+use Ekyna\Component\Resource\Search\Search;
 use Elastica\Client as ElasticaClient;
-use Elastica\Result;
-use FOS\ElasticaBundle\Manager\RepositoryManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +25,9 @@ class ProductController
     private $authorization;
 
     /**
-     * @var RepositoryManagerInterface
+     * @var Search
      */
-    private $manager;
+    private $search;
 
     /**
      * @var ElasticaClient
@@ -44,18 +44,18 @@ class ProductController
      * Constructor.
      *
      * @param AuthorizationCheckerInterface $authorization
-     * @param RepositoryManagerInterface    $manager
+     * @param Search                        $search
      * @param ElasticaClient                $client
      * @param string                        $productClass
      */
     public function __construct(
         AuthorizationCheckerInterface $authorization,
-        RepositoryManagerInterface $manager,
+        Search $search,
         ElasticaClient $client,
         string $productClass
     ) {
         $this->authorization = $authorization;
-        $this->manager = $manager;
+        $this->search = $search;
         $this->client = $client;
         $this->productClass = $productClass;
     }
@@ -73,35 +73,29 @@ class ProductController
             throw new AccessDeniedHttpException();
         }
 
-        $page = intval($request->query->get('page', 1)) - 1;
-        $limit = intval($request->query->get('limit', 10));
-
-        $repository = $this->manager->getRepository($this->productClass);
-        if (!$repository instanceOf ProductRepository) {
+        $repository = $this->search->getRepository('ekyna_product.product');
+        if (!$repository instanceof ProductRepository) {
             throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
         }
 
-        $query = trim($request->query->get('query'));
-        $types = $request->query->get('types', []);
+        $page = $request->query->getInt('page', 1) - 1;
+        $limit = $request->query->getInt('limit', 10);
+        $expression = (string)$request->query->get('query');
 
-        $query = $repository
-            ->createSearchQuery($query, $types, false)
-            ->setFrom($limit * $page)
-            ->setSize($limit);
+        $searchRequest = new SearchRequest($expression);
+        $searchRequest
+            ->setType(SearchRequest::RAW)
+            ->setLimit($limit)
+            ->setOffset($page * $limit)
+            ->setParameter('types', (array)$request->query->get('types', []));
 
-        $results = $this
-            ->client
-            ->getIndex('ekyna_product_product')
-            ->getType('doc')
-            ->search($query);
+        if (!$repository->supports($searchRequest)) {
+            return new JsonResponse([
+                'results'     => [],
+                'total_count' => 0,
+            ]);
+        }
 
-        $data = [
-            'results'     => array_map(function (Result $result) {
-                return $result->getSource();
-            }, $results->getResults()),
-            'total_count' => $results->getTotalHits(),
-        ];
-
-        return new JsonResponse($data);
+        return new JsonResponse($repository->search($searchRequest));
     }
 }

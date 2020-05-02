@@ -31,7 +31,7 @@
         <!-- Product account controller -->
         <service id="Ekyna\Bundle\ProductBundle\Controller\Account\ProductController">
             <argument type="service" id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface"/>
-            <argument type="service" id="FOS\ElasticaBundle\Manager\RepositoryManagerInterface"/>
+            <argument type="service" id="Ekyna\Component\Resource\Search\Search"/>
             <argument type="service" id="Elastica\Client"/>
             <argument>%ekyna_product.product.class%</argument>
         </service>
