@@ -9,7 +9,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: TABB
         taxGroup: <defaultTaxGroup()>
         title: Tablet B
-        description: "<identity('<p>Tablet B</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_tabbw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -38,8 +38,8 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         designation: Tablet C
         reference: TABC
         taxGroup: <defaultTaxGroup()>
-        title: Tablet B
-        description: "<identity('<p>Tablet B</p>')>"
+        title: Tablet C
+        description: <htmlParagraphs()>
         visible: true
     product_tabcw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -69,7 +69,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: KES
         taxGroup: <defaultTaxGroup()>
         title: Kiosk Extension Shell
-        description: "<identity('<p>Kiosk Extension Shell</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_kesw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -99,7 +99,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: SWC
         taxGroup: <defaultTaxGroup()>
         title: Switch Cuff
-        description: "<identity('<p>Switch Cuff</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_swcw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -129,7 +129,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: ROC
         taxGroup: <defaultTaxGroup()>
         title: Rotate Cuff
-        description: "<identity('<p>Rotate Cuff</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_rocw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -159,7 +159,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: KDB
         taxGroup: <defaultTaxGroup()>
         title: Kiosk Desk Base
-        description: "<identity('<p>Kiosk Desk Base</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_kdbw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -189,7 +189,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: KSB
         taxGroup: <defaultTaxGroup()>
         title: Kiosk Stand Base
-        description: "<identity('<p>Kiosk Stand Base</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_ksbw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -219,7 +219,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: SHA
         taxGroup: <defaultTaxGroup()>
         title: Kiosk Shell A
-        description: "<identity('<p>Kiosk Shell A</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_shaw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -249,7 +249,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: SHB
         taxGroup: <defaultTaxGroup()>
         title: Kiosk Shell B
-        description: "<identity('<p>Kiosk Shell B</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_shbw:
         __factory: { '@ekyna_product.product.repository::createNew': [] }

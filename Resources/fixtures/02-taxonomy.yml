@@ -3,19 +3,19 @@ Ekyna\Bundle\ProductBundle\Model\BrandInterface:
         __factory: { '@ekyna_product.brand.repository::createNew': [] }
         name: Apple
         title: Apple
-        description: "<identity('<p>Fabriquant de tablettes tactiles.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     brand_samsung:
         __factory: { '@ekyna_product.brand.repository::createNew': [] }
         name: Samsung
         title: Samsung
-        description: "<identity('<p>Fabriquant de tablettes tactiles.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     brand_acme:
         __factory: { '@ekyna_product.brand.repository::createNew': [] }
         name: Acme
         title: Acme
-        description: "<identity('<p>Équipementier tablettes tactiles.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
 
 Ekyna\Bundle\ProductBundle\Model\CategoryInterface:
@@ -23,23 +23,23 @@ Ekyna\Bundle\ProductBundle\Model\CategoryInterface:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
         name: Devices
         title: Devices
-        description: "<identity('<p>Devices.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     category_kiosk:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
         name: Kiosks
         title: Kiosks
-        description: "<identity('<p>Kiosks.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     category_case:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
         name: Cases
         title: Cases
-        description: "<identity('<p>Cases.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     category_component:
         __factory: { '@ekyna_product.category.repository::createNew': [] }
         name: Components
         title: Components
-        description: "<identity('<p>Components.</p>')>"
+        description: <htmlParagraphs()>
         visible: false

@@ -8,7 +8,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: NRKE
         taxGroup: <defaultTaxGroup()>
         title: NFC Reader Kiosk Extension
-        description: "<identity('<p>NFC Reader Kiosk Extension.</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_kico:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -19,7 +19,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         reference: KICO
         taxGroup: <defaultTaxGroup()>
         title: Kiosk configurator
-        description: "<identity('<p>Kiosk configurator</p>')>"
+        description: <htmlParagraphs()>
         visible: true
 
 Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface:
@@ -35,17 +35,17 @@ Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface:
         __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
         bundle: '@product_kico'
         title: Kiosk Shell
-        description: "<identity('<p>Choose your kiosk shell&hellip;</p>')>"
+        description: <htmlParagraphs()>
     product_kico_slot_2:
         __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
         bundle: '@product_kico'
         title: Kisok Base
-        description: "<identity('<p>Choose your kiosk base&hellip;</p>')>"
+        description: <htmlParagraphs()>
     product_kico_slot_3:
         __factory: { '@ekyna_product.bundle_slot.repository::createNew': [] }
         bundle: '@product_kico'
         title: Extension
-        description: "<identity('<p>Choose your extension&hellip;</p>')>"
+        description: <htmlParagraphs()>
         required: false
 
 

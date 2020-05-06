@@ -13,7 +13,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         minimumOrderQuantity: 0.1
         taxGroup: <defaultTaxGroup()>
         title: Hand work
-        description: "<identity('<p>Hand work</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_nfcr:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -26,7 +26,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.2
         taxGroup: <defaultTaxGroup()>
         title: NFC Reader
-        description: "<identity('<p>NFC Reader</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_musb:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -40,7 +40,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.05
         taxGroup: <defaultTaxGroup()>
         title: Micro USB Connector
-        description: "<identity('<p>Micro USB Connector</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_typc:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -54,7 +54,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.05
         taxGroup: <defaultTaxGroup()>
         title: Type-C Connector
-        description: "<identity('<p>Type-C Connector</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_hub:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -67,7 +67,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.15
         taxGroup: <defaultTaxGroup()>
         title: Hub
-        description: "<identity('<p>Hub</p>')>"
+        description: <htmlParagraphs()>
         visible: true
     product_bk9:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -81,7 +81,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.05
         taxGroup: <defaultTaxGroup()>
         title: Blocking kit 9 inches
-        description: "<identity('<p>Blocking kit 9 inches</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_bk11:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -95,7 +95,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.05
         taxGroup: <defaultTaxGroup()>
         title: Blocking kit 11 inches
-        description: "<identity('<p>Blocking kit 11 inches</p>')>"
+        description: <htmlParagraphs()>
         visible: false
     product_taba:
         __factory: { '@ekyna_product.product.repository::createNew': [] }
@@ -109,7 +109,7 @@ Ekyna\Bundle\ProductBundle\Model\ProductInterface:
         weight: 0.6
         taxGroup: <defaultTaxGroup()>
         title: Tablet A
-        description: "<identity('<p>Tablet A</p>')>"
+        description: <htmlParagraphs()>
         visible: true
 
 Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface:
