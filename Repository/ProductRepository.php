@@ -611,6 +611,28 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * @inheritDoc
+     */
+    public function findForSitemap(): array
+    {
+        $qb = $this->getQueryBuilder('p');
+
+        return $qb
+            ->innerJoin('p.seo', 's')
+            ->leftJoin('p.categories', 'c')
+            ->leftJoin('c.translations', 'c_t', Expr\Join::WITH, $this->getLocaleCondition('c_t'))
+            ->innerJoin('p.brand', 'b')
+            ->addSelect('s', 'c', 'c_t')
+            ->andWhere($qb->expr()->eq('p.visible', true))
+            ->andWhere($qb->expr()->eq('b.visible', true))
+            ->andWhere($qb->expr()->eq('c.visible', true))
+            ->andWhere($qb->expr()->eq('s.index', true))
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param array $ignore
      *
      * @return array

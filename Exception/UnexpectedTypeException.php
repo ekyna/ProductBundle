@@ -10,11 +10,16 @@ namespace Ekyna\Bundle\ProductBundle\Exception;
 class UnexpectedTypeException extends \UnexpectedValueException implements ProductExceptionInterface
 {
     /**
-     * @inheritDoc
+     * Constructor.
+     *
+     * @param mixed           $value
+     * @param string|string[] $types
+     * @param int             $code
+     * @param \Throwable|null $previous
      */
     public function __construct($value, $types, $code = 0, \Throwable $previous = null)
     {
-        $types = (array) $types;
+        $types = (array)$types;
 
         if (1 === $length = count($types)) {
             $types = $types[0];

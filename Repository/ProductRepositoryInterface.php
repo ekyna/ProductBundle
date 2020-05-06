@@ -194,6 +194,13 @@ interface ProductRepositoryInterface extends TranslatableResourceRepositoryInter
     public function findBySkuOrReferences(string $code): array;
 
     /**
+     * Returns products that should be added to sitemap.
+     *
+     * @return Model\ProductInterface[]
+     */
+    public function findForSitemap(): array;
+
+    /**
      * Loads the product's medias.
      *
      * @param Model\ProductInterface $product

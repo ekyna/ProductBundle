@@ -105,17 +105,15 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
             $schema->gtin8($ref);
         }
 
-        if (!($object->isQuoteOnly() || $object->isEndOfLife())) {
-            $schema->offers(
-                Schema::offer()
-                    ->availability($this->getAvailability($object->getStockState()))
-                    ->itemCondition('http://schema.org/NewCondition')
-                    ->price((string)round($object->getNetPrice(), 2))// TODO Round regarding to currency
-                    // TODO ->priceValidUntil()
-                    ->priceCurrency($this->defaultCurrency)
-                    // TODO ->seller()
-            );
-        }
+        $schema->offers(
+            Schema::offer()
+                ->availability($this->getAvailability($object))
+                ->itemCondition('https://schema.org/NewCondition')
+                ->price((string)round($object->getMinPrice(), 2))// TODO Round regarding to currency
+                // TODO ->priceValidUntil()
+                ->priceCurrency($this->defaultCurrency)
+                // TODO ->seller()
+        );
 
         /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
         if ($image = $object->getImages(true, 1)->first()) {
@@ -151,21 +149,25 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
     }
 
     /**
-     * @param $state
+     * @param Model\ProductInterface $object
      *
      * @return string
      */
-    private function getAvailability($state)
+    private function getAvailability(Model\ProductInterface $object)
     {
         // TODO use SchemaOrg/ItemAvailability constants/enumerations when available.
 
-        switch ($state) {
+        switch ($object->getStockState()) {
             case StockSubjectStates::STATE_PRE_ORDER:
-                return 'http://schema.org/PreOrder';
+                return 'https://schema.org/PreOrder';
             case StockSubjectStates::STATE_IN_STOCK:
-                return 'http://schema.org/InStock';
+                return 'https://schema.org/InStock';
             default:
-                return 'http://schema.org/OutOfStock';
+                if ($object->isEndOfLife()) {
+                    return 'https://schema.org/Discontinued';
+                }
+
+                return 'https://schema.org/OutOfStock';
         }
     }
 
