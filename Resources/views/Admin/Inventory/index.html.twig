@@ -121,12 +121,16 @@
                     <th class="boolean">
                         <span>Vie</span>
                     </th>
-                    <th class="number">
-                        <span>Rupture</span>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'stockFloor') }}>
+                            Rupture
+                        </a>
                         {#{{- 'ekyna_commerce.stock_subject.field.floor'|trans -}}#}
                     </th>
-                    <th class="number">
-                        <span>Réassort</span>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'replenishmentTime') }}>
+                            Réassort
+                        </a>
                         {#{{- 'ekyna_commerce.stock_subject.field.replenishment_time'|trans -}}#}
                     </th>
                     <th class="state">
@@ -136,24 +140,32 @@
                     <th class="state">
                         <span>{{- 'ekyna_core.field.status'|trans -}}</span>
                     </th>
-                    <th class="number">
-                        <span>Réel</span>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'inStock') }}>
+                            Réel
+                        </a>
                         {#{{- 'ekyna_commerce.field.in_stock'|trans -}}#}
                     </th>
-                    <th class="number">
-                        <span>Dispo</span>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'availableStock') }}>
+                            Dispo
+                        </a>
 {#                            {{- 'ekyna_commerce.field.available_stock'|trans -}}#}
                     </th>
-                    <th class="number">
-                        <span>Prévisionel</span>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'virtualStock') }}>
+                            Prévisionel
+                        </a>
 {#                            {{- 'ekyna_commerce.field.virtual_stock'|trans -}}#}
                     </th>
-                    <th class="text">
-                        <span>Réassort</span>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'estimatedDateOfArrival') }}>
+                            Réassort
+                        </a>
 {#                            {{- 'ekyna_commerce.field.replenishment_eda'|trans -}}#}
                     </th>
                     {# Units #}
-                    <th class="number">
+                    <th class="number sort">
                         <span>Commandé</span>
                         {#{{- 'ekyna_commerce.stock_unit.field.ordered_quantity'|trans -}}#}
                     </th>

@@ -1639,6 +1639,10 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
                 foreach ($this->bundleSlots as $slot) {
                     $choices = $slot->getChoices();
                     foreach ($choices as $choice) {
+                        if ($type === Media\MediaTypes::IMAGE && $choice->isExcludeImages()) {
+                            continue;
+                        }
+
                         $product = $choice->getProduct();
                         if (0 < $product->getMedias()->count()) {
                             foreach ($product->getMedias() as $pm) {

@@ -72,7 +72,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
             foreach ($choices as $choice) {
                 $this->addChoice(clone $choice);
             }
-            
+
             $rules = $this->rules->toArray();
             $this->rules = new ArrayCollection();
             foreach ($rules as $rule) {

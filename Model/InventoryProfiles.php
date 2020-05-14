@@ -15,6 +15,7 @@ class InventoryProfiles extends AbstractConstants
     const TREATMENT    = 'treatment';
     const RESUPPLY     = 'resupply';
     const OUT_OF_STOCK = 'out_of_stock';
+    const ORDERED      = 'ordered';
 
 
     /**
@@ -29,6 +30,7 @@ class InventoryProfiles extends AbstractConstants
             static::TREATMENT    => [$prefix . static::TREATMENT],
             static::RESUPPLY     => [$prefix . static::RESUPPLY],
             static::OUT_OF_STOCK => [$prefix . static::OUT_OF_STOCK],
+            static::ORDERED      => [$prefix . static::ORDERED],
         ];
     }
 

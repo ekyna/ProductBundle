@@ -508,9 +508,10 @@
                         <th class="text-right">{{ 'ekyna_core.field.type'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_core.field.visible'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_product.bundle_choice.field.hidden'|trans }}</th>
+                        <th class="text-right">{{ 'ekyna_core.field.images'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_product.option.label.plural'|trans }}</th>
-                        <th class="text-right">{{ 'ekyna_core.field.quantity'|trans }}</th>
-                        <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}&nbsp;(kg)</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">{{ 'ekyna_core.field.weight'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_commerce.field.net_price'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_commerce.field.buy_net_price'|trans }}</th>
                         <th class="text-right">{{ 'ekyna_commerce.sale.field.margin'|trans }}</th>
@@ -556,6 +557,13 @@
                                 <span class="label label-default">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
+                        <td id="{{ slot_id ~ 'excludeImages' }}" class="text-right" style="font-size: 11px">
+                            {%- if choice.excludeImages -%}
+                                <span class="label label-warning">{{ 'ekyna_core.value.no'|trans }}</span>
+                            {%- else -%}
+                                <span class="label label-default">{{ 'ekyna_core.value.yes'|trans }}</span>
+                            {%- endif -%}
+                        </td>
                         <td id="{{ slot_id ~ 'options' }}" class="text-right" style="font-size: 11px">
                             {{ choice|bundle_choice_option_groups }}
                         </td>
@@ -597,7 +605,7 @@
                     </tr>
                     {%- endfor -%}
                     <tr>
-                        <td colspan="8" class="text-right">
+                        <td colspan="9" class="text-right">
                             <strong>{{ 'ekyna_core.field.total'|trans }}</strong>
                         </td>
                         <td class="text-right">

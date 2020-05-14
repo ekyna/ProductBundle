@@ -23,10 +23,19 @@
         </id>
 
         <field name="excludedOptionGroups" column="excluded_option_groups" type="simple_array" nullable="true"/>
-        <field name="hidden" column="hidden" type="boolean" nullable="false"/>
+        <field name="hidden" column="hidden" type="boolean" nullable="false">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
         <field name="minQuantity" column="min_quantity" type="decimal" precision="8" scale="5" nullable="false"/>
         <field name="maxQuantity" column="max_quantity" type="decimal" precision="8" scale="5" nullable="true"/>
         <field name="netPrice" column="net_price" type="decimal" precision="10" scale="5" nullable="true"/>
+        <field name="excludeImages" type="boolean" column="exclude_images">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
 
         <field name="position" type="integer" column="position">
             <gedmo:sortable-position />

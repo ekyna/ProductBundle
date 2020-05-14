@@ -94,6 +94,13 @@ class BundleChoiceType extends ResourceFormType
                     'attr'     => [
                         'align_with_widget' => true,
                     ],
+                ])
+                ->add('excludeImages', Type\CheckboxType::class, [
+                    'label'    => 'ekyna_product.bundle_choice.field.exclude_images',
+                    'required' => false,
+                    'attr'     => [
+                        'align_with_widget' => true,
+                    ],
                 ]);
         }
 

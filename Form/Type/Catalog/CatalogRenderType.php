@@ -60,6 +60,18 @@ class CatalogRenderType extends AbstractType
             ->add('template', TemplateChoiceType::class, [
                 'with_slots' => true,
             ])
+            ->add('displayPrices', ChoiceType::class, [
+                'label'    => 'ekyna_product.catalog.field.display_prices',
+                'choices'  => [
+                    'ekyna_core.value.yes' => 1,
+                    'ekyna_core.value.no'  => 0,
+                ],
+                'expanded' => true,
+                'attr'     => [
+                    'inline'            => true,
+                    'align_with_widget' => true,
+                ],
+            ])
             ->add('saleItems', SaleItemChoiceType::class, [
                 'sale'     => $options['sale'],
                 'multiple' => true,

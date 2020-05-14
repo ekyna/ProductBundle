@@ -142,6 +142,7 @@ ekyna_product:
             plural: Choice
         field:
             hidden: Hidden
+            exclude_images: Exclude images
         button:
             add: Add a choice
 
@@ -286,6 +287,7 @@ ekyna_product:
             treatment: Treatment
             resupply: Resupply
             out_of_stock: Out of stock
+            ordered: Ordered
         message:
             batch_edit_warning: >
                 Check the fields whose value will be applied to the following products

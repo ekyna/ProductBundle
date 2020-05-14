@@ -41,11 +41,6 @@ class BundleChoice implements Model\BundleChoiceInterface
     protected $maxQuantity;
 
     /**
-     * @var bool
-     */
-    protected $useOptions;
-
-    /**
      * @var array
      */
     protected $excludedOptionGroups;
@@ -65,6 +60,11 @@ class BundleChoice implements Model\BundleChoiceInterface
      */
     protected $rules;
 
+    /**
+     * @var bool
+     */
+    protected $excludeImages;
+
 
     /**
      * Constructor.
@@ -73,10 +73,10 @@ class BundleChoice implements Model\BundleChoiceInterface
     {
         $this->minQuantity = 1;
         $this->maxQuantity = 1;
-        $this->useOptions = true;
         $this->excludedOptionGroups = [];
         $this->hidden = false;
         $this->rules = new ArrayCollection();
+        $this->excludeImages = false;
     }
 
     /**
@@ -124,7 +124,7 @@ class BundleChoice implements Model\BundleChoiceInterface
             }
 
             if ($this->slot = $slot) {
-               $this->slot->addChoice($this);
+                $this->slot->addChoice($this);
             }
         }
 
@@ -287,6 +287,24 @@ class BundleChoice implements Model\BundleChoiceInterface
     public function setRules(ArrayCollection $rules)
     {
         $this->rules = $rules;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isExcludeImages(): bool
+    {
+        return $this->excludeImages;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setExcludeImages(bool $exclude): Model\BundleChoiceInterface
+    {
+        $this->excludeImages = $exclude;
 
         return $this;
     }

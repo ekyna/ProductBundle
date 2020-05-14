@@ -548,6 +548,12 @@ class Inventory
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
                 ->setParameter('not_mode', CStockModes::MODE_DISABLED)
                 ->andHaving($expr->lt('virtual_stock', 'stock_floor'));
+        } elseif (InventoryProfiles::ORDERED === $context->getProfile()) {
+            $qb
+                ->andWhere($expr->neq('p.stockMode', ':not_mode'))
+                ->setParameter('not_mode', CStockModes::MODE_DISABLED)
+                ->andHaving($expr->gt('virtual_stock', 'stock_floor'))
+                ->andHaving($expr->gt('ordered', 'received'));
         }
 
         // Sorting

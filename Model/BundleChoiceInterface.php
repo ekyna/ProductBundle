@@ -169,4 +169,20 @@ interface BundleChoiceInterface extends ResourceInterface, SortableInterface
      * @internal
      */
     public function setRules(ArrayCollection $rules);
+
+    /**
+     * Returns whether to exclude images (from parent gallery).
+     *
+     * @return bool
+     */
+    public function isExcludeImages(): bool;
+
+    /**
+     * Sets whether to exclude images (from parent gallery).
+     *
+     * @param bool $exclude
+     *
+     * @return BundleChoice
+     */
+    public function setExcludeImages(bool $exclude): BundleChoiceInterface;
 }
