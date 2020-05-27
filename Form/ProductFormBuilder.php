@@ -390,6 +390,7 @@ class ProductFormBuilder
         $options = array_replace([
             'label'    => 'ekyna_core.field.reference',
             'required' => false,
+            'disabled' => !empty($this->product->getReference()),
         ], $options);
 
         $this->form->add('reference', SF\TextType::class, $options);
