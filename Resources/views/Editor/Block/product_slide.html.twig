@@ -1,4 +1,4 @@
-{% spaceless %}
+{% apply spaceless %}
 <div class="wrap"{% if max_width is not empty %} style="max-width: {{ max_width }};"{% endif %}>
     <div class="slides"{% if duration is not empty %} data-duration="{{ duration }}"{% endif %}>
         <a href="javascript: void(0)" class="prev-slide"></a>
@@ -27,4 +27,4 @@
         {%- endfor %}
     </div>
 </div>
-{% endspaceless %}
+{% endapply %}

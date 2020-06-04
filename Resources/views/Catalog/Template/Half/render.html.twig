@@ -3,7 +3,7 @@
 {% import '@EkynaProduct/Catalog/Template/macros.html.twig' as macros %}
 
 {% block content -%}
-{% spaceless %}
+{% apply spaceless %}
 {% for slot in page.slots|slice(0, 2) -%}
     {% set product = slot.product %}
     <div class="product half {{ loop.first ? 'left' : 'right' }}">
@@ -11,39 +11,29 @@
             <div class="row">
             {% if loop.first -%}
                 <div class="col-xs-6">{{ macros.image(catalog, product) }}</div>
+            {%- endif %}
                 <div class="col-xs-6">
                     {{ macros.title(catalog, product) }}
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-xs-5">
                             {{ macros.infos(catalog, product) }}
                         </div>
-                        <div class="col-xs-6">
+                        <div class="col-xs-7">
                             {{ macros.grid(catalog, product) }}
                         </div>
                     </div>
                 </div>
-            {%- else -%}
-                <div class="col-xs-6">
-                    {{ macros.title(catalog, product) }}
-                    <div class="row">
-                        <div class="col-xs-6">
-                            {{ macros.infos(catalog, product) }}
-                        </div>
-                        <div class="col-xs-6">
-                            {{ macros.grid(catalog, product) }}
-                        </div>
-                    </div>
-                </div>
+            {% if not loop.first -%}
                 <div class="col-xs-6">{{ macros.image(catalog, product) }}</div>
             {%- endif %}
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="description">{{ product.description|raw }}</div>
+                    <p class="description">{{ product.description|paragraph_to_break }}</p>
                 </div>
             </div>
         </div>
     </div>
 {%- endfor %}
-{% endspaceless %}
+{% endapply %}
 {% endblock content %}

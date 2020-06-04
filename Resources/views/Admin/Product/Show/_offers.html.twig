@@ -1,4 +1,4 @@
-{% spaceless %}
+{% apply spaceless %}
 {% if offers_list is not empty %}
 <hr>
 <h3>{{ 'ekyna_product.offer.label.plural'|trans }}</h3>
@@ -60,4 +60,4 @@
 {% endfor %}
 </div>
 {% endif %}
-{% endspaceless %}
+{% endapply %}

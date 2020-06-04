@@ -4,37 +4,12 @@
 
 {% block content -%}
 {% apply spaceless -%}
-{% set product = (page.slots|first).product -%}
-<div class="product half left">
-    <div class="inner">
-        <div class="row">
-            <div class="col-xs-6">
-                {{- macros.image(catalog, product) -}}
-            </div>
-            <div class="col-xs-6">
-                {{- macros.title(catalog, product) -}}
-                <div class="row">
-                    <div class="col-xs-5">
-                        {{- macros.infos(catalog, product) -}}
-                    </div>
-                    <div class="col-xs-7">
-                        {{- macros.grid(catalog, product) -}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <p class="description">
-                    {{- product.description|paragraph_to_break -}}
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+
+{% for slot in page.slots|slice(0, 4) -%}
+{% if loop.first or loop.index0 % 2 == 0 -%}
 <div class="product dual">
     <div class="row">
-        {% for slot in page.slots|slice(1, 2) -%}
+{%- endif %}
         {% set product = slot.product -%}
         <div class="col-xs-6">
             <div class="inner">
@@ -55,8 +30,10 @@
                 </p>
             </div>
         </div>
-        {%- endfor %}
+{% if loop.last or loop.index0 % 2 == 1 -%}
     </div>
 </div>
+{%- endif %}
+{%- endfor %}
 {%- endapply %}
 {%- endblock content %}

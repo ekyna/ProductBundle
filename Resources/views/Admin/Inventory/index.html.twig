@@ -1,13 +1,13 @@
 {% extends '@EkynaAdmin/base.html.twig' %}
 
 {% macro sortLinkAttribute(data, field) %}
-{% spaceless %}
+{% apply spaceless %}
     {%- set sortClass = 'none' -%}
     {%- if data.sortBy == field -%}
         {% set sortClass =  data.sortDir|lower %}
     {%- endif -%}
     href="javascript:void(0)" class="{{ sortClass }}" data-by="{{ field }}"
-{% endspaceless %}
+{% endapply %}
 {% endmacro sortLinkAttribute %}
 
 {% import _self as macro %}
@@ -34,7 +34,7 @@
 {% endblock actions %}#}
 
 {% block body %}
-{% spaceless %}
+{% apply spaceless %}
 
     {{ form_start(form) }}
     {{ bootstrap_set_col_size('md') }}
@@ -227,7 +227,7 @@
             </tfoot>
         </table>
     </form>
-{% endspaceless %}
+{% endapply %}
 {% endblock body %}
 
 

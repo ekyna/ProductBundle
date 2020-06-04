@@ -198,6 +198,7 @@ ekyna_product:
             full: Article pleine page
             half: Un article en haut, un article en bas
             half_dual: Un article en haut, deux articles en bas
+            quarter: Deux articles en haut, deux articles en bas
         alert:
             no_item: Aucun catalogue configuré
 

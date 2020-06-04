@@ -1,4 +1,4 @@
-{% spaceless %}
+{% apply spaceless %}
 {% set url = absolute_url('/') %}
 <div class="cover">
     <div class="inner">
@@ -9,4 +9,4 @@
         <div class="description">{{ catalog.description|raw }}</div>
     </div>
 </div>
-{% endspaceless %}
+{% endapply %}

@@ -1,7 +1,7 @@
 {% block widget_attributes -%}{% for key, value in attr %} {{ key }}="{{ value }}"{% endfor -%}{% endblock widget_attributes %}
 
 {% block attribute_config_widget %}
-{% spaceless %}
+{% apply spaceless %}
     {% set attr = attr|merge({'class': ('show-widget show-widget-block ' ~ attr.class|default(''))|trim }) %}
     <div{{ block('widget_attributes') }}>
         {% if value is empty -%}
@@ -12,5 +12,5 @@
             {%- endfor %}
         {%- endif %}
     </div>
-{% endspaceless %}
+{% endapply %}
 {% endblock attribute_config_widget %}

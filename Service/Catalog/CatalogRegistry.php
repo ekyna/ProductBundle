@@ -209,6 +209,13 @@ class CatalogRegistry
                 'slots'     => 3,
                 'mockup'    => 'null',
             ],
+            'default.quarter' => [
+                'label'     => 'ekyna_product.catalog.template.quarter',
+                'form_type' => Type\QuarterType::class,
+                'directory' => '@EkynaProduct/Catalog/Template/Quarter',
+                'slots'     => 4,
+                'mockup'    => 'null',
+            ],
         ];
     }
 }

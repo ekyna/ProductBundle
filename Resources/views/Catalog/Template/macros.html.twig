@@ -1,41 +1,41 @@
 {% macro image(catalog, product) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set image = product.images|first %}
     <img src="{{ absolute_url(image.path|imagine_filter('media_front')) }}" alt="{{ image.title }}"
          class="img-responsive" width="800" height="600">
-{% endspaceless %}
+{% endapply %}
 {% endmacro image %}
 
 {% macro title(catalog, product) %}
-{% spaceless %}
+{% apply spaceless %}
     <h1>
         <span class="brand">{{ product.brand.title }}</span><br>
         {{- product.fullTitle -}}
     </h1>
-{% endspaceless %}
+{% endapply %}
 {% endmacro title %}
 
 {% macro grid(catalog, product) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if catalog.displayPrices -%}
         {{ product|product_pricing_grid(null, 'grid') }}
     {%- endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro grid %}
 
 {% macro infos(catalog, product) %}
-{% spaceless %}
-    <p>
+{% apply spaceless %}
+    <p class="information">
         <span class="field">{{ 'ekyna_core.field.reference'|trans }}</span>&nbsp;
         <span class="reference">{{ product.reference }}</span><br>
         {% if catalog.displayPrices -%}
             <span class="price">{{ product|product_price({'discount': false})|raw }}</span>
         {%- endif %}
     </p>
-    <p>
+    <p class="information">
         <a href="{{ product|subject_public_url(false) }}" class="btn btn-primary">
             {{ 'ekyna_product.common.read_more'|trans }}
         </a>
     </p>
-{% endspaceless %}
+{% endapply %}
 {% endmacro infos %}

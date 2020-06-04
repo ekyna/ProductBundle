@@ -1,4 +1,4 @@
-{% spaceless %}
+{% apply spaceless %}
 <div style="margin:15px;">
 {% set per_row = 3 %}
 {% for pricing in pricings %}
@@ -44,4 +44,4 @@
 {% if loop.last or loop.index % per_row == 0 %}</div>{% endif %}
 {% endfor %}
 </div>
-{% endspaceless %}
+{% endapply %}

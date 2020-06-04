@@ -198,6 +198,7 @@ ekyna_product:
             full: Full page product
             half: One product up, on down
             half_dual: One product up, two down
+            quarter: Two products up, two down
         alert:
             no_item: No catalog configured
 

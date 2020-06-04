@@ -6,7 +6,7 @@
 
 
 {% block sale_item_configurable_slot %}
-{% spaceless %}
+{% apply spaceless %}
     <div class="row">
         <div class="col-sm-8 col-sm-push-4">
             <h3 class="product-title">
@@ -73,12 +73,12 @@
         </div>
         {%- endif -%}
     </div>
-{% endspaceless %}
+{% endapply %}
 {% endblock sale_item_configurable_slot %}
 
 
 {% block sale_item_configurable_slot_widget %}
-{% spaceless %}
+{% apply spaceless %}
     {# TODO form_errors(form) #}
     <div class="bundle-slot" data-config='{{ form.vars.slot_config|json_encode_data|raw }}'>
         <div class="slot-info">
@@ -132,12 +132,12 @@
             {%- endfor %}
         </div>
     </div>
-{% endspaceless %}
+{% endapply %}
 {% endblock sale_item_configurable_slot_widget %}
 
 
 {% block sale_item_option_groups_widget %}
-{% spaceless %}
+{% apply spaceless %}
     <div {{ block('widget_container_attributes') }}>
         {% set sizing = sizing|default(bootstrap_get_sizing()) %}
         {% for child in form %}
@@ -156,22 +156,22 @@
         {% endfor %}
         {{- form_rest(form) -}}
     </div>
-{% endspaceless %}
+{% endapply %}
 {% endblock sale_item_option_groups_widget %}
 
 
 {% block sale_item_variant_widget %}
-{% spaceless %}
+{% apply spaceless %}
     <div class="input-group">
         {{- block('choice_widget') -}}
         <span class="input-group-addon sale-item-info">&nbsp;</span>
     </div>
-{% endspaceless %}
+{% endapply %}
 {% endblock sale_item_variant_widget %}
 
 
 {% block sale_item_configure_widget %}
-{% spaceless %}
+{% apply spaceless %}
     {{- bootstrap_backup_form_settings() -}}
     {{- bootstrap_set_style('horizontal') -}}
     {{- bootstrap_set_col_size('sm') -}}
@@ -290,5 +290,5 @@
     </div>{# End .sale-item-inner #}
 
     {{- form_rest(form) -}}
-{% endspaceless %}
+{% endapply %}
 {% endblock sale_item_configure_widget %}
