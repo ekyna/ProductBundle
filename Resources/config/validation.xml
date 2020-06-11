@@ -977,6 +977,10 @@
             </constraint>
         </property>
 
+        <property name="mentions">
+            <constraint name="Valid"/>
+        </property>
+
         <property name="adjustments">
             <constraint name="Valid"/>
         </property>
