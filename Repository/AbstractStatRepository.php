@@ -25,6 +25,7 @@ abstract class AbstractStatRepository extends ServiceEntityRepository
 {
     use LocaleAwareRepositoryTrait;
 
+
     /**
      * @var OptionsResolver
      */

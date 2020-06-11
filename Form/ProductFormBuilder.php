@@ -5,9 +5,12 @@ namespace Ekyna\Bundle\ProductBundle\Form;
 use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Common\MentionsType;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
+use Ekyna\Bundle\ProductBundle\Entity\ProductMentionTranslation;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
@@ -56,7 +59,7 @@ class ProductFormBuilder
      */
     public function __construct(Features $features, string $mediaClass)
     {
-        $this->features = $features;
+        $this->features   = $features;
         $this->mediaClass = $mediaClass;
     }
 
@@ -75,7 +78,7 @@ class ProductFormBuilder
         }
 
         $this->product = $product;
-        $this->form = $form;
+        $this->form    = $form;
 
         return $this;
     }
@@ -115,7 +118,7 @@ class ProductFormBuilder
 
         $options['required'] = true;
         $options['disabled'] = false;
-        $attr = [];
+        $attr                = [];
         if ($this->product->getType() === ProductTypes::TYPE_SIMPLE) {
             $options['required'] = false;
             if (null !== $this->product->getAttributeSet()) {
@@ -296,6 +299,25 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('medias', MediaCollectionType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the mentions field.
+     *
+     * @param array $options
+     *
+     * @return self
+     */
+    public function addMentionsField(array $options = [])
+    {
+        $options = array_replace([
+            'mention_class'     => ProductMention::class,
+            'translation_class' => ProductMentionTranslation::class,
+        ], $options);
+
+        $this->form->add('mentions', MentionsType::class, $options);
 
         return $this;
     }

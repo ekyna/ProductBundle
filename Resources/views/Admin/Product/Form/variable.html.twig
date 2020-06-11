@@ -31,3 +31,10 @@
     {{ form_row(form.crossSellings) }}
     {{ form_row(form.attributeSet) }}
 {% endblock general_content %}
+
+
+{% block content_content %}
+    {{ parent() }}
+    <hr>
+    {{ form_row(form.mentions) }}
+{% endblock content_content %}

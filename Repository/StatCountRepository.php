@@ -9,7 +9,6 @@ use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
-use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -19,9 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class StatCountRepository extends AbstractStatRepository
 {
-    use LocaleAwareRepositoryTrait;
-
-
     /**
      * @var Query
      */
@@ -96,7 +92,7 @@ class StatCountRepository extends AbstractStatRepository
 
         if ($group) {
             $parameters['group'] = $group;
-            $query = $this->getFindByProductAndPeriodAndGroupQuery();
+            $query               = $this->getFindByProductAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindByProductAndPeriodQuery();
         }

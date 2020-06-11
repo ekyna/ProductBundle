@@ -2,6 +2,7 @@
 
 
 {% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as macros %}
+{% import '@EkynaCommerce/Admin/macros.html.twig' as _commerce %}
 
 
 {% block general_content %}
@@ -34,6 +35,12 @@
     {{ macros.show_cross_sellings(product) }}
     {{ macros.show_attribute_set(product) }}
 {% endblock general_content %}
+
+
+{% block content_content %}
+    {{ parent() }}
+    {{ _commerce.show_mentions(product) }}
+{% endblock content_content %}
 
 
 {% block children_content %}

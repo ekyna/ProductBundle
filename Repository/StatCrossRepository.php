@@ -9,7 +9,6 @@ use Ekyna\Bundle\ProductBundle\Entity\StatCross;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface as Group;
-use Ekyna\Component\Resource\Doctrine\ORM\Util\LocaleAwareRepositoryTrait;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,9 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class StatCrossRepository extends AbstractStatRepository
 {
-    use LocaleAwareRepositoryTrait;
-
-
     /**
      * @var Query
      */
@@ -216,7 +212,8 @@ class StatCrossRepository extends AbstractStatRepository
      *
      * @param OptionsResolver $resolver
      *
-     * @noinspection PhpUnusedParameterInspection*/
+     * @noinspection PhpUnusedParameterInspection
+     */
     protected function configureFindProductsParametersResolver(OptionsResolver $resolver): void
     {
         $resolver

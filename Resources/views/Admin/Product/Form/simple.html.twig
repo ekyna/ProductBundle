@@ -37,6 +37,11 @@
     {{ form_row(form.tags) }}
 {% endblock general_content %}
 
+{% block content_content %}
+    {{ parent() }}
+    <hr>
+    {{ form_row(form.mentions) }}
+{% endblock content_content %}
 
 {% block pricing_content %}
     {{ parent() }}

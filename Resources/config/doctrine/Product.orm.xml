@@ -124,6 +124,16 @@
             </cascade>
         </one-to-many>
 
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Entity\ProductMention"
+                     field="mentions" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+            <order-by>
+                <order-by-field name="position"/>
+            </order-by>
+        </one-to-many>
+
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductAdjustmentInterface"
                      field="adjustments" mapped-by="product" orphan-removal="true" index-by="id">
             <cascade>

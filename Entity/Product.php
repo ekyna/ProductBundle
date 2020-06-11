@@ -26,6 +26,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
     use Model\VisibilityTrait,
         Common\AdjustableTrait,
+        Common\MentionSubjectTrait,
         Cms\ContentSubjectTrait,
         Cms\SeoSubjectTrait,
         Cms\TagsSubjectTrait,
@@ -191,6 +192,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->variants = new ArrayCollection();
 
         $this->initializeAdjustments();
+        $this->initializeMentions();
         $this->initializeStock();
     }
 
@@ -1577,6 +1579,40 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         if ($this->hasAdjustment($adjustment)) {
             $this->adjustments->removeElement($adjustment);
             $adjustment->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasMention(ProductMention $mention): bool
+    {
+        return $this->mentions->contains($mention);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addMention(ProductMention $mention): Model\ProductInterface
+    {
+        if (!$this->hasMention($mention)) {
+            $this->mentions->add($mention);
+            $mention->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeMention(ProductMention $mention): Model\ProductInterface
+    {
+        if ($this->hasMention($mention)) {
+            $this->mentions->removeElement($mention);
+            $mention->setProduct(null);
         }
 
         return $this;

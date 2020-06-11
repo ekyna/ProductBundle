@@ -4,8 +4,8 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
-use Ekyna\Bundle\ProductBundle\Entity\Product;
-use Ekyna\Component\Commerce\Common\Model\AdjustableInterface;
+use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
+use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
@@ -28,7 +28,8 @@ interface ProductInterface extends
     RM\SortableInterface,
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,
-    AdjustableInterface,
+    Common\AdjustableInterface,
+    Common\MentionSubjectInterface,
     TaxableInterface,
     StockSubjectInterface
 {
@@ -899,6 +900,33 @@ interface ProductInterface extends
      * @return $this|ProductInterface
      */
     public function setStatUpdatedAt(\DateTime $date = null);
+
+    /**
+     * Returns whether this product has the given mention.
+     *
+     * @param ProductMention $mention
+     *
+     * @return bool
+     */
+    public function hasMention(ProductMention $mention): bool;
+
+    /**
+     * Adds the mention.
+     *
+     * @param ProductMention $mention
+     *
+     * @return $this|ProductInterface
+     */
+    public function addMention(ProductMention $mention): ProductInterface;
+
+    /**
+     * Removes the mention.
+     *
+     * @param ProductMention $mention
+     *
+     * @return $this|ProductInterface
+     */
+    public function removeMention(ProductMention $mention): ProductInterface;
 
     /**
      * Returns the product images.
