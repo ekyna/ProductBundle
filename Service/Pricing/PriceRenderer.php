@@ -177,7 +177,7 @@ class PriceRenderer
             $display->setPricingPercent($percent = $formatter->percent($price['details'][Offer::TYPE_PRICING]));
 
             if ($extended) {
-                $display->setSpecialLabel($this->translator->trans('ekyna_product.price.display.pricing', [
+                $display->setPricingLabel($this->translator->trans('ekyna_product.price.display.pricing', [
                     '%percent%' => $percent,
                 ]));
             }
