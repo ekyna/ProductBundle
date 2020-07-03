@@ -68,7 +68,7 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
             ->setParameters([
                 'pricings' => $scalars,
             ])
-            ->setPriority(2000);
+            ->setPriority(950);
 
         $event->addWidget($widget);
     }

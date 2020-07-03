@@ -1,37 +1,37 @@
 {% extends '@EkynaProduct/Admin/Product/Show/base.html.twig' %}
 
 
-{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as macros %}
+{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
 {% import '@EkynaCms/Admin/show_macros.html.twig' as _cms %}
 
 
 {% block general_content %}
     {{ parent() }}
-    {{ macros.show_variable(product) }}
+    {{ _product.show_variable(product) }}
     <div class="row">
         <div class="col-md-6">
-            {{ macros.show_visible(product, {'label_col': 4}) }}
+            {{ _product.show_visible(product, {'label_col': 4}) }}
         </div>
         <div class="col-md-6">
-            {{ macros.show_released_at(product, {'label_col': 4}) }}
+            {{ _product.show_released_at(product, {'label_col': 4}) }}
         </div>
     </div>
-    {{ macros.show_attributes(product) }}
+    {{ _product.show_attributes(product) }}
     {{ _cms.show_tags(product) }}
 {% endblock general_content %}
 
 
 {% block pricing_content %}
     {{ parent() }}
-    {{ macros.show_customer_groups(product) }}
-    {{ macros.show_references(product) }}
-    {{ macros.show_adjustments(product) }}
+    {{ _product.show_customer_groups(product) }}
+    {{ _product.show_references(product) }}
+    {{ _product.show_adjustments(product) }}
 {% endblock pricing_content %}
 
 
 {% block stock_content %}
     {{ parent() }}
-    {{ macros.show_stock_units(product) }}
+    {{ _product.show_stock_units(product) }}
 {% endblock stock_content %}
 
 

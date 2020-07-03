@@ -1,5 +1,5 @@
-{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as macros %}
-{% import '@EkynaCommerce/Admin/Stock/_subject_macros.html.twig' as stock_macros %}
+{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
+{% import '@EkynaCommerce/Admin/Stock/_subject_macros.html.twig' as _subject %}
 
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs" data-tab-key="{{ resource_id }}">
@@ -81,16 +81,16 @@
         <div class="tab-content">
             <div class="tab-pane active" id="product-general">
             {%- block general_content -%}
-                {{ macros.show_designation(product) }}
+                {{ _product.show_designation(product) }}
             {%- endblock general_content -%}
             </div>
 
             {%- block content_pane -%}
                 <div class="tab-pane" id="product-content">
                 {%- block content_content -%}
-                    {{ macros.show_translations(product) }}
-                    {{ macros.show_medias(product) }}
-                    {{ macros.show_notContractual(product) }}
+                    {{ _product.show_translations(product) }}
+                    {{ _product.show_medias(product) }}
+                    {{ _product.show_notContractual(product) }}
                 {%- endblock content_content -%}
                 </div>
             {%- endblock content_pane -%}
@@ -100,33 +100,33 @@
                 {%- block pricing_content -%}
                     <div class="row">
                         <div class="col-md-4">
-                            {{ macros.show_reference(product, {'label_col': 6}) }}
+                            {{ _product.show_reference(product, {'label_col': 6}) }}
                         </div>
                         <div class="col-md-4">
-                            {{ macros.show_net_price(product, {'label_col': 6}) }}
+                            {{ _product.show_net_price(product, {'label_col': 6}) }}
                         </div>
                         <div class="col-md-4">
-                            {{ macros.show_tax_group(product, {'label_col': 6}) }}
+                            {{ _product.show_tax_group(product, {'label_col': 6}) }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
-                            {{ macros.show_min_price(product, {'label_col': 6}) }}
+                            {{ _product.show_min_price(product, {'label_col': 6}) }}
                         </div>
                     </div>
                 {%- endblock pricing_content -%}
                 {%- if product_feature('component') and product is variable_product -%}{# TODO (?) or product is bundle_product #}
-                {{ macros.show_components(product) }}
+                {{ _product.show_components(product) }}
                 {%- endif -%}
-                {{ macros.show_option_groups(product) }}
+                {{ _product.show_option_groups(product) }}
                 </div>
             {%- endblock pricing_pane -%}
 
             {%- block offers_pane -%}
             <div class="tab-pane" id="product-offers">
                 {% block offers_content -%}
-                {{ macros.show_special_offers(product) }}
-                {{ macros.show_pricings(product) }}
+                {{ _product.show_special_offers(product) }}
+                {{ _product.show_pricings(product) }}
                 {% include '@EkynaProduct/Admin/Product/Show/_offers.html.twig' %}
                 {% include '@EkynaProduct/Admin/Product/Show/_prices.html.twig' %}
                 {%- endblock offers_content %}
@@ -147,7 +147,7 @@
                     }) }}
                 </p>
                 <div id="stock-view">
-                    {{ stock_macros.show_stock_view(product, 'product') }}
+                    {{ _subject.show_stock_view(product, 'product') }}
                 </div>
             {%- endblock stock_content -%}
             </div>
@@ -159,15 +159,15 @@
             {%- block relations_content -%}
                 {% if bundleParents is not empty -%}
                     <p class="h4">{{ 'ekyna_product.product.field.bundle_parents'|trans }}</p>
-                    {{ macros.show_relations(bundleParents) }}
+                    {{ _product.show_relations(bundleParents) }}
                 {%- endif %}
                 {% if componentParents is not empty -%}
                     <p class="h4">{{ 'ekyna_product.product.field.component_parents'|trans }}</p>
-                    {{ macros.show_relations(componentParents) }}
+                    {{ _product.show_relations(componentParents) }}
                 {%- endif %}
                 {% if optionParents is not empty -%}
                     <p class="h4">{{ 'ekyna_product.product.field.option_parents'|trans }}</p>
-                    {{ macros.show_relations(optionParents) }}
+                    {{ _product.show_relations(optionParents) }}
                 {%- endif %}
             {%- endblock relations_content -%}
             </div>
@@ -198,7 +198,7 @@
             {%- block stat_pane -%}
             <div class="tab-pane" id="product-stat">
             {%- block stat_content -%}
-                {{ macros.show_stat_charts(product) }}
+                {{ _product.show_stat_charts(product) }}
             {%- endblock stat_content -%}
             </div>
             {%- endblock stat_pane -%}
@@ -206,7 +206,7 @@
             {%- block seo_pane -%}
             <div class="tab-pane" id="product-seo">
             {%- block seo_content -%}
-                {{ macros.show_seo(product) }}
+                {{ _product.show_seo(product) }}
             {%- endblock seo_content -%}
             </div>
             {%- endblock seo_pane -%}

@@ -1,39 +1,39 @@
 {% extends '@EkynaProduct/Admin/Product/Show/base.html.twig' %}
 
 
-{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as macros %}
+{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
 {% import '@EkynaCommerce/Admin/macros.html.twig' as _commerce %}
 
 
 {% block general_content %}
     {{ parent() }}
-    {{ macros.show_categories(product) }}
+    {{ _product.show_categories(product) }}
     <div class="row">
         <div class="col-md-6">
-            {{ macros.show_brand(product, {'label_col': 4}) }}
+            {{ _product.show_brand(product, {'label_col': 4}) }}
         </div>
         <div class="col-md-6">
-            {{ macros.show_brandNaming(product, {'label_col': 4}) }}
+            {{ _product.show_brandNaming(product, {'label_col': 4}) }}
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
-            {{ macros.show_visible(product, {'label_col': 4}) }}
+            {{ _product.show_visible(product, {'label_col': 4}) }}
         </div>
         <div class="col-md-6">
-            {{ macros.show_visibility(product, {'label_col': 4}) }}
+            {{ _product.show_visibility(product, {'label_col': 4}) }}
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
-            {{ macros.show_best_seller(product, {'label_col': 4}) }}
+            {{ _product.show_best_seller(product, {'label_col': 4}) }}
         </div>
         <div class="col-md-6">
-            {{ macros.show_cross_selling(product, {'label_col': 4}) }}
+            {{ _product.show_cross_selling(product, {'label_col': 4}) }}
         </div>
     </div>
-    {{ macros.show_cross_sellings(product) }}
-    {{ macros.show_attribute_set(product) }}
+    {{ _product.show_cross_sellings(product) }}
+    {{ _product.show_attribute_set(product) }}
 {% endblock general_content %}
 
 
