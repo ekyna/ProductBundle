@@ -105,7 +105,10 @@ class SimpleHandler extends AbstractHandler
         $changed = false;
         $childEvents = [];
 
-        $stockProperties = ['stockMode', 'inStock', 'availableStock', 'virtualStock', 'estimatedDateOfArrival'];
+        $stockProperties = [
+            'stockMode', 'inStock', 'availableStock', 'virtualStock',
+            'estimatedDateOfArrival', 'minimumOrderQuantity'
+        ];
         if ($this->persistenceHelper->isChanged($product, $stockProperties)) {
             $changed |= $this->stockUpdater->update($product);
 
