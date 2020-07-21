@@ -1,6 +1,11 @@
 {% apply spaceless %}
-{% if offers_list is not empty %}
 <hr>
+{{- admin_resource_btn(product, 'invalidate_offers', {
+    'theme': 'primary',
+    'size': 'sm'
+}, {
+    'class': ('pull-right' ~ (product.pendingOffers ? ' disabled' : ''))
+}) -}}
 <h3>{{ 'ekyna_product.offer.label.plural'|trans }}</h3>
 <div class="show-product-offers">
 {% for list in offers_list %}
@@ -57,7 +62,8 @@
     {% if loop.last or loop.index % 3 == 0 %}
     </div>
     {% endif %}
+{% else %}
+    <p><em>{{ 'ekyna_product.product.alert.no_offer'|trans }}</em></p>
 {% endfor %}
 </div>
-{% endif %}
 {% endapply %}

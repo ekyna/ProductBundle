@@ -466,6 +466,31 @@ class ProductController extends AbstractSubjectController
     }
 
     /**
+     * Invalidates the product offers and prices.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function invalidateOffers(Request $request): Response
+    {
+        $context = $this->loadContext($request);
+        /** @var ProductInterface $product */
+        $product = $context->getResource();
+
+        $this->isGranted('EDIT', $product);
+
+        $product
+            ->setPendingOffers(true)
+            ->setPendingPrices(true);
+
+        $event = $this->getOperator()->update($product);
+        $event->toFlashes($this->getFlashBag());
+
+        return $this->redirect($this->generateResourcePath($product, 'show'));
+    }
+
+    /**
      * Products export action.
      *
      * @param Request $request

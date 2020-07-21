@@ -130,6 +130,13 @@ ekyna_product_product_admin_remove:
     requirements:
         productId: \d+
 
+ekyna_product_product_admin_invalidate_offers:
+    path: /{productId}/invalidate-offers
+    controller: "ekyna_product.product.controller:invalidateOffers"
+    methods: [GET]
+    requirements:
+        productId: \d+
+
 ekyna_product_product_admin_generate_reference:
     path: /{productId}/generate-reference/{type}
     controller: "ekyna_product.product.controller:generateReference"

@@ -419,6 +419,7 @@ ekyna_product:
             remove: Supprimer le produit
             convert: Convertir
             label: Étiquette
+            invalidate_offers: Recalculer les offres et tarifs
         type:
             simple: Simple
             variable: Variable
@@ -444,6 +445,8 @@ ekyna_product:
             not_contractual: Visuels non contractuels
         alert:
             no_item: Aucun produit configuré
+            no_offer: Aucune offre configuré
+            no_price: Aucun tarif configuré
             pending_offers: >
                 Les offres de ce produit sont en attente de mise à jour.
             supplier_product_exists: >

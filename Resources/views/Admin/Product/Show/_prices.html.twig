@@ -1,5 +1,4 @@
 {% apply spaceless %}
-{% if prices_list is not empty %}
 <hr>
 <h3>{{ 'ekyna_product.price.label.plural'|trans }}</h3>
 <div class="show-product-offers">
@@ -37,7 +36,8 @@
     {% if loop.last or loop.index % 3 == 0 %}
     </div>
     {% endif %}
+{% else %}
+    <p><em>{{ 'ekyna_product.product.alert.no_price'|trans }}</em></p>
 {% endfor %}
 </div>
-{% endif %}
 {% endapply %}

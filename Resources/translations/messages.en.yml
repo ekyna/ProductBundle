@@ -418,6 +418,7 @@ ekyna_product:
             remove: Remove the product
             convert: Convert
             label: Label
+            invalidate_offers: Recalculate offers and prices
         type:
             simple: Simple
             variable: Variable
@@ -442,6 +443,8 @@ ekyna_product:
             not_contractual: Non-contractual photos
         alert:
             no_item: No product configured
+            no_offer: No offer configured
+            no_price: No price configured
             pending_offers: >
                 This product has pending offers and pricing updates.
             supplier_product_exists: >
