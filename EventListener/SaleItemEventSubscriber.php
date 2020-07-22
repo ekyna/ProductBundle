@@ -133,17 +133,21 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         // Loop through parents and keep the best offer
         do {
-            if (null !== $product = $this->getProductFromItem($item)) {
-                $o = $this
-                    ->offerRepository
-                    ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
+            if (null === $product = $this->getProductFromItem($item)) {
+                continue;
+            }
 
-                if (is_null($o)) {
-                    continue;
-                }
-                if (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2)) {
-                    $offer = $o;
-                }
+            $o = $this
+                ->offerRepository
+                ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
+
+            if (!is_null($o) && (is_null($offer) || 0 <= bccomp($o['percent'], $offer['percent'], 2))) {
+                $offer = $o;
+            }
+
+            // Options should not inherit
+            if ($item->hasData(ItemBuilder::OPTION_GROUP_ID) || $item->hasData(ItemBuilder::OPTION_ID)) {
+                break;
             }
         } while ($item = $item->getParent());
 

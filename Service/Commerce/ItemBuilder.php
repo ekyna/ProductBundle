@@ -72,6 +72,7 @@ class ItemBuilder
      */
     public function build(SaleItemInterface $item)
     {
+        /** @var ProductInterface $product */
         $product = $this->provider->resolve($item);
 
         $this->buildFromProduct($item, $product, []);
@@ -409,7 +410,9 @@ class ItemBuilder
         }
 
         // Configurable only if root item
-        if (null === $item->getParent()) {
+        if ($root = $item->getParent()) {
+            $root->setConfigurable(true);
+        } else {
             $item->setConfigurable(true);
         }
 
@@ -662,6 +665,7 @@ class ItemBuilder
      */
     public function initialize(SaleItemInterface $item, array $exclude = [])
     {
+        /** @var ProductInterface $product */
         $product = $this->provider->resolve($item);
 
         // Clear identifiers vars
@@ -975,6 +979,7 @@ class ItemBuilder
      */
     public function getBundleSlots(SaleItemInterface $item)
     {
+        /** @var ProductInterface $product */
         $product = $this->provider->resolve($item);
 
         return $this->filter->getBundleSlots($product);
@@ -990,6 +995,7 @@ class ItemBuilder
      */
     public function getOptionGroups(SaleItemInterface $item, array $exclude = [])
     {
+        /** @var ProductInterface $product */
         $product = $this->provider->resolve($item);
 
         $groups = $this->filter->getOptionGroups($product, $exclude);
