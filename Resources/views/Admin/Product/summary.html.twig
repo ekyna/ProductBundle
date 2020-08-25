@@ -53,6 +53,8 @@
                 <dd>{{ replenishment }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.quote_only'|trans }}</dt>
                 <dd>{{ quote_only }}</dd>
+                <dt>{{ 'ekyna_core.field.visible'|trans }}</dt>
+                <dd>{{ ('ekyna_core.value.' ~ (visible ? 'yes' : 'no'))|trans }}</dd>
             </dl>
         </td>
         <td>
@@ -69,6 +71,8 @@
                 <dd>{{ eda }}</dd>
                 <dt>{{ 'ekyna_commerce.stock_subject.field.end_of_life'|trans }}</dt>
                 <dd>{{ end_of_life }}</dd>
+                <dt>{{ 'ekyna_product.common.visibility'|trans }}</dt>
+                <dd>{{ visibility }}</dd>
             </dl>
         </td>
     </tr>

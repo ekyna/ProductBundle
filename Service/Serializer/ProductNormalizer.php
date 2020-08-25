@@ -149,6 +149,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
 
         } elseif ($this->contextHasGroup('Summary', $context)) {
 
+            $data['visibility'] = $product->getVisibility();
+
             // Brand
             if (null !== $brand = $product->getBrand()) {
                 $data['brand'] = $brand->getName();
