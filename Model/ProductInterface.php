@@ -4,6 +4,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
+use Ekyna\Bundle\MediaBundle\Model\MediaInterface;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
@@ -929,12 +930,19 @@ interface ProductInterface extends
     public function removeMention(ProductMention $mention): ProductInterface;
 
     /**
+     * Returns the product's main image.
+     *
+     * @return MediaInterface|null
+     */
+    public function getImage(): ?MediaInterface;
+
+    /**
      * Returns the product images.
      *
      * @param bool $withChildren
      * @param int  $limit
      *
-     * @return Collection|\Ekyna\Bundle\MediaBundle\Model\MediaInterface[]
+     * @return Collection|MediaInterface[]
      */
     public function getImages(bool $withChildren = true, int $limit = 5);
 

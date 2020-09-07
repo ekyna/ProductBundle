@@ -1619,6 +1619,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     }
 
     /**
+     * Returns the product's main image.
+     *
+     * @return Media\MediaInterface|null
+     */
+    public function getImage(): ?Media\MediaInterface
+    {
+        $limit = 1;
+        $images = $this->gatherMedias(Media\MediaTypes::IMAGE, true, $limit);
+
+        return $images->isEmpty() ? null : $images->first();
+    }
+
+    /**
      * @inheritdoc
      */
     public function getImages($withChildren = true, $limit = 5)
