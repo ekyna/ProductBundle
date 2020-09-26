@@ -162,6 +162,7 @@ ekyna_product:
             add_condition: Add a condition
 
     cart:
+        configure: Configure
         success: This product has been added to your cart.
 
     catalog:

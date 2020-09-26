@@ -1211,7 +1211,11 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         rule_table: 'Your prices',
         price_table: 'Detailed unit price',
         ati: 'ATI',
-        net: 'Net'
+        net: 'Net',
+        from: 'from %min%',
+        range: 'from %min% to %max%',
+        add_to_cart: 'Add to cart',
+        pre_order: 'Pre order'
     };
 
     $.extend(SaleItem.prototype, {
@@ -1578,11 +1582,14 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.$offers.empty();
             }
 
+            this.$submitButton.text(SaleItem.trans.add_to_cart);
             if (availability.hasClass()) {
                 this.$quantity.closest('.form-group').addClass('has-' + availability.getClass());
 
                 if (availability.level === 3 && !this.parentItem && this.$submitButton && !this.config.privileged) {
                     this.$submitButton.prop('disabled', true);
+                } else if (availability.level === 1) {
+                    this.$submitButton.text(SaleItem.trans.pre_order);
                 }
             }
 

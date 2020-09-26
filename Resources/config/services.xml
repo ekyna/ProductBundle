@@ -125,7 +125,7 @@
             <argument type="service" id="ekyna_commerce.supplier_delivery.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_delivery_item.repository"/>
             <argument type="service" id="ekyna_commerce.supplier_delivery.operator"/>
-            <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelper"/>
         </service>
         <service id="Ekyna\Bundle\ProductBundle\Form\Type\Inventory\InventoryType">
             <argument type="service" id="ekyna_product.brand.repository"/>
@@ -181,7 +181,7 @@
             <argument type="service" id="ekyna_product.commerce.subject_provider"/>
             <argument type="service" id="ekyna_product.commerce.product_filter"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
-            <argument type="service" id="ekyna_commerce.availability_helper"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Stock\AvailabilityHelper"/>
             <argument type="service" id="ekyna_resource.locale_provider"/>
             <argument type="service" id="translator"/>
             <argument>%ekyna_product.default.no_image%</argument>
@@ -443,7 +443,7 @@
         <!-- Product table type -->
         <service id="ekyna_product.product.table_type"
                  class="Ekyna\Bundle\ProductBundle\Table\Type\ProductType"><!-- TODO use parameter defined by config builder -->
-            <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelper"/>
             <argument type="service" id="router"/>
             <argument>%ekyna_product.product.class%</argument>
             <tag name="table.type"/>
@@ -871,7 +871,7 @@
         <service id="Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter">
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
-            <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelper"/>
             <argument type="service" id="Symfony\Component\Translation\TranslatorInterface"/>
         </service>
 
@@ -886,7 +886,7 @@
             <argument type="service" id="ekyna_product.catalog.registry"/>
             <argument type="service" id="templating"/>
             <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Document\PdfGenerator"/>
-            <argument type="service" id="ekyna_commerce.subject_helper"/>
+            <argument type="service" id="Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelper"/>
             <argument>%ekyna_commerce.default.company_logo%</argument>
             <argument>%kernel.debug%</argument>
         </service>

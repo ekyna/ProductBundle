@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 
@@ -145,6 +146,8 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
+        $this->sortChoices($variants);
+
         return $this->variantCache[$product->getId()] = $variants;
     }
 
@@ -184,6 +187,10 @@ class ProductFilter implements ProductFilterInterface
                 $choices[] = $choice;
             }
         }
+
+        $this->sortChoices($choices, function(Model\BundleChoiceInterface $choice) {
+            return $choice->getProduct();
+        });
 
         return $this->choiceCache[$slot->getId()] = $choices;
     }
@@ -232,6 +239,10 @@ class ProductFilter implements ProductFilterInterface
                 $options[] = $option;
             }
         }
+
+        $this->sortChoices($options, function(Model\OptionInterface $option) {
+            return $option->getProduct();
+        });
 
         return $this->optionCache[$group->getId()] = $options;
     }
@@ -322,6 +333,40 @@ class ProductFilter implements ProductFilterInterface
         $this->groupCache = [];
         $this->optionCache = [];
         $this->componentCache = [];
+    }
+
+    /**
+     * Sort the choices by availability.
+     *
+     * @param array         $choices
+     * @param callable|null $getter
+     */
+    protected function sortChoices(array &$choices, callable $getter = null): void
+    {
+        usort($choices, function ($a, $b) use ($getter) {
+            if ($getter) {
+                $a = $getter($a);
+                $b = $getter($b);
+            }
+
+            if (!$a || !$b) {
+                return 0;
+            }
+
+            if (!$a instanceof Model\ProductInterface || !$b instanceof Model\ProductInterface) {
+                throw new RuntimeException("Expected instance of " . Model\ProductInterface::class);
+            }
+
+            if ($a->getAvailableStock() && !$b->getAvailableStock()) {
+                return -1;
+            }
+
+            if (!$a->getAvailableStock() && $b->getAvailableStock()) {
+                return 1;
+            }
+
+            return 0;
+        });
     }
 }
 

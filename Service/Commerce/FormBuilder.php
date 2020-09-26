@@ -470,6 +470,8 @@ class FormBuilder
             'net'         => $this->translate('ekyna_commerce.pricing.vat_display_mode.net'),
             'from'        => $this->translate('ekyna_product.pricing_rule.field.from'),
             'range'       => $this->translate('ekyna_product.pricing_rule.field.range'),
+            'add_to_cart' => $this->translate('ekyna_commerce.button.add_to_cart'),
+            'pre_order'   => $this->translate('ekyna_commerce.button.pre_order'),
         ];
     }
 
@@ -504,7 +506,8 @@ class FormBuilder
         $repository = $this->productProvider->getRepository();
 
         // Variable : add variant choice form
-        if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT], true)) {
+        if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT],
+            true)) {
             $variable = $product->getType() === Model\ProductTypes::TYPE_VARIANT ? $product->getParent() : $product;
 
             $repository->loadVariants($variable);

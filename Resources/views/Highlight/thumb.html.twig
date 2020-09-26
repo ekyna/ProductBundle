@@ -18,8 +18,12 @@
     <a href="{{ product_path }}" class="btn btn-sm btn-default read-more">
         Read more
     </a>
-    <a href="{{ product_path }}" class="btn btn-sm btn-primary add-to-cart"
-       data-add-to-cart="{{ product|subject_add_to_cart_url }}">
-        Add to cart
-    </a>
+    {% if product is configurable_product -%}
+        {{ product|subject_add_to_cart_button({
+            'class': 'btn btn-sm btn-primary',
+            'add_to_cart': {'label': 'ekyna_product.cart.configure'}
+        }) }}
+    {%- else -%}
+        {{ product|subject_add_to_cart_button({'class': 'btn btn-sm btn-primary'}) }}
+    {%- endif %}
 </div>
