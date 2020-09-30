@@ -1582,14 +1582,18 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.$offers.empty();
             }
 
-            this.$submitButton.text(SaleItem.trans.add_to_cart);
+            if (this.$submitButton) {
+                this.$submitButton.text(SaleItem.trans.add_to_cart);
+            }
             if (availability.hasClass()) {
                 this.$quantity.closest('.form-group').addClass('has-' + availability.getClass());
 
-                if (availability.level === 3 && !this.parentItem && this.$submitButton && !this.config.privileged) {
-                    this.$submitButton.prop('disabled', true);
-                } else if (availability.level === 1) {
-                    this.$submitButton.text(SaleItem.trans.pre_order);
+                if (this.$submitButton) {
+                    if (availability.level === 3 && !this.parentItem && this.$submitButton && !this.config.privileged) {
+                        this.$submitButton.prop('disabled', true);
+                    } else if (availability.level === 1) {
+                        this.$submitButton.text(SaleItem.trans.pre_order);
+                    }
                 }
             }
 
