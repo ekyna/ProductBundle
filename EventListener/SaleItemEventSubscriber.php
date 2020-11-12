@@ -226,7 +226,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     {
         $provider = $this->itemBuilder->getProvider();
 
-        if ($provider->supportsRelative($item)) {
+        if ($provider->supportsReference($item)) {
             try {
                 $subject = $provider->resolve($item);
 

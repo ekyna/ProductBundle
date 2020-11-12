@@ -7,7 +7,7 @@ use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Exception\SubjectException;
 use Ekyna\Component\Commerce\Subject\Entity\SubjectIdentity as Identity;
 use Ekyna\Component\Commerce\Subject\Model\SubjectInterface as Subject;
-use Ekyna\Component\Commerce\Subject\Model\SubjectRelativeInterface as Relative;
+use Ekyna\Component\Commerce\Subject\Model\SubjectReferenceInterface as Reference;
 use Ekyna\Component\Commerce\Subject\Provider\SubjectProviderInterface;
 use Ekyna\Component\Commerce\Subject\Repository\SubjectRepositoryInterface;
 
@@ -46,17 +46,17 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * @inheritDoc
      */
-    public function assign(Relative $relative, Subject $subject): SubjectProviderInterface
+    public function assign(Reference $reference, Subject $subject): SubjectProviderInterface
     {
-        return $this->transform($subject, $relative->getSubjectIdentity());
+        return $this->transform($subject, $reference->getSubjectIdentity());
     }
 
     /**
      * @inheritDoc
      */
-    public function resolve(Relative $relative): Subject
+    public function resolve(Reference $reference): Subject
     {
-        return $this->reverseTransform($relative->getSubjectIdentity());
+        return $this->reverseTransform($reference->getSubjectIdentity());
     }
 
     /**
@@ -115,9 +115,9 @@ class ProductProvider implements SubjectProviderInterface
     /**
      * @inheritdoc
      */
-    public function supportsRelative(Relative $relative): bool
+    public function supportsReference(Reference $reference): bool
     {
-        return $relative->getSubjectIdentity()->getProvider() === self::NAME;
+        return $reference->getSubjectIdentity()->getProvider() === self::NAME;
     }
 
     /**
@@ -200,7 +200,7 @@ class ProductProvider implements SubjectProviderInterface
     }
 
     /**
-     * Asserts that the subject relative is supported.
+     * Asserts that the subject reference is supported.
      *
      * @param Subject $subject
      *
