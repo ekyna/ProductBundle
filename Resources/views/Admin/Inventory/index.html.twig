@@ -238,5 +238,5 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="{{ asset('bundles/ekynaproduct/css/admin/inventory.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/inventory.css')) }}" rel="stylesheet" type="text/css"/>
 {% endblock stylesheets %}
