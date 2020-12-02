@@ -66,7 +66,7 @@
     height: @footer-height;
 }
 
-.cover {
+.cover, .separator {
     width: 100%;
     height: @height;
     margin-top: -@header-height;
@@ -76,12 +76,26 @@
 
     > .inner {
         position: absolute;
-        top: @height * 0.25;
-        height: @height * 0.5;
-        left: @width * 0.2;
+        top: 50%;
+        left: 50%;
         width: @width * 0.6;
+        transform: translate(-50%, -50%);
     }
 
+    h1 {
+        text-align: center;
+        font-size: floor((@font-size-base * 4));
+        margin-bottom: floor((@font-size-base * 4));
+    }
+
+    p {
+        text-align: center;
+        font-size: floor((@font-size-base * 1.8));
+        margin-bottom: floor((@font-size-base * 1.8));
+    }
+}
+
+.cover {
     a.company-logo {
         display: block;
         width: 70%;
@@ -92,18 +106,8 @@
             height: auto;
         }
     }
-
-    h1 {
-        text-align: center;
-        font-size: floor((@font-size-base * 4));
-        margin-bottom: floor((@font-size-base * 4));
-    }
-
-    p {
-        font-size: floor((@font-size-base * 1.8));
-        margin-bottom: floor((@font-size-base * 1.8));
-    }
 }
+
 
 .product {
     padding: 0 @default-padding;

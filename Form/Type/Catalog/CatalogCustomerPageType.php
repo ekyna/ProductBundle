@@ -55,4 +55,12 @@ class CatalogCustomerPageType extends AbstractType
             'data_class' => CatalogPage::class,
         ]);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBlockPrefix()
+    {
+        return 'ekyna_product_catalog_page';
+    }
 }

@@ -8,6 +8,7 @@ use Ekyna\Bundle\CommerceBundle\Form\ChoiceList\SaleItemChoiceLoader;
 use Ekyna\Bundle\ProductBundle\Entity\Catalog;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogRenderType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\SlotsType;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Ekyna\Component\Commerce\Exception\PdfException;
@@ -23,13 +24,13 @@ use Symfony\Component\HttpFoundation\Request;
 class CatalogController extends ResourceController
 {
     /**
-     * Slots form action.
+     * Page form action.
      *
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function slotsFormAction(Request $request)
+    public function pageFormAction(Request $request)
     {
         $config = $this
             ->get('ekyna_product.catalog.registry')
@@ -41,10 +42,19 @@ class CatalogController extends ResourceController
             ->get('form.factory')
             ->createNamed('page__name', Type\FormType::class, $page, [
                 'compound' => true,
-            ])
-            ->add('slots', $config['form_type']);
+            ]);
 
-        $response = $this->render('@EkynaProduct/Admin/Catalog/page_slots_form.xml.twig', [
+        if (0 < $count = $config['slots']) {
+            $form->add('slots', SlotsType::class, [
+                'slot_count' => $count,
+            ]);
+        }
+
+        if (!empty($type = $config['form_type'])) {
+            $form->add('options', $type);
+        }
+
+        $response = $this->render('@EkynaProduct/Admin/Catalog/page_form.xml.twig', [
             'form' => $form->createView(),
             'name' => $request->query->get('name'),
         ]);

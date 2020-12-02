@@ -32,18 +32,14 @@ class SlotsType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param int                  $index
      * @param bool                 $product
-     *
-     * @return FormBuilderInterface
      */
-    protected function addSlot(FormBuilderInterface $builder, $index, $product = true)
+    protected function addSlot(FormBuilderInterface $builder, int $index, bool $product = true): void
     {
         $slot = $builder->create((string)$index, SlotType::class, [
             'product' => $product,
         ]);
 
         $builder->add($slot);
-
-        return $slot;
     }
 
     /**

@@ -50,9 +50,9 @@ ekyna_product_catalog_admin_remove:
     requirements:
         catalogId: \d+
 
-ekyna_product_catalog_admin_page_slots_form:
-    path: /page-slots-form/{template}
-    defaults: { _controller: "ekyna_product.catalog.controller:slotsFormAction" }
+ekyna_product_catalog_admin_page_form:
+    path: /page-form/{template}
+    defaults: { _controller: "ekyna_product.catalog.controller:pageFormAction" }
     methods: [GET]
     requirements:
         template: "[a-z0-9\\._]+"

@@ -42,7 +42,7 @@ class CatalogRegistry
      *
      * @return CatalogRegistry
      */
-    public function setThemes(array $themes)
+    public function setThemes(array $themes): CatalogRegistry
     {
         foreach ($themes as $name => $config) {
             $this->registerTheme($name, $config);
@@ -59,7 +59,7 @@ class CatalogRegistry
      *
      * @return CatalogRegistry
      */
-    public function registerTheme($name, $config)
+    public function registerTheme(string $name, array $config): CatalogRegistry
     {
         if (isset($this->themes[$name])) {
             throw new InvalidArgumentException("Catalog theme '$name' is already registered.");
@@ -71,39 +71,13 @@ class CatalogRegistry
     }
 
     /**
-     * Returns the theme path by its name.
-     *
-     * @param string $name
-     *
-     * @return array
-     */
-    public function getTheme($name)
-    {
-        if (!isset($this->themes[$name])) {
-            throw new InvalidArgumentException("Catalog theme '$name' is not registered.");
-        }
-
-        return $this->themes[$name];
-    }
-
-    /**
-     * Returns the registered themes.
-     *
-     * @return array
-     */
-    public function allThemes()
-    {
-        return $this->themes;
-    }
-
-    /**
      * Sets the templates.
      *
      * @param array $templates
      *
      * @return CatalogRegistry
      */
-    public function setTemplates(array $templates)
+    public function setTemplates(array $templates): CatalogRegistry
     {
         foreach ($templates as $name => $config) {
             $this->registerTemplate($name, $config);
@@ -120,7 +94,7 @@ class CatalogRegistry
      *
      * @return CatalogRegistry
      */
-    public function registerTemplate($name, array $config)
+    public function registerTemplate(string $name, array $config): CatalogRegistry
     {
         if (isset($this->templates[$name])) {
             throw new InvalidArgumentException("Catalog template '$name' is already registered.");
@@ -132,37 +106,11 @@ class CatalogRegistry
     }
 
     /**
-     * Returns the template for the given name.
-     *
-     * @param string $name
-     *
-     * @return array
-     */
-    public function getTemplate($name)
-    {
-        if (!$this->templates[$name]) {
-            throw new InvalidArgumentException("Catalog template '$name' is not registered.");
-        }
-
-        return $this->templates[$name];
-    }
-
-    /**
-     * Returns the registered templates.
-     *
-     * @return array
-     */
-    public function allTemplates()
-    {
-        return $this->templates;
-    }
-
-    /**
      * Returns the default themes.
      *
      * @return array
      */
-    public static function getDefaultThemes()
+    public static function getDefaultThemes(): array
     {
         return [
             'default' => [
@@ -178,7 +126,7 @@ class CatalogRegistry
      *
      * @return array
      */
-    public static function getDefaultTemplates()
+    public static function getDefaultTemplates(): array
     {
         return [
             'default.cover'     => [
@@ -186,36 +134,95 @@ class CatalogRegistry
                 'form_type' => Type\CoverType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Cover',
                 'slots'     => 0,
-                'mockup'    => 'null',
+                'mockup'    => null,
+            ],
+            'default.separator' => [
+                'label'     => 'ekyna_product.catalog.template.separator',
+                'form_type' => Type\SeparatorType::class,
+                'directory' => '@EkynaProduct/Catalog/Template/Separator',
+                'slots'     => 0,
+                'mockup'    => null,
             ],
             'default.full'      => [
                 'label'     => 'ekyna_product.catalog.template.full',
-                'form_type' => Type\FullType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Full',
+                'form_type' => null,
                 'slots'     => 1,
-                'mockup'    => 'null',
+                'mockup'    => null,
             ],
             'default.half'      => [
                 'label'     => 'ekyna_product.catalog.template.half',
-                'form_type' => Type\HalfType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Half',
+                'form_type' => null,
                 'slots'     => 2,
-                'mockup'    => 'null',
+                'mockup'    => null,
             ],
             'default.half_dual' => [
                 'label'     => 'ekyna_product.catalog.template.half_dual',
-                'form_type' => Type\HalfDualType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/HalfDual',
+                'form_type' => null,
                 'slots'     => 3,
-                'mockup'    => 'null',
+                'mockup'    => null,
             ],
-            'default.quarter' => [
+            'default.quarter'   => [
                 'label'     => 'ekyna_product.catalog.template.quarter',
-                'form_type' => Type\QuarterType::class,
                 'directory' => '@EkynaProduct/Catalog/Template/Quarter',
+                'form_type' => null,
                 'slots'     => 4,
-                'mockup'    => 'null',
+                'mockup'    => null,
             ],
         ];
+    }
+
+    /**
+     * Returns the theme path by its name.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getTheme(string $name): array
+    {
+        if (!isset($this->themes[$name])) {
+            throw new InvalidArgumentException("Catalog theme '$name' is not registered.");
+        }
+
+        return $this->themes[$name];
+    }
+
+    /**
+     * Returns the registered themes.
+     *
+     * @return array
+     */
+    public function allThemes(): array
+    {
+        return $this->themes;
+    }
+
+    /**
+     * Returns the template for the given name.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getTemplate(string $name): array
+    {
+        if (!$this->templates[$name]) {
+            throw new InvalidArgumentException("Catalog template '$name' is not registered.");
+        }
+
+        return $this->templates[$name];
+    }
+
+    /**
+     * Returns the registered templates.
+     *
+     * @return array
+     */
+    public function allTemplates(): array
+    {
+        return $this->templates;
     }
 }

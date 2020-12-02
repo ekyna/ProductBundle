@@ -22,9 +22,9 @@ use Symfony\Component\Templating\EngineInterface;
  */
 class CatalogRenderer
 {
-    const FORMAT_PDF   = 'PDF';
-    const FORMAT_HTML  = 'HTML';
-    const FORMAT_EMAIL = 'EMail';
+    public const FORMAT_PDF   = 'PDF';
+    public const FORMAT_HTML  = 'HTML';
+    public const FORMAT_EMAIL = 'EMail';
 
     /**
      * @var CatalogRegistry
@@ -72,8 +72,8 @@ class CatalogRenderer
         EngineInterface $templating,
         PdfGenerator $pdfGenerator,
         SubjectHelperInterface $subjectHelper,
-        $logoPath,
-        $debug = false
+        string $logoPath,
+        bool $debug = false
     ) {
         $this->registry = $registry;
         $this->templating = $templating;
@@ -81,6 +81,53 @@ class CatalogRenderer
         $this->subjectHelper = $subjectHelper;
         $this->logoPath = $logoPath;
         $this->debug = $debug;
+    }
+
+    /**
+     * Returns the catalog response.
+     *
+     * @param Catalog      $catalog
+     * @param Request|null $request
+     *
+     * @return Response
+     *
+     * @throws \Ekyna\Component\Commerce\Exception\PdfException
+     */
+    public function respond(Catalog $catalog, Request $request = null)
+    {
+        $response = new Response();
+
+        $format = $catalog->getFormat();
+        $download = $request ? (bool)$request->query->get('download', 0) : false;
+
+        if ($format === static::FORMAT_PDF) {
+            $response->headers->add(['Content-Type' => 'application/pdf']);
+            $extension = 'pdf';
+        } else {
+            $extension = 'html';
+        }
+
+        $disposition = $download
+            ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
+            : ResponseHeaderBag::DISPOSITION_INLINE;
+
+        $filename = sprintf('%s.%s', Transliterator::urlize($catalog->getTitle()), $extension);
+
+        $response->headers->set(
+            'Content-Disposition',
+            $response->headers->makeDisposition($disposition, $filename)
+        );
+
+        if ($request && !$this->debug) {
+            $response->setLastModified($catalog->getUpdatedAt());
+            if ($response->isNotModified($request)) {
+                return $response;
+            }
+        }
+
+        $response->setContent($this->render($catalog));
+
+        return $response;
     }
 
     /**
@@ -128,10 +175,8 @@ class CatalogRenderer
      * Builds the catalog pages from sale items list.
      *
      * @param Catalog $catalog
-     *
-     * @throws \Ekyna\Component\Commerce\Exception\SubjectException
      */
-    private function buildPages(Catalog $catalog)
+    private function buildPages(Catalog $catalog): void
     {
         $products = [];
 
@@ -172,58 +217,11 @@ class CatalogRenderer
     }
 
     /**
-     * Returns the catalog response.
-     *
-     * @param Catalog $catalog
-     * @param Request $request
-     *
-     * @return Response
-     *
-     * @throws \Ekyna\Component\Commerce\Exception\PdfException
-     */
-    public function respond(Catalog $catalog, Request $request = null)
-    {
-        $response = new Response();
-
-        $format = $catalog->getFormat();
-        $download = $request ? (bool)$request->query->get('download', 0) : false;
-
-        if ($format === static::FORMAT_PDF) {
-            $response->headers->add(['Content-Type' => 'application/pdf']);
-            $extension = 'pdf';
-        } else {
-            $extension = 'html';
-        }
-
-        $disposition = $download
-            ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
-            : ResponseHeaderBag::DISPOSITION_INLINE;
-
-        $filename = sprintf('%s.%s', Transliterator::urlize($catalog->getTitle()), $extension);
-
-        $response->headers->set(
-            'Content-Disposition',
-            $response->headers->makeDisposition($disposition, $filename)
-        );
-
-        if ($request && !$this->debug) {
-            $response->setLastModified($catalog->getUpdatedAt());
-            if ($response->isNotModified($request)) {
-                return $response;
-            }
-        }
-
-        $response->setContent($this->render($catalog));
-
-        return $response;
-    }
-
-    /**
      * Validates the format.
      *
      * @param string $format
      */
-    protected function validateFormat($format)
+    protected function validateFormat(string $format): void
     {
         if (!in_array($format, static::getFormats(), true)) {
             throw new InvalidArgumentException("Unsupported format '$format'.");
@@ -235,7 +233,7 @@ class CatalogRenderer
      *
      * @return array
      */
-    public static function getFormats()
+    public static function getFormats(): array
     {
         return [
             static::FORMAT_PDF   => static::FORMAT_PDF,

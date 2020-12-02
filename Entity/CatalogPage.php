@@ -3,6 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Class CatalogPage
@@ -32,7 +33,7 @@ class CatalogPage
     private $template;
 
     /**
-     * @var ArrayCollection|CatalogSlot[]
+     * @var Collection|CatalogSlot[]
      */
     private $slots;
 
@@ -55,7 +56,7 @@ class CatalogPage
      *
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -63,9 +64,9 @@ class CatalogPage
     /**
      * Returns the catalog.
      *
-     * @return Catalog
+     * @return Catalog|null
      */
-    public function getCatalog()
+    public function getCatalog(): ?Catalog
     {
         return $this->catalog;
     }
@@ -73,11 +74,11 @@ class CatalogPage
     /**
      * Sets the catalog.
      *
-     * @param Catalog $catalog
+     * @param Catalog|null $catalog
      *
      * @return CatalogPage
      */
-    public function setCatalog(Catalog $catalog = null)
+    public function setCatalog(Catalog $catalog = null): CatalogPage
     {
         if ($catalog !== $this->catalog) {
             if ($previous = $this->catalog) {
@@ -98,7 +99,7 @@ class CatalogPage
      *
      * @return int
      */
-    public function getNumber()
+    public function getNumber(): ?int
     {
         return $this->number;
     }
@@ -110,7 +111,7 @@ class CatalogPage
      *
      * @return CatalogPage
      */
-    public function setNumber($number)
+    public function setNumber(int $number): CatalogPage
     {
         $this->number = $number;
 
@@ -120,9 +121,9 @@ class CatalogPage
     /**
      * Returns the template.
      *
-     * @return string
+     * @return string|null
      */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -134,7 +135,7 @@ class CatalogPage
      *
      * @return CatalogPage
      */
-    public function setTemplate($template)
+    public function setTemplate(string $template): CatalogPage
     {
         $this->template = $template;
 
@@ -144,9 +145,9 @@ class CatalogPage
     /**
      * Returns the slots.
      *
-     * @return ArrayCollection|CatalogSlot[]
+     * @return Collection|CatalogSlot[]
      */
-    public function getSlots()
+    public function getSlots(): Collection
     {
         return $this->slots;
     }
@@ -158,7 +159,7 @@ class CatalogPage
      *
      * @return CatalogPage
      */
-    public function addSlot(CatalogSlot $slot)
+    public function addSlot(CatalogSlot $slot): CatalogPage
     {
         if (!$this->slots->contains($slot)) {
             $this->slots->add($slot);
@@ -175,7 +176,7 @@ class CatalogPage
      *
      * @return CatalogPage
      */
-    public function removeSlot(CatalogSlot $slot)
+    public function removeSlot(CatalogSlot $slot): CatalogPage
     {
         if ($this->slots->contains($slot)) {
             $this->slots->removeElement($slot);
@@ -188,9 +189,9 @@ class CatalogPage
     /**
      * Returns the options.
      *
-     * @return array
+     * @return array|null
      */
-    public function getOptions()
+    public function getOptions(): ?array
     {
         return $this->options;
     }
@@ -198,11 +199,11 @@ class CatalogPage
     /**
      * Sets the options.
      *
-     * @param array $options
+     * @param array|null $options
      *
      * @return CatalogPage
      */
-    public function setOptions(array $options = [])
+    public function setOptions(array $options = null): CatalogPage
     {
         $this->options = $options;
 

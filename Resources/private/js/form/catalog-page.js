@@ -10,10 +10,10 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
 
             var $page = $(this),
                 $template = $page.find('select.catalog-page-template'),
-                $slots = $page.find('div.catalog-page-slots'),
-                xhr = null;
+                $container = $page.find('div.catalog-page-form'),
+                form = null, xhr = null;
 
-            if (!(1 === $template.length && 1 === $slots.length)) {
+            if (!(1 === $template.length && 1 === $container.length)) {
                 throw 'Unexpected form composition';
             }
 
@@ -23,12 +23,16 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
                     xhr = null;
                 }
 
+                if (form) {
+                    form.destroy();
+                }
+
                 var template = $template.val();
 
-                $slots.loadingSpinner();
+                $container.loadingSpinner();
 
                 xhr = $.ajax({
-                    url: Router.generate('ekyna_product_catalog_admin_page_slots_form', {
+                    url: Router.generate('ekyna_product_catalog_admin_page_form', {
                         'template': template,
                         'name': $page.attr('name')
                     }),
@@ -36,23 +40,23 @@ define(['jquery', 'routing', 'ekyna-form', 'ekyna-ui'], function($, Router, Form
                 });
 
                 xhr.done(function(xml) {
-                    $slots.loadingSpinner('off').empty();
+                    $container.loadingSpinner('off').empty();
 
                     var $form = $(xml).find('form');
                     if (1 !== $form.length) {
                         return;
                     }
 
-                    $slots.append($($form.text()).children());
+                    $container.empty().append($($form.text()).children());
 
-                    var form = Form.create($slots);
+                    form = Form.create($container);
                     form.init();
                 });
             }
 
             $template.on('change', loadSlotsForm);
 
-            if ($slots.is(':empty')) {
+            if ($container.is(':empty')) {
                 loadSlotsForm();
             }
         });

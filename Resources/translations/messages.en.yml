@@ -196,6 +196,7 @@ ekyna_product:
             default: Default
         template:
             cover: Cover
+            separator: Separator
             full: Full page product
             half: One product up, on down
             half_dual: One product up, two down

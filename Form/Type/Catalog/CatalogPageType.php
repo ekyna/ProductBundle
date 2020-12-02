@@ -46,35 +46,65 @@ class CatalogPageType extends AbstractType
     {
         $builder
             ->add('template', TemplateChoiceType::class, [
-                'attr'    => [
+                'attr' => [
                     'class' => 'catalog-page-template',
                 ],
             ])
             ->add('number', CollectionPositionType::class)
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                $form = $event->getForm();
                 /** @var CatalogPage $data */
                 $data = $event->getData();
+                $template = $data ? $data->getTemplate() : null;
 
-                $this->buildSlotsForm($event->getForm(), $data ? $data->getTemplate() : null);
+                $this->buildSlotsForm($form, $template);
+                $this->buildOptionsForm($form, $template);
             })
             ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                $form = $event->getForm();
                 $data = $event->getData();
 
-                $this->buildSlotsForm($event->getForm(), $data['template']);
+                $this->buildSlotsForm($form, $data['template']);
+                $this->buildOptionsForm($form, $data['template']);
             });
+    }
+
+    /**
+     * Build the data form.
+     *
+     * @param FormInterface $form
+     * @param string|null   $template
+     */
+    public function buildOptionsForm(FormInterface $form, string $template = null)
+    {
+        if (empty($template)) {
+            return;
+        }
+
+        if (empty($type = $this->registry->getTemplate($template)['form_type'])) {
+            return;
+        }
+
+        $form->add('options', $type);
     }
 
     /**
      * Build the slots form.
      *
      * @param FormInterface $form
-     * @param null          $templateName
+     * @param string|null   $template
      */
-    public function buildSlotsForm(FormInterface $form, $templateName = null)
+    public function buildSlotsForm(FormInterface $form, string $template = null)
     {
-        $type = empty($templateName) ? SlotsType::class : $this->registry->getTemplate($templateName)['form_type'];
+        $count = empty($template) ? 0 : (int)$this->registry->getTemplate($template)['slots'];
 
-        $form->add('slots', $type);
+        if (0 >= $count) {
+            return;
+        }
+
+        $form->add('slots', SlotsType::class, [
+            'slot_count' => $count,
+        ]);
     }
 
     /**
@@ -95,5 +125,13 @@ class CatalogPageType extends AbstractType
         $resolver->setDefaults([
             'data_class' => CatalogPage::class,
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBlockPrefix()
+    {
+        return 'ekyna_product_catalog_page';
     }
 }

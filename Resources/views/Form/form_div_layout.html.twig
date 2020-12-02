@@ -191,6 +191,22 @@
 {%- endblock ekyna_product_bundle_rule_condition_widget -%}
 
 
+{%- block ekyna_product_catalog_page_widget -%}
+    <div {{ block('widget_container_attributes') }}>
+        {{- form_row(form.template) -}}
+        <div class="catalog-page-form">
+            {%- if form.options is defined -%}
+                {{- form_row(form.options) -}}
+            {%- endif -%}
+            {%- if form.slots is defined -%}
+                {{- form_row(form.slots) -}}
+            {%- endif -%}
+        </div>
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock ekyna_product_catalog_page_widget -%}
+
+
 {%- block ekyna_product_catalog_slots_widget -%}
     <div {{ block('widget_container_attributes') }}>
     {{- form_errors(form) -}}

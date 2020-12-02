@@ -1,0 +1,18 @@
+{% extends '@EkynaAdmin/base.xml.twig' %}
+
+{% block response %}
+{% apply spaceless %}
+<form>
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    <![CDATA[
+        {%- if form.options is defined -%}
+            {{- form_row(form.options)|replace({'page__name': name})|raw -}}
+        {%- endif -%}
+        {%- if form.slots is defined -%}
+            {{- form_row(form.slots)|replace({'page__name': name})|raw -}}
+        {%- endif -%}
+    ]]>
+</form>
+{% endapply %}
+{% endblock response %}

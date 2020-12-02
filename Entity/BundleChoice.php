@@ -74,9 +74,9 @@ class BundleChoice implements Model\BundleChoiceInterface
         $this->minQuantity = 1;
         $this->maxQuantity = 1;
         $this->excludedOptionGroups = [];
-        $this->hidden = false;
+        $this->hidden = true;
+        $this->excludeImages = true;
         $this->rules = new ArrayCollection();
-        $this->excludeImages = false;
     }
 
     /**

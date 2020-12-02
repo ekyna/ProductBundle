@@ -196,6 +196,7 @@ ekyna_product:
             default: Par défault
         template:
             cover: Couverture
+            separator: Séparateur
             full: Article pleine page
             half: Un article en haut, un article en bas
             half_dual: Un article en haut, deux articles en bas
