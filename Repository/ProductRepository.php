@@ -366,18 +366,33 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $qb = $this->getQueryBuilder();
 
         $qb
-            ->leftJoin($as . '.bundleSlots', 's')
-            ->leftJoin('s.choices', 'c')
-            ->andWhere($qb->expr()->eq('c.product', ':bundled'));
+            ->join($as . '.bundleSlots', 's')
+            ->join('s.choices', 'c');
+
+        $parameters = [];
+
+        if (Model\ProductTypes::isVariableType($bundled)) {
+            $qb->andWhere($qb->expr()->in('c.product', ':bundled'));
+            $products = $bundled->getVariants()->toArray();
+            $products[] = $bundled;
+            $parameters['bundled'] = $products;
+        } elseif (Model\ProductTypes::isVariantType($bundled)) {
+            $qb->andWhere($qb->expr()->in('c.product', ':bundled'));
+            $parameters['bundled'] = [$bundled, $bundled->getParent()];
+        } else {
+            $qb->andWhere($qb->expr()->eq('c.product', ':bundled'));
+            $parameters['bundled'] = $bundled;
+        }
 
         if ($requiredSlots) {
-            $qb->andWhere($qb->expr()->eq('s.required', true));
+            $qb->andWhere($qb->expr()->eq('s.required', ':required'));
+            $parameters['required'] = true;
         }
 
         return $qb
             ->getQuery()
             //->useQueryCache(true)
-            ->setParameter('bundled', $bundled)
+            ->setParameters($parameters)
             ->getResult();
     }
 
@@ -394,18 +409,33 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $qb = $this->getQueryBuilder();
 
         $qb
-            ->leftJoin($as . '.optionGroups', 'g')
-            ->leftJoin('g.options', 'o')
-            ->andWhere($qb->expr()->eq('o.product', ':product'));
+            ->join($as . '.optionGroups', 'g')
+            ->join('g.options', 'o');
+
+        $parameters = [];
+
+        if (Model\ProductTypes::isVariableType($product)) {
+            $qb->andWhere($qb->expr()->in('o.product', ':products'));
+            $products = $product->getVariants()->toArray();
+            $products[] = $product;
+            $parameters['products'] = $products;
+        } elseif (Model\ProductTypes::isVariantType($product)) {
+            $qb->andWhere($qb->expr()->in('o.product', ':products'));
+            $parameters['products'] = [$product, $product->getParent()];
+        } else {
+            $qb->andWhere($qb->expr()->eq('o.product', ':product'));
+            $parameters['product'] = $product;
+        }
 
         if ($requiredGroups) {
-            $qb->andWhere($qb->expr()->eq('g.required', true));
+            $qb->andWhere($qb->expr()->eq('g.required', ':required'));
+            $parameters['required'] = true;
         }
 
         return $qb
             ->getQuery()
             //->useQueryCache(true)
-            ->setParameter('product', $product)
+            ->setParameters($parameters)
             ->getResult();
     }
 
@@ -421,7 +451,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $as = $this->getAlias();
         $qb = $this->getQueryBuilder();
         $qb
-            ->leftJoin($as . '.components', 'c')
+            ->join($as . '.components', 'c')
             ->andWhere($qb->expr()->eq('c.child', ':product'));
 
         return $qb
