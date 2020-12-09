@@ -617,9 +617,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
         updateState: function () {
             // Hide if required and only one option choice
-            if (this.isRequired() && 1 === this.getChoiceCount()) {
+            /*if (this.isRequired() && 1 === this.getChoiceCount()) {
                 this.hide();
-            }
+            }*/
 
             // Disable if locked
             if (this.locked) {

@@ -138,6 +138,10 @@
 
 {% block sale_item_option_groups_widget %}
 {% apply spaceless %}
+    {{- bootstrap_set_style('horizontal') -}}
+    {{- bootstrap_set_col_size('sm') -}}
+    {{- bootstrap_set_label_col(3) -}}
+    {{- bootstrap_set_widget_col(9) -}}
     <div {{ block('widget_container_attributes') }}>
         {% set sizing = sizing|default(bootstrap_get_sizing()) %}
         {% for child in form %}
