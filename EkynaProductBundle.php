@@ -20,9 +20,10 @@ class EkynaProductBundle extends AbstractBundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\RegisterProductEventHandlerPass());
-        $container->addCompilerPass(new Compiler\AttributeTypeRegistryPass());
         $container->addCompilerPass(new Compiler\AdminMenuPass());
+        $container->addCompilerPass(new Compiler\AttributeTypeRegistryPass());
+        $container->addCompilerPass(new Compiler\ConverterPass());
+        $container->addCompilerPass(new Compiler\ProductEventHandlerPass());
     }
 
     /**

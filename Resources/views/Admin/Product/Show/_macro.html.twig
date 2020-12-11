@@ -101,9 +101,23 @@
 
 
 {%- macro show_translations(product, options = {}) -%}
-    {{- show_row(product.translations, 'translations', {
-        'id': 'product_translations',
-        'fields': {
+    {% if product is variant_product %}
+        {% set fields = {
+            'title': {'label': 'ekyna_core.field.title'},
+            'attributesTitle': {'label': 'ekyna_product.product.field.attributes_title'},
+            'subTitle': {'label': 'ekyna_core.field.subtitle'},
+            'description': {
+                'label': 'ekyna_core.field.description',
+                'type': 'tinymce',
+                'options': {
+                    'height': 150,
+                    'route': 'ekyna_product_product_admin_tinymce',
+                    'route_params': {'productId': product.id},
+                }
+            }
+        } %}
+    {% else %}
+        {% set fields = {
             'title': {'label': 'ekyna_core.field.title'},
             'slug': {'label': 'ekyna_core.field.url'},
             'subTitle': {'label': 'ekyna_core.field.subtitle'},
@@ -116,7 +130,11 @@
                     'route_params': {'productId': product.id},
                 }
             }
-        }
+        } %}
+    {% endif %}
+    {{- show_row(product.translations, 'translations', {
+        'id': 'product_translations',
+        'fields': fields
     }|merge(options)) -}}
 {%- endmacro show_translations -%}
 

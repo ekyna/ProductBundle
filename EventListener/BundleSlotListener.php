@@ -97,7 +97,9 @@ class BundleSlotListener implements EventSubscriberInterface
      */
     private function scheduleChildPriceChangeEvent(ProductInterface $bundle)
     {
-        ProductTypes::assertBundled($bundle);
+        if (!ProductTypes::isBundledType($bundle)) {
+            return;
+        }
 
         $this->persistenceHelper->scheduleEvent(ProductEvents::CHILD_PRICE_CHANGE, $bundle);
     }

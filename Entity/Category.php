@@ -18,13 +18,13 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Category extends RM\AbstractTranslatable implements Model\CategoryInterface
 {
-    use Model\VisibilityTrait,
-        Cms\ContentSubjectTrait,
-        Cms\SeoSubjectTrait,
-        MediaSubjectTrait,
-        TreeTrait,
-        RM\TimestampableTrait,
-        RM\TaggedEntityTrait;
+    use Cms\ContentSubjectTrait;
+    use Cms\SeoSubjectTrait;
+    use MediaSubjectTrait;
+    use Model\VisibilityTrait;
+    use RM\TaggedEntityTrait;
+    use RM\TimestampableTrait;
+    use TreeTrait;
 
     /**
      * @var integer
@@ -210,7 +210,7 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return CategoryTranslation::class;
     }

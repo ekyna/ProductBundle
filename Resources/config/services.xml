@@ -667,7 +667,7 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_resource.event_dispatcher"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
-            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
             <tag name="ekyna_product.product_event_handler"/>
@@ -696,7 +696,7 @@
                 <argument type="service" id="ekyna_product.price.invalidator"/>
             </call>
             <call method="setStockUpdater">
-                <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+                <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             </call>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
@@ -708,7 +708,7 @@
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
-            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
         <!-- Configurable product event handler -->
@@ -718,23 +718,22 @@
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
             <argument type="service" id="ekyna_product.pricing.price_calculator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
-            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             <tag name="ekyna_product.product_event_handler"/>
         </service>
 
         <!-- Product event handlers registry -->
-        <service id="ekyna_product.product.listener.handler_registry"
-                 class="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
+        <service id="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
 
         <!-- Product event listener -->
         <service id="ekyna_product.product.listener"
                  class="Ekyna\Bundle\ProductBundle\EventListener\ProductListener">
             <argument type="service" id="ekyna_resource.doctrine.orm.persistence_helper"/>
-            <argument type="service" id="ekyna_product.product.listener.handler_registry"/>
+            <argument type="service" id="Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerRegistry"/>
             <argument type="service" id="ekyna_product.product.reference_generator"/>
             <argument type="service" id="ekyna_product.offer.invalidator"/>
             <argument type="service" id="ekyna_product.price.invalidator"/>
-            <argument>%ekyna_commerce.stock_subject_defaults%</argument>
+            <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             <tag name="resource.event_subscriber"/>
         </service>
 
@@ -808,8 +807,12 @@
         </service>
 
         <!-- Product converter -->
-        <service id="ekyna_product.product.product_converter"
-                 class="Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter">
+        <service id="Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter">
+            <tag name="twig.runtime"/>
+        </service>
+
+        <!-- Abstract converter -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Converter\AbstractConverter" abstract="true">
             <argument type="service" id="ekyna_product.product.repository"/>
             <argument type="service" id="ekyna_product.product.manager"/>
             <argument type="service" id="ekyna_product.product.operator"/>
@@ -817,6 +820,21 @@
             <argument type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
             <argument type="service" id="ekyna_resource.event_dispatcher"/>
+        </service>
+
+        <!-- Simple to variable converter -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Converter\SimpleToVariableConverter"
+                 parent="Ekyna\Bundle\ProductBundle\Service\Converter\AbstractConverter">
+            <tag name="ekyna_product.converter"/>
+        </service>
+
+        <!-- Bundle to simple converter -->
+        <service id="Ekyna\Bundle\ProductBundle\Service\Converter\BundleToSimpleConverter"
+                 parent="Ekyna\Bundle\ProductBundle\Service\Converter\AbstractConverter">
+            <call method="setStockSubjectUpdater">
+                <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
+            </call>
+            <tag name="ekyna_product.converter"/>
         </service>
 
         <!-- Product convert form type -->
@@ -1084,7 +1102,7 @@
         </service>
         <service id="Ekyna\Bundle\ProductBundle\Command\StockUpdateCommand" public="false">
             <argument type="service" id="ekyna_product.product.repository"/>
-            <argument type="service" id="ekyna_commerce.stock_subject_updater"/>
+            <argument type="service" id="Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface"/>
             <argument type="service" id="ekyna_product.product.manager"/>
             <tag name="console.command"/>
         </service>

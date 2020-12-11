@@ -19,8 +19,8 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  */
 class Option extends RM\AbstractTranslatable implements Model\OptionInterface, GroupSequenceProviderInterface
 {
-    use RM\SortableTrait,
-        TaxableTrait;
+    use RM\SortableTrait;
+    use TaxableTrait;
 
     /**
      * @var integer
@@ -293,7 +293,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     /**
      * @inheritDoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return OptionTranslation::class;
     }

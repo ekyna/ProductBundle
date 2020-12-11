@@ -20,7 +20,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     use RM\SortableTrait;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
@@ -257,7 +257,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     /**
      * @inheritDoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return OptionGroupTranslation::class;
     }

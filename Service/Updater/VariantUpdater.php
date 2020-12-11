@@ -97,9 +97,9 @@ class VariantUpdater
 
             // If title is not blank or locale is the default one or a translation exists for this locale.
             if (
-                0 < strlen($title) ||
-                $locale == $this->localeProvider->getFallbackLocale() ||
-                null !== $variant->getTranslations()->get($locale)
+                !empty($title) ||
+                $locale === $this->localeProvider->getFallbackLocale() ||
+                $variant->hasTranslationForLocale($locale)
             ) {
                 // Create variant translation
                 $vTrans = $variant->translate($locale, true);

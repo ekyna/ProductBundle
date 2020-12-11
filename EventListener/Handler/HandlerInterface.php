@@ -13,14 +13,14 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 interface HandlerInterface
 {
-    const INSERT                    = 'handleInsert';
-    const UPDATE                    = 'handleUpdate';
-    const DELETE                    = 'handleDelete';
-    const STOCK_UNIT_CHANGE         = 'handleStockUnitChange';
-    const STOCK_UNIT_REMOVAL        = 'handleStockUnitRemoval';
-    const CHILD_PRICE_CHANGE        = 'handleChildPriceChange';
-    const CHILD_AVAILABILITY_CHANGE = 'handleChildAvailabilityChange';
-    const CHILD_STOCK_CHANGE        = 'handleChildStockChange';
+    public const INSERT                    = 'handleInsert';
+    public const UPDATE                    = 'handleUpdate';
+    public const DELETE                    = 'handleDelete';
+    public const STOCK_UNIT_CHANGE         = 'handleStockUnitChange';
+    public const STOCK_UNIT_REMOVAL        = 'handleStockUnitRemoval';
+    public const CHILD_PRICE_CHANGE        = 'handleChildPriceChange';
+    public const CHILD_AVAILABILITY_CHANGE = 'handleChildAvailabilityChange';
+    public const CHILD_STOCK_CHANGE        = 'handleChildStockChange';
 
 
     /**

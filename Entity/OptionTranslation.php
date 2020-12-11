@@ -24,17 +24,6 @@ class OptionTranslation extends AbstractTranslation implements OptionTranslation
 
 
     /**
-     * Clones the option translation.
-     */
-    public function __clone()
-    {
-        if ($this->id) {
-            $this->id = null;
-            $this->translatable = null;
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     public function getId()

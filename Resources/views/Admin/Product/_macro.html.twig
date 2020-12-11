@@ -30,7 +30,7 @@
 {%- endmacro -%}
 
 {%- macro convert_product_button(product) -%}
-    {%- set types = product_convert_types(product) -%}
+    {%- set types = product_convert_types(product.type) -%}
     {%- if types is not empty -%}
     <div class="btn-group btn-group-sm">
         <span class="btn btn-default disabled">

@@ -15,11 +15,11 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class AttributeChoice extends RM\AbstractTranslatable implements Model\AttributeChoiceInterface
 {
-    use MediaSubjectTrait,
-        RM\SortableTrait;
+    use MediaSubjectTrait;
+    use RM\SortableTrait;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
@@ -40,7 +40,9 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
 
 
     /**
-     * @inheritdoc
+     * Returns the string representation.
+     *
+     * @eturn string
      */
     public function __toString()
     {
@@ -139,7 +141,7 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return AttributeChoiceTranslation::class;
     }

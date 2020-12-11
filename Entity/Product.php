@@ -24,16 +24,16 @@ use Ekyna\Component\Resource\Model as RM;
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
-    use Model\VisibilityTrait,
-        Common\AdjustableTrait,
-        Common\MentionSubjectTrait,
-        Cms\ContentSubjectTrait,
-        Cms\SeoSubjectTrait,
-        Cms\TagsSubjectTrait,
-        RM\SortableTrait,
-        RM\TimestampableTrait,
-        RM\TaggedEntityTrait,
-        Stock\StockSubjectTrait;
+    use Cms\ContentSubjectTrait;
+    use Cms\SeoSubjectTrait;
+    use Cms\TagsSubjectTrait;
+    use Common\AdjustableTrait;
+    use Common\MentionSubjectTrait;
+    use Model\VisibilityTrait;
+    use RM\SortableTrait;
+    use RM\TaggedEntityTrait;
+    use RM\TimestampableTrait;
+    use Stock\StockSubjectTrait;
 
     /**
      * @var int
@@ -485,16 +485,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         return $this;
     }
-
-    /**
-     * @inheritdoc
-     */
-    /*public function setAttributes(Collection $attributes)
-    {
-        $this->attributes = $attributes;
-
-        return $this;
-    }*/
 
     /**
      * @inheritdoc
@@ -1752,7 +1742,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return ProductTranslation::class;
     }
@@ -1838,7 +1828,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritdoc
      */
-    static public function getProviderName(): string
+    public static function getProviderName(): string
     {
         return ProductProvider::NAME;
     }

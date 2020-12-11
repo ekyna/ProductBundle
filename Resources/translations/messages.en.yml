@@ -244,10 +244,14 @@ ekyna_product:
             media_choice: |
                 Select the <strong>variable</strong> product medias.
                 Medias not selected will be trasfered to the <strong>variant</strong> created.
-        variable_success: |
-            Conversion succeed.<br>
-            Please check all the variable <strong>AND</strong> the created variant informations.
-
+        simple_to_variable:
+            warning: Please check all the variable <strong>AND</strong> the created variant informations.
+        bundle_to_sdimple:
+            warning: Are you sure you want to convert this bundle into a simple product ? Composition will be lost.
+        success: |
+            Conversion succeeded.
+            <br><strong>Warning</strong>: this product has been marqued as &laquo; <strong>quote only</strong> &raquo;'.
+            <br>Please check all the information, especially the &laquo; <strong>stock</strong> &raquo; tab.
     cross_selling:
         label:
             singular: Cross selling
@@ -443,6 +447,8 @@ ekyna_product:
             component_parents: This product is a component of the following products
             brand_naming: Include brand in title and designation
             not_contractual: Non-contractual photos
+            attributes_title: Aattributes title
+            attributes_designation: Attributes designation
         alert:
             no_item: No product configured
             no_offer: No offer configured

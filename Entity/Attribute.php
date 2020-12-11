@@ -196,7 +196,7 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return AttributeTranslation::class;
     }

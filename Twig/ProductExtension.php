@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
+use Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
@@ -201,7 +202,7 @@ class ProductExtension extends AbstractExtension
             ),
             new TwigFunction(
                 'product_convert_types',
-                [Model\ProductTypes::class, 'getConversionTypes']
+                [ProductConverter::class, 'getTargetTypes']
             ),
             new TwigFunction(
                 'attribute_create_types',

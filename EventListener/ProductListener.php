@@ -11,6 +11,7 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Common\Generator\GeneratorInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
+use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\QueueEvents;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
@@ -49,20 +50,20 @@ class ProductListener implements EventSubscriberInterface
     protected $priceInvalidator;
 
     /**
-     * @var array
+     * @var StockSubjectUpdaterInterface
      */
-    private $stockDefaults;
+    protected $stockSubjectUpdater;
 
 
     /**
      * Constructor.
      *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param Handler\HandlerRegistry    $registry
-     * @param GeneratorInterface         $referenceGenerator
-     * @param OfferInvalidator           $offerInvalidator
-     * @param PriceInvalidator           $priceInvalidator
-     * @param array                      $stockDefaults
+     * @param PersistenceHelperInterface   $persistenceHelper
+     * @param Handler\HandlerRegistry      $registry
+     * @param GeneratorInterface           $referenceGenerator
+     * @param OfferInvalidator             $offerInvalidator
+     * @param PriceInvalidator             $priceInvalidator
+     * @param StockSubjectUpdaterInterface $stockSubjectUpdater
      */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
@@ -70,14 +71,35 @@ class ProductListener implements EventSubscriberInterface
         GeneratorInterface $referenceGenerator,
         OfferInvalidator $offerInvalidator,
         PriceInvalidator $priceInvalidator,
-        array $stockDefaults
+        StockSubjectUpdaterInterface $stockSubjectUpdater
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->handlerRegistry = $registry;
         $this->referenceGenerator = $referenceGenerator;
         $this->offerInvalidator = $offerInvalidator;
         $this->priceInvalidator = $priceInvalidator;
-        $this->stockDefaults = $stockDefaults;
+        $this->stockSubjectUpdater = $stockSubjectUpdater;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            ProductEvents::INITIALIZE                => ['onInitialize', 0],
+            ProductEvents::PRE_CREATE                => ['onPreCreate', 0],
+            ProductEvents::PRE_UPDATE                => ['onPreUpdate', 0],
+            ProductEvents::PRE_DELETE                => ['onPreDelete', 0],
+            ProductEvents::INSERT                    => ['onInsert', 0],
+            ProductEvents::UPDATE                    => ['onUpdate', 0],
+            ProductEvents::DELETE                    => ['onDelete', 0],
+            ProductEvents::STOCK_UNIT_CHANGE         => ['onStockUnitChange', 0],
+            ProductEvents::CHILD_PRICE_CHANGE        => ['onChildPriceChange', 0],
+            ProductEvents::CHILD_STOCK_CHANGE        => ['onChildStockChange', 0],
+            ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
+            QueueEvents::QUEUE_CLOSE                 => ['onQueueClose', 0],
+        ];
     }
 
     /**
@@ -90,30 +112,7 @@ class ProductListener implements EventSubscriberInterface
         $product = $this->getProductFromEvent($event);
 
         if (ProductTypes::isChildType($product)) {
-            $this->setStockDefaults($product);
-        }
-    }
-
-    /**
-     * Sets the product's stock defaults.
-     *
-     * @param ProductInterface $product
-     */
-    private function setStockDefaults(ProductInterface $product)
-    {
-        $map = [
-            'stock_mode'             => 'setStockMode',
-            'stock_floor'            => 'setStockFloor',
-            'replenishment_time'     => 'setReplenishmentTime',
-            'minimum_order_quantity' => 'setMinimumOrderQuantity',
-            'quote_only'             => 'setQuoteOnly',
-            'end_of_life'            => 'setEndOfLife',
-        ];
-
-        foreach ($map as $key => $method) {
-            if (isset($this->stockDefaults[$key])) {
-                $product->{$method}($this->stockDefaults[$key]);
-            }
+            $this->stockSubjectUpdater->reset($product);
         }
     }
 
@@ -358,26 +357,5 @@ class ProductListener implements EventSubscriberInterface
         }
 
         return $resource;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            ProductEvents::INITIALIZE                => ['onInitialize', 0],
-            ProductEvents::PRE_CREATE                => ['onPreCreate', 0],
-            ProductEvents::PRE_UPDATE                => ['onPreUpdate', 0],
-            ProductEvents::PRE_DELETE                => ['onPreDelete', 0],
-            ProductEvents::INSERT                    => ['onInsert', 0],
-            ProductEvents::UPDATE                    => ['onUpdate', 0],
-            ProductEvents::DELETE                    => ['onDelete', 0],
-            ProductEvents::STOCK_UNIT_CHANGE         => ['onStockUnitChange', 0],
-            ProductEvents::CHILD_PRICE_CHANGE        => ['onChildPriceChange', 0],
-            ProductEvents::CHILD_STOCK_CHANGE        => ['onChildStockChange', 0],
-            ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
-            QueueEvents::QUEUE_CLOSE                 => ['onQueueClose', 0],
-        ];
     }
 }

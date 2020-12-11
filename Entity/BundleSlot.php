@@ -17,8 +17,8 @@ use Ekyna\Component\Resource\Model\SortableTrait;
  */
 class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterface
 {
-    use MediaSubjectTrait,
-        SortableTrait;
+    use MediaSubjectTrait;
+    use SortableTrait;
 
     /**
      * @var integer

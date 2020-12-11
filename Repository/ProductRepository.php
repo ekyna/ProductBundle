@@ -372,13 +372,13 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $parameters = [];
 
         if (Model\ProductTypes::isVariableType($bundled)) {
-            $qb->andWhere($qb->expr()->in('c.product', ':bundled'));
+            $qb->andWhere($qb->expr()->in('IDENTITY(c.product)', ':bundled'));
             $products = $bundled->getVariants()->toArray();
             $products[] = $bundled;
-            $parameters['bundled'] = $products;
+            $parameters['bundled'] = $this->filterProductsIds($products);
         } elseif (Model\ProductTypes::isVariantType($bundled)) {
-            $qb->andWhere($qb->expr()->in('c.product', ':bundled'));
-            $parameters['bundled'] = [$bundled, $bundled->getParent()];
+            $qb->andWhere($qb->expr()->in('IDENTITY(c.product)', ':bundled'));
+            $parameters['bundled'] = $this->filterProductsIds([$bundled, $bundled->getParent()]);
         } else {
             $qb->andWhere($qb->expr()->eq('c.product', ':bundled'));
             $parameters['bundled'] = $bundled;
@@ -415,13 +415,13 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
         $parameters = [];
 
         if (Model\ProductTypes::isVariableType($product)) {
-            $qb->andWhere($qb->expr()->in('o.product', ':products'));
+            $qb->andWhere($qb->expr()->in('IDENTITY(o.product)', ':products'));
             $products = $product->getVariants()->toArray();
             $products[] = $product;
-            $parameters['products'] = $products;
+            $parameters['products'] = $this->filterProductsIds($products);
         } elseif (Model\ProductTypes::isVariantType($product)) {
-            $qb->andWhere($qb->expr()->in('o.product', ':products'));
-            $parameters['products'] = [$product, $product->getParent()];
+            $qb->andWhere($qb->expr()->in('IDENTITY(o.product)', ':products'));
+            $parameters['products'] = $this->filterProductsIds([$product, $product->getParent()]);
         } else {
             $qb->andWhere($qb->expr()->eq('o.product', ':product'));
             $parameters['product'] = $product;
@@ -573,7 +573,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameter('reference', $reference);
 
         array_push($ignore, $product);
-        if (!empty($ids = $this->ignoreToIds($ignore))) {
+        if (!empty($ids = $this->filterProductsIds($ignore))) {
             $qb
                 ->andWhere($qb->expr()->notIn('p.id', ':ids'))
                 ->setParameter('ids', $ids);
@@ -608,7 +608,7 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
             ->setParameter('brand', $brand);
 
         array_push($ignore, $product);
-        if (!empty($ids = $this->ignoreToIds($ignore))) {
+        if (!empty($ids = $this->filterProductsIds($ignore))) {
             $qb
                 ->andWhere($qb->expr()->notIn('p.id', ':ids'))
                 ->setParameter('ids', $ids);
@@ -663,11 +663,13 @@ class ProductRepository extends TranslatableResourceRepository implements Produc
     }
 
     /**
+     * Filters the products ids.
+     *
      * @param array $ignore
      *
-     * @return array
+     * @return int[]
      */
-    private function ignoreToIds(array $ignore): array
+    private function filterProductsIds(array $ignore): array
     {
         $ids = [];
 

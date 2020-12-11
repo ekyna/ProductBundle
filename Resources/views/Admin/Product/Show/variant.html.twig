@@ -7,6 +7,10 @@
 
 {% block general_content %}
     {{ parent() }}
+    {{- show_row(product.attributesDesignation, 'text', {
+        'label': 'ekyna_product.product.field.attributes_designation',
+        'id': 'product_attributesDesignation'
+    }) -}}
     {{ _product.show_variable(product) }}
     <div class="row">
         <div class="col-md-6">

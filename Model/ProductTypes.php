@@ -12,35 +12,17 @@ use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
  */
 class ProductTypes extends AbstractConstants
 {
-    const TYPE_SIMPLE       = 'simple';
-    const TYPE_VARIABLE     = 'variable';
-    const TYPE_VARIANT      = 'variant';
-    const TYPE_BUNDLE       = 'bundle';
-    const TYPE_CONFIGURABLE = 'configurable';
+    public const TYPE_SIMPLE       = 'simple';
+    public const TYPE_VARIABLE     = 'variable';
+    public const TYPE_VARIANT      = 'variant';
+    public const TYPE_BUNDLE       = 'bundle';
+    public const TYPE_CONFIGURABLE = 'configurable';
 
-
-    /**
-     * Supported conversion types map.
-     *
-     * @var array
-     */
-    const CONVERSION_MAP = [
-        ProductTypes::TYPE_SIMPLE       => [
-            ProductTypes::TYPE_VARIABLE,
-            //ProductTypes::TYPE_BUNDLE,
-        ],
-        ProductTypes::TYPE_VARIABLE     => [],
-        ProductTypes::TYPE_VARIANT      => [],
-        ProductTypes::TYPE_BUNDLE       => [
-            //ProductTypes::TYPE_CONFIGURABLE,
-        ],
-        ProductTypes::TYPE_CONFIGURABLE => [],
-    ];
 
     /**
      * {@inheritdoc}
      */
-    static public function getConfig(): array
+    public static function getConfig(): array
     {
         $prefix = 'ekyna_product.product.type.';
 
@@ -58,7 +40,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return array
      */
-    static public function getTypes()
+    public static function getTypes(): array
     {
         return [
             self::TYPE_SIMPLE,
@@ -74,7 +56,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return array
      */
-    static public function getCreateTypes()
+    public static function getCreateTypes(): array
     {
         return [
             self::TYPE_SIMPLE,
@@ -91,7 +73,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isSimpleType($type)
+    public static function isSimpleType($type): bool
     {
         return self::TYPE_SIMPLE === self::typeFromProduct($type);
     }
@@ -103,7 +85,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isVariantType($type)
+    public static function isVariantType($type): bool
     {
         return self::TYPE_VARIANT === self::typeFromProduct($type);
     }
@@ -115,7 +97,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isVariableType($type)
+    public static function isVariableType($type): bool
     {
         return self::TYPE_VARIABLE === self::typeFromProduct($type);
     }
@@ -127,7 +109,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isBundleType($type)
+    public static function isBundleType($type): bool
     {
         return self::TYPE_BUNDLE === self::typeFromProduct($type);
     }
@@ -139,7 +121,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isConfigurableType($type)
+    public static function isConfigurableType($type): bool
     {
         return self::TYPE_CONFIGURABLE === self::typeFromProduct($type);
     }
@@ -149,7 +131,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return array
      */
-    static public function getChildTypes()
+    public static function getChildTypes(): array
     {
         return [
             ProductTypes::TYPE_SIMPLE,
@@ -164,7 +146,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isChildType($type)
+    public static function isChildType($type): bool
     {
         return in_array(self::typeFromProduct($type), self::getChildTypes(), true);
     }
@@ -174,7 +156,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return array
      */
-    static public function getParentTypes()
+    public static function getParentTypes(): array
     {
         return [
             ProductTypes::TYPE_VARIABLE,
@@ -190,7 +172,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isParentType($type)
+    public static function isParentType($type): bool
     {
         return in_array(self::typeFromProduct($type), self::getParentTypes(), true);
     }
@@ -200,7 +182,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return array
      */
-    static public function getBundledTypes()
+    public static function getBundledTypes(): array
     {
         return [
             ProductTypes::TYPE_BUNDLE,
@@ -215,7 +197,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return bool
      */
-    static public function isBundledType($type)
+    public static function isBundledType($type): bool
     {
         return in_array(self::typeFromProduct($type), self::getBundledTypes(), true);
     }
@@ -227,7 +209,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static public function assertSimple(ProductInterface $product)
+    public static function assertSimple(ProductInterface $product): void
     {
         self::assertType($product, self::TYPE_SIMPLE);
     }
@@ -239,7 +221,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static public function assertVariable(ProductInterface $product)
+    public static function assertVariable(ProductInterface $product): void
     {
         self::assertType($product, self::TYPE_VARIABLE);
     }
@@ -251,7 +233,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static public function assertVariant(ProductInterface $product)
+    public static function assertVariant(ProductInterface $product): void
     {
         self::assertType($product, self::TYPE_VARIANT);
     }
@@ -263,7 +245,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static public function assertBundle(ProductInterface $product)
+    public static function assertBundle(ProductInterface $product): void
     {
         self::assertType($product, self::TYPE_BUNDLE);
     }
@@ -275,7 +257,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static public function assertConfigurable(ProductInterface $product)
+    public static function assertConfigurable(ProductInterface $product): void
     {
         self::assertType($product, self::TYPE_CONFIGURABLE);
     }
@@ -285,7 +267,7 @@ class ProductTypes extends AbstractConstants
      *
      * @param ProductInterface $product
      */
-    static public function assertChildType(ProductInterface $product)
+    public static function assertChildType(ProductInterface $product): void
     {
         if (!self::isChildType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'child' type.");
@@ -297,7 +279,7 @@ class ProductTypes extends AbstractConstants
      *
      * @param ProductInterface $product
      */
-    static public function assertParentType(ProductInterface $product)
+    public static function assertParentType(ProductInterface $product): void
     {
         if (!self::isParentType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'parent' type.");
@@ -309,23 +291,11 @@ class ProductTypes extends AbstractConstants
      *
      * @param ProductInterface $product
      */
-    static public function assertBundled(ProductInterface $product)
+    public static function assertBundled(ProductInterface $product): void
     {
         if (!self::isBundledType($product->getType())) {
             throw new InvalidArgumentException("Expected product of 'bundled' type.");
         }
-    }
-
-    /**
-     * Returns the available types the given product can be converted to.
-     *
-     * @param ProductInterface $product
-     *
-     * @return string[]
-     */
-    static public function getConversionTypes(ProductInterface $product)
-    {
-        return self::CONVERSION_MAP[$product->getType()];
     }
 
     /**
@@ -336,7 +306,7 @@ class ProductTypes extends AbstractConstants
      *
      * @throws InvalidArgumentException
      */
-    static private function assertType(ProductInterface $product, $type)
+    private static function assertType(ProductInterface $product, string $type): void
     {
         if ($product->getType() !== $type) {
             throw new InvalidArgumentException("Expected product of type '$type'.");
@@ -350,7 +320,7 @@ class ProductTypes extends AbstractConstants
      *
      * @return string
      */
-    static private function typeFromProduct($type)
+    private static function typeFromProduct($type): string
     {
         if ($type instanceof ProductInterface) {
             return $type->getType();

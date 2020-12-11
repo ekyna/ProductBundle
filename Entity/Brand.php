@@ -16,13 +16,13 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
 {
-    use Model\VisibilityTrait,
-        Cms\ContentSubjectTrait,
-        Cms\SeoSubjectTrait,
-        MediaSubjectTrait,
-        RM\SortableTrait,
-        RM\TimestampableTrait,
-        RM\TaggedEntityTrait;
+    use Cms\ContentSubjectTrait;
+    use Cms\SeoSubjectTrait;
+    use MediaSubjectTrait;
+    use Model\VisibilityTrait;
+    use RM\SortableTrait;
+    use RM\TaggedEntityTrait;
+    use RM\TimestampableTrait;
 
     /**
      * @var int
@@ -128,7 +128,7 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     /**
      * @inheritdoc
      */
-    protected function getTranslationClass()
+    protected function getTranslationClass(): string
     {
         return BrandTranslation::class;
     }
