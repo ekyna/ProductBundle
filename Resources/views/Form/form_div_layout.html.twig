@@ -193,7 +193,9 @@
 
 {%- block ekyna_product_catalog_page_widget -%}
     <div {{ block('widget_container_attributes') }}>
-        {{- form_row(form.template) -}}
+        {%- if form.template is defined -%}
+            {{- form_row(form.template) -}}
+        {%- endif -%}
         <div class="catalog-page-form">
             {%- if form.options is defined -%}
                 {{- form_row(form.options) -}}

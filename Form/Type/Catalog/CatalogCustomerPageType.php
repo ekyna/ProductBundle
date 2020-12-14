@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 use Ekyna\Bundle\CoreBundle\Form\Type\CollectionPositionType;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\HalfType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\Template\SlotsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -25,9 +26,10 @@ class CatalogCustomerPageType extends AbstractType
     {
         $builder
             ->add('number', CollectionPositionType::class)
-            ->add('slots', HalfType::class, [
-                'label' => false,
-                'attr'  => [
+            ->add('slots', SlotsType::class, [
+                'label'      => false,
+                'slot_count' => 2,
+                'attr'       => [
                     'label_col'  => 0,
                     'widget_col' => 12,
                 ],
