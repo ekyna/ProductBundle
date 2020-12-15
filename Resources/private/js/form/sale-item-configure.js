@@ -1327,12 +1327,9 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Submit button
             this.$submitButton = undefined;
             if (!this.parentItem) {
-                this.$submitButton = this.$element.find('button[type=submit]');
+                this.$submitButton = this.$element.find('button#submit');
                 if (0 === this.$submitButton.size()) {
                     this.$submitButton = this.$element.closest('.modal-content').find('.bootstrap-dialog-footer button#submit');
-                }
-                if (0 === this.$submitButton.size()) {
-                    throw 'Submit button not found';
                 }
             }
 

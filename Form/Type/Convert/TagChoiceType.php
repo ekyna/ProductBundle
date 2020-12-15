@@ -39,9 +39,6 @@ class TagChoiceType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'required' => false,
-                'attr'     => [
-                    'help_text' => 'ekyna_product.convert.help.tag_choice',
-                ],
             ])
             ->setAllowedTypes('tags', 'array')
             ->setAllowedValues('tags', function ($value) {

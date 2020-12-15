@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Constraints;
 
 /**
  * Class VariableType
@@ -70,19 +70,6 @@ class VariableType extends AbstractType
                             'attr'         => ['icon' => 'ok'],
                         ],
                     ],
-                    /*'cancel' => [
-                        'type'    => Type\ButtonType::class,
-                        'options' => [
-                            'label'        => 'ekyna_core.button.cancel',
-                            'button_class' => 'default',
-                            'as_link'      => true,
-                            'attr'         => [
-                                'class' => 'form-cancel-btn',
-                                'icon'  => 'remove',
-                                'href'  => $this->resourceHelper->generateResourcePath($variant),
-                            ],
-                        ],
-                    ],*/
                 ],
             ]);
 
@@ -98,10 +85,26 @@ class VariableType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
 
+            /** @var AttributeSetInterface $attributeSet */
             $attributeSet = $this->attributeSetRepository->find($data['attributeSet']);
 
             $this->addVariantForm($event->getForm(), $attributeSet);
         });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver
+            ->setDefaults([
+                'data_class'        => ProductInterface::class,
+                'attr'              => [
+                    'class' => 'form-horizontal',
+                ],
+                'validation_groups' => ['convert_' . ProductTypes::TYPE_VARIABLE],
+            ]);
     }
 
     /**
@@ -120,18 +123,27 @@ class VariableType extends AbstractType
         if (!empty($optionGroups = $variant->getOptionGroups()->toArray())) {
             $form->add('option_group_selection', OptionGroupChoiceType::class, [
                 'optionGroups' => $optionGroups,
+                'attr'         => [
+                    'help_text' => 'ekyna_product.convert.simple_to_variable.option_group_choice',
+                ],
             ]);
         }
 
         if (!empty($medias = $variant->getMedias()->toArray())) {
             $form->add('media_selection', MediaChoiceType::class, [
                 'medias' => $medias,
+                'attr'   => [
+                    'help_text' => 'ekyna_product.convert.simple_to_variable.media_choice',
+                ],
             ]);
         }
 
         if (!empty($tags = $variant->getTags()->toArray())) {
             $form->add('tag_selection', TagChoiceType::class, [
                 'tags' => $tags,
+                'attr' => [
+                    'help_text' => 'ekyna_product.convert.simple_to_variable.tag_choice',
+                ],
             ]);
         }
 
@@ -139,23 +151,8 @@ class VariableType extends AbstractType
             'property_path' => 'variants[0]',
             'attribute_set' => $attributeSet,
             'constraints'   => [
-                new Valid(),
+                new Constraints\Valid(),
             ],
         ]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver
-            ->setDefaults([
-                'data_class'         => ProductInterface::class,
-                'attr'               => [
-                    'class' => 'form-horizontal',
-                ],
-                'validation_groups'  => ['convert_' . ProductTypes::TYPE_VARIABLE],
-            ]);
     }
 }

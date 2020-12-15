@@ -39,9 +39,6 @@ class OptionGroupChoiceType extends AbstractType
                 'expanded'     => true,
                 'multiple'     => true,
                 'required'     => false,
-                'attr'         => [
-                    'help_text' => 'ekyna_product.convert.help.option_group_choice',
-                ],
             ])
             ->setAllowedTypes('optionGroups', 'array')
             ->setAllowedValues('optionGroups', function ($value) {

@@ -62,9 +62,6 @@ class MediaChoiceType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'required' => false,
-                'attr'     => [
-                    'help_text' => 'ekyna_product.convert.help.media_choice',
-                ],
             ])
             ->setAllowedTypes('medias', 'array')
             ->setAllowedValues('medias', function ($value) {

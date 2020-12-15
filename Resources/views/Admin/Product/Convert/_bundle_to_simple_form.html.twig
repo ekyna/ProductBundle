@@ -4,6 +4,10 @@
 
     {{ form_errors(form) }}
 
+    {% if form.option_group_selection is defined %}
+        {{ form_row(form.option_group_selection) }}
+    {% endif %}
+
     {{ form_row(form.confirm) }}
 
     {{ form_rest(form) }}

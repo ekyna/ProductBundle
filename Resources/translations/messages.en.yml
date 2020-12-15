@@ -234,7 +234,8 @@ ekyna_product:
     convert:
         warning: >
             <strong>Warning!</strong> This operation is <strong>not reversible</strong>.
-        help:
+        simple_to_variable:
+            warning: Please check all the variable <strong>AND</strong> the created variant informations.
             tag_choice: |
                 Select the <strong>variable</strong> product tags.
                 Tags not selected will be trasfered to the <strong>variant</strong> created.
@@ -244,10 +245,10 @@ ekyna_product:
             media_choice: |
                 Select the <strong>variable</strong> product medias.
                 Medias not selected will be trasfered to the <strong>variant</strong> created.
-        simple_to_variable:
-            warning: Please check all the variable <strong>AND</strong> the created variant informations.
-        bundle_to_sdimple:
-            warning: Are you sure you want to convert this bundle into a simple product ? Composition will be lost.
+        bundle_to_simple:
+            confirm: Are you sure you want to convert this bundle into a simple product ? Composition will be lost.
+            option_group_choice: |
+                Select the <strong>sub-products</strong> options group.
         success: |
             Conversion succeeded.
             <br><strong>Warning</strong>: this product has been marqued as &laquo; <strong>quote only</strong> &raquo;'.

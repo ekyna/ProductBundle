@@ -234,7 +234,8 @@ ekyna_product:
     convert:
         warning: >
             <strong>Attention !</strong> Cette opération n'est <strong>pas réversible</strong>.
-        help:
+        simple_to_variable:
+            warning: Veuillez vérifier les informations du produit variable <strong>ET</strong> de la variante créée.
             tag_choice: |
                 Sélectionnez les tags à destination du produit <strong>variable</strong>.
                 Les tags non sélectionnés seront transférés à la <strong>variante</strong> créée.
@@ -244,10 +245,11 @@ ekyna_product:
             media_choice: |
                 Sélectionnez les médias à destination du produit <strong>variable</strong>.
                 Les médias non sélectionnés seront transférés à la <strong>variante</strong> créée.
-        simple_to_variable:
-            warning: Veuillez vérifier les informations du produit variable <strong>ET</strong> de la variante créée.
         bundle_to_simple:
             confirm: Êtes-vous sûr de vouloir convertir ce pack en produit simple ? La composition sera perdue.
+            option_group_choice: |
+                Sélectionnez les groupes d'options des sous-produits du pack
+                à destination du produit <strong>simpe</strong>.
         success: |
             Conversion réussie.
             <br><strong>Attention</strong> : le produit a été marqué &laquo; <strong>sur devis uniquement</strong> &raquo;.
