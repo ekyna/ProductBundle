@@ -66,12 +66,20 @@ class BundleToSimpleConverter extends AbstractConverter
     /**
      * @inheritDoc
      */
-    protected function onConvert(): void
+    protected function onPreConvert(): void
     {
         $this->stockSubjectUpdater->reset($this->target);
 
         $this->target->setType(ProductTypes::TYPE_SIMPLE);
 
+        parent::onPreConvert();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function onConvert(): void
+    {
         $form = $this->getForm();
 
         // Option groups
