@@ -104,11 +104,13 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
     }
 
     /**
-     * @inheritDoc
+     * Returns the string representation.
+     *
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->title;
+        return $this->title ?: 'New catalog';
     }
 
     /**
@@ -116,7 +118,7 @@ class Catalog implements RM\ResourceInterface, RM\TimestampableInterface
      *
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

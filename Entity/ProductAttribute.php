@@ -52,7 +52,7 @@ class ProductAttribute implements ProductAttributeInterface
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

@@ -84,22 +84,20 @@ class BundleChoice implements Model\BundleChoiceInterface
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->slot = null;
+        $this->id = null;
+        $this->slot = null;
 
-            $rules = $this->rules->toArray();
-            $this->rules = new ArrayCollection();
-            foreach ($rules as $rule) {
-                $this->addRule(clone $rule);
-            }
+        $rules = $this->rules->toArray();
+        $this->rules = new ArrayCollection();
+        foreach ($rules as $rule) {
+            $this->addRule(clone $rule);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

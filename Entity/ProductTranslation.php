@@ -16,11 +16,6 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class ProductTranslation extends AbstractTranslation implements ProductTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
@@ -47,11 +42,15 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getId()
+    public function __clone()
     {
-        return $this->id;
+        parent::__clone();
+
+        $this->title = null;
+        $this->slug = null;
+        $this->attributesTitle = null;
     }
 
     /**

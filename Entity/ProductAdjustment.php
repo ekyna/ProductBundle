@@ -20,14 +20,12 @@ class ProductAdjustment extends AbstractAdjustment implements Model\ProductAdjus
 
 
     /**
-     * @inheritdoc
+     * Clones the product adjustment.
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->product = null;
-        }
+        $this->id = null;
+        $this->product = null;
     }
 
     /**

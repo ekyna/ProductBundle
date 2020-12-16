@@ -13,11 +13,6 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class BundleSlotTranslation extends AbstractTranslation implements BundleSlotTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
@@ -27,14 +22,6 @@ class BundleSlotTranslation extends AbstractTranslation implements BundleSlotTra
      */
     protected $description;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @inheritdoc

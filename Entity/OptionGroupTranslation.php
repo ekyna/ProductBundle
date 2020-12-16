@@ -16,23 +16,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class OptionGroupTranslation extends AbstractTranslation implements OptionGroupTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @inheritdoc

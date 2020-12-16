@@ -13,11 +13,6 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class CategoryTranslation extends AbstractTranslation implements CategoryTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
@@ -32,14 +27,6 @@ class CategoryTranslation extends AbstractTranslation implements CategoryTransla
      */
     protected $slug;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @inheritdoc

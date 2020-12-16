@@ -58,19 +58,19 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     }
 
     /**
-     * Returns the string representation
+     * Returns the string representation.
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name ?: 'New category';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

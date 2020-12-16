@@ -36,19 +36,19 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
 
 
     /**
-     * Returns the string representation
+     * Returns the string representation.
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name ?: 'New brand';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

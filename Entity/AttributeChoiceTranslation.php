@@ -13,23 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class AttributeChoiceTranslation extends AbstractTranslation implements AttributeChoiceTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @inheritdoc

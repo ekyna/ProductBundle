@@ -30,16 +30,14 @@ class BundleSlotRule extends AbstractBundleRule implements Model\BundleSlotRuleI
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->slot = null;
-        }
+        $this->id = null;
+        $this->slot = null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

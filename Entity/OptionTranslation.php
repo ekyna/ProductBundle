@@ -13,23 +13,10 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
 class OptionTranslation extends AbstractTranslation implements OptionTranslationInterface
 {
     /**
-     * @var integer
-     */
-    protected $id;
-
-    /**
      * @var string
      */
     protected $title;
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @inheritdoc

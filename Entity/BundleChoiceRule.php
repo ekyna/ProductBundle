@@ -30,16 +30,14 @@ class BundleChoiceRule extends AbstractBundleRule implements Model\BundleChoiceR
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->choice = null;
-        }
+        $this->id = null;
+        $this->choice = null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

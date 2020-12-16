@@ -67,21 +67,15 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->product = null;
+        parent::__clone();
 
-            $options = $this->options->toArray();
-            $this->options = new ArrayCollection();
-            foreach ($options as $option) {
-                $this->addOption(clone $option);
-            }
+        $this->id = null;
+        $this->product = null;
 
-            $translations = $this->translations->toArray();
-            $this->translations = new ArrayCollection();
-            foreach ($translations as $translation) {
-                $this->addTranslation(clone $translation);
-            }
+        $options = $this->options->toArray();
+        $this->options = new ArrayCollection();
+        foreach ($options as $option) {
+            $this->addOption(clone $option);
         }
     }
 
@@ -90,15 +84,15 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name ?: 'New option group';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

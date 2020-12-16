@@ -42,17 +42,17 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     /**
      * Returns the string representation.
      *
-     * @eturn string
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name ?: 'New attribute choice';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

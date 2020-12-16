@@ -79,7 +79,7 @@ class Price implements ResourceInterface
     }
 
     /**
-     * @inheritDoc
+     * Clones the price.
      */
     public function __clone()
     {
@@ -94,7 +94,7 @@ class Price implements ResourceInterface
      *
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

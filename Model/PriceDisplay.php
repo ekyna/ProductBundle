@@ -84,9 +84,11 @@ class PriceDisplay
     }
 
     /**
-     * @inheritDoc
+     * Returns the string representation.
+     *
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->from . $this->originalPrice . $this->finalPrice;
     }

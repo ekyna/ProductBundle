@@ -54,17 +54,19 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     }
 
     /**
-     * @inheritdoc
+     * Returns the string representation.
+     *
+     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name ?: 'New attribute';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

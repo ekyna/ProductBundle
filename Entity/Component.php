@@ -46,25 +46,23 @@ class Component implements ComponentInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return (string)$this->child;
+        return null !== $this->child ? (string)$this->child : 'New component';
     }
 
     /**
-     * @inheritDoc
+     * Clones the component.
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-        }
+        $this->id = null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

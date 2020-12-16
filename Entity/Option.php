@@ -68,16 +68,10 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->group = null;
+        parent::__clone();
 
-            $translations = $this->translations->toArray();
-            $this->translations = new ArrayCollection();
-            foreach ($translations as $translation) {
-                $this->addTranslation(clone $translation);
-            }
-        }
+        $this->id = null;
+        $this->group = null;
     }
 
     /**
@@ -85,15 +79,15 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getDesignation();
+        return $this->designation ?: 'New option';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

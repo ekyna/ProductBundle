@@ -201,134 +201,150 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      */
     public function __clone()
     {
-        if ($this->id) {
+        parent::__clone();
 
-            // ---- ONE TO MANY ----
+        // ---- ONE TO MANY ----
 
-            // Adjustments
-            $adjustments = $this->adjustments->toArray();
-            $this->adjustments = new ArrayCollection();
-            foreach ($adjustments as $adjustment) {
-                $this->addAdjustment(clone $adjustment);
-            }
-
-            // Attributes
-            $attributes = $this->attributes->toArray();
-            $this->attributes = new ArrayCollection();
-            foreach ($attributes as $attribute) {
-                $this->addAttribute(clone $attribute);
-            }
-
-            // Bundle slots
-            $bundleSlots = $this->bundleSlots->toArray();
-            $this->bundleSlots = new ArrayCollection();
-            foreach ($bundleSlots as $bundleSlot) {
-                $this->addBundleSlot(clone $bundleSlot);
-            }
-
-            // Components
-            $components = $this->components->toArray();
-            $this->components = new ArrayCollection();
-            foreach ($components as $component) {
-                $this->addComponent(clone $component);
-            }
-
-            // Medias
-            $medias = $this->medias->toArray();
-            $this->medias = new ArrayCollection();
-            foreach ($medias as $media) {
-                $this->addMedia(clone $media);
-            }
-
-            // Option groups
-            $optionGroups = $this->optionGroups->toArray();
-            $this->optionGroups = new ArrayCollection();
-            foreach ($optionGroups as $optionGroup) {
-                $this->addOptionGroup(clone $optionGroup);
-            }
-
-            // References
-            $this->references = new ArrayCollection();
-
-            // Translations
-            $translations = $this->translations->toArray();
-            $this->translations = new ArrayCollection();
-            foreach ($translations as $translation) {
-                /** @var Model\ProductTranslationInterface $t */
-                $t = clone $translation;
-                $t
-                    ->setSlug(null)
-                    ->setAttributesTitle(null);
-                $this->addTranslation(clone $translation);
-            }
-
-            // Variants
-            $variants = $this->variants->toArray();
-            $this->variants = new ArrayCollection();
-            foreach ($variants as $variant) {
-                $this->addVariant(clone $variant);
-            }
-
-            // ---- MANY TO MANY ----
-
-            // Categories
-            $categories = $this->categories->toArray();
-            $this->categories = new ArrayCollection();
-            foreach ($categories as $category) {
-                $this->addCategory($category);
-            }
-
-            // Customer groups
-            $customerGroups = $this->customerGroups->toArray();
-            $this->customerGroups = new ArrayCollection();
-            foreach ($customerGroups as $customerGroup) {
-                $this->addCustomerGroup($customerGroup);
-            }
-
-            // Tags
-            $tags = $this->tags->toArray();
-            $this->tags = new ArrayCollection();
-            foreach ($tags as $tag) {
-                $this->addTag($tag);
-            }
-
-            // ---- MANY TO ONE ----
-
-            // Brand is ok
-            // Parent is ok
-            // Tax group is ok
-            // Attribute set is ok
-
-            // ---- BASICS ----
-
-            // Seo
-            if ($this->seo) {
-                $this->seo = clone $this->seo;
-            }
-            // Content
-            $this->content = null;
-
-            // ---- BASICS ----
-
-            // Reset stock data (but preserve mode)
-            $stockMode = $this->stockMode;
-            $quoteOnly = $this->quoteOnly;
-            $this->initializeStock();
-            $this->stockMode = $stockMode;
-            $this->quoteOnly = $quoteOnly;
-
-            // Clear critical fields
-            $this->id = null;
-            $this->designation = null;
-            $this->reference = null;
-            $this->geocode = null;
-            $this->references = new ArrayCollection();
-            $this->visible = false;
-            $this->notContractual = true;
-            //$this->netPrice = 0;
-            //$this->weight = 0;
-            //$this->releasedAt = null;
+        // Adjustments
+        $adjustments = $this->adjustments->toArray();
+        $this->adjustments = new ArrayCollection();
+        foreach ($adjustments as $adjustment) {
+            $this->addAdjustment(clone $adjustment);
         }
+
+        // Attributes
+        $attributes = $this->attributes->toArray();
+        $this->attributes = new ArrayCollection();
+        foreach ($attributes as $attribute) {
+            $this->addAttribute(clone $attribute);
+        }
+
+        // Bundle slots
+        $bundleSlots = $this->bundleSlots->toArray();
+        $this->bundleSlots = new ArrayCollection();
+        foreach ($bundleSlots as $bundleSlot) {
+            $this->addBundleSlot(clone $bundleSlot);
+        }
+
+        // Components
+        $components = $this->components->toArray();
+        $this->components = new ArrayCollection();
+        foreach ($components as $component) {
+            $this->addComponent(clone $component);
+        }
+
+        // Medias
+        $medias = $this->medias->toArray();
+        $this->medias = new ArrayCollection();
+        foreach ($medias as $media) {
+            $this->addMedia(clone $media);
+        }
+
+        // Option groups
+        $optionGroups = $this->optionGroups->toArray();
+        $this->optionGroups = new ArrayCollection();
+        foreach ($optionGroups as $optionGroup) {
+            $this->addOptionGroup(clone $optionGroup);
+        }
+
+        // References
+        $this->references = new ArrayCollection();
+
+        // Variants
+        $variants = $this->variants->toArray();
+        $this->variants = new ArrayCollection();
+        foreach ($variants as $variant) {
+            $this->addVariant(clone $variant);
+        }
+
+        // Cross sellings
+        $crossSellings = $this->crossSellings->toArray();
+        $this->crossSellings = new ArrayCollection();
+        foreach ($crossSellings as $crossSelling) {
+            $this->addCrossSelling(clone $crossSelling);
+        }
+
+        // Special offers
+        $specialOffers = $this->specialOffers->toArray();
+        $this->specialOffers = new ArrayCollection();
+        foreach ($specialOffers as $specialOffer) {
+            $this->addSpecialOffer(clone $specialOffer);
+        }
+
+        // Pricings
+        $pricings = $this->pricings->toArray();
+        $this->pricings = new ArrayCollection();
+        foreach ($pricings as $pricing) {
+            $this->addPricing(clone $pricing);
+        }
+
+        // Mentions
+        $mentions = $this->mentions->toArray();
+        $this->mentions = new ArrayCollection();
+        foreach ($mentions as $mention) {
+            $this->addMention(clone $mention);
+        }
+
+        // ---- MANY TO MANY ----
+
+        // Categories
+        $categories = $this->categories->toArray();
+        $this->categories = new ArrayCollection();
+        foreach ($categories as $category) {
+            $this->addCategory($category);
+        }
+
+        // Customer groups
+        $customerGroups = $this->customerGroups->toArray();
+        $this->customerGroups = new ArrayCollection();
+        foreach ($customerGroups as $customerGroup) {
+            $this->addCustomerGroup($customerGroup);
+        }
+
+        // Tags
+        $tags = $this->tags->toArray();
+        $this->tags = new ArrayCollection();
+        foreach ($tags as $tag) {
+            $this->addTag($tag);
+        }
+
+        // ---- MANY TO ONE ----
+
+        // Brand is ok
+        // Parent is ok
+        // Tax group is ok
+        // Attribute set is ok
+
+        // ---- BASICS ----
+
+        // Seo
+        if ($this->seo) {
+            $seo = clone $this->seo;
+            $this->seo = $seo;
+        }
+        // Content
+        $this->content = null;
+
+        // ---- BASICS ----
+
+        // Reset stock data (but preserve mode)
+        $stockMode = $this->stockMode;
+        $quoteOnly = $this->quoteOnly;
+        $this->initializeStock();
+        $this->stockMode = $stockMode;
+        $this->quoteOnly = $quoteOnly;
+
+        // Clear critical fields
+        $this->id = null;
+        $this->designation = null;
+        $this->reference = null;
+        $this->geocode = null;
+        $this->references = new ArrayCollection();
+        $this->visible = false;
+        $this->notContractual = true;
+        //$this->netPrice = 0;
+        //$this->weight = 0;
+        //$this->releasedAt = null;
     }
 
     /**
@@ -336,15 +352,15 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getFullDesignation(true);
+        return $this->getFullDesignation(true) ?: 'New product';
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

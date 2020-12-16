@@ -16,7 +16,7 @@ class ProductMedia implements ProductMediaInterface
     use GalleryMediaTrait;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
@@ -27,20 +27,18 @@ class ProductMedia implements ProductMediaInterface
 
 
     /**
-     * @inheritdoc
+     * Clones the product media.
      */
     public function __clone()
     {
-        if ($this->id) {
-            $this->id = null;
-            $this->product = null;
-        }
+        $this->id = null;
+        $this->product = null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
