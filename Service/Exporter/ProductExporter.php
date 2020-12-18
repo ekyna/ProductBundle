@@ -10,7 +10,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepository;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
-use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
+use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**

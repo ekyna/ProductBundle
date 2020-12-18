@@ -9,7 +9,7 @@ use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
+use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;

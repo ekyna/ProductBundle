@@ -15,7 +15,7 @@ use Ekyna\Bundle\ProductBundle\Table\Column\ReferenceType;
 use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
 use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
-use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
+use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
 use Ekyna\Component\Table\Exception\InvalidArgumentException;

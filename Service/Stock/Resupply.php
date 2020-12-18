@@ -3,7 +3,7 @@
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use Ekyna\Component\Commerce\Subject\Model\SubjectInterface;
-use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
+use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Component\Commerce\Supplier\Model;
 use Ekyna\Component\Commerce\Supplier\Repository;
 use Ekyna\Component\Commerce\Supplier\Util\SupplierUtil;
