@@ -43,6 +43,7 @@
 
 {% block pricing_content %}
     {{ parent() }}
+    {{ form_row(form.references) }}
     {{ form_row(form.bundleSlots) }}
 {% endblock pricing_content %}
 

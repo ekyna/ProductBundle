@@ -46,5 +46,6 @@
 
 {% block pricing_content %}
     {{ parent() }}
+    {{ _product.show_references(product) }}
     {{ _product.show_bundle_composition(product) }}
 {% endblock pricing_content %}

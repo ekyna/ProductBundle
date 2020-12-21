@@ -612,24 +612,26 @@ class ProductController extends AbstractSubjectController
             }
 
             $data['variants'] = $table->createView();
-        } elseif (ProductTypes::isChildType($product->getType())) {
-            $type = $this->get('ekyna_commerce.supplier_product.configuration')->getTableType();
+        } else {
+            if (ProductTypes::isChildType($product->getType())) {
+                $type = $this->get('ekyna_commerce.supplier_product.configuration')->getTableType();
 
-            $table = $this
-                ->getTableFactory()
-                ->createTable('supplierProducts', $type, [
-                    'subject' => $product,
-                ]);
+                $table = $this
+                    ->getTableFactory()
+                    ->createTable('supplierProducts', $type, [
+                        'subject' => $product,
+                    ]);
 
-            if (null !== $response = $table->handleRequest($context->getRequest())) {
-                return $response;
+                if (null !== $response = $table->handleRequest($context->getRequest())) {
+                    return $response;
+                }
+
+                $data['supplierProducts'] = $table->createView();
+
+                $data['newSupplierProductForm'] = $this
+                    ->createNewSupplierProductForm($product)
+                    ->createView();
             }
-
-            $data['supplierProducts'] = $table->createView();
-
-            $data['newSupplierProductForm'] = $this
-                ->createNewSupplierProductForm($product)
-                ->createView();
 
             if (null === $product->getReferenceByType(ProductReferenceTypes::TYPE_EAN_13)) {
                 if ($this->get(Features::class)->isEnabled(Features::GTIN13_GENERATOR)) {

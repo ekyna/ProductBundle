@@ -333,6 +333,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addNotContractualField()
             ->addCrossSellingsField()
             // Pricing
+            ->addReferencesField()
             ->addBundleSlotsField()
             // TODO (?) ->addComponentsField()
             ->addOptionGroupsField()

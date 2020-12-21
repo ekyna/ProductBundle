@@ -971,7 +971,6 @@
                 <option name="max">0</option>
                 <option name="groups">
                     <value>variable</value>
-                    <value>bundle</value>
                     <value>configurable</value>
                 </option>
             </constraint>
@@ -1168,8 +1167,10 @@
                 <value>Default</value>
                 <value>simple</value>
                 <value>variant</value>
+                <value>bundle</value>
             </option>
         </constraint>
+
         <!-- Unique type by product constraint -->
         <!-- TODO bug because product may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -1181,6 +1182,7 @@
                 <value>Default</value>
                 <value>simple</value>
                 <value>variant</value>
+                <value>bundle</value>
             </option>
         </constraint>-->
     </class>

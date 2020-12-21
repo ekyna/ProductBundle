@@ -54,7 +54,7 @@ class ExternalReferenceGenerator
      */
     public function generateGtin13(ProductInterface $product): void
     {
-        if (!ProductTypes::isChildType($product)) {
+        if (!(ProductTypes::isChildType($product) || ProductTypes::isBundleType($product))) {
             throw new RuntimeException("Unexpected product type.");
         }
 
