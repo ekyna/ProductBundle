@@ -5,6 +5,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 
 /**
  * Class ProductFilter
@@ -44,11 +45,6 @@ class ProductFilter implements ProductFilterInterface
     private $optionCache;
 
     /**
-     * @var array
-     */
-    private $componentCache;
-
-    /**
      * @var ContextInterface
      */
     private $context;
@@ -75,7 +71,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function isProductAvailable(Model\ProductInterface $product, array $exclude = [])
+    public function isProductAvailable(Model\ProductInterface $product, array $exclude = []): bool
     {
         if ($this->hasProductAvailability($product)) {
             return $this->getProductAvailability($product);
@@ -126,7 +122,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getVariants(Model\ProductInterface $product)
+    public function getVariants(Model\ProductInterface $product): array
     {
         Model\ProductTypes::assertVariable($product);
 
@@ -154,7 +150,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getBundleSlots(Model\ProductInterface $product)
+    public function getBundleSlots(Model\ProductInterface $product): array
     {
         Model\ProductTypes::assertBundled($product);
 
@@ -175,7 +171,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getSlotChoices(Model\BundleSlotInterface $slot)
+    public function getSlotChoices(Model\BundleSlotInterface $slot): array
     {
         if (isset($this->choiceCache[$slot->getId()])) {
             return $this->choiceCache[$slot->getId()];
@@ -188,7 +184,7 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        $this->sortChoices($choices, function(Model\BundleChoiceInterface $choice) {
+        $this->sortChoices($choices, function (Model\BundleChoiceInterface $choice) {
             return $choice->getProduct();
         });
 
@@ -198,7 +194,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getOptionGroups(Model\ProductInterface $product, array $exclude = [])
+    public function getOptionGroups(Model\ProductInterface $product, array $exclude = []): array
     {
         $key = implode('-', $exclude);
 
@@ -227,7 +223,7 @@ class ProductFilter implements ProductFilterInterface
     /**
      * @inheritdoc
      */
-    public function getGroupOptions(Model\OptionGroupInterface $group)
+    public function getGroupOptions(Model\OptionGroupInterface $group): array
     {
         if (isset($this->optionCache[$group->getId()])) {
             return $this->optionCache[$group->getId()];
@@ -240,7 +236,7 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        $this->sortChoices($options, function(Model\OptionInterface $option) {
+        $this->sortChoices($options, function (Model\OptionInterface $option) {
             return $option->getProduct();
         });
 
@@ -254,11 +250,11 @@ class ProductFilter implements ProductFilterInterface
      *
      * @return bool
      */
-    protected function isChoiceAvailable(Model\BundleChoiceInterface $choice)
+    protected function isChoiceAvailable(Model\BundleChoiceInterface $choice): bool
     {
         $product = $choice->getProduct();
 
-        if (!$this->context->isAdmin() && ($product->isQuoteOnly() || $product->isEndOfLife())) {
+        if ($this->hasReservedAvailability($product)) {
             return false;
         }
 
@@ -272,17 +268,41 @@ class ProductFilter implements ProductFilterInterface
      *
      * @return bool
      */
-    protected function isOptionAvailable(Model\OptionInterface $option)
+    protected function isOptionAvailable(Model\OptionInterface $option): bool
     {
         if (null === $product = $option->getProduct()) {
             return true;
         }
 
-        if (!$this->context->isAdmin() && ($product->isQuoteOnly() || $product->isEndOfLife())) {
+        if ($this->hasReservedAvailability($product)) {
             return false;
         }
 
         return $this->isProductAvailable($product);
+    }
+
+    /**
+     * Returns whether the product has reserved availability.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return bool
+     */
+    protected function hasReservedAvailability(Model\ProductInterface $product): bool
+    {
+        if ($this->context->isAdmin()) {
+            return false;
+        }
+
+        if ($product->isQuoteOnly()) {
+            return true;
+        }
+
+        if ($product->isEndOfLife() && ($product->getStockState() !== StockSubjectStates::STATE_IN_STOCK)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -292,7 +312,7 @@ class ProductFilter implements ProductFilterInterface
      *
      * @return bool
      */
-    protected function hasProductAvailability(Model\ProductInterface $product)
+    protected function hasProductAvailability(Model\ProductInterface $product): bool
     {
         return isset($this->productCache[$product->getId()]);
     }
@@ -304,7 +324,7 @@ class ProductFilter implements ProductFilterInterface
      *
      * @return bool
      */
-    protected function getProductAvailability(Model\ProductInterface $product)
+    protected function getProductAvailability(Model\ProductInterface $product): bool
     {
         return $this->productCache[$product->getId()];
     }
@@ -317,22 +337,21 @@ class ProductFilter implements ProductFilterInterface
      *
      * @return bool                  The defined availability
      */
-    protected function setProductAvailability(Model\ProductInterface $product, $available)
+    protected function setProductAvailability(Model\ProductInterface $product, bool $available): bool
     {
-        return $this->productCache[$product->getId()] = (bool)$available;
+        return $this->productCache[$product->getId()] = $available;
     }
 
     /**
      * Clears the results cache.
      */
-    protected function clearCache()
+    protected function clearCache(): void
     {
         $this->productCache = [];
         $this->slotCache = [];
         $this->choiceCache = [];
         $this->groupCache = [];
         $this->optionCache = [];
-        $this->componentCache = [];
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -15,12 +16,12 @@ use Ekyna\Component\Commerce\Exception;
  */
 class ItemBuilder
 {
-    const VARIANT_ID       = 'variant_id';
-    const BUNDLE_SLOT_ID   = 'bundle_slot_id';
-    const BUNDLE_CHOICE_ID = 'bundle_choice_id';
-    const OPTION_GROUP_ID  = 'option_group_id';
-    const OPTION_ID        = 'option_id';
-    const COMPONENT_ID     = 'component_id';
+    public const VARIANT_ID       = 'variant_id';
+    public const BUNDLE_SLOT_ID   = 'bundle_slot_id';
+    public const BUNDLE_CHOICE_ID = 'bundle_choice_id';
+    public const OPTION_GROUP_ID  = 'option_group_id';
+    public const OPTION_ID        = 'option_id';
+    public const COMPONENT_ID     = 'component_id';
 
     /**
      * @var ProductProvider
@@ -50,7 +51,7 @@ class ItemBuilder
      *
      * @return ProductProvider
      */
-    public function getProvider()
+    public function getProvider(): ProductProvider
     {
         return $this->provider;
     }
@@ -60,7 +61,7 @@ class ItemBuilder
      *
      * @return ProductFilterInterface
      */
-    public function getFilter()
+    public function getFilter(): ProductFilterInterface
     {
         return $this->filter;
     }
@@ -72,8 +73,7 @@ class ItemBuilder
      */
     public function build(SaleItemInterface $item)
     {
-        /** @var ProductInterface $product */
-        $product = $this->provider->resolve($item);
+        $product = $this->resolve($item);
 
         $this->buildFromProduct($item, $product, []);
     }
@@ -83,7 +83,7 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $exclude The option group ids to exclude
+     * @param array|null        $exclude The option group ids to exclude
      *
      * @throws Exception\InvalidArgumentException If product type is not supported
      */
@@ -170,12 +170,10 @@ class ItemBuilder
         }
 
         if (null === $variant) {
-            /** @var ProductInterface $variant */
             $variant = reset($variants);
         }
 
         $this->buildFromVariant($item, $variant);
-
         // TODO Variable product should always be public (not private) as it is a user choice.
     }
 
@@ -199,9 +197,9 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $exclude The option groups ids to exclude
+     * @param array|null        $exclude The option groups ids to exclude
      */
-    protected function buildFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude = null)
+    protected function buildFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude = null): void
     {
         ProductTypes::assertBundle($product);
 
@@ -228,7 +226,6 @@ class ItemBuilder
                 continue;
             }
 
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = current($choices);
 
             // Find matching item
@@ -265,10 +262,13 @@ class ItemBuilder
      *
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
-     * @param array             $exclude
+     * @param array|null        $exclude
      */
-    protected function buildFromConfigurable(SaleItemInterface $item, ProductInterface $product, array $exclude = null)
-    {
+    protected function buildFromConfigurable(
+        SaleItemInterface $item,
+        ProductInterface $product,
+        array $exclude = null
+    ): void {
         ProductTypes::assertConfigurable($product);
 
         $this->provider->assign($item, $product);
@@ -293,7 +293,6 @@ class ItemBuilder
                 continue;
             }
 
-            /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $bundleChoice */
             $bundleChoice = current($choices);
 
             // Find matching item
@@ -321,7 +320,6 @@ class ItemBuilder
 
                     // Build the item from the bundle choice's product
                     $this->buildFromBundleChoice($childItem, $bundleChoice, $exclude);
-
                 } elseif (!$bundleSlot->isRequired()) {
                     // No choice and not required : remove child item
                     $item->removeChild($childItem);
@@ -354,15 +352,15 @@ class ItemBuilder
      *
      * @param SaleItemInterface           $item    The sale item
      * @param Model\BundleChoiceInterface $choice  The bundle choice
-     * @param array                       $exclude The option group ids to exclude
+     * @param array|null                  $exclude The option group ids to exclude
      */
     protected function buildFromBundleChoice(
         SaleItemInterface $item,
         Model\BundleChoiceInterface $choice,
         array $exclude = null
-    ) {
+    ): void {
         if (!is_null($exclude)) {
-             $exclude = array_unique(array_merge($exclude, $choice->getExcludedOptionGroups()));
+            $exclude = array_unique(array_merge($exclude, $choice->getExcludedOptionGroups()));
         }
 
         $this->buildFromProduct($item, $choice->getProduct(), $exclude);
@@ -399,7 +397,7 @@ class ItemBuilder
      *
      * @throws Exception\LogicException If an option group is required but no option is selected
      */
-    protected function buildOptions(SaleItemInterface $item, array $exclude)
+    protected function buildOptions(SaleItemInterface $item, array $exclude): void
     {
         $optionGroups = $this->getOptionGroups($item, $exclude);
 
@@ -487,7 +485,7 @@ class ItemBuilder
      * @param Model\OptionInterface $option
      * @param int                   $choiceCount
      */
-    public function buildFromOption(SaleItemInterface $item, Model\OptionInterface $option, int $choiceCount)
+    public function buildFromOption(SaleItemInterface $item, Model\OptionInterface $option, int $choiceCount): void
     {
         // Reset net price
         $item->setNetPrice(0);
@@ -533,9 +531,9 @@ class ItemBuilder
      * @param SaleItemInterface        $item
      * @param Model\ComponentInterface $component
      */
-    protected function buildFromComponent(SaleItemInterface $item, Model\ComponentInterface $component)
+    protected function buildFromComponent(SaleItemInterface $item, Model\ComponentInterface $component): void
     {
-        $this->buildFromProduct($item, $component->getChild(), null);
+        $this->buildFromProduct($item, $component->getChild());
 
         $item
             ->setQuantity($component->getQuantity())
@@ -555,9 +553,9 @@ class ItemBuilder
      *
      * @throws Exception\SubjectException
      */
-    protected function buildComponents(SaleItemInterface $item)
+    protected function buildComponents(SaleItemInterface $item): void
     {
-        $product = $this->provider->resolve($item);
+        $product = $this->resolve($item);
 
         // TODO (?) $components = $this->filter->getComponents($product);
         $components = $product->getComponents()->toArray();
@@ -612,7 +610,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param array             $bundleSlotIds The bundle slots ids to keep
      */
-    private function cleanUpBundleSlots(SaleItemInterface $item, array $bundleSlotIds = [])
+    private function cleanUpBundleSlots(SaleItemInterface $item, array $bundleSlotIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
             if (0 < $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID))) {
@@ -629,7 +627,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param array             $optionGroupIds The option groups ids to keep
      */
-    private function cleanUpOptionGroups(SaleItemInterface $item, array $optionGroupIds = [])
+    private function cleanUpOptionGroups(SaleItemInterface $item, array $optionGroupIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
             if (0 < $optionGroupId = intval($childItem->getData(self::OPTION_GROUP_ID))) {
@@ -646,7 +644,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param array             $componentIds The components ids to keep
      */
-    private function cleanUpComponents(SaleItemInterface $item, array $componentIds = [])
+    private function cleanUpComponents(SaleItemInterface $item, array $componentIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
             if (0 < $componentId = intval($childItem->getData(self::COMPONENT_ID))) {
@@ -663,10 +661,9 @@ class ItemBuilder
      * @param SaleItemInterface $item    The sale item
      * @param array             $exclude The option group ids to exclude
      */
-    public function initialize(SaleItemInterface $item, array $exclude = [])
+    public function initialize(SaleItemInterface $item, array $exclude = []): void
     {
-        /** @var ProductInterface $product */
-        $product = $this->provider->resolve($item);
+        $product = $this->resolve($item);
 
         // Clear identifiers vars
         $item->unsetData(self::VARIANT_ID);
@@ -703,7 +700,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function initializeFromSimple(SaleItemInterface $item, ProductInterface $product)
+    protected function initializeFromSimple(SaleItemInterface $item, ProductInterface $product): void
     {
         ProductTypes::assertChildType($product);
 
@@ -719,7 +716,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function initializeFromVariable(SaleItemInterface $item, ProductInterface $product)
+    protected function initializeFromVariable(SaleItemInterface $item, ProductInterface $product): void
     {
         ProductTypes::assertVariable($product);
 
@@ -732,7 +729,7 @@ class ItemBuilder
      * @param SaleItemInterface $item
      * @param ProductInterface  $product
      */
-    protected function initializeFromVariant(SaleItemInterface $item, ProductInterface $product)
+    protected function initializeFromVariant(SaleItemInterface $item, ProductInterface $product): void
     {
         ProductTypes::assertVariant($product);
 
@@ -748,7 +745,7 @@ class ItemBuilder
      * @param ProductInterface  $product The product
      * @param array             $exclude The option group ids to exclude
      */
-    protected function initializeFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude)
+    protected function initializeFromBundle(SaleItemInterface $item, ProductInterface $product, array $exclude): void
     {
         ProductTypes::assertBundled($product);
 
@@ -806,7 +803,7 @@ class ItemBuilder
                     $bundleSlotIds[] = $bundleSlotId;
 
                     // Get/resolve item subject
-                    $childProduct = $this->provider->resolve($child);
+                    $childProduct = $this->resolve($child);
 
                     // If invalid choice
                     if (!in_array($childProduct->getId(), $choiceProductIds)) {
@@ -822,7 +819,6 @@ class ItemBuilder
             }
 
             // Item not found : create it
-            /** @var SaleItemInterface $child */
             $child = $item->createChild();
 
             if ($bundleSlot->isRequired()) {
@@ -844,7 +840,7 @@ class ItemBuilder
         SaleItemInterface $item,
         Model\BundleChoiceInterface $choice,
         array $exclude = []
-    ) {
+    ): void {
         $product = $this->fallbackVariableToVariant($choice->getProduct());
         $this->provider->assign($item, $product);
 
@@ -868,7 +864,7 @@ class ItemBuilder
      * @param SaleItemInterface $item    The sale item
      * @param array             $exclude The option groups ids to exclude
      */
-    protected function initializeOptions(SaleItemInterface $item, array $exclude)
+    protected function initializeOptions(SaleItemInterface $item, array $exclude): void
     {
         $optionGroups = $this->getOptionGroups($item, $exclude);
 
@@ -923,7 +919,6 @@ class ItemBuilder
 
                         // Default choice if required
                         if ($optionGroup->isRequired()) {
-                            /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
                             if ($option = current($options)) {
                                 $child->setData(self::OPTION_ID, $option->getId());
                             }
@@ -948,7 +943,7 @@ class ItemBuilder
      * @param SaleItemInterface          $item
      * @param Model\OptionGroupInterface $optionGroup
      */
-    public function initializeFromOptionGroup(SaleItemInterface $item, Model\OptionGroupInterface $optionGroup)
+    public function initializeFromOptionGroup(SaleItemInterface $item, Model\OptionGroupInterface $optionGroup): void
     {
         $item
             ->setData(self::OPTION_GROUP_ID, $optionGroup->getId())
@@ -963,7 +958,6 @@ class ItemBuilder
                 return;
             }
 
-            /** @var \Ekyna\Bundle\ProductBundle\Model\OptionInterface $option */
             if ($option = current($options)) {
                 $item->setData(self::OPTION_ID, $option->getId());
             }
@@ -977,10 +971,9 @@ class ItemBuilder
      *
      * @return Model\BundleSlotInterface[]
      */
-    public function getBundleSlots(SaleItemInterface $item)
+    public function getBundleSlots(SaleItemInterface $item): array
     {
-        /** @var ProductInterface $product */
-        $product = $this->provider->resolve($item);
+        $product = $this->resolve($item);
 
         return $this->filter->getBundleSlots($product);
     }
@@ -993,16 +986,14 @@ class ItemBuilder
      *
      * @return Model\OptionGroupInterface[]
      */
-    public function getOptionGroups(SaleItemInterface $item, array $exclude = [])
+    public function getOptionGroups(SaleItemInterface $item, array $exclude = []): array
     {
-        /** @var ProductInterface $product */
-        $product = $this->provider->resolve($item);
+        $product = $this->resolve($item);
 
         $groups = $this->filter->getOptionGroups($product, $exclude);
 
         // Filter product option groups
         if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            /** @var ProductInterface $variable */
             $variable = $product->getParent();
 
             // Filter variant option groups
@@ -1015,13 +1006,15 @@ class ItemBuilder
     /**
      * Returns the relevant variant if the given product is a variable one.
      *
-     * @param ProductInterface  $product
-     * @param SaleItemInterface $item
+     * @param ProductInterface       $product
+     * @param SaleItemInterface|null $item
      *
      * @return ProductInterface If product has no variant
      */
-    private function fallbackVariableToVariant(ProductInterface $product, SaleItemInterface $item = null)
-    {
+    private function fallbackVariableToVariant(
+        ProductInterface $product,
+        SaleItemInterface $item = null
+    ): ProductInterface {
         if ($product->getType() === ProductTypes::TYPE_VARIABLE) {
             $variants = $this->filter->getVariants($product);
 
@@ -1038,6 +1031,25 @@ class ItemBuilder
             }
 
             return reset($variants);
+        }
+
+        return $product;
+    }
+
+    /**
+     * Resolves the sale item's product.
+     *
+     * @param SaleItemInterface $item
+     *
+     * @return ProductInterface
+     * @throws Exception\SubjectException
+     */
+    private function resolve(SaleItemInterface $item): ProductInterface
+    {
+        $product = $this->provider->resolve($item);
+
+        if (!$product instanceof ProductInterface) {
+            throw new UnexpectedTypeException($product, ProductInterface::class);
         }
 
         return $product;

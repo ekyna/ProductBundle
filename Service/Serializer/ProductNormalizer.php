@@ -90,8 +90,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 $data['brand'] = $brand->getId();
             }
 
-            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
-            if ($image = $product->getImages(true, 1)->first()) {
+            // Image
+            if ($image = $product->getImage()) {
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_front');
             }
 
@@ -156,8 +156,8 @@ class ProductNormalizer extends AbstractTranslatableNormalizer implements CacheM
                 $data['brand'] = $brand->getName();
             }
 
-            /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
-            if ($image = $product->getImages(true, 1)->first()) {
+            // Image
+            if ($image = $product->getImage()) {
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
             }
 

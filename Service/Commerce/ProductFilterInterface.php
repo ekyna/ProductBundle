@@ -27,7 +27,7 @@ interface ProductFilterInterface
      *
      * @return bool
      */
-    public function isProductAvailable(Model\ProductInterface $product, array $exclude = []);
+    public function isProductAvailable(Model\ProductInterface $product, array $exclude = []): bool;
 
     /**
      * Returns the available variants for the given variable product.
@@ -36,7 +36,7 @@ interface ProductFilterInterface
      *
      * @return Model\ProductInterface[] The available variants
      */
-    public function getVariants(Model\ProductInterface $product);
+    public function getVariants(Model\ProductInterface $product): array;
 
     /**
      * Returns the available slots for the given configurable product.
@@ -45,7 +45,7 @@ interface ProductFilterInterface
      *
      * @return Model\BundleSlotInterface[] The available bundle slots
      */
-    public function getBundleSlots(Model\ProductInterface $product);
+    public function getBundleSlots(Model\ProductInterface $product): array;
 
     /**
      * Returns the available bundle slot choices for the given bundle slot.
@@ -54,7 +54,7 @@ interface ProductFilterInterface
      *
      * @return Model\BundleChoiceInterface[] The available bundle slot choices
      */
-    public function getSlotChoices(Model\BundleSlotInterface $slot);
+    public function getSlotChoices(Model\BundleSlotInterface $slot): array;
 
     /**
      * Returns the available option groups for the given product.
@@ -64,7 +64,7 @@ interface ProductFilterInterface
      *
      * @return Model\OptionGroupInterface[] The available option groups
      */
-    public function getOptionGroups(Model\ProductInterface $product, array $exclude = []);
+    public function getOptionGroups(Model\ProductInterface $product, array $exclude = []): array;
 
     /**
      * Returns the available options for the given option group.
@@ -73,5 +73,5 @@ interface ProductFilterInterface
      *
      * @return Model\OptionInterface[] The options
      */
-    public function getGroupOptions(Model\OptionGroupInterface $group);
+    public function getGroupOptions(Model\OptionGroupInterface $group): array;
 }

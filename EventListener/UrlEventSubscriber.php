@@ -29,13 +29,9 @@ class UrlEventSubscriber implements EventSubscriberInterface
 
         $event->stopPropagation();
 
-        $images = $resource->getImages(true, 1);
-        if ($images->isEmpty()) {
+        if (null === $image = $resource->getImage()) {
             return;
         }
-
-        /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
-        $image = $images->first();
 
         $event
             ->addData('route', 'ekyna_media_download')

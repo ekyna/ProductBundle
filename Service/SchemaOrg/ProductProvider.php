@@ -115,8 +115,7 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
                 // TODO ->seller()
         );
 
-        /** @var \Ekyna\Bundle\MediaBundle\Model\MediaInterface $image */
-        if ($image = $object->getImages(true, 1)->first()) {
+        if ($image = $object->getImage()) {
             $schema->image($this->schemaBuilder->build($image));
         }
 
