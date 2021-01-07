@@ -615,7 +615,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         if (true === $exclude) {
             return [];
-        } elseif (!is_array($exclude)) {
+        }
+
+        if (!is_array($exclude)) {
             $exclude = [];
         }
 

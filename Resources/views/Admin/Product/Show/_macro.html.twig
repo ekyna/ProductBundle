@@ -551,38 +551,38 @@
                                 {{- choice_product -}}
                             </a>
                         </td>
-                        <td id="{{ slot_id ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                        <td id="{{ slot_id ~ 'reference' }}" class="text-right"
                             data-clipboard-copy="{{ choice_product.reference }}">
                             {{- choice_product.reference -}}
                         </td>
-                        <td id="{{ slot_id ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'stockState' }}" class="text-right">
                             {{- choice_product|stock_subject_state_badge -}}
                         </td>
-                        <td id="{{ slot_id ~ 'type' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'type' }}" class="text-right">
                             {{- choice_product|product_type_badge -}}
                         </td>
-                        <td id="{{ slot_id ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'visible' }}" class="text-right">
                             {%- if choice_product.visible -%}
                                 <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slot_id ~ 'hidden' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'hidden' }}" class="text-right">
                             {%- if choice.hidden -%}
                                 <span class="label label-warning">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-default">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slot_id ~ 'excludeImages' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'excludeImages' }}" class="text-right">
                             {%- if choice.excludeImages -%}
                                 <span class="label label-warning">{{ 'ekyna_core.value.no'|trans }}</span>
                             {%- else -%}
                                 <span class="label label-default">{{ 'ekyna_core.value.yes'|trans }}</span>
                             {%- endif -%}
                         </td>
-                        <td id="{{ slot_id ~ 'options' }}" class="text-right" style="font-size: 11px">
+                        <td id="{{ slot_id ~ 'options' }}" class="text-right">
                             {{ choice|bundle_choice_option_groups }}
                         </td>
                         <td id="{{ slot_id ~ 'minQuantity' }}" class="text-right">
@@ -605,9 +605,11 @@
                             {% set total_price = total_price + price %}
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_buyPrice' }}" class="text-right">
-                            {% set purchase = choice_product|product_purchase_cost(false) * choice.minQuantity %}
+                            {%- set purchase = choice_product|product_purchase_cost(false, true) * choice.minQuantity -%}
                             {{- purchase|localizedcurrency(commerce_default_currency) -}}
-                            {% set total_purchase = total_purchase + purchase %}
+                            {%- set total_purchase = total_purchase + purchase -%}
+                            {%- set cost = choice_product|product_purchase_cost(false) * choice.minQuantity -%}
+                            &nbsp;(<em>{{- cost|localizedcurrency(commerce_default_currency) -}}</em>)
                         </td>
                         <td id="{{ slot_id ~ 'choice_0_product_margin' }}" class="text-right">
                         {%- if 0 < purchase  -%}
@@ -623,8 +625,10 @@
                     </tr>
                     {%- endfor -%}
                     <tr>
-                        <td colspan="9" class="text-right">
-                            <strong>{{ 'ekyna_core.field.total'|trans }}</strong>
+                        <td colspan="2" class="text-right">&nbsp;</td>
+                        <td colspan="6" class="text-right">&nbsp;</td>
+                        <td class="text-right">
+                            <strong class="group-price">{{ 'ekyna_core.field.total'|trans }}</strong>
                         </td>
                         <td class="text-right">
                             {{- total_weight|localizednumber -}}
@@ -918,7 +922,7 @@
                         {%- set choice_id = slot_id ~ '_choice_' ~ loop.index0 ~ '_' -%}
                         {%- set choice_product = choice.product -%}
                         <tr>
-                            <td style="font-size: 11px">[{{ slot.position }}.{{ choice.position }}]</td>
+                            <td>[{{ slot.position }}.{{ choice.position }}]</td>
                             <td id="{{ choice_id ~ 'product' }}">
                                 <a href="{{ admin_resource_path(choice_product) }}" class="show-entity"
                                    data-summary='{{ {
@@ -928,24 +932,24 @@
                                     {{- choice_product -}}
                                 </a>
                             </td>
-                            <td id="{{ choice_id ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                            <td id="{{ choice_id ~ 'reference' }}" class="text-right"
                                 data-clipboard-copy="{{ choice_product.reference }}">
                                 {{- choice_product.reference -}}
                             </td>
-                            <td id="{{ choice_id ~ 'type' }}" class="text-right" style="font-size: 11px">
+                            <td id="{{ choice_id ~ 'type' }}" class="text-right">
                                 {{- choice_product|product_type_badge -}}
                             </td>
-                            <td id="{{ choice_id ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                            <td id="{{ choice_id ~ 'stockState' }}" class="text-right">
                                 {{- choice_product|stock_subject_state_badge -}}
                             </td>
-                            <td id="{{ choice_id ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                            <td id="{{ choice_id ~ 'visible' }}" class="text-right">
                                 {%- if choice_product.visible -%}
                                     <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                                 {%- else -%}
                                     <span class="label label-danger">{{ 'ekyna_core.value.no'|trans }}</span>
                                 {%- endif -%}
                             </td>
-                            <td id="{{ choice_id ~ 'options' }}" class="text-right" style="font-size: 11px">
+                            <td id="{{ choice_id ~ 'options' }}" class="text-right">
                                 {{ choice|bundle_choice_option_groups }}
                             </td>
                             <td id="{{ choice_id ~ 'minQuantity' }}" class="text-right">
@@ -983,7 +987,7 @@
 
 
 {%- macro show_relations(products) -%}
-    <table class="table table-stripped table-condensed table-hover table-alt-head">
+    <table class="table table-stripped table-condensed table-hover table-alt-head show-product-relation">
         <tr>
             <th>{{ 'ekyna_product.product.label.singular'|trans }}</th>
             <th>{{ 'ekyna_core.field.reference'|trans }}</th>
@@ -1004,17 +1008,17 @@
                         {{- product -}}
                     </a>
                 </td>
-                <td id="{{ relationId ~ 'reference' }}" class="text-right" style="font-size: 11px"
+                <td id="{{ relationId ~ 'reference' }}" class="text-right"
                     data-clipboard-copy="{{ product.reference }}">
                     {{- product.reference -}}
                 </td>
-                <td id="{{ relationId ~ 'type' }}" class="text-right" style="font-size: 11px">
+                <td id="{{ relationId ~ 'type' }}" class="text-right">
                     {{- product|product_type_badge -}}
                 </td>
-                <td id="{{ relationId ~ 'stockState' }}" class="text-right" style="font-size: 11px">
+                <td id="{{ relationId ~ 'stockState' }}" class="text-right">
                     {{- product|stock_subject_state_badge -}}
                 </td>
-                <td id="{{ relationId ~ 'visible' }}" class="text-right" style="font-size: 11px">
+                <td id="{{ relationId ~ 'visible' }}" class="text-right">
                     {%- if product.visible -%}
                         <span class="label label-success">{{ 'ekyna_core.value.yes'|trans }}</span>
                     {%- else -%}

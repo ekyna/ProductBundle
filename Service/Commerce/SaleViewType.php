@@ -18,7 +18,7 @@ class SaleViewType extends AbstractViewType
     /**
      * @inheritDoc
      */
-    public function buildItemView(SaleItemInterface $item, LineView $view, array $options)
+    public function buildItemView(SaleItemInterface $item, LineView $view, array $options): void
     {
         if (!$options['private']) {
             return;
@@ -50,7 +50,7 @@ class SaleViewType extends AbstractViewType
     /**
      * @inheritDoc
      */
-    public function supportsSale(SaleInterface $sale)
+    public function supportsSale(SaleInterface $sale): bool
     {
         return true;
     }
@@ -58,7 +58,7 @@ class SaleViewType extends AbstractViewType
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getName(): string
     {
         return 'ekyna_product_sale';
     }

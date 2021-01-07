@@ -77,7 +77,7 @@ class EkynaProductExtension extends AbstractExtension
         // Pricing
         $container
             ->getDefinition('ekyna_product.pricing.renderer')
-            ->replaceArgument(7, $config['pricing']);
+            ->replaceArgument(6, $config['pricing']);
 
         if (in_array($container->getParameter('kernel.environment'), ['dev', 'test'], true)) {
             $loader = new XmlFileLoader($container, new FileLocator($this->getConfigurationDirectory()));

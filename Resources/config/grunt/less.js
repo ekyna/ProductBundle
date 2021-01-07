@@ -9,8 +9,8 @@ module.exports = function (grunt, options) {
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/account/catalog.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/account/catalog.less',
 
-                'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/show.css':
-                    'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/show.less',
+                'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/product.css':
+                    'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/product.less',
 
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/form.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/form.less',

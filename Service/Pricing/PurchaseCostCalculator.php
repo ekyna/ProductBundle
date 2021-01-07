@@ -2,7 +2,8 @@
 
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
-use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Subject\Guesser\PurchaseCostGuesserInterface;
 
 /**
@@ -48,44 +49,45 @@ class PurchaseCostCalculator
     /**
      * Calculates the product minimum purchase cost.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $product
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    public function calculateMinPurchaseCost(Model\ProductInterface $product, $exclude = []): float
+    public function calculateMinPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
     {
-        if (Model\ProductTypes::isConfigurableType($product)) {
-            return $this->calculateConfigurablePurchaseCost($product, $exclude);
+        if (ProductTypes::isConfigurableType($product)) {
+            return $this->calculateConfigurablePurchaseCost($product, $exclude, $shipping);
         }
 
-        if (Model\ProductTypes::isBundleType($product)) {
-            return $this->calculateBundlePurchaseCost($product, $exclude);
+        if (ProductTypes::isBundleType($product)) {
+            return $this->calculateBundlePurchaseCost($product, $exclude, $shipping);
         }
 
-        if (Model\ProductTypes::isVariableType($product)) {
-            return $this->calculateVariablePurchaseCost($product, $exclude);
+        if (ProductTypes::isVariableType($product)) {
+            return $this->calculateVariablePurchaseCost($product, $exclude, $shipping);
         }
 
-        return $this->calculateProductPurchaseCost($product, $exclude);
+        return $this->calculateProductPurchaseCost($product, $exclude, $shipping);
     }
 
     /**
      * Calculates the product min options purchase cost.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $product
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateMinOptionsPurchaseCost(Model\ProductInterface $product, $exclude = []): float
+    protected function calculateMinOptionsPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
     {
         $cost = 0;
 
         $optionGroups = $product->resolveOptionGroups($exclude);
 
         // For each option groups
-        /** @var \Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface $optionGroup */
         foreach ($optionGroups as $optionGroup) {
             // Skip non required option group
             if (!$optionGroup->isRequired()) {
@@ -110,7 +112,7 @@ class PurchaseCostCalculator
             // If lowest price found for the option group
             if (null !== $lowestOption) {
                 if ($op = $lowestOption->getProduct()) {
-                    $cost += $this->costGuesser->guess($op, $this->defaultCurrency);
+                    $cost += $this->costGuesser->guess($op, $this->defaultCurrency, $shipping);
                 }
             }
         }
@@ -121,39 +123,42 @@ class PurchaseCostCalculator
     /**
      * Calculates the product component's purchase cost.
      *
-     * @param Model\ProductInterface $product
+     * @param Product $product
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateComponentsPurchaseCost(Model\ProductInterface $product): float
+    protected function calculateComponentsPurchaseCost(Product $product, bool $shipping = false): float
     {
-        $cost = 0;
+        $total = 0;
 
         foreach ($product->getComponents() as $component) {
-            $cost += $this->costGuesser->guess($component->getChild(), $this->defaultCurrency)
-                * $component->getQuantity();
+            $cost = $this->costGuesser->guess($component->getChild(), $this->defaultCurrency, $shipping);
+
+            $total += $cost * $component->getQuantity();
         }
 
-        return $cost;
+        return $total;
     }
 
     /**
      * Calculates the simple/variant product minimum purchase cost.
      *
-     * @param Model\ProductInterface $product
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $product
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateProductPurchaseCost(Model\ProductInterface $product, $exclude = []): float
+    protected function calculateProductPurchaseCost(Product $product, $exclude = [], bool $shipping = false): float
     {
-        Model\ProductTypes::assertChildType($product);
+        ProductTypes::assertChildType($product);
 
-        $price = $this->costGuesser->guess($product, $this->defaultCurrency);
+        $price = $this->costGuesser->guess($product, $this->defaultCurrency, $shipping);
 
-        $price += $this->calculateMinOptionsPurchaseCost($product, $exclude);
+        $price += $this->calculateMinOptionsPurchaseCost($product, $exclude, $shipping);
 
-        $price += $this->calculateComponentsPurchaseCost($product);
+        $price += $this->calculateComponentsPurchaseCost($product, $shipping);
 
         return $price;
     }
@@ -161,16 +166,17 @@ class PurchaseCostCalculator
     /**
      * Calculates the variable product minimum purchase cost.
      *
-     * @param Model\ProductInterface $variable
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $variable
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateVariablePurchaseCost(Model\ProductInterface $variable, $exclude = []): float
+    protected function calculateVariablePurchaseCost(Product $variable, $exclude = [], bool $shipping = false): float
     {
-        Model\ProductTypes::assertVariable($variable);
+        ProductTypes::assertVariable($variable);
 
-        /** @var Model\ProductInterface $lowestVariant */
+        /** @var Product $lowestVariant */
         $lowestVariant = null;
         foreach ($variable->getVariants() as $variant) {
             if (!$variant->isVisible()) {
@@ -185,8 +191,8 @@ class PurchaseCostCalculator
         }
 
         if ($lowestVariant) {
-            return $this->calculateProductPurchaseCost($lowestVariant, $exclude)
-                + $this->calculateComponentsPurchaseCost($variable);
+            return $this->calculateProductPurchaseCost($lowestVariant, $exclude, $shipping)
+                + $this->calculateComponentsPurchaseCost($variable, $shipping);
         }
 
         return 0;
@@ -195,16 +201,17 @@ class PurchaseCostCalculator
     /**
      * Calculates the variable bundle minimum purchase cost.
      *
-     * @param Model\ProductInterface $bundle
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $bundle
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateBundlePurchaseCost(Model\ProductInterface $bundle, $exclude = []): float
+    protected function calculateBundlePurchaseCost(Product $bundle, $exclude = [], bool $shipping = false): float
     {
-        Model\ProductTypes::assertBundle($bundle);
+        ProductTypes::assertBundle($bundle);
 
-        $price = 0;
+        $total = 0;
         foreach ($bundle->getBundleSlots() as $slot) {
             /** @var \Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
@@ -217,30 +224,35 @@ class PurchaseCostCalculator
                 ));
             }
 
-            $price += $this->calculateMinPurchaseCost($choice->getProduct(), $choiceExclude)
-                * $choice->getMinQuantity(); // TODO Use packaging format
+            $cost = $this->calculateMinPurchaseCost($choice->getProduct(), $choiceExclude, $shipping);
+
+            $total += $cost * $choice->getMinQuantity(); // TODO Use packaging format
         }
 
-        $price += $this->calculateMinOptionsPurchaseCost($bundle, $exclude);
+        $total += $this->calculateMinOptionsPurchaseCost($bundle, $exclude, $shipping);
 
-        $price += $this->calculateComponentsPurchaseCost($bundle);
+        $total += $this->calculateComponentsPurchaseCost($bundle, $shipping);
 
-        return $price;
+        return $total;
     }
 
     /**
      * Calculates the variable configurable minimum purchase cost.
      *
-     * @param Model\ProductInterface $configurable
-     * @param bool|array             $exclude The option group ids to exclude, true to exclude all
+     * @param Product    $configurable
+     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool       $shipping Whether to include shipping cost
      *
      * @return float
      */
-    protected function calculateConfigurablePurchaseCost(Model\ProductInterface $configurable, $exclude = []): float
-    {
-        Model\ProductTypes::assertConfigurable($configurable);
+    protected function calculateConfigurablePurchaseCost(
+        Product $configurable,
+        $exclude = [],
+        bool $shipping = false
+    ): float {
+        ProductTypes::assertConfigurable($configurable);
 
-        $price = 0;
+        $total = 0;
 
         // For each bundle slots
         foreach ($configurable->getBundleSlots() as $slot) {
@@ -263,12 +275,18 @@ class PurchaseCostCalculator
                     ));
                 }
 
-                if ($childProduct->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                    $choicePrice = $this->priceCalculator->calculateBundleMinPrice($childProduct, $choiceExclude);
-                } elseif ($childProduct->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                    $choicePrice = $this->priceCalculator->calculateVariableMinPrice($childProduct, $choiceExclude);
+                if ($childProduct->getType() === ProductTypes::TYPE_BUNDLE) {
+                    $choicePrice = $this
+                        ->priceCalculator
+                        ->calculateBundleMinPrice($childProduct, $choiceExclude, $shipping);
+                } elseif ($childProduct->getType() === ProductTypes::TYPE_VARIABLE) {
+                    $choicePrice = $this
+                        ->priceCalculator
+                        ->calculateVariableMinPrice($childProduct, $choiceExclude, $shipping);
                 } else {
-                    $choicePrice = $this->priceCalculator->calculateProductMinPrice($childProduct, $choiceExclude);
+                    $choicePrice = $this
+                        ->priceCalculator
+                        ->calculateProductMinPrice($childProduct, $choiceExclude, $shipping);
                 }
 
                 // TODO Use packaging format
@@ -290,15 +308,16 @@ class PurchaseCostCalculator
                     ));
                 }
 
-                $price += $this->calculateMinPurchaseCost($lowestChoice->getProduct(), $choiceExclude)
-                    * $lowestChoice->getMinQuantity(); // TODO Use packaging format
+                $cost = $this->calculateMinPurchaseCost($lowestChoice->getProduct(), $choiceExclude, $shipping);
+
+                $total += $cost * $lowestChoice->getMinQuantity(); // TODO Use packaging format
             }
         }
 
-        $price += $this->calculateMinOptionsPurchaseCost($configurable, $exclude);
+        $total += $this->calculateMinOptionsPurchaseCost($configurable, $exclude);
 
-        $price += $this->calculateComponentsPurchaseCost($configurable);
+        $total += $this->calculateComponentsPurchaseCost($configurable);
 
-        return $price;
+        return $total;
     }
 }

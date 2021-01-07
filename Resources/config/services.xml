@@ -576,7 +576,6 @@
                  lazy="true">
             <argument id="ekyna_product.pricing.price_calculator" type="service"/>
             <argument id="ekyna_product.pricing.purchase_cost_calculator" type="service"/>
-            <argument id="ekyna_resource.locale_provider" type="service"/>
             <argument id="ekyna_commerce.common.context_provider" type="service"/>
             <argument id="ekyna_commerce.util.formatter_factory" type="service"/>
             <argument id="translator" type="service"/>

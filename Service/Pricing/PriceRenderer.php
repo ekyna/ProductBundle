@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -28,11 +27,6 @@ class PriceRenderer
      * @var PurchaseCostCalculator
      */
     private $purchaseCostCalculator;
-
-    /**
-     * @var LocaleProviderInterface
-     */
-    private $localeProvider; // TODO remove as not used.
 
     /**
      * @var ContextProviderInterface
@@ -65,7 +59,6 @@ class PriceRenderer
      *
      * @param PriceCalculator          $priceCalculator
      * @param PurchaseCostCalculator   $purchaseCostCalculator
-     * @param LocaleProviderInterface  $localeProvider
      * @param ContextProviderInterface $contextProvider
      * @param FormatterFactory         $formatterFactory
      * @param TranslatorInterface      $translator
@@ -75,7 +68,6 @@ class PriceRenderer
     public function __construct(
         PriceCalculator $priceCalculator,
         PurchaseCostCalculator $purchaseCostCalculator,
-        LocaleProviderInterface $localeProvider,
         ContextProviderInterface $contextProvider,
         FormatterFactory $formatterFactory,
         TranslatorInterface $translator,
@@ -84,7 +76,6 @@ class PriceRenderer
     ) {
         $this->priceCalculator = $priceCalculator;
         $this->purchaseCostCalculator = $purchaseCostCalculator;
-        $this->localeProvider = $localeProvider;
         $this->contextProvider = $contextProvider;
         $this->formatterFactory = $formatterFactory;
         $this->translator = $translator;
@@ -101,7 +92,7 @@ class PriceRenderer
      * Renders the product price.
      *
      * @param Model\ProductInterface $product
-     * @param ContextInterface       $context
+     * @param ContextInterface|null  $context
      * @param bool                   $discount
      * @param bool                   $extended
      *
@@ -198,7 +189,7 @@ class PriceRenderer
      *
      * @return float
      */
-    public function getBundlePrice(Model\ProductInterface $bundle, $withOptions = true): float
+    public function getBundlePrice(Model\ProductInterface $bundle, bool $withOptions = true): float
     {
         return $this->priceCalculator->calculateBundleMinPrice($bundle, !$withOptions);
     }
@@ -211,7 +202,7 @@ class PriceRenderer
      *
      * @return float
      */
-    public function getConfigurablePrice(Model\ProductInterface $configurable, $withOptions = true): float
+    public function getConfigurablePrice(Model\ProductInterface $configurable, bool $withOptions = true): float
     {
         return $this->priceCalculator->calculateConfigurableMinPrice($configurable, !$withOptions);
     }
@@ -233,12 +224,16 @@ class PriceRenderer
      *
      * @param Model\ProductInterface $product
      * @param bool                   $withOptions Whether to add options min cost.
+     * @param bool                   $shipping    Whether to include shipping cost.
      *
      * @return float|int
      */
-    public function getPurchaseCost(Model\ProductInterface $product, $withOptions = true): float
-    {
-        return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions);
+    public function getPurchaseCost(
+        Model\ProductInterface $product,
+        bool $withOptions = true,
+        bool $shipping = false
+    ): float {
+        return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions, $shipping);
     }
 
     /**
@@ -248,13 +243,13 @@ class PriceRenderer
      * @param ContextInterface|null  $context
      * @param string                 $class
      *
-     * @return string
+     * @return string|null
      */
     public function renderPricingGrid(
         Model\ProductInterface $product,
         ContextInterface $context = null,
-        $class = 'product-pricing-grid'
-    ) {
+        string $class = 'product-pricing-grid'
+    ): ?string {
         if (null === $context) {
             $context = $this->contextProvider->getContext();
         }

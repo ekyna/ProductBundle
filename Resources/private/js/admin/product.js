@@ -49,5 +49,5 @@ define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-ui'],
         trigger: 'hover',
         placement: 'top',
         html: true
-    })
+    });
 });
