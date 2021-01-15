@@ -209,6 +209,7 @@ class ItemBuilder
         $item
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference())
+            ->setNetPrice(.0)
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
             ->setConfigurable(false)
@@ -277,6 +278,7 @@ class ItemBuilder
         $item
             ->setDesignation($product->getDesignation())
             ->setReference($product->getReference())
+            ->setNetPrice(.0)
             ->setTaxGroup($product->getTaxGroup())
             ->setCompound(true)
             ->setConfigurable(true)
