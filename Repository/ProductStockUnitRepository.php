@@ -193,6 +193,35 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
     /**
      * @inheritDoc
      */
+    public function findLatestNotClosedBySubject(StockSubjectInterface $subject, int $limit = 3): array
+    {
+        if (!$subject instanceof ProductInterface) {
+            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
+        }
+
+        if (!$subject->getId()) {
+            return [];
+        }
+
+        $alias = $this->getAlias();
+        $qb = $this->getQueryBuilder();
+
+        return $qb
+            ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
+            ->andWhere($qb->expr()->neq($alias . '.state', ':state'))
+            ->addOrderBy($alias . '.createdAt', 'DESC')
+            ->setParameters([
+                'product' => $subject,
+                'state'   => StockUnitStates::STATE_CLOSED,
+            ])
+            ->getQuery()
+            ->setMaxResults($limit)
+            ->getResult();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function findLatestClosedBySubject(StockSubjectInterface $subject, int $limit = 3): array
     {
         if (!$subject instanceof ProductInterface) {
