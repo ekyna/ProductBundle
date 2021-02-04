@@ -9,6 +9,7 @@ use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Exception\InvalidArgumentException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\TableBuilderInterface;
+use Ekyna\Component\Table\Util\ColumnSort;
 
 /**
  * Class CatalogType
@@ -32,6 +33,7 @@ class CatalogType extends ResourceTableType
         });
 
         $builder
+            ->addDefaultSort('createdAt', ColumnSort::DESC)
             ->addColumn('title', BType\Column\AnchorType::class, [
                 'label'                => 'ekyna_core.field.name',
                 'route_name'           => 'ekyna_product_catalog_admin_show',

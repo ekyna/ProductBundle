@@ -11,9 +11,9 @@ use Ekyna\Bundle\ResourceBundle\Model\AbstractConstants;
  */
 final class ProductReferenceTypes extends AbstractConstants
 {
-    const TYPE_EAN_8        = 'ean8';
-    const TYPE_EAN_13       = 'ean13';
-    const TYPE_MANUFACTURER = 'manufacturer';
+    public const TYPE_EAN_8        = 'ean8';
+    public const TYPE_EAN_13       = 'ean13';
+    public const TYPE_MANUFACTURER = 'manufacturer';
 
     /**
      * @inheritDoc

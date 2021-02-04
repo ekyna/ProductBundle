@@ -3,6 +3,8 @@
     <div class="inner">
         <h1>{{ page.options.title }}</h1>
         <div class="description">{{ page.options.description|raw }}</div>
+        {% set media = page.options.image|media_find %}
+        {% if media %}{{ media|media_image }}{% endif %}
     </div>
 </div>
 {% endapply %}

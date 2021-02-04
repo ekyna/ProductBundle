@@ -115,6 +115,12 @@ class ProductExtension extends AbstractExtension
                 ['is_safe' => ['html']]
             ),
             new TwigFilter(
+                'product_external_reference',
+                function(Model\ProductInterface $product, string $type = Model\ProductReferenceTypes::TYPE_EAN_13): ?string {
+                    return $product->getReferenceByType($type);
+                }
+            ),
+            new TwigFilter(
                 'product_attribute_type_label',
                 [$this->constantHelper, 'renderAttributeTypeLabel']
             ),
