@@ -349,21 +349,21 @@ class ProductTypeSubscriber implements EventSubscriberInterface
 
         $this->stockBuilder
             ->addStockMode(['disabled' => true])
-            ->addGeocodeField(['disabled' => true])
+            ->addGeocodeField()
             ->addStockFloor(['disabled' => true])
             ->addReplenishmentTime(['disabled' => true])
             ->addMinimumOrderQuantity()
             ->addQuoteOnlyField()
             ->addEndOfLifeField()
-            ->addWeightField(['disabled' => true])
-            ->addWidthField(['disabled' => true])
-            ->addHeightField(['disabled' => true])
-            ->addDepthField(['disabled' => true])
+            ->addWeightField()
+            ->addWidthField()
+            ->addHeightField()
+            ->addDepthField()
             ->addUnitField(['disabled' => true])
-            ->addPackageWeightField(['disabled' => true])
-            ->addPackageWidthField(['disabled' => true])
-            ->addPackageHeightField(['disabled' => true])
-            ->addPackageDepthField(['disabled' => true]);
+            ->addPackageWeightField()
+            ->addPackageWidthField()
+            ->addPackageHeightField()
+            ->addPackageDepthField();
     }
 
     /**
