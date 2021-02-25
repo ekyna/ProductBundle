@@ -501,6 +501,7 @@
         <tr>
             <th>&nbsp;</th>
             <th>{{ 'ekyna_core.field.number'|trans }}</th>
+            <th>{{ 'ekyna_core.field.state'|trans }}</th>
             <th>{{ 'ekyna_commerce.supplier_order.field.shipping_cost'|trans }}</th>
             <th>{{ 'ekyna_commerce.supplier_order.field.payment_total'|trans }}</th>
             <th>{{ 'ekyna_commerce.supplier_product.field.eda'|trans }}</th>
@@ -525,6 +526,7 @@
                 {{- supplierOrder.number -}}
             </a>
         </td>
+        <td>{{ supplierOrder|supplier_order_state_badge }}</td>
         <td>{{ supplierOrder.shippingCost|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
         <td>{{ supplierOrder.paymentTotal|localizedcurrency(supplierOrder.supplier.currency.code) }}</td>
         <td>
@@ -544,7 +546,7 @@
     {%- if supplierOrder is not same as(null) -%}
     <tr id="supplier_order_{{ supplierOrder.id }}_details" class="supplier-order-details" style="display:none;">
         <td>&nbsp;</td>
-        <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
+        <td colspan="6">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
     </tr>
     {%- endif -%}
 {%- endblock ekyna_product_inventory_resupply_order_widget -%}
