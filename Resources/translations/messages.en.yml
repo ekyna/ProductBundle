@@ -201,6 +201,8 @@ ekyna_product:
             half: One product up, on down
             half_dual: One product up, two down
             quarter: Two products up, two down
+            sixth: Six products
+            eighth: Eight products
         alert:
             no_item: No catalog configured
 

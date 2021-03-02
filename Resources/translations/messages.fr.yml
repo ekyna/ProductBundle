@@ -201,6 +201,8 @@ ekyna_product:
             half: Un article en haut, un article en bas
             half_dual: Un article en haut, deux articles en bas
             quarter: Deux articles en haut, deux articles en bas
+            sixth: Six articles
+            eighth: Huit articles
         alert:
             no_item: Aucun catalogue configuré
 

@@ -5,24 +5,21 @@
 {% block content -%}
 {% apply spaceless -%}
 
-{% for slot in page.slots|slice(0, 4) -%}
+{% for slot in page.slots|slice(0, 6) -%}
 {% if loop.first or loop.index0 % 2 == 0 -%}
-<div class="product dual quarter">
+<div class="product dual sixth">
     <div class="row">
 {%- endif %}
         {% set product = slot.product -%}
         <div class="col-xs-6">
             <div class="inner">
                 {{- macros.title(catalog, product) -}}
-                <p class="image">
-                    {{- macros.image(catalog, product) -}}
-                </p>
                 <div class="row">
                     <div class="col-xs-6">
-                        {{- macros.infos(catalog, product) -}}
+                        {{- macros.image(catalog, product) -}}
                     </div>
                     <div class="col-xs-6">
-                        {{- macros.grid(catalog, product) -}}
+                        {{- macros.infos(catalog, product) -}}
                     </div>
                 </div>
                 <p class="description">

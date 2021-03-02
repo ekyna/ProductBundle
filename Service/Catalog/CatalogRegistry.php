@@ -171,6 +171,20 @@ class CatalogRegistry
                 'slots'     => 4,
                 'mockup'    => null,
             ],
+            'default.sixth'   => [
+                'label'     => 'ekyna_product.catalog.template.sixth',
+                'directory' => '@EkynaProduct/Catalog/Template/Sixth',
+                'form_type' => null,
+                'slots'     => 6,
+                'mockup'    => null,
+            ],
+            'default.eighth'   => [
+                'label'     => 'ekyna_product.catalog.template.eighth',
+                'directory' => '@EkynaProduct/Catalog/Template/Eighth',
+                'form_type' => null,
+                'slots'     => 8,
+                'mockup'    => null,
+            ],
         ];
     }
 
