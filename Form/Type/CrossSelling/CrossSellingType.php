@@ -55,9 +55,7 @@ class CrossSellingType extends ResourceFormType
     {
         parent::configureOptions($resolver);
 
-        $resolver
-            ->setDefault('empty_data', new $this->dataClass)
-            ->setDefault('collection', false);
+        $resolver->setDefault('collection', false);
     }
 
     /**

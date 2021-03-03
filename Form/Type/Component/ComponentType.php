@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ComponentType
@@ -38,16 +37,6 @@ class ComponentType extends ResourceFormType
                 'label'    => 'ekyna_commerce.field.net_price',
                 'required' => false,
             ]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-
-        $resolver->setDefault('empty_data', new $this->dataClass);
     }
 
     /**

@@ -15,32 +15,32 @@ interface CrossSellingInterface extends SortableInterface, ResourceInterface
     /**
      * Returns the source.
      *
-     * @return ProductInterface
+     * @return ProductInterface|null
      */
     public function getSource(): ?ProductInterface;
 
     /**
      * Sets the source.
      *
-     * @param ProductInterface $source
+     * @param ProductInterface|null $source
      *
      * @return $this|CrossSellingInterface
      */
-    public function setSource(ProductInterface $source): CrossSellingInterface;
+    public function setSource(ProductInterface $source = null): CrossSellingInterface;
 
     /**
      * Returns the target.
      *
-     * @return ProductInterface
+     * @return ProductInterface|null
      */
     public function getTarget(): ?ProductInterface;
 
     /**
      * Sets the target.
      *
-     * @param ProductInterface $target
+     * @param ProductInterface|null $target
      *
      * @return $this|CrossSellingInterface
      */
-    public function setTarget(ProductInterface $target): CrossSellingInterface;
+    public function setTarget(ProductInterface $target = null): CrossSellingInterface;
 }

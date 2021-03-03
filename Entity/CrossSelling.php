@@ -50,7 +50,7 @@ class CrossSelling implements CrossSellingInterface
     /**
      * @inheritDoc
      */
-    public function setSource(ProductInterface $source): CrossSellingInterface
+    public function setSource(ProductInterface $source = null): CrossSellingInterface
     {
         $this->source = $source;
 
@@ -68,7 +68,7 @@ class CrossSelling implements CrossSellingInterface
     /**
      * @inheritDoc
      */
-    public function setTarget(ProductInterface $target): CrossSellingInterface
+    public function setTarget(ProductInterface $target = null): CrossSellingInterface
     {
         $this->target = $target;
 
