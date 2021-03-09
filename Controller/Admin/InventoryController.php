@@ -454,6 +454,7 @@ class InventoryController extends Controller
                 'stock',
                 'geocode',
                 'buy price',
+                'shipping cost',
                 'currency',
                 'valorization',
             ], ';', '"');
@@ -466,15 +467,17 @@ class InventoryController extends Controller
 
                 /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
                 $product = $stockUnit->getSubject();
-                $value = $price = $stockUnit->getNetPrice();
+                $price = $stockUnit->getNetPrice();
+                $shipping = $stockUnit->getShippingPrice();
 
                 $currency = ($c = $stockUnit->getCurrency()) ? $c->getCode() : $defaultCurrency;
 
                 if ($rate = $stockUnit->getExchangeRate()) {
                     $price = Money::round($price * $rate, $currency);
+                    $shipping = Money::round($shipping * $rate, $currency);
                 }
 
-                $value = Money::round($value * $inStock, $currency);
+                $value = Money::round(($price + $shipping) * $inStock, $currency);
 
                 $data = [
                     $product->getId(),
@@ -483,6 +486,7 @@ class InventoryController extends Controller
                     $inStock,
                     implode(', ', $stockUnit->getGeocodes()),
                     $price,
+                    $shipping,
                     $currency,
                     $value,
                 ];
