@@ -88,7 +88,10 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
             ->andWhere($qb->expr()->orX(
-                $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not yet linked to a supplier order
+                $qb->expr()->andX(
+                    $qb->expr()->isNull($alias . '.supplierOrderItem'), // Not linked to a supplier order
+                    $qb->expr()->eq($alias . '.adjustedQuantity', 0)    // Not adjusted
+                ),
                 $qb->expr()->lt(                                    // Sold lower than ordered + adjusted
                     $alias . '.soldQuantity',
                     $qb->expr()->sum($alias . '.orderedQuantity', $alias . '.adjustedQuantity')
@@ -117,8 +120,9 @@ class ProductStockUnitRepository extends ResourceRepository implements StockUnit
 
         return $qb
             ->andWhere($qb->expr()->eq($alias . '.product', ':product'))
-            ->andWhere($qb->expr()->neq($alias . '.state', ':state'))// Not closed
-            ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem'))// Not yet linked to a supplier order
+            ->andWhere($qb->expr()->neq($alias . '.state', ':state'))      // Not closed
+            ->andWhere($qb->expr()->isNull($alias . '.supplierOrderItem')) // Not linked to a supplier order
+            ->andWhere($qb->expr()->eq($alias . '.adjustedQuantity', 0))   // Not adjusted
             ->setParameters([
                 'product' => $subject,
                 'state'   => StockUnitStates::STATE_CLOSED,
