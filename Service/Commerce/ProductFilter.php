@@ -142,7 +142,7 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        $this->sortChoices($variants);
+        //$this->sortChoices($variants);
 
         return $this->variantCache[$product->getId()] = $variants;
     }
@@ -184,9 +184,9 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        $this->sortChoices($choices, function (Model\BundleChoiceInterface $choice) {
+        /*$this->sortChoices($choices, function (Model\BundleChoiceInterface $choice) {
             return $choice->getProduct();
-        });
+        });*/
 
         return $this->choiceCache[$slot->getId()] = $choices;
     }
@@ -236,9 +236,9 @@ class ProductFilter implements ProductFilterInterface
             }
         }
 
-        $this->sortChoices($options, function (Model\OptionInterface $option) {
+        /*$this->sortChoices($options, function (Model\OptionInterface $option) {
             return $option->getProduct();
-        });
+        });*/
 
         return $this->optionCache[$group->getId()] = $options;
     }
