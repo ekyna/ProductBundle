@@ -177,9 +177,12 @@ class ProductFilter implements ProductFilterInterface
             return $this->choiceCache[$slot->getId()];
         }
 
+        $isBundle = Model\ProductTypes::isBundleType($slot->getBundle());
+
         $choices = [];
         foreach ($slot->getChoices() as $choice) {
-            if ($this->isChoiceAvailable($choice)) {
+            // Don't check availability for bundle (but configurable) slot choice
+            if ($isBundle || $this->isChoiceAvailable($choice)) {
                 $choices[] = $choice;
             }
         }
