@@ -40,7 +40,11 @@ class ProductSearchType extends AbstractType
             ->setDefaults([
                 'label'    => 'ekyna_product.product.label.singular',
                 'class'    => $this->productClass,
-                'route'    => 'ekyna_product_product_admin_search',
+                'route'    => function(Options $options) {
+                    return $options['admin_mode']
+                        ? 'ekyna_product_product_admin_search'
+                        : 'ekyna_product_account_product_search';
+                },
                 'required' => true,
                 'visible'  => false,
                 'types'    => [

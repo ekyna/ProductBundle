@@ -2,4 +2,6 @@ ekyna_product_account_product_search:
     path: /search
     controller: Ekyna\Bundle\ProductBundle\Controller\Account\ProductController::search
     methods: GET
-    options: { i18n: false }
+    options:
+        i18n: false
+        expose: true
