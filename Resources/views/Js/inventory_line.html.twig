@@ -24,10 +24,7 @@
     <td class="number">{{ virtual_stock }}</td>
     <td class="text text-right">{{ eda }}</td>
     <td class="number">{{ ordered }}{% if pending is not empty %} (+{{ pending }}){% endif %}</td>
-    <td class="number">{{ received }}</td>
-    <td class="number">{{ adjusted }}</td>
     <td class="number{% if sold_theme is not empty %} bg-{{ sold_theme }}{% endif %}">{{ sold }}</td>
-    <td class="number">{{ shipped }}</td>
     <td class="action">
         {# TODO translations #}
         <a href="javascript: void(0)" class="btn btn-xs btn-default quick-edit" title="Edit">

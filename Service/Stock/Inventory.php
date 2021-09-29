@@ -334,7 +334,7 @@ class Inventory
             // Eda
             /** @var \DateTime $eda */
             if (null !== $eda = $product['eda']) {
-                $product['eda'] = (new \DateTime($product['eda']))->format('d/m/Y'); // TODO localized format
+                $product['eda'] = (new \DateTime($eda))->format('d/m/Y'); // TODO localized format
             }
 
             // Stock themes
@@ -345,11 +345,8 @@ class Inventory
 
             // Stock sums
             $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
-            $product['ordered'] = $formatter->number((float)$product['ordered']);
-            $product['received'] = $formatter->number((float)$product['received']);
-            $product['adjusted'] = $formatter->number((float)$product['adjusted']);
-            $product['sold'] = $formatter->number((float)$product['sold']);
-            $product['shipped'] = $formatter->number((float)$product['shipped']);
+            $product['ordered'] = $formatter->number((float)($product['ordered'] - $product['received']));
+            $product['sold'] = $formatter->number((float)($product['sold'] - $product['shipped']));
 
             // Stock mode badge
             $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
