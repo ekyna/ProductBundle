@@ -207,7 +207,7 @@ class ItemBuilder
 
         // Bundle root item
         $item
-            ->setDesignation($product->getDesignation())
+            ->setDesignation((string)$product)
             ->setReference($product->getReference())
             ->setNetPrice(.0)
             ->setTaxGroup($product->getTaxGroup())
@@ -276,7 +276,7 @@ class ItemBuilder
 
         // Configurable root item
         $item
-            ->setDesignation($product->getDesignation())
+            ->setDesignation((string)$product)
             ->setReference($product->getReference())
             ->setNetPrice(.0)
             ->setTaxGroup($product->getTaxGroup())
