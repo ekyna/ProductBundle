@@ -20,7 +20,7 @@ class BrandNormalizer extends TranslatableNormalizer
      *
      * @param Model\BrandInterface $object
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $data = parent::normalize($object, $format, $context);
 
@@ -43,7 +43,7 @@ class BrandNormalizer extends TranslatableNormalizer
     /**
      * @inheritDoc
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         //$object = parent::denormalize($data, $class, $format, $context);
 

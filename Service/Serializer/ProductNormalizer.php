@@ -40,7 +40,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
      *
      * @param Model\ProductInterface $object
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if ($this->contextHasGroup('StockView', $context)) {
             return $this->helper->normalizeStock($object, $format, $context);
@@ -191,7 +191,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
     /**
      * @inheritDoc
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         //$resource = parent::denormalize($data, $class, $format, $context);
 

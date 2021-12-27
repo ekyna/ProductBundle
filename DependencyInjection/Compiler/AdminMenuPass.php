@@ -14,6 +14,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AdminMenuPass implements CompilerPassInterface
 {
+    public const GROUP = [
+        'name'     => 'catalog',
+        'label'    => 'label',
+        'domain'   => 'EkynaProduct',
+        'icon'     => 'cube',
+        'position' => 12,
+    ];
+
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('ekyna_admin.menu.pool')) {
@@ -24,15 +32,7 @@ class AdminMenuPass implements CompilerPassInterface
 
         // CATALOG
 
-        $pool->addMethodCall('createGroup', [
-            [
-                'name'     => 'catalog',
-                'label'    => 'label',
-                'domain'   => 'EkynaProduct',
-                'icon'     => 'cube',
-                'position' => 12,
-            ],
-        ]);
+        $pool->addMethodCall('createGroup', [self::GROUP]);
 
         // Products
         $pool->addMethodCall('createEntry', [

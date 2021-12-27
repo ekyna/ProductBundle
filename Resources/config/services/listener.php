@@ -103,7 +103,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('resource.event_subscriber')
 
         // Option group resource event listener
-        ->set('ekyna_product.listener.option', OptionGroupListener::class)
+        ->set('ekyna_product.listener.option_group', OptionGroupListener::class)
             ->args([
                 service('ekyna_resource.orm.persistence_helper'),
             ])

@@ -200,7 +200,7 @@ return static function (ContainerConfigurator $container) {
 
         // Purchase cost calculator
         ->set('ekyna_product.calculator.purchase_cost', Pricing\PurchaseCostCalculator::class)
-            // TODO ? ->lazy()
+            ->lazy()
             ->args([
                 service('ekyna_product.calculator.price'),
                 service('ekyna_commerce.guesser.subject_purchase_cost'),
@@ -209,7 +209,7 @@ return static function (ContainerConfigurator $container) {
 
         // Pricing renderer cost calculator
         ->set('ekyna_product.renderer.pricing', Pricing\PriceRenderer::class)
-            // TODO ? ->lazy()
+            ->lazy()
             ->args([
                 service('ekyna_product.calculator.price'),
                 service('ekyna_product.calculator.purchase_cost'),
