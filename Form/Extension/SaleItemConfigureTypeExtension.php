@@ -119,7 +119,7 @@ class SaleItemConfigureTypeExtension extends AbstractTypeExtension
         return false;
     }
 
-    public static function getExtendedTypes(): array
+    public static function getExtendedTypes(): iterable
     {
         return [SaleItemConfigureType::class];
     }

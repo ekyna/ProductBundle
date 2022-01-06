@@ -5,6 +5,3 @@ admin_ekyna_product:
 ekyna_product:
     resource: 'routing/front.yaml'
 
-ekyna_product_loader:
-    resource: .
-    type: product_routing

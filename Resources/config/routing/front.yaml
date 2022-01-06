@@ -1,6 +1,3 @@
-ekyna_product_account:
-    resource: "front/account.yaml"
-    prefix:
-        en: /my-account
-        fr: /mon-compte
-        es: /mi-cuenta
+ekyna_product_loader:
+    resource: .
+    type: product_routing

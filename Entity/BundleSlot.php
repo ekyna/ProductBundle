@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectTrait;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 use Ekyna\Component\Resource\Model\AbstractTranslatable;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
@@ -16,7 +17,7 @@ use Ekyna\Component\Resource\Model\SortableTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method Model\BundleSlotTranslationInterface translate($locale = null, $create = false)
+ * @method Model\BundleSlotTranslationInterface translate(string $locale = null, bool $create = false)
  */
 class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterface
 {
@@ -43,20 +44,13 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     {
         parent::__clone();
 
-        $this->id = null;
         $this->bundle = null;
+    }
 
-        $choices = $this->choices->toArray();
-        $this->choices = new ArrayCollection();
-        foreach ($choices as $choice) {
-            $this->addChoice(clone $choice);
-        }
-
-        $rules = $this->rules->toArray();
-        $this->rules = new ArrayCollection();
-        foreach ($rules as $rule) {
-            $this->addRule(clone $rule);
-        }
+    public function onCopy(CopierInterface $copier): void
+    {
+        $this->choices = $copier->copyCollection($this->choices, true);
+        $this->rules = $copier->copyCollection($this->rules, true);
     }
 
     public function getId(): ?int

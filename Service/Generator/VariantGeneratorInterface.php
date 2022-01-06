@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Generator;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -14,10 +16,9 @@ interface VariantGeneratorInterface
     /**
      * Generates the variants for the given variable product.
      *
-     * @param ProductInterface $product The variable product
+     * @param ProductInterface $variable The variable product
      *
-     * @return ProductInterface[] The generated variants
-     * @throws \Ekyna\Component\Commerce\Exception\CommerceExceptionInterface
+     * @return array<ProductInterface> The generated variants
      */
-    public function generateVariants(ProductInterface $product);
+    public function generateVariants(ProductInterface $variable): array;
 }

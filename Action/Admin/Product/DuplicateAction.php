@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ResourceBundle\Action\AbstractAction;
+use Ekyna\Bundle\ResourceBundle\Action\CopierTrait;
 use Ekyna\Bundle\ResourceBundle\Action\FormTrait;
 use Ekyna\Bundle\ResourceBundle\Action\HelperTrait;
 use Ekyna\Bundle\ResourceBundle\Action\ManagerTrait;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class DuplicateAction extends AbstractAction implements AdminActionInterface
 {
+    use CopierTrait;
     use FormTrait;
     use HelperTrait;
     use ManagerTrait;
@@ -51,7 +53,8 @@ class DuplicateAction extends AbstractAction implements AdminActionInterface
             throw new NotFoundHttpException('Not yet implemented.');
         }
 
-        $target = clone $source;
+        $target = $this->copier->copyResource($source);
+
         $this->context->setResource($target);
 
         $type = $this->context->getConfig()->getData('form');

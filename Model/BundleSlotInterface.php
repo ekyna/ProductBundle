@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\MediaBundle\Model\MediaSubjectInterface;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 use Ekyna\Component\Resource\Model\TranslatableInterface;
 
@@ -14,9 +15,9 @@ use Ekyna\Component\Resource\Model\TranslatableInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method BundleSlotTranslationInterface translate($locale = null, $create = false)
+ * @method BundleSlotTranslationInterface translate(string $locale = null, bool $create = false)
  */
-interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterface, SortableInterface
+interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterface, SortableInterface, CopyInterface
 {
     public function getBundle(): ?ProductInterface;
 

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method Model\OptionTranslationInterface translate($locale = null, $create = false)
+ * @method Model\OptionTranslationInterface translate(string $locale = null, bool $create = false)
  *
  * @TODO    Rename to 'OptionValue' or 'OptionChoice'
  */
@@ -37,7 +37,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     {
         parent::__clone();
 
-        $this->id = null;
         $this->group = null;
     }
 

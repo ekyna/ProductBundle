@@ -42,6 +42,9 @@ class Price implements PriceInterface
     public function __clone()
     {
         $this->id = null;
+        $this->originalPrice = clone $this->originalPrice;
+        $this->sellPrice = clone $this->sellPrice;
+        $this->percent = clone $this->percent;
         $this->product = null;
         $this->country = null;
         $this->group = null;

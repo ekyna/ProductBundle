@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -19,10 +20,16 @@ use Symfony\Component\Form\FormInterface;
 class BundleToSimpleConverter extends AbstractConverter
 {
     private StockSubjectUpdaterInterface $stockSubjectUpdater;
+    private CopierInterface              $copier;
 
     public function setStockSubjectUpdater(StockSubjectUpdaterInterface $stockSubjectUpdater): void
     {
         $this->stockSubjectUpdater = $stockSubjectUpdater;
+    }
+
+    public function setCopier(CopierInterface $copier): void
+    {
+        $this->copier = $copier;
     }
 
     public function supportsSourceType(string $type): bool
@@ -77,7 +84,7 @@ class BundleToSimpleConverter extends AbstractConverter
                         continue;
                     }
 
-                    $this->target->addOptionGroup(clone $group);
+                    $this->target->addOptionGroup($this->copier->copyResource($group));
                 }
             }
         }

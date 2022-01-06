@@ -8,6 +8,7 @@ use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
@@ -42,12 +43,11 @@ class BundleChoice implements Model\BundleChoiceInterface
     {
         $this->id = null;
         $this->slot = null;
+    }
 
-        $rules = $this->rules->toArray();
-        $this->rules = new ArrayCollection();
-        foreach ($rules as $rule) {
-            $this->addRule(clone $rule);
-        }
+    public function onCopy(CopierInterface $copier): void
+    {
+        $this->rules = $copier->copyCollection($this->rules, true);
     }
 
     public function getId(): ?int

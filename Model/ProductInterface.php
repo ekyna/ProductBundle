@@ -13,6 +13,7 @@ use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableInterface;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -20,7 +21,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method ProductTranslationInterface translate($locale = null, $create = false)
+ * @method ProductTranslationInterface translate(string $locale = null, bool $create = false)
  * @method Collection|ProductTranslationInterface[] getTranslations()
  */
 interface ProductInterface extends
@@ -32,6 +33,7 @@ interface ProductInterface extends
     RM\SortableInterface,
     RM\TimestampableInterface,
     RM\TaggedEntityInterface,
+    CopyInterface,
     Common\AdjustableInterface,
     Common\MentionSubjectInterface,
     TaxableInterface,

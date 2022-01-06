@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -14,7 +15,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method Model\OptionGroupTranslationInterface translate($locale = null, $create = false)
+ * @method Model\OptionGroupTranslationInterface translate(string $locale = null, bool $create = false)
  *
  * @TODO    Rename to 'Option'
  */
@@ -37,23 +38,21 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
         $this->options = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->name ?: 'New option group';
+    }
+
     public function __clone()
     {
         parent::__clone();
 
-        $this->id = null;
         $this->product = null;
-
-        $options = $this->options->toArray();
-        $this->options = new ArrayCollection();
-        foreach ($options as $option) {
-            $this->addOption(clone $option);
-        }
     }
 
-    public function __toString(): string
+    public function onCopy(CopierInterface $copier): void
     {
-        return $this->name ?: 'New option group';
+        $this->options = $copier->copyCollection($this->options, true);
     }
 
     public function getId(): ?int

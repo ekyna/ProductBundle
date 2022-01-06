@@ -17,6 +17,7 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 use function array_map;
@@ -42,7 +43,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     use RM\SortableTrait;
     use RM\TaggedEntityTrait;
     use RM\TimestampableTrait;
-    use Stock\StockSubjectTrait;
+    use Stock\StockSubjectTrait {
+        __clone as stockSubjectClone;
+    }
 
     protected ?int               $id                    = null;
     protected ?string            $type                  = null;
@@ -114,110 +117,32 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         parent::__clone();
 
+        $this->stockSubjectClone();
+    }
+
+    public function onCopy(CopierInterface $copier): void
+    {
         // ---- ONE TO MANY ----
 
-        // Adjustments
-        $adjustments = $this->adjustments->toArray();
-        $this->adjustments = new ArrayCollection();
-        foreach ($adjustments as $adjustment) {
-            $this->addAdjustment(clone $adjustment);
-        }
+        $this->adjustments = $copier->copyCollection($this->adjustments, true);
+        $this->attributes = $copier->copyCollection($this->attributes, true);
+        $this->bundleSlots = $copier->copyCollection($this->bundleSlots, true);
+        $this->components = $copier->copyCollection($this->components, true);
+        $this->medias = $copier->copyCollection($this->medias, true);
+        $this->optionGroups = $copier->copyCollection($this->optionGroups, true);
+        $this->variants = $copier->copyCollection($this->variants, true);
+        $this->crossSellings = $copier->copyCollection($this->crossSellings, true);
+        $this->specialOffers = $copier->copyCollection($this->specialOffers, true);
+        $this->pricings = $copier->copyCollection($this->pricings, true);
+        $this->mentions = $copier->copyCollection($this->mentions, true);
 
-        // Attributes
-        $attributes = $this->attributes->toArray();
-        $this->attributes = new ArrayCollection();
-        foreach ($attributes as $attribute) {
-            $this->addAttribute(clone $attribute);
-        }
-
-        // Bundle slots
-        $bundleSlots = $this->bundleSlots->toArray();
-        $this->bundleSlots = new ArrayCollection();
-        foreach ($bundleSlots as $bundleSlot) {
-            $this->addBundleSlot(clone $bundleSlot);
-        }
-
-        // Components
-        $components = $this->components->toArray();
-        $this->components = new ArrayCollection();
-        foreach ($components as $component) {
-            $this->addComponent(clone $component);
-        }
-
-        // Medias
-        $medias = $this->medias->toArray();
-        $this->medias = new ArrayCollection();
-        foreach ($medias as $media) {
-            $this->addMedia(clone $media);
-        }
-
-        // Option groups
-        $optionGroups = $this->optionGroups->toArray();
-        $this->optionGroups = new ArrayCollection();
-        foreach ($optionGroups as $optionGroup) {
-            $this->addOptionGroup(clone $optionGroup);
-        }
-
-        // References
         $this->references = new ArrayCollection();
-
-        // Variants
-        $variants = $this->variants->toArray();
-        $this->variants = new ArrayCollection();
-        foreach ($variants as $variant) {
-            $this->addVariant(clone $variant);
-        }
-
-        // Cross sellings
-        $crossSellings = $this->crossSellings->toArray();
-        $this->crossSellings = new ArrayCollection();
-        foreach ($crossSellings as $crossSelling) {
-            $this->addCrossSelling(clone $crossSelling);
-        }
-
-        // Special offers
-        $specialOffers = $this->specialOffers->toArray();
-        $this->specialOffers = new ArrayCollection();
-        foreach ($specialOffers as $specialOffer) {
-            $this->addSpecialOffer(clone $specialOffer);
-        }
-
-        // Pricings
-        $pricings = $this->pricings->toArray();
-        $this->pricings = new ArrayCollection();
-        foreach ($pricings as $pricing) {
-            $this->addPricing(clone $pricing);
-        }
-
-        // Mentions
-        $mentions = $this->mentions->toArray();
-        $this->mentions = new ArrayCollection();
-        foreach ($mentions as $mention) {
-            $this->addMention(clone $mention);
-        }
 
         // ---- MANY TO MANY ----
 
-        // Categories
-        $categories = $this->categories->toArray();
-        $this->categories = new ArrayCollection();
-        foreach ($categories as $category) {
-            $this->addCategory($category);
-        }
-
-        // Customer groups
-        $customerGroups = $this->customerGroups->toArray();
-        $this->customerGroups = new ArrayCollection();
-        foreach ($customerGroups as $customerGroup) {
-            $this->addCustomerGroup($customerGroup);
-        }
-
-        // Tags
-        $tags = $this->tags->toArray();
-        $this->tags = new ArrayCollection();
-        foreach ($tags as $tag) {
-            $this->addTag($tag);
-        }
+        $this->categories = $copier->copyCollection($this->categories, false);
+        $this->customerGroups = $copier->copyCollection($this->customerGroups, false);
+        $this->tags = $copier->copyCollection($this->tags, false);
 
         // ---- MANY TO ONE ----
 
@@ -226,19 +151,16 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         // Tax group is ok
         // Attribute set is ok
 
-        // ---- BASICS ----
+        // ---- ONE TO ONE ----
 
-        // Seo
-        if ($this->seo) {
-            $seo = clone $this->seo;
-            $this->seo = $seo;
-        }
-        // Content
         $this->content = null;
+        if ($this->seo) {
+            $this->seo = $copier->copyResource($this->seo);
+        }
 
         // ---- BASICS ----
 
-        // Reset stock data (but preserve mode)
+        // Reset stock data (but preserve mode and quoteOnly)
         $stockMode = $this->stockMode;
         $quoteOnly = $this->quoteOnly;
         $this->initializeStock();
@@ -246,7 +168,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->quoteOnly = $quoteOnly;
 
         // Clear critical fields
-        $this->id = null;
         $this->designation = null;
         $this->reference = null;
         $this->geocode = null;
@@ -1241,16 +1162,20 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             $collection = new ArrayCollection();
         }
 
+        // TODO "Add media to collection" closure
+
         foreach ($this->medias as $pm) {
             $media = $pm->getMedia();
             if ($media->getType() === $type && !$collection->contains($media)) {
                 $collection->add($media);
                 $limit--;
                 if (0 >= $limit) {
-                    break;
+                    return $collection;
                 }
             }
         }
+
+        // TODO If product is variant, add medias from parent
 
         if ($recurse && $limit) {
             if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {

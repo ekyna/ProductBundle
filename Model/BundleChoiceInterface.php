@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Decimal\Decimal;
 use Doctrine\Common\Collections\Collection;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 use Ekyna\Component\Resource\Model\SortableInterface;
 
@@ -14,7 +15,7 @@ use Ekyna\Component\Resource\Model\SortableInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface BundleChoiceInterface extends ResourceInterface, SortableInterface
+interface BundleChoiceInterface extends ResourceInterface, SortableInterface, CopyInterface
 {
     public function getSlot(): ?BundleSlotInterface;
 

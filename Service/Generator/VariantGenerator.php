@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Generator;
 
-use Ekyna\Component\Commerce\Exception\RuntimeException;
+use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
+use Ekyna\Bundle\ProductBundle\Factory\ProductFactoryInterface;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Copier\CopierInterface;
 
 /**
  * Class VariantGenerator
@@ -12,33 +16,24 @@ use Ekyna\Bundle\ProductBundle\Model;
  */
 class VariantGenerator implements VariantGeneratorInterface
 {
-    /**
-     * @var string
-     */
-    protected $productClass;
+    private ProductFactoryInterface $productFactory;
+    private CopierInterface         $copier;
 
-
-    /**
-     * Constructor.
-     *
-     * @param string $productClass
-     */
-    public function __construct($productClass)
+    public function __construct(ProductFactoryInterface $productFactory, CopierInterface $copier)
     {
-        $this->productClass = $productClass;
+        $this->productFactory = $productFactory;
+        $this->copier = $copier;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function generateVariants(Model\ProductInterface $variable)
+    public function generateVariants(Model\ProductInterface $variable): array
     {
         Model\ProductTypes::assertVariable($variable);
 
         if (null === $attributeSet = $variable->getAttributeSet()) {
-            throw new RuntimeException("Variable attribute set must be defined.");
+            throw new RuntimeException('Variable attribute set must be defined.');
         }
 
+        /** @var array<Model\ProductInterface> $variants */
         $variants = [];
 
         foreach ($attributeSet->getSlots() as $slot) {
@@ -47,14 +42,12 @@ class VariantGenerator implements VariantGeneratorInterface
             // First pass : create initial variants
             if (empty($variants)) {
                 foreach ($attributes as $attribute) {
-                    /** @var Model\ProductInterface $variant */
-                    $variant = new $this->productClass();
-                    $variant
-                        ->setType(Model\ProductTypes::TYPE_VARIANT)
+                    $variants[] = $this
+                        ->productFactory
+                        ->createWithType(Model\ProductTypes::TYPE_VARIANT)
                         ->addAttribute($attribute);
-
-                    $variants[] = $variant;
                 }
+
                 continue;
             }
 
@@ -63,7 +56,7 @@ class VariantGenerator implements VariantGeneratorInterface
             // Next passes : clone variants to preserve previous pass variants.
             foreach ($attributes as $attribute) {
                 foreach ($variants as $variant) {
-                    $clone = clone $variant;
+                    $clone = $this->copier->copyResource($variant);
                     $tmp[] = $clone->addAttribute($attribute);
                 }
             }

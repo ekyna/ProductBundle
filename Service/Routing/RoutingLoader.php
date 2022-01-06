@@ -20,16 +20,18 @@ class RoutingLoader extends Loader
 
     private const DIRECTORY = '@EkynaProductBundle/Resources/config/routing/front';
 
-    private bool  $loaded = false;
+    private array $routingPrefix;
     private array $config;
+    private bool  $loaded = false;
 
-    public function __construct(array $config, string $env = null) // TODO Features
+    public function __construct(array $config, array $routingPrefix, string $env = null) // TODO Features
     {
         parent::__construct($env);
 
         $this->config = array_replace([
             'catalog' => false,
         ], $config);
+        $this->routingPrefix = $routingPrefix;
     }
 
     /**
@@ -38,13 +40,17 @@ class RoutingLoader extends Loader
     public function load($resource, string $type = null)
     {
         if (true === $this->loaded) {
-            throw new RuntimeException('Do not add the "product account" routes loader twice.');
+            throw new RuntimeException('Do not add the "product_routing" routes loader twice.');
         }
 
         $this->loaded = true;
 
         $collection = new RouteCollection();
         $accountCollection = new RouteCollection();
+
+        $accountCollection->addCollection(
+            $this->import(self::DIRECTORY . '/account.yaml', 'yaml')
+        );
 
         if ($this->config['catalog']) {
             $routes = $this->import(self::DIRECTORY . '/account/catalog.yaml', 'yaml');
@@ -56,16 +62,9 @@ class RoutingLoader extends Loader
             $accountCollection->addCollection($routes);
         }
 
-        if (0 < $accountCollection->count()) {
-            // Should be configurable (sync with CMS)
-            $this->addPrefixes($accountCollection, [
-                'en' => '/my-account',
-                'fr' => '/mon-compte',
-                'es' => '/mi-cuenta',
-            ]);
+        $this->addPrefixes($accountCollection, $this->routingPrefix);
 
-            $collection->addCollection($accountCollection);
-        }
+        $collection->addCollection($accountCollection);
 
         return $collection;
     }

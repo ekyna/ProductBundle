@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model as RM;
 
 /**
@@ -12,9 +13,9 @@ use Ekyna\Component\Resource\Model as RM;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method OptionGroupTranslationInterface translate($locale = null, $create = false)
+ * @method OptionGroupTranslationInterface translate(string $locale = null, bool $create = false)
  */
-interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInterface
+interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInterface, CopyInterface
 {
     public function getProduct(): ?ProductInterface;
 

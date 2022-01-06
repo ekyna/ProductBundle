@@ -34,6 +34,7 @@ class Component implements ComponentInterface
     public function __clone()
     {
         $this->id = null;
+        $this->parent = null;
     }
 
     public function getId(): ?int

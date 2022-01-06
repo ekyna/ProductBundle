@@ -43,6 +43,8 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.loader.routing', RoutingLoader::class)
             ->args([
                 abstract_arg('Product routing configuration'), // TODO Inject features
+                param('ekyna_user.account_routing_prefix'),
+                param('kernel.debug'),
             ])
             ->tag('routing.loader')
 
@@ -224,7 +226,8 @@ return static function (ContainerConfigurator $container) {
         // Variant generator
         ->set('ekyna_product.generator.variant', Generator\VariantGenerator::class)
             ->args([
-                param('ekyna_product.class.product'),
+                service('ekyna_product.factory.product'),
+                service('ekyna_resource.copier'),
             ])
 
         // Reference generator
@@ -269,6 +272,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.converter.product.bundle_to_simple', Converter\BundleToSimpleConverter::class)
             ->parent('ekyna_product.converter.product.abstract')
             ->call('setStockSubjectUpdater', [service('ekyna_commerce.updater.stock_subject')])
+            ->call('setCopier', [service('ekyna_resource.copier')])
             ->tag(Converter\ConverterInterface::DI_TAG)
 
         // CMS Editor plugins

@@ -6,6 +6,8 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface;
+use Ekyna\Component\Resource\Copier\CopierInterface;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model\AbstractTranslation;
 
 /**
@@ -15,7 +17,7 @@ use Ekyna\Component\Resource\Model\AbstractTranslation;
  *
  * @method ProductInterface getTranslatable()
  */
-class ProductTranslation extends AbstractTranslation implements ProductTranslationInterface
+class ProductTranslation extends AbstractTranslation implements ProductTranslationInterface, CopyInterface
 {
     protected ?string $title           = null;
     protected ?string $subTitle        = null;
@@ -23,10 +25,8 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     protected ?string $description     = null;
     protected ?string $slug            = null;
 
-    public function __clone()
+    public function onCopy(CopierInterface $copier): void
     {
-        parent::__clone();
-
         $this->title = null;
         $this->slug = null;
         $this->attributesTitle = null;
