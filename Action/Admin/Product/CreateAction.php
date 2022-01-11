@@ -45,11 +45,11 @@ class CreateAction extends BaseAction implements RoutingActionInterface
 
     private function setProductParent(ProductInterface $product): void
     {
-        if (null === $parent = $this->request->query->get('parent')) {
+        if (0 >= $parent = $this->request->query->getInt('parent')) {
             return;
         }
 
-        $parent = $this->getRepository()->find((int)$parent);
+        $parent = $this->getRepository()->find($parent);
 
         if (!$parent instanceof ProductInterface) {
             throw new UnexpectedTypeException($parent, ProductInterface::class);

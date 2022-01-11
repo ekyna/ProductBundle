@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -42,9 +41,7 @@ class BatchEditController extends AbstractController
             return $this->respond([]);
         }
 
-        array_map(function($id) {
-            return (int)$id;
-        }, $ids);
+        $ids = array_map(fn($v) => (int)$v, $ids);
 
         $products = $this->findProductsById($ids);
         if (empty($products)) {

@@ -275,7 +275,7 @@ class CatalogController implements ControllerInterface
     {
         $customer = $this->getCustomer();
 
-        $id = intval($request->attributes->get('catalogId'));
+        $id = $request->attributes->getInt('catalogId');
 
         $catalog = $this->catalogRepository->findOneByCustomerAndId($customer, $id);
 

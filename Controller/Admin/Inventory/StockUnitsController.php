@@ -32,7 +32,7 @@ class StockUnitsController extends AbstractController
     {
         $this->assertXhr($request);
 
-        $product = $this->findProductById($request->attributes->get('productId'));
+        $product = $this->findProductById($request->attributes->getInt('productId'));
 
         $list = $this
             ->stockRenderer

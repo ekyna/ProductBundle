@@ -63,7 +63,7 @@ class CatalogRenderer
         $response = new Response();
 
         $format = $catalog->getFormat();
-        $download = $request && $request->query->get('download', 0);
+        $download = $request && $request->query->getBoolean('download', false);
 
         if ($format === static::FORMAT_PDF) {
             $response->headers->add(['Content-Type' => 'application/pdf']);
