@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -114,7 +115,7 @@ class StockReportCommand extends Command
         $message = new Email();
         $message
             ->subject($title)
-            ->from($fromEmail, $fromName)
+            ->from(new Address($fromEmail, $fromName))
             ->to($toEmail)
             ->html($body);
 
