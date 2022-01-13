@@ -116,7 +116,7 @@ class StockReportCommand extends Command
         $message
             ->subject($title)
             ->from(new Address($fromEmail, $fromName))
-            ->to($toEmail)
+            ->to(...$toEmail)
             ->html($body);
 
         $this->mailer->send($message);
