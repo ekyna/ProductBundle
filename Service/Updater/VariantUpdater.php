@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use Ekyna\Bundle\ProductBundle\Attribute\AttributeTypeRegistryInterface;
-use Ekyna\Component\Commerce\Exception\CommerceExceptionInterface;
-use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidProductException;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Exception\CommerceExceptionInterface;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
+use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
+
+use function is_null;
 
 /**
  * Class ProductUpdater
@@ -19,13 +21,13 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class VariantUpdater
 {
-    private PersistenceHelperInterface $persistenceHelper;
-    private LocaleProviderInterface $localeProvider;
+    private PersistenceHelperInterface     $persistenceHelper;
+    private LocaleProviderInterface        $localeProvider;
     private AttributeTypeRegistryInterface $typeRegistry;
 
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        LocaleProviderInterface $localeProvider,
+        PersistenceHelperInterface     $persistenceHelper,
+        LocaleProviderInterface        $localeProvider,
         AttributeTypeRegistryInterface $typeRegistry
     ) {
         $this->persistenceHelper = $persistenceHelper;
@@ -78,20 +80,24 @@ class VariantUpdater
 
             // If title is not blank or locale is the default one or a translation exists for this locale.
             if (
-                !empty($title) ||
-                $locale === $this->localeProvider->getFallbackLocale() ||
-                $variant->hasTranslationForLocale($locale)
+                !empty($title)
+                || $locale === $this->localeProvider->getFallbackLocale()
+                || $variant->hasTranslationForLocale($locale)
             ) {
                 // Create variant translation
+                $vChanged = false;
                 $vTrans = $variant->translate($locale, true);
 
-                if ($title != $vTrans->getAttributesTitle()) {
+                if ($title !== $vTrans->getAttributesTitle()) {
                     $vTrans->setAttributesTitle($title);
-
-                    $this->persistTranslation($vTrans);
-
-                    $changed = true;
+                    $vChanged = true;
                 }
+
+                if ($vChanged || is_null($vTrans->getId())) {
+                    $this->persistenceHelper->persistAndRecompute($vTrans);
+                }
+
+                $changed = $changed || $vChanged;
             }
         }
 
@@ -111,7 +117,7 @@ class VariantUpdater
                         foreach ($productAttribute->getChoices() as $attributeChoice) {
                             $names[] = $attributeChoice->getName();
                         }
-                    } elseif(!empty($name = $attributeType->render($productAttribute, $locale))) {
+                    } elseif (!empty($name = $attributeType->render($productAttribute, $locale))) {
                         $names[] = $name;
                     }
 
@@ -217,28 +223,6 @@ class VariantUpdater
         }
 
         return $changed;
-    }
-
-    /**
-     * Persists and recomputes the translation.
-     *
-     * @param Model\ProductTranslationInterface $translation
-     */
-    protected function persistTranslation(Model\ProductTranslationInterface $translation)
-    {
-        $manager = $this->persistenceHelper->getManager();
-        $uow = $manager->getUnitOfWork();
-
-        if (!($uow->isScheduledForInsert($translation) || $uow->isScheduledForUpdate($translation))) {
-            $manager->persist($translation);
-        }
-
-        $metadata = $manager->getClassMetadata(get_class($translation));
-        if ($uow->getEntityChangeSet($translation)) {
-            $uow->recomputeSingleEntityChangeSet($metadata, $translation);
-        } else {
-            $uow->computeChangeSet($metadata, $translation);
-        }
     }
 
     /**
