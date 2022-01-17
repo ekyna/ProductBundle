@@ -154,7 +154,7 @@ class ProductExporter
 
         if ($column === ExportConfig::COLUMN_DESCRIPTION) {
             $desc = $product->translate($this->config->getContext()->getLocale())->getDescription();
-            $desc = str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $desc);
+            $desc = str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $desc ?? '');
 
             return strip_tags($desc);
         }

@@ -43,12 +43,10 @@ class ProductProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderA
         /** @var Brand $brand */
         $brand = $this->schemaBuilder->build($object->getBrand());
 
-        $description = trim(strip_tags($object->getDescription()));
+        $description = trim(strip_tags($object->getDescription() ?? ''));
 
-        if ($object->getType() === Model\ProductTypes::TYPE_VARIANT) {
-            if (empty($description)) {
-                $description = trim(strip_tags($object->getParent()->getDescription()));
-            }
+        if (empty($description) && ($object->getType() === Model\ProductTypes::TYPE_VARIANT)) {
+            $description = trim(strip_tags($object->getParent()->getDescription() ?? ''));
         }
 
         $schema = Schema::product()

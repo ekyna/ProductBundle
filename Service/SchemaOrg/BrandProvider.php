@@ -25,7 +25,7 @@ class BrandProvider implements SchemaOrg\ProviderInterface, SchemaOrg\BuilderAwa
     {
         $schema = Schema::brand()
             ->name($object->getName())
-            ->description(strip_tags($object->getDescription()));
+            ->description(strip_tags($object->getDescription() ?? ''));
             // TODO ->url()
 
         if ($image = $object->getMedia()) {
