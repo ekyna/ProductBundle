@@ -78,7 +78,7 @@ class OfferScalarHydrator extends AbstractHydrator
             case 'sell_price':
             case 'net_price':
             case 'percent':
-                return new Decimal($value);
+                return new Decimal((string)$value);
 
             case 'details':
                 return $this->normalizeDetails($value);
@@ -92,7 +92,7 @@ class OfferScalarHydrator extends AbstractHydrator
         $data = json_decode($data, true);
 
         foreach ($data as $key => $value) {
-            $data[$key] = new Decimal($value);
+            $data[$key] = new Decimal((string)$value);
         }
 
         return $data;
