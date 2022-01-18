@@ -33,7 +33,7 @@ interface ProductAttributeInterface extends ResourceInterface
 
     public function removeChoice(AttributeChoiceInterface $choice): ProductAttributeInterface;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function setValue(?string $value): ProductAttributeInterface;
 

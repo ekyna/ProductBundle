@@ -1228,13 +1228,13 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $values = [];
         foreach ($this->attributes as $pr) {
             $key = $pr->getAttributeSlot()->getAttribute()->getId();
-            if (!empty($v = $pr->getValue())) {
-                $values[$key] = $v;
+            if (!empty($value = $pr->getValue())) {
+                $values[$key] = $value;
             } else {
                 $ids = [];
-                /** @var Model\AttributeChoiceInterface $c */
-                foreach ($pr->getChoices()->toArray() as $c) {
-                    $ids[] = $c->getId();
+                /** @var Model\AttributeChoiceInterface $choice */
+                foreach ($pr->getChoices()->toArray() as $choice) {
+                    $ids[] = $choice->getId();
                 }
                 sort($ids);
                 $values[$key] = implode(',', $ids);
