@@ -98,6 +98,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->attributes = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
         $this->components = new ArrayCollection();
+        $this->crossSellings = new ArrayCollection();
         $this->specialOffers = new ArrayCollection();
         $this->pricings = new ArrayCollection();
         $this->categories = new ArrayCollection();
