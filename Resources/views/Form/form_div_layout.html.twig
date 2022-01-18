@@ -477,8 +477,8 @@
         </td>
         <td>{{ supplierProduct.reference }}</td>
         <td>{{ supplierProduct.netPrice|format_currency(supplierProduct.supplier.currency.code) }}</td>
-        <td>{{ supplierProduct.availableStock|format_number() }}</td>
-        <td>{{ supplierProduct.orderedStock|format_number() }}</td>
+        <td>{{ supplierProduct.availableStock|format_number }}</td>
+        <td>{{ supplierProduct.orderedStock|format_number }}</td>
         <td>
             {%- if supplierProduct.estimatedDateOfArrival is not same as(null) -%}
                 {{- supplierProduct.estimatedDateOfArrival|format_datetime('short', 'none') -}}

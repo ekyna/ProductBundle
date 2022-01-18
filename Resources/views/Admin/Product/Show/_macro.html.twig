@@ -408,7 +408,7 @@
                             {{- offer.minQuantity|format_number -}}
                         </td>
                         <td id="{{ offerId ~ 'percent' }}" class="text-right">
-                            {{- (offer.percent / 100)|format_number('percent') -}}
+                            {{- (offer.percent / 100)|format_number(style='percent') -}}
                         </td>
                         <td id="{{ offerId ~ 'startsAt' }}" class="text-right">
                         {%- if offer.startsAt is null -%}
@@ -482,7 +482,7 @@
                                 <tr>
                                     <th class="text-right">{{ 'common.percent'|trans({}, 'EkynaProduct') }}</th>
                                     {%- for rule in pricing.rules -%}
-                                        <td class="text-right">{{ (rule.percent / 100)|format_number('percent') }}</td>
+                                        <td class="text-right">{{ (rule.percent / 100)|format_number(style='percent') }}</td>
                                     {%- endfor -%}
                                 </tr>
                             </table>
