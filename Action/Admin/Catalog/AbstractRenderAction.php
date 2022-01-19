@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Action\Admin\Catalog;
 
 use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
-use Ekyna\Bundle\AdminBundle\Action\ReadAction;
 use Ekyna\Bundle\AdminBundle\Action\Util\BreadcrumbTrait;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog\CatalogRenderType;
@@ -21,7 +20,7 @@ use Ekyna\Bundle\ResourceBundle\Action\TemplatingTrait;
 use Ekyna\Bundle\UiBundle\Action\FlashTrait;
 use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
-use Ekyna\Component\Commerce\Common\Factory\SaleFactoryInterface;
+use Ekyna\Component\Commerce\Common\Helper\FactoryHelperInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -51,16 +50,16 @@ abstract class AbstractRenderAction extends AbstractAction implements AdminActio
 
     protected ContextProviderInterface $contextProvider;
     protected CatalogRenderer          $catalogRenderer;
-    protected SaleFactoryInterface     $saleFactory;
+    protected FactoryHelperInterface   $factoryHelper;
 
     public function __construct(
         ContextProviderInterface $contextProvider,
         CatalogRenderer          $catalogRenderer,
-        SaleFactoryInterface     $saleFactory
+        FactoryHelperInterface   $factoryHelper
     ) {
         $this->contextProvider = $contextProvider;
         $this->catalogRenderer = $catalogRenderer;
-        $this->saleFactory = $saleFactory;
+        $this->factoryHelper = $factoryHelper;
     }
 
     protected function createRenderForm(CatalogInterface $catalog, SaleInterface $sale = null): FormInterface
@@ -107,7 +106,7 @@ abstract class AbstractRenderAction extends AbstractAction implements AdminActio
         $file = new UploadedFile($path, 'catalog.pdf', null, null, true);
 
         // Attachment
-        $attachment = $this->saleFactory->createAttachmentForSale($sale);
+        $attachment = $this->factoryHelper->createAttachmentForSale($sale);
 
         $attachment
             ->setTitle('Catalog')

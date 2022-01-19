@@ -33,7 +33,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('ekyna_commerce.provider.context'),
                 service('ekyna_product.renderer.catalog'),
-                service('ekyna_commerce.factory.sale'),
+                service('ekyna_commerce.helper.factory'),
             ])
 
         ->set('ekyna_product.action.admin.catalog.render', Catalog\RenderAction::class)
