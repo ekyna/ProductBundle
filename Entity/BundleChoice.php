@@ -47,7 +47,7 @@ class BundleChoice implements Model\BundleChoiceInterface
 
     public function onCopy(CopierInterface $copier): void
     {
-        $this->rules = $copier->copyCollection($this->rules, true);
+        $copier->copyCollection($this, 'rules', true);
     }
 
     public function getId(): ?int

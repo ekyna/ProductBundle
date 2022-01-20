@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class OptionValidator
@@ -17,27 +19,22 @@ class OptionValidator extends ConstraintValidator
     /**
      * @inheritDoc
      */
-    public function validate($option, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
-        if (!$option instanceof Model\OptionInterface) {
-            throw new InvalidArgumentException("Expected instance of " . Model\OptionInterface::class);
+        if (!$value instanceof Model\OptionInterface) {
+            throw new UnexpectedTypeException($value, Model\OptionInterface::class);
         }
         if (!$constraint instanceof Option) {
-            throw new InvalidArgumentException("Expected instance of " . Option::class);
+            throw new UnexpectedTypeException($constraint, Option::class);
         }
 
-        /* @var Model\OptionInterface $option */
-        /* @var Option $constraint */
-
-        $product = $option->getProduct();
-
-        if ($product === $option->getGroup()->getProduct()) {
-            $this->context
-                ->buildViolation($constraint->recursive_choice)
-                ->atPath('product')
-                ->addViolation();
-
+        if ($value->getProduct() !== $value->getGroup()->getProduct()) {
             return;
         }
+
+        $this->context
+            ->buildViolation($constraint->recursive_choice)
+            ->atPath('product')
+            ->addViolation();
     }
 }

@@ -123,27 +123,29 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
     public function onCopy(CopierInterface $copier): void
     {
+        parent::onCopy($copier);
+
         // ---- ONE TO MANY ----
 
-        $this->adjustments = $copier->copyCollection($this->adjustments, true);
-        $this->attributes = $copier->copyCollection($this->attributes, true);
-        $this->bundleSlots = $copier->copyCollection($this->bundleSlots, true);
-        $this->components = $copier->copyCollection($this->components, true);
-        $this->medias = $copier->copyCollection($this->medias, true);
-        $this->optionGroups = $copier->copyCollection($this->optionGroups, true);
-        $this->variants = $copier->copyCollection($this->variants, true);
-        $this->crossSellings = $copier->copyCollection($this->crossSellings, true);
-        $this->specialOffers = $copier->copyCollection($this->specialOffers, true);
-        $this->pricings = $copier->copyCollection($this->pricings, true);
-        $this->mentions = $copier->copyCollection($this->mentions, true);
+        $copier->copyCollection($this, 'adjustments', true);
+        $copier->copyCollection($this, 'attributes', true);
+        $copier->copyCollection($this, 'bundleSlots', true);
+        $copier->copyCollection($this, 'components', true);
+        $copier->copyCollection($this, 'medias', true);
+        $copier->copyCollection($this, 'optionGroups', true);
+        $copier->copyCollection($this, 'variants', true);
+        $copier->copyCollection($this, 'crossSellings', true);
+        $copier->copyCollection($this, 'specialOffers', true);
+        $copier->copyCollection($this, 'pricings', true);
+        $copier->copyCollection($this, 'mentions', true);
 
         $this->references = new ArrayCollection();
 
         // ---- MANY TO MANY ----
 
-        $this->categories = $copier->copyCollection($this->categories, false);
-        $this->customerGroups = $copier->copyCollection($this->customerGroups, false);
-        $this->tags = $copier->copyCollection($this->tags, false);
+        $copier->copyCollection($this, 'categories', false);
+        $copier->copyCollection($this, 'customerGroups', false);
+        $copier->copyCollection($this, 'tags', false);
 
         // ---- MANY TO ONE ----
 

@@ -52,7 +52,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
 
     public function onCopy(CopierInterface $copier): void
     {
-        $this->options = $copier->copyCollection($this->options, true);
+        $copier->copyCollection($this, 'options', true);
     }
 
     public function getId(): ?int

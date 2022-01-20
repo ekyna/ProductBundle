@@ -49,8 +49,8 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
 
     public function onCopy(CopierInterface $copier): void
     {
-        $this->choices = $copier->copyCollection($this->choices, true);
-        $this->rules = $copier->copyCollection($this->rules, true);
+        $copier->copyCollection($this, 'choices', true);
+        $copier->copyCollection($this, 'rules', true);
     }
 
     public function getId(): ?int
