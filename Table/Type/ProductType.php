@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Action;
+use Ekyna\Bundle\AdminBundle\Table\Type\Filter\ConstantChoiceType;
 use Ekyna\Bundle\CmsBundle\Table\Column\TagsType;
 use Ekyna\Bundle\CommerceBundle\Action\Admin\Subject;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes;
@@ -28,12 +29,10 @@ use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Ekyna\Component\Table\Util\ColumnSort;
-use Ekyna\Component\Table\View;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-use function json_encode;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -200,9 +199,10 @@ class ProductType extends AbstractResourceType
 
         if (!$variantMode) {
             $builder
-                ->addFilter('type', CType\Filter\ChoiceType::class, [
+                ->addFilter('type', ConstantChoiceType::class, [
                     'label'    => t('field.type', [], 'EkynaUi'),
-                    'choices'  => ProductTypes::getChoices([ProductTypes::TYPE_VARIANT]),
+                    'class'    => ProductTypes::class,
+                    'filter'   => [ProductTypes::TYPE_VARIANT],
                     'position' => 10,
                 ])
                 ->addFilter('designation', CType\Filter\TextType::class, [
@@ -225,14 +225,14 @@ class ProductType extends AbstractResourceType
                     'label'    => t('field.weight', [], 'EkynaUi'),
                     'position' => 60,
                 ])
-                ->addFilter('stockMode', CType\Filter\ChoiceType::class, [
+                ->addFilter('stockMode', ConstantChoiceType::class, [
                     'label'    => t('stock_subject.field.mode', [], 'EkynaCommerce'),
-                    'choices'  => StockSubjectModes::getChoices(),
+                    'class'    => StockSubjectModes::class,
                     'position' => 70,
                 ])
-                ->addFilter('stockState', CType\Filter\ChoiceType::class, [
+                ->addFilter('stockState', ConstantChoiceType::class, [
                     'label'    => t('stock_subject.field.state', [], 'EkynaCommerce'),
-                    'choices'  => StockSubjectStates::getChoices(),
+                    'class'    => StockSubjectStates::class,
                     'position' => 80,
                 ])
                 ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
@@ -266,19 +266,15 @@ class ProductType extends AbstractResourceType
         }
     }
 
-    public function buildRowView(View\RowView $view, RowInterface $row, array $options): void
-    {
-        $view->vars['attr']['data-summary'] = $this
-            ->resourceHelper
-            ->generateResourcePath($row->getData(null), Action\SummaryAction::class);
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver
-            ->setDefault('variant_mode', false)
+            ->setDefaults([
+                'variant_mode'     => false,
+                'resource_summary' => true,
+            ])
             ->setAllowedTypes('variant_mode', 'bool')
             ->setNormalizer('source', function (Options $options, $value) {
                 if ($options['variant_mode']) {
