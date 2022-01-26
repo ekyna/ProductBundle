@@ -58,7 +58,7 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
         return $this->id;
     }
 
-    public function getBundle(): Model\ProductInterface
+    public function getBundle(): ?Model\ProductInterface
     {
         return $this->bundle;
     }
