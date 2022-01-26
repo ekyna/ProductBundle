@@ -202,7 +202,7 @@ class ProductReadHelper
             return null;
         }
 
-        if (!ProductTypes::isChildType($product)) {
+        if (ProductTypes::isVariableType($product) || ProductTypes::isConfigurableType($product)) {
             return null;
         }
 

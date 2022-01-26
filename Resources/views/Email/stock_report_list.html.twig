@@ -62,7 +62,7 @@
             </td>
             <td class="right">
                 {%- if product.estimatedDateOfArrival is not empty -%}
-                    {{ product.estimatedDateOfArrival|format_datetime('short', 'none', locale) }}
+                    {{ product.estimatedDateOfArrival|format_datetime('short', 'none', locale=locale) }}
                 {%- endif -%}
             </td>
         </tr>
