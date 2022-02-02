@@ -47,7 +47,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         __clone as stockSubjectClone;
     }
 
-    protected ?int               $id                    = null;
     protected ?string            $type                  = null;
     protected Decimal            $minPrice;
     protected bool               $notContractual        = false;
@@ -174,7 +173,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->designation = null;
         $this->reference = null;
         $this->geocode = null;
-        $this->references = new ArrayCollection();
         $this->visible = false;
         $this->notContractual = true;
         $this->minPrice = new Decimal(0);
@@ -184,11 +182,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function __toString(): string
     {
         return $this->getFullDesignation(true) ?: 'New product';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getIdentifier(): int

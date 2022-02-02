@@ -20,7 +20,6 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
 {
     use RM\SortableTrait;
 
-    protected ?int    $id     = null;
     protected ?string $name   = null;
     protected ?string $type   = null;
     protected array   $config = [];
@@ -37,11 +36,6 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     public function __toString(): string
     {
         return $this->name ?: 'New attribute';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

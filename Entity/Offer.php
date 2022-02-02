@@ -10,15 +10,15 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class Offer
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Offer implements OfferInterface
+class Offer extends AbstractResource implements OfferInterface
 {
-    private ?int                         $id           = null;
     private Decimal                      $minQuantity;
     private Decimal                      $percent;
     private Decimal                      $netPrice;
@@ -35,11 +35,6 @@ class Offer implements OfferInterface
         $this->minQuantity = new Decimal(0);
         $this->percent = new Decimal(0);
         $this->netPrice = new Decimal(0);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getMinQuantity(): Decimal

@@ -20,7 +20,6 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     use MediaSubjectTrait;
     use RM\SortableTrait;
 
-    protected ?int                      $id        = null;
     protected ?Model\AttributeInterface $attribute = null;
     protected ?string                   $name      = null;
     protected ?string                   $color     = null;
@@ -28,11 +27,6 @@ class AttributeChoice extends RM\AbstractTranslatable implements Model\Attribute
     public function __toString(): string
     {
         return $this->name ?: 'New attribute choice';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getAttribute(): ?Model\AttributeInterface

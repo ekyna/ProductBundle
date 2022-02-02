@@ -16,18 +16,13 @@ class BundleChoiceRule extends AbstractBundleRule implements Model\BundleChoiceR
 {
     use SortableTrait;
 
-    protected ?int                         $id     = null;
     protected ?Model\BundleChoiceInterface $choice = null;
 
     public function __clone()
     {
-        $this->id = null;
-        $this->choice = null;
-    }
+        parent::__clone();
 
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->choice = null;
     }
 
     public function getChoice(): ?Model\BundleChoiceInterface

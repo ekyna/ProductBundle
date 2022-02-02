@@ -14,6 +14,7 @@ use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Copier\CopierInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\TaggedEntityTrait;
 use Ekyna\Component\Resource\Model\TrackAssociationTrait;
 
@@ -22,7 +23,7 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class SpecialOffer implements SpecialOfferInterface
+class SpecialOffer extends AbstractResource implements SpecialOfferInterface
 {
     public const REL_PRODUCTS  = 'products';
     public const REL_BRANDS    = 'brands';
@@ -32,7 +33,6 @@ class SpecialOffer implements SpecialOfferInterface
     use TaggedEntityTrait;
     use TrackAssociationTrait;
 
-    protected ?int               $id       = null;
     protected ?string            $name     = null;
     protected Decimal            $percent;
     protected Decimal            $minQuantity;
@@ -69,7 +69,9 @@ class SpecialOffer implements SpecialOfferInterface
 
     public function __clone()
     {
-        $this->id = null;
+        parent::__clone();
+
+        $this->product = null;
         $this->percent = clone $this->percent;
         $this->minQuantity = clone $this->minQuantity;
     }
@@ -77,11 +79,6 @@ class SpecialOffer implements SpecialOfferInterface
     public function onCopy(CopierInterface $copier): void
     {
         $this->snapshot = null;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

@@ -24,7 +24,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     use RM\SortableTrait;
     use TaxableTrait;
 
-    protected ?int                        $id          = null;
     protected ?Model\OptionGroupInterface $group       = null;
     protected ?Model\ProductInterface     $product     = null;
     protected bool                        $cascade     = false;
@@ -43,11 +42,6 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     public function __toString(): string
     {
         return $this->designation ?: 'New option';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getGroup(): ?Model\OptionGroupInterface

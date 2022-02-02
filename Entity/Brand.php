@@ -26,17 +26,11 @@ class Brand extends RM\AbstractTranslatable implements Model\BrandInterface
     use RM\TaggedEntityTrait;
     use RM\TimestampableTrait;
 
-    protected ?int $id = null;
     protected ?string $name = null;
 
     public function __toString(): string
     {
         return $this->name ?: 'New brand';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model\TaggedEntityInterface;
 use Ekyna\Component\Resource\Model\TrackAssociationInterface;
 
@@ -15,7 +16,7 @@ use Ekyna\Component\Resource\Model\TrackAssociationInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterface
+interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterface, CopyInterface
 {
     public function getName(): ?string;
 

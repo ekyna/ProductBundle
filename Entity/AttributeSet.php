@@ -7,15 +7,15 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class AttributeSet
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeSet implements Model\AttributeSetInterface
+class AttributeSet extends AbstractResource implements Model\AttributeSetInterface
 {
-    protected ?int       $id   = null;
     protected ?string    $name = null;
     protected Collection $slots;
 
@@ -27,11 +27,6 @@ class AttributeSet implements Model\AttributeSetInterface
     public function __toString(): string
     {
         return $this->name ?: 'New attribute set';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

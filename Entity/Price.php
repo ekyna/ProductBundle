@@ -12,25 +12,25 @@ use Ekyna\Bundle\ProductBundle\Model\PriceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class Price
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Price implements PriceInterface
+class Price extends AbstractResource implements PriceInterface
 {
-    private ?int                    $id           = null;
-    private bool                    $startingFrom = false;
-    private Decimal                 $originalPrice;
-    private Decimal                 $sellPrice;
-    private Decimal                 $percent;
-    /** @var array<string, string>  */
-    private array                   $details      = [];
-    private ?DateTimeInterface      $endsAt       = null;
-    private ?ProductInterface       $product      = null;
-    private ?CustomerGroupInterface $group        = null;
-    private ?CountryInterface       $country      = null;
+    private bool    $startingFrom = false;
+    private Decimal $originalPrice;
+    private Decimal $sellPrice;
+    private Decimal $percent;
+    /** @var array<string, string> */
+    private array                   $details = [];
+    private ?DateTimeInterface      $endsAt  = null;
+    private ?ProductInterface       $product = null;
+    private ?CustomerGroupInterface $group   = null;
+    private ?CountryInterface       $country = null;
 
     public function __construct()
     {
@@ -41,18 +41,14 @@ class Price implements PriceInterface
 
     public function __clone()
     {
-        $this->id = null;
+        parent::__clone();
+
         $this->originalPrice = clone $this->originalPrice;
         $this->sellPrice = clone $this->sellPrice;
         $this->percent = clone $this->percent;
         $this->product = null;
         $this->country = null;
         $this->group = null;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function isStartingFrom(): bool

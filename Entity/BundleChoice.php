@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Copier\CopierInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
@@ -16,11 +17,10 @@ use Ekyna\Component\Resource\Model\SortableTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class BundleChoice implements Model\BundleChoiceInterface
+class BundleChoice extends AbstractResource implements Model\BundleChoiceInterface
 {
     use SortableTrait;
 
-    protected ?int                       $id                   = null;
     protected ?Model\BundleSlotInterface $slot                 = null;
     protected ?Model\ProductInterface    $product              = null;
     protected Decimal                    $minQuantity;
@@ -41,18 +41,14 @@ class BundleChoice implements Model\BundleChoiceInterface
 
     public function __clone()
     {
-        $this->id = null;
+        parent::__clone();
+
         $this->slot = null;
     }
 
     public function onCopy(CopierInterface $copier): void
     {
         $copier->copyCollection($this, 'rules', true);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getSlot(): ?Model\BundleSlotInterface

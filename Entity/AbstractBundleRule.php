@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\BundleRuleInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class AbstractBundleRule
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-abstract class AbstractBundleRule implements BundleRuleInterface
+abstract class AbstractBundleRule extends AbstractResource implements BundleRuleInterface
 {
     protected ?string $type       = null;
     protected ?array  $conditions = null;

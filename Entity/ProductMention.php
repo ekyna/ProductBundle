@@ -17,6 +17,13 @@ class ProductMention extends AbstractMention implements ProductMentionInterface
 {
     private ?ProductInterface $product = null;
 
+    public function __clone()
+    {
+        parent::__clone();
+
+        $this->product = null;
+    }
+
     public function getProduct(): ?ProductInterface
     {
         return $this->product;

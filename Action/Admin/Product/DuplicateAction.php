@@ -42,13 +42,12 @@ class DuplicateAction extends AbstractAction implements AdminActionInterface
             throw new NotFoundHttpException('Not yet implemented.');
         }
 
-        // Source
         $source = $this->context->getResource();
         if (!$source instanceof ProductInterface) {
             throw new UnexpectedTypeException($source, ProductInterface::class);
         }
 
-        // TODO Temporary lock
+        // TODO Temporary restrict to simple products
         if ($source->getType() !== ProductTypes::TYPE_SIMPLE) {
             throw new NotFoundHttpException('Not yet implemented.');
         }
@@ -64,7 +63,7 @@ class DuplicateAction extends AbstractAction implements AdminActionInterface
             'attr'              => ['class' => 'form-horizontal form-with-tabs'],
             'admin_mode'        => true,
             '_redirect_enabled' => true,
-            'action' => $this->generateResourcePath($source, self::class),
+            'action'            => $this->generateResourcePath($source, self::class),
         ]);
 
         FormUtil::addFooter($form, [
@@ -74,10 +73,6 @@ class DuplicateAction extends AbstractAction implements AdminActionInterface
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            foreach ($target->getTranslations() as $translation) {
-                $translation->setSlug(null);
-            }
-
             $event = $this->getManager()->save($target);
 
             if (!$event->hasErrors()) {

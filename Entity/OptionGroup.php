@@ -23,7 +23,6 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
 {
     use RM\SortableTrait;
 
-    protected ?int                    $id        = null;
     protected ?Model\ProductInterface $product   = null;
     protected ?string                 $name      = null;
     protected bool                    $required  = false;
@@ -53,11 +52,6 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     public function onCopy(CopierInterface $copier): void
     {
         $copier->copyCollection($this, 'options', true);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getProduct(): ?Model\ProductInterface

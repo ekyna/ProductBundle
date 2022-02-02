@@ -6,28 +6,24 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class ProductReference
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductReference implements ProductReferenceInterface
+class ProductReference extends AbstractResource implements ProductReferenceInterface
 {
-    protected ?int              $id      = null;
     protected ?ProductInterface $product = null;
     protected ?string           $type    = null;
     protected ?string           $code    = null;
 
     public function __clone()
     {
-        $this->id = null;
-        $this->product = null;
-    }
+        parent::__clone();
 
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->product = null;
     }
 
     public function getProduct(): ?ProductInterface

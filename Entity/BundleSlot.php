@@ -24,7 +24,6 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     use MediaSubjectTrait;
     use SortableTrait;
 
-    protected ?int                    $id     = null;
     protected ?Model\ProductInterface $bundle = null;
     protected bool                    $required = true;
     /** @var Collection<Model\BundleChoiceInterface> */
@@ -51,11 +50,6 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
     {
         $copier->copyCollection($this, 'choices', true);
         $copier->copyCollection($this, 'rules', true);
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getBundle(): ?Model\ProductInterface

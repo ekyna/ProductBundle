@@ -27,7 +27,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     use RM\TimestampableTrait;
     use RM\TreeTrait;
 
-    protected ?int    $id   = null;
     protected ?string $name = null;
 
     public function __construct()
@@ -41,11 +40,6 @@ class Category extends RM\AbstractTranslatable implements Model\CategoryInterfac
     public function __toString(): string
     {
         return $this->name ?: 'New category';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string

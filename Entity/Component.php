@@ -7,15 +7,15 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\ComponentInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class Component
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class Component implements ComponentInterface
+class Component extends AbstractResource implements ComponentInterface
 {
-    private ?int              $id       = null;
     private ?ProductInterface $parent   = null;
     private ?ProductInterface $child    = null;
     private Decimal           $quantity;
@@ -33,13 +33,9 @@ class Component implements ComponentInterface
 
     public function __clone()
     {
-        $this->id = null;
-        $this->parent = null;
-    }
+        parent::__clone();
 
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->parent = null;
     }
 
     public function getParent(): ?ProductInterface

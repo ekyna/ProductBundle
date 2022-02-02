@@ -10,29 +10,37 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSlotInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Resource\Copier\CopierInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class ProductAttribute
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductAttribute implements ProductAttributeInterface
+class ProductAttribute extends AbstractResource implements ProductAttributeInterface
 {
-    protected ?int                    $id            = null;
     protected ?ProductInterface       $product       = null;
     protected ?AttributeSlotInterface $attributeSlot = null;
     /** @var Collection<AttributeChoiceInterface> */
     protected Collection $choices;
-    protected ?string $value = null;
+    protected ?string    $value = null;
 
     public function __construct()
     {
         $this->choices = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function __clone()
     {
-        return $this->id;
+        parent::__clone();
+
+        $this->product = null;
+    }
+
+    public function onCopy(CopierInterface $copier): void
+    {
+        $copier->copyCollection($this, 'choices', false);
     }
 
     public function getProduct(): ?ProductInterface

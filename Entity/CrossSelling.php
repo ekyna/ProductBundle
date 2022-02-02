@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model\CrossSellingInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
@@ -13,17 +14,18 @@ use Ekyna\Component\Resource\Model\SortableTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class CrossSelling implements CrossSellingInterface
+class CrossSelling extends AbstractResource implements CrossSellingInterface
 {
     use SortableTrait;
 
-    protected ?int              $id     = null;
     protected ?ProductInterface $source = null;
     protected ?ProductInterface $target = null;
 
-    public function getId(): ?int
+    public function __clone()
     {
-        return $this->id;
+        parent::__clone();
+
+        $this->source = null;
     }
 
     public function getSource(): ?ProductInterface

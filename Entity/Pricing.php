@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Copier\CopierInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\TaggedEntityTrait;
 use Ekyna\Component\Resource\Model\TrackAssociationTrait;
 
@@ -17,7 +19,7 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class Pricing implements Model\PricingInterface
+class Pricing extends AbstractResource implements Model\PricingInterface
 {
     public const REL_GROUPS    = 'groups';
     public const REL_COUNTRIES = 'countries';
@@ -26,7 +28,6 @@ class Pricing implements Model\PricingInterface
     use TaggedEntityTrait;
     use TrackAssociationTrait;
 
-    protected ?int                    $id          = null;
     protected ?string                 $name        = null;
     protected ?Model\ProductInterface $product     = null;
     /** @var Collection<CustomerGroupInterface> */
@@ -51,9 +52,19 @@ class Pricing implements Model\PricingInterface
         return $this->name ?: 'New pricing';
     }
 
-    public function getId(): ?int
+    public function __clone()
     {
-        return $this->id;
+        parent::__clone();
+
+        $this->product = null;
+    }
+
+    public function onCopy(CopierInterface $copier): void
+    {
+        $copier->copyCollection($this, 'groups', false);
+        $copier->copyCollection($this, 'countries', false);
+        $copier->copyCollection($this, 'brands', false);
+        $copier->copyCollection($this, 'rules', true);
     }
 
     public function getName(): ?string

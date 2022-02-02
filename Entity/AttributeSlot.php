@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\SortableTrait;
 
 /**
@@ -12,27 +13,21 @@ use Ekyna\Component\Resource\Model\SortableTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class AttributeSlot implements Model\AttributeSlotInterface
+class AttributeSlot extends AbstractResource implements Model\AttributeSlotInterface
 {
     use SortableTrait;
 
-    protected ?int                         $id        = null;
     protected ?Model\AttributeSetInterface $set       = null;
     protected ?Model\AttributeInterface    $attribute = null;
     protected bool                         $required  = false;
     protected bool                         $naming    = false;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getSet(): ?Model\AttributeSetInterface
     {
         return $this->set;
     }
 
-    public function setSet(Model\AttributeSetInterface $set = null): Model\AttributeSlotInterface
+    public function setSet(?Model\AttributeSetInterface $set): Model\AttributeSlotInterface
     {
         if ($this->set === $set) {
             return $this;

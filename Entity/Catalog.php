@@ -10,6 +10,7 @@ use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
 use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 use Ekyna\Component\Resource\Model\TimestampableTrait;
 
 /**
@@ -17,26 +18,25 @@ use Ekyna\Component\Resource\Model\TimestampableTrait;
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class Catalog implements CatalogInterface
+class Catalog extends AbstractResource implements CatalogInterface
 {
     use TimestampableTrait;
 
-    private ?int $id = null;
-    private ?CustomerInterface $customer = null;
-    private ?string $theme = null;
-    private ?string $title = null;
-    private ?string $description = null;
-    private ?string $slug = null;
+    private ?CustomerInterface $customer    = null;
+    private ?string            $theme       = null;
+    private ?string            $title       = null;
+    private ?string            $description = null;
+    private ?string            $slug        = null;
     /** @var Collection<CatalogPage> */
     private Collection $pages;
-    private ?array $options = null;
+    private ?array     $options = null;
 
     /** Non-mapped fields */
 
-    private ?string $format = null;
-    private bool $displayPrices = false;
-    private ?ContextInterface $context = null;
-    private ?string $template = null;
+    private ?string           $format        = null;
+    private bool              $displayPrices = false;
+    private ?ContextInterface $context       = null;
+    private ?string           $template      = null;
     /** @var Collection<SaleItemInterface> */
     private Collection $saleItems;
     /** (non-mapped) */
@@ -51,11 +51,6 @@ class Catalog implements CatalogInterface
     public function __toString(): string
     {
         return $this->title ?: 'New catalog';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getCustomer(): ?CustomerInterface

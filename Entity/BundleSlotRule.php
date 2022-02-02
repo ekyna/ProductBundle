@@ -16,19 +16,13 @@ class BundleSlotRule extends AbstractBundleRule implements Model\BundleSlotRuleI
 {
     use SortableTrait;
 
-    protected ?int                       $id = null;
     protected ?Model\BundleSlotInterface $slot;
-
 
     public function __clone()
     {
-        $this->id = null;
-        $this->slot = null;
-    }
+        parent::__clone();
 
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->slot = null;
     }
 
     public function getSlot(): ?Model\BundleSlotInterface

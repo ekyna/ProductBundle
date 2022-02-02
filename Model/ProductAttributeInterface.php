@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Ekyna\Component\Resource\Copier\CopyInterface;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -12,7 +13,7 @@ use Ekyna\Component\Resource\Model\ResourceInterface;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-interface ProductAttributeInterface extends ResourceInterface
+interface ProductAttributeInterface extends ResourceInterface, CopyInterface
 {
     public function getProduct(): ?ProductInterface;
 

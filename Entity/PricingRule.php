@@ -6,15 +6,15 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 
 use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class PricingRule
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class PricingRule implements Model\PricingRuleInterface
+class PricingRule extends AbstractResource implements Model\PricingRuleInterface
 {
-    protected ?int                    $id      = null;
     protected ?Model\PricingInterface $pricing = null;
     protected Decimal                 $minQuantity;
     protected Decimal                 $percent;
@@ -25,9 +25,13 @@ class PricingRule implements Model\PricingRuleInterface
         $this->percent = new Decimal(0);
     }
 
-    public function getId(): ?int
+    public function __clone()
     {
-        return $this->id;
+        parent::__clone();
+
+        $this->pricing = null;
+        $this->minQuantity = clone $this->minQuantity;
+        $this->percent = clone $this->percent;
     }
 
     public function getPricing(): ?Model\PricingInterface

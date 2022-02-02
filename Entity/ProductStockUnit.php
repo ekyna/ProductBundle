@@ -19,7 +19,6 @@ class ProductStockUnit extends AbstractStockUnit implements Model\ProductStockUn
 {
     protected ?Model\ProductInterface $product = null;
 
-
     public function setProduct(Model\ProductInterface $product): Model\ProductStockUnitInterface
     {
         $this->product = $product;

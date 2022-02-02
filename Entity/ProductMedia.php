@@ -7,28 +7,24 @@ namespace Ekyna\Bundle\ProductBundle\Entity;
 use Ekyna\Bundle\MediaBundle\Model\GalleryMediaTrait;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
+use Ekyna\Component\Resource\Model\AbstractResource;
 
 /**
  * Class ProductMedia
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class ProductMedia implements ProductMediaInterface
+class ProductMedia extends AbstractResource implements ProductMediaInterface
 {
     use GalleryMediaTrait;
 
-    protected ?int              $id      = null;
     protected ?ProductInterface $product = null;
 
     public function __clone()
     {
-        $this->id = null;
-        $this->product = null;
-    }
+        parent::__clone();
 
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->product = null;
     }
 
     public function getProduct(): ?ProductInterface
