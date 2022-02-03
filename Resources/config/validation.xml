@@ -572,12 +572,12 @@
         </property>
         <property name="minQuantity">
             <constraint name="NotBlank"/>
-            <constraint name="GreaterThanOrEqual">1</constraint>
+            <constraint name="GreaterThan">0</constraint>
         </property>
         <property name="percent">
             <constraint name="NotBlank"/>
-            <constraint name="GreaterThanOrEqual">0</constraint>
-            <constraint name="LessThanOrEqual">100</constraint>
+            <constraint name="GreaterThan">0</constraint>
+            <constraint name="LessThan">100</constraint>
         </property>
         <!-- TODO bug because pricing may not have an identifier ...
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
@@ -1196,8 +1196,8 @@
         </property>
         <property name="minQuantity">
             <constraint name="NotNull"/>
-            <constraint name="GreaterThanOrEqual">
-                <option name="value">1</option>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
             </constraint>
         </property>
         <property name="startsAt">
