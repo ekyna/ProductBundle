@@ -38,12 +38,14 @@ class ProductRepository extends SearchRepository implements Locale\LocaleProvide
         $bool->addMust($query);
         $bool->addMust(new Query\Terms('type', $types));
 
-        if (!$request->isPrivate()) {
-            $bool
-                ->addMust((new Query\Term())->setTerm('visible', true))
-                ->addMust((new Query\Term())->setTerm('quote_only', false))
-                ->addMust((new Query\Term())->setTerm('end_of_life', false));
+        if ($request->isPrivate()) {
+            return $bool;
         }
+
+        $bool
+            ->addMust((new Query\Term())->setTerm('visible', true))
+            ->addMust((new Query\Term())->setTerm('quote_only', false))
+            ->addMust((new Query\Term())->setTerm('end_of_life', false)); // TODO Not end_of_life & out_of_stock
 
         return $bool;
     }

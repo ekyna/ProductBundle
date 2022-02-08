@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Controller\Account;
 
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Service\Search\ProductRepository;
 use Ekyna\Component\Resource\Search\Request as SearchRequest;
 use Ekyna\Component\Resource\Search\Search;
@@ -39,7 +40,7 @@ class ProductController
 
         $repository = $this->search->getRepository('ekyna_product.product');
         if (!$repository instanceof ProductRepository) {
-            throw new \RuntimeException('Expected instance of ' . ProductRepository::class);
+            throw new UnexpectedTypeException($repository, ProductRepository::class);
         }
 
         $page = $request->query->getInt('page', 1) - 1;
