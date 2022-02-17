@@ -54,7 +54,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected bool               $brandNaming           = true; // Include brand name in designation and title
     protected bool               $pendingOffers         = true; // Schedule offers update at creation
     protected bool               $pendingPrices         = true; // Schedule prices update at creation
-    protected ?DateTimeInterface $releasedAt            = null;
     protected string             $bestSeller            = Model\HighlightModes::MODE_AUTO;
     protected string             $crossSelling          = Model\HighlightModes::MODE_AUTO;
     protected ?DateTimeInterface $statUpdatedAt         = null;
@@ -176,7 +175,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->visible = false;
         $this->notContractual = true;
         $this->minPrice = new Decimal(0);
-        //$this->releasedAt = null;
     }
 
     public function __toString(): string
@@ -269,18 +267,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setPendingPrices(bool $pending): Model\ProductInterface
     {
         $this->pendingPrices = $pending;
-
-        return $this;
-    }
-
-    public function getReleasedAt(): ?DateTimeInterface
-    {
-        return $this->releasedAt;
-    }
-
-    public function setReleasedAt(?DateTimeInterface $date): Model\ProductInterface
-    {
-        $this->releasedAt = $date;
 
         return $this;
     }

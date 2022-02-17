@@ -72,17 +72,6 @@
     }|merge(options)) -}}
 {%- endmacro show_customer_groups -%}
 
-
-{%- macro show_released_at(product, options = {}) -%}
-    {{- show_row(product.releasedAt, 'datetime', {
-        'label': t('product.field.released_at', [], 'EkynaProduct'),
-        'date_format': 'short',
-        'time_format': 'none',
-        'id': 'product_releasedAt'
-    }|merge(options)) -}}
-{%- endmacro show_released_at -%}
-
-
 {%- macro show_reference(product, options = {}) -%}
     {{- show_row(product.reference, 'text', {
         'label': t('field.reference', [], 'EkynaUi'),

@@ -68,6 +68,7 @@ class SimpleHandler extends AbstractHandler
             'virtualStock',
             'estimatedDateOfArrival',
             'minimumOrderQuantity',
+            'releasedAt',
         ];
         if ($this->persistenceHelper->isChanged($product, $stockProperties)) {
             $changed = $this->stockUpdater->update($product) || $changed;
@@ -85,7 +86,7 @@ class SimpleHandler extends AbstractHandler
             $childEvents[] = ProductEvents::CHILD_PRICE_CHANGE;
         }
 
-        $availabilityProperties = ['visible', 'quoteOnly', 'endOfLife'];
+        $availabilityProperties = ['visible', 'quoteOnly', 'endOfLife', 'releasedAt'];
         if ($this->persistenceHelper->isChanged($product, $availabilityProperties)) {
             $childEvents[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
 

@@ -77,10 +77,6 @@ interface ProductInterface extends
      */
     public function setPendingPrices(bool $pending): ProductInterface;
 
-    public function getReleasedAt(): ?DateTimeInterface;
-
-    public function setReleasedAt(?DateTimeInterface $date): ProductInterface;
-
     /**
      * Returns the best seller mode.
      */

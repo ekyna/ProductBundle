@@ -442,7 +442,6 @@ product:
         total_net_price: Total ex-tax
         pricing: Pricing
         stock: Stocks
-        released_at: Released at
         best_seller: Best seller
         cross_selling: Cross selling
         composition: Composition

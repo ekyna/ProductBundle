@@ -447,7 +447,6 @@ product:
         stock: Stocks
         best_seller: Meilleure vente
         cross_selling: Cross selling
-        released_at: Date de sortie
         composition: Composition
         option_parents: Ce produit constitue une option des produits suivants
         bundle_parents: Ce produit est inclus dans les packs suivants

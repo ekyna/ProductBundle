@@ -45,7 +45,6 @@
         <field name="bestSeller" column="best_seller" type="string" length="6" nullable="false"/>
         <field name="crossSelling" column="cross_selling" type="string" length="6" nullable="false"/>
 
-        <field name="releasedAt" column="released_at" type="datetime" nullable="true"/>
         <field name="statUpdatedAt" column="stat_updated_at" type="datetime" nullable="true"/>
 
         <field name="createdAt" type="datetime" column="created_at">

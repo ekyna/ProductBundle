@@ -6,7 +6,10 @@ namespace Ekyna\Bundle\ProductBundle\Service\Updater;
 
 use ArrayIterator;
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Common\Util\DateUtil;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
+
+use function is_null;
 
 /**
  * Class VariableUpdater
@@ -59,17 +62,23 @@ class VariableUpdater extends AbstractUpdater
         Model\ProductTypes::assertVariable($variable);
 
         $changed = false;
+        $releasedAt = null;
+        $visible = $quoteOnly = $endOfLife = false;
 
-        if (0 === $variable->getVariants()->count()) {
-            $quoteOnly = $endOfLife = false;
-
-            if ($variable->isVisible()) {
-                $variable->setVisible(false);
-                $changed = true;
+        if (!$variable->getVariants()->isEmpty()) {
+            foreach ($variable->getVariants() as $variant) {
+                if ($variant->isVisible()) {
+                    $visible = true;
+                }
+                if (null === $vReleasedAt = $variant->getReleasedAt()) {
+                    continue;
+                }
+                if (null === $releasedAt || $releasedAt < $vReleasedAt) {
+                    $releasedAt = $vReleasedAt;
+                }
             }
-        } else {
-            $quoteOnly = $endOfLife = true;
 
+            $quoteOnly = $endOfLife = true;
             foreach ($variable->getVariants() as $variant) {
                 if (!$variant->isQuoteOnly()) {
                     $quoteOnly = false;
@@ -83,11 +92,19 @@ class VariableUpdater extends AbstractUpdater
             }
         }
 
-        if ($quoteOnly != $variable->isQuoteOnly()) {
+        if (!DateUtil::equals($variable->getReleasedAt(), $releasedAt)) {
+            $variable->setReleasedAt($releasedAt);
+            $changed = true;
+        }
+        if ($visible !== $variable->isvisible()) {
+            $variable->setvisible($visible);
+            $changed = true;
+        }
+        if ($quoteOnly !== $variable->isQuoteOnly()) {
             $variable->setQuoteOnly($quoteOnly);
             $changed = true;
         }
-        if ($endOfLife != $variable->isEndOfLife()) {
+        if ($endOfLife !== $variable->isEndOfLife()) {
             $variable->setEndOfLife($endOfLife);
             $changed = true;
         }

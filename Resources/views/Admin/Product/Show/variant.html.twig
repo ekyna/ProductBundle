@@ -10,13 +10,12 @@
         'label': t('product.field.attributes_designation', [], 'EkynaProduct'),
         'id': 'product_attributesDesignation'
     }) -}}
-    {{ _product.show_variable(product) }}
     <div class="row">
-        <div class="col-md-6">
-            {{ _product.show_visible(product, {'label_col': 4}) }}
+        <div class="col-md-8">
+            {{ _product.show_variable(product, {'label_col': 3}) }}
         </div>
-        <div class="col-md-6">
-            {{ _product.show_released_at(product, {'label_col': 4}) }}
+        <div class="col-md-4">
+            {{ _product.show_visible(product, {'label_col': 6}) }}
         </div>
     </div>
     {{ _product.show_attributes(product) }}

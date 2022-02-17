@@ -360,21 +360,6 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the released at field.
-     */
-    public function addReleasedAtField(array $options = []): ProductFormBuilder
-    {
-        $options = array_replace([
-            'label'    => t('product.field.released_at', [], 'EkynaProduct'),
-            'required' => false,
-        ], $options);
-
-        $this->form->add('releasedAt', SF\DateTimeType::class, $options);
-
-        return $this;
-    }
-
-    /**
      * Adds the seo field.
      */
     public function addSeoField(array $options = []): ProductFormBuilder
