@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Ekyna\Bundle\ProductBundle\Command\BundleFixReleasedAtCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\ReferenceConvertCommand;
@@ -20,6 +21,15 @@ use Ekyna\Bundle\ProductBundle\Command\WeightFromSupplierCommand;
 return static function (ContainerConfigurator $container) {
     $container
         ->services()
+
+        // Bundle fix released at command
+        ->set('ekyna_product.command.bundle_fix_released_at', BundleFixReleasedAtCommand::class)
+            ->args([
+                service('ekyna_product.repository.product'),
+                service('doctrine.orm.default_entity_manager'),
+                service('ekyna_product.calculator.price'),
+            ])
+            ->tag('console.command')
 
         // Offer invalidate command
         ->set('ekyna_product.command.offer_invalidate', OfferInvalidateCommand::class)

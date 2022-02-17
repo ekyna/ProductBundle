@@ -20,8 +20,6 @@ use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
 use function array_merge;
 use function array_unique;
 
-use const SORT_NUMERIC;
-
 /**
  * Class PriceCalculator
  * @package Ekyna\Bundle\ProductBundle\Service\Pricing

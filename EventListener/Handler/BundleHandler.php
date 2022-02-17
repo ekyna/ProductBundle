@@ -116,7 +116,13 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        return $this->getBundleUpdater()->updateReleasedAt($bundle);
+        if ($this->getBundleUpdater()->updateReleasedAt($bundle)) {
+            $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_AVAILABILITY_CHANGE]);
+
+            return true;
+        }
+
+        return false;
     }
 
     public function handleChildStockChange(ResourceEventInterface $event): bool
