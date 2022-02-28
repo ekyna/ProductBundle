@@ -25,7 +25,7 @@ define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-spinn
 
         stockXhr.done(function(xml) {
             var $view = $(xml).find('stockView');
-            if (1 === $view.size()) {
+            if (1 === $view.length) {
                 $stockView.html($view.text());
             }
         });
@@ -48,6 +48,7 @@ define(['jquery', 'ekyna-dispatcher', 'ekyna-commerce/stock-units', 'ekyna-spinn
     $('.show-product-configurable [data-toggle="popover"], .show-product-bundle [data-toggle="popover"]').popover({
         trigger: 'hover',
         placement: 'top',
-        html: true
+        html: true,
+        sanitize: false
     });
 });

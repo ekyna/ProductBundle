@@ -269,7 +269,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         },
 
         bindEvents: function () {
-            if (0 === this.$radio.size()) {
+            if (0 === this.$radio.length) {
                 return;
             }
 
@@ -307,7 +307,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     }
                 });
 
-                if (!$prev || 0 === $prev.size()) {
+                if (!$prev || 0 === $prev.length) {
                     $prev = $radio.first();
                 }
 
@@ -332,7 +332,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                     }
                 });
 
-                if (!$next || 0 === $next.size()) {
+                if (!$next || 0 === $next.length) {
                     $next = $radio.first();
                 }
 
@@ -342,7 +342,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         },
 
         unbindEvents: function () {
-            if (0 === this.$radio.size()) {
+            if (0 === this.$radio.length) {
                 return;
             }
 
@@ -419,7 +419,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
         },
 
         selectChoice: function () {
-            if (0 === this.$radio.size()) {
+            if (0 === this.$radio.length) {
                 this.$choice = this.$element.find('.slot-choice-form').saleItem(this.parentItem);
                 this.choice = this.$choice.data('saleItem');
 
@@ -437,7 +437,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 choiceId = this.$radio.filter(':checked:not(:disabled)').val() || 0,
                 $selected = this.$element.find('.slot-choice-form[data-id="' + choiceId + '"]');
 
-            if (0 === $selected.size()) {
+            if (0 === $selected.length) {
                 return;
             }
 
@@ -450,7 +450,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             var showChoice = function () {
                 toggleDisabled($selected, false);
                 that.$choice = $selected;
-                if (1 === that.$choice.find('input.sale-item-quantity').size()) {
+                if (1 === that.$choice.find('input.sale-item-quantity').length) {
                     that.$choice.saleItem(that.parentItem);
                     that.choice = that.$choice.data('saleItem');
                 } else {
@@ -602,7 +602,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Image
             if (this.optionGroups.item.$gallery) {
                 this.$image = this.optionGroups.item.$gallery.find('a[data-option-id="' + this.$element.data('id') + '"]');
-                if (0 === this.$image.size()) {
+                if (0 === this.$image.length) {
                     this.$image = $('<a data-option-id="' + this.$element.data('id') + '"><img></a>');
                     this.$image.appendTo(this.optionGroups.item.$gallery.find('.item-gallery-children'));
                 }
@@ -828,7 +828,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
         hide: function () {
             this.$element.hide();
-            if (this.$image && this.$image.size()) {
+            if (this.$image && this.$image.length) {
                 this.$image.hide();
             }
 
@@ -837,7 +837,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
 
         show: function () {
             this.$element.show();
-            if (this.$image && this.$image.size()) {
+            if (this.$image && this.$image.length) {
                 this.$image.show();
             }
 
@@ -944,7 +944,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             }
 
             var $group = this.$element.find('> .form-group[data-id="' + data.id + '"]');
-            if (1 === $group.size()) {
+            if (1 === $group.length) {
                 $group.data('optionGroup').show().unlock().updateState();
                 $group.attr('data-parent', parent);
                 return false;
@@ -1063,7 +1063,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Image
             if (this.item.$gallery) {
                 this.$image = this.item.$gallery.find('> a');
-                if (1 === this.$image.size()) {
+                if (1 === this.$image.length) {
                     // Default href and title
                     this.$image
                         .data('href', this.$image.attr('href'))
@@ -1102,7 +1102,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             this.variant = undefined;
 
             var $variant = this.$element.find('option[value="' + this.$element.val() + '"]').eq(0);
-            if (1 === $variant.size() && $variant.data('config')) {
+            if (1 === $variant.length && $variant.data('config')) {
                 this.variant = $.extend({
                     id: this.$element.val(),
                     label: null,
@@ -1247,7 +1247,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Images
             this.$gallery = undefined;
             var $gallery = $('#' + this.id + '_gallery');
-            if (1 === $gallery.size()) {
+            if (1 === $gallery.length) {
                 this.$gallery = $gallery;
             }
 
@@ -1259,7 +1259,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
                 this.totalQuantity = this.quantity * this.parentItem.getTotalQuantity();
 
                 this.$parentQuantity = this.$quantity.parent().find('.sale-item-parent-qty');
-                if (this.$parentQuantity.size() === 0) {
+                if (this.$parentQuantity.length === 0) {
                     this.$parentQuantity = $('<span class="input-group-addon sale-item-parent-qty"></span>');
                     this.$parentQuantity.insertBefore(this.$quantity);
                 }
@@ -1275,13 +1275,13 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Option groups
             this.optionGroups = null;
             this.$optionGroups = this.$element.find('#' + this.id + '_options').optionGroups(this);
-            if (this.$optionGroups.size()) {
+            if (this.$optionGroups.length) {
                 this.optionGroups = this.$optionGroups.data('optionGroups');
             }
 
             // Variant
             var $variant = this.$element.find('#' + this.id + '_variant');
-            if ($variant.size() === 1) {
+            if ($variant.length === 1) {
                 this.$variant = $variant.variant(this);
                 this.variant = $variant.data('variant');
 
@@ -1310,7 +1310,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             // Bundle slots
             var bundleSlots = [];
             this.$bundleSlots = this.$element.find('#' + this.id + '_configuration > .bundle-slot');
-            if (0 < this.$bundleSlots.size()) {
+            if (0 < this.$bundleSlots.length) {
                 this.$bundleSlots.bundleSlot(this).each(function () {
                     bundleSlots.push($(this).data('bundleSlot'));
                 });
@@ -1329,7 +1329,7 @@ define(['require', 'jquery', 'ekyna-product/templates', 'ekyna-polyfill'], funct
             this.$submitButton = undefined;
             if (!this.parentItem) {
                 this.$submitButton = this.$element.find('button#submit');
-                if (0 === this.$submitButton.size()) {
+                if (0 === this.$submitButton.length) {
                     this.$submitButton = this.$element.closest('.modal-content').find('.bootstrap-dialog-footer button#submit');
                 }
             }

@@ -23,4 +23,3 @@ class ProductSlidePlugin extends BasePlugin {
 }
 
 export = ProductSlidePlugin;
-

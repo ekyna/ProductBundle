@@ -1,1 +1,1 @@
-define(["require","jquery"],function(a,b){"use strict";var c=function(){};return c.prototype={init:function(){var c=b(".product-slide");0<c.length&&a(["ekyna-product/cms/product-slide"],function(a){a.init(c)})}},new c});
+define(["require","jquery"],function(n,e){"use strict";function t(){}return t.prototype={init:function(){var t=e(".product-slide");0<t.length&&n(["ekyna-product/cms/product-slide"],function(n){n.init(t)})}},new t});

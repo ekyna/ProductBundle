@@ -19,7 +19,7 @@ define(['jquery'], function($) {
                 $form.find('.supplier-order-details').hide();
 
                 var $checked = $form.find('input[name="supplierProduct"]:checked');
-                if (1 === $checked.size()) {
+                if (1 === $checked.length) {
                     $netPrice.val($checked.data('price'));
                     $quantity.focus();
                 }

@@ -1,4 +1,4 @@
-define(['jquery', 'jquery-ui/widget', 'select2', 'ekyna-commerce/form/price'], function ($) {
+define(['jquery', 'jquery-ui/ui/widget', 'select2', 'ekyna-commerce/form/price'], function ($) {
     "use strict";
 
     $.widget('ekyna_product.optionType', {
