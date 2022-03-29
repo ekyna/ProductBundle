@@ -11,6 +11,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PurchaseCostCalculator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -22,6 +23,7 @@ class ProductExporter
 {
     private ProductRepositoryInterface $productRepository;
     private PriceCalculator            $priceCalculator;
+    private PurchaseCostCalculator     $costCalculator;
     private SubjectHelperInterface     $subjectHelper;
     private TranslatorInterface        $translator;
 
@@ -32,11 +34,13 @@ class ProductExporter
     public function __construct(
         ProductRepositoryInterface $productRepository,
         PriceCalculator            $priceCalculator,
+        PurchaseCostCalculator     $costCalculator,
         SubjectHelperInterface     $subjectHelper,
         TranslatorInterface        $translator
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
+        $this->costCalculator = $costCalculator;
         $this->subjectHelper = $subjectHelper;
         $this->translator = $translator;
     }
@@ -143,6 +147,14 @@ class ProductExporter
 
         if ($column === ExportConfig::COLUMN_SELL_PRICE) {
             return (string)$price['sell_price'];
+        }
+
+        if ($column === ExportConfig::COLUMN_BUY_PRICE) {
+            return $this->costCalculator->calculateMinPurchaseCost($product)->toFixed(3);
+        }
+
+        if ($column === ExportConfig::COLUMN_BUY_PRICE_SHIP) {
+            return $this->costCalculator->calculateMinPurchaseCost($product, [], true)->toFixed(3);
         }
 
         if ($column === ExportConfig::COLUMN_VALID_UNTIL) {

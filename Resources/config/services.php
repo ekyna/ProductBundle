@@ -290,6 +290,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('ekyna_product.repository.product'),
                 service('ekyna_product.calculator.price'),
+                service('ekyna_product.calculator.purchase_cost'),
                 service('ekyna_commerce.helper.subject'),
                 service('translator'),
             ])

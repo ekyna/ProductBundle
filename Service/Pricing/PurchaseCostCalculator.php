@@ -17,14 +17,14 @@ use Ekyna\Component\Commerce\Subject\Guesser\PurchaseCostGuesserInterface;
  */
 class PurchaseCostCalculator
 {
-    protected PriceCalculator $priceCalculator;
+    protected PriceCalculator              $priceCalculator;
     protected PurchaseCostGuesserInterface $costGuesser;
-    private string $defaultCurrency;
+    private string                         $defaultCurrency;
 
     public function __construct(
-        PriceCalculator $priceCalculator,
+        PriceCalculator              $priceCalculator,
         PurchaseCostGuesserInterface $guesser,
-        string $defaultCurrency
+        string                       $defaultCurrency
     ) {
         $this->priceCalculator = $priceCalculator;
         $this->costGuesser = $guesser;
@@ -61,7 +61,7 @@ class PurchaseCostCalculator
      * Calculates the product min options purchase cost.
      *
      * @param Product    $product
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
      * @return Decimal
@@ -97,7 +97,7 @@ class PurchaseCostCalculator
             // If lowest price found for the option group
             if (null !== $lowestOption) {
                 if ($op = $lowestOption->getProduct()) {
-                    $cost += $this->costGuesser->guess($op, $this->defaultCurrency, $shipping);
+                    $cost += $this->calculateMinPurchaseCost($op, true, $shipping);
                 }
             }
         }
@@ -109,7 +109,7 @@ class PurchaseCostCalculator
      * Calculates the product component's purchase cost.
      *
      * @param Product $product
-     * @param bool       $shipping Whether to include shipping cost
+     * @param bool    $shipping Whether to include shipping cost
      *
      * @return Decimal
      */
@@ -130,7 +130,7 @@ class PurchaseCostCalculator
      * Calculates the simple/variant product minimum purchase cost.
      *
      * @param Product    $product
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
      * @return Decimal
@@ -152,7 +152,7 @@ class PurchaseCostCalculator
      * Calculates the variable product minimum purchase cost.
      *
      * @param Product    $variable
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
      * @return Decimal
@@ -187,7 +187,7 @@ class PurchaseCostCalculator
      * Calculates the variable bundle minimum purchase cost.
      *
      * @param Product    $bundle
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
      * @return Decimal
@@ -225,15 +225,15 @@ class PurchaseCostCalculator
      * Calculates the variable configurable minimum purchase cost.
      *
      * @param Product    $configurable
-     * @param bool|array $exclude The option group ids to exclude, true to exclude all
+     * @param bool|array $exclude  The option group ids to exclude, true to exclude all
      * @param bool       $shipping Whether to include shipping cost
      *
      * @return Decimal
      */
     protected function calculateConfigurablePurchaseCost(
         Product $configurable,
-        $exclude = [],
-        bool $shipping = false
+                $exclude = [],
+        bool    $shipping = false
     ): Decimal {
         ProductTypes::assertConfigurable($configurable);
 

@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
+use function array_keys;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -30,6 +31,8 @@ class ExportConfig
     public const COLUMN_NET_PRICE        = 'net_price';
     public const COLUMN_DISCOUNT         = 'discount';
     public const COLUMN_SELL_PRICE       = 'quote_price';
+    public const COLUMN_BUY_PRICE        = 'buy_price';
+    public const COLUMN_BUY_PRICE_SHIP   = 'buy_price_ship';
     public const COLUMN_VALID_UNTIL      = 'valid_until';
     public const COLUMN_WEIGHT           = 'weight';
     public const COLUMN_WIDTH            = 'width';
@@ -176,6 +179,8 @@ class ExportConfig
             self::COLUMN_NET_PRICE        => t('export.column.net_price', [], 'EkynaProduct'),
             self::COLUMN_DISCOUNT         => t('sale.field.discount', [], 'EkynaCommerce'),
             self::COLUMN_SELL_PRICE       => t('export.column.sell_price', [], 'EkynaProduct'),
+            self::COLUMN_BUY_PRICE        => t('field.buy_net_price', [], 'EkynaCommerce'),
+            self::COLUMN_BUY_PRICE_SHIP   => t('field.buy_net_price_including_shipping', [], 'EkynaCommerce'),
             self::COLUMN_VALID_UNTIL      => t('export.column.valid_until', [], 'EkynaProduct'),
             self::COLUMN_WEIGHT           => t('field.weight', [], 'EkynaUi'),
             self::COLUMN_WIDTH            => t('field.width', [], 'EkynaUi'),
@@ -194,24 +199,7 @@ class ExportConfig
      */
     public static function getColumnsChoices(): array
     {
-        return [
-            self::COLUMN_DESIGNATION,
-            self::COLUMN_REFERENCE,
-            self::COLUMN_EXT_EAN8,
-            self::COLUMN_EXT_EAN13,
-            self::COLUMN_EXT_MANUFACTURER,
-            self::COLUMN_NET_PRICE,
-            self::COLUMN_DISCOUNT,
-            self::COLUMN_SELL_PRICE,
-            self::COLUMN_VALID_UNTIL,
-            self::COLUMN_WEIGHT,
-            self::COLUMN_WIDTH,
-            self::COLUMN_HEIGHT,
-            self::COLUMN_DEPTH,
-            self::COLUMN_DESCRIPTION,
-            self::COLUMN_IMAGE,
-            self::COLUMN_URL,
-        ];
+        return array_keys(self::getColumnsLabels());
     }
 
     /**
