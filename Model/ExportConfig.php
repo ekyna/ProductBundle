@@ -22,19 +22,22 @@ class ExportConfig
 {
     public const FORMAT_CSV = 'csv';
 
-    public const COLUMN_DESIGNATION = 'designation';
-    public const COLUMN_REFERENCE   = 'reference';
-    public const COLUMN_NET_PRICE   = 'net_price';
-    public const COLUMN_DISCOUNT    = 'discount';
-    public const COLUMN_BUY_PRICE   = 'quote_price';
-    public const COLUMN_VALID_UNTIL = 'valid_until';
-    public const COLUMN_WEIGHT      = 'weight';
-    public const COLUMN_WIDTH       = 'width';
-    public const COLUMN_HEIGHT      = 'height';
-    public const COLUMN_DEPTH       = 'depth';
-    public const COLUMN_DESCRIPTION = 'description';
-    public const COLUMN_IMAGE       = 'image';
-    public const COLUMN_URL         = 'url';
+    public const COLUMN_DESIGNATION      = 'designation';
+    public const COLUMN_REFERENCE        = 'reference';
+    public const COLUMN_EXT_EAN8         = 'ext_ean8';
+    public const COLUMN_EXT_EAN13        = 'ext_ean13';
+    public const COLUMN_EXT_MANUFACTURER = 'ext_manufacturer';
+    public const COLUMN_NET_PRICE        = 'net_price';
+    public const COLUMN_DISCOUNT         = 'discount';
+    public const COLUMN_SELL_PRICE       = 'quote_price';
+    public const COLUMN_VALID_UNTIL      = 'valid_until';
+    public const COLUMN_WEIGHT           = 'weight';
+    public const COLUMN_WIDTH            = 'width';
+    public const COLUMN_HEIGHT           = 'height';
+    public const COLUMN_DEPTH            = 'depth';
+    public const COLUMN_DESCRIPTION      = 'description';
+    public const COLUMN_IMAGE            = 'image';
+    public const COLUMN_URL              = 'url';
 
     private string            $format    = self::FORMAT_CSV;
     private array             $columns;
@@ -165,19 +168,22 @@ class ExportConfig
     public static function getColumnsLabels(): array
     {
         return [
-            self::COLUMN_DESIGNATION => t('field.designation', [], 'EkynaUi'),
-            self::COLUMN_REFERENCE   => t('field.reference', [], 'EkynaUi'),
-            self::COLUMN_NET_PRICE   => t('export.column.net_price', [], 'EkynaProduct'),
-            self::COLUMN_DISCOUNT    => t('sale.field.discount', [], 'EkynaCommerce'),
-            self::COLUMN_BUY_PRICE   => t('export.column.buy_price', [], 'EkynaProduct'),
-            self::COLUMN_VALID_UNTIL => t('export.column.valid_until', [], 'EkynaProduct'),
-            self::COLUMN_WEIGHT      => t('field.weight', [], 'EkynaUi'),
-            self::COLUMN_WIDTH       => t('field.width', [], 'EkynaUi'),
-            self::COLUMN_HEIGHT      => t('field.height', [], 'EkynaUi'),
-            self::COLUMN_DEPTH       => t('field.depth', [], 'EkynaUi'),
-            self::COLUMN_DESCRIPTION => t('field.description', [], 'EkynaUi'),
-            self::COLUMN_IMAGE       => t('field.image', [], 'EkynaUi'),
-            self::COLUMN_URL         => t('field.url', [], 'EkynaUi'),
+            self::COLUMN_DESIGNATION      => t('field.designation', [], 'EkynaUi'),
+            self::COLUMN_REFERENCE        => t('field.reference', [], 'EkynaUi'),
+            self::COLUMN_EXT_EAN8         => t('product_reference.type.ean8', [], 'EkynaProduct'),
+            self::COLUMN_EXT_EAN13        => t('product_reference.type.ean13', [], 'EkynaProduct'),
+            self::COLUMN_EXT_MANUFACTURER => t('product_reference.type.manufacturer', [], 'EkynaProduct'),
+            self::COLUMN_NET_PRICE        => t('export.column.net_price', [], 'EkynaProduct'),
+            self::COLUMN_DISCOUNT         => t('sale.field.discount', [], 'EkynaCommerce'),
+            self::COLUMN_SELL_PRICE       => t('export.column.sell_price', [], 'EkynaProduct'),
+            self::COLUMN_VALID_UNTIL      => t('export.column.valid_until', [], 'EkynaProduct'),
+            self::COLUMN_WEIGHT           => t('field.weight', [], 'EkynaUi'),
+            self::COLUMN_WIDTH            => t('field.width', [], 'EkynaUi'),
+            self::COLUMN_HEIGHT           => t('field.height', [], 'EkynaUi'),
+            self::COLUMN_DEPTH            => t('field.depth', [], 'EkynaUi'),
+            self::COLUMN_DESCRIPTION      => t('field.description', [], 'EkynaUi'),
+            self::COLUMN_IMAGE            => t('field.image', [], 'EkynaUi'),
+            self::COLUMN_URL              => t('field.url', [], 'EkynaUi'),
         ];
     }
 
@@ -191,9 +197,12 @@ class ExportConfig
         return [
             self::COLUMN_DESIGNATION,
             self::COLUMN_REFERENCE,
+            self::COLUMN_EXT_EAN8,
+            self::COLUMN_EXT_EAN13,
+            self::COLUMN_EXT_MANUFACTURER,
             self::COLUMN_NET_PRICE,
             self::COLUMN_DISCOUNT,
-            self::COLUMN_BUY_PRICE,
+            self::COLUMN_SELL_PRICE,
             self::COLUMN_VALID_UNTIL,
             self::COLUMN_WEIGHT,
             self::COLUMN_WIDTH,

@@ -33,7 +33,7 @@ class BundleFixReleasedAtCommand extends Command
 
     private ProductRepositoryInterface $repository;
     private EntityManagerInterface     $manager;
-    private PriceCalculator $priceCalculator;
+    private PriceCalculator            $priceCalculator;
 
     public function __construct(
         ProductRepositoryInterface $repository,
@@ -75,6 +75,7 @@ class BundleFixReleasedAtCommand extends Command
 
         if (!$updater->updateReleasedAt($bundle)) {
             $output->writeln('<comment>passed</comment>');
+
             return Command::SUCCESS;
         }
 

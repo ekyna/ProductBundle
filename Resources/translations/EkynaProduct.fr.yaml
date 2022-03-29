@@ -270,7 +270,7 @@ cross_selling:
 export:
     column:
         net_price: Prix publique
-        buy_price: Prix d'achat
+        sell_price: Prix remisé
         valid_until: Valide jusqu'au
 
 highlight:

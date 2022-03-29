@@ -268,9 +268,9 @@ cross_selling:
 
 export:
     column:
-        net_price: Prix publique
-        buy_price: Prix d'achat
-        valid_until: Valide jusqu'au
+        net_price: Public price
+        sell_price: Discounted price
+        valid_until: Valid_until
 
 highlight:
     title: Highlight

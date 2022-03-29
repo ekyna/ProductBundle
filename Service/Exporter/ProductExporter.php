@@ -8,6 +8,7 @@ use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -98,9 +99,9 @@ class ProductExporter
     {
         $row = [];
 
-        foreach ($this->config->getColumns() as $column) {
-            $price = $this->priceCalculator->getPrice($product, $this->config->getContext());
+        $price = $this->priceCalculator->getPrice($product, $this->config->getContext());
 
+        foreach ($this->config->getColumns() as $column) {
             $row[] = $this->buildCell($product, $price, $column);
         }
 
@@ -120,6 +121,18 @@ class ProductExporter
             return $product->getReference();
         }
 
+        if ($column === ExportConfig::COLUMN_EXT_EAN8) {
+            return $product->getReferenceByType(ProductReferenceTypes::TYPE_EAN_8) ?: '';
+        }
+
+        if ($column === ExportConfig::COLUMN_EXT_EAN13) {
+            return $product->getReferenceByType(ProductReferenceTypes::TYPE_EAN_13) ?: '';
+        }
+
+        if ($column === ExportConfig::COLUMN_EXT_MANUFACTURER) {
+            return $product->getReferenceByType(ProductReferenceTypes::TYPE_MANUFACTURER) ?: '';
+        }
+
         if ($column === ExportConfig::COLUMN_NET_PRICE) {
             return (string)($price['original_price'] ?? $price['sell_price']);
         }
@@ -128,7 +141,7 @@ class ProductExporter
             return 0 < $price['percent'] ? (string)$price['percent'] : '';
         }
 
-        if ($column === ExportConfig::COLUMN_BUY_PRICE) {
+        if ($column === ExportConfig::COLUMN_SELL_PRICE) {
             return (string)$price['sell_price'];
         }
 

@@ -105,7 +105,7 @@ class AttributeSet extends AbstractResource implements Model\AttributeSetInterfa
      *
      * @see https://github.com/Atlantic18/DoctrineExtensions/issues/1726
      */
-    public function compareTo($other)
+    public function compareTo($other): int
     {
         if ($other instanceof Model\AttributeSetInterface) {
             if ($this->id && $other->getId()) {
