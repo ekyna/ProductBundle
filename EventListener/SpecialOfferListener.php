@@ -8,12 +8,11 @@ use Doctrine\ORM\PersistentCollection;
 use Ekyna\Bundle\ProductBundle\Entity\SpecialOffer;
 use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
+use Ekyna\Bundle\ProductBundle\Service\Generator\PricingNameGenerator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
-use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
@@ -30,20 +29,23 @@ class SpecialOfferListener implements EventSubscriberInterface
     protected const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
     protected PersistenceHelperInterface $persistenceHelper;
-    protected OfferInvalidator $offerInvalidator;
-    protected PriceInvalidator $priceInvalidator;
-    protected TranslatorInterface $translator;
+    protected OfferInvalidator           $offerInvalidator;
+    protected PriceInvalidator           $priceInvalidator;
+    protected PricingNameGenerator       $nameGenerator;
+    protected TranslatorInterface        $translator;
 
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        OfferInvalidator $offerInvalidator,
-        PriceInvalidator $priceInvalidator,
-        TranslatorInterface $translator
+        OfferInvalidator           $offerInvalidator,
+        PriceInvalidator           $priceInvalidator,
+        PricingNameGenerator       $nameGenerator,
+        TranslatorInterface        $translator
     ) {
         $this->persistenceHelper = $persistenceHelper;
-        $this->offerInvalidator  = $offerInvalidator;
-        $this->priceInvalidator  = $priceInvalidator;
-        $this->translator        = $translator;
+        $this->offerInvalidator = $offerInvalidator;
+        $this->priceInvalidator = $priceInvalidator;
+        $this->nameGenerator = $nameGenerator;
+        $this->translator = $translator;
     }
 
     public function onInsert(ResourceEventInterface $event): SpecialOfferInterface
@@ -52,7 +54,7 @@ class SpecialOfferListener implements EventSubscriberInterface
 
         $this->simplify($specialOffer, $event);
 
-        $this->buildName($specialOffer);
+        $this->updateName($specialOffer);
 
         $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
 
@@ -65,7 +67,7 @@ class SpecialOfferListener implements EventSubscriberInterface
 
         $this->simplify($specialOffer, $event);
 
-        $this->buildName($specialOffer);
+        $this->updateName($specialOffer);
 
         $this->invalidate($specialOffer);
 
@@ -81,29 +83,32 @@ class SpecialOfferListener implements EventSubscriberInterface
     {
         $specialOffer = $this->getSpecialOfferFromEvent($event);
 
+        $this->invalidate($specialOffer, true);
+
         $this->offerInvalidator->invalidateSpecialOffer($specialOffer);
 
         // As offers are deleted by DBMS (On delete FK constraint),
         // we need to invalidate product prices here.
         $this->priceInvalidator->invalidateSpecialOffer($specialOffer);
 
-        $this->invalidate($specialOffer, true);
-
         return $specialOffer;
     }
 
+    /**
+     * Invalidates product offers related to this special offer.
+     */
     protected function invalidate(SpecialOfferInterface $specialOffer, bool $andPrices = false): void
     {
         $productCs = $this->persistenceHelper->getChangeSet($specialOffer, 'product');
 
         // Product
         if (!empty($productCs)) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+            /** @var ProductInterface $product */
             foreach ([0, 1] as $key) {
                 if (($product = $productCs[$key]) && ($id = $product->getId())) {
                     $this->offerInvalidator->invalidateByProductId($id);
                     if ($andPrices) {
-                        $this->offerInvalidator->invalidateByProductId($id);
+                        $this->priceInvalidator->invalidateByProductId($id);
                     }
                 }
             }
@@ -113,13 +118,13 @@ class SpecialOfferListener implements EventSubscriberInterface
         foreach ($specialOffer->getInsertedIds(SpecialOffer::REL_PRODUCTS) as $id) {
             $this->offerInvalidator->invalidateByProductId($id);
             if ($andPrices) {
-                $this->offerInvalidator->invalidateByProductId($id);
+                $this->priceInvalidator->invalidateByProductId($id);
             }
         }
         foreach ($specialOffer->getRemovedIds(SpecialOffer::REL_PRODUCTS) as $id) {
             $this->offerInvalidator->invalidateByProductId($id);
             if ($andPrices) {
-                $this->offerInvalidator->invalidateByProductId($id);
+                $this->priceInvalidator->invalidateByProductId($id);
             }
         }
 
@@ -127,24 +132,21 @@ class SpecialOfferListener implements EventSubscriberInterface
         foreach ($specialOffer->getInsertedIds(SpecialOffer::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
             if ($andPrices) {
-                $this->offerInvalidator->invalidateByBrandId($id);
+                $this->priceInvalidator->invalidateByBrandId($id);
             }
         }
         foreach ($specialOffer->getRemovedIds(SpecialOffer::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
             if ($andPrices) {
-                $this->offerInvalidator->invalidateByBrandId($id);
+                $this->priceInvalidator->invalidateByBrandId($id);
             }
         }
     }
 
     /**
      * Simplifies the special offer by removing products covered by brands.
-     *
-     * @param SpecialOfferInterface  $specialOffer
-     * @param ResourceEventInterface $event
      */
-    protected function simplify(SpecialOfferInterface $specialOffer, ResourceEventInterface $event)
+    protected function simplify(SpecialOfferInterface $specialOffer, ResourceEventInterface $event): void
     {
         if (null !== $specialOffer->getProduct()) {
             // Brands and products lists should be empty.
@@ -176,44 +178,25 @@ class SpecialOfferListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * Builds the special offer name.
-     */
-    protected function buildName(SpecialOfferInterface $specialOffer): void
+    protected function updateName(SpecialOfferInterface $specialOffer): void
     {
-        if (!empty($specialOffer->getName())) {
+        if (null !== $specialOffer->getProduct()) {
+            if (null !== $specialOffer->getName()) {
+                $specialOffer->setName(null);
+            }
+
+            $this->persistenceHelper->persistAndRecompute($specialOffer, false);
+
             return;
         }
 
-        $parts = ['-' . $specialOffer->getPercent()->toFixed(2) . '%'];
+        $name = $this->nameGenerator->generateSpecialOfferName($specialOffer);
 
-        if (null !== $product = $specialOffer->getProduct()) {
-            if (32 > strlen($designation = $product->getDesignation())) {
-                $parts[] = $designation;
-            } else {
-                $parts[] = substr($designation, 0, 32) . '...';
-            }
-        } elseif (empty($brands = $specialOffer->getBrands()->toArray())) {
-            $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
-        } else {
-            $parts[] = implode('/', array_map(function (BrandInterface $brand) {
-                return $brand->getName();
-            }, $brands));
+        if ($name === $specialOffer->getName()) {
+            return;
         }
 
-        if (!empty($groups = $specialOffer->getGroups()->toArray())) {
-            $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
-                return $group->getName();
-            }, $groups));
-        }
-
-        if (!empty($countries = $specialOffer->getCountries()->toArray())) {
-            $parts[] = implode('/', array_map(function (CountryInterface $country) {
-                return $country->getName();
-            }, $countries));
-        }
-
-        $specialOffer->setName(implode(' - ', $parts));
+        $specialOffer->setName($name);
 
         $this->persistenceHelper->persistAndRecompute($specialOffer, false);
     }

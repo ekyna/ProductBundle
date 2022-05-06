@@ -22,6 +22,7 @@
         </id>
 
         <field name="name" column="name" type="string" length="255" nullable="true"/>
+        <field name="designation" column="designation" type="string" length="255" nullable="true"/>
 
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingRuleInterface"
                      field="rules" mapped-by="pricing" orphan-removal="true">

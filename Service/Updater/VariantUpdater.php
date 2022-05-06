@@ -39,6 +39,8 @@ class VariantUpdater
      * Updates the attributes designation and title if needed.
      *
      * @throws CommerceExceptionInterface
+     *
+     * @TODO Move to a 'VariantDesignationGenerator' service
      */
     public function updateAttributesDesignationAndTitle(Model\ProductInterface $variant): bool
     {

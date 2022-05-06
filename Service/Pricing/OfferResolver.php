@@ -17,9 +17,9 @@ use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
  */
 class OfferResolver
 {
-    protected PricingRepositoryInterface $pricingRepository;
+    protected PricingRepositoryInterface      $pricingRepository;
     protected SpecialOfferRepositoryInterface $specialOfferRepository;
-    protected PriceCalculator $priceCalculator;
+    protected PriceCalculator                 $priceCalculator;
 
     public function __construct(
         PricingRepositoryInterface      $pricingRepository,

@@ -22,6 +22,10 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
 
     public function setName(?string $name): PricingInterface;
 
+    public function getDesignation(): ?string;
+
+    public function setDesignation(?string $designation): PricingInterface;
+
     public function getProduct(): ?ProductInterface;
 
     public function setProduct(?ProductInterface $product): PricingInterface;

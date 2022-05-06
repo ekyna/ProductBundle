@@ -175,7 +175,7 @@ class ProductListener implements EventSubscriberInterface
 
         // Schedule offers update if needed
         if ($this->persistenceHelper->isChanged($product, ['netPrice', 'brand'])) {
-            $this->offerInvalidator->invalidateByProductId($product->getId());
+            $this->offerInvalidator->invalidateByProduct($product);
         }
     }
 

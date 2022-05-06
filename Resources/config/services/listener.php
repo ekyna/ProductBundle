@@ -91,6 +91,7 @@ return static function (ContainerConfigurator $container) {
         // Customer group resource event listener
         ->set('ekyna_product.listener.customer_group', CustomerGroupListener::class)
             ->args([
+                service('ekyna_product.invalidator.offer'),
                 service('ekyna_product.invalidator.price'),
             ])
             ->tag('resource.event_subscriber')
@@ -125,6 +126,7 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_resource.orm.persistence_helper'),
                 service('ekyna_commerce.repository.customer_group'),
                 service('ekyna_commerce.repository.country'),
+                service('doctrine.orm.default_result_cache')->nullOnInvalid()
             ])
             ->tag('resource.event_subscriber')
             ->tag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate'])
@@ -135,6 +137,7 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_resource.orm.persistence_helper'),
                 service('ekyna_product.invalidator.offer'),
                 service('ekyna_product.invalidator.price'),
+                service('ekyna_product.generator.pricing_name'),
                 service('translator'),
             ])
             ->tag('resource.event_subscriber')
@@ -145,12 +148,12 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_resource.orm.persistence_helper'),
                 service('ekyna_product.invalidator.offer'),
                 service('ekyna_product.invalidator.price'),
-                service('translator'),
+                service('ekyna_product.generator.pricing_name'),
             ])
             ->tag('resource.event_subscriber')
 
         // Pricing rule resource event listener
-        ->set('ekyna_product.listener.pricing', PricingRuleListener::class)
+        ->set('ekyna_product.listener.pricing_rule', PricingRuleListener::class)
             ->args([
                 service('ekyna_resource.orm.persistence_helper'),
                 service('ekyna_product.invalidator.offer'),

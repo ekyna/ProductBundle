@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Ekyna\Bundle\ProductBundle\Entity\Pricing;
 use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Generator\PricingNameGenerator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
-use Ekyna\Component\Commerce\Common\Model\CountryInterface;
-use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,87 +23,48 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PricingListener implements EventSubscriberInterface
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface $persistenceHelper;
+    protected OfferInvalidator           $offerInvalidator;
+    protected PriceInvalidator           $priceInvalidator;
+    protected PricingNameGenerator       $nameGenerator;
 
-    /**
-     * @var OfferInvalidator
-     */
-    protected $offerInvalidator;
-
-    /**
-     * @var PriceInvalidator
-     */
-    protected $priceInvalidator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface $persistenceHelper
-     * @param OfferInvalidator           $offerInvalidator
-     * @param PriceInvalidator           $priceInvalidator
-     */
     public function __construct(
         PersistenceHelperInterface $persistenceHelper,
-        OfferInvalidator $offerInvalidator,
-        PriceInvalidator $priceInvalidator
+        OfferInvalidator           $offerInvalidator,
+        PriceInvalidator           $priceInvalidator,
+        PricingNameGenerator       $nameGenerator
     ) {
         $this->persistenceHelper = $persistenceHelper;
-        $this->offerInvalidator  = $offerInvalidator;
-        $this->priceInvalidator  = $priceInvalidator;
+        $this->offerInvalidator = $offerInvalidator;
+        $this->priceInvalidator = $priceInvalidator;
+        $this->nameGenerator = $nameGenerator;
     }
 
-    /**
-     * Pre insert event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingInterface
-     */
-    public function onInsert(ResourceEventInterface $event)
+    public function onInsert(ResourceEventInterface $event): PricingInterface
     {
         $pricing = $this->getPricingFromEvent($event);
 
-        $this->buildName($pricing);
+        $this->updateName($pricing);
 
         $this->offerInvalidator->invalidatePricing($pricing);
 
         return $pricing;
     }
 
-    /**
-     * Pre update event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingInterface
-     */
-    public function onUpdate(ResourceEventInterface $event)
+    public function onUpdate(ResourceEventInterface $event): PricingInterface
     {
         $pricing = $this->getPricingFromEvent($event);
 
-        $this->buildName($pricing);
+        $this->updateName($pricing);
 
         $this->invalidate($pricing);
 
         return $pricing;
     }
 
-    /**
-     * Pre delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingInterface
-     */
-    public function onDelete(ResourceEventInterface $event)
+    public function onDelete(ResourceEventInterface $event): PricingInterface
     {
         $pricing = $this->getPricingFromEvent($event);
-
-        $this->buildName($pricing);
 
         $this->invalidate($pricing, true);
 
@@ -117,22 +79,19 @@ class PricingListener implements EventSubscriberInterface
 
     /**
      * Invalidates product offers related to this pricing.
-     *
-     * @param PricingInterface $pricing
-     * @param bool             $andPrices
      */
-    protected function invalidate(PricingInterface $pricing, bool $andPrices = false)
+    protected function invalidate(PricingInterface $pricing, bool $andPrices = false): void
     {
         $productCs = $this->persistenceHelper->getChangeSet($pricing, 'product');
 
         // Product
         if (!empty($productCs)) {
-            /** @var \Ekyna\Bundle\ProductBundle\Model\ProductInterface $product */
+            /** @var ProductInterface $product */
             foreach ([0, 1] as $key) {
                 if (($product = $productCs[$key]) && ($id = $product->getId())) {
                     $this->offerInvalidator->invalidateByProductId($id);
                     if ($andPrices) {
-                        $this->offerInvalidator->invalidateByProductId($id);
+                        $this->priceInvalidator->invalidateByProductId($id);
                     }
                 }
             }
@@ -141,76 +100,56 @@ class PricingListener implements EventSubscriberInterface
         // Brands association changes
         foreach ($pricing->getInsertedIds(Pricing::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByBrandId($id);
+            }
         }
         foreach ($pricing->getRemovedIds(Pricing::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByBrandId($id);
+            }
         }
     }
 
-    /**
-     * Builds the pricing name.
-     *
-     * @param PricingInterface $pricing
-     */
-    protected function buildName(PricingInterface $pricing)
+    protected function updateName(PricingInterface $pricing): void
     {
-        if (!empty($pricing->getName())) {
+        if (null !== $pricing->getProduct()) {
+            if (null !== $pricing->getName()) {
+                $pricing->setName(null);
+            }
+
+            $this->persistenceHelper->persistAndRecompute($pricing, false);
+
             return;
         }
 
-        $parts = [];
+        $name = $this->nameGenerator->generatePricingName($pricing);
 
-        if (null !== $product = $pricing->getProduct()) {
-            if (32 > strlen($designation = $product->getDesignation())) {
-                $parts[] = $designation;
-            } else {
-                $parts[] = substr($designation, 0, 32) . '...';
-            }
-        } else {
-            $parts[] = implode('/', array_map(function (BrandInterface $brand) {
-                return $brand->getName();
-            }, $pricing->getBrands()->toArray()));
+        if ($name === $pricing->getName()) {
+            return;
         }
 
-        if (!empty($groups = $pricing->getGroups()->toArray())) {
-            $parts[] = implode('/', array_map(function (CustomerGroupInterface $group) {
-                return $group->getName();
-            }, $groups));
-        }
-
-        if (!empty($countries = $pricing->getCountries()->toArray())) {
-            $parts[] = implode('/', array_map(function (CountryInterface $country) {
-                return $country->getName();
-            }, $countries));
-        }
-
-        $pricing->setName(implode(' - ', $parts));
+        $pricing->setName($name);
 
         $this->persistenceHelper->persistAndRecompute($pricing, false);
     }
 
     /**
      * Returns the pricing from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PricingInterface
      */
-    protected function getPricingFromEvent(ResourceEventInterface $event)
+    protected function getPricingFromEvent(ResourceEventInterface $event): PricingInterface
     {
         $pricing = $event->getResource();
 
         if (!$pricing instanceof PricingInterface) {
-            throw new InvalidArgumentException("Expected instance of " . PricingInterface::class);
+            throw new UnexpectedTypeException($pricing, PricingInterface::class);
         }
 
         return $pricing;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PricingEvents::INSERT => ['onInsert', 0],

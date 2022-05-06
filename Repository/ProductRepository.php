@@ -19,11 +19,10 @@ use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
+use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
 
-use function array_column;
 use function array_merge;
-use function array_push;
 use function array_replace;
 use function array_unique;
 use function is_array;
@@ -341,8 +340,11 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getResult();
     }
 
-    public function findParentsByBundled(Model\ProductInterface $bundled, bool $requiredSlots = false): array
-    {
+    public function findParentsByBundled(
+        Model\ProductInterface $bundled,
+        bool                   $requiredSlots = false,
+        bool                   $idOnly = false
+    ): array {
         if (is_null($bundled->getId())) {
             return [];
         }
@@ -374,6 +376,15 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             $parameters['required'] = true;
         }
 
+        if ($idOnly) {
+            return $qb
+                ->select($as . '.id')
+                ->getQuery()
+                //->useQueryCache(true)
+                ->setParameters($parameters)
+                ->getResult(IdHydrator::NAME);
+        }
+
         return $qb
             ->getQuery()
             //->useQueryCache(true)
@@ -381,8 +392,11 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getResult();
     }
 
-    public function findParentsByOptionProduct(Model\ProductInterface $product, bool $requiredGroups = false): array
-    {
+    public function findParentsByOptionProduct(
+        Model\ProductInterface $product,
+        bool                   $requiredGroups = false,
+        bool                   $idOnly = false
+    ): array {
         if (is_null($product->getId())) {
             return [];
         }
@@ -414,6 +428,15 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             $parameters['required'] = true;
         }
 
+        if ($idOnly) {
+            return $qb
+                ->select($as . '.id')
+                ->getQuery()
+                //->useQueryCache(true)
+                ->setParameters($parameters)
+                ->getResult(IdHydrator::NAME);
+        }
+
         return $qb
             ->getQuery()
             //->useQueryCache(true)
@@ -421,7 +444,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getResult();
     }
 
-    public function findParentsByComponent(Model\ProductInterface $product): array
+    public function findParentsByComponent(Model\ProductInterface $product, bool $idOnly = false): array
     {
         if (is_null($product->getId())) {
             return [];
@@ -432,6 +455,15 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
         $qb
             ->join($as . '.components', 'c')
             ->andWhere($qb->expr()->eq('c.child', ':product'));
+
+        if ($idOnly) {
+            return $qb
+                ->select($as . '.id')
+                ->getQuery()
+                ->setParameter('product', $product)
+                //->useQueryCache(true)
+                ->getResult(IdHydrator::NAME);
+        }
 
         return $qb
             ->getQuery()
@@ -536,7 +568,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->andWhere($qb->expr()->eq('p.reference', ':reference'))
             ->setParameter('reference', $reference);
 
-        array_push($ignore, $product);
+        $ignore[] = $product;
         if (!empty($ids = $this->filterProductsIds($ignore))) {
             $qb
                 ->andWhere($qb->expr()->notIn('p.id', ':ids'))
@@ -568,7 +600,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->setParameter('designation', $designation)
             ->setParameter('brand', $brand);
 
-        array_push($ignore, $product);
+        $ignore[] = $product;
         if (!empty($ids = $this->filterProductsIds($ignore))) {
             $qb
                 ->andWhere($qb->expr()->notIn('p.id', ':ids'))
@@ -944,7 +976,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->setMaxResults($options['limit']);
 
         if ($options['id_only']) {
-            return array_column($query->getScalarResult(), 'id');
+            return $query->getResult(IdHydrator::NAME);
         }
 
         return $query->getResult();

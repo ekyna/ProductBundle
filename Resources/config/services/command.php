@@ -7,7 +7,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Ekyna\Bundle\ProductBundle\Command\BundleFixReleasedAtCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
-use Ekyna\Bundle\ProductBundle\Command\ReferenceConvertCommand;
 use Ekyna\Bundle\ProductBundle\Command\ResupplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockReportCommand;

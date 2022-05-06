@@ -29,6 +29,7 @@ class Pricing extends AbstractResource implements Model\PricingInterface
     use TrackAssociationTrait;
 
     protected ?string                 $name        = null;
+    protected ?string                 $designation = null;
     protected ?Model\ProductInterface $product     = null;
     /** @var Collection<CustomerGroupInterface> */
     protected Collection $groups;
@@ -49,7 +50,7 @@ class Pricing extends AbstractResource implements Model\PricingInterface
 
     public function __toString(): string
     {
-        return $this->name ?: 'New pricing';
+        return $this->designation ?: ($this->name ?: 'New pricing');
     }
 
     public function __clone()
@@ -75,6 +76,18 @@ class Pricing extends AbstractResource implements Model\PricingInterface
     public function setName(?string $name): Model\PricingInterface
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(?string $designation): Model\PricingInterface
+    {
+        $this->designation = $designation;
 
         return $this;
     }

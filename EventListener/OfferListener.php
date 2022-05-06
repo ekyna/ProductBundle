@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Decimal\Decimal;
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\MultiOperationCache;
-use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
-use Ekyna\Component\Resource\Exception\InvalidArgumentException;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,61 +24,33 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class OfferListener implements EventSubscriberInterface
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface       $persistenceHelper;
+    protected CustomerGroupRepositoryInterface $customerGroupRepository;
+    protected CountryRepositoryInterface       $countryRepository;
+    private ?CacheProvider                     $resultCache;
+    private array                              $productIds = [];
+    private array                              $cacheIds   = [];
 
-    /**
-     * @var CustomerGroupRepositoryInterface
-     */
-    protected $customerGroupRepository;
-
-    /**
-     * @var CountryRepositoryInterface
-     */
-    protected $countryRepository;
-
-    /**
-     * @var array
-     */
-    private $productIds = [];
-
-    /**
-     * @var array
-     */
-    private $cacheIds = [];
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface       $persistenceHelper
-     * @param CustomerGroupRepositoryInterface $customerGroupRepository
-     * @param CountryRepositoryInterface       $countryRepository
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
+        PersistenceHelperInterface       $persistenceHelper,
         CustomerGroupRepositoryInterface $customerGroupRepository,
-        CountryRepositoryInterface $countryRepository
+        CountryRepositoryInterface       $countryRepository,
+        CacheProvider                    $resultCache = null
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->customerGroupRepository = $customerGroupRepository;
         $this->countryRepository = $countryRepository;
+        $this->resultCache = $resultCache;
     }
 
     /**
      * Insert/Update/Delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return OfferInterface
      */
-    public function onChange(ResourceEventInterface $event)
+    public function onChange(ResourceEventInterface $event): OfferInterface
     {
         $offer = $this->getOfferFromEvent($event);
 
-        $id = (int)$offer->getProduct()->getId();
+        $id = $offer->getProduct()->getId();
 
         if (!in_array($id, $this->productIds, true)) {
             $this->productIds[] = $id;
@@ -88,19 +62,13 @@ class OfferListener implements EventSubscriberInterface
     /**
      * Kernel/Console terminate event handler.
      */
-    public function onTerminate()
+    public function onTerminate(): void
     {
-        if (empty($this->productIds)) {
+        if (null === $this->resultCache) {
             return;
         }
 
-        $cache = $this
-            ->persistenceHelper
-            ->getManager()
-            ->getConfiguration()
-            ->getResultCacheImpl();
-
-        if (!$cache) {
+        if (empty($this->productIds)) {
             return;
         }
 
@@ -122,11 +90,11 @@ class OfferListener implements EventSubscriberInterface
             }
         }
 
-        if ($cache instanceof MultiOperationCache) {
-            $cache->deleteMultiple($this->cacheIds);
+        if ($this->resultCache instanceof MultiOperationCache) {
+            $this->resultCache->deleteMultiple($this->cacheIds);
         } else {
             foreach ($this->cacheIds as $childId) {
-                $cache->delete($childId);
+                $this->resultCache->delete($childId);
             }
         }
 
@@ -136,26 +104,19 @@ class OfferListener implements EventSubscriberInterface
 
     /**
      * Returns the offer from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return OfferInterface
      */
-    protected function getOfferFromEvent(ResourceEventInterface $event)
+    protected function getOfferFromEvent(ResourceEventInterface $event): OfferInterface
     {
-        $offer = $event->getResource();
+        $resource = $event->getResource();
 
-        if (!$offer instanceof Offer) {
-            throw new InvalidArgumentException("Expected instance of " . Offer::class);
+        if (!$resource instanceof OfferInterface) {
+            throw new UnexpectedTypeException($resource, OfferInterface::class);
         }
 
-        return $offer;
+        return $resource;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             OfferEvents::INSERT => ['onChange', 0],

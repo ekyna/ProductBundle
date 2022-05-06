@@ -20,7 +20,7 @@ class OfferUpdater
     protected EntityManagerInterface   $manager;
     protected OfferResolver            $offerResolver;
     protected OfferRepositoryInterface $offerRepository;
-    protected PriceInvalidator         $priceInvalidator;
+    protected OfferInvalidator         $offerInvalidator;
     protected string                   $customerGroupClass;
     protected string                   $countryClass;
     protected string                   $pricingClass;
@@ -30,7 +30,7 @@ class OfferUpdater
         EntityManagerInterface   $manager,
         OfferResolver            $offerResolver,
         OfferRepositoryInterface $offerRepository,
-        PriceInvalidator         $priceInvalidator,
+        OfferInvalidator         $offerInvalidator,
         string                   $customerGroupClass,
         string                   $countryClass,
         string                   $pricingClass,
@@ -39,7 +39,7 @@ class OfferUpdater
         $this->manager = $manager;
         $this->offerResolver = $offerResolver;
         $this->offerRepository = $offerRepository;
-        $this->priceInvalidator = $priceInvalidator;
+        $this->offerInvalidator = $offerInvalidator;
         $this->customerGroupClass = $customerGroupClass;
         $this->countryClass = $countryClass;
         $this->pricingClass = $pricingClass;
@@ -51,7 +51,7 @@ class OfferUpdater
      *
      * @return bool Whether this product offers has been updated
      */
-    public function updateByProduct(ProductInterface $product): bool
+    public function updateProduct(ProductInterface $product): bool
     {
         if (in_array($product->getType(), [Types::TYPE_VARIABLE, Types::TYPE_CONFIGURABLE], true)) {
             $newOffers = [];
@@ -120,7 +120,7 @@ class OfferUpdater
             ->setPendingOffers(false)
             ->setPendingPrices(true);
 
-        $this->priceInvalidator->invalidateParentsPrices($product);
+        $this->offerInvalidator->invalidateParents($product);
 
         $this->manager->persist($product);
 

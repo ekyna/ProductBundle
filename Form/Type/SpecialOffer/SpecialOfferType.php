@@ -91,8 +91,8 @@ class SpecialOfferType extends AbstractResourceType
 
         if (!$options['product_mode']) {
             $builder
-                ->add('name', TextType::class, [
-                    'label'    => t('field.name', [], 'EkynaUi'),
+                ->add('designation', TextType::class, [
+                    'label'    => t('field.designation', [], 'EkynaUi'),
                     'required' => false,
                     'attr'     => [
                         'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),

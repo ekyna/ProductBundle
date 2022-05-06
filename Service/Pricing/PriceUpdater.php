@@ -49,35 +49,30 @@ class PriceUpdater
     }
 
     /**
-     * Updates the product offers.
+     * Updates the product prices.
      *
-     * @return bool Whether this product offers has been updated
+     * @return bool Whether this product prices has been updated
      */
-    public function updateByProduct(Model\ProductInterface $product): bool
+    public function updateProduct(Model\ProductInterface $product): bool
     {
         switch ($product->getType()) {
             case Types::TYPE_SIMPLE:
             case Types::TYPE_VARIANT:
-                return $this->updateChildProduct($product);
+            case Types::TYPE_BUNDLE:
+                return $this->updateDefault($product);
 
             case Types::TYPE_VARIABLE:
-                return $this->updateVariableProduct($product);
-
-            case Types::TYPE_BUNDLE:
-                return $this->updateBundleProduct($product);
+                return $this->updateVariable($product);
 
             case Types::TYPE_CONFIGURABLE:
-                return $this->updateConfigurableProduct($product);
+                return $this->updateConfigurable($product);
 
             default:
                 throw new InvalidArgumentException('Unexpected product type.');
         }
     }
 
-    /**
-     * Updates child product.
-     */
-    protected function updateChildProduct(Model\ProductInterface $product): bool
+    protected function updateDefault(Model\ProductInterface $product): bool
     {
         $builder = new Config\Builder($this->offerResolver);
 
@@ -99,13 +94,13 @@ class PriceUpdater
     }
 
     /**
-     * Update the given variable product's offers.
+     * Update the given variable product's prices.
      */
-    protected function updateVariableProduct(Model\ProductInterface $product): bool
+    protected function updateVariable(Model\ProductInterface $product): bool
     {
         $newPrices = [];
 
-        // Gather best offers for each group/country couples
+        // Gather best prices for each group/country couples
         $variants = $product->getVariants();
         foreach ($variants as $variant) {
             $prices = $this->resolvePrices($variant);
@@ -132,33 +127,9 @@ class PriceUpdater
     }
 
     /**
-     * Update the given bundle product's offers.
+     * Update the given configurable product's prices.
      */
-    protected function updateBundleProduct(Model\ProductInterface $product): bool
-    {
-        $builder = new Config\Builder($this->offerResolver);
-
-        $config = $builder->build($product);
-
-        $keys = $config->getKeys();
-
-        $newPrices = [];
-
-        foreach ($keys as $key) {
-            if (null === $price = $builder->flatten($config, $key)->toArray()) {
-                continue;
-            }
-
-            $newPrices[$key] = $price;
-        }
-
-        return $this->update($product, $newPrices);
-    }
-
-    /**
-     * Update the given configurable product's offers.
-     */
-    protected function updateConfigurableProduct(Model\ProductInterface $product): bool
+    protected function updateConfigurable(Model\ProductInterface $product): bool
     {
         return $this->update($product, []);
     }
@@ -217,7 +188,7 @@ class PriceUpdater
 
         $product->setPendingPrices(false);
 
-        $this->priceInvalidator->invalidateParentsPrices($product);
+        $this->priceInvalidator->invalidateParents($product);
 
         $this->manager->persist($product);
 
@@ -225,7 +196,7 @@ class PriceUpdater
     }
 
     /**
-     * Resolves the product offers.
+     * Resolves the product prices.
      */
     protected function resolvePrices(Model\ProductInterface $product): array
     {

@@ -33,14 +33,15 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
     use TaggedEntityTrait;
     use TrackAssociationTrait;
 
-    protected ?string            $name     = null;
+    protected ?string            $name        = null;
+    protected ?string            $designation = null;
     protected Decimal            $percent;
     protected Decimal            $minQuantity;
-    protected ?DateTimeInterface $startsAt = null;
-    protected ?DateTimeInterface $endsAt   = null;
-    protected bool               $stack    = true;
-    protected bool               $enabled  = false;
-    protected ?ProductInterface  $product  = null;
+    protected ?DateTimeInterface $startsAt    = null;
+    protected ?DateTimeInterface $endsAt      = null;
+    protected bool               $stack       = true;
+    protected bool               $enabled     = false;
+    protected ?ProductInterface  $product     = null;
     /** @var Collection<ProductInterface> */
     protected Collection $products;
     /** @var Collection<BrandInterface> */
@@ -64,7 +65,7 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
 
     public function __toString(): string
     {
-        return $this->name ?: 'New special offer';
+        return $this->designation ?: ($this->name ?: 'New special offer');
     }
 
     public function __clone()
@@ -89,6 +90,18 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
     public function setName(?string $name): SpecialOfferInterface
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(?string $designation): SpecialOfferInterface
+    {
+        $this->designation = $designation;
 
         return $this;
     }

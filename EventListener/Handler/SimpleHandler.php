@@ -91,7 +91,7 @@ class SimpleHandler extends AbstractHandler
             $childEvents[] = ProductEvents::CHILD_AVAILABILITY_CHANGE;
 
             if ($this->persistenceHelper->isChanged($product, 'visible')) {
-                $this->priceInvalidator->invalidateParentsPrices($product);
+                $this->priceInvalidator->invalidateParents($product);
             }
         }
 
@@ -145,7 +145,7 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
-        $this->priceInvalidator->invalidateParentsPrices($product);
+        $this->priceInvalidator->invalidateParents($product);
 
         return $this->updateMinPrice($product);
     }

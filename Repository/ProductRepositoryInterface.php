@@ -77,21 +77,29 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
      *
      * @return array<Model\ProductInterface>
      */
-    public function findParentsByBundled(Model\ProductInterface $bundled, bool $requiredSlots = false): array;
+    public function findParentsByBundled(
+        Model\ProductInterface $bundled,
+        bool                   $requiredSlots = false,
+        bool                   $idOnly = false
+    ): array;
 
     /**
      * Finds the products having the given product as option.
      *
      * @return array<Model\ProductInterface>
      */
-    public function findParentsByOptionProduct(Model\ProductInterface $product, bool $requiredGroups = false): array;
+    public function findParentsByOptionProduct(
+        Model\ProductInterface $product,
+        bool                   $requiredGroups = false,
+        bool                   $idOnly = false
+    ): array;
 
     /**
      * Finds the products having the given product as component.
      *
      * @return array<Model\ProductInterface>
      */
-    public function findParentsByComponent(Model\ProductInterface $product): array;
+    public function findParentsByComponent(Model\ProductInterface $product, bool $idOnly = false): array;
 
     /**
      * Finds the "out of stock" products for the given mode.

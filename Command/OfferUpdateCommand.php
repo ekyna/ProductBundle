@@ -151,7 +151,7 @@ class OfferUpdateCommand extends Command
     {
         $this->productName($product, $output);
 
-        if ($this->offerUpdater->updateByProduct($product)) {
+        if ($this->offerUpdater->updateProduct($product)) {
             $output->writeln('<info>updated</info>');
         } else {
             $output->writeln('<comment>up to date</comment>');
@@ -167,7 +167,7 @@ class OfferUpdateCommand extends Command
     {
         $this->productName($product, $output);
 
-        if ($this->priceUpdater->updateByProduct($product)) {
+        if ($this->priceUpdater->updateProduct($product)) {
             $output->writeln('<info>updated</info>');
         } else {
             $output->writeln('<comment>up to date</comment>');

@@ -37,6 +37,7 @@ class SpecialOfferType extends AbstractResourceType
         $builder
             ->addColumn('name', BType\Column\AnchorType::class, [
                 'label'    => t('field.name', [], 'EkynaUi'),
+                'property_path' => false,
                 'position' => 10,
             ])
             ->addColumn('percent', CType\Column\NumberType::class, [
@@ -108,17 +109,25 @@ class SpecialOfferType extends AbstractResourceType
                 'resource' => 'ekyna_product.brand',
                 'position' => 30,
             ])
+            ->addFilter('groups', ResourceType::class, [
+                'resource' => 'ekyna_commerce.customer_group',
+                'position' => 40,
+            ])
+            ->addFilter('countries', ResourceType::class, [
+                'resource' => 'ekyna_commerce.country',
+                'position' => 50,
+            ])
             ->addFilter('startsAt', CType\Filter\DateTimeType::class, [
                 'label'    => t('field.start_date', [], 'EkynaUi'),
-                'position' => 40,
+                'position' => 60,
             ])
             ->addFilter('endsAt', CType\Filter\DateTimeType::class, [
                 'label'    => t('field.end_date', [], 'EkynaUi'),
-                'position' => 50,
+                'position' => 70,
             ])
             ->addFilter('enabled', CType\Filter\BooleanType::class, [
                 'label'    => t('field.enabled', [], 'EkynaUi'),
-                'position' => 60,
+                'position' => 80,
             ]);
     }
 

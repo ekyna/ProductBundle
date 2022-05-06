@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\MultiOperationCache;
-use Ekyna\Bundle\ProductBundle\Entity\Price;
 use Ekyna\Bundle\ProductBundle\Event\PriceEvents;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\PriceInterface;
@@ -21,52 +23,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PriceListener implements EventSubscriberInterface
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
+    protected PersistenceHelperInterface       $persistenceHelper;
+    protected CustomerGroupRepositoryInterface $customerGroupRepository;
+    protected CountryRepositoryInterface       $countryRepository;
+    private ?CacheProvider                     $resultCache;
+    private array                              $cacheIds = [];
 
-    /**
-     * @var CustomerGroupRepositoryInterface
-     */
-    protected $customerGroupRepository;
-
-    /**
-     * @var CountryRepositoryInterface
-     */
-    protected $countryRepository;
-
-    /**
-     * @var array
-     */
-    private $cacheIds = [];
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface       $persistenceHelper
-     * @param CustomerGroupRepositoryInterface $customerGroupRepository
-     * @param CountryRepositoryInterface       $countryRepository
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
+        PersistenceHelperInterface       $persistenceHelper,
         CustomerGroupRepositoryInterface $customerGroupRepository,
-        CountryRepositoryInterface $countryRepository
+        CountryRepositoryInterface       $countryRepository,
+        CacheProvider                    $resultCache = null
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->customerGroupRepository = $customerGroupRepository;
         $this->countryRepository = $countryRepository;
+        $this->resultCache = $resultCache;
     }
 
     /**
      * Insert/Update/Delete event handler.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PriceInterface
      */
-    public function onChange(ResourceEventInterface $event)
+    public function onChange(ResourceEventInterface $event): PriceInterface
     {
         $price = $this->getPriceFromEvent($event);
 
@@ -92,27 +70,21 @@ class PriceListener implements EventSubscriberInterface
     /**
      * Kernel/Console terminate event handler.
      */
-    public function onTerminate()
+    public function onTerminate(): void
     {
+        if (null === $this->resultCache) {
+            return;
+        }
+
         if (empty($this->cacheIds)) {
             return;
         }
 
-        $cache = $this
-            ->persistenceHelper
-            ->getManager()
-            ->getConfiguration()
-            ->getResultCacheImpl();
-
-        if (!$cache) {
-            return;
-        }
-
-        if ($cache instanceof MultiOperationCache) {
-            $cache->deleteMultiple($this->cacheIds);
+        if ($this->resultCache instanceof MultiOperationCache) {
+            $this->resultCache->deleteMultiple($this->cacheIds);
         } else {
             foreach ($this->cacheIds as $childId) {
-                $cache->delete($childId);
+                $this->resultCache->delete($childId);
             }
         }
 
@@ -121,26 +93,19 @@ class PriceListener implements EventSubscriberInterface
 
     /**
      * Returns the price from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return PriceInterface
      */
-    protected function getPriceFromEvent(ResourceEventInterface $event)
+    protected function getPriceFromEvent(ResourceEventInterface $event): PriceInterface
     {
-        $offer = $event->getResource();
+        $resource = $event->getResource();
 
-        if (!$offer instanceof Price) {
-            throw new InvalidArgumentException("Expected instance of " . Price::class);
+        if (!$resource instanceof PriceInterface) {
+            throw new InvalidArgumentException($resource, PriceInterface::class);
         }
 
-        return $offer;
+        return $resource;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PriceEvents::INSERT => ['onChange', 0],

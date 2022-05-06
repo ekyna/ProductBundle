@@ -24,6 +24,10 @@ interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationI
 
     public function setName(?string $name): SpecialOfferInterface;
 
+    public function getDesignation(): ?string;
+
+    public function setDesignation(?string $designation): SpecialOfferInterface;
+
     public function getPercent(): Decimal;
 
     public function setPercent(Decimal $percent): SpecialOfferInterface;

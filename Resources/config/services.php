@@ -143,6 +143,9 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('twig.runtime')
 
+        // Name generator
+        ->set('ekyna_product.generator.pricing_name', Generator\PricingNameGenerator::class)
+
         // Offer resolver
         ->set('ekyna_product.resolver.offer', Pricing\OfferResolver::class)
             ->args([
@@ -154,7 +157,8 @@ return static function (ContainerConfigurator $container) {
         // Offer invalidator
         ->set('ekyna_product.invalidator.offer', Pricing\OfferInvalidator::class)
             ->args([
-                param('ekyna_product.class.product'),
+                service('ekyna_product.repository.product'),
+                param('ekyna_product.class.offer'),
             ])
 
         // Offer updater
@@ -163,7 +167,7 @@ return static function (ContainerConfigurator $container) {
                 service('doctrine.orm.default_entity_manager'),
                 service('ekyna_product.resolver.offer'),
                 service('ekyna_product.repository.offer'),
-                service('ekyna_product.invalidator.price'),
+                service('ekyna_product.invalidator.offer'),
                 param('ekyna_commerce.class.customer_group'),
                 param('ekyna_commerce.class.country'),
                 param('ekyna_product.class.pricing'),
@@ -372,6 +376,5 @@ return static function (ContainerConfigurator $container) {
         // Brand schema.org provider
         ->set('ekyna_product.schema_org.brand', SchemaOrg\BrandProvider::class)
             ->tag('ekyna_cms.schema_org_provider')
-
     ;
 };
