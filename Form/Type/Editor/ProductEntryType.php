@@ -6,8 +6,8 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
 use Ekyna\Bundle\ProductBundle\Model\ProductEntry;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,11 +28,7 @@ class ProductEntryType extends AbstractType
                     'widget_col' => 12,
                 ],
             ])
-            ->add('position', HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

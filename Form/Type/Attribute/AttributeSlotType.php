@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 
 use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
 use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
+use Ekyna\Bundle\UiBundle\Form\Type\CollectionPositionType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -39,11 +40,7 @@ class AttributeSlotType extends AbstractResourceType
                     'help_text' => t('attribute_slot.help.naming', [], 'EkynaProduct'),
                 ],
             ])
-            ->add('position', Type\HiddenType::class, [
-                'attr' => [
-                    'data-collection-role' => 'position',
-                ],
-            ]);
+            ->add('position', CollectionPositionType::class);
     }
 
     public function getBlockPrefix(): string
