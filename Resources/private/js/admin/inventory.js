@@ -2,14 +2,15 @@ define(
     ['require', 'jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner', 'ekyna-clipboard-copy'],
     function (require, $, Router, Dispatcher, Templates, Modal, Scanner) {
 
-    var $window = $(window),
+    const $window = $(window),
         $head = $('#inventory thead'),
         $body = $('#inventory tbody'),
         $foot = $('#inventory tfoot'),
         $wait = $('#inventory_wait').detach(),
         $none = $('#inventory_none').detach(),
-        $contextForm = $('form[name="inventory"]'),
-        busy = false,
+        $contextForm = $('form[name="inventory"]');
+
+    let busy = false,
         productsXhr;
 
     /**
@@ -18,10 +19,10 @@ define(
      * @returns object
      */
     function getContext() {
-        var array = $contextForm.serializeArray();
+        let array = $contextForm.serializeArray();
 
-        var context = {};
-        for (var i = 0; i < array.length; i++) {
+        let context = {};
+        for (let i = 0; i < array.length; i++) {
             if (array[i]['value']) {
                 context[array[i]['name']] = array[i]['value'];
             }
@@ -38,7 +39,7 @@ define(
         $contextForm.find('table select').val(null).find('option').prop('selected', false);
     }
 
-    var eol = false,
+    let eol = false,
         page = -1;
 
     /**
@@ -91,7 +92,7 @@ define(
     }
 
     function updateListHeight() {
-        var height = $window.height() - $contextForm.outerHeight() - $head.outerHeight() - $foot.outerHeight();
+        let height = $window.height() - $contextForm.outerHeight() - $head.outerHeight() - $foot.outerHeight();
         if (0 > height) {
             height = 0;
         }
@@ -113,15 +114,15 @@ define(
         parameters = parameters || {};
 
         if (true === parameters) {
-            var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
+            const productId = $(event.currentTarget).parents('tr').eq(0).data('id');
             if (!productId) {
                 console.log('Undefined product id.');
                 return false;
             }
-            parameters = {productId: productId};
+            parameters = {'productId': productId};
         }
 
-        var xhr = $.ajax({
+        const xhr = $.ajax({
             url: Router.generate(route, parameters),
             method: method
         });
@@ -147,16 +148,16 @@ define(
         handler = handler || handleResponse;
 
         if (true === parameters) {
-            var productId = $(event.currentTarget).parents('tr').eq(0).data('id');
+            const productId = $(event.currentTarget).parents('tr').eq(0).data('id');
             if (!productId) {
                 console.log('Undefined product id.');
                 return false;
             }
-            parameters = {productId: productId};
+            parameters = {'productId': productId};
         }
 
         try {
-            var modal = new Modal();
+            const modal = new Modal();
             modal.load({
                 url: Router.generate(route, parameters),
                 method: 'GET'
@@ -200,7 +201,7 @@ define(
         }
 
         $.each(data.products, function (index, product) {
-            var $new = $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)),
+            const $new = $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)),
                 $old = $body.find('tr[data-id=' + product.id + ']');
 
             if (1 === $old.length) {
@@ -259,7 +260,7 @@ define(
      * Line's bookmark buttons click handler
      */
     $body.on('click', 'a.bookmark', function (e) {
-        var $icon = $(e.currentTarget).closest('a'),
+        const $icon = $(e.currentTarget).closest('a'),
             value = $icon.hasClass('fa-bookmark-o'),
             route = value
                 ? 'admin_ekyna_product_product_bookmark_add'
@@ -285,18 +286,18 @@ define(
      * Line's print label buttons click handler
      */
     $body.on('click', 'a.print-label', function (e) {
-        var productId = $(e.currentTarget).parents('tr').eq(0).data('id');
+        const productId = $(e.currentTarget).parents('tr').eq(0).data('id');
         if (!productId) {
             console.log('Undefined product id.');
             return false;
         }
 
-        var url = Router.generate('admin_ekyna_product_product_label', {
+        const url = Router.generate('admin_ekyna_product_product_label', {
             'format': 'large',
             'id': [productId]
         });
 
-        var win = window.open(url, '_blank');
+        const win = window.open(url, '_blank');
         win.focus();
     });
 
@@ -304,6 +305,11 @@ define(
      * Context form submit.
      */
     $contextForm.on('submit', function (e) {
+        let event = e.originalEvent ?? e;
+        if (event.submitter && event.submitter.id === 'inventory_export') {
+            return true;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -349,7 +355,7 @@ define(
     });
 
     $('button[name="batch_submit"]').on('click', function(e) {
-        var ids = [];
+        let ids = [];
         $('#inventory').serializeArray().forEach(function(obj) {
             ids.push(obj.value);
         });
@@ -370,8 +376,8 @@ define(
         e.preventDefault();
         e.stopPropagation();
 
-        var $a = $(e.currentTarget),
-            sortDir = 'none';
+        const $a = $(e.currentTarget);
+        let sortDir = 'none';
 
         if ($a.hasClass('none')) {
             sortDir = 'asc';

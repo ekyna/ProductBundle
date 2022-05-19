@@ -130,7 +130,7 @@ class Inventory
             ->create(
                 InventoryType::class,
                 $this->getContext(),
-                array_replace(['method' => 'GET'], $options)
+                $options
             );
     }
 
@@ -162,13 +162,14 @@ class Inventory
      * Returns the product list.
      *
      * @param Request $request
+     * @param bool    $raw
      *
      * @return array
      */
-    public function listProducts(Request $request): array
+    public function listProducts(Request $request, bool $raw = false, array $options = []): array
     {
         // Form
-        $form = $this->getForm();
+        $form = $this->getForm($options);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->saveContext();
@@ -193,9 +194,13 @@ class Inventory
                 ->setMaxResults(30);
         }
 
-        return $this->normalizeProducts(
-            $qb->getQuery()->getScalarResult()
-        );
+        $products = $qb->getQuery()->getScalarResult();
+
+        if ($raw) {
+            return $products;
+        }
+
+        return $this->normalizeProducts($products);
     }
 
     /**

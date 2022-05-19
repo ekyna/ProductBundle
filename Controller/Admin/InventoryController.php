@@ -48,7 +48,8 @@ class InventoryController
             ]);
 
         $form = $this->inventory->getForm([
-            'action' => $this->urlGenerator->generate('admin_ekyna_product_inventory_products'),
+            'action' => $this->urlGenerator->generate('admin_ekyna_product_inventory_export'),
+            'method' => 'POST'
         ]);
 
         $data = $this->inventory->getContext();
@@ -63,7 +64,7 @@ class InventoryController
 
     public function products(Request $request): Response
     {
-        $products = $this->inventory->listProducts($request);
+        $products = $this->inventory->listProducts($request, false, ['method' => 'GET']);
 
         $data = [
             'products' => $products,

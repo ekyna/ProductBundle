@@ -128,7 +128,13 @@ class InventoryType extends AbstractType
             ->add('sortBy', Type\HiddenType::class)
             ->add('sortDir', Type\HiddenType::class)
             ->add('submit', Type\SubmitType::class, [
-                'label' => t('button.apply', [], 'EkynaUi'),
+                'label' => t('button.filter', [], 'EkynaUi'),
+                'attr'  => [
+                    'class' => 'btn-sm',
+                ],
+            ])
+            ->add('export', Type\SubmitType::class, [
+                'label' => t('button.export', [], 'EkynaUi'),
                 'attr'  => [
                     'class' => 'btn-sm',
                 ],

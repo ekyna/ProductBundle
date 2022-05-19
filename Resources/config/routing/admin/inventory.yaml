@@ -45,6 +45,11 @@ admin_ekyna_product_inventory_resupply:
     options:
         expose: true
 
+admin_ekyna_product_inventory_export:
+    path: /export
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportController
+    methods: [POST]
+
 admin_ekyna_product_inventory_export_products:
     path: /export-products
     controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportProductsController

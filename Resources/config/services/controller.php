@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\AbstractController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\BatchEditController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\CustomerOrdersController;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportProductsController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\ExportUnitsController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\Inventory\QuickEditController;
@@ -132,6 +133,12 @@ return static function (ContainerConfigurator $container) {
                 service('translator'),
             ])
             ->alias(CustomerOrdersController::class, 'ekyna_product.controller.admin.inventory.customer_orders')->public()
+
+        ->set('ekyna_product.controller.admin.inventory.export', ExportController::class)
+            ->args([
+                service('ekyna_product.inventory'),
+            ])
+            ->alias(ExportController::class, 'ekyna_product.controller.admin.inventory.export')->public()
 
         ->set('ekyna_product.controller.admin.inventory.export_units', ExportUnitsController::class)
             ->args([
