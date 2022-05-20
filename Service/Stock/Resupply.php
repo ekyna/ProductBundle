@@ -207,7 +207,7 @@ class Resupply
                 ->create();
 
             $deliveryItem
-                ->setOrderItem($item)
+                ->setOrder($item)
                 ->setQuantity(SupplierUtil::calculateDeliveryRemainingQuantity($item))
                 ->setGeocode('TEST');
 

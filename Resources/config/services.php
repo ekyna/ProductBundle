@@ -103,7 +103,6 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.commerce.provider.subject', Commerce\ProductProvider::class)
             ->args([
                 service('ekyna_product.repository.product'),
-                param('ekyna_product.class.product'),
             ])
             ->tag(SubjectProviderPass::TAG)
 

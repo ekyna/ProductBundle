@@ -58,7 +58,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
 
         $item = $event->getItem();
 
-        $context = $this->contextProvider->getContext($item->getSale());
+        $context = $this->contextProvider->getContext($item->getRootSale());
 
         $this->formBuilder->setContext($context);
 
@@ -98,7 +98,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         $offer = null;
         $item = $event->getItem();
 
-        $context = $this->contextProvider->getContext($item->getSale());
+        $context = $this->contextProvider->getContext($item->getRootSale());
 
         // Loop through parents and keep the best offer
         do {

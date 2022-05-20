@@ -33,7 +33,7 @@
         <h2>{{ 'attribute_choice.header.list'|trans({}, 'EkynaProduct')|raw }}</h2>
     </div>
     <div class="actions">
-        {{ admin_resource_btn('ekyna_product.attribute_choice', 'admin_create') }}
+        {{ admin_resource_btn('ekyna_product.attribute_choice', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction') }}
     </div>
     {{ ekyna_table_render(admin_resource_table('ekyna_product.attribute_choice', {
         'source': attribute.choices.toArray()

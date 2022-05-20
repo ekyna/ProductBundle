@@ -16,6 +16,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Class ProductChoiceType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @deprecated Use ProductSearchType
  */
 class ProductChoiceType extends AbstractType
 {
@@ -38,10 +40,14 @@ class ProductChoiceType extends AbstractType
                             ->addOrderBy('p.attributesDesignation', 'DESC');
                     };
                 },
-                'choice_value'  => function (ProductInterface $product) {
-                    return $product->getId();
+                'choice_value'  => function (?ProductInterface $product) {
+                    return $product ? $product->getId() : null;
                 },
-                'choice_label'  => function (ProductInterface $product) {
+                'choice_label'  => function (?ProductInterface $product) {
+                    if (!$product) {
+                        return null;
+                    }
+
                     return sprintf(
                         '[%s] %s',
                         $product->getReference(),

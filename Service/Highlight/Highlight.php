@@ -305,7 +305,7 @@ class Highlight
             }
 
             if ($item->hasSubjectIdentity()) {
-                if ($item->getSubjectIdentity()->getProvider() === ProductProvider::NAME) {
+                if ($item->getSubjectIdentity()->getProvider() === ProductProvider::getName()) {
                     $id = $item->getSubjectIdentity()->getIdentifier();
                     if (!in_array($id, $ids, true)) {
                         $ids[] = $id;

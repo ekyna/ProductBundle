@@ -105,6 +105,8 @@ function rules_purge(array &$rules): void
             if (rule_is_better($bd, $ad)) {
                 // B is a better rule, remove A
                 unset($rules[$ak]);
+
+                continue 2;
             }
         }
     }

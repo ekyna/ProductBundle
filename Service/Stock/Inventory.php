@@ -358,7 +358,7 @@ class Inventory
             )))*/
             ->setParameters([
                 'types'    => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
-                'provider' => ProductProvider::NAME,
+                'provider' => ProductProvider::getName(),
                 //'end_of_life'   => true,
                 //'virtual_stock' => 0,
             ]);

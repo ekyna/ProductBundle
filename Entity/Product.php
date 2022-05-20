@@ -16,6 +16,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductMentionInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Commerce\Exception\RuntimeException;
 use Ekyna\Component\Commerce\Stock\Model as Stock;
 use Ekyna\Component\Resource\Copier\CopierInterface;
 use Ekyna\Component\Resource\Model as RM;
@@ -184,7 +185,11 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
     public function getIdentifier(): int
     {
-        return $this->getId();
+        if (null === $id = $this->getId()) {
+            throw new RuntimeException('Subject identifier is not defined');
+        }
+
+        return $id;
     }
 
     public function getType(): ?string
@@ -1303,6 +1308,6 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
     public static function getProviderName(): string
     {
-        return ProductProvider::NAME;
+        return ProductProvider::getName();
     }
 }

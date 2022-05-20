@@ -80,6 +80,13 @@
             </a>
         </li>
         {%- endblock seo_tab -%}
+        {% for tab in extra_tabs -%}
+        <li>
+            <a href="#{{ resource_name }}-{{ tab.id }}" id="toggle-{{ tab.id }}" data-toggle="tab">
+                {{ tab.title|trans }}
+            </a>
+        </li>
+        {%- endfor %}
     </ul>
     <div class="show-body">
         <div class="tab-content">
@@ -216,6 +223,12 @@
             {%- endblock seo_content -%}
             </div>
             {%- endblock seo_pane -%}
+
+            {% for tab in extra_tabs -%}
+            <div class="tab-pane" id="{{ resource_name }}-{{ tab.id }}">
+                {% include tab.template with tab.data only %}
+            </div>
+            {%- endfor %}
         </div>
     </div>
 </div>

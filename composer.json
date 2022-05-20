@@ -1,6 +1,6 @@
 {
     "name": "ekyna/product-bundle",
-    "description": "Product management",
+    "description": "e-commerce Product management",
     "type": "symfony-bundle",
     "authors": [
         {
