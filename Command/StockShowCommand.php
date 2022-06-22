@@ -27,7 +27,7 @@ class StockShowCommand extends AbstractStockCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $product = $this->findProduct($input->getArgument('id'));
+        $product = $this->findProduct((int)$input->getArgument('id'));
 
         $this->stockTable($output, [$product]);
 

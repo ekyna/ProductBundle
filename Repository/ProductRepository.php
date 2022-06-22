@@ -17,6 +17,7 @@ use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
 use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
@@ -502,6 +503,30 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ))
             ->getQuery()
             ->setParameter('mode', $mode)
+            ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
+            ->setParameter('today', $today, Types::DATE_MUTABLE)
+            ->getResult();
+    }
+
+    /**
+     * Finds products having a past estimated date of arrival.
+     */
+    public function findHavingPastEDA(): array
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        $today = new DateTime();
+        $today->setTime(0, 0);
+
+        return $qb
+            ->andWhere($qb->expr()->in('p.type', ':types'))
+            ->andWhere($qb->expr()->neq('p.stockMode', ':not_mode'))
+            ->andWhere($qb->expr()->andX(
+                $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
+                $qb->expr()->lt('p.estimatedDateOfArrival', ':today')
+            ))
+            ->getQuery()
+            ->setParameter('not_mode', StockSubjectModes::MODE_DISABLED)
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
             ->setParameter('today', $today, Types::DATE_MUTABLE)
             ->getResult();

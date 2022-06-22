@@ -109,6 +109,13 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     public function findOutOfStockProducts(string $mode): array;
 
     /**
+     * Finds products having a past estimated date of arrival.
+     *
+     * @return array<ProductInterface>
+     */
+    public function findHavingPastEDA(): array;
+
+    /**
      * Finds the products for inventory export.
      *
      * @return array<Model\ProductInterface>

@@ -1012,10 +1012,7 @@
         <div class="actions">
             {{- admin_resource_btn('ekyna_product.product_stock_unit', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction', {
                 'label': t('stock_unit.button.new', [], 'EkynaCommerce'),
-                'size': 'xs',
-                'path': path('ekyna_product_product_stock_unit_admin_new', {
-                    'productId': product.id,
-                })
+                'size': 'xs'
             }) -}}
         </div>
         {%- endif -%}

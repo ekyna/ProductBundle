@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\ProductBundle\Command\BundleFixReleasedAtCommand;
+use Ekyna\Bundle\ProductBundle\Command\ClearPastEDACommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\ResupplyCommand;
@@ -27,6 +28,15 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.repository.product'),
                 service('doctrine.orm.default_entity_manager'),
                 service('ekyna_product.calculator.price'),
+            ])
+            ->tag('console.command')
+
+        // Clear past EDA command
+        ->set('ekyna_product.command.clear_past_eda', ClearPastEDACommand::class)
+            ->args([
+                service('ekyna_product.repository.product'),
+                service('ekyna_commerce.updater.stock_subject'),
+                service('ekyna_product.manager.product'),
             ])
             ->tag('console.command')
 

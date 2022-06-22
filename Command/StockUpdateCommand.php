@@ -15,6 +15,7 @@ use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
@@ -53,6 +54,12 @@ class StockUpdateCommand extends AbstractStockCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->persist = $input->getOption('persist');
+
+        if (!$this->persist) {
+            $output->writeln('<comment>Dry-run. Use --persist if you want to.</comment>');
+        }
+
         if (0 < $id = (int)$input->getArgument('id')) {
             if (!$product = $this->findProduct($id)) {
                 $output->writeln('<error>No product found</error>');
@@ -148,9 +155,11 @@ class StockUpdateCommand extends AbstractStockCommand
 
         $this->updater->update($product);
 
-        $this->manager->persist($product);
-        $this->manager->flush();
-        $this->manager->clear();
+        if ($this->persist) {
+            $this->manager->persist($product);
+            $this->manager->flush();
+            $this->manager->clear();
+        }
 
         return $this->showDiff($output, $product, $pre);
     }
