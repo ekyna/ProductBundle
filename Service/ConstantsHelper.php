@@ -82,7 +82,7 @@ class ConstantsHelper extends AbstractConstantsHelper
             $label = strtoupper($label[0]);
         }
 
-        return $this->renderBadge($label, $theme);
+        return $this->renderBadge($label, $theme, ['product-type-badge']);
     }
 
     /**

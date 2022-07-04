@@ -115,7 +115,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             }
 
             // Options should not inherit
-            if ($item->hasData(ItemBuilder::OPTION_GROUP_ID) || $item->hasData(ItemBuilder::OPTION_ID)) {
+            if ($item->hasDatum(ItemBuilder::OPTION_GROUP_ID) || $item->hasDatum(ItemBuilder::OPTION_ID)) {
                 break;
             }
         } while ($item = $item->getParent());

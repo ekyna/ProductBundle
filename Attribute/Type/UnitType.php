@@ -11,13 +11,15 @@ use Ekyna\Bundle\ProductBundle\Model\AttributeInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductAttributeInterface;
 use Ekyna\Component\Commerce\Common\Model\Units as CUnits;
 use NumberFormatter;
-use Symfony\Contracts\Translation\TranslatableInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function floatval;
 use function sprintf;
+use function str_contains;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -41,6 +43,8 @@ class UnitType extends AbstractType
         if (empty($value = $productAttribute->getValue())) {
             return null;
         }
+
+        $value = str_contains($value, '.') ? floatval($value) : intval($value);
 
         $formatter = NumberFormatter::create($locale, NumberFormatter::DECIMAL);
 

@@ -21,8 +21,7 @@ use Ekyna\Component\Resource\Model as RM;
  * @package Ekyna\Bundle\ProductBundle\Model
  * @author  Etienne Dauvergne <contact@ekyna.com>
  *
- * @method ProductTranslationInterface translate(string $locale = null, bool $create = false)
- * @method Collection|ProductTranslationInterface[] getTranslations()
+ * @implements RM\TranslatableInterface<ProductTranslationInterface>
  */
 interface ProductInterface extends
     VisibilityInterface,

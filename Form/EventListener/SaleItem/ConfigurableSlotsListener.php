@@ -49,8 +49,8 @@ class ConfigurableSlotsListener implements EventSubscriberInterface
 
         foreach ($bundleSlots as $bundleSlot) {
             foreach ($item->getChildren() as $index => $child) {
-                $bundleSlotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID));
-                if ($bundleSlotId == $bundleSlot->getId()) {
+                $bundleSlotId = intval($child->getDatum(ItemBuilder::BUNDLE_SLOT_ID));
+                if ($bundleSlotId === $bundleSlot->getId()) {
                     $form->add('slot_' . $bundleSlot->getId(), ConfigurableSlotType::class, [
                         'bundle_slot'   => $bundleSlot,
                         'property_path' => '[' . $index . ']',

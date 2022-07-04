@@ -29,9 +29,6 @@ use function sprintf;
  * Class Product
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
- *
- * @method Model\ProductTranslationInterface translate(string $locale = null, bool $create = false)
- * @method Collection<Model\ProductTranslationInterface> getTranslations()
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {

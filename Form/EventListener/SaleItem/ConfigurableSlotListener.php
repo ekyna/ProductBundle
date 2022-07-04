@@ -46,7 +46,7 @@ class ConfigurableSlotListener implements EventSubscriberInterface
 
         $form = $event->getForm();
 
-        $choiceId = $item->getData(ItemBuilder::BUNDLE_CHOICE_ID);
+        $choiceId = $item->getDatum(ItemBuilder::BUNDLE_CHOICE_ID);
 
         /** @var BundleChoiceInterface $choice */
         if (null !== $choice = $this->transformer->transform($choiceId)) {

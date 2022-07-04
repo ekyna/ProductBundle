@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
-use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Symfony\Component\Console\Command\Command;
@@ -31,8 +27,8 @@ class StockUpdateCommand extends AbstractStockCommand
     private StockSubjectUpdaterInterface $updater;
     private EntityManagerInterface       $manager;
 
-    private ?Query $query = null;
-    private int    $id;
+    private int $id;
+    private bool $persist;
 
     public function __construct(
         ProductRepositoryInterface   $repository,
@@ -45,11 +41,12 @@ class StockUpdateCommand extends AbstractStockCommand
         $this->manager = $manager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Updates the product stock.')
-            ->addArgument('id', InputArgument::OPTIONAL, "The product's id to update.");
+            ->addArgument('id', InputArgument::OPTIONAL, "The product's id to update.")
+            ->addOption('persist', null, InputOption::VALUE_NONE, 'Whether to persist changes');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -86,29 +83,6 @@ class StockUpdateCommand extends AbstractStockCommand
         return Command::SUCCESS;
     }
 
-    private function getQuery(): Query
-    {
-        if ($this->query) {
-            return $this->query;
-        }
-
-        if (!$this->repository instanceof EntityRepository) {
-            throw new UnexpectedTypeException($this->repository, EntityRepository::class);
-        }
-
-        $qb = $this->repository->createQueryBuilder('p');
-
-        $query = $qb
-            ->select('p')
-            ->andWhere($qb->expr()->gt('p.id', ':id'))
-            ->andWhere($qb->expr()->in('p.type', [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT]))
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(1)
-            ->getQuery();
-
-        return $this->query = $query;
-    }
-
     private function updateAll(OutputInterface $output): void
     {
         // TODO Symfony 4.1+ (need Table::appendRow)
@@ -119,7 +93,7 @@ class StockUpdateCommand extends AbstractStockCommand
         $this->id = 0;
         $total = $count = 0;
 
-        while ($product = $this->findNext()) {
+        while (null !== $product = $this->findNext()) {
             $total++;
 
             if ($this->doUpdate($output, $product)) {
@@ -136,13 +110,7 @@ class StockUpdateCommand extends AbstractStockCommand
 
     private function findNext(): ?ProductInterface
     {
-        /** @var ProductInterface|null $product */
-        $product = $this
-            ->getQuery()
-            ->setParameter('id', $this->id)
-            ->getOneOrNullResult();
-
-        if ($product) {
+        if (null !== $product = $this->repository->findNext($this->id)) {
             $this->id = $product->getId();
         }
 

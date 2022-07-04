@@ -8,6 +8,11 @@ use Ekyna\Bundle\CommerceBundle\Model\CustomerInterface;
 use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
+/**
+ * Class CatalogRepository
+ * @package Ekyna\Bundle\ProductBundle\Repository
+ * @author  Étienne Dauvergne <contact@ekyna.com>
+ */
 class CatalogRepository extends ResourceRepository implements CatalogRepositoryInterface
 {
     public function findByCustomer(CustomerInterface $customer): array

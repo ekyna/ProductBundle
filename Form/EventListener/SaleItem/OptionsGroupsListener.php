@@ -92,8 +92,8 @@ class OptionsGroupsListener implements EventSubscriberInterface
         foreach ($item->getChildren() as $index => $child) {
             // Bundle slot lookup
             if ($product->getType() === Model\ProductTypes::TYPE_BUNDLE) {
-                if (0 < $slotId = intval($child->getData(ItemBuilder::BUNDLE_SLOT_ID))) {
-                    $choiceId = intval($child->getData(ItemBuilder::BUNDLE_CHOICE_ID));
+                if (0 < $slotId = intval($child->getDatum(ItemBuilder::BUNDLE_SLOT_ID))) {
+                    $choiceId = intval($child->getDatum(ItemBuilder::BUNDLE_CHOICE_ID));
 
                     $found = false;
                     foreach ($product->getBundleSlots() as $slot) {
@@ -126,8 +126,8 @@ class OptionsGroupsListener implements EventSubscriberInterface
             }
 
             // Option group lookup
-            if (0 < $groupId = intval($child->getData(ItemBuilder::OPTION_GROUP_ID))) {
-                $optionId = intval($child->getData(ItemBuilder::OPTION_ID));
+            if (0 < $groupId = intval($child->getDatum(ItemBuilder::OPTION_GROUP_ID))) {
+                $optionId = intval($child->getDatum(ItemBuilder::OPTION_ID));
                 if (isset($data['option_group_' . $groupId])) {
                     $optionId = intval($data['option_group_' . $groupId]['choice']);
                 }
@@ -193,11 +193,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
         // Remove item children that does not match option groups
         foreach ($item->getChildren() as $childItem) {
             // Skip non option group child
-            if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+            if (!$childItem->hasDatum(ItemBuilder::OPTION_GROUP_ID)) {
                 continue;
             }
 
-            $id = intval($childItem->getData(ItemBuilder::OPTION_GROUP_ID));
+            $id = intval($childItem->getDatum(ItemBuilder::OPTION_GROUP_ID));
             if (0 < $id && in_array($id, $ids)) {
                 continue;
             }
@@ -211,11 +211,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Bundle choice options
                 if (isset($childMap['slot_id'])) {
                     // Skip non bundle slot child
-                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if ($childMap['slot_id'] == $childItem->getDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         $this->clearItems($childItem, $childMap);
 
                         continue 2; // Next child map
@@ -225,11 +225,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Option product options
                 if (isset($childMap['group_id'])) {
                     // Skip non option group child
-                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if ($childMap['group_id'] == $childItem->getDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         $this->clearItems($childItem, $childMap);
 
                         continue 2; // Next child map
@@ -254,7 +254,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         foreach ($groups as $group) {
             // Find matching sale item's child
             foreach ($item->getChildren() as $childItem) {
-                if ($group->getId() === $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                if ($group->getId() === $childItem->getDatum(ItemBuilder::OPTION_GROUP_ID)) {
                     continue 2;
                 }
             }
@@ -271,11 +271,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Bundle choice options
                 if (isset($childMap['slot_id'])) {
                     // Skip non bundle slot child
-                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if ($childMap['slot_id'] == $childItem->getDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         $this->createItems($childItem, $childMap);
 
                         continue 2; // Next child map
@@ -285,11 +285,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Option product options
                 if (isset($childMap['group_id'])) {
                     // Skip non option group child
-                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if ($childMap['group_id'] == $childItem->getDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         $this->createItems($childItem, $childMap);
 
                         continue 2; // Next child map
@@ -312,7 +312,7 @@ class OptionsGroupsListener implements EventSubscriberInterface
         /** @var Model\OptionGroupInterface $optionGroup */
         foreach ($treeMap['groups'] as $optionGroup) {
             foreach ($item->getChildren() as $index => $child) {
-                if ($optionGroup->getId() === $child->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                if ($optionGroup->getId() === $child->getDatum(ItemBuilder::OPTION_GROUP_ID)) {
                     $path = '[' . implode('].children[', array_merge($indexes, [$index])) . ']';
 
                     $flatMap[$path] = $optionGroup;
@@ -330,11 +330,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Bundle choice options
                 if (isset($childMap['slot_id'])) {
                     // Skip non bundle slot child
-                    if (!$childItem->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['slot_id'] == $childItem->getData(ItemBuilder::BUNDLE_SLOT_ID)) {
+                    if ($childMap['slot_id'] == $childItem->getDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                         $this->buildFlatMap($childItem, $childMap, $flatMap, array_merge($indexes, [$index]));
 
                         continue 2; // Next child map
@@ -344,11 +344,11 @@ class OptionsGroupsListener implements EventSubscriberInterface
                 // Option product options
                 if (isset($childMap['group_id'])) {
                     // Skip non option group child
-                    if (!$childItem->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if (!$childItem->hasDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         continue; // Next child item
                     }
 
-                    if ($childMap['group_id'] == $childItem->getData(ItemBuilder::OPTION_GROUP_ID)) {
+                    if ($childMap['group_id'] == $childItem->getDatum(ItemBuilder::OPTION_GROUP_ID)) {
                         $this->buildFlatMap($childItem, $childMap, $flatMap, array_merge($indexes, [$index]));
 
                         continue 2; // Next child map

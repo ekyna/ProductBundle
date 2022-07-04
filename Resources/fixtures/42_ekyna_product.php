@@ -45,20 +45,20 @@ return [
     ],
     PricingInterface::class     => [
         'pricing_1' => [
-            '__factory' => [
+            '__factory'   => [
                 '@ekyna_product.factory.pricing::create' => [],
             ],
-            'name'      => 'Tarifs revendeur',
-            'groups'    => [
+            'designation' => 'Tarifs revendeur',
+            'groups'      => [
                 0 => '<customerGroup(true)>',
             ],
-            'countries' => [
+            'countries'   => [
                 0 => '<countryByCode(\'FR\')>',
             ],
-            'brands'    => [
+            'brands'      => [
                 0 => '@brand_acme',
             ],
-            'rules'     => [
+            'rules'       => [
                 0 => '@pricing_1_rule_1',
                 1 => '@pricing_1_rule_2',
                 2 => '@pricing_1_rule_3',

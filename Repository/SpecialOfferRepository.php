@@ -11,8 +11,6 @@ use Doctrine\ORM\Query;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
-use function round;
-
 /**
  * Class SpecialOfferRepository
  * @package Ekyna\Bundle\ProductBundle\Repository

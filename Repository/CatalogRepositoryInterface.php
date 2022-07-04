@@ -12,6 +12,8 @@ use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
  * Class CatalogRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @implements ResourceRepositoryInterface<CatalogInterface>
  */
 interface CatalogRepositoryInterface extends ResourceRepositoryInterface
 {

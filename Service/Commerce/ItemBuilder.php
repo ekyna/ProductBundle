@@ -151,7 +151,7 @@ class ItemBuilder
             throw new Exception\LogicException('Variable product must have at least one variant.');
         }
 
-        if (0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {
+        if (0 < ($variantId = intval($item->getDatum(self::VARIANT_ID)))) {
             foreach ($variants as $v) {
                 if ($variantId == $v->getId()) {
                     $variant = $v;
@@ -180,7 +180,7 @@ class ItemBuilder
 
         $this->buildFromSimple($item, $variant);
 
-        $item->setData(self::VARIANT_ID, $variant->getId()); // TODO Useless
+        $item->setDatum(self::VARIANT_ID, $variant->getId()); // TODO Useless
     }
 
     /**
@@ -222,7 +222,7 @@ class ItemBuilder
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID));
+                $bundleSlotId = intval($childItem->getDatum(self::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
@@ -290,7 +290,7 @@ class ItemBuilder
 
             // Find matching item
             foreach ($item->getChildren() as $childItem) {
-                $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID));
+                $bundleSlotId = intval($childItem->getDatum(self::BUNDLE_SLOT_ID));
                 if ($bundleSlotId != $bundleSlot->getId()) {
                     continue;
                 }
@@ -303,7 +303,7 @@ class ItemBuilder
                 $bundleSlotIds[] = $bundleSlotId;
 
                 // Resolve choice
-                if (0 < $bundleChoiceId = intval($childItem->getData(self::BUNDLE_CHOICE_ID))) {
+                if (0 < $bundleChoiceId = intval($childItem->getDatum(self::BUNDLE_CHOICE_ID))) {
                     foreach ($choices as $choice) {
                         if ($bundleChoiceId === $choice->getId()) {
                             $bundleChoice = $choice;
@@ -334,7 +334,7 @@ class ItemBuilder
 
         // Direct children must be public as they are user choices.
         foreach ($item->getChildren() as $child) {
-            if ($child->hasData(self::BUNDLE_SLOT_ID)) {
+            if ($child->hasDatum(self::BUNDLE_SLOT_ID)) {
                 $child->setPrivate(false);
             }
         }
@@ -377,8 +377,8 @@ class ItemBuilder
         }
 
         $item
-            ->setData(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
-            ->setData(self::BUNDLE_CHOICE_ID, $choice->getId())
+            ->setDatum(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setDatum(self::BUNDLE_CHOICE_ID, $choice->getId())
             ->setImmutable(true);
     }
 
@@ -419,7 +419,7 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Check option group id
-                    $optionGroupId = intval($child->getData(self::OPTION_GROUP_ID));
+                    $optionGroupId = intval($child->getDatum(self::OPTION_GROUP_ID));
                     if ($optionGroupId != $optionGroup->getId()) {
                         continue;
                     }
@@ -437,7 +437,7 @@ class ItemBuilder
 
                     // Check option choice
                     $found = false;
-                    if (0 < $optionId = intval($child->getData(self::OPTION_ID))) {
+                    if (0 < $optionId = intval($child->getDatum(self::OPTION_ID))) {
                         foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
@@ -449,7 +449,7 @@ class ItemBuilder
                         }
                         // Not Found => unset choice
                         if (!$found) {
-                            $child->unsetData(self::OPTION_ID);
+                            $child->unsetDatum(self::OPTION_ID);
                         }
                     }
 
@@ -485,7 +485,7 @@ class ItemBuilder
 
         if (null !== $product = $option->getProduct()) {
             $this->buildFromProduct($item, $product, []); // TODO Cascade / exclude
-            $item->unsetData(self::VARIANT_ID); // Not a variant choice
+            $item->unsetDatum(self::VARIANT_ID); // Not a variant choice
         } else {
             $designation = sprintf(
                 '%s : %s',
@@ -506,8 +506,8 @@ class ItemBuilder
         }
 
         $item
-            ->setData(self::OPTION_GROUP_ID, $option->getGroup()->getId())
-            ->setData(self::OPTION_ID, $option->getId())
+            ->setDatum(self::OPTION_GROUP_ID, $option->getGroup()->getId())
+            ->setDatum(self::OPTION_ID, $option->getId())
             ->setQuantity(new Decimal(1))
             ->setImmutable(true)
             ->setConfigurable(false);
@@ -568,7 +568,7 @@ class ItemBuilder
         foreach ($components as $component) {
             // Find option group matching item
             foreach ($item->getChildren() as $child) {
-                $componentId = intval($child->getData(self::COMPONENT_ID));
+                $componentId = intval($child->getDatum(self::COMPONENT_ID));
 
                 // Component id match
                 if ($componentId != $component->getId()) {
@@ -606,7 +606,7 @@ class ItemBuilder
     private function cleanUpBundleSlots(SaleItemInterface $item, array $bundleSlotIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
-            if (0 < $bundleSlotId = intval($childItem->getData(self::BUNDLE_SLOT_ID))) {
+            if (0 < $bundleSlotId = intval($childItem->getDatum(self::BUNDLE_SLOT_ID))) {
                 if (!in_array($bundleSlotId, $bundleSlotIds)) {
                     $item->removeChild($childItem);
                 }
@@ -623,7 +623,7 @@ class ItemBuilder
     private function cleanUpOptionGroups(SaleItemInterface $item, array $optionGroupIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
-            if (0 < $optionGroupId = intval($childItem->getData(self::OPTION_GROUP_ID))) {
+            if (0 < $optionGroupId = intval($childItem->getDatum(self::OPTION_GROUP_ID))) {
                 if (!in_array($optionGroupId, $optionGroupIds)) {
                     $item->removeChild($childItem);
                 }
@@ -640,7 +640,7 @@ class ItemBuilder
     private function cleanUpComponents(SaleItemInterface $item, array $componentIds = []): void
     {
         foreach ($item->getChildren() as $childItem) {
-            if (0 < $componentId = intval($childItem->getData(self::COMPONENT_ID))) {
+            if (0 < $componentId = intval($childItem->getDatum(self::COMPONENT_ID))) {
                 if (!in_array($componentId, $componentIds)) {
                     $item->removeChild($childItem);
                 }
@@ -659,12 +659,12 @@ class ItemBuilder
         $product = $this->resolve($item);
 
         // Clear identifiers vars
-        $item->unsetData(self::VARIANT_ID);
-        $item->unsetData(self::BUNDLE_SLOT_ID);
-        $item->unsetData(self::BUNDLE_CHOICE_ID);
-        $item->unsetData(self::OPTION_GROUP_ID);
-        $item->unsetData(self::OPTION_ID);
-        $item->unsetData(self::COMPONENT_ID);
+        $item->unsetDatum(self::VARIANT_ID);
+        $item->unsetDatum(self::BUNDLE_SLOT_ID);
+        $item->unsetDatum(self::BUNDLE_CHOICE_ID);
+        $item->unsetDatum(self::OPTION_GROUP_ID);
+        $item->unsetDatum(self::OPTION_ID);
+        $item->unsetDatum(self::COMPONENT_ID);
 
         switch ($product->getType()) {
             case ProductTypes::TYPE_SIMPLE:
@@ -726,7 +726,7 @@ class ItemBuilder
     {
         ProductTypes::assertVariant($product);
 
-        $item->setData(self::VARIANT_ID, $product->getId());
+        $item->setDatum(self::VARIANT_ID, $product->getId());
 
         $this->initializeFromSimple($item, $product);
     }
@@ -783,7 +783,7 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Check bundle slot id
-                    $bundleSlotId = intval($child->getData(self::BUNDLE_SLOT_ID));
+                    $bundleSlotId = intval($child->getDatum(self::BUNDLE_SLOT_ID));
                     if ($bundleSlotId != $bundleSlot->getId()) {
                         continue;
                     }
@@ -817,7 +817,7 @@ class ItemBuilder
             if ($bundleSlot->isRequired()) {
                 $this->initializeFromBundleChoice($child, $defaultChoice, $exclude);
             } else {
-                $child->setData(self::BUNDLE_SLOT_ID, $bundleSlot->getId());
+                $child->setDatum(self::BUNDLE_SLOT_ID, $bundleSlot->getId());
             }
         }
     }
@@ -847,8 +847,8 @@ class ItemBuilder
         $item
             ->setQuantity($choice->getMinQuantity())
             ->setPosition($choice->getSlot()->getPosition())
-            ->setData(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
-            ->setData(self::BUNDLE_CHOICE_ID, $choice->getId());
+            ->setDatum(self::BUNDLE_SLOT_ID, $choice->getSlot()->getId())
+            ->setDatum(self::BUNDLE_CHOICE_ID, $choice->getId());
     }
 
     /**
@@ -874,12 +874,12 @@ class ItemBuilder
             if ($item->hasChildren()) {
                 foreach ($item->getChildren() as $child) {
                     // Skip if item has no option group data
-                    if (!$child->hasData(self::OPTION_GROUP_ID)) {
+                    if (!$child->hasDatum(self::OPTION_GROUP_ID)) {
                         continue;
                     }
 
                     // Check option group data
-                    $optionGroupId = intval($child->getData(self::OPTION_GROUP_ID));
+                    $optionGroupId = intval($child->getDatum(self::OPTION_GROUP_ID));
                     if ($optionGroupId != $optionGroup->getId()) {
                         continue;
                     }
@@ -897,7 +897,7 @@ class ItemBuilder
 
                     // Check option choice
                     $found = false;
-                    if (0 < $optionId = intval($child->getData(self::OPTION_ID))) {
+                    if (0 < $optionId = intval($child->getDatum(self::OPTION_ID))) {
                         foreach ($options as $option) {
                             if ($optionId === $option->getId()) {
                                 $found = true;
@@ -908,12 +908,12 @@ class ItemBuilder
 
                     // Not Found
                     if (!$found) {
-                        $child->unsetData(self::OPTION_ID);
+                        $child->unsetDatum(self::OPTION_ID);
 
                         // Default choice if required
                         if ($optionGroup->isRequired()) {
                             if ($option = current($options)) {
-                                $child->setData(self::OPTION_ID, $option->getId());
+                                $child->setDatum(self::OPTION_ID, $option->getId());
                             }
                         }
                     }
@@ -939,7 +939,7 @@ class ItemBuilder
     public function initializeFromOptionGroup(SaleItemInterface $item, Model\OptionGroupInterface $optionGroup): void
     {
         $item
-            ->setData(self::OPTION_GROUP_ID, $optionGroup->getId())
+            ->setDatum(self::OPTION_GROUP_ID, $optionGroup->getId())
             ->setQuantity(new Decimal(1))
             ->setPosition($optionGroup->getPosition());
 
@@ -952,7 +952,7 @@ class ItemBuilder
             }
 
             if ($option = current($options)) {
-                $item->setData(self::OPTION_ID, $option->getId());
+                $item->setDatum(self::OPTION_ID, $option->getId());
             }
         }
     }
@@ -1015,7 +1015,7 @@ class ItemBuilder
                 throw new Exception\InvalidArgumentException('Variable product must have at least one variant.');
             }
 
-            if ($item && 0 < ($variantId = intval($item->getData(self::VARIANT_ID)))) {
+            if ($item && 0 < ($variantId = intval($item->getDatum(self::VARIANT_ID)))) {
                 foreach ($variants as $v) {
                     if ($variantId == $v->getId()) {
                         return $v;

@@ -9,8 +9,10 @@ use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 
 /**
  * Interface ProductReferenceRepositoryInterface
- * @package      Ekyna\Bundle\ProductBundle\Repository
- * @author       Etienne Dauvergne <contact@ekyna.com>
+ * @package Ekyna\Bundle\ProductBundle\Repository
+ * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @implements ResourceRepositoryInterface<ProductReferenceInterface>
  */
 interface ProductReferenceRepositoryInterface extends ResourceRepositoryInterface
 {

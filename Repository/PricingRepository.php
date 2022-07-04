@@ -6,7 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Decimal\Decimal;
 use Doctrine\ORM\Query;
-use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
 
@@ -21,7 +21,7 @@ class PricingRepository extends ResourceRepository implements PricingRepositoryI
 {
     private ?Query $byProductQuery = null;
 
-    public function findRulesByProduct(Model\ProductInterface $product): array
+    public function findRulesByProduct(ProductInterface $product): array
     {
         $rules = $this
             ->getByProductQuery()

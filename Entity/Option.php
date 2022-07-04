@@ -8,6 +8,7 @@ use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Pricing\Model\TaxableTrait;
 use Ekyna\Component\Resource\Model as RM;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 
 /**
@@ -170,10 +171,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
     {
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getGroupSequence()
+    public function getGroupSequence(): array|GroupSequence
     {
         $groups = ['Option'];
 

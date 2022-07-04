@@ -39,11 +39,11 @@ class SaleItemConfigurableValidator extends ConstraintValidator
     {
         /** @var \Ekyna\Component\Commerce\Common\Model\SaleItemInterface $child */
         foreach ($collection->getIterator() as $child) {
-            if ($child->hasData(ItemBuilder::OPTION_GROUP_ID)) {
+            if ($child->hasDatum(ItemBuilder::OPTION_GROUP_ID)) {
                 continue;
             }
 
-            if ($child->hasData(ItemBuilder::BUNDLE_SLOT_ID)) {
+            if ($child->hasDatum(ItemBuilder::BUNDLE_SLOT_ID)) {
                 return true;
             }
         }

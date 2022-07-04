@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Decimal\Decimal;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
@@ -16,6 +15,7 @@ use Ekyna\Component\Commerce\Customer\Repository\CustomerGroupRepositoryInterfac
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * OfferListener
@@ -27,7 +27,7 @@ class OfferListener implements EventSubscriberInterface
     protected PersistenceHelperInterface       $persistenceHelper;
     protected CustomerGroupRepositoryInterface $customerGroupRepository;
     protected CountryRepositoryInterface       $countryRepository;
-    private ?CacheProvider                     $resultCache;
+    private ?CacheInterface                    $resultCache;
     private array                              $productIds = [];
     private array                              $cacheIds   = [];
 
@@ -35,7 +35,7 @@ class OfferListener implements EventSubscriberInterface
         PersistenceHelperInterface       $persistenceHelper,
         CustomerGroupRepositoryInterface $customerGroupRepository,
         CountryRepositoryInterface       $countryRepository,
-        CacheProvider                    $resultCache = null
+        CacheInterface                   $resultCache = null
     ) {
         $this->persistenceHelper = $persistenceHelper;
         $this->customerGroupRepository = $customerGroupRepository;

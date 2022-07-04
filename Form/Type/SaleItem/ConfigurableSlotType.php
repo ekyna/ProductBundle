@@ -94,7 +94,7 @@ class ConfigurableSlotType extends Form\AbstractType
         if (!$bundleSlot->isRequired()) {
             // Make empty choice last
             $first = array_shift($view->children['choice']->children);
-            array_push($view->children['choice']->children, $first);
+            $view->children['choice']->children[] = $first;
         }
 
         // Add image to each subject choice radio buttons vars

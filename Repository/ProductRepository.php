@@ -9,6 +9,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\CommerceBundle\Model\StockSubjectModes as BStockModes;
@@ -31,6 +32,8 @@ use function is_int;
 use function is_null;
 use function method_exists;
 
+use const SORT_ASC;
+
 /**
  * Class ProductRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
@@ -38,6 +41,9 @@ use function method_exists;
  */
 class ProductRepository extends TranslatableRepository implements ProductRepositoryInterface
 {
+    /** @var array<int, Query> */
+    private array $findNextQuery = [];
+
     // TODO Store queries in private properties
 
     public function getUpdateDateById(int $id, bool $visible = true, array $types = null): ?DateTimeInterface
@@ -108,6 +114,21 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
         }
 
         return null;
+    }
+
+    public function findNext(int $id, array $types = [], int $direction = SORT_ASC): ?Model\ProductInterface
+    {
+        if (empty($types)) {
+            $types = [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT];
+        }
+
+        return $this
+            ->getFindNextQuery($direction)
+            ->setParameters([
+                'id'    => $id,
+                'types' => $types,
+            ])
+            ->getOneOrNullResult();
     }
 
     public function findOneById(int $id): ?Model\ProductInterface
@@ -1180,6 +1201,30 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
         }
 
         return $this;
+    }
+
+    private function getFindNextQuery(int $direction): Query
+    {
+        if (isset($this->findNextQuery[$direction])) {
+            return $this->findNextQuery[$direction];
+        }
+
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->andWhere($qb->expr()->in('p.type', ':types'))
+            ->setMaxResults(1);
+
+        if (SORT_ASC === $direction) {
+            $qb
+                ->andWhere($qb->expr()->gt('p.id', ':id'))
+                ->orderBy('p.id', 'ASC');
+        } else {
+            $qb
+                ->andWhere($qb->expr()->lt('p.id', ':id'))
+                ->orderBy('p.id', 'DESC');
+        }
+
+        return $this->findNextQuery[$direction] = $qb->getQuery();
     }
 
     /**
