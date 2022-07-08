@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Ekyna\Bundle\CommerceBundle\Event\SubjectLabelEvent;
 use Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AccountMenuSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AddToCartEventSubscriber;
@@ -277,7 +278,10 @@ return static function (ContainerConfigurator $container) {
 
         // Product label event listener
         ->set('ekyna_product.listener.product_label', LabelListener::class)
-            ->tag('kernel.event_subscriber')
+            ->tag('kernel.event_listener', [
+                'event'  => SubjectLabelEvent::BUILD,
+                'method' => 'onBuildSubjectLabel'
+            ])
 
         // Image url event listener
         ->set('ekyna_product.listener.image_url', ImageUrlEventListener::class)

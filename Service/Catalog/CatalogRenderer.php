@@ -118,12 +118,10 @@ class CatalogRenderer
 
         if ($catalog->getFormat() === static::FORMAT_PDF) {
             $options = [
-                'margins' => [
-                    'top'    => 0,
-                    'right'  => 0,
-                    'bottom' => 0,
-                    'left'   => 0,
-                ],
+                'marginTop'     => 0,
+                'marginBottom'  => 0,
+                'marginLeft'    => 0,
+                'marginRight'   => 0,
             ];
 
             return $this->pdfGenerator->generateFromHtml($content, $options);

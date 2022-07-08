@@ -27,7 +27,7 @@
         }) }}
     {%- endif -%}
     {{- admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') -}}
-    {{ macros.export_products_button() }}
+    {{- macros.export_products_button() -}}
     {{- macros.new_product_button() -}}
 {% endblock actions %}
 
@@ -38,9 +38,7 @@
             {{ product|cms_tags({'text': false}) -}}
         </div>
         <div class="actions">
-            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\LabelAction', {
-                'parameters': {'id': [product.id]}
-            }, {'target': '_blank'}) }}
+            {{ macros.labels_product_button(product) }}
             {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\ExportOrdersAction') }}
             {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}

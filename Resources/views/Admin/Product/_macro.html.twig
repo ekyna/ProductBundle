@@ -23,11 +23,13 @@
     {%- endfor %}
     </ul>
 </div>
-{%- endmacro -%}
+{%- endmacro new_product_button -%}
+
 
 {%- macro export_products_button() -%}
     {{- admin_resource_btn('ekyna_product.product', 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ExportAction') -}}
-{%- endmacro -%}
+{%- endmacro export_products_button -%}
+
 
 {%- macro convert_product_button(product) -%}
     {%- set types = product_convert_types(product.type) -%}
@@ -52,4 +54,31 @@
         </ul>
     </div>
     {%- endif -%}
-{%- endmacro -%}
+{%- endmacro convert_product_button -%}
+
+
+{%- macro labels_product_button(product) -%}
+    <div class="btn-group btn-group-sm">
+        <span class="btn btn-default disabled">
+            <span class="glyphicon glyphicon-barcode"></span>
+            {{- 'button.print_label'|trans({}, 'EkynaCommerce') -}}
+        </span>
+        <button type="button" class="btn btn-default dropdown-toggle"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            {% for format in subject_label_formats() -%}
+                <li>
+                    <a href="{{ admin_resource_path(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\LabelAction', {
+                        'id': [product.id],
+                        'format': format
+                    }, {'target': '_blank'}) }}" target="_blank">
+                        {{- ('subject.label_format.' ~ format)|trans({}, 'EkynaCommerce') -}}
+                    </a>
+                </li>
+            {%- endfor %}
+        </ul>
+    </div>
+{%- endmacro labels_product_button -%}
