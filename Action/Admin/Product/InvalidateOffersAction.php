@@ -7,10 +7,9 @@ namespace Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ResourceBundle\Action\AbstractAction;
 use Ekyna\Bundle\ResourceBundle\Action\HelperTrait;
-use Ekyna\Bundle\ResourceBundle\Action\ManagerTrait;
-use Ekyna\Bundle\UiBundle\Action\FlashTrait;
 use Ekyna\Component\Resource\Action\Permission;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,9 +20,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InvalidateOffersAction extends AbstractAction implements AdminActionInterface
 {
-    use ManagerTrait;
     use HelperTrait;
-    use FlashTrait;
+
+    public function __construct(private readonly OfferInvalidator $offerInvalidator)
+    {
+    }
 
     public function __invoke(): Response
     {
@@ -32,13 +33,8 @@ class InvalidateOffersAction extends AbstractAction implements AdminActionInterf
             throw new UnexpectedTypeException($product, ProductInterface::class);
         }
 
-        $product
-            ->setPendingOffers(true)
-            ->setPendingPrices(true);
-
-        $event = $this->getManager()->update($product);
-
-        $this->addFlashFromEvent($event);
+        $this->offerInvalidator->invalidateByProduct($product);
+        $this->offerInvalidator->flush();
 
         return $this->redirect($this->generateResourcePath($product));
     }

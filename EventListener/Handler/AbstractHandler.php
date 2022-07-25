@@ -60,21 +60,27 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * Returns the product from the event.
      *
-     * @param string|array           $types
-     *
      * @todo Greedy : assertions are made by the 'supports' method.
      */
-    protected function getProductFromEvent(ResourceEventInterface $event, $types = null): ProductInterface
-    {
+    protected function getProductFromEvent(
+        ResourceEventInterface $event,
+        string|array|null      $types = null
+    ): ProductInterface {
         $resource = $event->getResource();
 
         if (!$resource instanceof ProductInterface) {
             throw new UnexpectedTypeException($resource, ProductInterface::class);
         }
 
-        if (null !== $types && !in_array($resource->getType(), (array) $types)) {
+        if (null === $types) {
+            return $resource;
+        }
+
+        $types = (array)$types;
+
+        if (!in_array($resource->getType(), $types, true)) {
             throw new InvalidArgumentException(
-                "Expected product with type '" . implode("' or '", (array) $types) . "'."
+                "Expected product with type '" . implode("' or '", $types) . "'."
             );
         }
 

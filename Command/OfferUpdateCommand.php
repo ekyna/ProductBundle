@@ -27,30 +27,26 @@ class OfferUpdateCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:offer:update';
 
-    private ProductRepositoryInterface $repository;
-    private OfferUpdater               $offerUpdater;
-    private PriceUpdater               $priceUpdater;
-    private EntityManagerInterface     $manager;
-    private int                        $timeout;
+    private int $timeout;
 
     public function __construct(
-        ProductRepositoryInterface $repository,
-        OfferUpdater               $offerUpdater,
-        PriceUpdater               $priceUpdater,
-        EntityManagerInterface     $manager
+        private readonly ProductRepositoryInterface $repository,
+        private readonly OfferUpdater               $offerUpdater,
+        private readonly PriceUpdater               $priceUpdater,
+        private readonly EntityManagerInterface     $manager
     ) {
         parent::__construct();
-
-        $this->repository = $repository;
-        $this->offerUpdater = $offerUpdater;
-        $this->priceUpdater = $priceUpdater;
-        $this->manager = $manager;
     }
 
     protected function configure(): void
     {
         $this
-            ->setDescription('Updates the product(s) offers')
+            ->setDescription(<<<TXT
+                Updates the product(s) offers.
+                
+                If symfony/messenger is not available, this command should be run periodically.
+                TXT
+            )
             ->addArgument('id', InputArgument::OPTIONAL, 'The product identifier to update the offers of.')
             ->addOption('max_execution_time', 't', InputOption::VALUE_OPTIONAL, 'Max execution time in seconds', 59);
     }

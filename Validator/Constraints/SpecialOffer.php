@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpPropertyNamingConventionInspection */
+
+declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
@@ -11,14 +13,12 @@ use Symfony\Component\Validator\Constraint;
  */
 class SpecialOffer extends Constraint
 {
-    public $at_least_one_brand_or_product     = 'ekyna_product.special_offer.at_least_one_brand_or_product';
-    public $products_and_brands_must_be_empty = 'ekyna_product.special_offer.products_and_brands_must_be_empty';
+    public string $brands_must_be_empty                           = 'ekyna_product.pricing.brands_must_be_empty';
+    public string $pricing_groups_must_be_empty                   = 'ekyna_product.pricing.pricing_groups_must_be_empty';
+    public string $products_must_be_empty                         = 'ekyna_product.special_offer.pricing_groups_must_be_empty';
+    public string $at_least_one_pricing_group_or_brand_or_product = 'ekyna_product.special_offer.at_least_one_pricing_group_or_brand_or_product';
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargets()
+    public function getTargets(): string
     {
         return static::CLASS_CONSTRAINT;
     }

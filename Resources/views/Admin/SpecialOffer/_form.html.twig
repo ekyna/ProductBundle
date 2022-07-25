@@ -25,9 +25,10 @@
                 {{ form_row(form.enabled, {'label_col': 6, 'widget_col': 6}) }}
             </div>
         </div>
-        {{ form_row(form.products) }}
-        {{ form_row(form.brands) }}
-        {{ form_row(form.groups) }}
+        {{ form_row(form.customerGroups) }}
         {{ form_row(form.countries) }}
+        {{ form_row(form.products) }}
+        {{ form_row(form.pricingGroups) }}
+        {{ form_row(form.brands) }}
     </div>
 {%- endblock main_contents -%}

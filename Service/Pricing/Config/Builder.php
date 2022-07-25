@@ -18,11 +18,8 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferResolver;
  */
 class Builder
 {
-    protected OfferResolver $offerResolver;
-
-    public function __construct(OfferResolver $offerResolver)
+    public function __construct(private readonly OfferResolver $offerResolver)
     {
-        $this->offerResolver = $offerResolver;
     }
 
     /**
@@ -251,7 +248,6 @@ class Builder
             return $visible;
         }
 
-        $visible = true;
         $flat->setStartingFrom(true);
 
         foreach ($optionGroups as $group) {
@@ -316,7 +312,6 @@ class Builder
             }
         }
 
-
-        return $visible;
+        return true;
     }
 }

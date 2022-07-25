@@ -45,18 +45,26 @@ class ExportConfig
     private string            $format    = self::FORMAT_CSV;
     private array             $columns;
     private bool              $visible   = true;
-    private ContextInterface  $context;
     private DateTimeInterface $validUntil;
     private string            $separator = ',';
     private string            $enclosure = '"';
     /** @var Collection<BrandInterface> */
     private Collection $brands;
 
-    public function __construct(ContextInterface $context)
+    public function __construct(private readonly ContextInterface $context)
     {
-        $this->columns = array_keys(self::getColumnsLabels());
+        $this->columns = [
+            self::COLUMN_DESIGNATION,
+            self::COLUMN_REFERENCE,
+            self::COLUMN_EXT_EAN13,
+            self::COLUMN_NET_PRICE,
+            self::COLUMN_DISCOUNT,
+            self::COLUMN_SELL_PRICE,
+            self::COLUMN_VALID_UNTIL,
+            self::COLUMN_IMAGE,
+            self::COLUMN_URL,
+        ];
         $this->brands = new ArrayCollection();
-        $this->context = $context;
         $this->validUntil = new DateTime('last day of December');
     }
 

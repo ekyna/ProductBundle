@@ -24,6 +24,7 @@ use Ekyna\Bundle\ProductBundle\Service\Stat;
 use Ekyna\Bundle\ProductBundle\Service\Stock;
 use Ekyna\Component\Commerce\Bridge\Symfony\DependencyInjection\RegisterViewTypePass;
 use Ekyna\Component\Commerce\Bridge\Symfony\DependencyInjection\SubjectProviderPass;
+use Ekyna\Component\Resource\Event\QueueEvents;
 
 return static function (ContainerConfigurator $container) {
     $container
@@ -156,8 +157,15 @@ return static function (ContainerConfigurator $container) {
         // Offer invalidator
         ->set('ekyna_product.invalidator.offer', Pricing\OfferInvalidator::class)
             ->args([
+                service('doctrine.orm.default_entity_manager'),
                 service('ekyna_product.repository.product'),
+                service('ekyna_resource.queue.message'),
                 param('ekyna_product.class.offer'),
+            ])
+            ->tag('resource.event_listener', [
+                'event'    => QueueEvents::QUEUE_CLOSE,
+                'method'   => 'flush',
+                'priority' => 1,
             ])
 
         // Offer updater
@@ -167,6 +175,7 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.resolver.offer'),
                 service('ekyna_product.repository.offer'),
                 service('ekyna_product.invalidator.offer'),
+                service('ekyna_product.invalidator.price'),
                 param('ekyna_commerce.class.customer_group'),
                 param('ekyna_commerce.class.country'),
                 param('ekyna_product.class.pricing'),
@@ -176,8 +185,14 @@ return static function (ContainerConfigurator $container) {
         // Price invalidator
         ->set('ekyna_product.invalidator.price', Pricing\PriceInvalidator::class)
             ->args([
+                service('doctrine.orm.default_entity_manager'),
                 service('ekyna_product.repository.product'),
+                service('ekyna_resource.queue.message'),
                 param('ekyna_product.class.price'),
+            ])
+            ->tag('resource.event_listener', [
+                'event'  => QueueEvents::QUEUE_CLOSE,
+                'method' => 'flush',
             ])
 
         // Price updater
@@ -264,6 +279,7 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
                 service('validator'),
                 service('ekyna_resource.event_dispatcher'),
+                service('ekyna_product.invalidator.offer'),
             ])
 
         // Simple to variable product converter

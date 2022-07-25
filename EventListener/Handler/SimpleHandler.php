@@ -8,6 +8,7 @@ use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Exception\RuntimeException;
@@ -23,24 +24,14 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class SimpleHandler extends AbstractHandler
 {
-    private PersistenceHelperInterface   $persistenceHelper;
-    private PriceCalculator              $calculator;
-    private StockSubjectUpdaterInterface $stockUpdater;
-    private ProductRepositoryInterface   $productRepository;
-    private PriceInvalidator             $priceInvalidator;
-
     public function __construct(
-        PersistenceHelperInterface   $persistenceHelper,
-        PriceCalculator              $calculator,
-        StockSubjectUpdaterInterface $stockUpdater,
-        ProductRepositoryInterface   $productRepository,
-        PriceInvalidator             $priceInvalidator
+        private readonly PersistenceHelperInterface   $persistenceHelper,
+        private readonly PriceCalculator              $priceCalculator,
+        private readonly StockSubjectUpdaterInterface $stockUpdater,
+        private readonly ProductRepositoryInterface   $productRepository,
+        private readonly OfferInvalidator             $offerInvalidator,
+        private readonly PriceInvalidator             $priceInvalidator
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->calculator = $calculator;
-        $this->stockUpdater = $stockUpdater;
-        $this->productRepository = $productRepository;
-        $this->priceInvalidator = $priceInvalidator;
     }
 
     // TODO Deal with required option group stocks ?
@@ -71,17 +62,17 @@ class SimpleHandler extends AbstractHandler
             'releasedAt',
         ];
         if ($this->persistenceHelper->isChanged($product, $stockProperties)) {
-            $changed = $this->stockUpdater->update($product) || $changed;
+            $changed = $this->stockUpdater->update($product);
 
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         } elseif ($this->persistenceHelper->isChanged($product, 'stockState')) {
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;
         }
 
-        if ($this->persistenceHelper->isChanged($product, 'netPrice')) {
+        if ($this->persistenceHelper->isChanged($product, ['brand', 'pricingGroup'])) {
+            $this->offerInvalidator->invalidateByProduct($product);
+        } elseif ($this->persistenceHelper->isChanged($product, 'netPrice')) {
             $changed = $this->updateMinPrice($product) || $changed;
-
-            $this->priceInvalidator->invalidateByProduct($product);
 
             $childEvents[] = ProductEvents::CHILD_PRICE_CHANGE;
         }
@@ -162,9 +153,11 @@ class SimpleHandler extends AbstractHandler
      */
     protected function updateMinPrice(ProductInterface $product): bool
     {
-        $minPrice = $this->calculator->calculateProductMinPrice($product);
+        $minPrice = $this->priceCalculator->calculateProductMinPrice($product);
         if (!$product->getMinPrice()->equals($minPrice)) {
             $product->setMinPrice($minPrice);
+
+            $this->offerInvalidator->invalidateByProduct($product);
 
             return true;
         }

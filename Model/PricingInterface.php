@@ -33,13 +33,24 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     /**
      * @return Collection<CustomerGroupInterface>
      */
-    public function getGroups(): Collection;
+    public function getCustomerGroups(): Collection;
 
-    public function hasGroup(CustomerGroupInterface $group): bool;
+    public function hasCustomerGroup(CustomerGroupInterface $group): bool;
 
-    public function addGroup(CustomerGroupInterface $group): PricingInterface;
+    public function addCustomerGroup(CustomerGroupInterface $group): PricingInterface;
 
-    public function removeGroup(CustomerGroupInterface $group): PricingInterface;
+    public function removeCustomerGroup(CustomerGroupInterface $group): PricingInterface;
+
+    /**
+     * @return Collection<PricingGroupInterface>
+     */
+    public function getPricingGroups(): Collection;
+
+    public function hasPricingGroup(PricingGroupInterface $group): bool;
+
+    public function addPricingGroup(PricingGroupInterface $group): PricingInterface;
+
+    public function removePricingGroup(PricingGroupInterface $group): PricingInterface;
 
     /**
      * @return Collection<CountryInterface>

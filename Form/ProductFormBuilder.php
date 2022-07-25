@@ -17,6 +17,7 @@ use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
+use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Features;
@@ -296,6 +297,22 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('optionGroups', CollectionType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the pricing group field.
+     */
+    public function addPricingGroupField(array $options = []): ProductFormBuilder
+    {
+        $options = array_replace([
+            'resource'  => PricingGroupInterface::class,
+            'allow_new' => true,
+            'required'  => false,
+        ], $options);
+
+        $this->form->add('pricingGroup', ResourceChoiceType::class, $options);
 
         return $this;
     }

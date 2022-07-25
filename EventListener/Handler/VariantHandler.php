@@ -85,6 +85,7 @@ class VariantHandler extends AbstractVariantHandler
         if (null === $variable = $variant->getParent()) {
             $variable = $this->persistenceHelper->getChangeSet($variant, 'parent')[0];
         }
+
         if (null !== $variable) {
             $variableUpdater = $this->getVariableUpdater();
 

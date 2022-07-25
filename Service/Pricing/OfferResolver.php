@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\PricingRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
 
@@ -17,18 +18,11 @@ use Ekyna\Bundle\ProductBundle\Repository\SpecialOfferRepositoryInterface;
  */
 class OfferResolver
 {
-    protected PricingRepositoryInterface      $pricingRepository;
-    protected SpecialOfferRepositoryInterface $specialOfferRepository;
-    protected PriceCalculator                 $priceCalculator;
-
     public function __construct(
-        PricingRepositoryInterface      $pricingRepository,
-        SpecialOfferRepositoryInterface $specialOfferRepository,
-        PriceCalculator                 $priceCalculator
+        protected readonly PricingRepositoryInterface      $pricingRepository,
+        protected readonly SpecialOfferRepositoryInterface $specialOfferRepository,
+        protected readonly PriceCalculator                 $priceCalculator
     ) {
-        $this->pricingRepository = $pricingRepository;
-        $this->specialOfferRepository = $specialOfferRepository;
-        $this->priceCalculator = $priceCalculator;
     }
 
     /**
@@ -36,6 +30,10 @@ class OfferResolver
      */
     public function resolve(ProductInterface $product): array
     {
+        if (in_array($product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE], true)) {
+            return [];
+        }
+
         // Pricing rules
         $discounts = $this->pricingRepository->findRulesByProduct($product);
         foreach ($discounts as &$discount) {
@@ -126,7 +124,7 @@ function rule_is_better(array $a, array $b): bool
 }
 
 /**
- * Returns whether $a is applies to $b.
+ * Returns whether $a is applicable to $b.
  *
  * @param array $a
  * @param array $b

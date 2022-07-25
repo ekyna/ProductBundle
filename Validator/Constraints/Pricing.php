@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpPropertyNamingConventionInspection */
+
+declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
@@ -11,13 +13,11 @@ use Symfony\Component\Validator\Constraint;
  */
 class Pricing extends Constraint
 {
-    public $brands_must_be_empty = 'ekyna_product.pricing.brands_must_be_empty';
-    public $at_least_one_brand   = 'ekyna_product.pricing.at_least_one_brand';
+    public string $brands_must_be_empty                = 'ekyna_product.pricing.brands_must_be_empty';
+    public string $pricing_groups_must_be_empty        = 'ekyna_product.pricing.pricing_groups_must_be_empty';
+    public string $at_least_one_pricing_group_or_brand = 'ekyna_product.pricing.at_least_one_pricing_group_or_brand';
 
-    /**
-     * @inheritDoc
-     */
-    public function getTargets()
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }

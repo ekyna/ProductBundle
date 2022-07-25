@@ -16,8 +16,9 @@ ekyna_product:
     component:
         tax_group_integrity: This component must share the same tax group.
     pricing:
+        pricing_groups_must_be_empty: The associated pricing group list must be empty.
         brands_must_be_empty: The associated brand list must be empty.
-        at_least_one_brand: Please select at least one brand.
+        at_least_one_pricing_group_or_brand: Please select at least one pricing group or brand.
     product:
         duplicate_designation: Another product already exists with this designation for the same brand (%reference%).
         duplicate_variant_designation: Another variant already exists with this designation for the same parent (variable product).
@@ -34,7 +35,7 @@ ekyna_product:
     option:
         recursive_choice: A choice cannot be an option of itself.
     special_offer:
-        at_least_one_brand_or_product: Please select at least one product or brand.
-        products_and_brands_must_be_empty: The associated products and brands lists must be empty.
+        products_must_be_empty: The associated products list must be empty.
+        at_least_one_pricing_group_or_brand_or_product: Please select at least one pricing group, brand or product.
     sale_item:
         at_least_one_choice_required: Please select at least one product.

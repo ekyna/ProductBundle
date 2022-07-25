@@ -1,104 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
-use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler\HandlerInterface;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Commerce\Common\Generator\GeneratorInterface;
-use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\Event\SubjectStockUnitEvent;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
-use Ekyna\Component\Resource\Event\QueueEvents;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class ProductListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductListener implements EventSubscriberInterface
+class ProductListener
 {
-    /**
-     * @var PersistenceHelperInterface
-     */
-    protected $persistenceHelper;
-
-    /**
-     * @var Handler\HandlerRegistry
-     */
-    protected $handlerRegistry;
-
-    /**
-     * @var GeneratorInterface
-     */
-    protected $referenceGenerator;
-
-    /**
-     * @var OfferInvalidator
-     */
-    protected $offerInvalidator;
-
-    /**
-     * @var PriceInvalidator
-     */
-    protected $priceInvalidator;
-
-
-    /**
-     * Constructor.
-     *
-     * @param PersistenceHelperInterface   $persistenceHelper
-     * @param Handler\HandlerRegistry      $registry
-     * @param GeneratorInterface           $referenceGenerator
-     * @param OfferInvalidator             $offerInvalidator
-     * @param PriceInvalidator             $priceInvalidator
-     * @param StockSubjectUpdaterInterface $stockSubjectUpdater
-     */
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        Handler\HandlerRegistry $registry,
-        GeneratorInterface $referenceGenerator,
-        OfferInvalidator $offerInvalidator,
-        PriceInvalidator $priceInvalidator,
-        StockSubjectUpdaterInterface $stockSubjectUpdater
+        protected readonly PersistenceHelperInterface   $persistenceHelper,
+        protected readonly Handler\HandlerRegistry      $handlerRegistry,
+        protected readonly GeneratorInterface           $referenceGenerator,
+        protected readonly OfferInvalidator             $offerInvalidator,
+        protected readonly PriceInvalidator             $priceInvalidator,
+        protected readonly StockSubjectUpdaterInterface $stockSubjectUpdater
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->handlerRegistry = $registry;
-        $this->referenceGenerator = $referenceGenerator;
-        $this->offerInvalidator = $offerInvalidator;
-        $this->priceInvalidator = $priceInvalidator;
-        $this->stockSubjectUpdater = $stockSubjectUpdater;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ProductEvents::PRE_CREATE                => ['onPreCreate', 0],
-            ProductEvents::PRE_UPDATE                => ['onPreUpdate', 0],
-            ProductEvents::PRE_DELETE                => ['onPreDelete', 0],
-            ProductEvents::INSERT                    => ['onInsert', 0],
-            ProductEvents::UPDATE                    => ['onUpdate', 0],
-            ProductEvents::DELETE                    => ['onDelete', 0],
-            ProductEvents::STOCK_UNIT_CHANGE         => ['onStockUnitChange', 0],
-            ProductEvents::CHILD_PRICE_CHANGE        => ['onChildPriceChange', 0],
-            ProductEvents::CHILD_STOCK_CHANGE        => ['onChildStockChange', 0],
-            ProductEvents::CHILD_AVAILABILITY_CHANGE => ['onChildAvailabilityChange', 0],
-            QueueEvents::QUEUE_CLOSE                 => ['onQueueClose', 0],
-        ];
     }
 
     /**
      * Pre create event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onPreCreate(ResourceEventInterface $event)
+    public function onPreCreate(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -110,10 +48,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Pre update event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onPreUpdate(ResourceEventInterface $event)
+    public function onPreUpdate(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -125,10 +61,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Pre delete event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onPreDelete(ResourceEventInterface $event)
+    public function onPreDelete(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -140,10 +74,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Insert event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onInsert(ResourceEventInterface $event)
+    public function onInsert(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -158,10 +90,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Update event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onUpdate(ResourceEventInterface $event)
+    public function onUpdate(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -181,20 +111,16 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Delete event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onDelete(ResourceEventInterface $event)
+    public function onDelete(ResourceEventInterface $event): void
     {
         $this->executeHandlers($event, HandlerInterface::DELETE);
     }
 
     /**
      * Stock unit change event handler.
-     *
-     * @param SubjectStockUnitEvent $event
      */
-    public function onStockUnitChange(SubjectStockUnitEvent $event)
+    public function onStockUnitChange(SubjectStockUnitEvent $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -205,10 +131,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Stock unit delete event handler.
-     *
-     * @param SubjectStockUnitEvent $event
      */
-    public function onStockUnitRemoval(SubjectStockUnitEvent $event)
+    public function onStockUnitRemoval(SubjectStockUnitEvent $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -219,10 +143,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Child price change event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onChildPriceChange(ResourceEventInterface $event)
+    public function onChildPriceChange(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -233,10 +155,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Child availability change event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onChildAvailabilityChange(ResourceEventInterface $event)
+    public function onChildAvailabilityChange(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -247,10 +167,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Child stock change event handler.
-     *
-     * @param ResourceEventInterface $event
      */
-    public function onChildStockChange(ResourceEventInterface $event)
+    public function onChildStockChange(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
 
@@ -260,29 +178,10 @@ class ProductListener implements EventSubscriberInterface
     }
 
     /**
-     * Queue close event handler.
-     */
-    public function onQueueClose()
-    {
-        $manager = $this->persistenceHelper->getManager();
-
-        $manager->getConnection()->transactional(function () use ($manager) {
-            $this->offerInvalidator->flush($manager);
-            $this->priceInvalidator->flush($manager);
-        });
-    }
-
-    /**
-     * Execute the event handlers method regarding to the product type,
+     * Execute the event handlers method regarding the product type,
      * and returns whether or the product has been changed.
-     *
-     * @param ResourceEventInterface $event
-     * @param string                 $method
-     * @param bool                   $skipDeleted
-     *
-     * @return bool
      */
-    protected function executeHandlers(ResourceEventInterface $event, $method, $skipDeleted = false)
+    protected function executeHandlers(ResourceEventInterface $event, string $method, bool $skipDeleted = false): bool
     {
         $product = $this->getProductFromEvent($event);
 
@@ -302,12 +201,8 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Generates the product reference if it is empty.
-     *
-     * @param ProductInterface $product
-     *
-     * @return bool
      */
-    protected function generateReference(ProductInterface $product)
+    protected function generateReference(ProductInterface $product): bool
     {
         if (!empty($product->getReference())) {
             return false;
@@ -320,17 +215,13 @@ class ProductListener implements EventSubscriberInterface
 
     /**
      * Returns the product from the event.
-     *
-     * @param ResourceEventInterface $event
-     *
-     * @return ProductInterface
      */
-    protected function getProductFromEvent(ResourceEventInterface $event)
+    protected function getProductFromEvent(ResourceEventInterface $event): ProductInterface
     {
         $resource = $event->getResource();
 
         if (!$resource instanceof ProductInterface) {
-            throw new InvalidArgumentException('Expected instance of ' . ProductInterface::class);
+            throw new UnexpectedTypeException($resource, ProductInterface::class);
         }
 
         return $resource;

@@ -55,21 +55,25 @@
                 }) }}
             </div>
         </div>
-        {{ show_row(specialOffer.products, 'resource', {
-            'label': t('product.label.plural', [], 'EkynaProduct'),
-            'resource': 'ekyna_product.product'
-        }) }}
-        {{ show_row(specialOffer.brands, 'resource', {
-            'label': t('brand.label.plural', [], 'EkynaProduct'),
-            'resource': 'ekyna_product.brand'
-        }) }}
-        {{ show_row(specialOffer.groups, 'resource', {
+        {{ show_row(specialOffer.customerGroups, 'resource', {
             'label': t('customer_group.label.plural', [], 'EkynaCommerce'),
             'resource': 'ekyna_commerce.customer_group'
         }) }}
         {{ show_row(specialOffer.countries, 'resource', {
             'label': t('special_offer.field.countries', [], 'EkynaProduct'),
             'resource': 'ekyna_commerce.country'
+        }) }}
+        {{ show_row(specialOffer.products, 'resource', {
+            'label': t('product.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.product'
+        }) }}
+        {{ show_row(specialOffer.pricingGroups, 'resource', {
+            'label': t('pricing_group.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.pricing_group'
+        }) }}
+        {{ show_row(specialOffer.brands, 'resource', {
+            'label': t('brand.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.brand'
         }) }}
     </div>
 {%- endblock main_contents %}

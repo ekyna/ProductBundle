@@ -63,14 +63,19 @@ class AdminMenuPass implements CompilerPassInterface
                 'position' => 11,
             ])
             ->addEntry([
+                'name'     => 'pricing_group',
+                'resource' => 'ekyna_product.pricing_group',
+                'position' => 70,
+            ])
+            ->addEntry([
                 'name'     => 'pricing',
                 'resource' => 'ekyna_product.pricing',
-                'position' => 70,
+                'position' => 71,
             ])
             ->addEntry([
                 'name'     => 'special_offer',
                 'resource' => 'ekyna_product.special_offer',
-                'position' => 71,
+                'position' => 72,
             ])
             ->addEntry([
                 'name'     => 'inventory',

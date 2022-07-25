@@ -19,20 +19,13 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 class ConfigurableHandler extends AbstractHandler
 {
-    private PriceCalculator              $priceCalculator;
-    private PriceInvalidator             $priceInvalidator;
-    private StockSubjectUpdaterInterface $stockUpdater;
-
     private ?ConfigurableUpdater $configurableUpdater = null;
 
     public function __construct(
-        PriceCalculator              $priceCalculator,
-        PriceInvalidator             $priceInvalidator,
-        StockSubjectUpdaterInterface $stockUpdater
+        private readonly PriceCalculator              $priceCalculator,
+        private readonly PriceInvalidator             $priceInvalidator,
+        private readonly StockSubjectUpdaterInterface $stockUpdater
     ) {
-        $this->priceCalculator = $priceCalculator;
-        $this->priceInvalidator = $priceInvalidator;
-        $this->stockUpdater = $stockUpdater;
     }
 
     public function handleInsert(ResourceEventInterface $event): bool

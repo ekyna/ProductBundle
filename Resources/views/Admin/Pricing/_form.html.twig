@@ -3,8 +3,9 @@
 {% block main_contents -%}
     <div class="tab-pane active" id="{{ resource_name }}-general">
         {{ form_row(form.designation) }}
-        {{ form_row(form.groups) }}
+        {{ form_row(form.customerGroups) }}
         {{ form_row(form.countries) }}
+        {{ form_row(form.pricingGroups) }}
         {{ form_row(form.brands) }}
         {{ form_row(form.rules) }}
     </div>

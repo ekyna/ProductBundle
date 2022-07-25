@@ -145,6 +145,7 @@ class PriceUpdater
         // Abort if no diff
         if (!$this->hasDiff($oldPrices, $newPrices)) {
             $product->setPendingPrices(false);
+
             $this->manager->persist($product);
 
             return false;

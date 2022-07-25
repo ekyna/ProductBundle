@@ -7,7 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\MultiOperationCache;
 use Ekyna\Bundle\ProductBundle\Event\PriceEvents;
-use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\PriceInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\CacheUtil;
 use Ekyna\Component\Commerce\Common\Repository\CountryRepositoryInterface;
@@ -99,7 +99,7 @@ class PriceListener implements EventSubscriberInterface
         $resource = $event->getResource();
 
         if (!$resource instanceof PriceInterface) {
-            throw new InvalidArgumentException($resource, PriceInterface::class);
+            throw new UnexpectedTypeException($resource, PriceInterface::class);
         }
 
         return $resource;

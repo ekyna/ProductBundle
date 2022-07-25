@@ -361,6 +361,19 @@ pricing:
     alert:
         no_item: Aucune tarification configuré
 
+pricing_group:
+    label:
+        singular: Groupe de tarification
+        plural: Groupes de tarification
+    header:
+        list: Groupes de tarification <small>Liste des groupes</small>
+        show: Détail du groupes de tarification <small>%name%</small>
+        new: Créer un nouveau groupe de tarification
+        edit: Modifier le groupe de tarification <small>%name%</small>
+        remove: Supprimer le groupe de tarification <small>%name%</small>
+    alert:
+        no_item: Aucun groupe de tarification configuré
+
 pricing_rule:
     label:
         singular: Règle de tarification
@@ -396,9 +409,12 @@ special_offer:
         stack: Cumulable
         countries: Pays de facturation
     message:
-        product_removed: |
+        product_removed_by_brand: |
             Le produit <strong>{product}</strong> a été retiré de la liste
             car il appartient à la marque <strong>{brand}</strong>.
+        product_removed_by_pricing_group: |
+            Le produit <strong>{product}</strong> a été retiré de la liste
+            car il appartient au groupe de tarification <strong>{pricingGroup}</strong>.
     alert:
         no_item: Aucune promotion configuré
 

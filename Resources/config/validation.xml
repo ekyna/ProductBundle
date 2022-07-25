@@ -566,6 +566,20 @@
         <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\Pricing"/>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Entity\PricingGroup">
+        <property name="name">
+            <constraint name="NotBlank"/>
+            <constraint name="Length">
+                <option name="max">64</option>
+            </constraint>
+        </property>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">
+                <value>name</value>
+            </option>
+        </constraint>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\PricingRule">
         <property name="pricing">
             <constraint name="NotNull"/>
@@ -890,6 +904,23 @@
                     <value>simple</value>
                     <value>variable</value>
                     <value>bundle</value>
+                    <value>configurable</value>
+                </option>
+            </constraint>
+        </property>
+
+        <!-- Pricing group -->
+        <property name="pricingGroup">
+            <constraint name="NotNull">
+                <option name="groups">
+                    <value>simple</value>
+                    <value>variant</value>
+                    <value>bundle</value>
+                </option>
+            </constraint>
+            <constraint name="IsNull">
+                <option name="groups">
+                    <value>variable</value>
                     <value>configurable</value>
                 </option>
             </constraint>

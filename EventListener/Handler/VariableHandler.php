@@ -18,9 +18,8 @@ use Ekyna\Component\Resource\Event\ResourceEventInterface;
  */
 class VariableHandler extends AbstractVariantHandler
 {
-    private PriceInvalidator             $priceInvalidator;
-    private StockSubjectUpdaterInterface $stockUpdater;
-
+    private readonly PriceInvalidator             $priceInvalidator;
+    private readonly StockSubjectUpdaterInterface $stockUpdater;
 
     public function setPriceInvalidator(PriceInvalidator $invalidator): void
     {

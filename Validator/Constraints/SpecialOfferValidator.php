@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class SpecialOfferValidator
@@ -14,24 +16,38 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class SpecialOfferValidator extends ConstraintValidator
 {
-    /**
-     * @inheritDoc
-     */
-    public function validate($specialOffer, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$specialOffer instanceof SpecialOfferInterface) {
-            throw new InvalidArgumentException("Expected instance of " . SpecialOfferInterface::class);
+        if (!$value instanceof SpecialOfferInterface) {
+            throw new UnexpectedTypeException($value, SpecialOfferInterface::class);
         }
         if (!$constraint instanceof SpecialOffer) {
-            throw new InvalidArgumentException("Expected instance of " . SpecialOffer::class);
+            throw new UnexpectedTypeException($constraint, SpecialOffer::class);
         }
 
         // Single product case
-        if (null !== $specialOffer->getProduct()) {
-            if (0 < $specialOffer->getProducts()->count() || 0 < $specialOffer->getBrands()->count()) {
+        if (null !== $value->getProduct()) {
+            if (!$value->getPricingGroups()->isEmpty()) {
                 $this
                     ->context
-                    ->buildViolation($constraint->products_and_brands_must_be_empty)
+                    ->buildViolation($constraint->pricing_groups_must_be_empty)
+                    ->atPath('pricingGroups')
+                    ->addViolation();
+            }
+
+            if (!$value->getBrands()->isEmpty()) {
+                $this
+                    ->context
+                    ->buildViolation($constraint->brands_must_be_empty)
+                    ->atPath('brands')
+                    ->addViolation();
+            }
+
+            if (!$value->getProducts()->isEmpty()) {
+                $this
+                    ->context
+                    ->buildViolation($constraint->products_must_be_empty)
+                    ->atPath('products')
                     ->addViolation();
             }
 
@@ -39,11 +55,19 @@ class SpecialOfferValidator extends ConstraintValidator
         }
 
         // Multiple product case
-        if (0 === $specialOffer->getProducts()->count() && 0 === $specialOffer->getBrands()->count()) {
-            $this
-                ->context
-                ->buildViolation($constraint->at_least_one_brand_or_product)
-                ->addViolation();
+        if (!$value->getPricingGroups()->isEmpty()) {
+            return;
         }
+        if (!$value->getBrands()->isEmpty()) {
+            return;
+        }
+        if (!$value->getProducts()->isEmpty()) {
+            return;
+        }
+
+        $this
+            ->context
+            ->buildViolation($constraint->at_least_one_pricing_group_or_brand_or_product)
+            ->addViolation();
     }
 }

@@ -338,7 +338,7 @@
     {{- bootstrap_backup_form_settings() -}}
     {{- bootstrap_set_sizing('sm') -}}
     {{- form_errors(form) -}}
-    {{- form_row(form.groups, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_row(form.customerGroups, {'label_col': 2, 'widget_col': 10}) -}}
     {{- form_row(form.countries, {'label_col': 2, 'widget_col': 10}) -}}
     {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
     {{- form_rest(form) -}}
@@ -404,7 +404,7 @@
             {{- form_row(form.enabled, {'label_col': 6, 'widget_col': 6}) -}}
         </div>
     </div>
-    {{- form_row(form.groups, {'label_col': 2, 'widget_col': 10}) -}}
+    {{- form_row(form.customerGroups, {'label_col': 2, 'widget_col': 10}) -}}
     {{- form_row(form.countries, {'label_col': 2, 'widget_col': 10}) -}}
     {{- form_rest(form) -}}
     {{- bootstrap_restore_form_settings() -}}

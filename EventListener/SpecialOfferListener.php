@@ -6,7 +6,6 @@ namespace Ekyna\Bundle\ProductBundle\EventListener;
 
 use Doctrine\ORM\PersistentCollection;
 use Ekyna\Bundle\ProductBundle\Entity\SpecialOffer;
-use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
@@ -16,7 +15,6 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,28 +22,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class SpecialOfferListener implements EventSubscriberInterface
+class SpecialOfferListener
 {
     protected const FIELDS = ['product', 'percent', 'minQuantity', 'startsAt', 'endsAt', 'stack', 'enabled'];
 
-    protected PersistenceHelperInterface $persistenceHelper;
-    protected OfferInvalidator           $offerInvalidator;
-    protected PriceInvalidator           $priceInvalidator;
-    protected PricingNameGenerator       $nameGenerator;
-    protected TranslatorInterface        $translator;
-
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        OfferInvalidator           $offerInvalidator,
-        PriceInvalidator           $priceInvalidator,
-        PricingNameGenerator       $nameGenerator,
-        TranslatorInterface        $translator
+        protected readonly PersistenceHelperInterface $persistenceHelper,
+        protected readonly OfferInvalidator           $offerInvalidator,
+        protected readonly PriceInvalidator           $priceInvalidator,
+        protected readonly PricingNameGenerator       $nameGenerator,
+        protected readonly TranslatorInterface        $translator
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->offerInvalidator = $offerInvalidator;
-        $this->priceInvalidator = $priceInvalidator;
-        $this->nameGenerator = $nameGenerator;
-        $this->translator = $translator;
     }
 
     public function onInsert(ResourceEventInterface $event): SpecialOfferInterface
@@ -128,6 +115,20 @@ class SpecialOfferListener implements EventSubscriberInterface
             }
         }
 
+        // Pricing groups association changes
+        foreach ($specialOffer->getInsertedIds(SpecialOffer::REL_PRICING_GROUPS) as $id) {
+            $this->offerInvalidator->invalidateByPricingGroupId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByPricingGroupId($id);
+            }
+        }
+        foreach ($specialOffer->getRemovedIds(SpecialOffer::REL_PRICING_GROUPS) as $id) {
+            $this->offerInvalidator->invalidateByPricingGroupId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByPricingGroupId($id);
+            }
+        }
+
         // Brands association changes
         foreach ($specialOffer->getInsertedIds(SpecialOffer::REL_BRANDS) as $id) {
             $this->offerInvalidator->invalidateByBrandId($id);
@@ -153,20 +154,35 @@ class SpecialOfferListener implements EventSubscriberInterface
             return;
         }
 
-        $brandIds = [];
+        $pricingGroupIds = $brandIds = [];
 
         foreach ($specialOffer->getBrands() as $brand) {
             $brandIds[] = $brand->getId();
+        }
+        foreach ($specialOffer->getPricingGroups() as $group) {
+            $pricingGroupIds[] = $group->getId();
         }
 
         $messages = [];
 
         foreach ($specialOffer->getProducts() as $product) {
-            $brand = $product->getBrand();
-            if (in_array($brand->getId(), $brandIds)) {
+            $group = $product->getPricingGroup();
+            if ($group && in_array($group->getId(), $pricingGroupIds, true)) {
                 $specialOffer->removeProduct($product);
 
-                $messages[] = $this->translator->trans('special_offer.message.product_removed', [
+                $messages[] = $this->translator->trans('special_offer.message.product_removed_by_pricing_group', [
+                    '{product}'      => $product->getFullDesignation(),
+                    '{pricingGroup}' => $group->getName(),
+                ], 'EkynaProduct');
+
+                continue;
+            }
+
+            $brand = $product->getBrand();
+            if (in_array($brand->getId(), $brandIds, true)) {
+                $specialOffer->removeProduct($product);
+
+                $messages[] = $this->translator->trans('special_offer.message.product_removed_by_brand', [
                     '{product}' => $product->getFullDesignation(),
                     '{brand}'   => $brand->getName(),
                 ], 'EkynaProduct');
@@ -211,7 +227,7 @@ class SpecialOfferListener implements EventSubscriberInterface
         }
 
         // TODO use track association trait methods ?
-        $groups = $specialOffer->getGroups();
+        $groups = $specialOffer->getCustomerGroups();
         if ($groups instanceof PersistentCollection && $groups->isDirty()) {
             return true;
         }
@@ -236,14 +252,5 @@ class SpecialOfferListener implements EventSubscriberInterface
         }
 
         return $specialOffer;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            SpecialOfferEvents::INSERT => ['onInsert', 0],
-            SpecialOfferEvents::UPDATE => ['onUpdate', 0],
-            SpecialOfferEvents::DELETE => ['onDelete', 0],
-        ];
     }
 }

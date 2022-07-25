@@ -21,9 +21,10 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  */
 class Pricing extends AbstractResource implements Model\PricingInterface
 {
-    public const REL_GROUPS    = 'groups';
-    public const REL_COUNTRIES = 'countries';
-    public const REL_BRANDS    = 'brands';
+    public const REL_CUSTOMER_GROUPS = 'customerGroups';
+    public const REL_PRICING_GROUPS  = 'pricingGroups';
+    public const REL_COUNTRIES       = 'countries';
+    public const REL_BRANDS          = 'brands';
 
     use TaggedEntityTrait;
     use TrackAssociationTrait;
@@ -32,7 +33,9 @@ class Pricing extends AbstractResource implements Model\PricingInterface
     protected ?string                 $designation = null;
     protected ?Model\ProductInterface $product     = null;
     /** @var Collection<CustomerGroupInterface> */
-    protected Collection $groups;
+    protected Collection $customerGroups;
+    /** @var Collection<Model\PricingGroupInterface> */
+    protected Collection $pricingGroups;
     /** @var Collection<CountryInterface> */
     protected Collection $countries;
     /** @var Collection<Model\BrandInterface> */
@@ -42,7 +45,8 @@ class Pricing extends AbstractResource implements Model\PricingInterface
 
     public function __construct()
     {
-        $this->groups = new ArrayCollection();
+        $this->customerGroups = new ArrayCollection();
+        $this->pricingGroups = new ArrayCollection();
         $this->countries = new ArrayCollection();
         $this->brands = new ArrayCollection();
         $this->rules = new ArrayCollection();
@@ -62,7 +66,8 @@ class Pricing extends AbstractResource implements Model\PricingInterface
 
     public function onCopy(CopierInterface $copier): void
     {
-        $copier->copyCollection($this, 'groups', false);
+        $copier->copyCollection($this, 'customerGroups', false);
+        $copier->copyCollection($this, 'pricingGroups', false);
         $copier->copyCollection($this, 'countries', false);
         $copier->copyCollection($this, 'brands', false);
         $copier->copyCollection($this, 'rules', true);
@@ -104,29 +109,57 @@ class Pricing extends AbstractResource implements Model\PricingInterface
         return $this;
     }
 
-    public function getGroups(): Collection
+    public function getCustomerGroups(): Collection
     {
-        return $this->groups;
+        return $this->customerGroups;
     }
 
-    public function hasGroup(CustomerGroupInterface $group): bool
+    public function hasCustomerGroup(CustomerGroupInterface $group): bool
     {
-        return $this->groups->contains($group);
+        return $this->customerGroups->contains($group);
     }
 
-    public function addGroup(CustomerGroupInterface $group): Model\PricingInterface
+    public function addCustomerGroup(CustomerGroupInterface $group): Model\PricingInterface
     {
-        if (!$this->hasGroup($group)) {
-            $this->groups->add($group);
+        if (!$this->hasCustomerGroup($group)) {
+            $this->customerGroups->add($group);
         }
 
         return $this;
     }
 
-    public function removeGroup(CustomerGroupInterface $group): Model\PricingInterface
+    public function removeCustomerGroup(CustomerGroupInterface $group): Model\PricingInterface
     {
-        if ($this->hasGroup($group)) {
-            $this->groups->removeElement($group);
+        if ($this->hasCustomerGroup($group)) {
+            $this->customerGroups->removeElement($group);
+        }
+
+        return $this;
+    }
+
+    public function getPricingGroups(): Collection
+    {
+        return $this->pricingGroups;
+    }
+
+    public function hasPricingGroup(Model\PricingGroupInterface $group): bool
+    {
+        return $this->pricingGroups->contains($group);
+    }
+
+    public function addPricingGroup(Model\PricingGroupInterface $group): Model\PricingInterface
+    {
+        if (!$this->hasPricingGroup($group)) {
+            $this->pricingGroups->add($group);
+        }
+
+        return $this;
+    }
+
+    public function removePricingGroup(Model\PricingGroupInterface $group): Model\PricingInterface
+    {
+        if ($this->hasPricingGroup($group)) {
+            $this->pricingGroups->removeElement($group);
         }
 
         return $this;
@@ -229,7 +262,8 @@ class Pricing extends AbstractResource implements Model\PricingInterface
     public static function getAssociationsProperties(): array
     {
         return [
-            static::REL_GROUPS,
+            static::REL_CUSTOMER_GROUPS,
+            static::REL_PRICING_GROUPS,
             static::REL_COUNTRIES,
             static::REL_BRANDS,
         ];

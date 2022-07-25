@@ -78,11 +78,9 @@ class ExportAction extends AbstractAction implements AdminActionInterface
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $path = $this->productExporter->export($config);
+                $file = $this->productExporter->export($config);
 
-                return Csv::buildResponse($path, [
-                    'file_name' => 'products.csv',
-                ]);
+                return $file->download();
             } catch (ProductExceptionInterface $e) {
                 $this->addFlash($e->getMessage(), 'danger');
             }

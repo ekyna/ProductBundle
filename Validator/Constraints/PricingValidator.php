@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class PricingValidator
@@ -14,21 +16,26 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class PricingValidator extends ConstraintValidator
 {
-    /**
-     * @inheritDoc
-     */
-    public function validate($pricing, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$pricing instanceof Model\PricingInterface) {
-            throw new InvalidArgumentException("Expected instance of PricingInterface");
+        if (!$value instanceof Model\PricingInterface) {
+            throw new UnexpectedTypeException($value, Model\PricingInterface::class);
         }
         if (!$constraint instanceof Pricing) {
-            throw new InvalidArgumentException("Expected instance of Pricing (validation constraint)");
+            throw new UnexpectedTypeException($constraint, Pricing::class);
         }
 
         // Single product case
-        if (null !== $pricing->getProduct()) {
-            if (0 < $pricing->getBrands()->count()) {
+        if (null !== $value->getProduct()) {
+            if (!$value->getPricingGroups()->isEmpty()) {
+                $this
+                    ->context
+                    ->buildViolation($constraint->pricing_groups_must_be_empty)
+                    ->atPath('pricingGroups')
+                    ->addViolation();
+            }
+
+            if (!$value->getBrands()->isEmpty()) {
                 $this
                     ->context
                     ->buildViolation($constraint->brands_must_be_empty)
@@ -40,12 +47,16 @@ class PricingValidator extends ConstraintValidator
         }
 
         // Multiple product case
-        if (0 === $pricing->getBrands()->count()) {
-            $this
-                ->context
-                ->buildViolation($constraint->at_least_one_brand)
-                ->atPath('brands')
-                ->addViolation();
+        if (!$value->getPricingGroups()->isEmpty()) {
+            return;
         }
+        if (!$value->getBrands()->isEmpty()) {
+            return;
+        }
+
+        $this
+            ->context
+            ->buildViolation($constraint->at_least_one_pricing_group_or_brand)
+            ->addViolation();
     }
 }

@@ -7,7 +7,10 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Pricing;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\CountryChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Customer\CustomerGroupChoiceType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
+use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
+use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +30,7 @@ class PricingType extends AbstractResourceType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('groups', CustomerGroupChoiceType::class, [
+            ->add('customerGroups', CustomerGroupChoiceType::class, [
                 'multiple' => true,
                 'required' => false,
             ])
@@ -46,7 +49,7 @@ class PricingType extends AbstractResourceType
                 'add_button_text' => t('pricing_rule.button.add', [], 'EkynaProduct'),
             ])
             ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-                /** @var \Ekyna\Bundle\ProductBundle\Model\PricingInterface $pricing */
+                /** @var PricingInterface $pricing */
                 if (null === $pricing = $event->getData()) {
                     return;
                 }
@@ -54,19 +57,27 @@ class PricingType extends AbstractResourceType
                 $pricing->takeSnapshot();
             });
 
-        if (!$options['product_mode']) {
-            $builder
-                ->add('designation', TextType::class, [
-                    'label'    => t('field.designation', [], 'EkynaUi'),
-                    'required' => false,
-                    'attr'     => [
-                        'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
-                    ],
-                ])
-                ->add('brands', BrandChoiceType::class, [
-                    'multiple' => true,
-                ]);
+        if ($options['product_mode']) {
+            return;
         }
+
+        $builder
+            ->add('designation', TextType::class, [
+                'label'    => t('field.designation', [], 'EkynaUi'),
+                'required' => false,
+                'attr'     => [
+                    'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
+                ],
+            ])
+            ->add('pricingGroups', ResourceChoiceType::class, [
+                'resource' => PricingGroupInterface::class,
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('brands', BrandChoiceType::class, [
+                'multiple' => true,
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

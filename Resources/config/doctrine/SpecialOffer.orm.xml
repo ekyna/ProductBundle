@@ -59,14 +59,26 @@
             </join-table>
         </many-to-many>
 
-        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
-                      field="groups">
-            <join-table name="product_special_offers_groups">
+        <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface"
+                      field="pricingGroups">
+            <join-table name="product_special_offers_pricing_groups">
                 <join-columns>
                     <join-column name="special_offer_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
                 <inverse-join-columns>
-                    <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE"/>
+                    <join-column name="pricing_group_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+        <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
+                      field="customerGroups">
+            <join-table name="product_special_offers_customer_groups">
+                <join-columns>
+                    <join-column name="special_offer_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="customer_group_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </inverse-join-columns>
             </join-table>
         </many-to-many>

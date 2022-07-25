@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
 use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
 use Ekyna\Bundle\ProductBundle\Factory\ProductFactoryInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
@@ -32,43 +33,26 @@ use function sprintf;
  */
 abstract class AbstractConverter implements ConverterInterface
 {
-    protected ProductFactoryInterface          $productFactory;
-    protected ResourceManagerInterface         $productManager;
-    protected EntityManagerInterface           $entityManager;
-    protected FormFactoryInterface             $formFactory;
-    protected RequestStack                     $requestStack;
-    protected ValidatorInterface               $validator;
-    protected ResourceEventDispatcherInterface $eventDispatcher;
-
     protected ?ProductInterface $source = null;
     protected ?ProductInterface $target = null;
     private ?ConvertEvent       $event  = null;
     private ?FormInterface      $form   = null;
     private array               $data   = [];
 
-
     public function __construct(
-        ProductFactoryInterface          $productFactory,
-        ResourceManagerInterface         $productManager,
-        EntityManagerInterface           $entityManager,
-        FormFactoryInterface             $formFactory,
-        RequestStack                     $requestStack,
-        ValidatorInterface               $validator,
-        ResourceEventDispatcherInterface $eventDispatcher
+        protected readonly ProductFactoryInterface          $productFactory,
+        protected readonly ResourceManagerInterface         $productManager,
+        protected readonly EntityManagerInterface           $entityManager,
+        protected readonly FormFactoryInterface             $formFactory,
+        protected readonly RequestStack                     $requestStack,
+        protected readonly ValidatorInterface               $validator,
+        protected readonly ResourceEventDispatcherInterface $eventDispatcher,
+        protected readonly OfferInvalidator                 $offerInvalidator
     ) {
-        $this->productFactory = $productFactory;
-        $this->productManager = $productManager;
-        $this->entityManager = $entityManager;
-        $this->formFactory = $formFactory;
-        $this->requestStack = $requestStack;
-        $this->validator = $validator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Returns the latest event.
-     *
-     * @return ConvertEvent|null
      */
     public function getEvent(): ?ConvertEvent
     {
@@ -77,8 +61,6 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Returns the convert form.
-     *
-     * @return FormInterface|null
      */
     public function getForm(): ?FormInterface
     {
@@ -126,7 +108,7 @@ abstract class AbstractConverter implements ConverterInterface
 
                 $this->event->setSuccess(true);
             }
-        } catch (ConvertException $e) {
+        } catch (ConvertException) {
             $this->onError();
         }
 
@@ -137,15 +119,11 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Initializes the conversion.
-     *
-     * @return ProductInterface The target product
      */
     abstract protected function init(): ProductInterface;
 
     /**
      * Builds the target form.
-     *
-     * @return FormInterface
      */
     abstract protected function buildForm(): FormInterface;
 
@@ -158,6 +136,8 @@ abstract class AbstractConverter implements ConverterInterface
             ->setQuoteOnly(true)
             ->setPendingOffers(true)
             ->setPendingPrices(true);
+
+        $this->offerInvalidator->invalidateByProduct($this->target);
     }
 
     /**
@@ -239,20 +219,16 @@ abstract class AbstractConverter implements ConverterInterface
 
     /**
      * Stores data.
-     *
-     * @param mixed $data
      */
-    protected function set(string $key, $data): void
+    protected function set(string $key, mixed $data): void
     {
         $this->data[$key] = $data;
     }
 
     /**
      * Retrieves data.
-     *
-     * @return mixed
      */
-    protected function get(string $key)
+    protected function get(string $key): mixed
     {
         if (!array_key_exists($key, $this->data)) {
             throw new ConvertException("No data for key '$key'.");

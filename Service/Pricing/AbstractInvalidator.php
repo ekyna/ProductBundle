@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
+use Ekyna\Component\Resource\Message\MessageQueue;
 
 use function in_array;
 
@@ -19,27 +22,30 @@ use function in_array;
  */
 abstract class AbstractInvalidator
 {
-    protected ProductRepositoryInterface $productRepository;
-    private string                       $entityClass;
-    private string                       $flagProperty;
-
     /** @var array<int> */
     private array $productIds;
     /** @var array<int> */
     private array $brandIds;
     /** @var array<int> */
-    private array $groupIds;
+    private array $customerGroupIds;
+    /** @var array<int> */
+    private array $pricingGroupIds;
+
+    private bool $messagesEnabled = true;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        string                     $entityClass,
-        string                     $flagProperty
+        private readonly EntityManagerInterface     $entityManager,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly MessageQueue               $messageQueue,
+        private readonly string                     $entityClass,
+        private readonly string                     $flagProperty
     ) {
-        $this->productRepository = $productRepository;
-        $this->entityClass = $entityClass;
-        $this->flagProperty = $flagProperty;
-
         $this->clear();
+    }
+
+    public function toggleMessages(bool $enabled): void
+    {
+        $this->messagesEnabled = $enabled;
     }
 
     /**
@@ -49,85 +55,111 @@ abstract class AbstractInvalidator
     {
         $this->productIds = [];
         $this->brandIds = [];
-        $this->groupIds = [];
+        $this->customerGroupIds = [];
+        $this->pricingGroupIds = [];
     }
 
     /**
      * Invalidates scheduled entities.
      */
-    public function flush(EntityManagerInterface $manager): void
+    public function flush(): void
     {
-        if (!empty($this->productIds)) {
-            $qb = $manager->createQueryBuilder();
-            $qb
-                ->update($this->productRepository->getClassName(), 'p')
-                ->set('p.' . $this->flagProperty, ':flag')
-                ->andWhere($qb->expr()->in('p.id', ':product_ids'))
-                ->getQuery()
-                ->useQueryCache(false)
-                ->disableResultCache()
-                ->setParameters([
-                    'flag'        => 1,
-                    'product_ids' => $this->productIds,
-                ])
-                ->execute();
+        $ex = new Expr();
+
+        $clauses = $parameters = [];
+
+        if (!empty($this->pricingGroupIds)) {
+            $clauses[] = $ex->in('IDENTITY(p.pricingGroup)', ':pricing_group_ids');
+            $parameters['pricing_group_ids'] = $this->pricingGroupIds;
         }
 
         if (!empty($this->brandIds)) {
-            $qb = $manager->createQueryBuilder();
-            $qb
-                ->update($this->productRepository->getClassName(), 'p')
-                ->set('p.' . $this->flagProperty, ':flag')
-                ->andWhere($qb->expr()->in('p.type', ':types'))
-                ->andWhere($qb->expr()->in('IDENTITY(p.brand)', ':brand_ids'))
-                ->getQuery()
-                ->useQueryCache(false)
-                ->disableResultCache()
-                ->setParameters([
-                    'flag'      => 1,
-                    'brand_ids' => $this->brandIds,
-                    'types'     => [
-                        ProductTypes::TYPE_SIMPLE,
-                        ProductTypes::TYPE_VARIANT,
-                    ],
-                ])
-                ->execute();
+            $clauses[] = $ex->in('IDENTITY(p.brand)', ':brand_ids');
+            $parameters['brand_ids'] = $this->brandIds;
         }
 
-        if (!empty($this->groupIds)) {
-            $qb = $manager->createQueryBuilder();
-            $subQuery = $qb
+        if (!empty($this->customerGroupIds)) {
+            $subQb = $this->entityManager->createQueryBuilder();
+            $subQuery = $subQb
                 ->from($this->entityClass, 'object')
                 ->select('object')
-                ->andWhere($qb->expr()->in('object.group', ':group_ids'))
-                ->andWhere($qb->expr()->eq('object.product', 'p.id'))
+                ->andWhere($ex->in('object.group', ':customer_group_ids'))
+                ->andWhere($ex->eq('object.product', 'p.id'))
                 ->getDQL();
 
-            $qb = $manager->createQueryBuilder();
-            $qb
-                ->update($this->productRepository->getClassName(), 'p')
-                ->set('p.' . $this->flagProperty, ':flag')
-                ->andWhere($qb->expr()->exists($subQuery))
-                ->andWhere($qb->expr()->in('p.type', ':types'))
-                ->getQuery()
-                ->useQueryCache(false)
-                ->disableResultCache()
-                ->setParameters([
-                    'flag'      => 1,
-                    'group_ids' => $this->groupIds,
-                    'types'     => [
-                        ProductTypes::TYPE_SIMPLE,
-                        ProductTypes::TYPE_VARIANT,
-                    ],
-                ])
-                ->execute();
+            $clauses[] = $ex->exists($subQuery);
+            $parameters['customer_group_ids'] = $this->customerGroupIds;
+        }
+
+        if (!empty($clauses)) {
+            $clauses = [
+                $ex->andX(
+                    $ex->in('p.type', ':types'),
+                    $ex->orX(...$clauses)
+                ),
+            ];
+            $parameters['types'] = [
+                ProductTypes::TYPE_SIMPLE,
+                ProductTypes::TYPE_VARIANT,
+            ];
+        }
+        if (!empty($this->productIds)) {
+            $clauses[] = $ex->in('p.id', ':product_ids');
+            $parameters['product_ids'] = $this->productIds;
         }
 
         $this->clear();
+
+        if (empty($clauses)) {
+            return;
+        }
+
+        $parameters['flag'] = 1;
+
+        // Query identifiers of products that will be updated
+        $qb = $this->entityManager->createQueryBuilder();
+        $productIds = $qb
+            ->from($this->productRepository->getClassName(), 'p')
+            ->select(['p.id'])
+            ->andWhere(
+                $ex->orX(...$clauses),
+                $ex->neq('p.' . $this->flagProperty, ':flag')
+            )
+            ->getQuery()
+            ->useQueryCache(false)
+            ->disableResultCache()
+            ->setParameters($parameters)
+            ->getResult(IdHydrator::NAME);
+
+        // Update products flags
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb
+            ->update($this->productRepository->getClassName(), 'p')
+            ->set('p.' . $this->flagProperty, ':flag')
+            ->andWhere(
+                $ex->orX(...$clauses),
+                $ex->neq('p.' . $this->flagProperty, ':flag')
+            )
+            ->getQuery()
+            ->useQueryCache(false)
+            ->disableResultCache()
+            ->setParameters($parameters)
+            ->execute();
+
+        if (!$this->messagesEnabled) {
+            return;
+        }
+
+        // Send update messages
+        foreach ($productIds as $productId) {
+            $this->messageQueue->addMessage($this->createMessage($productId));
+        }
     }
 
+    abstract protected function createMessage(int $productId): object;
+
     /**
-     * Invalidates product's parents prices (by bundle choice or option product).
+     * Invalidates product's parents (by bundle choice or option product).
      */
     public function invalidateParents(Model\ProductInterface $product): void
     {
@@ -156,15 +188,27 @@ abstract class AbstractInvalidator
     }
 
     /**
-     * Schedule offer invalidation by product.
+     * Schedule invalidation by product.
      */
     public function invalidateByProduct(Model\ProductInterface $product): void
     {
-        $this->invalidateByProductId($product->getId());
+        if (null !== $id = $product->getId()) {
+            $this->invalidateByProductId($id);
+
+            return;
+        }
+
+        if (!$this->messagesEnabled) {
+            return;
+        }
+
+        $this->messageQueue->addMessage(function () use ($product) {
+            return $this->createMessage($product->getId());
+        });
     }
 
     /**
-     * Schedule offer invalidation by product id.
+     * Schedule invalidation by product id.
      */
     public function invalidateByProductId(?int $id): void
     {
@@ -172,7 +216,7 @@ abstract class AbstractInvalidator
     }
 
     /**
-     * Schedule offer invalidation by brand.
+     * Schedule invalidation by brand.
      */
     public function invalidateByBrand(Model\BrandInterface $brand): void
     {
@@ -180,7 +224,7 @@ abstract class AbstractInvalidator
     }
 
     /**
-     * Schedule offer invalidation by brand id.
+     * Schedule invalidation by brand id.
      */
     public function invalidateByBrandId(?int $id): void
     {
@@ -188,7 +232,23 @@ abstract class AbstractInvalidator
     }
 
     /**
-     * Schedule offer invalidation by customer group.
+     * Schedule invalidation by pricing group.
+     */
+    public function invalidateByPricingGroup(Model\PricingGroupInterface $group): void
+    {
+        $this->invalidateByPricingGroupId($group->getId());
+    }
+
+    /**
+     * Schedule invalidation by pricing group id.
+     */
+    public function invalidateByPricingGroupId(?int $id): void
+    {
+        $this->invalidateId($id, $this->pricingGroupIds);
+    }
+
+    /**
+     * Schedule invalidation by customer group.
      */
     public function invalidateByCustomerGroup(CustomerGroupInterface $group): void
     {
@@ -196,15 +256,15 @@ abstract class AbstractInvalidator
     }
 
     /**
-     * Schedule offer invalidation by customer group id.
+     * Schedule invalidation by customer group id.
      */
     public function invalidateByCustomerGroupId(?int $id): void
     {
-        $this->invalidateId($id, $this->groupIds);
+        $this->invalidateId($id, $this->customerGroupIds);
     }
 
     /**
-     * Invalidates offers for the given pricing.
+     * Invalidates for the given pricing.
      */
     public function invalidatePricing(Model\PricingInterface $pricing): void
     {
@@ -217,10 +277,14 @@ abstract class AbstractInvalidator
         foreach ($pricing->getBrands() as $brand) {
             $this->invalidateByBrandId($brand->getId());
         }
+
+        foreach ($pricing->getPricingGroups() as $group) {
+            $this->invalidateByPricingGroupId($group->getId());
+        }
     }
 
     /**
-     * Invalidates offers for the given special offer.
+     * Invalidates for the given special offer.
      */
     public function invalidateSpecialOffer(Model\SpecialOfferInterface $specialOffer): void
     {
@@ -236,6 +300,10 @@ abstract class AbstractInvalidator
 
         foreach ($specialOffer->getBrands() as $brand) {
             $this->invalidateByBrandId($brand->getId());
+        }
+
+        foreach ($specialOffer->getPricingGroups() as $group) {
+            $this->invalidateByPricingGroupId($group->getId());
         }
     }
 

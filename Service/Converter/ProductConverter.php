@@ -17,8 +17,8 @@ use RuntimeException;
  */
 class ProductConverter
 {
-    /** @var array<ConverterInterface> */
-    private $converters = [];
+    /** @var array<string, ConverterInterface> */
+    private array $converters = [];
 
     public function registerConverter(ConverterInterface $converter): void
     {
@@ -54,7 +54,7 @@ class ProductConverter
             $this->getConverter($product->getType(), $type);
 
             return true;
-        } catch (ConvertException $exception) {
+        } catch (ConvertException) {
         }
 
         return false;

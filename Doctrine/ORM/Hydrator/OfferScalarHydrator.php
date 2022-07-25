@@ -50,41 +50,15 @@ class OfferScalarHydrator extends AbstractHydrator
         $result[] = $tmp;
     }
 
-    /**
-     * @param string $name
-     * @param mixed value
-     *
-     * @return array|bool|Decimal|int|null
-     */
-    private function normalizeValue(string $name, $value)
+    private function normalizeValue(string $name, mixed $value): Decimal|int|bool|array|null
     {
-        switch ($name) {
-            case 'id':
-            case 'group_id':
-            case 'country_id':
-            case 'special_offer_id':
-            case 'pricing_id':
-                if (is_null($value)) {
-                    return null;
-                }
-
-                return intval($value);
-
-            case 'starting_from':
-                return (bool)$value;
-
-            case 'min_qty':
-            case 'original_price':
-            case 'sell_price':
-            case 'net_price':
-            case 'percent':
-                return new Decimal((string)$value);
-
-            case 'details':
-                return $this->normalizeDetails($value);
-        }
-
-        return $value;
+        return match ($name) {
+            'id', 'group_id', 'country_id', 'special_offer_id', 'pricing_id' => is_null($value) ? null : intval($value),
+            'starting_from' => (bool)$value,
+            'min_qty', 'original_price', 'sell_price', 'net_price', 'percent' => new Decimal((string)$value),
+            'details' => $this->normalizeDetails($value),
+            default => $value,
+        };
     }
 
     private function normalizeDetails(string $data): array

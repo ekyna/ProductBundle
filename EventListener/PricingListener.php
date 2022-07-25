@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
+use Doctrine\ORM\PersistentCollection;
 use Ekyna\Bundle\ProductBundle\Entity\Pricing;
-use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
@@ -14,30 +14,20 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class PricingListener
  * @package Ekyna\Bundle\ProductBundle\EventListener
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class PricingListener implements EventSubscriberInterface
+class PricingListener
 {
-    protected PersistenceHelperInterface $persistenceHelper;
-    protected OfferInvalidator           $offerInvalidator;
-    protected PriceInvalidator           $priceInvalidator;
-    protected PricingNameGenerator       $nameGenerator;
-
     public function __construct(
-        PersistenceHelperInterface $persistenceHelper,
-        OfferInvalidator           $offerInvalidator,
-        PriceInvalidator           $priceInvalidator,
-        PricingNameGenerator       $nameGenerator
+        protected readonly PersistenceHelperInterface $persistenceHelper,
+        protected readonly OfferInvalidator           $offerInvalidator,
+        protected readonly PriceInvalidator           $priceInvalidator,
+        protected readonly PricingNameGenerator       $nameGenerator
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->offerInvalidator = $offerInvalidator;
-        $this->priceInvalidator = $priceInvalidator;
-        $this->nameGenerator = $nameGenerator;
     }
 
     public function onInsert(ResourceEventInterface $event): PricingInterface
@@ -58,6 +48,10 @@ class PricingListener implements EventSubscriberInterface
         $this->updateName($pricing);
 
         $this->invalidate($pricing);
+
+        if ($this->pricingHasChanged($pricing)) {
+            $this->offerInvalidator->invalidatePricing($pricing);
+        }
 
         return $pricing;
     }
@@ -94,6 +88,20 @@ class PricingListener implements EventSubscriberInterface
                         $this->priceInvalidator->invalidateByProductId($id);
                     }
                 }
+            }
+        }
+
+        // Pricing groups association changes
+        foreach ($pricing->getInsertedIds(Pricing::REL_PRICING_GROUPS) as $id) {
+            $this->offerInvalidator->invalidateByPricingGroupId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByPricingGroupId($id);
+            }
+        }
+        foreach ($pricing->getRemovedIds(Pricing::REL_PRICING_GROUPS) as $id) {
+            $this->offerInvalidator->invalidateByPricingGroupId($id);
+            if ($andPrices) {
+                $this->priceInvalidator->invalidateByPricingGroupId($id);
             }
         }
 
@@ -136,6 +144,29 @@ class PricingListener implements EventSubscriberInterface
     }
 
     /**
+     * Returns whether the given pricing has changed.
+     */
+    protected function pricingHasChanged(PricingInterface $pricing): bool
+    {
+        if ($this->persistenceHelper->isChanged($pricing, 'product')) {
+            return true;
+        }
+
+        // TODO use track association trait methods ?
+        $groups = $pricing->getCustomerGroups();
+        if ($groups instanceof PersistentCollection && $groups->isDirty()) {
+            return true;
+        }
+
+        $countries = $pricing->getCountries();
+        if ($countries instanceof PersistentCollection && $countries->isDirty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the pricing from the event.
      */
     protected function getPricingFromEvent(ResourceEventInterface $event): PricingInterface
@@ -147,14 +178,5 @@ class PricingListener implements EventSubscriberInterface
         }
 
         return $pricing;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PricingEvents::INSERT => ['onInsert', 0],
-            PricingEvents::UPDATE => ['onUpdate', 0],
-            PricingEvents::DELETE => ['onDelete', 0],
-        ];
     }
 }

@@ -20,20 +20,12 @@ class OfferInvalidateCommand extends Command
 {
     protected static $defaultName = 'ekyna:product:offer:invalidate';
 
-    private SpecialOfferRepositoryInterface $repository;
-    private OfferInvalidator                $invalidator;
-    private EntityManagerInterface          $manager;
-
     public function __construct(
-        SpecialOfferRepositoryInterface $repository,
-        OfferInvalidator                $invalidator,
-        EntityManagerInterface          $manager
+        private readonly SpecialOfferRepositoryInterface $repository,
+        private readonly OfferInvalidator                $invalidator,
+        private readonly EntityManagerInterface          $manager
     ) {
         parent::__construct();
-
-        $this->repository = $repository;
-        $this->invalidator = $invalidator;
-        $this->manager = $manager;
     }
 
     protected function configure(): void
@@ -55,7 +47,7 @@ class OfferInvalidateCommand extends Command
             $this->invalidator->invalidateSpecialOffer($offer);
         }
 
-        $this->invalidator->flush($this->manager);
+        $this->invalidator->flush();
 
         return Command::SUCCESS;
     }

@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Generator;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\PricingInterface;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
@@ -31,10 +32,9 @@ class PricingNameGenerator
 
         $parts = [];
 
-        $this->addCustomerGroupsPart($pricing->getGroups(), $parts);
-
+        $this->addCustomerGroupsPart($pricing->getCustomerGroups(), $parts);
+        $this->addPricingGroupsPart($pricing->getPricingGroups(), $parts);
         $this->addBrandsPart($pricing->getBrands(), $parts);
-
         $this->addCountriesPart($pricing->getCountries(), $parts);
 
         if (empty($parts)) {
@@ -52,11 +52,12 @@ class PricingNameGenerator
 
         $parts = ['-' . $specialOffer->getPercent()->toFixed(2) . '%'];
 
-        $this->addCustomerGroupsPart($specialOffer->getGroups(), $parts);
+        $this->addCustomerGroupsPart($specialOffer->getCustomerGroups(), $parts);
 
         if ($specialOffer->getBrands()->isEmpty()) {
             $parts[] = $specialOffer->getProducts()->count() . ' product(s)';
         } else {
+            $this->addPricingGroupsPart($specialOffer->getPricingGroups(), $parts);
             $this->addBrandsPart($specialOffer->getBrands(), $parts);
         }
 
@@ -71,49 +72,41 @@ class PricingNameGenerator
 
     protected function addBrandsPart(Collection $brands, array &$parts): void
     {
-        if ($brands->isEmpty()) {
-            return;
-        }
-
-        $part = implode('/', array_map(function (BrandInterface $brand) {
+        $this->addCollectionPart($brands, $parts, function (BrandInterface $brand) {
             return $brand->getName();
-        }, $brands->slice(0, 3)));
+        });
+    }
 
-        if (3 < $count = $brands->count()) {
-            $part .= sprintf('(+%d)', $count - 3);
-        }
-
-        $parts[] = $part;
+    protected function addPricingGroupsPart(Collection $groups, array &$parts): void
+    {
+        $this->addCollectionPart($groups, $parts, function (PricingGroupInterface $group) {
+            return $group->getName();
+        });
     }
 
     protected function addCustomerGroupsPart(Collection $groups, array &$parts): void
     {
-        if ($groups->isEmpty()) {
-            return;
-        }
-
-        $part = implode('/', array_map(function (CustomerGroupInterface $group) {
+        $this->addCollectionPart($groups, $parts, function (CustomerGroupInterface $group) {
             return $group->getName();
-        }, $groups->slice(0, 3)));
-
-        if (3 < $count = $groups->count()) {
-            $part .= sprintf('(+%d)', $count - 3);
-        }
-
-        $parts[] = $part;
+        });
     }
 
     protected function addCountriesPart(Collection $countries, array &$parts): void
     {
-        if ($countries->isEmpty()) {
+        $this->addCollectionPart($countries, $parts, function (CountryInterface $country): string {
+            return $country->getName();
+        });
+    }
+
+    private function addCollectionPart(Collection $resources, array &$parts, callable $getName): void
+    {
+        if ($resources->isEmpty()) {
             return;
         }
 
-        $part = implode('/', array_map(function (CountryInterface $country) {
-            return $country->getName();
-        }, $countries->slice(0, 3)));
+        $part = implode('/', array_map($getName, $resources->slice(0, 3)));
 
-        if (3 < $count = $countries->count()) {
+        if (3 < $count = $resources->count()) {
             $part .= sprintf('(+%d)', $count - 3);
         }
 

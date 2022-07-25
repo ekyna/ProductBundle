@@ -74,6 +74,9 @@ interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationI
 
     public function setProduct(?ProductInterface $product): SpecialOfferInterface;
 
+    /**
+     * @return Collection<ProductInterface>
+     */
     public function getProducts(): Collection;
 
     public function addProduct(ProductInterface $product): SpecialOfferInterface;
@@ -90,13 +93,22 @@ interface SpecialOfferInterface extends TaggedEntityInterface, TrackAssociationI
     public function removeBrand(BrandInterface $brand): SpecialOfferInterface;
 
     /**
+     * @return Collection<PricingGroupInterface>
+     */
+    public function getPricingGroups(): Collection;
+
+    public function addPricingGroup(PricingGroupInterface $group): SpecialOfferInterface;
+
+    public function removePricingGroup(PricingGroupInterface $group): SpecialOfferInterface;
+
+    /**
      * @return Collection<CustomerGroupInterface>
      */
-    public function getGroups(): Collection;
+    public function getCustomerGroups(): Collection;
 
-    public function addGroup(CustomerGroupInterface $group): SpecialOfferInterface;
+    public function addCustomerGroup(CustomerGroupInterface $group): SpecialOfferInterface;
 
-    public function removeGroup(CustomerGroupInterface $group): SpecialOfferInterface;
+    public function removeCustomerGroup(CustomerGroupInterface $group): SpecialOfferInterface;
 
     /**
      * @return Collection<CountryInterface>

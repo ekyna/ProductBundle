@@ -12,6 +12,10 @@
         <ini name="memory_limit" value="-1" />
     </php>
 
+    <extensions>
+        <extension class="Ekyna\Component\Resource\Tests\PhpUnit\DecimalExtension" />
+    </extensions>
+
     <testsuites>
         <testsuite name="Product">
             <directory>./Tests/</directory>

@@ -7,7 +7,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Entity\Offer;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes as Types;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 
 /**
@@ -17,33 +16,17 @@ use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
  */
 class OfferUpdater
 {
-    protected EntityManagerInterface   $manager;
-    protected OfferResolver            $offerResolver;
-    protected OfferRepositoryInterface $offerRepository;
-    protected OfferInvalidator         $offerInvalidator;
-    protected string                   $customerGroupClass;
-    protected string                   $countryClass;
-    protected string                   $pricingClass;
-    protected string                   $specialOfferClass;
-
     public function __construct(
-        EntityManagerInterface   $manager,
-        OfferResolver            $offerResolver,
-        OfferRepositoryInterface $offerRepository,
-        OfferInvalidator         $offerInvalidator,
-        string                   $customerGroupClass,
-        string                   $countryClass,
-        string                   $pricingClass,
-        string                   $specialOfferClass
+        protected readonly EntityManagerInterface   $manager,
+        protected readonly OfferResolver            $offerResolver,
+        protected readonly OfferRepositoryInterface $offerRepository,
+        protected readonly OfferInvalidator         $offerInvalidator,
+        protected readonly PriceInvalidator         $priceInvalidator,
+        protected readonly string                   $customerGroupClass,
+        protected readonly string                   $countryClass,
+        protected readonly string                   $pricingClass,
+        protected readonly string                   $specialOfferClass
     ) {
-        $this->manager = $manager;
-        $this->offerResolver = $offerResolver;
-        $this->offerRepository = $offerRepository;
-        $this->offerInvalidator = $offerInvalidator;
-        $this->customerGroupClass = $customerGroupClass;
-        $this->countryClass = $countryClass;
-        $this->pricingClass = $pricingClass;
-        $this->specialOfferClass = $specialOfferClass;
     }
 
     /**
@@ -53,11 +36,7 @@ class OfferUpdater
      */
     public function updateProduct(ProductInterface $product): bool
     {
-        if (in_array($product->getType(), [Types::TYPE_VARIABLE, Types::TYPE_CONFIGURABLE], true)) {
-            $newOffers = [];
-        } else {
-            $newOffers = $this->offerResolver->resolve($product);
-        }
+        $newOffers = $this->offerResolver->resolve($product);
 
         // Old offers
         $oldOffers = $this->offerRepository->findByProduct($product, true);
@@ -121,6 +100,7 @@ class OfferUpdater
             ->setPendingPrices(true);
 
         $this->offerInvalidator->invalidateParents($product);
+        $this->priceInvalidator->invalidateByProduct($product);
 
         $this->manager->persist($product);
 

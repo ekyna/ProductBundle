@@ -7,10 +7,12 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\SpecialOffer;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\CountryChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Customer\CustomerGroupChoiceType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
-use Ekyna\Bundle\ProductBundle\Form\Type\ProductChoiceType;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductSearchType;
+use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -71,7 +73,7 @@ class SpecialOfferType extends AbstractResourceType
                 'label'    => t('field.end_date', [], 'EkynaUi'),
                 'required' => false,
             ])
-            ->add('groups', CustomerGroupChoiceType::class, [
+            ->add('customerGroups', CustomerGroupChoiceType::class, [
                 'multiple' => true,
                 'required' => false,
             ])
@@ -89,29 +91,36 @@ class SpecialOfferType extends AbstractResourceType
                 $specialOffer->takeSnapshot();
             });
 
-        if (!$options['product_mode']) {
-            $builder
-                ->add('designation', TextType::class, [
-                    'label'    => t('field.designation', [], 'EkynaUi'),
-                    'required' => false,
-                    'attr'     => [
-                        'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
-                    ],
-                ])
-                ->add('products', ProductChoiceType::class, [
-                    'multiple' => true,
-                    'required' => false,
-                    'types'    => [
-                        ProductTypes::TYPE_SIMPLE,
-                        ProductTypes::TYPE_VARIANT,
-                        //ProductTypes::TYPE_BUNDLE,
-                    ],
-                ])
-                ->add('brands', BrandChoiceType::class, [
-                    'multiple' => true,
-                    'required' => false,
-                ]);
+        if ($options['product_mode']) {
+            return;
         }
+
+        $builder
+            ->add('designation', TextType::class, [
+                'label'    => t('field.designation', [], 'EkynaUi'),
+                'required' => false,
+                'attr'     => [
+                    'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
+                ],
+            ])
+            ->add('products', ProductSearchType::class, [
+                'multiple' => true,
+                'required' => false,
+                'types'    => [
+                    ProductTypes::TYPE_SIMPLE,
+                    ProductTypes::TYPE_VARIANT,
+                    //TODO (?) ProductTypes::TYPE_BUNDLE,
+                ],
+            ])
+            ->add('pricingGroups', ResourceChoiceType::class, [
+                'resource' => PricingGroupInterface::class,
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('brands', BrandChoiceType::class, [
+                'multiple' => true,
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

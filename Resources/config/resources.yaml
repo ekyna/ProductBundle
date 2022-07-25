@@ -259,6 +259,20 @@ resources:
                 class: Ekyna\Bundle\ProductBundle\Repository\PriceRepository
             trans_domain: EkynaProduct
 
+        pricing_group:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\PricingGroup
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\PricingGroupRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\PricingGroupRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\Pricing\PricingGroupType
+            table: Ekyna\Bundle\ProductBundle\Table\Type\PricingGroupType
+            trans_domain: EkynaProduct
+            actions:
+                admin_crud: ~
+
         pricing:
             driver: doctrine/orm
             entity:

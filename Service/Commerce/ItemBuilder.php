@@ -247,6 +247,23 @@ class ItemBuilder
         }
 
         $this->cleanUpBundleSlots($item, $bundleSlotIds);
+
+        if ($product->getWeight()->isZero()) {
+            return;
+        }
+
+        // Weight override case
+        $item->setWeight(clone $product->getWeight());
+        $this->clearChildrenWeight($item);
+    }
+
+    private function clearChildrenWeight(SaleItemInterface $item): void
+    {
+        foreach ($item->getChildren() as $child) {
+            $child->setWeight(new Decimal(0));
+
+            $this->clearChildrenWeight($child);
+        }
     }
 
     /**

@@ -58,15 +58,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('ekyna_resource.action')
 
         ->set('ekyna_product.action.admin.product.create', Product\CreateAction::class)
-            ->args([
-                // TODO service('twig'),
-            ])
             ->tag('ekyna_resource.action')
 
         ->set('ekyna_product.action.admin.product.duplicate', Product\DuplicateAction::class)
-            ->args([
-                // TODO service('twig'),
-            ])
             ->tag('ekyna_resource.action')
 
         ->set('ekyna_product.action.admin.product.export', Product\ExportAction::class)
@@ -84,20 +78,14 @@ return static function (ContainerConfigurator $container) {
 
         ->set('ekyna_product.action.admin.product.invalidate_offers', Product\InvalidateOffersAction::class)
             ->args([
-                // TODO service('twig'),
+                service('ekyna_product.invalidator.offer'),
             ])
             ->tag('ekyna_resource.action')
 
         ->set('ekyna_product.action.admin.product.move_up', Product\MoveUpAction::class)
-            ->args([
-                // TODO service('twig'),
-            ])
             ->tag('ekyna_resource.action')
 
         ->set('ekyna_product.action.admin.product.move_down', Product\MoveDownAction::class)
-            ->args([
-                // TODO service('twig'),
-            ])
             ->tag('ekyna_resource.action')
     ;
 };

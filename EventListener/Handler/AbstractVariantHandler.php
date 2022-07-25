@@ -19,27 +19,16 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 abstract class AbstractVariantHandler extends AbstractHandler
 {
-    protected PersistenceHelperInterface     $persistenceHelper;
-    protected LocaleProviderInterface        $localeProvider;
-    protected AttributeTypeRegistryInterface $typeRegistry;
-    protected PriceCalculator                $priceCalculator;
-    protected ProductRepositoryInterface     $productRepository;
-
     private ?VariantUpdater  $variantUpdater  = null;
     private ?VariableUpdater $variableUpdater = null;
 
     public function __construct(
-        PersistenceHelperInterface     $persistenceHelper,
-        LocaleProviderInterface        $localeProvider,
-        PriceCalculator                $priceCalculator,
-        AttributeTypeRegistryInterface $typeRegistry,
-        ProductRepositoryInterface     $productRepository
+        protected readonly PersistenceHelperInterface     $persistenceHelper,
+        protected readonly LocaleProviderInterface        $localeProvider,
+        protected readonly PriceCalculator                $priceCalculator,
+        protected readonly AttributeTypeRegistryInterface $typeRegistry,
+        protected readonly ProductRepositoryInterface     $productRepository
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->localeProvider = $localeProvider;
-        $this->typeRegistry = $typeRegistry;
-        $this->priceCalculator = $priceCalculator;
-        $this->productRepository = $productRepository;
     }
 
     protected function getVariantUpdater(): VariantUpdater

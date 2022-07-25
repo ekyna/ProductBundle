@@ -140,10 +140,10 @@ class ProductHelper
         foreach ($groups as $group) {
             $all++;
             if (in_array($group->getId(), $excluded)) {
-                $icon = '<i class="fa fa-remove text-danger"/>';
+                $icon = '<i class="fa fa-remove text-danger"></i>';
                 $exc++;
             } else {
-                $icon = '<i class="fa fa-check text-success"/>';
+                $icon = '<i class="fa fa-check text-success"></i>';
             }
 
             $label = sprintf(
@@ -159,13 +159,13 @@ class ProductHelper
 
         if ($exc === 0) {
             $theme = 'success';
-            $icon = '<i class="fa fa-check"/>';
+            $icon = '<i class="fa fa-check"></i>';
         } elseif ($all === $exc) {
             $theme = 'danger';
-            $icon = '<i class="fa fa-remove"/>';
+            $icon = '<i class="fa fa-remove"></i>';
         } else {
             $theme = 'warning';
-            $icon = '<i class="fa fa-check"/>';
+            $icon = '<i class="fa fa-check"></i>';
         }
 
         if ($all === 0) {

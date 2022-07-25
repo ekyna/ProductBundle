@@ -135,7 +135,7 @@ class PriceCalculator
      *
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
-    public function calculateMinPrice(Model\ProductInterface $product, $exclude = []): Decimal
+    public function calculateMinPrice(Model\ProductInterface $product, array|bool $exclude = []): Decimal
     {
         if (Types::isConfigurableType($product)) {
             return $this->calculateConfigurableMinPrice($product, $exclude);
@@ -157,7 +157,7 @@ class PriceCalculator
      *
      * @param bool|array $exclude The option group ids to exclude, true to exclude all
      */
-    protected function calculateMinOptionsPrice(Model\ProductInterface $product, $exclude = []): Decimal
+    protected function calculateMinOptionsPrice(Model\ProductInterface $product, array|bool $exclude = []): Decimal
     {
         if (true === $exclude) {
             return new Decimal(0);
@@ -221,7 +221,7 @@ class PriceCalculator
      */
     public function calculateProductMinPrice(
         Model\ProductInterface $product,
-                          $exclude = [],
+        array|bool             $exclude = [],
         Decimal                $price = null
     ): Decimal {
         Types::assertChildType($product);
@@ -244,7 +244,7 @@ class PriceCalculator
      */
     public function calculateVariableMinPrice(
         Model\ProductInterface $variable,
-                          $exclude = [],
+        array|bool             $exclude = [],
         Decimal                $price = null
     ): Decimal {
         Types::assertVariable($variable);
@@ -288,7 +288,7 @@ class PriceCalculator
      */
     public function calculateBundleMinPrice(
         Model\ProductInterface $bundle,
-                               $exclude = [],
+        array|bool             $exclude = [],
         Decimal                $price = null
     ): Decimal {
         Types::assertBundle($bundle);
@@ -335,8 +335,10 @@ class PriceCalculator
      *
      * @todo The product (configurable) min price should be processed and persisted during update (flush)
      */
-    public function calculateConfigurableMinPrice(Model\ProductInterface $configurable, $exclude = []): Decimal
-    {
+    public function calculateConfigurableMinPrice(
+        Model\ProductInterface $configurable,
+        array|bool             $exclude = []
+    ): Decimal {
         Types::assertConfigurable($configurable);
 
         $price = new Decimal(0);
@@ -414,9 +416,9 @@ class PriceCalculator
         }
 
         $pricing = [
-            'net_price'  => $amount,
-            'offers' => null,
-            'taxes'  => null,
+            'net_price' => $amount,
+            'offers'    => null,
+            'taxes'     => null,
         ];
 
         // Offers rules
@@ -524,9 +526,9 @@ class PriceCalculator
             );
 
         return [
-            'net_price'  => $price,
-            'offers' => [], // Prevent inheritance
-            'taxes'  => $withTaxes ? $this->getTaxesRates($option, $context) : [],
+            'net_price' => $price,
+            'offers'    => [], // Prevent inheritance
+            'taxes'     => $withTaxes ? $this->getTaxesRates($option, $context) : [],
         ];
     }
 
@@ -616,7 +618,7 @@ class PriceCalculator
         Model\ProductInterface $bundle,
         ContextInterface       $context,
         array                  $parentOffers,
-        Decimal                    $qty = null
+        Decimal                $qty = null
     ): bool {
         Types::assertBundle($bundle);
 

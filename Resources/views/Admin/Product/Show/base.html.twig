@@ -136,8 +136,11 @@
             {%- block offers_pane -%}
             <div class="tab-pane" id="{{ resource_name }}-offers">
                 {% block offers_content -%}
+                {% if product is simple_product or product is variant_product or product is bundle_product -%}
+                {{ _product.show_pricing_group(product) }}
                 {{ _product.show_special_offers(product) }}
                 {{ _product.show_pricings(product) }}
+                {%- endif %}
                 {% include '@EkynaProduct/Admin/Product/Show/_offers.html.twig' %}
                 {% include '@EkynaProduct/Admin/Product/Show/_prices.html.twig' %}
                 {%- endblock offers_content %}

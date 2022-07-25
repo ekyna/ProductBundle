@@ -19,7 +19,7 @@
         </a>
     </li>
     {% endblock pricing_tab %}
-    {% if form.specialOffers is defined or form.pricings is defined %}
+    {% if form.pricingGroup is defined or form.specialOffers is defined or form.pricings is defined %}
     {% block offers_tab %}
     <li>
         <a href="#product-offers" id="toggle-product-offers" data-toggle="tab">
@@ -93,9 +93,12 @@
         </div>
         {% endblock pricing_pane %}
 
-        {% if form.specialOffers is defined or form.pricings is defined %}
+        {% if form.pricingGroup is defined or form.specialOffers is defined or form.pricings is defined %}
         {% block offers_pane %}
         <div class="tab-pane" id="product-offers">
+            {% if form.pricingGroup is defined %}
+                {{ form_row(form.pricingGroup) }}
+            {% endif %}
             {% if form.specialOffers is defined %}
                 {{ form_row(form.specialOffers) }}
             {% endif %}

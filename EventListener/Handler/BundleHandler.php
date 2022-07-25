@@ -23,26 +23,15 @@ use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
  */
 class BundleHandler extends AbstractHandler
 {
-    private PersistenceHelperInterface   $persistenceHelper;
-    private ProductRepositoryInterface   $productRepository;
-    private PriceCalculator              $priceCalculator;
-    private PriceInvalidator             $priceInvalidator;
-    private StockSubjectUpdaterInterface $stockUpdater;
-
     private ?BundleUpdater $bundleUpdater = null;
 
     public function __construct(
-        PersistenceHelperInterface   $persistenceHelper,
-        ProductRepositoryInterface   $productRepository,
-        PriceCalculator              $priceCalculator,
-        PriceInvalidator             $priceInvalidator,
-        StockSubjectUpdaterInterface $stockUpdater
+        private readonly PersistenceHelperInterface   $persistenceHelper,
+        private readonly ProductRepositoryInterface   $productRepository,
+        private readonly PriceCalculator              $priceCalculator,
+        private readonly PriceInvalidator             $priceInvalidator,
+        private readonly StockSubjectUpdaterInterface $stockUpdater
     ) {
-        $this->persistenceHelper = $persistenceHelper;
-        $this->productRepository = $productRepository;
-        $this->priceCalculator = $priceCalculator;
-        $this->priceInvalidator = $priceInvalidator;
-        $this->stockUpdater = $stockUpdater;
     }
 
     public function handleInsert(ResourceEventInterface $event): bool
@@ -57,7 +46,7 @@ class BundleHandler extends AbstractHandler
 
         $changed = $updater->updateNetPrice($bundle) || $changed;
 
-        return $updater->updateMinPrice($bundle) || $changed;
+        return $this->updateMinPrice($bundle) || $changed;
     }
 
     public function handleUpdate(ResourceEventInterface $event): bool
@@ -81,7 +70,7 @@ class BundleHandler extends AbstractHandler
             $changed = true;
         }
 
-        $changed = $updater->updateMinPrice($bundle) || $changed;
+        $changed = $this->updateMinPrice($bundle) || $changed;
 
         if (!empty($events)) {
             $this->scheduleChildChangeEvents($bundle, $events);
@@ -96,8 +85,6 @@ class BundleHandler extends AbstractHandler
 
         $updater = $this->getBundleUpdater();
 
-        $this->priceInvalidator->invalidateByProduct($bundle);
-
         $changed = false;
 
         if ($updater->updateNetPrice($bundle)) {
@@ -105,11 +92,22 @@ class BundleHandler extends AbstractHandler
             $changed = true;
         }
 
-        if ($updater->updateMinPrice($bundle)) {
+        if ($this->updateMinPrice($bundle)) {
             $changed = true;
         }
 
         return $changed;
+    }
+
+    protected function updateMinPrice(ProductInterface $product): bool
+    {
+        if (!$this->getBundleUpdater()->updateMinPrice($product)) {
+            return false;
+        }
+
+        $this->priceInvalidator->invalidateByProduct($product);
+
+        return true;
     }
 
     public function handleChildAvailabilityChange(ResourceEventInterface $event): bool

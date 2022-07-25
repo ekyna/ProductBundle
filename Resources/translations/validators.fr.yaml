@@ -16,8 +16,9 @@ ekyna_product:
     component:
         tax_group_integrity: Ce composant doit utiliser le même groupe de taxes.
     pricing:
+        pricing_groups_must_be_empty: Les listes des groupes de tarification associés doit être vide.
         brands_must_be_empty: Les listes des marques associées doit être vide.
-        at_least_one_brand: Veuillez sélectionner au moins une marque.
+        at_least_one_pricing_group_or_brand: Veuillez sélectionner au moins un groupe de tarification ou une marque.
     product:
         duplicate_designation: Un autre produit existe déjà avec cette désignation pour la même marque (%reference%).
         duplicate_variant_designation: Une autre variante existe déjà avec cette désignation pour le même parent (produit variable).
@@ -34,7 +35,7 @@ ekyna_product:
     option:
         recursive_choice: Un produit ne peut pas être une option de lui-même.
     special_offer:
-        at_least_one_brand_or_product: Veuillez sélectionner au moins un produit ou une marque.
-        products_and_brands_must_be_empty: Les listes de produits et de marques associé(e)s doivent être vides.
+        products_must_be_empty: Les listes des produits associées doit être vide.
+        at_least_one_pricing_group_or_brand_or_product: Veuillez sélectionner au moins un groupe de tarification, une marque ou un produit.
     sale_item:
         at_least_one_choice_required: Veuillez sélectionner au moins un article.

@@ -5,16 +5,17 @@
         {{ show_row(pricing.designation, 'text', {
             'label': t('field.designation', [], 'EkynaUi')
         }) }}
-        {#{{ show_row(pricing.designation, 'text', {
-            'label': t('field.designation', [], 'EkynaUi')
-        }) }}#}
-        {{ show_row(pricing.groups, 'resource', {
+        {{ show_row(pricing.customerGroups, 'resource', {
             'label': t('customer_group.label.plural', [], 'EkynaCommerce'),
             'resource': 'ekyna_commerce.customer_group'
         }) }}
         {{ show_row(pricing.countries, 'resource', {
             'label': t('pricing.field.countries', [], 'EkynaProduct'),
             'resource': 'ekyna_commerce.country'
+        }) }}
+        {{ show_row(pricing.pricingGroups, 'resource', {
+            'label': t('pricing_group.label.plural', [], 'EkynaProduct'),
+            'resource': 'ekyna_product.pricing_group'
         }) }}
         {{ show_row(pricing.brands, 'resource', {
             'label': t('brand.label.plural', [], 'EkynaProduct'),

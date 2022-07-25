@@ -40,13 +40,25 @@
         </many-to-one>
 
         <many-to-many target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
-                      field="groups">
-            <join-table name="product_pricings_groups">
+                      field="customerGroups">
+            <join-table name="product_pricings_customer_groups">
                 <join-columns>
                     <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </join-columns>
                 <inverse-join-columns>
-                    <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE"/>
+                    <join-column name="customer_group_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+
+        <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface"
+                      field="pricingGroups">
+            <join-table name="product_pricings_pricing_groups">
+                <join-columns>
+                    <join-column name="pricing_id" referenced-column-name="id" on-delete="CASCADE"/>
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="pricing_group_id" referenced-column-name="id" on-delete="CASCADE"/>
                 </inverse-join-columns>
             </join-table>
         </many-to-many>

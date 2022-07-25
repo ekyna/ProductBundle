@@ -342,7 +342,7 @@ pricing:
         singular: Pricing
         plural: Pricings
     header:
-        list: Pricings <small>List of the pricings</small>
+        list: Pricings <small>List of pricings</small>
         show: Pricing details <small>%name%</small>
         new: Create a new pricing
         edit: Edit the pricing <small>%name%</small>
@@ -359,6 +359,19 @@ pricing:
         rules: Rules
     alert:
         no_item: No pricing configured
+
+pricing_group:
+    label:
+        singular: Pricing group
+        plural: Pricing groups
+    header:
+        list: Pricing groups <small>List of groups</small>
+        show: Pricing group <small>%name%</small>
+        new: Create a new pricing group
+        edit: Edit the pricing group <small>%name%</small>
+        remove: Remove the pricing group <small>%name%</small>
+    alert:
+        no_item: No pricing group configured
 
 pricing_rule:
     label:
@@ -395,9 +408,12 @@ special_offer:
         stack: Stackable
         countries: Invoice country
     message:
-        product_removed: |
+        product_removed_by_brand: |
             The product <strong>{product}</strong> has been put out of the list
             because it belongs to the brand <strong>{brand}</strong>.
+        product_removed_by_pricing_group: |
+            The product <strong>{product}</strong> has been put out of the list
+            because it belongs to the pricing group <strong>{pricingGroup}</strong>.
     alert:
         no_item: No special offer configured
 

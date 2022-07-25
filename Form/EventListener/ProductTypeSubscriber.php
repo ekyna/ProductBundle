@@ -140,6 +140,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addCrossSellingsField()
             ->addOptionGroupsField()
             ->addSpecialOffersField()
+            ->addPricingGroupField()
             ->addPricingsField()
             ->addSeoField();
 
@@ -252,6 +253,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // Pricing
             ->addOptionGroupsField()
             ->addSpecialOffersField()
+            ->addPricingGroupField()
             ->addPricingsField();
 
         $this->subjectBuilder
@@ -318,6 +320,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             // TODO (?) ->addComponentsField()
             ->addOptionGroupsField()
             ->addSpecialOffersField()
+            ->addPricingGroupField()
             ->addPricingsField()
             // Seo
             ->addSeoField();

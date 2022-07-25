@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\CommerceBundle\Event\SubjectLabelEvent;
+use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
+use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
+use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
 use Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AccountMenuSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AddToCartEventSubscriber;
@@ -119,7 +122,10 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_commerce.repository.country'),
             ])
             ->tag('resource.event_subscriber')
-            ->tag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate'])
+            ->tag('kernel.event_listener', [
+                'event'  => ConsoleEvents::TERMINATE,
+                'method' => 'onTerminate'
+            ])
 
         // Offer resource event listener
         ->set('ekyna_product.listener.offer', OfferListener::class)
@@ -130,7 +136,10 @@ return static function (ContainerConfigurator $container) {
                 service('doctrine.orm.default_result_cache')->nullOnInvalid()
             ])
             ->tag('resource.event_subscriber')
-            ->tag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onTerminate'])
+            ->tag('kernel.event_listener', [
+                'event'  => ConsoleEvents::TERMINATE,
+                'method' => 'onTerminate'
+            ])
 
         // Special offer resource event listener
         ->set('ekyna_product.listener.special_offer', SpecialOfferListener::class)
@@ -141,7 +150,18 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.generator.pricing_name'),
                 service('translator'),
             ])
-            ->tag('resource.event_subscriber')
+            ->tag('resource.event_listener', [
+                'event'  => SpecialOfferEvents::INSERT,
+                'method' => 'onInsert',
+            ])
+            ->tag('resource.event_listener', [
+                'event'  => SpecialOfferEvents::UPDATE,
+                'method' => 'onUpdate',
+            ])
+            ->tag('resource.event_listener', [
+                'event'  => SpecialOfferEvents::DELETE,
+                'method' => 'onDelete',
+            ])
 
         // Pricing resource event listener
         ->set('ekyna_product.listener.pricing', PricingListener::class)
@@ -151,7 +171,18 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.invalidator.price'),
                 service('ekyna_product.generator.pricing_name'),
             ])
-            ->tag('resource.event_subscriber')
+            ->tag('resource.event_listener', [
+                'event'  => PricingEvents::INSERT,
+                'method' => 'onInsert',
+            ])
+            ->tag('resource.event_listener', [
+                'event'  => PricingEvents::UPDATE,
+                'method' => 'onUpdate',
+            ])
+            ->tag('resource.event_listener', [
+                'event'  => PricingEvents::DELETE,
+                'method' => 'onDelete',
+            ])
 
         // Pricing rule resource event listener
         ->set('ekyna_product.listener.pricing_rule', PricingRuleListener::class)
@@ -197,6 +228,7 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.calculator.price'),
                 service('ekyna_commerce.updater.stock_subject'),
                 service('ekyna_product.repository.product'),
+                service('ekyna_product.invalidator.offer'),
                 service('ekyna_product.invalidator.price'),
             ])
             ->tag(Handler\HandlerInterface::DI_TAG)
@@ -255,7 +287,16 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.invalidator.price'),
                 service('ekyna_commerce.updater.stock_subject'),
             ])
-            ->tag('resource.event_subscriber')
+            ->tag('resource.event_listener', ['event' => ProductEvents::PRE_CREATE, 'method' => 'onPreCreate'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::PRE_UPDATE, 'method' => 'onPreUpdate'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::PRE_DELETE, 'method' => 'onPreDelete'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::INSERT, 'method' => 'onInsert'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::UPDATE, 'method' => 'onUpdate'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::DELETE, 'method' => 'onDelete'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::STOCK_UNIT_CHANGE, 'method' => 'onStockUnitChange'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_PRICE_CHANGE, 'method' => 'onChildPriceChange'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_STOCK_CHANGE, 'method' => 'onChildStockChange'])
+            ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_AVAILABILITY_CHANGE, 'method' => 'onChildAvailabilityChange'])
 
         // Product media resource event listener
         ->set('ekyna_product.listener.product_media', ProductMediaListener::class)

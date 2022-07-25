@@ -47,6 +47,14 @@
 {%- endmacro show_brand -%}
 
 
+{%- macro show_pricing_group(product, options = {}) -%}
+    {{- show_row(product.pricingGroup, 'resource', {
+        'resource': 'ekyna_product.pricing_group',
+        'id': 'product_pricingGroup'
+    }|merge(options)) -}}
+{%- endmacro show_pricing_group -%}
+
+
 {%- macro show_brandNaming(product, options = {}) -%}
     {{- show_row(product.brandNaming, 'boolean', {
         'label': t('product.field.brand_naming', [], 'EkynaProduct'),

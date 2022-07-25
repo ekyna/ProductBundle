@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use DateTime;
-use Decimal\Decimal;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
+use Ekyna\Bundle\ProductBundle\Doctrine\ORM\Hydrator\OfferScalarHydrator;
+use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\ResourceRepository;
+
+use function in_array;
 
 /**
  * Class SpecialOfferRepository
@@ -22,27 +26,21 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
 
     public function findRulesByProduct(ProductInterface $product): array
     {
-        $rules = $this
+        if (in_array($product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE], true)) {
+            throw new InvalidArgumentException('Expected simple, variant or bundle product type.');
+        }
+
+        return $this
             ->getByProductQuery()
             ->setParameters([
-                'product' => $product,
-                'brand'   => $product->getBrand(),
-                'now'     => new DateTime(),
-                'enabled' => true,
+                'product'       => $product,
+                'brand'         => $product->getBrand(),
+                'pricing_group' => $product->getPricingGroup(),
+                'now'           => new DateTime(),
+                'enabled'       => true,
             ])
             ->setParameter('now', new DateTime(), Types::DATE_MUTABLE)
-            ->getScalarResult();
-
-        return array_map(function ($rule) {
-            return [
-                'special_offer_id' => (int)$rule['special_offer_id'],
-                'group_id'         => $rule['group_id'] ? (int)$rule['group_id'] : null,
-                'country_id'       => $rule['country_id'] ? (int)$rule['country_id'] : null,
-                'min_qty'          => new Decimal($rule['min_qty']),
-                'percent'          => new Decimal($rule['percent']),
-                'stack'            => (bool)$rule['stack'],
-            ];
-        }, $rules);
+            ->getResult(OfferScalarHydrator::NAME);
     }
 
     public function findStartingTodayOrEndingYesterday(): array
@@ -80,24 +78,27 @@ class SpecialOfferRepository extends ResourceRepository implements SpecialOfferR
         return $this->byProductQuery = $qb
             ->select([
                 's.id as special_offer_id',
-                'g.id as group_id',
+                'cg.id as group_id',
                 'c.id as country_id',
                 's.minQuantity as min_qty',
                 's.percent as percent',
                 's.stack as stack',
             ])
-            ->leftJoin('s.groups', 'g')
+            ->leftJoin('s.customerGroups', 'cg')
             ->leftJoin('s.countries', 'c')
-            ->leftJoin('s.brands', 'b')
-            ->addOrderBy('g.id', 'ASC')
+//            ->leftJoin('s.brands', 'b')
+//            ->leftJoin('s.pricingGroups', 'pg')
+            ->addOrderBy('cg.id', 'ASC')
             ->addOrderBy('c.id', 'ASC')
-            ->addOrderBy('b.id', 'ASC')
+//            ->addOrderBy('b.id', 'ASC')
+//            ->addOrderBy('pg.id', 'ASC')
             ->addOrderBy('s.percent', 'DESC')
             ->addOrderBy('s.minQuantity', 'DESC')
             ->andWhere($ex->eq('s.enabled', ':enabled'))
             ->andWhere($ex->orX(
                 $ex->eq('s.product', ':product'),
                 $ex->isMemberOf(':brand', 's.brands'),
+                $ex->isMemberOf(':pricing_group', 's.pricingGroups'),
                 $ex->isMemberOf(':product', 's.products')
             ))
             ->andWhere($ex->orX($ex->isNull('s.startsAt'), $ex->lte('s.startsAt', ':now')))

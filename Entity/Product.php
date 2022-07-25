@@ -12,7 +12,6 @@ use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model as Media;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model;
-use Ekyna\Bundle\ProductBundle\Model\ProductMentionInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
@@ -29,6 +28,8 @@ use function sprintf;
  * Class Product
  * @package Ekyna\Bundle\ProductBundle\Entity
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @implements RM\TranslatableInterface<Model\ProductTranslationInterface>
  */
 class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 {
@@ -57,6 +58,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected ?DateTimeInterface $statUpdatedAt         = null;
 
     protected ?Model\BrandInterface        $brand        = null;
+    protected ?Model\PricingGroupInterface $pricingGroup = null;
     protected ?Model\ProductInterface      $parent       = null;
     protected ?Model\AttributeSetInterface $attributeSet = null;
 
@@ -431,6 +433,18 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
+    public function getPricingGroup(): ?Model\PricingGroupInterface
+    {
+        return $this->pricingGroup;
+    }
+
+    public function setPricingGroup(?Model\PricingGroupInterface $pricingGroup): Model\ProductInterface
+    {
+        $this->pricingGroup = $pricingGroup;
+
+        return $this;
+    }
+
     public function getParent(): ?Model\ProductInterface
     {
         return $this->parent;
@@ -616,7 +630,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     /**
      * @inheritDoc
      */
-    public function resolveOptionGroups($exclude = [], bool $bundle = false): array
+    public function resolveOptionGroups(bool|array $exclude = [], bool $bundle = false): array
     {
         if (true === $exclude) {
             return [];
@@ -1093,12 +1107,12 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    public function hasMention(ProductMentionInterface $mention): bool
+    public function hasMention(Model\ProductMentionInterface $mention): bool
     {
         return $this->mentions->contains($mention);
     }
 
-    public function addMention(ProductMentionInterface $mention): Model\ProductInterface
+    public function addMention(Model\ProductMentionInterface $mention): Model\ProductInterface
     {
         if (!$this->hasMention($mention)) {
             $this->mentions->add($mention);
@@ -1108,7 +1122,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this;
     }
 
-    public function removeMention(ProductMentionInterface $mention): Model\ProductInterface
+    public function removeMention(Model\ProductMentionInterface $mention): Model\ProductInterface
     {
         if ($this->hasMention($mention)) {
             $this->mentions->removeElement($mention);

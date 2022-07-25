@@ -6,13 +6,19 @@ namespace Ekyna\Bundle\ProductBundle\Service\Exporter;
 
 use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
+use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PurchaseCostCalculator;
+use Ekyna\Component\Resource\Helper\File\Csv;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function array_map;
+use function join;
 
 /**
  * Class ProductExporter
@@ -21,51 +27,45 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ProductExporter
 {
-    private ProductRepositoryInterface $productRepository;
-    private PriceCalculator            $priceCalculator;
-    private PurchaseCostCalculator     $costCalculator;
-    private SubjectHelperInterface     $subjectHelper;
-    private TranslatorInterface        $translator;
-
     protected ExportConfig $config;
-    /** @var resource */
-    private $handle;
+    protected Csv          $file;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        PriceCalculator            $priceCalculator,
-        PurchaseCostCalculator     $costCalculator,
-        SubjectHelperInterface     $subjectHelper,
-        TranslatorInterface        $translator
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly PriceCalculator            $priceCalculator,
+        private readonly PurchaseCostCalculator     $costCalculator,
+        private readonly SubjectHelperInterface     $subjectHelper,
+        private readonly TranslatorInterface        $translator
     ) {
-        $this->productRepository = $productRepository;
-        $this->priceCalculator = $priceCalculator;
-        $this->costCalculator = $costCalculator;
-        $this->subjectHelper = $subjectHelper;
-        $this->translator = $translator;
     }
 
     /**
      * Exports products.
      */
-    public function export(ExportConfig $config): string
+    public function export(ExportConfig $config): Csv
     {
         $this->config = $config;
 
-        if (false === $path = tempnam(sys_get_temp_dir(), 'product_export')) {
-            throw new RuntimeException('Failed to create temporary file.');
+        $brands = $this->config->getBrands()->toArray();
+
+        if (empty($brands)) {
+            $name = 'products';
+        } else {
+            $slugger = new AsciiSlugger();
+            $name = join('_', array_map(
+                fn(BrandInterface $brand) => $slugger->slug($brand->getName())->lower(),
+                $brands
+            ));
         }
 
-        if (false === $this->handle = fopen($path, 'w')) {
-            throw new RuntimeException("Failed to open '$path' for writing.");
-        }
+        $this->file = Csv::create($name . '_export.csv');
+        $this->file->setSeparator($this->config->getSeparator());
+        $this->file->setEnclosure($this->config->getEnclosure());
 
         $this->buildHeaders();
         $this->buildRows();
 
-        fclose($this->handle);
-
-        return $path;
+        return $this->file;
     }
 
     /**
@@ -81,7 +81,7 @@ class ProductExporter
             $headers[] = $definitions[$column]->trans($this->translator);
         }
 
-        fputcsv($this->handle, $headers, $this->config->getSeparator(), $this->config->getEnclosure());
+        $this->file->addRow($headers);
     }
 
     /**
@@ -109,7 +109,7 @@ class ProductExporter
             $row[] = $this->buildCell($product, $price, $column);
         }
 
-        fputcsv($this->handle, $row, $this->config->getSeparator(), $this->config->getEnclosure());
+        $this->file->addRow($row);
     }
 
     /**

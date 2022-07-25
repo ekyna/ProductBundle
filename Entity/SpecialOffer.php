@@ -9,6 +9,7 @@ use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
+use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
@@ -25,10 +26,11 @@ use Ekyna\Component\Resource\Model\TrackAssociationTrait;
  */
 class SpecialOffer extends AbstractResource implements SpecialOfferInterface
 {
-    public const REL_PRODUCTS  = 'products';
-    public const REL_BRANDS    = 'brands';
-    public const REL_GROUPS    = 'groups';
-    public const REL_COUNTRIES = 'countries';
+    public const REL_PRODUCTS        = 'products';
+    public const REL_BRANDS          = 'brands';
+    public const REL_PRICING_GROUPS  = 'pricingGroups';
+    public const REL_CUSTOMER_GROUPS = 'customerGroups';
+    public const REL_COUNTRIES       = 'countries';
 
     use TaggedEntityTrait;
     use TrackAssociationTrait;
@@ -46,8 +48,10 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
     protected Collection $products;
     /** @var Collection<BrandInterface> */
     protected Collection $brands;
+    /** @var Collection<PricingGroupInterface> */
+    protected Collection $pricingGroups;
     /** @var Collection<CustomerGroupInterface> */
-    protected Collection $groups;
+    protected Collection $customerGroups;
     /** @var Collection<CountryInterface> */
     protected Collection $countries;
 
@@ -59,7 +63,7 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
 
         $this->products = new ArrayCollection();
         $this->brands = new ArrayCollection();
-        $this->groups = new ArrayCollection();
+        $this->customerGroups = new ArrayCollection();
         $this->countries = new ArrayCollection();
     }
 
@@ -236,24 +240,47 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
         return $this;
     }
 
-    public function getGroups(): Collection
+    public function getPricingGroups(): Collection
     {
-        return $this->groups;
+        return $this->pricingGroups;
     }
 
-    public function addGroup(CustomerGroupInterface $group): SpecialOfferInterface
+    public function addPricingGroup(PricingGroupInterface $group): SpecialOfferInterface
     {
-        if (!$this->groups->contains($group)) {
-            $this->groups->add($group);
+        if (!$this->pricingGroups->contains($group)) {
+            $this->pricingGroups->add($group);
         }
 
         return $this;
     }
 
-    public function removeGroup(CustomerGroupInterface $group): SpecialOfferInterface
+    public function removePricingGroup(PricingGroupInterface $group): SpecialOfferInterface
     {
-        if ($this->groups->contains($group)) {
-            $this->groups->removeElement($group);
+        if ($this->pricingGroups->contains($group)) {
+            $this->pricingGroups->removeElement($group);
+        }
+
+        return $this;
+    }
+
+    public function getCustomerGroups(): Collection
+    {
+        return $this->customerGroups;
+    }
+
+    public function addCustomerGroup(CustomerGroupInterface $group): SpecialOfferInterface
+    {
+        if (!$this->customerGroups->contains($group)) {
+            $this->customerGroups->add($group);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomerGroup(CustomerGroupInterface $group): SpecialOfferInterface
+    {
+        if ($this->customerGroups->contains($group)) {
+            $this->customerGroups->removeElement($group);
         }
 
         return $this;
@@ -295,7 +322,8 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
         return [
             static::REL_PRODUCTS,
             static::REL_BRANDS,
-            static::REL_GROUPS,
+            static::REL_PRICING_GROUPS,
+            static::REL_CUSTOMER_GROUPS,
             static::REL_COUNTRIES,
         ];
     }

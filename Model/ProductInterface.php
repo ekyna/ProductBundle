@@ -188,12 +188,16 @@ interface ProductInterface extends
 
     public function setBrand(BrandInterface $brand): ProductInterface;
 
+    public function getPricingGroup(): ?PricingGroupInterface;
+
+    public function setPricingGroup(?PricingGroupInterface $pricingGroup): ProductInterface;
+
     public function getParent(): ?ProductInterface;
 
     public function setParent(?ProductInterface $parent): ProductInterface;
 
     /**
-     * @return array<ProductInterface>|Collection<ProductInterface>
+     * @return Collection<ProductInterface>
      */
     public function getVariants(): Collection;
 
@@ -208,7 +212,7 @@ interface ProductInterface extends
     public function setAttributeSet(?AttributeSetInterface $attributeSet): ProductInterface;
 
     /**
-     * @return array<ProductAttributeInterface>|Collection<ProductAttributeInterface>
+     * @return Collection<ProductAttributeInterface>
      */
     public function getAttributes(): Collection;
 
@@ -219,7 +223,7 @@ interface ProductInterface extends
     public function removeAttribute(ProductAttributeInterface $attribute): ProductInterface;
 
     /**
-     * @return array<OptionGroupInterface>|Collection<OptionGroupInterface>
+     * @return Collection<OptionGroupInterface>
      */
     public function getOptionGroups(): Collection;
 
@@ -249,10 +253,10 @@ interface ProductInterface extends
      *
      * @return array<OptionGroupInterface>
      */
-    public function resolveOptionGroups($exclude = [], bool $bundle = false): array;
+    public function resolveOptionGroups(bool|array $exclude = [], bool $bundle = false): array;
 
     /**
-     * @return array<BundleSlotInterface>|Collection<BundleSlotInterface>
+     * @return Collection<BundleSlotInterface>
      */
     public function getBundleSlots(): Collection;
 
@@ -270,7 +274,7 @@ interface ProductInterface extends
     public function setBundleSlots(Collection $slots): ProductInterface;
 
     /**
-     * @return array<ComponentInterface>|Collection<ComponentInterface>
+     * @return Collection<ComponentInterface>
      */
     public function getComponents(): Collection;
 
@@ -290,7 +294,7 @@ interface ProductInterface extends
     public function setComponents(Collection $components): ProductInterface;
 
     /**
-     * @return array<CrossSellingInterface>|Collection<CrossSellingInterface>
+     * @return Collection<CrossSellingInterface>
      */
     public function getCrossSellings(): Collection;
 
@@ -310,7 +314,7 @@ interface ProductInterface extends
     public function setCrossSellings(Collection $crossSellings): ProductInterface;
 
     /**
-     * @return array<SpecialOfferInterface>|Collection<SpecialOfferInterface>
+     * @return Collection<SpecialOfferInterface>
      */
     public function getSpecialOffers(): Collection;
 
@@ -328,7 +332,7 @@ interface ProductInterface extends
     public function setSpecialOffers(Collection $offers): ProductInterface;
 
     /**
-     * @return array<PricingInterface>|Collection<PricingInterface>
+     * @return Collection<PricingInterface>
      */
     public function getPricings(): Collection;
 
@@ -346,7 +350,7 @@ interface ProductInterface extends
     public function setPricings(Collection $pricings): ProductInterface;
 
     /**
-     * @return array<CategoryInterface>|Collection<CategoryInterface>
+     * @return Collection<CategoryInterface>
      */
     public function getCategories(): Collection;
 
@@ -362,7 +366,7 @@ interface ProductInterface extends
     public function setCategories(Collection $categories): ProductInterface;
 
     /**
-     * @return array<CustomerGroupInterface>|Collection<CustomerGroupInterface>
+     * @return Collection<CustomerGroupInterface>
      */
     public function getCustomerGroups(): Collection;
 
@@ -382,7 +386,7 @@ interface ProductInterface extends
     /**
      * @param array<string> $types To filter media by type(s)
      *
-     * @return array<ProductMediaInterface>|Collection<ProductMediaInterface>
+     * @return Collection<ProductMediaInterface>
      */
     public function getMedias(array $types = []): Collection;
 
@@ -397,7 +401,7 @@ interface ProductInterface extends
     public function removeReference(ProductReferenceInterface $reference): ProductInterface;
 
     /**
-     * @return array<ProductReferenceInterface>|Collection<ProductReferenceInterface>
+     * @return Collection<ProductReferenceInterface>
      */
     public function getReferences(): Collection;
 
@@ -418,12 +422,12 @@ interface ProductInterface extends
     public function getImage(): ?MediaInterface;
 
     /**
-     * @return array<MediaInterface>|Collection<MediaInterface>
+     * @return Collection<MediaInterface>
      */
     public function getImages(bool $withChildren = true, int $limit = 5): Collection;
 
     /**
-     * @return array<MediaInterface>|Collection<MediaInterface>
+     * @return Collection<MediaInterface>
      */
     public function getFiles(bool $withChildren = false, int $limit = 5): Collection;
 

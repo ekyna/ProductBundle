@@ -174,7 +174,11 @@
         </many-to-one>
 
         <many-to-one field="brand" target-entity="Ekyna\Bundle\ProductBundle\Model\BrandInterface">
-            <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
+            <join-column name="brand_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false" />
+        </many-to-one>
+
+        <many-to-one field="pricingGroup" target-entity="Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface">
+            <join-column name="pricing_group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
         </many-to-one>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface" field="categories">
