@@ -64,8 +64,8 @@ class BrandType extends AbstractResourceType
                     UpdateAction::class,
                     DeleteAction::class,
                 ],
-                'buttons' => [
-                    function (RowInterface $row) {
+                'buttons'  => [
+                    function (RowInterface $row): ?array {
                         $category = $row->getData(null);
 
                         if (!$path = $this->resourceHelper->generatePublicUrl($category)) {
@@ -80,7 +80,7 @@ class BrandType extends AbstractResourceType
                             'path'   => $path,
                         ];
                     },
-                    function (RowInterface $row) {
+                    function (RowInterface $row): ?array {
                         $category = $row->getData(null);
 
                         if (!$path = $this->resourceHelper->generatePublicUrl($category)) {
@@ -96,7 +96,6 @@ class BrandType extends AbstractResourceType
                                 'path' => $path,
                             ]),
                         ];
-
                     },
                 ],
             ])

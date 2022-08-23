@@ -154,7 +154,7 @@ class ProductType extends AbstractResourceType
             $actions[] = Product\MoveUpAction::class;
             $actions[] = Product\MoveDownAction::class;
         } else {
-            $buttons[] = function (RowInterface $row) {
+            $buttons[] = function (RowInterface $row): ?array {
                 $product = $row->getData(null);
 
                 if (null !== $path = $this->resourceHelper->generatePublicUrl($product)) {
@@ -169,7 +169,7 @@ class ProductType extends AbstractResourceType
 
                 return null;
             };
-            $buttons[] = function (RowInterface $row) {
+            $buttons[] = function (RowInterface $row): ?array {
                 $product = $row->getData(null);
 
                 if (null !== $path = $this->resourceHelper->generatePublicUrl($product)) {
