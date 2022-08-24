@@ -78,7 +78,7 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     /**
      * Finds the parents products of the given bundled product.
      *
-     * @return array<ProductInterface>
+     * @return array<ProductInterface|int>
      */
     public function findParentsByBundled(
         ProductInterface $bundled,
@@ -89,7 +89,7 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     /**
      * Finds the products having the given product as option.
      *
-     * @return array<ProductInterface>
+     * @return array<ProductInterface|int>
      */
     public function findParentsByOptionProduct(
         ProductInterface $product,
@@ -100,7 +100,7 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     /**
      * Finds the products having the given product as component.
      *
-     * @return array<ProductInterface>
+     * @return array<ProductInterface|int>
      */
     public function findParentsByComponent(ProductInterface $product, bool $idOnly = false): array;
 

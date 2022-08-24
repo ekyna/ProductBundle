@@ -18,7 +18,6 @@ use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Component\Resource\Repository\RepositoryFactoryInterface;
 use Symfony\Component\Intl\Countries;
-use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_reverse;
@@ -82,44 +81,6 @@ class ProductReadHelper
             ->findByProduct($product);
 
         return $this->buildList($offers, 'offers');
-
-        /*$allGroups = $this->translator->trans('customer_group.message.all', [], 'EkynaCommerce');
-        $allCountries = $this->translator->trans('country.message.all', [], 'EkynaCommerce');
-
-        $list = [];
-        foreach ($offers as $offer) {
-            $group = $offer->getGroup();
-            $country = $offer->getCountry();
-
-            $key = sprintf(
-                '%d-%d',
-                $group ? $group->getId() : 0,
-                $country ? $country->getId() : 0
-            );
-
-            $locale = $this->localeProvider->getCurrentLocale();
-
-            if (!isset($list[$key])) {
-                $list[$key] = [
-                    'title'  => sprintf(
-                        '%s / %s',
-                        $group ? $group->getName() : $allGroups,
-                        $country ? Countries::getName($country->getCode(), $locale) : $allCountries
-                    ),
-                    'offers' => [],
-                ];
-            }
-
-            $list[$key]['offers'][] = $offer;
-        }
-
-        $list = array_reverse($list);
-
-        foreach ($list as &$data) {
-            $data['offers'] = array_reverse($data['offers']);
-        }
-
-        return $list;*/
     }
 
     public function getPriceList(ProductInterface $product): array
@@ -129,44 +90,6 @@ class ProductReadHelper
             ->findByProduct($product);
 
         return $this->buildList($prices, 'prices');
-
-        /*$allGroups = $this->translator->trans('customer_group.message.all', [], 'EkynaCommerce');
-        $allCountries = $this->translator->trans('country.message.all', [], 'EkynaCommerce');
-
-        $list = [];
-        foreach ($prices as $price) {
-            $group = $price->getGroup();
-            $country = $price->getCountry();
-
-            $key = sprintf(
-                '%d-%d',
-                $group ? $group->getId() : 0,
-                $country ? $country->getId() : 0
-            );
-
-            $locale = $this->localeProvider->getCurrentLocale();
-
-            if (!isset($list[$key])) {
-                $list[$key] = [
-                    'title'  => sprintf(
-                        '%s / %s',
-                        $group ? $group->getName() : $allGroups,
-                        $country ? Countries::getName($country->getCode(), $locale) : $allCountries
-                    ),
-                    'prices' => [],
-                ];
-            }
-
-            $list[$key]['prices'][] = $price;
-        }
-
-        $list = array_reverse($list);
-
-        foreach ($list as &$data) {
-            $data['prices'] = array_reverse($data['prices']);
-        }
-
-        return $list;*/
     }
 
     /**
@@ -240,12 +163,12 @@ class ProductReadHelper
 
             if (!isset($list[$key])) {
                 $list[$key] = [
-                    'title'  => sprintf(
+                    'title' => sprintf(
                         '%s / %s',
                         $group ? $group->getName() : $allGroups,
                         $country ? Countries::getName($country->getCode(), $locale) : $allCountries
                     ),
-                    $name => [],
+                    $name   => [],
                 ];
             }
 

@@ -41,12 +41,12 @@ return static function (ContainerConfigurator $container) {
         ->services()
 
         // Account dashboard event listener
-        ->set('ekyna_product.listener.account.dashboard', AccountDashboardSubscriber::class)
+        /* TODO ->set('ekyna_product.listener.account.dashboard', AccountDashboardSubscriber::class)
             ->args([
                 service('ekyna_commerce.provider.context'),
                 service('ekyna_product.repository.pricing'),
             ])
-            ->tag('kernel.event_subscriber')
+            ->tag('kernel.event_subscriber')*/
 
         // Account menu event listener
         ->set('ekyna_product.listener.account.menu', AccountMenuSubscriber::class)

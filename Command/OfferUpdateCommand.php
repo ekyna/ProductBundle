@@ -9,7 +9,9 @@ use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferUpdater;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceUpdater;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,6 +35,8 @@ class OfferUpdateCommand extends Command
         private readonly ProductRepositoryInterface $repository,
         private readonly OfferUpdater               $offerUpdater,
         private readonly PriceUpdater               $priceUpdater,
+        private readonly OfferInvalidator           $offerInvalidator,
+        private readonly PriceInvalidator           $priceInvalidator,
         private readonly EntityManagerInterface     $manager
     ) {
         parent::__construct();
@@ -54,6 +58,8 @@ class OfferUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->manager->getConnection()->getConfiguration()->setSQLLogger(null);
+        $this->offerInvalidator->toggleMessages(false);
+        $this->priceInvalidator->toggleMessages(false);
 
         $this->timeout = time() + $input->getOption('max_execution_time');
 

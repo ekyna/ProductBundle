@@ -72,30 +72,34 @@ class PricingNameGenerator
 
     protected function addBrandsPart(Collection $brands, array &$parts): void
     {
-        $this->addCollectionPart($brands, $parts, function (BrandInterface $brand) {
-            return $brand->getName();
-        });
+        $this->addCollectionPart(
+            $brands, $parts,
+            static fn(BrandInterface $brand): string => $brand->getName()
+        );
     }
 
     protected function addPricingGroupsPart(Collection $groups, array &$parts): void
     {
-        $this->addCollectionPart($groups, $parts, function (PricingGroupInterface $group) {
-            return $group->getName();
-        });
+        $this->addCollectionPart(
+            $groups, $parts,
+            static fn(PricingGroupInterface $group): string => $group->getName()
+        );
     }
 
     protected function addCustomerGroupsPart(Collection $groups, array &$parts): void
     {
-        $this->addCollectionPart($groups, $parts, function (CustomerGroupInterface $group) {
-            return $group->getName();
-        });
+        $this->addCollectionPart(
+            $groups, $parts,
+            static fn(CustomerGroupInterface $group): string => $group->getName()
+        );
     }
 
     protected function addCountriesPart(Collection $countries, array &$parts): void
     {
-        $this->addCollectionPart($countries, $parts, function (CountryInterface $country): string {
-            return $country->getName();
-        });
+        $this->addCollectionPart(
+            $countries, $parts,
+            static fn(CountryInterface $country): string => $country->getName()
+        );
     }
 
     private function addCollectionPart(Collection $resources, array &$parts, callable $getName): void

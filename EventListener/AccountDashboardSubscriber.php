@@ -44,6 +44,7 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
             $scalars[] = $this->scalarPricing($pricing);
         }
 
+        # TODO Display pricing groups when no brand is configured
         $widget = DashboardWidget::create('@EkynaProduct/Account/Dashboard/pricings.html.twig')
             ->setTitle(t('account.pricing.title', [], 'EkynaProduct'))
             ->setParameters([

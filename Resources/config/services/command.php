@@ -55,6 +55,8 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.repository.product'),
                 service('ekyna_product.updater.offer'),
                 service('ekyna_product.updater.price'),
+                service('ekyna_product.invalidator.offer'),
+                service('ekyna_product.invalidator.price'),
                 service('doctrine.orm.default_entity_manager'),
             ])
             ->tag('console.command')

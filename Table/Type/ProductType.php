@@ -251,13 +251,17 @@ class ProductType extends AbstractResourceType
                     'resource' => 'ekyna_product.brand',
                     'position' => 210,
                 ])
+                ->addFilter('pricingGroup', ResourceType::class, [
+                    'resource' => 'ekyna_product.pricing_group',
+                    'position' => 220,
+                ])
                 ->addFilter('attributeSet', ResourceType::class, [
                     'resource' => 'ekyna_product.attribute_set',
-                    'position' => 220,
+                    'position' => 230,
                 ])
                 ->addFilter('taxGroup', ResourceType::class, [
                     'resource' => 'ekyna_commerce.tax_group',
-                    'position' => 230,
+                    'position' => 240,
                 ])
                 ->addFilter('tags', ResourceType::class, [
                     'resource' => 'ekyna_cms.tag',
