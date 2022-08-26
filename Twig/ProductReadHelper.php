@@ -148,6 +148,8 @@ class ProductReadHelper
         $allGroups = $this->translator->trans('customer_group.message.all', [], 'EkynaCommerce');
         $allCountries = $this->translator->trans('country.message.all', [], 'EkynaCommerce');
 
+        $locale = $this->localeProvider->getCurrentLocale();
+
         $list = [];
         foreach ($objects as $object) {
             $group = $object->getGroup();
@@ -158,8 +160,6 @@ class ProductReadHelper
                 $group ? $group->getId() : 0,
                 $country ? $country->getId() : 0
             );
-
-            $locale = $this->localeProvider->getCurrentLocale();
 
             if (!isset($list[$key])) {
                 $list[$key] = [

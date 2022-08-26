@@ -27,10 +27,6 @@ class AdminMenuPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('ekyna_admin.menu.pool')) {
-            return;
-        }
-
         $helper = new PoolHelper(
             $container->getDefinition('ekyna_admin.menu.pool')
         );
