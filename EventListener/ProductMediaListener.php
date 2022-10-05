@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
+use DateTime;
 use Ekyna\Bundle\ProductBundle\Event\ProductMediaEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -46,8 +47,8 @@ class ProductMediaListener implements EventSubscriberInterface
             $product = $this->persistenceHelper->getChangeSet($media, 'product')[0];
         }
 
-        if ($product) {
-            $product->setUpdatedAt(new \DateTime());
+        if ($product && !$this->persistenceHelper->isScheduledForRemove($product)) {
+            $product->setUpdatedAt(new DateTime());
 
             $this->persistenceHelper->persistAndRecompute($product, false);
         }

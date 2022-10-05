@@ -464,6 +464,7 @@ product:
         option_parents: This product is an option of the following products
         bundle_parents: This product is included in the following bundles
         component_parents: This product is a component of the following products
+        related_catalogs: This product is shown in the following catalogs
         brand_naming: Include brand in title and designation
         not_contractual: Non-contractual photos
         attributes_title: Aattributes title
@@ -478,6 +479,23 @@ product:
             A supplier reference already exists for the supplier <strong>%name%</strong>.
         generate_gtin_13: >
             This product does not have a Gtin 13 code. <a href="%url%">Click here to generate a Gtin 13 code</a>
+    message:
+        clear_relations_prior_delete: >
+            You must remove the following relations before you can delete this product.
+        relation_prevents_deletion: >
+            This product is used in <a href="{url}">{designation}</a>'s composition ({relation}) and 
+            therefore cannot be deleted. See the «Relations» tab to remove associations between this 
+            product and others.
+        catalog_prevents_deletion: >
+            This product is shown in the catalog <a href="{url}">{title}</a> and
+            therefore cannot be deleted. Edit this catalog before you van delete this product.
+        delete_warning: >
+            Warning, this operation cannot be reverted.<br>
+            All <strong>stock data</strong> will be <strong>definitively lost</strong>.<br>
+            For <strong>quotes</strong> and <strong>carts</strong>, lines associated
+            to this product will be <strong>deleted</strong>.<br>
+            For <strong>customer orders</strong> and <strong>supplier orders</strong>,
+            lines associated to this product will be kept but associations will be <strong>deleted</strong>.
 
 product_media:
     label:

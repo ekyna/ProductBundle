@@ -26,6 +26,7 @@ use Ekyna\Bundle\ProductBundle\EventListener\OptionListener;
 use Ekyna\Bundle\ProductBundle\EventListener\PriceListener;
 use Ekyna\Bundle\ProductBundle\EventListener\PricingListener;
 use Ekyna\Bundle\ProductBundle\EventListener\PricingRuleListener;
+use Ekyna\Bundle\ProductBundle\EventListener\ProductDeleteListener;
 use Ekyna\Bundle\ProductBundle\EventListener\ProductListener;
 use Ekyna\Bundle\ProductBundle\EventListener\ProductMediaListener;
 use Ekyna\Bundle\ProductBundle\EventListener\ProductStockUnitListener;
@@ -297,6 +298,26 @@ return static function (ContainerConfigurator $container) {
             ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_PRICE_CHANGE, 'method' => 'onChildPriceChange'])
             ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_STOCK_CHANGE, 'method' => 'onChildStockChange'])
             ->tag('resource.event_listener', ['event' => ProductEvents::CHILD_AVAILABILITY_CHANGE, 'method' => 'onChildAvailabilityChange'])
+
+        // Product resource delete event listener
+        ->set('ekyna_product.listener.product.delete', ProductDeleteListener::class)
+            ->args([
+                service('ekyna_product.repository.product'),
+                service('ekyna_product.repository.catalog'),
+                service('ekyna_resource.queue.message'),
+                service('ekyna_resource.helper'),
+                service('translator'),
+            ])
+            ->tag('resource.event_listener', [
+                'event'    => ProductEvents::PRE_DELETE,
+                'method'   => 'onPreDelete',
+                'priority' => 1024,
+            ])
+            ->tag('resource.event_listener', [
+                'event'    => ProductEvents::DELETE,
+                'method'   => 'onDelete',
+                'priority' => -1024,
+            ])
 
         // Product media resource event listener
         ->set('ekyna_product.listener.product_media', ProductMediaListener::class)

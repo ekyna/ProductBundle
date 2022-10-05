@@ -78,23 +78,29 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     /**
      * Finds the parents products of the given bundled product.
      *
+     * @param bool $requiredSlots Whether to return only bundles having this product as a REQUIRED slot choice.
+     *
      * @return array<ProductInterface|int>
      */
     public function findParentsByBundled(
         ProductInterface $bundled,
         bool             $requiredSlots = false,
-        bool             $idOnly = false
+        bool             $idOnly = false,
+        ?int             $limit = null
     ): array;
 
     /**
      * Finds the products having the given product as option.
+     *
+     * @param bool $requiredGroups Whether to return only bundles having this product as a REQUIRED option choice.
      *
      * @return array<ProductInterface|int>
      */
     public function findParentsByOptionProduct(
         ProductInterface $product,
         bool             $requiredGroups = false,
-        bool             $idOnly = false
+        bool             $idOnly = false,
+        ?int             $limit = null
     ): array;
 
     /**
@@ -102,7 +108,11 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
      *
      * @return array<ProductInterface|int>
      */
-    public function findParentsByComponent(ProductInterface $product, bool $idOnly = false): array;
+    public function findParentsByComponent(
+        ProductInterface $product,
+        bool             $idOnly = false,
+        ?int             $limit = null
+    ): array;
 
     /**
      * Finds the "out of stock" products for the given mode.

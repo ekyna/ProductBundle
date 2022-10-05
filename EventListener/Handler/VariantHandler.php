@@ -46,7 +46,7 @@ class VariantHandler extends AbstractVariantHandler
             $variableChanged = $this->getVariableUpdater()->updateMinPrice($variable) || $variableChanged;
 
             if ($variableChanged) {
-                $this->persistenceHelper->persistAndRecompute($variable);
+                $this->persistenceHelper->persistAndRecompute($variable, false);
             }
         }
 
@@ -98,7 +98,7 @@ class VariantHandler extends AbstractVariantHandler
                 $changed = $variableUpdater->updateMinPrice($variable) || $changed;
 
                 if ($changed) {
-                    $this->persistenceHelper->persistAndRecompute($variable);
+                    $this->persistenceHelper->persistAndRecompute($variable, false);
                 }
             }
         }

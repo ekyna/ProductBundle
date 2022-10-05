@@ -1,6 +1,7 @@
 {% extends '@EkynaAdmin/Entity/Crud/delete.html.twig' %}
 
-{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as _macros %}
+{% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _show %}
 
 {% block title %}
     {{ parent() }} {{ product|product_type_badge }}
@@ -8,6 +9,42 @@
 
 {% block actions %}
     {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
-    {{ macros.export_products_button() }}
-    {{ macros.new_product_button() }}
+    {{ _macros.export_products_button() }}
+    {{ _macros.new_product_button() }}
 {% endblock actions %}
+
+{% block main %}
+    {% set optionParents = product|option_parents %}
+    {% set componentParents = product|component_parents %}
+    {% set bundleParents = product|bundle_parents %}
+    {% set catalogs = product|related_catalogs %}
+    {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty or catalogs is not empty -%}
+        <div class="alert alert-warning">
+            <p>{{ 'product.message.clear_relations_before_delete'|trans({}, 'EkynaProduct') }}</p>
+        </div>
+        {% if bundleParents is not empty -%}
+            <p class="h4">{{ 'product.field.bundle_parents'|trans({}, 'EkynaProduct') }}</p>
+            {{ _show.show_relations(bundleParents, true) }}
+        {%- endif %}
+        {% if componentParents is not empty -%}
+            <p class="h4">{{ 'product.field.component_parents'|trans({}, 'EkynaProduct') }}</p>
+            {{ _show.show_relations(componentParents, true) }}
+        {%- endif %}
+        {% if optionParents is not empty -%}
+            <p class="h4">{{ 'product.field.option_parents'|trans({}, 'EkynaProduct') }}</p>
+            {{ _show.show_relations(optionParents, true) }}
+        {%- endif %}
+        {% if catalogs is not empty -%}
+            <p class="h4">{{ 'product.field.related_catalogs'|trans({}, 'EkynaProduct') }}</p>
+            {{ _show.show_catalogs(catalogs, true) }}
+        {%- endif %}
+    {%- else %}
+        <div class="alert alert-danger">
+            <p>
+                <i class="fa fa-warning fa-4x pull-left"></i>
+                {{ 'product.message.delete_warning'|trans({}, 'EkynaProduct')|raw }}
+            </p>
+        </div>
+        {{ parent() }}
+    {%- endif -%}
+{% endblock %}

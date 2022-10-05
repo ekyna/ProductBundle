@@ -9,7 +9,7 @@
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="product">
-            <join-column name="product_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true"/>
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
         </many-to-one>
 
     </entity>

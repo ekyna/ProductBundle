@@ -961,7 +961,7 @@
 {%- endmacro show_configurable_composition -%}
 
 
-{%- macro show_relations(products) -%}
+{%- macro show_relations(products, buttons = false) -%}
     <table class="table table-stripped table-condensed table-hover table-alt-head show-product-relation">
         <tr>
             <th>{{ 'product.label.singular'|trans({}, 'EkynaProduct') }}</th>
@@ -970,6 +970,7 @@
             <th class="text-right">{{ 'stock_subject.field.state'|trans({}, 'EkynaCommerce') }}</th>
             <th class="text-right">{{ 'field.visible'|trans({}, 'EkynaUi') }}</th>
             <th class="text-right">{{ 'field.net_price'|trans({}, 'EkynaCommerce') }}</th>
+            {% if buttons %}<th>&nbsp;</th>{% endif %}
         </tr>
         {%- for product in products -%}
             {%- set relationId = 'relation_' ~loop.index0 ~ '_' -%}
@@ -1000,10 +1001,58 @@
                 <td id="{{ relationId ~ 'product_netPrice' }}" class="text-right">
                     {{- product.netPrice|format_currency(commerce_default_currency) -}}
                 </td>
+                {% if buttons -%}
+                <th id="{{ relationId ~ 'product_delete' }}">
+                    {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {
+                        'label': '', 'size': 'xs'
+                    }) }}&nbsp;
+                    {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {
+                        'label': '', 'size': 'xs'
+                    }) }}
+                </th>
+                {%- endif %}
             </tr>
         {%- endfor -%}
     </table>
 {%- endmacro show_relations -%}
+
+
+{%- macro show_catalogs(catalogs, buttons = false) -%}
+    <table class="table table-stripped table-condensed table-hover table-alt-head">
+        <tr>
+            <th>{{ 'catalog.label.singular'|trans({}, 'EkynaProduct') }}</th>
+            <th>{{ 'customer.label.singular'|trans({}, 'EkynaCommerce') }}</th>
+            {% if buttons %}<th>&nbsp;</th>{% endif %}
+        </tr>
+        {%- for catalog in catalogs -%}
+            {%- set catalogId = 'relation_' ~loop.index0 ~ '_' -%}
+            <tr>
+                <td id="{{ catalogId ~ 'title' }}">
+                    <a href="{{ admin_resource_path(catalog) }}" class="show-entity">
+                        {{- catalog -}}
+                    </a>
+                </td>
+                <td id="{{ catalogId ~ 'customer' }}">
+                    {% if catalog.customer is not null -%}
+                        <a href="{{ admin_resource_path(catalog.customer) }}" class="show-entity">
+                            {{- catalog.customer -}}
+                        </a>
+                    {%- endif %}
+                </td>
+                {% if buttons -%}
+                <th id="{{ catalogId ~ 'update' }}">
+                    {{ admin_resource_btn(catalog, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {
+                        'label': '', 'size': 'xs'
+                    }) }}&nbsp;
+                    {{ admin_resource_btn(catalog, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {
+                        'label': '', 'size': 'xs'
+                    }) }}
+                </th>
+                {%- endif %}
+            </tr>
+        {%- endfor -%}
+    </table>
+{%- endmacro show_catalogs -%}
 
 
 {%- macro show_seo(product, options = {}) -%}

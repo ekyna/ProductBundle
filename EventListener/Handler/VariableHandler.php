@@ -109,7 +109,7 @@ class VariableHandler extends AbstractVariantHandler
         }
 
         foreach ($variants as $variant) {
-            $this->persistenceHelper->persistAndRecompute($variant);
+            $this->persistenceHelper->persistAndRecompute($variant, false);
         }
 
         $changed = false;

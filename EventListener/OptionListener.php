@@ -97,14 +97,14 @@ class OptionListener implements EventSubscriberInterface
             if (0 < $translations->count()) {
                 foreach ($translations as $translation) {
                     $option->removeTranslation($translation);
-                    $this->persistenceHelper->remove($translation);
+                    $this->persistenceHelper->remove($translation, false);
                 }
                 $changed = true;
             }
         }
 
         if ($changed) {
-            $this->persistenceHelper->persistAndRecompute($option);
+            $this->persistenceHelper->persistAndRecompute($option, false);
         }
     }
 

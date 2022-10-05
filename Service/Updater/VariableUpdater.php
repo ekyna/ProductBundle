@@ -172,7 +172,7 @@ class VariableUpdater extends AbstractUpdater
                 $variant->setPosition($position);
 
                 if ($helper && !$helper->isScheduledForRemove($variant)) {
-                    $helper->persistAndRecompute($variant);
+                    $helper->persistAndRecompute($variant, false);
                 }
 
                 $changed = true;

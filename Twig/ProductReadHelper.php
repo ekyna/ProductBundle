@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product\GenerateReferenceAction;
+use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Bundle\ProductBundle\Model\PriceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Repository\CatalogRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
@@ -51,30 +53,38 @@ class ProductReadHelper
     }
 
     /**
-     * @return array<ProductInterface>
+     * @return iterable<ProductInterface>
      */
-    public function getBundleParents(ProductInterface $bundle): array
+    public function getBundleParents(ProductInterface $bundle): iterable
     {
         return $this->getProductRepository()->findParentsByBundled($bundle);
     }
 
     /**
-     * @return array<ProductInterface>
+     * @return iterable<ProductInterface>
      */
-    public function getOptionParents(ProductInterface $product): array
+    public function getOptionParents(ProductInterface $product): iterable
     {
         return $this->getProductRepository()->findParentsByOptionProduct($product);
     }
 
     /**
-     * @return array<ProductInterface>
+     * @return iterable<ProductInterface>
      */
-    public function getComponentParents(ProductInterface $component): array
+    public function getComponentParents(ProductInterface $component): iterable
     {
         return $this->getProductRepository()->findParentsByComponent($component);
     }
 
-    public function getOfferList(ProductInterface $product): array
+    /**
+     * @return iterable<CatalogInterface>
+     */
+    public function getRelatedCatalogs(ProductInterface $product): iterable
+    {
+        return $this->getCatalogRepository()->findByProduct($product);
+    }
+
+    public function getOfferList(ProductInterface $product): iterable
     {
         $offers = $this
             ->getOfferRepository()
@@ -83,7 +93,7 @@ class ProductReadHelper
         return $this->buildList($offers, 'offers');
     }
 
-    public function getPriceList(ProductInterface $product): array
+    public function getPriceList(ProductInterface $product): iterable
     {
         $prices = $this
             ->getPriceRepository()
@@ -93,9 +103,9 @@ class ProductReadHelper
     }
 
     /**
-     * @return array<array>
+     * @return iterable<array>
      */
-    public function getMessages(ProductInterface $product): array
+    public function getMessages(ProductInterface $product): iterable
     {
         $messages = [];
 
@@ -141,9 +151,9 @@ class ProductReadHelper
     }
 
     /**
-     * @param array<PriceInterface|OfferInterface> $objects
+     * @param iterable<PriceInterface|OfferInterface> $objects
      */
-    private function buildList(array $objects, string $name): array
+    private function buildList(array $objects, string $name): iterable
     {
         $allGroups = $this->translator->trans('customer_group.message.all', [], 'EkynaCommerce');
         $allCountries = $this->translator->trans('country.message.all', [], 'EkynaCommerce');
@@ -200,5 +210,11 @@ class ProductReadHelper
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->repositoryFactory->getRepository(PriceInterface::class);
+    }
+
+    private function getCatalogRepository(): CatalogRepositoryInterface
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->repositoryFactory->getRepository(CatalogInterface::class);
     }
 }

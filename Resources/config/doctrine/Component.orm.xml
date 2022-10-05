@@ -26,7 +26,7 @@
 
         <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="child">
-            <join-column name="child_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+            <join-column name="child_id" referenced-column-name="id" on-delete="RESTRICT" nullable="false"/>
         </many-to-one>
 
     </entity>

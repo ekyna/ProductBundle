@@ -40,10 +40,7 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            // Pre load the variants for position indexation
-            $product->getParent()->getVariants()->toArray();
-        }
+        $this->loadVariants($product);
     }
 
     /**
@@ -53,10 +50,7 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            // Pre load the variants for position indexation
-            $product->getParent()->getVariants()->toArray();
-        }
+        $this->loadVariants($product);
     }
 
     /**
@@ -66,10 +60,17 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
-        if ($product->getType() === ProductTypes::TYPE_VARIANT) {
-            // Pre load the variants for position indexation
-            $product->getParent()->getVariants()->toArray();
+        $this->loadVariants($product);
+    }
+
+    private function loadVariants(ProductInterface $product): void
+    {
+        if ($product->getType() !== ProductTypes::TYPE_VARIANT) {
+            return;
         }
+
+        // Preload the variants for position indexation
+        $product->getParent()->getVariants()->toArray();
     }
 
     /**
@@ -84,7 +85,7 @@ class ProductListener
         $changed = $this->generateReference($product) || $changed;
 
         if ($changed) {
-            $this->persistenceHelper->persistAndRecompute($product);
+            $this->persistenceHelper->persistAndRecompute($product, false);
         }
     }
 
@@ -100,7 +101,7 @@ class ProductListener
         $changed = $this->generateReference($product) || $changed;
 
         if ($changed) {
-            $this->persistenceHelper->persistAndRecompute($product);
+            $this->persistenceHelper->persistAndRecompute($product, false);
         }
 
         // Schedule offers update if needed
@@ -124,6 +125,10 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
+
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
@@ -135,6 +140,10 @@ class ProductListener
     public function onStockUnitRemoval(SubjectStockUnitEvent $event): void
     {
         $product = $this->getProductFromEvent($event);
+
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
 
         if ($this->executeHandlers($event, HandlerInterface::STOCK_UNIT_REMOVAL, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
@@ -148,6 +157,10 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
+
         if ($this->executeHandlers($event, HandlerInterface::CHILD_PRICE_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
@@ -160,6 +173,10 @@ class ProductListener
     {
         $product = $this->getProductFromEvent($event);
 
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
+
         if ($this->executeHandlers($event, HandlerInterface::CHILD_AVAILABILITY_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);
         }
@@ -171,6 +188,10 @@ class ProductListener
     public function onChildStockChange(ResourceEventInterface $event): void
     {
         $product = $this->getProductFromEvent($event);
+
+        if ($this->persistenceHelper->isScheduledForRemove($product)) {
+            return;
+        }
 
         if ($this->executeHandlers($event, HandlerInterface::CHILD_STOCK_CHANGE, true)) {
             $this->persistenceHelper->persistAndRecompute($product, true);

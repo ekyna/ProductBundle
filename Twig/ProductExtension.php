@@ -131,6 +131,10 @@ class ProductExtension extends AbstractExtension
                 [ProductReadHelper::class, 'getComponentParents']
             ),
             new TwigFilter(
+                'related_catalogs',
+                [ProductReadHelper::class, 'getRelatedCatalogs']
+            ),
+            new TwigFilter(
                 'product_offer_list',
                 [ProductReadHelper::class, 'getOfferList']
             ),

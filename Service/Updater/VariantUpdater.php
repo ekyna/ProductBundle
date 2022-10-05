@@ -96,7 +96,7 @@ class VariantUpdater
                 }
 
                 if ($vChanged || is_null($vTrans->getId())) {
-                    $this->persistenceHelper->persistAndRecompute($vTrans);
+                    $this->persistenceHelper->persistAndRecompute($vTrans, false);
                 }
 
                 $changed = $changed || $vChanged;

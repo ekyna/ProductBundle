@@ -46,7 +46,7 @@ class ProductTranslationListener implements EventSubscriberInterface
             $product = $this->persistenceHelper->getChangeSet($translation, 'product')[0];
         }
 
-        if ($product) {
+        if ($product && !$this->persistenceHelper->isScheduledForRemove($product)) {
             $product->setUpdatedAt(new \DateTime());
 
             $this->persistenceHelper->persistAndRecompute($product, false);

@@ -467,6 +467,7 @@ product:
         option_parents: Ce produit constitue une option des produits suivants
         bundle_parents: Ce produit est inclus dans les packs suivants
         component_parents: Ce produit est un composant des produits suivants
+        related_catalogs: Ce produit est un présenté dans les catalogues suivants
         brand_naming: Inclure la marque dans le titre et la désignation
         not_contractual: Visuels non contractuels
         attributes_title: Titre d'attributs
@@ -481,6 +482,23 @@ product:
             Une référence fournisseur existe déjà pour le fournisseur <strong>%name%</strong>.
         generate_gtin_13: >
             Ce produit n'a pas de code EAN 13. <a href="%url%">Cliquez ici pour générer un code EAN 13</a>
+    message:
+        clear_relations_before_delete: >
+            Vous devez supprimer les relations suivantes avant de pouvoir supprimer ce produit.
+        relation_prevents_deletion: >
+            Ce produit est utilisé dans la composition ({relation}) du produit <a href="{url}">{designation}</a>
+            et ne peut donc pas être supprimé. Utilisez l'onglet «Relations» pour supprimer les
+            associations entre ce produit et les autres.
+        catalog_prevents_deletion: >
+            Ce produit est lié au catalogue <a href="{url}">{title}</a> et ne peut être supprimé.
+            Modifiez le catalogue afin de pouvoir supprimer ce produit.
+        delete_warning: >
+            Attention, cette opération n'est pas réversible.<br>
+            Toutes les <strong>données de stock</strong> seront <strong>définitivement perdues</strong>.<br>
+            Pour les <strong>devis</strong> et <strong>paniers</strong>, les lignes liées à
+            ce produit vont être <strong>supprimées</strong>.<br>
+            Pour les <strong>commandes clients</strong> et <strong>fournisseurs</strong>,
+            les lignes seront conservées mais les associations à ce produit vont être <strong>supprimées</strong>.
 
 product_media:
     label:

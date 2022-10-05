@@ -365,7 +365,8 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
     public function findParentsByBundled(
         Model\ProductInterface $bundled,
         bool                   $requiredSlots = false,
-        bool                   $idOnly = false
+        bool                   $idOnly = false,
+        ?int                   $limit = null
     ): array {
         if (is_null($bundled->getId())) {
             return [];
@@ -402,6 +403,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             return $qb
                 ->select($as . '.id')
                 ->getQuery()
+                ->setMaxResults($limit)
                 //->useQueryCache(true)
                 ->setParameters($parameters)
                 ->getResult(IdHydrator::NAME);
@@ -409,6 +411,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
         return $qb
             ->getQuery()
+            ->setMaxResults($limit)
             //->useQueryCache(true)
             ->setParameters($parameters)
             ->getResult();
@@ -417,7 +420,8 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
     public function findParentsByOptionProduct(
         Model\ProductInterface $product,
         bool                   $requiredGroups = false,
-        bool                   $idOnly = false
+        bool                   $idOnly = false,
+        ?int                   $limit = null
     ): array {
         if (is_null($product->getId())) {
             return [];
@@ -454,6 +458,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             return $qb
                 ->select($as . '.id')
                 ->getQuery()
+                ->setMaxResults($limit)
                 //->useQueryCache(true)
                 ->setParameters($parameters)
                 ->getResult(IdHydrator::NAME);
@@ -461,13 +466,17 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
         return $qb
             ->getQuery()
+            ->setMaxResults($limit)
             //->useQueryCache(true)
             ->setParameters($parameters)
             ->getResult();
     }
 
-    public function findParentsByComponent(Model\ProductInterface $product, bool $idOnly = false): array
-    {
+    public function findParentsByComponent(
+        Model\ProductInterface $product,
+        bool                   $idOnly = false,
+        ?int                   $limit = null
+    ): array {
         if (is_null($product->getId())) {
             return [];
         }
@@ -482,6 +491,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             return $qb
                 ->select($as . '.id')
                 ->getQuery()
+                ->setMaxResults($limit)
                 ->setParameter('product', $product)
                 //->useQueryCache(true)
                 ->getResult(IdHydrator::NAME);
@@ -489,6 +499,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
         return $qb
             ->getQuery()
+            ->setMaxResults($limit)
             //->useQueryCache(true)
             ->setParameter('product', $product)
             ->getResult();
