@@ -480,7 +480,7 @@ class PriceCalculator
         }
 
         foreach ($offers as &$offer) {
-            $offer['net_price'] = round($price * (1 - $offer['percent'] / 100), 5);
+            $offer['net_price'] = $price->mul(1 - $offer['percent'] / 100)->round(5);
         }
 
         return [

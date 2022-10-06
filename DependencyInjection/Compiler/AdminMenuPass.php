@@ -15,10 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AdminMenuPass implements CompilerPassInterface
 {
-    private const NAME = 'catalog';
-
     public const GROUP = [
-        'name'     => self::NAME,
+        'name'     => 'catalog',
         'label'    => 'label',
         'domain'   => 'EkynaProduct',
         'icon'     => 'cube',
