@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Form\Type as Pr;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\ProductMediaInterface;
+use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
@@ -264,8 +266,8 @@ class FormBuilder
         }
 
         if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
-            if (!empty($label = $product->getTitle())) {
-                return $label;
+            if (!empty($product->getTitle())) {
+                return $product->getFullTitle(true);
             }
 
             if (!$option->getGroup()->isFullTitle()) {
@@ -273,7 +275,7 @@ class FormBuilder
             }
         }
 
-        return $product->getFullTitle();
+        return $product->getFullTitle(true);
     }
 
     /**
@@ -410,6 +412,10 @@ class FormBuilder
         array                  $exclude = []
     ): void {
         $repository = $this->productProvider->getRepository();
+
+        if (!$repository instanceof ProductRepositoryInterface) {
+            throw new UnexpectedTypeException($repository, ProductRepositoryInterface::class);
+        }
 
         // Variable : add variant choice form
         if (in_array($product->getType(), [Model\ProductTypes::TYPE_VARIABLE, Model\ProductTypes::TYPE_VARIANT],

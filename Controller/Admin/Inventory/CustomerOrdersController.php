@@ -52,7 +52,7 @@ class CustomerOrdersController extends AbstractController
         $title = sprintf(
             '%s <small style="font-style:italic">%s</small>',
             $this->translator->trans('inventory.modal.orders', [], 'EkynaProduct'),
-            $product->getFullTitle()
+            $product->getFullDesignation(true)
         );
 
         $modal = new Modal($title);

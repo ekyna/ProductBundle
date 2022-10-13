@@ -120,7 +120,7 @@ class ItemBuilder
         $this->provider->assign($item, $product);
 
         $item
-            ->setDesignation((string)$product)
+            ->setDesignation($product->getFullTitle(true))
             ->setReference($product->getReference())
             ->setNetPrice(clone $product->getNetPrice())
             ->setWeight(clone $product->getPackageWeight())
@@ -198,7 +198,7 @@ class ItemBuilder
 
         // Bundle root item
         $item
-            ->setDesignation((string)$product)
+            ->setDesignation($product->getFullTitle(true))
             ->setReference($product->getReference())
             ->setNetPrice(new Decimal(0))
             ->setTaxGroup($product->getTaxGroup())
@@ -284,7 +284,7 @@ class ItemBuilder
 
         // Configurable root item
         $item
-            ->setDesignation((string)$product)
+            ->setDesignation($product->getFullTitle(true))
             ->setReference($product->getReference())
             ->setNetPrice(new Decimal(0))
             ->setTaxGroup($product->getTaxGroup())
@@ -506,8 +506,8 @@ class ItemBuilder
         } else {
             $designation = sprintf(
                 '%s : %s',
-                $option->getGroup()->getName(),
-                $option->getDesignation()
+                $option->getGroup()->getTitle(),
+                $option->getTitle()
             );
 
             $item

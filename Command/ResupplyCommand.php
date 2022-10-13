@@ -91,7 +91,7 @@ class ResupplyCommand extends Command
 
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion(
-            "Resupply '{$product->getFullTitle()}' for '$quantity' quantity ?", false
+            "Resupply '{$product->getFullDesignation(true)}' for '$quantity' quantity ?", false
         );
         if (!$helper->ask($input, $output, $question)) {
             return Command::SUCCESS;
@@ -255,7 +255,7 @@ class ResupplyCommand extends Command
     {
         ProductTypes::assertChildType($product);
 
-        $name = sprintf('[%s] %s', $product->getId(), $product->getFullTitle());
+        $name = sprintf('[%s] %s', $product->getId(), $product->getFullDesignation(true));
 
         $output->write(sprintf('<comment>%s</comment> %s ',
             $name,

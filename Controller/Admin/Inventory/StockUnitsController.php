@@ -44,7 +44,7 @@ class StockUnitsController extends AbstractController
         $title = sprintf(
             '%s <small style="font-style:italic">%s</small>',
             $this->translator->trans('stock_unit.label.plural', [], 'EkynaCommerce'),
-            $product->getFullTitle()
+            $product->getFullDesignation(true)
         );
 
         $modal = new Modal($title);

@@ -111,7 +111,7 @@ class ResupplyController extends AbstractController
         $title = sprintf(
             '%s <small style="font-style:italic">%s</small>',
             $this->translator->trans('inventory.modal.resupply', [], 'EkynaProduct'),
-            $product->getFullTitle()
+            $product->getFullDesignation(true)
         );
 
         $modal = new Modal($title);
