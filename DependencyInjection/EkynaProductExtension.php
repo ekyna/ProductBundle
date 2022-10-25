@@ -36,6 +36,7 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services/action.php');
         $loader->load('services/command.php');
+        $loader->load('services/commerce.php');
         $loader->load('services/controller.php');
         $loader->load('services/factory.php');
         $loader->load('services/form.php');

@@ -8,7 +8,6 @@ use Ekyna\Bundle\ProductBundle\Attribute;
 use Ekyna\Bundle\ProductBundle\Attribute\Type\TypeInterface;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
-use Ekyna\Bundle\ProductBundle\Service\Commerce;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Converter;
 use Ekyna\Bundle\ProductBundle\Service\Editor\Block\ProductSlidePlugin;
@@ -22,8 +21,6 @@ use Ekyna\Bundle\ProductBundle\Service\Routing\RoutingLoader;
 use Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Service\Stat;
 use Ekyna\Bundle\ProductBundle\Service\Stock;
-use Ekyna\Component\Commerce\Bridge\Symfony\DependencyInjection\RegisterViewTypePass;
-use Ekyna\Component\Commerce\Bridge\Symfony\DependencyInjection\SubjectProviderPass;
 use Ekyna\Component\Resource\Event\QueueEvents;
 
 return static function (ContainerConfigurator $container) {
@@ -99,41 +96,6 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_resource.manager.factory'),
                 service('ekyna_commerce.helper.subject'),
             ])
-
-        // Product subject provider
-        ->set('ekyna_product.commerce.provider.subject', Commerce\ProductProvider::class)
-            ->args([
-                service('ekyna_product.repository.product'),
-            ])
-            ->tag(SubjectProviderPass::TAG)
-
-        // Product filter
-        ->set('ekyna_product.commerce.filter.product', Commerce\ProductFilter::class)
-
-        // Sale item builder
-        ->set('ekyna_product.commerce.builder.item', Commerce\ItemBuilder::class)
-            ->args([
-                service('ekyna_product.commerce.provider.subject'),
-                service('ekyna_product.commerce.filter.product'),
-            ])
-
-        // Sale form builder
-        ->set('ekyna_product.commerce.builder.form', Commerce\FormBuilder::class)
-            ->args([
-                service('ekyna_product.commerce.provider.subject'),
-                service('ekyna_product.commerce.filter.product'),
-                service('ekyna_product.calculator.price'),
-                service('ekyna_commerce.helper.availability'),
-                service('ekyna_resource.provider.locale'),
-                service('translator'),
-                param('ekyna_product.default.no_image'), // TODO abstract_arg
-            ])
-            ->call('setCacheManager', [service('liip_imagine.cache.manager')])
-
-        // Sale view type
-        ->set('ekyna_product.commerce.view_type.sale', Commerce\SaleViewType::class)
-            ->parent('ekyna_commerce.view_type.abstract')
-            ->tag(RegisterViewTypePass::VIEW_TYPE_TAG)
 
         // Constant helper
         ->set('ekyna_product.helper.constants', ConstantsHelper::class)
