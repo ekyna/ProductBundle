@@ -233,6 +233,10 @@
             {{- form_widget(form.options) -}}
         {%- endif -%}
 
+        {% for field in form.vars.inner_extra_fields -%}
+            {{ form_row(form[field]) }}
+        {%- endfor %}
+
         <div class="row">
             {{- bootstrap_set_label_col(6) -}}
             <div class="col-sm-6">
