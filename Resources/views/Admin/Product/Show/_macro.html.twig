@@ -81,12 +81,9 @@
 {%- endmacro show_customer_groups -%}
 
 {%- macro show_reference(product, options = {}) -%}
-    {{- show_row(product.reference, 'text', {
+    {{- show_row(product.reference|ui_clipboard_copy, 'text', {
         'label': t('field.reference', [], 'EkynaUi'),
-        'id': 'product_reference',
-        'attr': {
-            'data-clipboard-copy': product.reference
-        }
+        'id': 'product_reference'
     }|merge(options)) -}}
 {%- endmacro show_reference -%}
 
@@ -203,7 +200,7 @@
                     <dl class="dl-horizontal">
                         {%- for reference in product.references -%}
                             <dt>{{ reference|product_reference_type_label }}</dt>
-                            <dd data-clipboard-copy="{{ reference.code }}">{{ reference.code }}</dd>
+                            <dd>{{ reference.code|ui_clipboard_copy }}</dd>
                         {%- endfor -%}
                     </dl>
                 {%- else -%}
@@ -341,8 +338,8 @@
                                             {{- data.designation -}}
                                         {%- endif -%}
                                         </td>
-                                        <td id="{{ optionId ~ 'reference' }}" data-clipboard-copy="{{ data.reference }}">
-                                            {{- data.reference -}}
+                                        <td id="{{ optionId ~ 'reference' }}">
+                                            {{- data.reference|ui_clipboard_copy -}}
                                         </td>
                                         <td id="{{ optionId ~ 'weight' }}" class="text-right">
                                             {{- data.weight|format_number ~ ' kg' -}}
@@ -536,9 +533,8 @@
                                 {{- choice_product -}}
                             </a>
                         </td>
-                        <td id="{{ slot_id ~ 'reference' }}" class="text-right"
-                            data-clipboard-copy="{{ choice_product.reference }}">
-                            {{- choice_product.reference -}}
+                        <td id="{{ slot_id ~ 'reference' }}" class="text-right">
+                            {{- choice_product.reference|ui_clipboard_copy -}}
                         </td>
                         <td id="{{ slot_id ~ 'stockState' }}" class="text-right">
                             {{- choice_product|stock_subject_state_badge -}}
@@ -708,7 +704,7 @@
                         <a href="{{ admin_resource_path(component.child) }}" data-summary="{{ admin_resource_path(component.child, 'admin_summary') }}">{{ component.child }}</a>
                     </td>
                     <td>
-                        <span data-clipboard-copy="{{ component.child.reference }}">{{ component.child.reference }}</span>
+                        {{ component.child.reference|ui_clipboard_copy }}
                     </td>
                     <td id="{{ component_id ~ 'quantity' }}" class="text-right">
                         {# TODO Packaging format #}
@@ -807,7 +803,7 @@
                         <a href="{{ admin_resource_path(crossSelling.target) }}" data-summary="{{ admin_resource_path(crossSelling.target, 'admin_summary') }}">{{ crossSelling.target }}</a>
                     </td>
                     <td>
-                        <span data-clipboard-copy="{{ crossSelling.target.reference }}">{{ crossSelling.target.reference }}</span>
+                        {{ crossSelling.target.reference|ui_clipboard_copy }}
                     </td>
                     <td id="{{ crossSelling_id ~ 'netPrice' }}" class="text-right">
                         {{- crossSelling.target.netPrice|format_currency(commerce_default_currency) -}}
@@ -907,9 +903,8 @@
                                     {{- choice_product -}}
                                 </a>
                             </td>
-                            <td id="{{ choice_id ~ 'reference' }}" class="text-right"
-                                data-clipboard-copy="{{ choice_product.reference }}">
-                                {{- choice_product.reference -}}
+                            <td id="{{ choice_id ~ 'reference' }}" class="text-right">
+                                {{- choice_product.reference|ui_clipboard_copy -}}
                             </td>
                             <td id="{{ choice_id ~ 'type' }}" class="text-right">
                                 {{- choice_product|product_type_badge -}}
@@ -981,9 +976,8 @@
                         {{- product -}}
                     </a>
                 </td>
-                <td id="{{ relationId ~ 'reference' }}" class="text-right"
-                    data-clipboard-copy="{{ product.reference }}">
-                    {{- product.reference -}}
+                <td id="{{ relationId ~ 'reference' }}" class="text-right">
+                    {{- product.reference|ui_clipboard_copy -}}
                 </td>
                 <td id="{{ relationId ~ 'type' }}" class="text-right">
                     {{- product|product_type_badge -}}

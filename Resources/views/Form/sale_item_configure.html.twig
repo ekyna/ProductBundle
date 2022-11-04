@@ -207,8 +207,8 @@
                     {% for bundle_product in bundle_products -%}
                     <tr>
                         <td class="quantity">{{- bundle_product.quantity|format_number -}}x</td>
-                        <td class="reference" data-clipboard-copy="{{ bundle_product.product.reference }}">
-                            {{- bundle_product.product.reference -}}
+                        <td class="reference">
+                            {{- bundle_product.product.reference|ui_clipboard_copy -}}
                         </td>
                         <td class="designation">
                             {% set path = bundle_product.product|subject_public_url -%}
