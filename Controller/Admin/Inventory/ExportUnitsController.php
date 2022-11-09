@@ -25,13 +25,10 @@ use function implode;
  */
 class ExportUnitsController
 {
-    private StockUnitRepositoryInterface $stockUnitRepository;
-    private string                       $defaultCurrency;
-
-    public function __construct(StockUnitRepositoryInterface $stockUnitRepository, string $defaultCurrency)
-    {
-        $this->stockUnitRepository = $stockUnitRepository;
-        $this->defaultCurrency = $defaultCurrency;
+    public function __construct(
+        private readonly StockUnitRepositoryInterface $stockUnitRepository,
+        private readonly string                       $defaultCurrency
+    ) {
     }
 
     public function __invoke(Request $request): Response

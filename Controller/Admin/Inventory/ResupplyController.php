@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-use function intval;
 use function sprintf;
 
 /**
@@ -31,29 +30,15 @@ class ResupplyController extends AbstractController
 {
     use InventoryTrait;
 
-    private SupplierProductRepositoryInterface $supplierProductRepository;
-    private SupplierOrderRepositoryInterface   $supplierOrderRepository;
-    private Resupply                           $resupply;
-    private FormFactoryInterface               $formFactory;
-    private UrlGeneratorInterface              $urlGenerator;
-    private TranslatorInterface                $translator;
-
     public function __construct(
-        SupplierProductRepositoryInterface $supplierProductRepository,
-        SupplierOrderRepositoryInterface   $supplierOrderRepository,
-        Resupply                           $resupply,
-        FormFactoryInterface               $formFactory,
-        UrlGeneratorInterface              $urlGenerator,
-        TranslatorInterface                $translator
+        private readonly SupplierProductRepositoryInterface $supplierProductRepository,
+        private readonly SupplierOrderRepositoryInterface   $supplierOrderRepository,
+        private readonly Resupply                           $resupply,
+        private readonly FormFactoryInterface               $formFactory,
+        private readonly UrlGeneratorInterface              $urlGenerator,
+        private readonly TranslatorInterface                $translator
     ) {
-        $this->supplierProductRepository = $supplierProductRepository;
-        $this->supplierOrderRepository = $supplierOrderRepository;
-        $this->resupply = $resupply;
-        $this->formFactory = $formFactory;
-        $this->urlGenerator = $urlGenerator;
-        $this->translator = $translator;
     }
-
 
     public function __invoke(Request $request): Response
     {

@@ -25,21 +25,12 @@ class QuickEditController extends AbstractController
 {
     use InventoryTrait;
 
-    private ResourceManagerInterface $productManager;
-    private FormFactoryInterface     $formFactory;
-    private UrlGeneratorInterface    $urlGenerator;
-    private TranslatorInterface      $translator;
-
     public function __construct(
-        ResourceManagerInterface $productManager,
-        FormFactoryInterface     $formFactory,
-        UrlGeneratorInterface    $urlGenerator,
-        TranslatorInterface      $translator
+        private readonly ResourceManagerInterface $productManager,
+        private readonly FormFactoryInterface     $formFactory,
+        private readonly UrlGeneratorInterface    $urlGenerator,
+        private readonly TranslatorInterface      $translator
     ) {
-        $this->productManager = $productManager;
-        $this->formFactory = $formFactory;
-        $this->urlGenerator = $urlGenerator;
-        $this->translator = $translator;
     }
 
     public function __invoke(Request $request): Response

@@ -22,11 +22,9 @@ use function fputcsv;
  */
 class ExportProductsController
 {
-    private ProductRepositoryInterface $productRepository;
-
-    public function __construct(ProductRepositoryInterface $productRepository)
-    {
-        $this->productRepository = $productRepository;
+    public function __construct(
+        private readonly ProductRepositoryInterface $productRepository
+    ) {
     }
 
     public function __invoke(Request $request): Response

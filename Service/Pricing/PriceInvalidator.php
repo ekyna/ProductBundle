@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Message\UpdatePrices;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Resource\Message\MessageQueue;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 /**
  * Class PriceInvalidator
@@ -27,6 +29,6 @@ class PriceInvalidator extends AbstractInvalidator
 
     protected function createMessage(array|int $productId): object
     {
-        return new UpdatePrices($productId);
+        return (new Envelope(new UpdatePrices($productId)))->with(new DelayStamp(1000));
     }
 }

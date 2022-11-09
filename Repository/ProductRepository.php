@@ -520,12 +520,12 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->andWhere($qb->expr()->orX(
                 $qb->expr()->orX(
                     $qb->expr()->andX(
-                        $qb->expr()->gt('p.stockFloor', 0),
-                        $qb->expr()->lte('p.virtualStock', 'p.stockFloor')
+                        $qb->expr()->eq('p.endOfLife', 0),
+                        $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
                     ),
                     $qb->expr()->andX(
-                        $qb->expr()->eq('p.stockFloor', 0),
-                        $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
+                        $qb->expr()->eq('p.endOfLife', 1),
+                        $qb->expr()->lt('p.virtualStock', 0)
                     )
                 ),
                 $qb->expr()->andX(

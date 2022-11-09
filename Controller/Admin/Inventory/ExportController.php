@@ -16,11 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ExportController
 {
-    private Inventory $inventory;
-
-    public function __construct(Inventory $inventory)
-    {
-        $this->inventory = $inventory;
+    public function __construct(
+        private readonly Inventory $inventory
+    ) {
     }
 
     public function __invoke(Request $request): Response

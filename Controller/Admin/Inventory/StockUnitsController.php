@@ -19,13 +19,10 @@ use function sprintf;
  */
 class StockUnitsController extends AbstractController
 {
-    private StockRenderer       $stockRenderer;
-    private TranslatorInterface $translator;
-
-    public function __construct(StockRenderer $stockRenderer, TranslatorInterface $translator)
-    {
-        $this->stockRenderer = $stockRenderer;
-        $this->translator = $translator;
+    public function __construct(
+        private readonly StockRenderer       $stockRenderer,
+        private readonly TranslatorInterface $translator
+    ) {
     }
 
     public function __invoke(Request $request): Response

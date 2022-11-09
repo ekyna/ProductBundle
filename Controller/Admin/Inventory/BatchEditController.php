@@ -27,10 +27,13 @@ class BatchEditController extends AbstractController
 {
     use InventoryTrait;
 
-    private ResourceManagerInterface $productManager;
-    private FormFactoryInterface     $formFactory;
-    private UrlGeneratorInterface    $urlGenerator;
-    private ValidatorInterface       $validator;
+    public function __construct(
+        private readonly ResourceManagerInterface $productManager,
+        private readonly FormFactoryInterface     $formFactory,
+        private readonly UrlGeneratorInterface    $urlGenerator,
+        private readonly ValidatorInterface       $validator
+    ) {
+    }
 
     public function __invoke(Request $request): Response
     {

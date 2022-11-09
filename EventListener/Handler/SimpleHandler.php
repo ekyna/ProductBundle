@@ -40,6 +40,8 @@ class SimpleHandler extends AbstractHandler
     {
         $product = $this->getProductFromEvent($event, ProductTypes::getChildTypes());
 
+        $this->offerInvalidator->invalidateByProduct($product);
+
         $changed = $this->stockUpdater->update($product);
 
         return $this->updateMinPrice($product) || $changed;
@@ -72,6 +74,8 @@ class SimpleHandler extends AbstractHandler
         if ($this->persistenceHelper->isChanged($product, ['brand', 'pricingGroup'])) {
             $this->offerInvalidator->invalidateByProduct($product);
         } elseif ($this->persistenceHelper->isChanged($product, 'netPrice')) {
+            $this->offerInvalidator->invalidateByProduct($product);
+
             $changed = $this->updateMinPrice($product) || $changed;
 
             $childEvents[] = ProductEvents::CHILD_PRICE_CHANGE;
@@ -138,6 +142,8 @@ class SimpleHandler extends AbstractHandler
 
         $this->priceInvalidator->invalidateParents($product);
 
+        $this->offerInvalidator->invalidateByProduct($product);
+
         return $this->updateMinPrice($product);
     }
 
@@ -156,8 +162,6 @@ class SimpleHandler extends AbstractHandler
         $minPrice = $this->priceCalculator->calculateProductMinPrice($product);
         if (!$product->getMinPrice()->equals($minPrice)) {
             $product->setMinPrice($minPrice);
-
-            $this->offerInvalidator->invalidateByProduct($product);
 
             return true;
         }

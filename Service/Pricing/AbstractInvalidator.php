@@ -13,6 +13,9 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
 use Ekyna\Component\Resource\Message\MessageQueue;
 
+use function array_merge;
+use function array_push;
+use function array_unique;
 use function in_array;
 
 /**
@@ -103,33 +106,38 @@ abstract class AbstractInvalidator
                 ProductTypes::TYPE_VARIANT,
             ];
         }
-        if (!empty($this->productIds)) {
-            $clauses[] = $ex->in('p.id', ':product_ids');
-            $parameters['product_ids'] = $this->productIds;
+
+        $productIds = $this->productIds;
+
+        if (empty($clauses) && empty($productIds)) {
+            return;
         }
 
         $this->clear();
 
-        if (empty($clauses)) {
+        $this->updateFlag($clauses, $parameters, $productIds);
+
+        $this->sendMessages($clauses, $parameters, $productIds);
+    }
+
+    private function updateFlag(array $clauses, array $parameters, array $productIds): void
+    {
+        $ex = new Expr();
+
+        if (!empty($clauses)) {
+            if (!empty($productIds)) {
+                $clauses[] = $ex->in('p.id', ':product_ids');
+                $parameters['product_ids'] = $productIds;
+            }
+            $clauses = $ex->orX(...$clauses);
+        } elseif (!empty($productIds)) {
+            $clauses = $ex->in('p.id', ':product_ids');
+            $parameters['product_ids'] = $productIds;
+        } else {
             return;
         }
 
         $parameters['flag'] = 1;
-
-        // Query identifiers of products that will be updated
-        $qb = $this->entityManager->createQueryBuilder();
-        $productIds = $qb
-            ->from($this->productRepository->getClassName(), 'p')
-            ->select(['p.id'])
-            ->andWhere(
-                $ex->orX(...$clauses),
-                $ex->neq('p.' . $this->flagProperty, ':flag')
-            )
-            ->getQuery()
-            ->useQueryCache(false)
-            ->disableResultCache()
-            ->setParameters($parameters)
-            ->getResult(IdHydrator::NAME);
 
         // Update products flags
         $qb = $this->entityManager->createQueryBuilder();
@@ -137,7 +145,7 @@ abstract class AbstractInvalidator
             ->update($this->productRepository->getClassName(), 'p')
             ->set('p.' . $this->flagProperty, ':flag')
             ->andWhere(
-                $ex->orX(...$clauses),
+                $clauses,
                 $ex->neq('p.' . $this->flagProperty, ':flag')
             )
             ->getQuery()
@@ -145,8 +153,35 @@ abstract class AbstractInvalidator
             ->disableResultCache()
             ->setParameters($parameters)
             ->execute();
+    }
 
+    private function sendMessages(array $clauses, array $parameters, array $productIds): void
+    {
         if (!$this->messagesEnabled) {
+            return;
+        }
+
+        if (!empty($clauses)) {
+            $qb = $this->entityManager->createQueryBuilder();
+            $result = $qb
+                ->from($this->productRepository->getClassName(), 'p')
+                ->select(['p.id'])
+                ->orWhere(...$clauses)
+                ->getQuery()
+                ->useQueryCache(false)
+                ->disableResultCache()
+                ->setParameters($parameters)
+                ->getResult(IdHydrator::NAME);
+
+            if (empty($productIds)) {
+                $productIds = $result;
+            } else {
+                array_push($productIds, ...$result);
+                $productIds = array_unique($productIds);
+            }
+        }
+
+        if (empty($productIds)) {
             return;
         }
 

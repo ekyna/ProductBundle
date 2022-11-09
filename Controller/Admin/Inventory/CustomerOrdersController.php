@@ -10,7 +10,6 @@ use Ekyna\Component\Commerce\Order\Model\OrderStates;
 use Ekyna\Component\Commerce\Shipment\Model\ShipmentStates;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function sprintf;
@@ -22,13 +21,10 @@ use function sprintf;
  */
 class CustomerOrdersController extends AbstractController
 {
-    private ResourceTableHelper $tableHelper;
-    private TranslatorInterface $translator;
-
-    public function __construct(ResourceTableHelper $tableHelper, TranslatorInterface $translator)
-    {
-        $this->tableHelper = $tableHelper;
-        $this->translator = $translator;
+    public function __construct(
+        private readonly ResourceTableHelper $tableHelper,
+        private readonly TranslatorInterface $translator
+    ) {
     }
 
     public function __invoke(Request $request): Response
