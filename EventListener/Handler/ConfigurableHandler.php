@@ -7,7 +7,6 @@ namespace Ekyna\Bundle\ProductBundle\EventListener\Handler;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
-use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\ConfigurableUpdater;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
@@ -23,7 +22,6 @@ class ConfigurableHandler extends AbstractHandler
 
     public function __construct(
         private readonly PriceCalculator              $priceCalculator,
-        private readonly PriceInvalidator             $priceInvalidator,
         private readonly StockSubjectUpdaterInterface $stockUpdater
     ) {
     }
@@ -32,29 +30,23 @@ class ConfigurableHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        $updater = $this->getConfigurableUpdater();
-
         $changed = $this->stockUpdater->update($bundle);
 
-        return $updater->updateMinPrice($bundle) || $changed;
+        return $this->getConfigurableUpdater()->updateMinPrice($bundle) || $changed;
     }
 
     public function handleUpdate(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
 
-        $updater = $this->getConfigurableUpdater();
-
         $changed = $this->stockUpdater->update($bundle);
 
-        return $updater->updateMinPrice($bundle) || $changed;
+        return $this->getConfigurableUpdater()->updateMinPrice($bundle) || $changed;
     }
 
     public function handleChildPriceChange(ResourceEventInterface $event): bool
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_CONFIGURABLE);
-
-        $this->priceInvalidator->invalidateByProduct($bundle);
 
         return $this->getConfigurableUpdater()->updateMinPrice($bundle);
     }

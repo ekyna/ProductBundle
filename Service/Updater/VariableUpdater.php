@@ -9,8 +9,6 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Commerce\Common\Util\DateUtil;
 use Ekyna\Component\Resource\Persistence\PersistenceHelperInterface;
 
-use function is_null;
-
 /**
  * Class VariableUpdater
  * @package Ekyna\Bundle\ProductBundle\Updater

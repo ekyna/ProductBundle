@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceInvalidator;
 use Ekyna\Bundle\ProductBundle\Service\Updater\BundleUpdater;
@@ -29,6 +30,7 @@ class BundleHandler extends AbstractHandler
         private readonly PersistenceHelperInterface   $persistenceHelper,
         private readonly ProductRepositoryInterface   $productRepository,
         private readonly PriceCalculator              $priceCalculator,
+        private readonly OfferInvalidator             $offerInvalidator,
         private readonly PriceInvalidator             $priceInvalidator,
         private readonly StockSubjectUpdaterInterface $stockUpdater
     ) {
@@ -40,11 +42,9 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
-        $updater = $this->getBundleUpdater();
-
         $changed = $this->stockUpdater->update($bundle);
 
-        $changed = $updater->updateNetPrice($bundle) || $changed;
+        $changed = $this->updateNetPrice($bundle) || $changed;
 
         return $this->updateMinPrice($bundle) || $changed;
     }
@@ -55,8 +55,6 @@ class BundleHandler extends AbstractHandler
 
         $this->checkQuantities($bundle);
 
-        $updater = $this->getBundleUpdater();
-
         $events = [];
         $changed = false;
 
@@ -65,7 +63,7 @@ class BundleHandler extends AbstractHandler
             $events[] = ProductEvents::CHILD_STOCK_CHANGE;
             $changed = true;
         }
-        if ($updater->updateNetPrice($bundle)) {
+        if ($this->updateNetPrice($bundle)) {
             $events[] = ProductEvents::CHILD_PRICE_CHANGE;
             $changed = true;
         }
@@ -83,20 +81,25 @@ class BundleHandler extends AbstractHandler
     {
         $bundle = $this->getProductFromEvent($event, ProductTypes::TYPE_BUNDLE);
 
-        $updater = $this->getBundleUpdater();
-
         $changed = false;
 
-        if ($updater->updateNetPrice($bundle)) {
+        if ($this->updateNetPrice($bundle)) {
             $this->scheduleChildChangeEvents($bundle, [ProductEvents::CHILD_PRICE_CHANGE]);
             $changed = true;
         }
 
-        if ($this->updateMinPrice($bundle)) {
-            $changed = true;
+        return $this->updateMinPrice($bundle) || $changed;
+    }
+
+    protected function updateNetPrice(ProductInterface $product): bool
+    {
+        if (!$this->getBundleUpdater()->updateNetPrice($product)) {
+            return false;
         }
 
-        return $changed;
+        $this->offerInvalidator->invalidateByProduct($product);
+
+        return true;
     }
 
     protected function updateMinPrice(ProductInterface $product): bool
