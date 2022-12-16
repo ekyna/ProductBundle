@@ -564,13 +564,21 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getResult();
     }
 
-    public function findForInventoryExport(): array
+    public function findForInventory(): array
     {
         $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
 
         return $qb
-            ->andWhere($qb->expr()->in('p.type', ':types'))
-            ->andWhere($qb->expr()->neq('p.stockMode', ':mode'))
+            ->andWhere($ex->in('p.type', ':types'))
+            ->andWhere($ex->neq('p.stockMode', ':mode'))
+            ->andWhere($ex->not($ex->andX(
+                $ex->eq('p.endOfLife', true),
+                $ex->eq('p.virtualStock', 0)
+            )))
+            ->addOrderBy('p.geocode', 'asc')
+            ->addOrderBy('p.reference', 'asc')
+            ->addOrderBy('p.designation', 'asc')
             ->getQuery()
             ->useQueryCache(true)
             ->setParameter('mode', [CStockModes::MODE_DISABLED])

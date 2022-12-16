@@ -1,0 +1,38 @@
+admin_ekyna_product_inventory_app_index:
+    path: ''
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp\IndexController
+    methods: [ GET ]
+
+admin_ekyna_product_inventory_app_list:
+    path: /list
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp\ListController
+    methods: [ GET ]
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_app_count:
+    path: /{id}/count
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp\CountController
+    methods: [ GET|POST ]
+    requirements:
+        id: \d+
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_app_end_of_life:
+    path: /{id}/end-of-life
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp\EndOfLifeController
+    methods: [ POST ]
+    requirements:
+        id: \d+
+    options:
+        expose: true
+
+admin_ekyna_product_inventory_app_validate:
+    path: /{id}/validate
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp\ValidateController
+    methods: [ POST ]
+    requirements:
+        id: \d+
+    options:
+        expose: true

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Factory;
 
-use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
@@ -29,7 +29,7 @@ class ProductFactory extends TranslatableFactory implements ProductFactoryInterf
         $product = parent::create();
 
         if (!$product instanceof ProductInterface) {
-            throw new UnexpectedValueException($product, ProductInterface::class);
+            throw new UnexpectedTypeException($product, ProductInterface::class);
         }
 
         ProductTypes::isValid($type, true);

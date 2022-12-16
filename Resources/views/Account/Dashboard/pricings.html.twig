@@ -5,6 +5,7 @@
 {% if loop.first or loop.index0 % per_row == 0 %}<div class="row">{% endif %}
     <div class="col-md-{{ 12 / per_row }}">
         <div style="padding:15px;border:1px solid #ddd;border-radius:4px">
+            {# TODO pricing groups ? #}
             <p>
                 <strong>{{ 'brand.label.plural'|trans({}, 'EkynaProduct') }}:</strong>
                 {% if pricing.brands is not empty -%}

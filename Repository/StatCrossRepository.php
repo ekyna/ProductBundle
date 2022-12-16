@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use DatePeriod;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -26,6 +27,8 @@ use function is_int;
  * Class StatCrossRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @implements EntityRepository<StatCross>
  */
 class StatCrossRepository extends AbstractStatRepository
 {

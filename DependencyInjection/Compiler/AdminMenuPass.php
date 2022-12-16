@@ -73,8 +73,13 @@ class AdminMenuPass implements CompilerPassInterface
             ])
             ->addEntry([
                 'name'     => 'inventory',
-                'route'    => 'admin_ekyna_product_inventory_index',
-                'label'    => 'inventory.title',
+                'resource' => 'ekyna_product.inventory',
+                'position' => 73,
+            ])
+            ->addEntry([
+                'name'     => 'stock_view',
+                'route'    => 'admin_ekyna_product_stock_view_index',
+                'label'    => 'stock_view.title',
                 'domain'   => 'EkynaProduct',
                 'resource' => 'ekyna_product.product',
                 'position' => 90,

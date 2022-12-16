@@ -1,0 +1,28 @@
+{% extends '@EkynaAdmin/Entity/Crud/read.html.twig' %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+{% endblock actions %}
+
+{% block main_actions -%}
+{%- endblock %}
+
+{% block main_contents -%}
+    <div class="tab-pane active" id="{{ resource_name }}-general">
+        <p>[TODO]</p>{# TODO #}
+        <div class="table-responsive">
+            <table class="table table-alt-head table-striped table-hover">
+                <thead>
+                <tr>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{%- endblock main_contents %}

@@ -1,0 +1,145 @@
+html, body {
+    overflow: hidden;
+}
+
+form[name=inventory] {
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 15px;
+
+    > table {
+        width: 100%;
+
+        th, td {
+            padding: 0 10px;
+
+            .btn-group {
+                min-width: 83px;
+            }
+        }
+    }
+}
+
+#inventory {
+    margin: 0;
+
+    th, td {
+        padding: 5px;
+
+        &.input { // 1
+            width: 2%;
+        }
+
+        &.text { // 2
+            width: 5%;
+        }
+
+        &.text2 { // 2
+            width: 6%;
+        }
+
+        &.designation { // 1
+            width: 10%;
+        }
+
+        &.boolean { // 3
+            width: 4%;
+        }
+
+        &.number { // 3
+            width: 4%;
+        }
+
+        &.state { // 3
+            width: 7%;
+        }
+
+        // &.action { // 3
+        //}
+    }
+
+    thead, tbody, tfoot {
+        width: 100%;
+
+        > tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+    }
+
+    thead {
+        > tr {
+            > th {
+                border-right: 1px solid #eee;
+                overflow: hidden;
+                position: relative;
+
+                &:last-child {
+                    border-right: none;
+                }
+
+                &.action {
+                    width: 122px;
+                }
+
+
+                > a, > span {
+                    display: inline-block;
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    &:hover {
+                        display: block;
+                        top: 6px;
+                        left: 5px;
+                        width: auto;
+                        position: absolute;
+                        text-overflow: initial;
+                    }
+                }
+            }
+        }
+    }
+
+    tbody {
+        display: block;
+        height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        > tr {
+            > td {
+                &.input {
+                    text-align: center;
+                }
+
+                &.number {
+                    text-align: right;
+                }
+
+                &.action { // 3
+                    width: 106px;
+                    text-align: left;
+
+                    > a {
+                        margin: 0 3px 3px 0;
+                    }
+                }
+            }
+        }
+    }
+
+    tfoot {
+        a {
+            margin-left: 10px;
+
+            > span {
+                margin-right: 5px;
+            }
+        }
+    }
+}

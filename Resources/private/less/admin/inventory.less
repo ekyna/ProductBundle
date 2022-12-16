@@ -1,144 +1,177 @@
-html, body {
-    overflow: hidden;
+
+#closed {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 }
 
-form[name=inventory] {
+#inventory_none, #inventory_wait {
+    position: fixed;
+    top:0; left:0;
     width: 100%;
-    border: none;
-    margin: 0;
-    padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 
-    > table {
-        width: 100%;
-
-        th, td {
-            padding: 0 10px;
-
-            .btn-group {
-                min-width: 83px;
-            }
-        }
+    > p {
+        font-size: 6vw;
     }
 }
 
 #inventory {
-    margin: 0;
+    padding-top: 36px;
+}
 
-    th, td {
-        padding: 5px;
+#controls {
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-bottom: 1px solid black;
 
-        &.input { // 1
-            width: 2%;
-        }
-
-        &.text { // 2
-            width: 5%;
-        }
-
-        &.text2 { // 2
-            width: 6%;
-        }
-
-        &.designation { // 1
-            width: 10%;
-        }
-
-        &.boolean { // 3
-            width: 4%;
-        }
-
-        &.number { // 3
-            width: 4%;
-        }
-
-        &.state { // 3
-            width: 7%;
-        }
-
-        // &.action { // 3
-        //}
+    > p {
+        padding: 4px 8px;
+        margin: 0;
     }
+}
 
-    thead, tbody, tfoot {
-        width: 100%;
-
-        > tr {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
+#inventory_list {
+    > div {
+        &[data-valid="1"] {
+            display: none;
         }
-    }
 
-    thead {
-        > tr {
-            > th {
-                border-right: 1px solid #eee;
-                overflow: hidden;
-                position: relative;
+        &[data-end-of-life="1"] {
+            display: none;
+        }
 
-                &:last-child {
-                    border-right: none;
+        color: #526273;
+        border: 1px solid #666;
+
+        > p {
+            padding: 6px 12px;
+            font-size: 5vw;
+        }
+
+        > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+
+            > p {
+                &:nth-child(1) {
+                    font-size: 3.5vw;
                 }
 
-                &.action {
-                    width: 122px;
-                }
+                &:nth-child(2) {
+                    font-size: 5vw;
 
+                    > span {
+                        padding: 2px 10px;
+                        border: 1px solid #999;
+                        min-width: 40px;
+                        display: inline-block;
+                        text-align: center;
 
-                > a, > span {
-                    display: inline-block;
-                    width: 100%;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
+                        &:first-child {
+                            border-radius: 6px 0 0 6px;
+                        }
 
-                    &:hover {
-                        display: block;
-                        top: 6px;
-                        left: 5px;
-                        width: auto;
-                        position: absolute;
-                        text-overflow: initial;
+                        &:last-child {
+                            border-radius: 0 6px 6px 0;
+                            border-left: none;
+                        }
                     }
                 }
-            }
-        }
-    }
 
-    tbody {
-        display: block;
-        height: 200px;
-        overflow-y: auto;
-        overflow-x: hidden;
-
-        > tr {
-            > td {
-                &.input {
-                    text-align: center;
-                }
-
-                &.number {
-                    text-align: right;
-                }
-
-                &.action { // 3
-                    width: 106px;
-                    text-align: left;
+                &:nth-child(3) {
+                    padding: 0;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
 
                     > a {
-                        margin: 0 3px 3px 0;
+                        margin-right: 6px;
+                        font-size: 18px;
+
+                        &:last-child {
+                            margin-right: 0;
+                        }
                     }
                 }
             }
         }
+
+        &.success {
+            background-color: #dff0d8;
+        }
+
+        &.end-of-life {
+            color: #ccc;
+
+            &:hover {
+                color: #526273;
+            }
+        }
+
+        &.focus {
+            display: block !important;
+            border: 4px solid red;
+        }
     }
 
-    tfoot {
-        a {
-            margin-left: 10px;
+    &.display-valid {
+        > div {
+            &[data-valid="1"] {
+                display: block;
+            }
+            &[data-end-of-life="1"] {
+                display: none;
+            }
+        }
+    }
+    &.display-end-of-life {
+        > div {
+            &[data-end-of-life="1"] {
+                display: block !important;
+            }
+        }
+    }
+}
 
-            > span {
-                margin-right: 5px;
+@media (min-width: 480px) {
+    #inventory_list {
+        > div {
+            border: 1px solid #666;
+
+            > p {
+                font-size: 24px;
+            }
+
+            > div {
+                > p {
+                    &:nth-child(1) {
+                        font-size: 16px;
+                    }
+
+                    &:nth-child(2) {
+                        font-size: 24px;
+                    }
+                }
             }
         }
     }

@@ -283,7 +283,24 @@ highlight:
     cross_selling: Ces articles pourraient vous intéresser
 
 inventory:
-    title: Inventaire
+    label:
+        singular: Inventaire
+        plural: Inventaires
+    status:
+        new: Nouveau
+        opened: En cours
+        closed: Terminé
+    header:
+        list: Inventaires <small>Liste des inventaires</small>
+        show: Détail de l'inventaire <small>%name%</small>
+    button:
+        list: Liste des inventaires
+        show: Détail de l'inventaire
+        new: Nouvel inventaire
+        remove: Supprimer l'inventaire
+
+stock_view:
+    title: Stock
     field:
         profile: Profil
         bookmark: Favoris

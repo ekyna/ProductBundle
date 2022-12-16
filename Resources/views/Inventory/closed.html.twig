@@ -1,0 +1,19 @@
+{% extends '@EkynaAdmin/base.html.twig' %}
+
+{% block body %}
+    <div id="closed">
+        <h1>
+            Aucun inventaire en cours.
+        </h1>
+    </div>
+{% endblock body %}
+
+{#{% block javascripts %}
+    #}{#    {{ parent() }}#}{#
+    <script type="text/javascript">require(['ekyna-product/admin/stock-view']);</script>
+{% endblock javascripts %}#}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/inventory.css')) }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}

@@ -2,6 +2,10 @@ admin_ekyna_product:
     resource: 'routing/admin.yaml'
     prefix:   '%ekyna_admin.routing_prefix%/catalog'
 
+admin_ekyna_product_inventory_app:
+    resource: 'routing/admin/inventory_app.yaml'
+    prefix:   '%ekyna_admin.routing_prefix%/inventory'
+
 ekyna_product:
     resource: 'routing/front.yaml'
 

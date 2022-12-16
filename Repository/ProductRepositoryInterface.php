@@ -129,11 +129,11 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     public function findHavingPastEDA(): array;
 
     /**
-     * Finds the products for inventory export.
+     * Finds the products for inventory.
      *
      * @return array<ProductInterface>
      */
-    public function findForInventoryExport(): array;
+    public function findForInventory(): array;
 
     /**
      * Finds one product with "pending offers" flag set to true.

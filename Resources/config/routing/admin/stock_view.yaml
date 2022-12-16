@@ -1,0 +1,61 @@
+admin_ekyna_product_stock_view_index:
+    path: ""
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\IndexController
+    methods: [GET]
+
+admin_ekyna_product_stock_view_products:
+    path: /products
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ListController
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_quick_edit:
+    path: /{productId}/quick-edit
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\QuickEditController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_batch_edit:
+    path: /batch-edit
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\BatchEditController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_stock_units:
+    path: /{productId}/stock-units
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\StockUnitsController
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_customer_orders:
+    path: /{productId}/customer-orders
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\CustomerOrdersController
+    methods: [GET]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_resupply:
+    path: /{productId}/resupply
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ResupplyController
+    methods: [GET, POST]
+    options:
+        expose: true
+
+admin_ekyna_product_stock_view_export:
+    path: /export
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ExportController
+    methods: [POST]
+
+admin_ekyna_product_stock_view_export_products:
+    path: /export-products
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ExportProductsController
+    methods: [GET]
+
+admin_ekyna_product_stock_view_export_units:
+    path: /export-units
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ExportUnitsController
+    methods: [GET]

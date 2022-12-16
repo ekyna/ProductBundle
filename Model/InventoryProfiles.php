@@ -21,7 +21,7 @@ class InventoryProfiles extends AbstractConstants
 
     public static function getConfig(): array
     {
-        $prefix = 'inventory.profile.';
+        $prefix = 'stock_view.profile.';
 
         return [
             static::NONE         => [$prefix . static::NONE],

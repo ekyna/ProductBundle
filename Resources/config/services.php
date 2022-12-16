@@ -71,8 +71,8 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag(TypeInterface::TYPE_TAG)
 
-        // Inventory
-        ->set('ekyna_product.inventory', Stock\Inventory::class)
+        // StockView
+        ->set('ekyna_product.stock_view', Stock\StockView::class)
             ->args([
                 service('doctrine.orm.default_entity_manager'),
                 service('ekyna_resource.helper'),

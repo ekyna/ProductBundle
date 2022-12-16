@@ -1,0 +1,38 @@
+{% extends '@EkynaAdmin/base.html.twig' %}
+
+{% block page_title %}Inventaire{% endblock page_title %}
+
+{% block body %}
+<div id="inventory_wait">
+    <p>Veuillez patienter&hellip;</p>
+</div>
+<div id="inventory_none" style="display: none">
+    <p>Aucun résultat</p>
+</div>
+<form id="controls" onsubmit="return false">
+    <p>
+        <label>
+            <input type="checkbox" id="display_valid" value="1">
+            Produits déjà comptés
+        </label>
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" id="display_end_of_life" value="1">
+            Produits en fin de vie
+        </label>
+    </p>
+</form>
+<div id="inventory">
+    <div id="inventory_list"></div>
+</div>
+{% endblock body %}
+
+{% block javascripts %}
+    <script type="text/javascript">require(['ekyna-product/admin/inventory']);</script>
+{% endblock javascripts %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/inventory.css')) }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}

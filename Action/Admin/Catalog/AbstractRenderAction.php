@@ -103,7 +103,7 @@ abstract class AbstractRenderAction extends AbstractAction implements AdminActio
         }
 
         // Fake uploaded file
-        $file = new UploadedFile($path, 'catalog.pdf', null, null, true);
+        $file = new UploadedFile($path, $sale->getNumber() . '_catalog.pdf', null, null, true);
 
         // Attachment
         $attachment = $this->factoryHelper->createAttachmentForSale($sale);

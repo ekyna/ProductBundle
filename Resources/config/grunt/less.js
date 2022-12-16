@@ -21,6 +21,9 @@ module.exports = function (grunt, options) {
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/inventory.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/inventory.less',
 
+                'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/admin/stock-view.css':
+                    'src/Ekyna/Bundle/ProductBundle/Resources/private/less/admin/stock-view.less',
+
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/catalog/base.css':
                     'src/Ekyna/Bundle/ProductBundle/Resources/private/less/catalog/base.less',
                 'src/Ekyna/Bundle/ProductBundle/Resources/public/tmp/css/catalog/default-theme.css':

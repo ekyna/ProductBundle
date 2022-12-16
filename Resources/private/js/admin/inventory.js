@@ -1,436 +1,205 @@
 define(
-    ['require', 'jquery', 'routing', 'ekyna-dispatcher', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner', 'ekyna-clipboard-copy'],
-    function (require, $, Router, Dispatcher, Templates, Modal, Scanner) {
+    ['require', 'jquery', 'routing', 'ekyna-product/templates', 'ekyna-modal', 'ekyna-admin/barcode-scanner', 'ekyna-clipboard-copy'],
+    function (require, $, Router, Templates, Modal, Scanner) {
 
-    const $window = $(window),
-        $head = $('#inventory thead'),
-        $body = $('#inventory tbody'),
-        $foot = $('#inventory tfoot'),
-        $wait = $('#inventory_wait').detach(),
-        $none = $('#inventory_none').detach(),
-        $contextForm = $('form[name="inventory"]');
+        const
+            $list = $('#inventory_list'),
+            $wait = $('#inventory_wait'),
+            $none = $('#inventory_none'),
+            route_prefix = 'admin_ekyna_product_inventory_app_',
+            $displayValid = $('#display_valid'),
+            $displayEndOfLife = $('#display_end_of_life');
 
-    let busy = false,
-        productsXhr;
+        let busy = false,
+            display_valid = $displayValid.prop('checked'),
+            display_end_of_life = $displayEndOfLife.prop('checked');
 
-    /**
-     * Returns the context form data.
-     *
-     * @returns object
-     */
-    function getContext() {
-        let array = $contextForm.serializeArray();
 
-        let context = {};
-        for (let i = 0; i < array.length; i++) {
-            if (array[i]['value']) {
-                context[array[i]['name']] = array[i]['value'];
+        function toggleRows() {
+            if (display_valid) {
+                $list.addClass('display-valid');
+            } else {
+                $list.removeClass('display-valid');
+            }
+            if (display_end_of_life) {
+                $list.addClass('display-end-of-life');
+            } else {
+                $list.removeClass('display-end-of-life');
             }
         }
 
-        return context;
-    }
-
-    /**
-     * Clears the context form data.
-     */
-    function clearContext() {
-        $contextForm.find('table input').val(null).attr('value', null);
-        $contextForm.find('table select').val(null).find('option').prop('selected', false);
-    }
-
-    let eol = false,
-        page = -1;
-
-    /**
-     * Refreshes the inventory list.
-     */
-    function refreshList() {
-        if (productsXhr) {
-            productsXhr.abort();
-        }
-
-        $body.empty();
-
-        eol = false;
-        page = -1;
-
-        nextList();
-    }
-
-    /**
-     * Display the inventory list's next page.
-     */
-    function nextList() {
-        if (productsXhr) {
-            productsXhr.abort();
-        }
-
-        if (eol) {
-            return;
-        }
-
-        busy = true;
-
-        $none.detach();
-        $wait.appendTo($body);
-
-        page++;
-
-        productsXhr = $.ajax({
-            url: Router.generate('admin_ekyna_product_inventory_products', {page: page}),
-            method: 'GET',
-            dataType: 'json',
-            data: getContext()
-        });
-
-        productsXhr.done(handleResponse);
-
-        productsXhr.always(function () {
-            busy = false;
-        });
-    }
-
-    function updateListHeight() {
-        let height = $window.height() - $contextForm.outerHeight() - $head.outerHeight() - $foot.outerHeight();
-        if (0 > height) {
-            height = 0;
-        }
-        $body.height(height);
-    }
-
-    function request(event, route, parameters, method, handler) {
-        method = method || 'GET';
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (busy) {
-            return false;
-        }
-
-        busy = true;
-
-        parameters = parameters || {};
-
-        if (true === parameters) {
-            const productId = $(event.currentTarget).parents('tr').eq(0).data('id');
-            if (!productId) {
-                console.log('Undefined product id.');
-                return false;
+        function list() {
+            if (busy) {
+                return;
             }
-            parameters = {'productId': productId};
+
+            busy = true;
+            $wait.show();
+            $none.hide();
+            $list.empty();
+
+            fetch(Router.generate(route_prefix + 'list'), {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch product list');
+                    }
+
+                    return response.json()
+                })
+                .then((data) => {
+                    console.log(data)
+
+                    if (!(data.hasOwnProperty('products') && data.products instanceof Array)) {
+                        return;
+                    }
+
+                    if (0 === data.products.length) {
+                        $none.show();
+
+                        return;
+                    }
+
+                    for (const product of data.products) {
+                        $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)).appendTo($list);
+                    }
+
+                    toggleRows();
+                })
+                .finally(() => {
+                    busy = false;
+                    $wait.hide();
+                });
         }
 
-        const xhr = $.ajax({
-            url: Router.generate(route, parameters),
-            method: method
-        });
+        list();
 
-        xhr.done(handler || handleResponse);
-
-        xhr.always(function() {
-            busy = false
-        });
-    }
-
-    function requestModal(event, route, parameters, handler) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (busy) {
-            return false;
-        }
-
-        busy = true;
-
-        parameters = parameters || {};
-        handler = handler || handleResponse;
-
-        if (true === parameters) {
-            const productId = $(event.currentTarget).parents('tr').eq(0).data('id');
-            if (!productId) {
-                console.log('Undefined product id.');
-                return false;
-            }
-            parameters = {'productId': productId};
-        }
-
-        try {
-            const modal = new Modal();
-            modal.load({
-                url: Router.generate(route, parameters),
-                method: 'GET'
-            });
-            $(modal).on('ekyna.modal.response', function (modalEvent) {
-                busy = false;
-
-                if (modalEvent.contentType === 'json') {
-                    modalEvent.preventDefault();
-
-                    handler(modalEvent.content);
-                    /*if (modalEvent.content.success) {
-                        refreshList();
-                    }*/
-
-                    modalEvent.modal.close();
-                }
-            });
-            $(modal).on('ekyna.modal.load_fail', function() {
-                busy = false;
-            });
-        } catch (exception) {
-            console.log(exception);
-            busy = false;
-        }
-
-        return false;
-    }
-
-    function handleResponse(data) {
-        if (!data.hasOwnProperty('products') || 0 === data.products.length) {
-            if (page === 0) {
-                $none.appendTo($body);
-            }
-            eol = true;
-            return;
-        }
-
-        if (!data.update) {
-            $wait.detach();
-        }
-
-        $.each(data.products, function (index, product) {
+        function update(product) {
             const $new = $(Templates['@EkynaProduct/Js/inventory_line.html.twig'].render(product)),
-                $old = $body.find('tr[data-id=' + product.id + ']');
+                $old = $list.find('div[data-id=' + product.id + ']');
 
             if (1 === $old.length) {
                 $old.replaceWith($new);
             } else {
-                $new.appendTo($body);
+                $new.appendTo($list);
             }
-        });
-
-        if (data.update) {
-            return;
         }
 
-        // TODO Ugly. Need data.count value.
-        if (30 > data.products.length) {
-            eol = true;
-            return;
-        }
-
-        $wait.appendTo($body);
-    }
-
-    Scanner.init({
-        //debug: true
-    });
-    Scanner.addListener(function(barcode) {
-        if (productsXhr) {
-            productsXhr.abort();
-        }
-
-        $body.empty();
-        $none.detach();
-        $wait.appendTo($body);
-
-        eol = false;
-        busy = true;
-        page = 0;
-
-        productsXhr = $.ajax({
-            url: Router.generate('admin_ekyna_product_inventory_products', {page: page}),
-            method: 'GET',
-            dataType: 'json',
-            data: {
-                referenceCode: barcode
+        function modal(event, route) {
+            const id = $(event.currentTarget).parents('div').eq(1).data('id');
+            if (!id) {
+                throw new Error('Undefined id');
             }
-        });
 
-        productsXhr.done(handleResponse);
-
-        productsXhr.always(function () {
-            busy = false;
-        });
-    });
-
-    /**
-     * Line's bookmark buttons click handler
-     */
-    $body.on('click', 'a.bookmark', function (e) {
-        const $icon = $(e.currentTarget).closest('a'),
-            value = $icon.hasClass('fa-bookmark-o'),
-            route = value
-                ? 'admin_ekyna_product_product_bookmark_add'
-                : 'admin_ekyna_product_product_bookmark_remove';
-
-        return request(e, route, true, value ? 'POST' : 'DELETE', function() {
-            if (value) {
-                $icon.removeClass('fa-bookmark-o').addClass('fa-bookmark');
-            } else {
-                $icon.removeClass('fa-bookmark').addClass('fa-bookmark-o');
+            if (busy) {
+                return false;
             }
-        });
-    });
 
-    /**
-     * Line's quick edit buttons click handler
-     */
-    $body.on('click', 'a.quick-edit', function (e) {
-        return requestModal(e, 'admin_ekyna_product_inventory_quick_edit', true);
-    });
+            busy = true;
 
-    /**
-     * Line's print label buttons click handler
-     */
-    $body.on('click', 'a.print-label', function (e) {
-        const productId = $(e.currentTarget).parents('tr').eq(0).data('id');
-        if (!productId) {
-            console.log('Undefined product id.');
-            return false;
-        }
+            try {
+                const modal = new Modal();
+                modal.load({
+                    url: Router.generate(route_prefix + route, {id: id}),
+                    method: 'GET'
+                });
+                $(modal).on('ekyna.modal.response', function (modalEvent) {
+                    busy = false;
 
-        const url = Router.generate('admin_ekyna_product_product_label', {
-            'format': 'large',
-            'id': [productId]
-        });
+                    if (modalEvent.contentType === 'json') {
+                        modalEvent.preventDefault();
 
-        const win = window.open(url, '_blank');
-        win.focus();
-    });
+                        update(modalEvent.content.product);
 
-    /**
-     * Context form submit.
-     */
-    $contextForm.on('submit', function (e) {
-        let event = e.originalEvent ?? e;
-        if (event.submitter && event.submitter.id === 'inventory_export') {
-            return true;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        refreshList();
-
-        return false;
-    });
-
-    /**
-     * Context form reset.
-     */
-    $contextForm.on('reset', function () {
-        clearContext();
-        refreshList();
-    });
-
-    /**
-     * Line's quick edit buttons click handler
-     */
-    $body.on('click', 'a.quick-edit', function (e) {
-        return requestModal(e, 'admin_ekyna_product_inventory_quick_edit', true);
-    });
-
-    /**
-     * Line's stock unit buttons click handler
-     */
-    $body.on('click', 'a.stock-units', function (e) {
-        return requestModal(e, 'admin_ekyna_product_inventory_stock_units', true);
-    });
-
-    /**
-     * Line's stock unit buttons click handler
-     */
-    $body.on('click', 'a.treatment', function (e) {
-        return requestModal(e, 'admin_ekyna_product_inventory_customer_orders', true);
-    });
-
-    /**
-     * Line's resupply buttons click handler
-     */
-    $body.on('click', 'a.resupply', function (e) {
-        return requestModal(e, 'admin_ekyna_product_inventory_resupply', true);
-    });
-
-    $('button[name="batch_submit"]').on('click', function(e) {
-        let ids = [];
-        $('#inventory').serializeArray().forEach(function(obj) {
-            ids.push(obj.value);
-        });
-
-        if (1 >= ids.length) {
-            alert('Please select some products');
+                        modalEvent.modal.close();
+                    }
+                });
+                $(modal).on('ekyna.modal.load_fail', function () {
+                    busy = false;
+                });
+            } catch (exception) {
+                console.log(exception);
+                busy = false;
+            }
 
             return false;
         }
 
-        return requestModal(e, 'admin_ekyna_product_inventory_batch_edit', {id: ids});
-    });
+        function request(event, route, confirmMessage) {
+            if (!confirm(confirmMessage)) {
+                return;
+            }
 
-    /**
-     * List sort headers click handler
-     */
-    $head.on('click', 'th.sort a', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+            const id = $(event.currentTarget).parents('div').eq(1).data('id');
+            if (!id) {
+                throw new Error('Undefined id');
+            }
 
-        const $a = $(e.currentTarget);
-        let sortDir = 'none';
+            if (busy) {
+                return false;
+            }
 
-        if ($a.hasClass('none')) {
-            sortDir = 'asc';
-        } else if ($a.hasClass('asc')) {
-            sortDir = 'desc';
+            busy = true;
+
+            fetch(Router.generate(route_prefix + route, {id: id}), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Request failed');
+                    }
+
+                    return response.json()
+                })
+                .then((data) => {
+                    console.log(data)
+
+                    if (!(data.hasOwnProperty('product') && typeof data.product === 'object')) {
+                        return;
+                    }
+
+                    update(data.product);
+                })
+                .finally(() => {
+                    busy = false;
+                });
         }
 
-        $head.find('th.sort a').removeClass('asc desc').addClass('none');
+        $displayValid.on('change', () => {
+            display_valid = $displayValid.prop('checked');
 
-        if (sortDir !== 'none') {
-            $a.removeClass('none').addClass(sortDir);
-            $contextForm.find('input[name="inventory[sortBy]"]').val($a.data('by'));
-            $contextForm.find('input[name="inventory[sortDir]"]').val(sortDir);
-        } else {
-            $contextForm.find('input[name="inventory[sortBy]"]').val(null);
-            $contextForm.find('input[name="inventory[sortDir]"]').val(null);
-        }
+            toggleRows();
+        });
 
-        $contextForm.trigger('submit');
+        $displayEndOfLife.on('change', () => {
+            display_end_of_life = $displayEndOfLife.prop('checked');
 
-        return false;
+            toggleRows();
+        });
+
+        $list.on('click', 'a.count', (e) => modal(e, 'count'));
+
+        $list.on('click', 'a.validate', (e) => request(e, 'validate', 'Valider le stock ?'));
+
+        $list.on('click', 'a.end-of-life', (e) => request(e, 'end_of_life', 'Confirmer «En fin de vie» ?'));
+
+        Scanner.init({
+            //debug: true
+        });
+        Scanner.addListener((gtin) => {
+            $list.find('> div').removeClass('focus');
+            let $row = $list.find('div[data-gtin="' + gtin + '"]');
+            if (0 === $row.length) {
+                return;
+            }
+            $row.addClass('focus');
+            let top = $row.offset().top;
+            $('html, body').scrollTop(top - 50);
+        });
     });
-
-    Dispatcher.on('ekyna_commerce.stock_units.change', function() {
-        refreshList();
-    });
-    refreshList();
-
-    $window.on('resize', updateListHeight);
-    updateListHeight();
-
-    $body.on('scroll', function () {
-        if (busy || eol) {
-            return;
-        }
-
-        if ($wait.offset().top < $body.height() + $contextForm.outerHeight() + $head.outerHeight()) {
-            nextList();
-        }
-    });
-
-    /* -----------------------------------------------------------------------------------------------------------------
-     * Resource summary
-     */
-    require(['ekyna-admin/summary'], function(Summary) {
-        Summary.init();
-    });
-
-    /* -----------------------------------------------------------------------------------------------------------------
-     * Resource side detail
-     */
-    require(['ekyna-admin/side-detail'], function(SideDetail) {
-        SideDetail.init();
-    });
-});
-

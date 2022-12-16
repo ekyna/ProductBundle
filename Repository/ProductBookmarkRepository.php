@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Ekyna\Bundle\AdminBundle\Model\UserInterface;
 use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
@@ -14,6 +15,8 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  * Class ProductBookmarkRepository
  * @package Ekyna\Bundle\ProductBundle\Repository
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * @implements EntityRepository<ProductBookmark>
  */
 class ProductBookmarkRepository extends ServiceEntityRepository
 {

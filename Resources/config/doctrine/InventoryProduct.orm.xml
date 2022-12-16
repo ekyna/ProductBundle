@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\InventoryProduct"
+            table="product_inventory_product">
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="geocodes" column="geocodes" type="simple_array" nullable="true"/>
+        <field name="initialStock" column="initial_stock" type="php_decimal" precision="10" scale="3" nullable="false"/>
+        <field name="realStock" column="real_stock" type="php_decimal" precision="10" scale="3" nullable="true"/>
+        <field name="appliedStock" column="applied_stock" type="php_decimal" precision="10" scale="3" nullable="true"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Entity\Inventory" field="inventory">
+            <join-column name="inventory_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        </many-to-one>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface" field="product">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="false" />
+        </many-to-one>
+
+        <field name="updatedAt" type="datetime" column="updated_at" nullable="true">
+            <gedmo:timestampable on="update"/>
+        </field>
+
+    </entity>
+
+</doctrine-mapping>

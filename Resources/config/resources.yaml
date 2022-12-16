@@ -19,7 +19,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\AttributeTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\AttributeTranslation
-                fields: [title]
+                fields: [ title ]
             actions:
                 admin_crud:
                     create: false
@@ -42,7 +42,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\AttributeChoiceTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\AttributeChoiceTranslation
-                fields: [title]
+                fields: [ title ]
             actions:
                 admin_crud:
                     templates: '@EkynaProduct/Admin/AttributeChoice'
@@ -87,7 +87,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\BrandTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BrandTranslation
-                fields: [title, description, slug]
+                fields: [ title, description, slug ]
             actions:
                 admin_crud:
                     form: '@EkynaProduct/Admin/Brand/_form.html.twig'
@@ -128,7 +128,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BundleSlotTranslation
-                fields: [title, description]
+                fields: [ title, description ]
 
         bundle_slot_rule:
             driver: doctrine/orm
@@ -178,7 +178,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\CategoryTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\CategoryTranslation
-                fields: [title, description, slug]
+                fields: [ title, description, slug ]
             actions:
                 admin_crud:
                     form: '@EkynaProduct/Admin/Category/_form.html.twig'
@@ -209,6 +209,23 @@ resources:
             parent: ekyna_product.product
             trans_domain: EkynaProduct
 
+        inventory:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\InventoryInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\Inventory
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\InventoryRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\InventoryRepository
+            table: Ekyna\Bundle\ProductBundle\Table\Type\InventoryType
+            trans_domain: EkynaProduct
+            actions:
+                admin_list:
+                    template: '@EkynaProduct/Admin/Inventory/list.html.twig'
+                admin_read:
+                    template: '@EkynaProduct/Admin/Inventory/read.html.twig'
+                Ekyna\Bundle\ProductBundle\Action\Admin\Inventory\CreateAction: ~
+
         option:
             driver: doctrine/orm
             entity:
@@ -222,7 +239,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\OptionTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\OptionTranslation
-                fields: [title, description]
+                fields: [ title, description ]
 
         option_group:
             driver: doctrine/orm
@@ -237,7 +254,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\OptionGroupTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\OptionGroupTranslation
-                fields: [title]
+                fields: [ title ]
 
         offer:
             driver: doctrine/orm
@@ -318,11 +335,11 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\ProductTranslation
-                fields: [title, subTitle, attributesTitle, description, slug]
+                fields: [ title, subTitle, attributesTitle, description, slug ]
             actions:
                 api_crud:
                     search:
-                        parameters: [types]
+                        parameters: [ types ]
                 admin_crud:
                     templates: '@EkynaProduct/Admin/Product'
                     summary: true
@@ -344,7 +361,8 @@ resources:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\MoveDownAction: ~
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\CreateSupplierProductAction: ~
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\ExportOrdersAction: ~
-                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\LabelAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\LabelAction:
+                    expose: true
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\RefreshStockAction: ~
 
         product_adjustment:
@@ -383,7 +401,7 @@ resources:
             translation:
                 interface: Ekyna\Bundle\ProductBundle\Model\ProductMentionTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\ProductMentionTranslation
-                fields: [content]
+                fields: [ content ]
 
         product_reference:
             driver: doctrine/orm

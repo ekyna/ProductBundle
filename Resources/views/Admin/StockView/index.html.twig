@@ -1,0 +1,226 @@
+{% extends '@EkynaAdmin/base.html.twig' %}
+
+{% macro sortLinkAttribute(data, field) %}
+{% apply spaceless %}
+    {%- set sortClass = 'none' -%}
+    {%- if data.sortBy == field -%}
+        {% set sortClass =  data.sortDir|lower %}
+    {%- endif -%}
+    href="javascript:void(0)" class="{{ sortClass }}" data-by="{{ field }}"
+{% endapply %}
+{% endmacro sortLinkAttribute %}
+
+{% import _self as macro %}
+
+{% block page_title %}{{ 'stock_view.title'|trans({}, 'EkynaProduct') }}{% endblock page_title %}
+
+{#{% block title %}
+    <h1>{{ 'stock_view.title'|trans({}, 'EkynaProduct') }}</h1>
+{% endblock title %}
+
+{% block actions %}
+    {{ ui_button('stock_view.button.export_products', {
+        'trans_domain': 'EkynaProduct',
+        'path': path('admin_ekyna_product_stock_view_export_products'),
+        'type': 'link',
+        'icon': 'download'
+    }) }}
+    {{ ui_button('stock_view.button.export_units', {
+        'trans_domain': 'EkynaProduct',
+        'path': path('admin_ekyna_product_stock_view_export_units'),
+        'type': 'link',
+        'icon': 'download'
+    }) }}
+{% endblock actions %}#}
+
+{% block body %}
+{% apply spaceless %}
+
+    {{ form_start(form) }}
+    {{ bootstrap_set_col_size('md') }}
+    {{ bootstrap_set_sizing('sm') }}
+    {% set fields = [
+        'brand', 'supplier', 'designation', 'reference', 'geocode', 'visible',
+        'quoteOnly', 'endOfLife', 'mode', 'state', 'bookmark', 'profile'
+    ] %}
+    <table>
+        <thead>
+        <tr>
+            {%- for field in fields -%}
+            <th>{{ form_label(form[field]) }}</th>
+            {%- endfor -%}
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {%- for field in fields -%}
+            <td>{{ form_widget(form[field]) }}{{ form_errors(form[field]) }}</td>
+            {%- endfor %}
+            <td>{{ form_widget(form.submit) }}</td>
+            <td>{{ form_widget(form.export) }}</td>
+            <td>{{ form_widget(form.reset) }}</td>
+        </tr>
+        </tbody>
+    </table>
+    {{ form_errors(form) }}
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+
+    <form id="inventory" action="{{ path('admin_ekyna_product_stock_view_batch_edit') }}" class="table-responsive" method="GET">
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width:46%" colspan="9">Article</th>
+                    <th class="text-center" style="width:23%" colspan="5">Configuration</th>
+                    <th class="text-center" style="width:24%" colspan="5">État stock</th>
+                    <th class="text-center" style="width:20%" colspan="5">Unités de stock</th>
+                    <th class="action">&nbsp;</th>
+                </tr>
+                <tr>
+                    {# Product #}
+                    <th class="input">&nbsp;</th>
+                    <th class="input">&nbsp;</th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'brand') }}>
+                            {{- 'brand.label.singular'|trans({}, 'EkynaProduct') -}}
+                        </a>
+                    </th>
+                    <th class="designation sort">
+                        <a {{ macro.sortLinkAttribute(data, 'designation') }}>
+                            {{- 'field.designation'|trans({}, 'EkynaUi') -}}
+                        </a>
+                    </th>
+                    <th class="text2 sort">
+                        <a {{ macro.sortLinkAttribute(data, 'reference') }}>
+                            {{- 'field.reference'|trans({}, 'EkynaUi') -}}
+                        </a>
+                    </th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'netPrice') }}>
+                            {{- 'field.net_price'|trans({}, 'EkynaCommerce') -}}
+                        </a>
+                    </th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'weight') }}>
+                            {{- 'field.weight'|trans({}, 'EkynaUi') -}}
+                        </a>
+                    </th>
+                    <th class="text2 sort">
+                        <a {{ macro.sortLinkAttribute(data, 'geocode') }}>
+                            {{- 'field.geocode'|trans({}, 'EkynaCommerce') -}}
+                        </a>
+                    </th>
+                    <th class="boolean">
+                        <span>Visible</span>
+                    </th>
+                    {# Configuration #}
+                    <th class="boolean">
+                        <span>Devis</span>
+                    </th>
+                    <th class="boolean">
+                        <span>Vie</span>
+                    </th>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'stockFloor') }}>
+                            Rupture
+                        </a>
+                    </th>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'replenishmentTime') }}>
+                            Réassort
+                        </a>
+                    </th>
+                    <th class="state">
+                        <span>{{- 'field.mode'|trans({}, 'EkynaUi') -}}</span>
+                    </th>
+                    {# State #}
+                    <th class="state">
+                        <span>{{- 'field.status'|trans({}, 'EkynaUi') -}}</span>
+                    </th>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'inStock') }}>
+                            Réel
+                        </a>
+                    </th>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'availableStock') }}>
+                            Dispo
+                        </a>
+                    </th>
+                    <th class="number sort">
+                        <a {{ macro.sortLinkAttribute(data, 'virtualStock') }}>
+                            Prévisionel
+                        </a>
+                    </th>
+                    <th class="text sort">
+                        <a {{ macro.sortLinkAttribute(data, 'estimatedDateOfArrival') }}>
+                            EDA
+                        </a>
+                    </th>
+                    {# Units #}
+                    <th class="number sort">
+                        <span>Commandé</span>
+                    </th>
+                    <th class="number">
+                        <span>Attendu</span>
+                    </th>
+                    <th class="action">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="inventory_wait">
+                    <td colspan="25">
+                        <p class="text-center">
+                            Please wait&hellip;
+                        </p>
+                    </td>
+                </tr>
+                <tr id="inventory_none" style="display:none">
+                    <td colspan="25">
+                        <p class="text-center">
+                            Aucun résultat.
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="17">
+                    <button type="submit" name="batch_submit" class="btn-sm btn btn-primary btn-sm">
+                        {{- 'stock_view.button.batch_edit'|trans({}, 'EkynaProduct') -}}
+                    </button>
+                </td>
+                <td colspan="18" style="text-align: right">
+                    {{ ui_button('stock_view.button.export_products', {
+                        'trans_domain': 'EkynaProduct',
+                        'path': path('admin_ekyna_product_stock_view_export_products'),
+                        'type': 'link',
+                        'icon': 'download'
+                    }) }}
+                    {{ ui_button('stock_view.button.export_units', {
+                        'trans_domain': 'EkynaProduct',
+                        'path': path('admin_ekyna_product_stock_view_export_units'),
+                        'type': 'link',
+                        'icon': 'download'
+                    }) }}
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </form>
+{% endapply %}
+{% endblock body %}
+
+
+{% block javascripts %}
+{#    {{ parent() }}#}
+    <script type="text/javascript">require(['ekyna-product/admin/stock-view']);</script>
+{% endblock javascripts %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/stock-view.css')) }}" rel="stylesheet" type="text/css"/>
+{% endblock stylesheets %}

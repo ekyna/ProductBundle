@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Ekyna\Bundle\ProductBundle\Action\Admin\Attribute\CreateAction;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Attribute;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Catalog;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Inventory;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 
 return static function (ContainerConfigurator $container) {
@@ -13,7 +14,7 @@ return static function (ContainerConfigurator $container) {
         ->services()
 
         // Attribute actions
-        ->set('ekyna_product.action.admin.attribute.create', CreateAction::class)
+        ->set('ekyna_product.action.admin.attribute.create', Attribute\CreateAction::class)
             ->args([
                 service('ekyna_product.registry.attribute_type'),
             ])
@@ -42,6 +43,14 @@ return static function (ContainerConfigurator $container) {
 
         ->set('ekyna_product.action.admin.catalog.render_from_sale', Catalog\RenderFromSaleAction::class)
             ->parent('ekyna_product.action.admin.catalog.abstract_render')
+            ->tag('ekyna_resource.action')
+
+        // Inventory actions
+        ->set('ekyna_product.action.admin.inventory.create', Inventory\CreateAction::class)
+            ->args([
+                service('ekyna_product.repository.inventory'),
+                service('ekyna_product.inventory.generator'),
+            ])
             ->tag('ekyna_resource.action')
 
         // Product actions

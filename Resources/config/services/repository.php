@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Ekyna\Bundle\ProductBundle\Repository\InventoryProductRepository;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepository;
 use Ekyna\Bundle\ProductBundle\Repository\PriceRepository;
 use Ekyna\Bundle\ProductBundle\Repository\ProductBookmarkRepository;
@@ -14,6 +15,13 @@ use Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository;
 return static function (ContainerConfigurator $container) {
     $container
         ->services()
+
+        // Inventory product repository
+        ->set('ekyna_product.repository.inventory_product', InventoryProductRepository::class)
+            ->args([
+                service('doctrine'),
+            ])
+            ->tag('doctrine.repository_service')
 
         // Product bookmark repository
         ->set('ekyna_product.repository.product_bookmark', ProductBookmarkRepository::class)

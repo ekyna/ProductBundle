@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ekyna\Bundle\ProductBundle\Form\Type\StockView;
+
+use Ekyna\Bundle\CommerceBundle\Form\StockSubjectFormBuilder;
+use Ekyna\Bundle\CommerceBundle\Form\SubjectFormBuilder;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Pricing\Resolver\TaxResolverInterface;
+use RuntimeException;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+/**
+ * Class QuickEditType
+ * @package Ekyna\Bundle\ProductBundle\Form\Type\StockView
+ * @author  Etienne Dauvergne <contact@ekyna.com>
+ */
+class QuickEditType extends AbstractType
+{
+    private SubjectFormBuilder      $subjectBuilder;
+    private StockSubjectFormBuilder $stockBuilder;
+    private TaxResolverInterface    $taxResolver;
+
+    public function __construct(
+        SubjectFormBuilder      $subjectBuilder,
+        StockSubjectFormBuilder $stockBuilder,
+        TaxResolverInterface    $taxResolver
+    ) {
+        $this->subjectBuilder = $subjectBuilder;
+        $this->stockBuilder = $stockBuilder;
+        $this->taxResolver = $taxResolver;
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var ProductInterface $product */
+            $product = $event->getData();
+            $form = $event->getForm();
+
+            $this->subjectBuilder->initialize($form);
+            $this->stockBuilder->initialize($form);
+
+            $rates = [];
+            $taxes = $this->taxResolver->resolveTaxes($product);
+            foreach ($taxes as $tax) {
+                $rates[] = $tax->getRate() / 100;
+            }
+
+            $this->subjectBuilder
+                ->addNetPriceField([
+                    'rates' => $rates,
+                ]);
+
+            $this->stockBuilder
+                ->addGeocodeField()
+                ->addStockFloor()
+                ->addStockMode()
+                ->addReplenishmentTime()
+                ->addMinimumOrderQuantity()
+                ->addEndOfLifeField()
+                ->addQuoteOnlyField()
+                ->addWeightField()
+                ->addWidthField()
+                ->addHeightField()
+                ->addDepthField()
+                ->addUnitField()
+                ->addPackageWeightField()
+                ->addPackageWidthField()
+                ->addPackageHeightField()
+                ->addPackageDepthField();
+        });
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class'        => ProductInterface::class,
+            'validation_groups' => function (FormInterface $form) {
+                /** @var ProductInterface $product */
+                $product = $form->getData();
+
+                if (!strlen($product->getType())) {
+                    throw new RuntimeException('Product type is not set.');
+                }
+
+                return ['Default', $product->getType()];
+            },
+        ]);
+    }
+}

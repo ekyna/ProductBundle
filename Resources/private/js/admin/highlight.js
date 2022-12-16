@@ -103,7 +103,7 @@ define(['jquery', 'routing'], function ($, Router) {
      * Line's quick edit buttons click handler
      */
     $list.on('click', 'a.quick-edit', function (e) {
-        return request(e, 'admin_ekyna_product_inventory_quick_edit');
+        return request(e, 'admin_ekyna_product_stock_view_quick_edit');
     });
 
     /**

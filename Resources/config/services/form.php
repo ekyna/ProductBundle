@@ -13,7 +13,7 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
 use Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 use Ekyna\Bundle\ProductBundle\Form\Type\ExportConfigType;
-use Ekyna\Bundle\ProductBundle\Form\Type\Inventory;
+use Ekyna\Bundle\ProductBundle\Form\Type\StockView;
 use Ekyna\Bundle\ProductBundle\Form\Type\Option;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAttributesType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductType;
@@ -37,7 +37,7 @@ return static function (ContainerConfigurator $container) {
                 service('ekyna_product.repository.attribute_set'),
             ])
 
-        ->set('ekyna_product.form_type.inventory', Inventory\InventoryType::class)
+        ->set('ekyna_product.form_type.stock_view', StockView\InventoryType::class)
             ->args([
                 service('ekyna_product.repository.brand'),
                 service('ekyna_commerce.repository.supplier'),
@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('form.type')
 
-        ->set('ekyna_product.form_type.inventory.quick_edit', Inventory\QuickEditType::class)
+        ->set('ekyna_product.form_type.stock_view.quick_edit', StockView\QuickEditType::class)
             ->args([
                 service('ekyna_commerce.builder.subject_form'),
                 service('ekyna_commerce.builder.stock_subject_form'),
@@ -58,7 +58,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('form.type')
 
-        ->set('ekyna_product.form_type.inventory.batch_edit', Inventory\BatchEditType::class)
+        ->set('ekyna_product.form_type.stock_view.batch_edit', StockView\BatchEditType::class)
             ->args([
                 service('ekyna_commerce.builder.stock_subject_form'),
             ])
@@ -68,7 +68,7 @@ return static function (ContainerConfigurator $container) {
                 'path'     => 'ekyna-product/form/batch-edit',
             ])
 
-        ->set('ekyna_product.form_type.inventory.resupply', Inventory\ResupplyType::class)
+        ->set('ekyna_product.form_type.stock_view.resupply', StockView\ResupplyType::class)
             ->args([
                 service('ekyna_commerce.repository.supplier_product'),
             ])
@@ -78,7 +78,7 @@ return static function (ContainerConfigurator $container) {
                 'path'     => 'ekyna-product/form/resupply',
             ])
 
-        ->set('ekyna_product.form_type.inventory.resupply_product', Inventory\ResupplyProductType::class)
+        ->set('ekyna_product.form_type.stock_view.resupply_product', StockView\ResupplyProductType::class)
             ->args([
                 service('ekyna_commerce.repository.supplier_order'),
             ])
