@@ -1,8 +1,13 @@
 {% macro image(catalog, product) %}
 {% apply spaceless %}
     {% set image = product.images|first %}
+    {% if image %}
     <img src="{{ absolute_url(image.path|imagine_filter('media_front')) }}" alt="{{ image.title }}"
          class="img-responsive" width="800" height="600">
+    {% else %}
+        <img src="{{ product_default_image() }}" alt="No picture"
+             class="img-responsive" width="800" height="600">
+    {% endif %}
 {% endapply %}
 {% endmacro image %}
 
