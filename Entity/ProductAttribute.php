@@ -22,7 +22,7 @@ class ProductAttribute extends AbstractResource implements ProductAttributeInter
 {
     protected ?ProductInterface       $product       = null;
     protected ?AttributeSlotInterface $attributeSlot = null;
-    /** @var Collection<AttributeChoiceInterface> */
+    /** @var Collection<int, AttributeChoiceInterface> */
     protected Collection $choices;
     protected ?string    $value = null;
 

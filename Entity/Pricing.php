@@ -32,15 +32,15 @@ class Pricing extends AbstractResource implements Model\PricingInterface
     protected ?string                 $name        = null;
     protected ?string                 $designation = null;
     protected ?Model\ProductInterface $product     = null;
-    /** @var Collection<CustomerGroupInterface> */
+    /** @var Collection<int, CustomerGroupInterface> */
     protected Collection $customerGroups;
-    /** @var Collection<Model\PricingGroupInterface> */
+    /** @var Collection<int, Model\PricingGroupInterface> */
     protected Collection $pricingGroups;
-    /** @var Collection<CountryInterface> */
+    /** @var Collection<int, CountryInterface> */
     protected Collection $countries;
-    /** @var Collection<Model\BrandInterface> */
+    /** @var Collection<int, Model\BrandInterface> */
     protected Collection $brands;
-    /** @var Collection<Model\PricingRuleInterface> */
+    /** @var Collection<int, Model\PricingRuleInterface> */
     protected Collection $rules;
 
     public function __construct()

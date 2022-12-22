@@ -1,0 +1,40 @@
+{% extends '@EkynaAdmin/Entity/Crud/create.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+{% import '@EkynaCommerce/Admin/Stock/_subject_macros.html.twig' as _subject %}
+
+{% block page_title %}
+    {{ (context.config.transPrefix ~ '.label.singular')|trans({}, context.config.transDomain)|raw }}
+{% endblock page_title %}
+
+{% block title %}
+    <h1>{{ 'product.header.adjust_stock'|trans({'%name%': product}, 'EkynaProduct')|raw }}</h1>
+{% endblock title %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+    {{ macros.new_product_button() }}
+{% endblock actions %}
+
+{% block main %}
+    <div id="stock-view" class="show-body" style="margin-bottom:20px;">
+        {{ _subject.show_stock_view(product, 'product') }}
+    </div>
+
+    <div class="alert alert-warning">
+        <p>
+            <i class="fa fa-warning fa-3x pull-left"></i>
+            {{ 'product.message.bundle_stock_adjust'|trans({}, 'EkynaProduct')|raw }}
+        </p>
+    </div>
+
+    {#  TODO Liste (tree) sous-produits + stock #}
+
+    {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    <div class="form-body">
+    {% include '@EkynaCommerce/Admin/Stock/stock_adjustment_form.html.twig' %}
+    </div>
+    {{ form_end(form) }}
+{% endblock main %}

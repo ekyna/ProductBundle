@@ -44,15 +44,15 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
     protected bool               $stack       = true;
     protected bool               $enabled     = false;
     protected ?ProductInterface  $product     = null;
-    /** @var Collection<ProductInterface> */
+    /** @var Collection<int, ProductInterface> */
     protected Collection $products;
-    /** @var Collection<BrandInterface> */
+    /** @var Collection<int, BrandInterface> */
     protected Collection $brands;
-    /** @var Collection<PricingGroupInterface> */
+    /** @var Collection<int, PricingGroupInterface> */
     protected Collection $pricingGroups;
-    /** @var Collection<CustomerGroupInterface> */
+    /** @var Collection<int, CustomerGroupInterface> */
     protected Collection $customerGroups;
-    /** @var Collection<CountryInterface> */
+    /** @var Collection<int, CountryInterface> */
     protected Collection $countries;
 
 

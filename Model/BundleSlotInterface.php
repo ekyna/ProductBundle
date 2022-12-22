@@ -32,7 +32,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
     public function setDescription(?string $description): BundleSlotInterface;
 
     /**
-     * @return Collection<BundleChoiceInterface>
+     * @return Collection<int, BundleChoiceInterface>
      */
     public function getChoices(): Collection;
 
@@ -43,7 +43,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
     public function removeChoice(BundleChoiceInterface $choice): BundleSlotInterface;
 
     /**
-     * @param Collection<BundleChoiceInterface> $choices
+     * @param Collection<int, BundleChoiceInterface> $choices
      */
     public function setChoices(Collection $choices): BundleSlotInterface;
 
@@ -52,7 +52,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
     public function setRequired(bool $required): BundleSlotInterface;
 
     /**
-     * @return Collection<BundleSlotRuleInterface>
+     * @return Collection<int, BundleSlotRuleInterface>
      */
     public function getRules(): Collection;
 
@@ -63,7 +63,7 @@ interface BundleSlotInterface extends TranslatableInterface, MediaSubjectInterfa
     public function removeRule(BundleSlotRuleInterface $rule): BundleSlotInterface;
 
     /**
-     * @param Collection<BundleSlotRuleInterface> $rules
+     * @param Collection<int, BundleSlotRuleInterface> $rules
      *
      * @internal
      */

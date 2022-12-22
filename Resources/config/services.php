@@ -88,6 +88,15 @@ return static function (ContainerConfigurator $container) {
                 param('ekyna_product.class.product_stock_unit'),
             ])
 
+        // Bundle stock adjuster
+        ->set('ekyna_product.bundle_stock_adjuster', Stock\BundleStockAdjuster::class)
+            ->args([
+                service('ekyna_commerce.factory.stock_adjustment'),
+                service('ekyna_product.repository.product_stock_unit'),
+                service('ekyna_product.factory.product_stock_unit'),
+                service('ekyna_resource.manager.factory'),
+            ])
+
         // Resupply
         ->set('ekyna_product.resupply', Stock\Resupply::class)
             ->args([

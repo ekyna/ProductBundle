@@ -451,6 +451,7 @@ product:
         convert: Convert the product <small>%name%</small>
         edit: Edit the product <small>%name%</small>
         remove: Remove the product <small>%name%</small>
+        adjust_stock: Adjust stock <small>%name%</small>
     button:
         list: Products list
         export: Catalog export
@@ -462,6 +463,7 @@ product:
         convert: Convert
         label: Label
         invalidate_offers: Recalculate offers and prices
+        adjust_stock: Adjust stock
     type:
         simple: Simple
         variable: Variable
@@ -513,6 +515,9 @@ product:
             to this product will be <strong>deleted</strong>.<br>
             For <strong>customer orders</strong> and <strong>supplier orders</strong>,
             lines associated to this product will be kept but associations will be <strong>deleted</strong>.
+        bundle_stock_adjust: >
+            This operation may generate <strong>many stock adjustments</strong> over many products.<br>
+            Please <strong>review this form</strong> before submitting it.
 
 product_media:
     label:

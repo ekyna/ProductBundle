@@ -23,7 +23,7 @@ class Attribute extends RM\AbstractTranslatable implements Model\AttributeInterf
     protected ?string $name   = null;
     protected ?string $type   = null;
     protected array   $config = [];
-    /** @var Collection<Model\AttributeChoiceInterface> */
+    /** @var Collection<int, Model\AttributeChoiceInterface> */
     protected Collection $choices;
 
     public function __construct()

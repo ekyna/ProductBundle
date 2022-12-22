@@ -29,7 +29,7 @@ class BundleChoice extends AbstractResource implements Model\BundleChoiceInterfa
     protected ?Decimal                   $netPrice             = null;
     protected bool                       $hidden               = true;
     protected bool                       $excludeImages        = true;
-    /** @var Collection<Model\BundleChoiceRuleInterface> */
+    /** @var Collection<int, Model\BundleChoiceRuleInterface> */
     protected Collection $rules;
 
     public function __construct()

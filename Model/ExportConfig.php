@@ -48,7 +48,7 @@ class ExportConfig
     private DateTimeInterface $validUntil;
     private string            $separator = ',';
     private string            $enclosure = '"';
-    /** @var Collection<BrandInterface> */
+    /** @var Collection<int, BrandInterface> */
     private Collection $brands;
 
     public function __construct(private readonly ContextInterface $context)
@@ -93,7 +93,7 @@ class ExportConfig
     }
 
     /**
-     * @return Collection<BrandInterface>
+     * @return Collection<int, BrandInterface>
      */
     public function getBrands(): Collection
     {

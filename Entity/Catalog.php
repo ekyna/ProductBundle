@@ -27,7 +27,7 @@ class Catalog extends AbstractResource implements CatalogInterface
     private ?string            $title       = null;
     private ?string            $description = null;
     private ?string            $slug        = null;
-    /** @var Collection<CatalogPage> */
+    /** @var Collection<int, CatalogPage> */
     private Collection $pages;
     private ?array     $options = null;
 
@@ -37,7 +37,7 @@ class Catalog extends AbstractResource implements CatalogInterface
     private bool              $displayPrices = false;
     private ?ContextInterface $context       = null;
     private ?string           $template      = null;
-    /** @var Collection<SaleItemInterface> */
+    /** @var Collection<int, SaleItemInterface> */
     private Collection $saleItems;
     /** (non-mapped) */
     private bool $save = false;

@@ -62,29 +62,29 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected ?Model\ProductInterface      $parent       = null;
     protected ?Model\AttributeSetInterface $attributeSet = null;
 
-    /** @var Collection<Model\ProductInterface> */
+    /** @var Collection<int, Model\ProductInterface> */
     protected Collection $variants;
-    /** @var Collection<Model\ProductAttributeInterface> */
+    /** @var Collection<int, Model\ProductAttributeInterface> */
     protected Collection $attributes;
-    /** @var Collection<Model\OptionGroupInterface> */
+    /** @var Collection<int, Model\OptionGroupInterface> */
     protected Collection $optionGroups;
-    /** @var Collection<Model\BundleSlotInterface> */
+    /** @var Collection<int, Model\BundleSlotInterface> */
     protected Collection $bundleSlots;
-    /** @var Collection<Model\ComponentInterface> */
+    /** @var Collection<int, Model\ComponentInterface> */
     protected Collection $components;
-    /** @var Collection<Model\CrossSellingInterface> */
+    /** @var Collection<int, Model\CrossSellingInterface> */
     protected Collection $crossSellings;
-    /** @var Collection<Model\SpecialOfferInterface> */
+    /** @var Collection<int, Model\SpecialOfferInterface> */
     protected Collection $specialOffers;
-    /** @var Collection<Model\PricingInterface> */
+    /** @var Collection<int, Model\PricingInterface> */
     protected Collection $pricings;
-    /** @var Collection<Model\CategoryInterface> */
+    /** @var Collection<int, Model\CategoryInterface> */
     protected Collection $categories;
-    /** @var Collection<CustomerGroupInterface> */
+    /** @var Collection<int, CustomerGroupInterface> */
     protected Collection $customerGroups;
-    /** @var Collection<Model\ProductMediaInterface> */
+    /** @var Collection<int, Model\ProductMediaInterface> */
     protected Collection $medias;
-    /** @var Collection<Model\ProductReferenceInterface> */
+    /** @var Collection<int, Model\ProductReferenceInterface> */
     protected Collection $references;
 
     public function __construct()

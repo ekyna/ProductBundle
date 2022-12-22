@@ -453,6 +453,7 @@ product:
         convert: Convertir le produit <small>%name%</small>
         edit: Modifier le produit <small>%name%</small>
         remove: Supprimer le produit <small>%name%</small>
+        adjust_stock: Ajuster le stock <small>%name%</small>
     button:
         list: Liste des produits
         export: Export catalogue
@@ -464,6 +465,7 @@ product:
         convert: Convertir
         label: Étiquette
         invalidate_offers: Recalculer les offres et tarifs
+        adjust_stock: Ajuster le stock
     type:
         simple: Simple
         variable: Variable
@@ -516,6 +518,9 @@ product:
             ce produit vont être <strong>supprimées</strong>.<br>
             Pour les <strong>commandes clients</strong> et <strong>fournisseurs</strong>,
             les lignes seront conservées mais les associations à ce produit vont être <strong>supprimées</strong>.
+        bundle_stock_adjust: >
+            Cette opération peut générer un <strong>grand nombre d'ajustements</strong> de stocks sur de nombreux produits.<br>
+            Veuillez <strong>vérifier votre saisie</strong> avant de soumettre ce formulaire.
 
 product_media:
     label:

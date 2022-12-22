@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleStockAdjustmentValidator;
 use Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductAttributeValidator;
 use Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductTranslationValidator;
 use Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator;
@@ -12,6 +13,13 @@ use Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator;
 return static function (ContainerConfigurator $container) {
     $container
         ->services()
+
+        // Bundle stock adjustment constraint validator
+        ->set('ekyna_product.validator.bundle_stock_adjustment', BundleStockAdjustmentValidator::class)
+            ->args([
+                service('ekyna_product.bundle_stock_adjuster'),
+            ])
+            ->tag('validator.constraint_validator')
 
         // Product constraint validator
         ->set('ekyna_product.validator.product', ProductValidator::class)

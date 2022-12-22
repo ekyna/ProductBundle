@@ -26,9 +26,9 @@ class BundleSlot extends AbstractTranslatable implements Model\BundleSlotInterfa
 
     protected ?Model\ProductInterface $bundle = null;
     protected bool                    $required = true;
-    /** @var Collection<Model\BundleChoiceInterface> */
+    /** @var Collection<int, Model\BundleChoiceInterface> */
     protected Collection $choices;
-    /** @var Collection<Model\BundleSlotRuleInterface> */
+    /** @var Collection<int, Model\BundleSlotRuleInterface> */
     protected Collection $rules;
 
     public function __construct()

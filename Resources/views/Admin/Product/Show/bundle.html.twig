@@ -12,7 +12,6 @@
     </li>
 {% endblock pricing_tab %}
 
-
 {% block general_content %}
     {{ parent() }}
     {{ _product.show_categories(product) }}
@@ -49,3 +48,9 @@
     {{ _product.show_references(product) }}
     {{ _product.show_bundle_composition(product) }}
 {% endblock pricing_content %}
+
+
+{%- block stock_actions -%}
+    {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\AdjustStockAction') }}
+    {{ parent() }}
+{%- endblock stock_actions -%}

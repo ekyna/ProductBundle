@@ -27,7 +27,7 @@ class OptionGroup extends RM\AbstractTranslatable implements Model\OptionGroupIn
     protected ?string                 $name      = null;
     protected bool                    $required  = false;
     protected bool                    $fullTitle = false;
-    /** @var Collection<Model\OptionInterface> */
+    /** @var Collection<int, Model\OptionInterface> */
     protected Collection $options;
 
     public function __construct()

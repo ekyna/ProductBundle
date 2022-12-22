@@ -349,6 +349,7 @@ resources:
                 admin_toggle:
                     properties: visible
                 admin_tinymce: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\AdjustStockAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\AttributesFormAction:
                     expose: true
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\CreateAction: ~

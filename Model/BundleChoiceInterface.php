@@ -56,7 +56,7 @@ interface BundleChoiceInterface extends ResourceInterface, SortableInterface, Co
     public function setHidden(bool $hidden): BundleChoiceInterface;
 
     /**
-     * @return Collection<BundleChoiceRuleInterface>
+     * @return Collection<int, BundleChoiceRuleInterface>
      */
     public function getRules(): Collection;
 
@@ -70,7 +70,7 @@ interface BundleChoiceInterface extends ResourceInterface, SortableInterface, Co
     public function removeRule(BundleChoiceRuleInterface $rule): BundleChoiceInterface;
 
     /**
-     * @param Collection<BundleChoiceRuleInterface> $rules
+     * @param Collection<int, BundleChoiceRuleInterface> $rules
      *
      * @internal
      */

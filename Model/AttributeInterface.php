@@ -39,12 +39,12 @@ interface AttributeInterface extends RM\SortableInterface, RM\TranslatableInterf
     public function setTitle(?string $title): AttributeInterface;
 
     /**
-     * @return Collection<AttributeChoiceInterface>
+     * @return Collection<int, AttributeChoiceInterface>
      */
     public function getChoices(): Collection;
 
     /**
-     * @param Collection<AttributeChoiceInterface> $choices
+     * @param Collection<int, AttributeChoiceInterface> $choices
      *
      * @internal
      */

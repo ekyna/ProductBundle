@@ -24,7 +24,7 @@ interface ProductAttributeInterface extends ResourceInterface, CopyInterface
     public function setAttributeSlot(?AttributeSlotInterface $slot): ProductAttributeInterface;
 
     /**
-     * @return Collection<AttributeChoiceInterface>
+     * @return Collection<int, AttributeChoiceInterface>
      */
     public function getChoices(): Collection;
 

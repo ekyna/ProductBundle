@@ -36,7 +36,7 @@ class ProductAttributesTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        /** @var Collection<Model\ProductAttributeInterface> $value */
+        /** @var Collection<int, Model\ProductAttributeInterface> $value */
         if ($value instanceof Collection) {
             $array = $value->toArray();
         } else {

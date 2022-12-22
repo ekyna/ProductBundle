@@ -50,7 +50,7 @@ interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInte
     public function setFullTitle(bool $full): OptionGroupInterface;
 
     /**
-     * @return Collection<OptionInterface>
+     * @return Collection<int, OptionInterface>
      */
     public function getOptions(): Collection;
 
@@ -64,7 +64,7 @@ interface OptionGroupInterface extends RM\TranslatableInterface, RM\SortableInte
     public function removeOption(OptionInterface $option): OptionGroupInterface;
 
     /**
-     * @param Collection<OptionInterface> $options
+     * @param Collection<int, OptionInterface> $options
      *
      * @internal
      */

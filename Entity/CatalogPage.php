@@ -19,7 +19,7 @@ class CatalogPage
     private ?CatalogInterface $catalog  = null;
     private ?int              $number   = null;
     private ?string           $template = null;
-    /** @var Collection<CatalogSlot>|array<CatalogSlot> */
+    /** @var Collection<int, CatalogSlot> */
     private Collection $slots;
     private array      $options;
 
@@ -81,7 +81,7 @@ class CatalogPage
     }
 
     /**
-     * @return Collection<CatalogSlot>|array<CatalogSlot>
+     * @return Collection<int, CatalogSlot>
      */
     public function getSlots(): Collection
     {

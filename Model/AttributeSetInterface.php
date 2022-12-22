@@ -20,7 +20,7 @@ interface AttributeSetInterface extends ResourceInterface, Comparable
     public function setName(?string $name): AttributeSetInterface;
 
     /**
-     * @return Collection<AttributeSlotInterface>
+     * @return Collection<int, AttributeSlotInterface>
      */
     public function getSlots(): Collection;
 
@@ -31,7 +31,7 @@ interface AttributeSetInterface extends ResourceInterface, Comparable
     public function removeSlot(AttributeSlotInterface $slot): AttributeSetInterface;
 
     /**
-     * @param Collection<AttributeSlotInterface> $slots
+     * @param Collection<int, AttributeSlotInterface> $slots
      *
      * @internal
      */

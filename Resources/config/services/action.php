@@ -54,6 +54,13 @@ return static function (ContainerConfigurator $container) {
             ->tag('ekyna_resource.action')
 
         // Product actions
+        ->set('ekyna_product.action.admin.product.adjust_stock', Product\AdjustStockAction::class)
+            ->args([
+                service('ekyna_product.bundle_stock_adjuster'),
+                service('doctrine.orm.default_entity_manager'),
+            ])
+            ->tag('ekyna_resource.action')
+
         ->set('ekyna_product.action.admin.product.attributes_form', Product\AttributesFormAction::class)
             ->args([
                 service('ekyna_product.builder.product_form'),

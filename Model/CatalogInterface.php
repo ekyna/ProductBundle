@@ -40,7 +40,7 @@ interface CatalogInterface extends ResourceInterface, TimestampableInterface
     public function setSlug(?string $slug): CatalogInterface;
 
     /**
-     * @return Collection<CatalogPage>
+     * @return Collection<int, CatalogPage>
      */
     public function getPages(): Collection;
 
@@ -69,7 +69,7 @@ interface CatalogInterface extends ResourceInterface, TimestampableInterface
     public function setTemplate(string $template): CatalogInterface;
 
     /**
-     * @return Collection<SaleItemInterface>
+     * @return Collection<int, SaleItemInterface>
      */
     public function getSaleItems(): Collection;
 

@@ -304,6 +304,30 @@
         </property>
     </class>
 
+    <class name="Ekyna\Bundle\ProductBundle\Model\BundleStockAdjustment">
+        <property name="quantity">
+            <constraint name="NotBlank"/>
+            <constraint name="GreaterThan">
+                <option name="value">0</option>
+            </constraint>
+        </property>
+        <property name="reason">
+            <constraint name="NotBlank"/>
+            <constraint name="Choice">
+                <option name="callback">
+                    <value>Ekyna\Component\Commerce\Stock\Model\StockAdjustmentReasons</value>
+                    <value>getReasons</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="note">
+            <constraint name="Length">
+                <option name="max">255</option>
+            </constraint>
+        </property>
+        <constraint name="Ekyna\Bundle\ProductBundle\Validator\Constraints\BundleStockAdjustment"/>
+    </class>
+
     <class name="Ekyna\Bundle\ProductBundle\Entity\Catalog">
         <property name="title">
             <constraint name="NotBlank">

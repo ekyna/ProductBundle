@@ -31,7 +31,7 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     public function setProduct(?ProductInterface $product): PricingInterface;
 
     /**
-     * @return Collection<CustomerGroupInterface>
+     * @return Collection<int, CustomerGroupInterface>
      */
     public function getCustomerGroups(): Collection;
 
@@ -42,7 +42,7 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     public function removeCustomerGroup(CustomerGroupInterface $group): PricingInterface;
 
     /**
-     * @return Collection<PricingGroupInterface>
+     * @return Collection<int, PricingGroupInterface>
      */
     public function getPricingGroups(): Collection;
 
@@ -53,7 +53,7 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     public function removePricingGroup(PricingGroupInterface $group): PricingInterface;
 
     /**
-     * @return Collection<CountryInterface>
+     * @return Collection<int, CountryInterface>
      */
     public function getCountries(): Collection;
 
@@ -64,7 +64,7 @@ interface PricingInterface extends TaggedEntityInterface, TrackAssociationInterf
     public function removeCountry(CountryInterface $country): PricingInterface;
 
     /**
-     * @return Collection<BrandInterface>
+     * @return Collection<int, BrandInterface>
      */
     public function getBrands(): Collection;
 
