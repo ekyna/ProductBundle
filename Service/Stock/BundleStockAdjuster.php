@@ -5,22 +5,12 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use Decimal\Decimal;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
-use Ekyna\Bundle\ProductBundle\Model\BundleStockAdjustment;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\ProductBundle\Model\ProductStockUnitInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Repository\ProductStockUnitRepository;
-use Ekyna\Component\Commerce\Exception\StockLogicException;
-use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentInterface;
-use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentReasons;
-use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
-use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
-use Ekyna\Component\Resource\Factory\ResourceFactoryInterface;
-use Ekyna\Component\Resource\Manager\ManagerFactoryInterface;
-use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
-
-use function array_push;
+use Ekyna\Component\Commerce\Stock\Helper\AdjustHelper;
+use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentData;
 
 use const INF;
 
@@ -31,25 +21,20 @@ use const INF;
  */
 class BundleStockAdjuster
 {
-    private BundleStockAdjustment $model;
+    private StockAdjustmentData $data;
 
     public function __construct(
-        private readonly ResourceFactoryInterface   $stockAdjustmentFactory,
-        private readonly ProductStockUnitRepository $stockUnitRepository,
-        private readonly ResourceFactoryInterface   $stockUnitFactory,
-        private readonly ManagerFactoryInterface $managerFactory,
+        private readonly AdjustHelper $helper,
     ) {
     }
 
-    public function apply(BundleStockAdjustment $adjustment): void
+    public function apply(StockAdjustmentData $data): void
     {
-        if (!ProductTypes::isBundleType($adjustment->bundle)) {
-            throw new UnexpectedValueException('Expected bundle product');
-        }
+        $subject = $this->getProduct($data);
 
-        $this->model = $adjustment;
+        $this->data = $data;
 
-        $this->applyProduct($adjustment->bundle, $adjustment->quantity);
+        $this->applyProduct($subject, $data->quantity);
     }
 
     private function applyProduct(ProductInterface $product, Decimal $quantity): void
@@ -66,83 +51,21 @@ class BundleStockAdjuster
             return;
         }
 
-        if (StockSubjectModes::MODE_DISABLED === $product->getStockMode()) {
-            return;
-        }
-
-        if (StockAdjustmentReasons::isDebitReason($this->model->reason)) {
-            $this->debitProduct($product, $quantity);
-
-            return;
-        }
-
-        $this->creditProduct($product, $quantity);
+        $this->helper->adjust(new StockAdjustmentData(
+            $product,
+            $quantity,
+            $this->data->reason,
+            $this->data->note
+        ));
     }
 
-    private function debitProduct(ProductInterface $product, Decimal $quantity): void
+    public function calculateMaxDebit(StockAdjustmentData $data): Decimal
     {
-        $units = $this->getChildStockUnits($product, true);
+        $subject = $this->getProduct($data);
 
-        foreach ($units as $unit) {
-            $qty = min($unit->getShippableQuantity(), $quantity);
+        $this->data = $data;
 
-            $adjustment = $this->createAdjustment();
-            $adjustment
-                ->setStockUnit($unit)
-                ->setQuantity($qty);
-
-            $this->getAdjustmentManager()->persist($adjustment);
-
-            $quantity -= $qty;
-
-            if ($quantity->isZero()) {
-                return;
-            }
-        }
-
-        if (!$quantity->isZero()) {
-            throw new StockLogicException('Failed to adjust bundle child.');
-        }
-    }
-
-    private function creditProduct(ProductInterface $product, Decimal $quantity): void
-    {
-        $units = $this->getChildStockUnits($product, false);
-
-        if (null === $unit = array_shift($units)) {
-            /** @var StockUnitInterface $unit */
-            $unit = $this->stockUnitFactory->create();
-            $unit->setSubject($product);
-
-            $this->getUnitManager()->persist($unit); // Should be stockUnitManager.
-        }
-
-        $adjustment = $this->createAdjustment();
-        $adjustment
-            ->setStockUnit($unit)
-            ->setQuantity($quantity);
-
-        $this->getAdjustmentManager()->persist($adjustment);
-    }
-
-    private function createAdjustment(): StockAdjustmentInterface
-    {
-        /** @var StockAdjustmentInterface $adjustment */
-        $adjustment = $this->stockAdjustmentFactory->create();
-        $adjustment
-            ->setReason($this->model->reason)
-            ->setNote($this->model->note);
-
-        return $adjustment;
-    }
-
-    public function calculateMaxDebit(BundleStockAdjustment $adjustment): Decimal
-    {
-        if (!ProductTypes::isBundleType($adjustment->bundle)) {
-            throw new UnexpectedValueException('Expected bundle product');
-        }
-
-        return $this->calculateProductMaxDebit($adjustment->bundle);
+        return $this->calculateProductMaxDebit($subject);
     }
 
     private function calculateProductMaxDebit(ProductInterface $product): Decimal
@@ -169,44 +92,21 @@ class BundleStockAdjuster
             throw new UnexpectedValueException('Unexpected product type.');
         }
 
-        if (StockSubjectModes::MODE_DISABLED === $product->getStockMode()) {
-            return new Decimal(INF);
-        }
-
-        $quantity = new Decimal(0);
-
-        $units = $this->getChildStockUnits($product, true);
-
-        foreach ($units as $unit) {
-            $quantity += $unit->getShippableQuantity();
-        }
-
-        return $quantity;
+        return $this->helper->calculateMaxDebit($product);
     }
 
-    /**
-     * @return iterable<int, StockUnitInterface>
-     */
-    private function getChildStockUnits(ProductInterface $product, bool $debitIntent): iterable
+    private function getProduct(StockAdjustmentData $data): ProductInterface
     {
-        $units = $this->stockUnitRepository->findNotClosedBySubject($product);
+        $subject = $data->subject;
 
-        if (!$debitIntent) {
-            array_push($units, ...$this->stockUnitRepository->findLatestClosedBySubject($product, 1));
+        if (!$subject instanceof ProductInterface) {
+            throw new UnexpectedTypeException($subject, ProductInterface::class);
         }
 
-        // TODO Sort ?
+        if (!ProductTypes::isBundleType($subject)) {
+            throw new UnexpectedValueException('Expected bundle product');
+        }
 
-        return $units;
-    }
-
-    private function getAdjustmentManager(): ResourceManagerInterface
-    {
-        return $this->managerFactory->getManager(StockAdjustmentInterface::class);
-    }
-
-    private function getUnitManager(): ResourceManagerInterface
-    {
-        return $this->managerFactory->getManager(ProductStockUnitInterface::class);
+        return $subject;
     }
 }

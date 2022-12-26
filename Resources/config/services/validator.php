@@ -11,42 +11,45 @@ use Ekyna\Bundle\ProductBundle\Validator\Constraints\ProductValidator;
 use Ekyna\Bundle\ProductBundle\Validator\Constraints\VariantValidator;
 
 return static function (ContainerConfigurator $container) {
-    $container
-        ->services()
+    $services = $container->services();
 
-        // Bundle stock adjustment constraint validator
+    // Bundle stock adjustment constraint validator
+    $services
         ->set('ekyna_product.validator.bundle_stock_adjustment', BundleStockAdjustmentValidator::class)
-            ->args([
-                service('ekyna_product.bundle_stock_adjuster'),
-            ])
-            ->tag('validator.constraint_validator')
+        ->args([
+            service('ekyna_product.bundle_stock_adjuster'),
+        ])
+        ->tag('validator.constraint_validator');
 
-        // Product constraint validator
+    // Product constraint validator
+    $services
         ->set('ekyna_product.validator.product', ProductValidator::class)
-            ->args([
-                service('ekyna_product.repository.product'),
-            ])
-            ->tag('validator.constraint_validator')
+        ->args([
+            service('ekyna_product.repository.product'),
+        ])
+        ->tag('validator.constraint_validator');
 
-        // Product translation constraint validator
+    // Product translation constraint validator
+    $services
         ->set('ekyna_product.validator.product_translation', ProductTranslationValidator::class)
-            ->args([
-                service('ekyna_product.repository.product_translation'),
-            ])
-            ->tag('validator.constraint_validator')
+        ->args([
+            service('ekyna_product.repository.product_translation'),
+        ])
+        ->tag('validator.constraint_validator');
 
-        // Variant constraint validator
+    // Variant constraint validator
+    $services
         ->set('ekyna_product.validator.variant', VariantValidator::class)
-            ->args([
-                service('ekyna_resource.provider.locale'),
-            ])
-            ->tag('validator.constraint_validator')
+        ->args([
+            service('ekyna_resource.provider.locale'),
+        ])
+        ->tag('validator.constraint_validator');
 
-        // Product attribute constraint validator
+    // Product attribute constraint validator
+    $services
         ->set('ekyna_product.validator.product_attribute', ProductAttributeValidator::class)
-            ->args([
-                service('ekyna_product.registry.attribute_type'),
-            ])
-            ->tag('validator.constraint_validator')
-    ;
+        ->args([
+            service('ekyna_product.registry.attribute_type'),
+        ])
+        ->tag('validator.constraint_validator');
 };

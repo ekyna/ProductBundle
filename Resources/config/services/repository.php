@@ -13,53 +13,58 @@ use Ekyna\Bundle\ProductBundle\Repository\StatCountRepository;
 use Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository;
 
 return static function (ContainerConfigurator $container) {
-    $container
-        ->services()
+    $services = $container->services();
 
-        // Inventory product repository
+    // Inventory product repository
+    $services
         ->set('ekyna_product.repository.inventory_product', InventoryProductRepository::class)
-            ->args([
-                service('doctrine'),
-            ])
-            ->tag('doctrine.repository_service')
+        ->args([
+            service('doctrine'),
+        ])
+        ->tag('doctrine.repository_service');
 
-        // Product bookmark repository
+    // Product bookmark repository
+    $services
         ->set('ekyna_product.repository.product_bookmark', ProductBookmarkRepository::class)
-            ->args([
-                service('doctrine'),
-            ])
-            ->tag('doctrine.repository_service')
+        ->args([
+            service('doctrine'),
+        ])
+        ->tag('doctrine.repository_service');
 
-        // Product translation repository
+    // Product translation repository
+    $services
         ->set('ekyna_product.repository.product_translation', ProductTranslationRepository::class)
-            ->args([
-                service('doctrine'),
-                param('ekyna_product.class.product_translation'),
-            ])
-            ->tag('doctrine.repository_service')
+        ->args([
+            service('doctrine'),
+            param('ekyna_product.class.product_translation'),
+        ])
+        ->tag('doctrine.repository_service');
 
-        // Offer repository
+    // Offer repository
+    $services
         ->set('ekyna_product.repository.offer', OfferRepository::class)
-            ->call('setCachedCountryCodes', [param('ekyna_commerce.cache.countries')])
+        ->call('setCachedCountryCodes', [param('ekyna_commerce.cache.countries')]);
 
-        // Price repository
+    // Price repository
+    $services
         ->set('ekyna_product.repository.price', PriceRepository::class)
-            ->call('setCachedCountryCodes', [param('ekyna_commerce.cache.countries')])
+        ->call('setCachedCountryCodes', [param('ekyna_commerce.cache.countries')]);
 
-        // Stat count repository
+    // Stat count repository
+    $services
         ->set('ekyna_product.repository.stat_count', StatCountRepository::class)
-            ->args([
-                service('doctrine'),
-            ])
-            ->call('setLocaleProvider', [service('ekyna_resource.provider.locale')])
-            ->tag('doctrine.repository_service')
+        ->args([
+            service('doctrine'),
+        ])
+        ->call('setLocaleProvider', [service('ekyna_resource.provider.locale')])
+        ->tag('doctrine.repository_service');
 
-        // Stat cross repository
+    // Stat cross repository
+    $services
         ->set('ekyna_product.repository.stat_cross', StatCrossRepository::class)
-            ->args([
-                service('doctrine'),
-            ])
-            ->call('setLocaleProvider', [service('ekyna_resource.provider.locale')])
-            ->tag('doctrine.repository_service')
-    ;
+        ->args([
+            service('doctrine'),
+        ])
+        ->call('setLocaleProvider', [service('ekyna_resource.provider.locale')])
+        ->tag('doctrine.repository_service');
 };

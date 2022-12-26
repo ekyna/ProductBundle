@@ -6,10 +6,10 @@ namespace Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
+use Ekyna\Bundle\AdminBundle\Action\Util\BreadcrumbTrait;
+use Ekyna\Bundle\CommerceBundle\Form\Type\Stock\StockAdjustmentDataType;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
-use Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleStockAdjustmentType;
-use Ekyna\Bundle\ProductBundle\Model\BundleStockAdjustment;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Stock\BundleStockAdjuster;
@@ -18,6 +18,7 @@ use Ekyna\Bundle\ResourceBundle\Action\FormTrait;
 use Ekyna\Bundle\ResourceBundle\Action\HelperTrait;
 use Ekyna\Bundle\ResourceBundle\Action\TemplatingTrait;
 use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
+use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentData;
 use Ekyna\Component\Resource\Action\Permission;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +33,7 @@ class AdjustStockAction extends AbstractAction implements AdminActionInterface
     use FormTrait;
     use HelperTrait;
     use TemplatingTrait;
+    use BreadcrumbTrait;
 
     public function __construct(
         private readonly BundleStockAdjuster    $adjuster,
@@ -50,9 +52,11 @@ class AdjustStockAction extends AbstractAction implements AdminActionInterface
             throw new UnexpectedValueException('Expected bundle product');
         }
 
-        $adjustment = new BundleStockAdjustment($product);
+        $adjustment = new StockAdjustmentData($product);
 
-        $form = $this->createForm(BundleStockAdjustmentType::class, $adjustment);
+        $form = $this->createForm(StockAdjustmentDataType::class, $adjustment, [
+            'validation_groups' => ['Default', 'BundleAdjustment']
+        ]);
 
         FormUtil::addFooter($form, [
             'cancel_path' => $this->generateResourcePath($this->context->getResource()),
@@ -69,6 +73,8 @@ class AdjustStockAction extends AbstractAction implements AdminActionInterface
                 $this->generateResourcePath($product)
             );
         }
+
+        $this->breadcrumbFromContext($this->context);
 
         $config = $this->context->getConfig();
 

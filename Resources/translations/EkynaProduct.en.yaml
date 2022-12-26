@@ -292,6 +292,7 @@ inventory:
     header:
         list: Inventories <small>List</small>
         show: Inventory detail <small>%name%</small>
+        remove: Delete inventory <small>%name%</small>
     button:
         list: Inventories list
         show: Inventory detail

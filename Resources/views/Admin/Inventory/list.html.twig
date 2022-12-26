@@ -1,5 +1,11 @@
 {% extends '@EkynaAdmin/Entity/Crud/list.html.twig' %}
 
 {% block actions %}
+{% if has_opened_inventory() %}
+<a href="{{ path('admin_ekyna_product_inventory_app_index') }}" class="btn btn-sm btn-default" target="_blank">
+    <i class="glyphicon glyphicon-new-window"></i>
+    {{ 'inventory.label.singular'|trans({}, 'EkynaProduct') }}
+</a>
+{% endif %}
 {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Inventory\\CreateAction') }}
 {% endblock actions %}

@@ -220,10 +220,12 @@ resources:
             table: Ekyna\Bundle\ProductBundle\Table\Type\InventoryType
             trans_domain: EkynaProduct
             actions:
-                admin_list:
-                    template: '@EkynaProduct/Admin/Inventory/list.html.twig'
-                admin_read:
-                    template: '@EkynaProduct/Admin/Inventory/read.html.twig'
+                admin_crud:
+                    create: false
+                    update: false
+                    list: '@EkynaProduct/Admin/Inventory/list.html.twig'
+                    read: '@EkynaProduct/Admin/Inventory/read.html.twig'
+                    delete: '@EkynaProduct/Admin/Inventory/delete.html.twig'
                 Ekyna\Bundle\ProductBundle\Action\Admin\Inventory\CreateAction: ~
 
         option:

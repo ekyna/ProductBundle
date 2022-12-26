@@ -7,8 +7,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Ekyna\Bundle\ProductBundle\Controller\Account\CatalogController;
 use Ekyna\Bundle\ProductBundle\Controller\Account\ProductController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
-use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\StockView;
 
 return static function (ContainerConfigurator $container) {

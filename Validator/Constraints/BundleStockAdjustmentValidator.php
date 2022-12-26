@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
-use Ekyna\Bundle\ProductBundle\Model\BundleStockAdjustment as Adjustment;
 use Ekyna\Bundle\ProductBundle\Service\Stock\BundleStockAdjuster;
+use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentData;
 use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentReasons;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\LessThan;
@@ -30,8 +30,8 @@ class BundleStockAdjustmentValidator extends ConstraintValidator
             return;
         }
 
-        if (!$value instanceof Adjustment) {
-            throw new UnexpectedTypeException($value, Adjustment::class);
+        if (!$value instanceof StockAdjustmentData) {
+            throw new UnexpectedTypeException($value, StockAdjustmentData::class);
         }
         if (!$constraint instanceof BundleStockAdjustment) {
             throw new UnexpectedTypeException($constraint, BundleStockAdjustment::class);

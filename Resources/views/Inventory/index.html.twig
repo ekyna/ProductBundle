@@ -11,15 +11,26 @@
 </div>
 <form id="controls" onsubmit="return false">
     <p>
+        <button type="button" id="reload_list">
+            <i class="fa fa-refresh"></i>
+        </button>
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" id="display_zero" value="1">
+            À zéro
+        </label>
+    </p>
+    <p>
         <label>
             <input type="checkbox" id="display_valid" value="1">
-            Produits déjà comptés
+            Déjà comptés
         </label>
     </p>
     <p>
         <label>
             <input type="checkbox" id="display_end_of_life" value="1">
-            Produits en fin de vie
+            En fin de vie
         </label>
     </p>
 </form>

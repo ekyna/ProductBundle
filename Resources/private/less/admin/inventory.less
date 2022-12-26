@@ -1,4 +1,3 @@
-
 #closed {
     width: 100%;
     height: 100%;
@@ -23,7 +22,7 @@
     align-content: center;
 
     > p {
-        font-size: 6vw;
+        font-size: 5vw;
     }
 }
 
@@ -50,6 +49,10 @@
 
 #inventory_list {
     > div {
+        &[data-zero="1"] {
+            display: none;
+        }
+
         &[data-valid="1"] {
             display: none;
         }
@@ -134,16 +137,22 @@
         }
     }
 
-    &.display-valid {
+    &.display-zero {
         > div {
-            &[data-valid="1"] {
-                display: block;
-            }
-            &[data-end-of-life="1"] {
-                display: none;
+            &[data-zero="1"] {
+                display: block !important;
             }
         }
     }
+
+    &.display-valid {
+        > div {
+            &[data-valid="1"] {
+                display: block !important;
+            }
+        }
+    }
+
     &.display-end-of-life {
         > div {
             &[data-end-of-life="1"] {

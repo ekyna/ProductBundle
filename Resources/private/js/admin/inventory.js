@@ -7,15 +7,23 @@ define(
             $wait = $('#inventory_wait'),
             $none = $('#inventory_none'),
             route_prefix = 'admin_ekyna_product_inventory_app_',
+            $reloadList = $('#reload_list'),
+            $displayZero = $('#display_zero'),
             $displayValid = $('#display_valid'),
             $displayEndOfLife = $('#display_end_of_life');
 
         let busy = false,
+            display_zero = $displayZero.prop('checked'),
             display_valid = $displayValid.prop('checked'),
             display_end_of_life = $displayEndOfLife.prop('checked');
 
 
         function toggleRows() {
+            if (display_zero) {
+                $list.addClass('display-zero');
+            } else {
+                $list.removeClass('display-zero');
+            }
             if (display_valid) {
                 $list.addClass('display-valid');
             } else {
@@ -171,14 +179,32 @@ define(
                 });
         }
 
+        $reloadList.on('click', () => {
+            $reloadList.blur();
+
+            list()
+        });
+
+        $displayZero.on('change', () => {
+            display_zero = $displayZero.prop('checked');
+
+            $displayZero.blur();
+
+            toggleRows();
+        });
+
         $displayValid.on('change', () => {
             display_valid = $displayValid.prop('checked');
+
+            $displayValid.blur();
 
             toggleRows();
         });
 
         $displayEndOfLife.on('change', () => {
             display_end_of_life = $displayEndOfLife.prop('checked');
+
+            $displayEndOfLife.blur();
 
             toggleRows();
         });
