@@ -203,7 +203,11 @@ class PriceCalculator
     {
         $price = new Decimal(0);
 
-        foreach ($product->getComponents() as $component) {
+        $components = Model\ProductTypes::isVariantType($product)
+            ? $product->getParent()->getComponents()
+            : $product->getComponents();
+
+        foreach ($components as $component) {
             if (is_null($p = $component->getNetPrice())) {
                 $p = $component->getChild()->getNetPrice();
             }
@@ -273,8 +277,6 @@ class PriceCalculator
         if (null === $price) {
             $price = $lowestVariant ?: new Decimal(0);
         }
-
-        $price += $this->calculateComponentsPrice($variable);
 
         return $price;
     }
@@ -384,8 +386,6 @@ class PriceCalculator
         }
 
         $price += $this->calculateMinOptionsPrice($configurable, $exclude);
-
-        $price += $this->calculateComponentsPrice($configurable);
 
         return $price;
     }

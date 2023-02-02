@@ -546,6 +546,7 @@ class ItemBuilder
         $this->buildFromProduct($item, $component->getChild());
 
         $item
+            ->setDatum(self::COMPONENT_ID, $component->getId())
             ->setQuantity(clone $component->getQuantity())
             ->setPrivate(true)
             ->setImmutable(true)
@@ -609,6 +610,8 @@ class ItemBuilder
             $child = $item->createChild();
 
             $this->buildFromComponent($child, $component);
+
+            $componentIds[] = $component->getId();
         }
 
         $this->cleanUpComponents($item, $componentIds);
