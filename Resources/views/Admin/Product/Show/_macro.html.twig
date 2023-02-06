@@ -153,6 +153,22 @@
 {%- endmacro show_medias -%}
 
 
+{%- macro show_internal_manual(product, options = {}) -%}
+    {{- show_row(product.internalManual, 'media_media', {
+        'label': t('product.field.internal_manual', [], 'EkynaProduct'),
+        'id': 'product_internal_manual'
+    }|merge(options)) -}}
+{%- endmacro show_internal_manual -%}
+
+
+{%- macro show_external_manual(product, options = {}) -%}
+    {{- show_row(product.externalManual, 'url', {
+        'label': t('product.field.external_manual', [], 'EkynaProduct'),
+        'id': 'product_external_manual'
+    }|merge(options)) -}}
+{%- endmacro show_external_manual -%}
+
+
 {%- macro show_notContractual(product, options = {}) -%}
     {{- show_row(product.notContractual, 'boolean', {
         'label': t('product.field.not_contractual', [], 'EkynaProduct'),

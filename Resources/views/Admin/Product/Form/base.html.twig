@@ -60,6 +60,14 @@
                 {{ form_row(form.translations) }}
                 {{ form_row(form.medias) }}
                 {{ form_row(form.notContractual) }}
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form_row(form.internalManual, {'label_col': 6, 'widget_col': 6}) }}
+                    </div>
+                    <div class="col-md-8">
+                        {{ form_row(form.externalManual, {'label_col': 3, 'widget_col': 9}) }}
+                    </div>
+                </div>
             {% endblock content_content %}
         </div>
         {% endblock content_pane %}

@@ -100,6 +100,14 @@ interface ProductInterface extends
 
     public function setStatUpdatedAt(?DateTimeInterface $date): ProductInterface;
 
+    public function getInternalManual(): ?MediaInterface;
+
+    public function setInternalManual(?MediaInterface $internalManual): ProductInterface;
+
+    public function getExternalManual(): ?string;
+
+    public function setExternalManual(?string $externalManual): ProductInterface;
+
     /**
      * Returns whether to include brand in full designation and title.
      */
@@ -278,7 +286,7 @@ interface ProductInterface extends
      */
     public function getComponents(): Collection;
 
-    public function hasComponents():bool;
+    public function hasComponents(): bool;
 
     public function hasComponent(ComponentInterface $component): bool;
 

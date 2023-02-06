@@ -8,6 +8,7 @@ use A2lix\TranslationFormBundle\Form\Type\TranslationsFormsType;
 use Ekyna\Bundle\CmsBundle\Form\Type\SeoType;
 use Ekyna\Bundle\CmsBundle\Form\Type\TagChoiceType;
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\MentionsType;
+use Ekyna\Bundle\MediaBundle\Form\Type\MediaChoiceType;
 use Ekyna\Bundle\MediaBundle\Form\Type\MediaCollectionType;
 use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
@@ -218,6 +219,36 @@ class ProductFormBuilder
         }*/
 
         $this->form->add('crossSellings', PR\CrossSelling\CrossSellingsType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the external manual field.
+     */
+    public function addExternalManualField(array $options = []): ProductFormBuilder
+    {
+        $options = array_replace([
+            'label'    => t('product.field.external_manual', [], 'EkynaProduct'),
+            'required' => false,
+        ], $options);
+
+        $this->form->add('externalManual', SF\UrlType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the internal manual field.
+     */
+    public function addInternalManualField(array $options = []): ProductFormBuilder
+    {
+        $options = array_replace([
+            'label'    => t('product.field.internal_manual', [], 'EkynaProduct'),
+            'required' => false,
+        ], $options);
+
+        $this->form->add('internalManual', MediaChoiceType::class, $options);
 
         return $this;
     }

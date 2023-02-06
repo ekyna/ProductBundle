@@ -137,6 +137,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addAttributesField($product->getAttributeSet())
             ->addMediasField()
             ->addNotContractualField()
+            ->addInternalManualField()
+            ->addExternalManualField()
             ->addCrossSellingsField()
             ->addOptionGroupsField()
             ->addSpecialOffersField()
@@ -195,6 +197,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addAttributeSetField()
             ->addMediasField()
             ->addNotContractualField()
+            ->addInternalManualField()
+            ->addExternalManualField()
             ->addCrossSellingsField()
             // Pricing
             ->addComponentsField()
@@ -250,6 +254,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addAttributesField($product->getParent()->getAttributeSet())
             ->addMediasField()
             ->addNotContractualField()
+            ->addInternalManualField()
+            ->addExternalManualField()
             // Pricing
             ->addOptionGroupsField()
             ->addSpecialOffersField()
@@ -313,6 +319,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTranslationsField()
             ->addMediasField()
             ->addNotContractualField()
+            ->addInternalManualField()
+            ->addExternalManualField()
             ->addCrossSellingsField()
             // Pricing
             ->addReferencesField()
@@ -368,6 +376,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addTranslationsField()
             ->addMediasField()
             ->addNotContractualField()
+            ->addInternalManualField()
+            ->addExternalManualField()
             ->addCrossSellingsField()
             // Pricing
             ->addBundleSlotsField(['configurable' => true])

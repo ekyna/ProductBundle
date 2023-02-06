@@ -47,6 +47,9 @@
 
         <field name="statUpdatedAt" column="stat_updated_at" type="datetime" nullable="true"/>
 
+        <!-- TODO internalManual, externalManual -->
+        <field name="externalManual" column="external_manual" type="string" length="255" nullable="true"/>
+
         <field name="createdAt" type="datetime" column="created_at">
             <gedmo:timestampable on="create"/>
         </field>
@@ -179,6 +182,10 @@
 
         <many-to-one field="pricingGroup" target-entity="Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface">
             <join-column name="pricing_group_id" referenced-column-name="id" on-delete="RESTRICT" nullable="true" />
+        </many-to-one>
+
+        <many-to-one field="internalManual" target-entity="Ekyna\Bundle\MediaBundle\Model\MediaInterface">
+            <join-column name="internal_manual_id" referenced-column-name="id" on-delete="SET NULL" nullable="true" />
         </many-to-one>
 
         <many-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\CategoryInterface" field="categories">

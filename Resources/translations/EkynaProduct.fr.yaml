@@ -492,6 +492,8 @@ product:
         not_contractual: Visuels non contractuels
         attributes_title: Titre d'attributs
         attributes_designation: Désignation d'attributs
+        internal_manual: Mode d'emploi (média)
+        external_manual: Mode d'emploi (URL)
     alert:
         no_item: Aucun produit configuré
         no_offer: Aucune offre configuré

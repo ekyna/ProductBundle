@@ -62,6 +62,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected ?Model\ProductInterface      $parent       = null;
     protected ?Model\AttributeSetInterface $attributeSet = null;
 
+    protected ?Media\MediaInterface $internalManual = null;
+    protected ?string               $externalManual = null;
+
     /** @var Collection<int, Model\ProductInterface> */
     protected Collection $variants;
     /** @var Collection<int, Model\ProductAttributeInterface> */
@@ -307,6 +310,30 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setStatUpdatedAt(?DateTimeInterface $date): Model\ProductInterface
     {
         $this->statUpdatedAt = $date;
+
+        return $this;
+    }
+
+    public function getInternalManual(): ?Media\MediaInterface
+    {
+        return $this->internalManual;
+    }
+
+    public function setInternalManual(?Media\MediaInterface $internalManual): Model\ProductInterface
+    {
+        $this->internalManual = $internalManual;
+
+        return $this;
+    }
+
+    public function getExternalManual(): ?string
+    {
+        return $this->externalManual;
+    }
+
+    public function setExternalManual(?string $externalManual): Model\ProductInterface
+    {
+        $this->externalManual = $externalManual;
 
         return $this;
     }

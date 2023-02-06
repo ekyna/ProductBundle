@@ -489,6 +489,8 @@ product:
         not_contractual: Non-contractual photos
         attributes_title: Aattributes title
         attributes_designation: Attributes designation
+        internal_manual: Product manual (media)
+        external_manual: Product manual (URL)
     alert:
         no_item: No product configured
         no_offer: No offer configured
