@@ -24,34 +24,22 @@ use function array_replace;
  */
 class PriceRenderer
 {
-    private PriceCalculator          $priceCalculator;
-    private PurchaseCostCalculator   $purchaseCostCalculator;
-    private ContextProviderInterface $contextProvider;
-    private FormatterFactory         $formatterFactory;
-    private TranslatorInterface      $translator;
-    private Environment              $twig;
-    private array                    $options;
+    private readonly array $options;
 
     public function __construct(
-        PriceCalculator          $priceCalculator,
-        PurchaseCostCalculator   $purchaseCostCalculator,
-        ContextProviderInterface $contextProvider,
-        FormatterFactory         $formatterFactory,
-        TranslatorInterface      $translator,
-        Environment              $twig,
-        array                    $options
+        private readonly PriceCalculator $priceCalculator,
+        private readonly PurchaseCostCalculator $purchaseCostCalculator,
+        private readonly ContextProviderInterface $contextProvider,
+        private readonly FormatterFactory $formatterFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Environment $twig,
+        array $options
     ) {
-        $this->priceCalculator = $priceCalculator;
-        $this->purchaseCostCalculator = $purchaseCostCalculator;
-        $this->contextProvider = $contextProvider;
-        $this->formatterFactory = $formatterFactory;
-        $this->translator = $translator;
-        $this->twig = $twig;
-
         $this->options = array_replace([
             'final_price_format'    => '<strong>{amount}</strong>&nbsp;<sup>{mode}</sup>',
             'original_price_format' => '<del>{amount}</del>&nbsp;',
             'price_with_from'       => false,
+            'vat_display_mode'      => \Ekyna\Component\Commerce\Pricing\Model\VatDisplayModes::MODE_ATI,
         ], $options);
     }
 
@@ -73,7 +61,7 @@ class PriceRenderer
         $price = $this->priceCalculator->getPrice($product, $context);
 
         $currency = $context->getCurrency()->getCode();
-        $mode = $context->getVatDisplayMode();
+        $mode = $context->getVatDisplayMode() ?? $this->options['vat_display_mode'];
 
         $formatter = $this->formatterFactory->create($context->getLocale(), $currency);
 
@@ -109,32 +97,42 @@ class PriceRenderer
         $display = new Model\PriceDisplay($final, $fromLabel, $originalLabel, $finalLabel, $endsAt);
 
         if ($options['extended'] && $endsAt) {
-            $display->addMention($this->translator->trans('price.display.valid_until', [
-                '%date%' => $endsAt,
-            ], 'EkynaProduct'));
+            $display->addMention(
+                $this->translator->trans('price.display.valid_until', [
+                    '%date%' => $endsAt,
+                ], 'EkynaProduct')
+            );
         }
 
         // Special offer
         if (isset($price['details'][OfferInterface::TYPE_SPECIAL])
             && 0 < $price['details'][OfferInterface::TYPE_SPECIAL]) {
-            $display->setSpecialPercent($percent = $formatter->percent($price['details'][OfferInterface::TYPE_SPECIAL]));
+            $display->setSpecialPercent(
+                $percent = $formatter->percent($price['details'][OfferInterface::TYPE_SPECIAL])
+            );
 
             if ($options['extended']) {
-                $display->setSpecialLabel($this->translator->trans('price.display.special_offer', [
-                    '%percent%' => $percent,
-                ], 'EkynaProduct'));
+                $display->setSpecialLabel(
+                    $this->translator->trans('price.display.special_offer', [
+                        '%percent%' => $percent,
+                    ], 'EkynaProduct')
+                );
             }
         }
 
         // Pricing
         if (isset($price['details'][OfferInterface::TYPE_PRICING])
             && 0 < $price['details'][OfferInterface::TYPE_PRICING]) {
-            $display->setPricingPercent($percent = $formatter->percent($price['details'][OfferInterface::TYPE_PRICING]));
+            $display->setPricingPercent(
+                $percent = $formatter->percent($price['details'][OfferInterface::TYPE_PRICING])
+            );
 
             if ($options['extended']) {
-                $display->setPricingLabel($this->translator->trans('price.display.pricing', [
-                    '%percent%' => $percent,
-                ], 'EkynaProduct'));
+                $display->setPricingLabel(
+                    $this->translator->trans('price.display.pricing', [
+                        '%percent%' => $percent,
+                    ], 'EkynaProduct')
+                );
             }
         }
 
@@ -194,8 +192,8 @@ class PriceRenderer
      */
     public function getPurchaseCost(
         Model\ProductInterface $product,
-        bool                   $withOptions = true,
-        bool                   $shipping = false
+        bool $withOptions = true,
+        bool $shipping = false
     ): Decimal {
         return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions, $shipping);
     }
@@ -211,8 +209,8 @@ class PriceRenderer
      */
     public function renderPricingGrid(
         Model\ProductInterface $product,
-        ContextInterface       $context = null,
-        string                 $class = 'product-pricing-grid'
+        ContextInterface $context = null,
+        string $class = 'product-pricing-grid'
     ): ?string {
         if (null === $context) {
             $context = $this->contextProvider->getContext();

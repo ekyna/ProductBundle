@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
 use function in_array;
@@ -124,7 +125,9 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
         // Pricing
         $container
             ->getDefinition('ekyna_product.renderer.pricing')
-            ->replaceArgument(6, $config['pricing']);
+            ->replaceArgument(6, array_replace([
+                'vat_display_mode' => new Parameter('ekyna_commerce.default.vat_display_mode'),
+            ], $config['pricing']));
     }
 
     private function configureFeatures(array $config, ContainerBuilder $container): void

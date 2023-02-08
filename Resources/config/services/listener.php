@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Ekyna\Bundle\CommerceBundle\Event\SubjectLabelEvent;
+use Ekyna\Bundle\CommerceBundle\Event\BuildSubjectLabels;
 use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
@@ -398,7 +398,7 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.listener.product_label', LabelListener::class)
         ->tag('kernel.event_listener', [
-            'event'  => SubjectLabelEvent::BUILD,
+            'event'  => BuildSubjectLabels::class,
             'method' => 'onBuildSubjectLabel',
         ]);
 
