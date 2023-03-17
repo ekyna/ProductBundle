@@ -169,7 +169,7 @@
 {%- endmacro show_external_manual -%}
 
 
-{%- macro show_notContractual(product, options = {}) -%}
+{%- macro show_not_contractual(product, options = {}) -%}
     {{- show_row(product.notContractual, 'boolean', {
         'label': t('product.field.not_contractual', [], 'EkynaProduct'),
         'id': 'product_notContractual',
@@ -177,7 +177,7 @@
         'true_class': 'label label-warning',
         'false_class': 'label label-default'
     }|merge(options)) -}}
-{%- endmacro show_notContractual -%}
+{%- endmacro show_not_contractual -%}
 
 
 {%- macro show_min_price(product, options = {}) -%}

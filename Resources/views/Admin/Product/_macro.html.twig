@@ -69,13 +69,13 @@
             <span class="sr-only">Toggle Dropdown</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-right">
-            {% for format in subject_label_formats() -%}
+            {% for title, format in subject_label_formats() -%}
                 <li>
                     <a href="{{ admin_resource_path(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\LabelAction', {
                         'id': [product.id],
                         'format': format
                     }, {'target': '_blank'}) }}" target="_blank">
-                        {{- ('subject.label_format.' ~ format)|trans({}, 'EkynaCommerce') -}}
+                        {{- title -}}
                     </a>
                 </li>
             {%- endfor %}
