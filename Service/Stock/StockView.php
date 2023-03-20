@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use DateTime;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Action\ReadAction;
@@ -163,6 +164,7 @@ class StockView
      *
      * @param Request $request
      * @param bool    $raw
+     * @param array $options
      *
      * @return array
      */
@@ -281,8 +283,13 @@ class StockView
             $product['virtual_stock'] = $formatter->number((float)$product['virtual_stock']);
 
             // Eda
+            $product['eda_theme'] = '';
             if (null !== $eda = $product['eda']) {
-                $product['eda'] = (new DateTime($eda))->format('d/m/Y'); // TODO localized format
+                $eda = new DateTime($eda);
+                $product['eda'] = $eda->format('d/m/Y'); // TODO localized format
+                if ($eda < (new DateTime())->setTime(0, 0)) {
+                    $product['eda_theme'] = 'danger';
+                }
             }
 
             // Stock themes
@@ -377,7 +384,7 @@ class StockView
      * @param QueryBuilder     $qb
      * @param InventoryContext $context
      */
-    private function applyContextToQueryBuilder(QueryBuilder $qb, InventoryContext $context)
+    private function applyContextToQueryBuilder(QueryBuilder $qb, InventoryContext $context): void
     {
         $expr = $qb->expr();
 
@@ -489,7 +496,23 @@ class StockView
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
                 ->setParameter('not_mode', CStockModes::MODE_DISABLED)
-                ->andHaving($expr->lt('virtual_stock', 'stock_floor'));
+                ->andHaving($qb->expr()->orX(
+                    $qb->expr()->orX(
+                        $qb->expr()->andX(
+                            $qb->expr()->eq('p.endOfLife', 0),
+                            $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
+                        ),
+                        $qb->expr()->andX(
+                            $qb->expr()->eq('p.endOfLife', 1),
+                            $qb->expr()->lt('p.virtualStock', 0)
+                        )
+                    ),
+                    $qb->expr()->andX(
+                        $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
+                        $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
+                    )
+                ))
+                ->setParameter('today', (new DateTime())->setTime(0, 0), Types::DATE_MUTABLE);
         } elseif (InventoryProfiles::ORDERED === $context->getProfile()) {
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
@@ -624,7 +647,7 @@ class StockView
     {
         try {
             return $this->requestStack->getSession();
-        } catch (SessionNotFoundException $exception) {
+        } catch (SessionNotFoundException) {
             return null;
         }
     }

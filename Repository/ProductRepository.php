@@ -533,6 +533,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
                     $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
                 )
             ))
+            ->addOrderBy('p.id', 'DESC')
             ->getQuery()
             ->setParameter('mode', $mode)
             ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
