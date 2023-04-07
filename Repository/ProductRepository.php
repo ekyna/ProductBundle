@@ -224,7 +224,6 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->andWhere($qb->expr()->eq($as . '.visible', ':visible'))
             ->andWhere($qb->expr()->eq('b.visible', ':brand_visible'))
             ->andWhere($qb->expr()->eq('c.visible', ':category_visible'))
-            ->setMaxResults(1)
             ->getQuery()
             ->useQueryCache(true)
             // TODO ->enableResultCache(3600, $this->getCachePrefix() . '[slug=' . $slug . ']')
