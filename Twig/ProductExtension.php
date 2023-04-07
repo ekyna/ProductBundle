@@ -102,14 +102,6 @@ class ProductExtension extends AbstractExtension
                 [AttributeRenderer::class, 'getAttributeType']
             ),
             new TwigFilter(
-                'product_by_id',
-                [ProductHelper::class, 'findOneProductById']
-            ),
-            new TwigFilter(
-                'product_by_reference',
-                [ProductHelper::class, 'findOneProductByReference']
-            ),
-            new TwigFilter(
                 'product_image',
                 [ProductHelper::class, 'getProductImagePath']
             ),
@@ -182,11 +174,11 @@ class ProductExtension extends AbstractExtension
             ),
             new TwigFunction(
                 'get_product_by_id',
-                [ProductHelper::class, 'findOneById']
+                [ProductHelper::class, 'findOneProductById']
             ),
             new TwigFunction(
                 'get_product_by_reference',
-                [ProductHelper::class, 'findOneByReference']
+                [ProductHelper::class, 'findOneProductByReference']
             ),
         ];
     }
