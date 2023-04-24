@@ -90,14 +90,17 @@ class Resupply
                 ->getFactory(Model\SupplierOrderItemInterface::class)
                 ->create();
 
+            $packing = clone $reference->getPacking();
+
             $item
-                ->setQuantity($quantity)
+                ->setQuantity($quantity->div($packing))
+                ->setPacking($packing)
                 ->setProduct($reference)
                 ->setNetPrice($netPrice);
 
             $order->addItem($item);
         } else {
-            $item->setQuantity($item->getQuantity() + $quantity);
+            $item->setQuantity($item->getQuantity() + $quantity->div($item->getPacking()));
 
             if ($netPrice > $item->getNetPrice()) {
                 $item->setNetPrice($netPrice);

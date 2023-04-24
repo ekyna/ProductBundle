@@ -16,7 +16,6 @@ use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
-use Ekyna\Bundle\ProductBundle\Table\Column\ReferenceType;
 use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
@@ -37,6 +36,7 @@ use function Symfony\Component\Translation\t;
 
 /**
  * Class ProductType
+ *
  * @package Ekyna\Bundle\ProductBundle\Table\Type
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
@@ -85,9 +85,10 @@ class ProductType extends AbstractResourceType
                 'property' => 'visible',
                 'position' => 30,
             ])
-            ->addColumn('reference', ReferenceType::class, [
-                'label'    => t('field.reference', [], 'EkynaUi'),
-                'position' => 40,
+            ->addColumn('reference', CType\Column\TextType::class, [
+                'label'          => t('field.reference', [], 'EkynaUi'),
+                'clipboard_copy' => true,
+                'position'       => 40,
             ])
             ->addColumn('netPrice', BType\Column\PriceType::class, [
                 'label'    => t('field.net_price', [], 'EkynaCommerce'),
@@ -291,7 +292,7 @@ class ProductType extends AbstractResourceType
 
                 $value->setQueryBuilderInitializer(function (QueryBuilder $qb, string $alias): void {
                     $qb
-                        ->andWhere($alias . '.type != :type')
+                        ->andWhere($alias.'.type != :type')
                         ->setParameter('type', ProductTypes::TYPE_VARIANT);
                 });
 
