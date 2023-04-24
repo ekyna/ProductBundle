@@ -142,9 +142,9 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
         if ($config[Features::GTIN13_GENERATOR]['enabled']) {
             $container
                 ->register('ekyna_product.generator.gtin13', $config[Features::GTIN13_GENERATOR]['class'])
-                ->setArguments([
+                ->setArguments(['%kernel.debug%'])
+                ->addMethodCall('setStorage', [
                     $config[Features::GTIN13_GENERATOR]['path'],
-                    '%kernel.debug%',
                 ])
                 ->addMethodCall('setManufacturerCode', [
                     $config[Features::GTIN13_GENERATOR]['manufacturer'],

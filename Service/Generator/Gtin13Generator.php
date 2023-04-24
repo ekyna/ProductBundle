@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Generator;
 
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
@@ -16,18 +18,16 @@ class Gtin13Generator extends AbstractGenerator implements GtinGeneratorInterfac
     /**
      * @var string
      */
-    private $manufacturerCode;
-
+    private string $manufacturerCode;
 
     /**
      * Constructor.
      *
-     * @param string $path
      * @param bool   $debug
      */
-    public function __construct(string $path, bool $debug = false)
+    public function __construct(bool $debug = false)
     {
-        parent::__construct($path, 13, '', $debug);
+        parent::__construct(13, '', $debug);
     }
 
     /**
@@ -41,14 +41,14 @@ class Gtin13Generator extends AbstractGenerator implements GtinGeneratorInterfac
     /**
      * Generates the product gtin 13 code.
      *
-     * @param object $product
+     * @param object $subject
      *
      * @return string
      */
-    public function generate(object $product): string
+    public function generate(object $subject): string
     {
         if (empty($this->manufacturerCode)) {
-            throw new RuntimeException("Manufacturer code is not configured");
+            throw new RuntimeException('Manufacturer code is not configured');
         }
 
         $productCode = $this->storage->read();
@@ -65,19 +65,19 @@ class Gtin13Generator extends AbstractGenerator implements GtinGeneratorInterfac
     /**
      * Increments the product code.
      *
-     * @param string $code
+     * @param string $number
      *
      * @return string
      */
-    protected function increment(string $code): string
+    protected function increment(string $number): string
     {
-        $code = intval($code);
+        $number = intval($number);
 
-        if ($this->debug && 9999 > $code) {
-            $code = 9999;
+        if ($this->debug && 9999 > $number) {
+            $number = 9999;
         }
 
-        return str_pad($code + 1, 12 - strlen($this->manufacturerCode), '0', STR_PAD_LEFT);
+        return str_pad((string)($number + 1), 12 - strlen($this->manufacturerCode), '0', STR_PAD_LEFT);
     }
 
     /**
@@ -92,7 +92,7 @@ class Gtin13Generator extends AbstractGenerator implements GtinGeneratorInterfac
         $gtin = $this->manufacturerCode . $productCode;
 
         if (12 !== strlen($gtin)) {
-            throw new UnexpectedValueException("Expected 12 length code");
+            throw new UnexpectedValueException('Expected 12 length code');
         }
 
         $even = false;

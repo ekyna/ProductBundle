@@ -21,6 +21,7 @@ use Ekyna\Bundle\ProductBundle\Service\Routing\RoutingLoader;
 use Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Service\Stat;
 use Ekyna\Bundle\ProductBundle\Service\Stock;
+use Ekyna\Component\Commerce\Common\Generator\DateNumberGenerator;
 use Ekyna\Component\Resource\Event\QueueEvents;
 
 return static function (ContainerConfigurator $container) {
@@ -240,12 +241,10 @@ return static function (ContainerConfigurator $container) {
 
     // Reference generator
     $services
-        ->set('ekyna_product.generator.reference', Generator\ReferenceGenerator::class)
-        ->args([
-            expr("parameter('kernel.project_dir')~'/var/data/product_reference'"),
-            8,
-            'ym',
-            param('kernel.debug'),
+        ->set('ekyna_product.generator.reference', DateNumberGenerator::class)
+        ->args([8, 'ym', param('kernel.debug')])
+        ->call('setStorage', [
+            expr("parameter('kernel.project_dir')~'/var/data/product_reference'")
         ]);
 
     // External reference generator
