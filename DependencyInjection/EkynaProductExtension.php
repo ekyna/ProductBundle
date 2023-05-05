@@ -96,9 +96,11 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
         $accountConfig = [
             'catalog' => $config['catalog']['enabled'] && $config['catalog']['account'],
         ];
-        // Remove controller service
+        // Remove controller and listener services
         if (!$accountConfig['catalog']) {
             $container->removeDefinition('ekyna_product.controller.account.catalog');
+            $container->removeDefinition('ekyna_product.controller.account.product.export');
+            $container->removeDefinition('ekyna_product.listener.account.dashboard');
         }
 
         // Account menu event subscriber

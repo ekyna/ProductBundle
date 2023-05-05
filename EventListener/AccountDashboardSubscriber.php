@@ -20,20 +20,20 @@ use function Symfony\Component\Translation\t;
  */
 class AccountDashboardSubscriber implements EventSubscriberInterface
 {
-    private ContextProviderInterface $contextProvider;
-    private PricingRepositoryInterface $pricingRepository;
+//    private ContextProviderInterface $contextProvider;
+//    private PricingRepositoryInterface $pricingRepository;
 
-    public function __construct(
-        ContextProviderInterface $contextProvider,
-        PricingRepositoryInterface $pricingRepository
-    ) {
-        $this->contextProvider = $contextProvider;
-        $this->pricingRepository = $pricingRepository;
-    }
+//    public function __construct(
+//        ContextProviderInterface $contextProvider,
+//        PricingRepositoryInterface $pricingRepository
+//    ) {
+//        $this->contextProvider = $contextProvider;
+//        $this->pricingRepository = $pricingRepository;
+//    }
 
     public function onDashboard(DashboardEvent $event): void
     {
-        $context = $this->contextProvider->getContext();
+        /*$context = $this->contextProvider->getContext();
 
         if (empty($pricings = $this->pricingRepository->findByContext($context))) {
             return;
@@ -42,47 +42,47 @@ class AccountDashboardSubscriber implements EventSubscriberInterface
         $scalars = [];
         foreach ($pricings as $pricing) {
             $scalars[] = $this->scalarPricing($pricing);
-        }
+        }*/
 
         # TODO Display pricing groups when no brand is configured
         $widget = DashboardWidget::create('@EkynaProduct/Account/Dashboard/pricings.html.twig')
             ->setTitle(t('account.pricing.title', [], 'EkynaProduct'))
-            ->setParameters([
+            /*->setParameters([
                 'pricings' => $scalars,
-            ])
+            ])*/
             ->setPriority(950);
 
         $event->addWidget($widget);
     }
 
-    /**
-     * Builds the pricing scalar data.
-     */
-    private function scalarPricing(Model\PricingInterface $pricing): array
-    {
-        $scalarRules = [];
-        $previousMin = null;
-
-        $rules = array_reverse($pricing->getRules()->toArray());
-        /** @var Model\PricingRuleInterface $rule */
-        foreach ($rules as $rule) {
-            $scalarRules[] = [
-                'min'     => $rule->getMinQuantity(),
-                'max'     => $previousMin,
-                'percent' => $rule->getPercent()->toFixed(2),
-            ];
-            $previousMin = $rule->getMinQuantity() - 1;
-        }
-
-        $brands = array_map(function(Model\BrandInterface $brand) {
-            return $brand->getTitle();
-        }, $pricing->getBrands()->toArray());
-
-        return [
-            'brands' => $brands,
-            'rules'  => array_reverse($scalarRules),
-        ];
-    }
+//    /**
+//     * Builds the pricing scalar data.
+//     */
+//    private function scalarPricing(Model\PricingInterface $pricing): array
+//    {
+//        $scalarRules = [];
+//        $previousMin = null;
+//
+//        $rules = array_reverse($pricing->getRules()->toArray());
+//        /** @var Model\PricingRuleInterface $rule */
+//        foreach ($rules as $rule) {
+//            $scalarRules[] = [
+//                'min'     => $rule->getMinQuantity(),
+//                'max'     => $previousMin,
+//                'percent' => $rule->getPercent()->toFixed(2),
+//            ];
+//            $previousMin = $rule->getMinQuantity() - 1;
+//        }
+//
+//        $brands = array_map(function(Model\BrandInterface $brand) {
+//            return $brand->getTitle();
+//        }, $pricing->getBrands()->toArray());
+//
+//        return [
+//            'brands' => $brands,
+//            'rules'  => array_reverse($scalarRules),
+//        ];
+//    }
 
     public static function getSubscribedEvents(): array
     {

@@ -1,4 +1,9 @@
+ekyna_product_account_product_export:
+    path: /export
+    controller: Ekyna\Bundle\ProductBundle\Controller\Account\ProductExportController
+    methods: GET
+
 ekyna_product_account_product_search:
     path: /search
-    controller: Ekyna\Bundle\ProductBundle\Controller\Account\ProductController::search
+    controller: Ekyna\Bundle\ProductBundle\Controller\Account\ProductSearchController
     methods: GET

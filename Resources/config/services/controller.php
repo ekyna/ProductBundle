@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Ekyna\Bundle\ProductBundle\Controller\Account\CatalogController;
-use Ekyna\Bundle\ProductBundle\Controller\Account\ProductController;
+use Ekyna\Bundle\ProductBundle\Controller\Account;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
@@ -14,18 +13,9 @@ use Ekyna\Bundle\ProductBundle\Controller\Admin\StockView;
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
+    // Removed by DI extension if account or catalog feature is disabled
     $services
-        ->set('ekyna_product.controller.account.product', ProductController::class)
-        ->args([
-            service('security.authorization_checker'),
-            service('ekyna_resource.search'),
-        ])
-        ->alias(ProductController::class, 'ekyna_product.controller.account.product')
-        ->public();
-
-    // Removed by DI extension if catalog feature (and account) is disabled
-    $services
-        ->set('ekyna_product.controller.account.catalog', CatalogController::class)
+        ->set('ekyna_product.controller.account.catalog', Account\CatalogController::class)
         ->args([
             service('ekyna_product.repository.catalog'),
             service('ekyna_product.factory.catalog'),
@@ -38,7 +28,27 @@ return static function (ContainerConfigurator $container) {
             service('twig'),
         ])
         ->call('setCustomerProvider', [service('ekyna_commerce.provider.customer')])
-        ->alias(CatalogController::class, 'ekyna_product.controller.account.catalog')
+        ->alias(Account\CatalogController::class, 'ekyna_product.controller.account.catalog')
+        ->public();
+
+    // Removed by DI extension if account feature is disabled
+    $services
+        ->set('ekyna_product.controller.account.product.export', Account\ProductExportController::class)
+        ->args([
+            service('ekyna_commerce.provider.context'),
+            service('ekyna_product.exporter.product'),
+        ])
+        ->call('setCustomerProvider', [service('ekyna_commerce.provider.customer')])
+        ->alias(Account\ProductExportController::class, 'ekyna_product.controller.account.product.export')
+        ->public();
+
+    $services
+        ->set('ekyna_product.controller.account.product.search', Account\ProductSearchController::class)
+        ->args([
+            service('security.authorization_checker'),
+            service('ekyna_resource.search'),
+        ])
+        ->alias(Account\ProductSearchController::class, 'ekyna_product.controller.account.product.search')
         ->public();
 
     $services

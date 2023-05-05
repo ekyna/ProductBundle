@@ -15,24 +15,19 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Class ProductController
+ * Class ProductSearchController
  * @package Ekyna\Bundle\ProductBundle\Controller\Account
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductController
+class ProductSearchController
 {
-    private AuthorizationCheckerInterface $authorization;
-    private Search                        $search;
-
     public function __construct(
-        AuthorizationCheckerInterface $authorization,
-        Search                        $search
+        private readonly AuthorizationCheckerInterface $authorization,
+        private readonly Search                        $search
     ) {
-        $this->authorization = $authorization;
-        $this->search = $search;
     }
 
-    public function search(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         if (!$this->authorization->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             throw new AccessDeniedHttpException();

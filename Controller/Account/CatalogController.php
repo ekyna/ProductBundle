@@ -25,7 +25,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-use function intval;
 use function Symfony\Component\Translation\t;
 
 /**

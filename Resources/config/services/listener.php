@@ -8,6 +8,7 @@ use Ekyna\Bundle\CommerceBundle\Event\BuildSubjectLabels;
 use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
+use Ekyna\Bundle\ProductBundle\EventListener\AccountDashboardSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AccountMenuSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\AddToCartEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\BarcodeListener;
@@ -34,19 +35,22 @@ use Ekyna\Bundle\ProductBundle\EventListener\ProductTranslationListener;
 use Ekyna\Bundle\ProductBundle\EventListener\SaleButtonsEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener;
+use Ekyna\Bundle\UserBundle\Event\DashboardEvent;
 use Symfony\Component\Console\ConsoleEvents;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     // Account dashboard event listener
-    /* TODO
     $services->set('ekyna_product.listener.account.dashboard', AccountDashboardSubscriber::class)
-        ->args([
+        /*->args([
             service('ekyna_commerce.provider.context'),
             service('ekyna_product.repository.pricing'),
-        ])
-        ->tag('kernel.event_subscriber');*/
+        ])*/
+        ->tag('kernel.event_listener', [
+            'event'  => DashboardEvent::class,
+            'method' => 'onDashboard',
+        ]);
 
     // Account menu event listener
     $services

@@ -1,11 +1,16 @@
 {% apply spaceless %}
 <div style="margin:15px;">
-{% set per_row = 3 %}
+    <p>
+        <a href="{{ path('ekyna_product_account_product_export') }}">
+            Télécharger vos tarifs au format CSV
+        </a>
+    </p>
+{#{% set per_row = 3 %}
 {% for pricing in pricings %}
 {% if loop.first or loop.index0 % per_row == 0 %}<div class="row">{% endif %}
     <div class="col-md-{{ 12 / per_row }}">
         <div style="padding:15px;border:1px solid #ddd;border-radius:4px">
-            {# TODO pricing groups ? #}
+            #}{# TODO pricing groups ? #}{#
             <p>
                 <strong>{{ 'brand.label.plural'|trans({}, 'EkynaProduct') }}:</strong>
                 {% if pricing.brands is not empty -%}
@@ -43,6 +48,6 @@
         </div>
     </div>
 {% if loop.last or loop.index % per_row == 0 %}</div>{% endif %}
-{% endfor %}
+{% endfor %}#}
 </div>
 {% endapply %}
