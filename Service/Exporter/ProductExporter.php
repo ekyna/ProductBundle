@@ -192,6 +192,18 @@ class ProductExporter
             return (string)$this->subjectHelper->generatePublicUrl($product, false);
         }
 
+        if ($column === ExportConfig::COLUMN_VISIBLE) {
+            return $product->isVisible() ? 'Yes' : 'No';
+        }
+
+        if ($column === ExportConfig::COLUMN_QUOTE_ONLY) {
+            return $product->isQuoteOnly() ? 'Yes' : 'No';
+        }
+
+        if ($column === ExportConfig::COLUMN_END_OF_LIFE) {
+            return $product->isEndOfLife() ? 'Yes' : 'No';
+        }
+
         throw new RuntimeException("Unexpected column name '$column'.");
     }
 }

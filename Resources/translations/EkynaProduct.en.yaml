@@ -267,6 +267,10 @@ cross_selling:
         add: Add cross selling
 
 export:
+    filter:
+        add_invisible: Add invisible products.
+        add_quote_only: Add « Quote only » products.
+        add_end_of_life: Add « End of life » in stock products.
     column:
         net_price: Public price
         sell_price: Discounted price

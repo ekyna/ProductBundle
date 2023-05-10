@@ -947,24 +947,12 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->addOrderBy('b.name', 'ASC')
             ->addOrderBy('p.designation', 'ASC')
             ->andWhere($qb->expr()->notIn('p.type', ':types'))
-            ->andWhere($qb->expr()->eq('p.quoteOnly', ':quote_only'))
-            ->andWhere(
-                $qb->expr()->not(
-                    $qb->expr()->andX(
-                        $qb->expr()->eq('p.endOfLife', ':end_of_life'),
-                        $qb->expr()->neq('p.stockState', ':stock_state')
-                    )
-                )
-            )
             ->setParameters(
                 [
                     'types'       => [
-                        ProductTypes::TYPE_VARIANT,
+                        ProductTypes::TYPE_VARIABLE,
                         ProductTypes::TYPE_CONFIGURABLE,
                     ],
-                    'quote_only'  => false,
-                    'end_of_life' => true,
-                    'stock_state' => StockSubjectStates::STATE_IN_STOCK,
                 ]
             );
 
@@ -975,10 +963,34 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
                 ->setParameter('brands', $brands->toArray());
         }
 
-        if ($config->isVisible()) {
+        if (!$config->isAddInvisible()) {
             $qb
                 ->andWhere($qb->expr()->eq('p.visible', ':visible'))
                 ->setParameter('visible', true);
+        }
+
+        if (!$config->isAddQuoteOnly()) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.quoteOnly', ':quote_only'))
+                ->setParameter('quote_only', false);
+        }
+
+        if (!$config->isAddEndOfLife()) {
+            $qb
+                ->andWhere($qb->expr()->eq('p.endOfLife', ':end_of_life'))
+                ->setParameter('end_of_life', false);
+        } else {
+            $qb
+                ->andWhere(
+                    $qb->expr()->not(
+                        $qb->expr()->andX(
+                            $qb->expr()->eq('p.endOfLife', ':end_of_life'),
+                            $qb->expr()->neq('p.stockState', ':stock_state')
+                        )
+                    )
+                )
+                ->setParameter('end_of_life', true)
+                ->setParameter('stock_state', StockSubjectStates::STATE_IN_STOCK);
         }
 
         return $qb

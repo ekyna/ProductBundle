@@ -41,13 +41,18 @@ class ExportConfig
     public const COLUMN_DESCRIPTION      = 'description';
     public const COLUMN_IMAGE            = 'image';
     public const COLUMN_URL              = 'url';
+    public const COLUMN_VISIBLE          = 'visible';
+    public const COLUMN_QUOTE_ONLY       = 'quote_only';
+    public const COLUMN_END_OF_LIFE      = 'end_of_life';
 
-    private string            $format    = self::FORMAT_CSV;
+    private string            $format       = self::FORMAT_CSV;
     private array             $columns;
-    private bool              $visible   = true;
+    private bool              $addInvisible = false;
+    private bool              $addQuoteOnly = false;
+    private bool              $addEndOfLife = false;
     private DateTimeInterface $validUntil;
-    private string            $separator = ',';
-    private string            $enclosure = '"';
+    private string            $separator    = ',';
+    private string            $enclosure    = '"';
     /** @var Collection<int, BrandInterface> */
     private Collection $brands;
 
@@ -118,14 +123,38 @@ class ExportConfig
         return $this;
     }
 
-    public function isVisible(): bool
+    public function isAddInvisible(): bool
     {
-        return $this->visible;
+        return $this->addInvisible;
     }
 
-    public function setVisible(bool $visible): self
+    public function setAddInvisible(bool $addInvisible): self
     {
-        $this->visible = $visible;
+        $this->addInvisible = $addInvisible;
+
+        return $this;
+    }
+
+    public function isAddQuoteOnly(): bool
+    {
+        return $this->addQuoteOnly;
+    }
+
+    public function setAddQuoteOnly(bool $addQuoteOnly): ExportConfig
+    {
+        $this->addQuoteOnly = $addQuoteOnly;
+
+        return $this;
+    }
+
+    public function isAddEndOfLife(): bool
+    {
+        return $this->addEndOfLife;
+    }
+
+    public function setAddEndOfLife(bool $addEndOfLife): ExportConfig
+    {
+        $this->addEndOfLife = $addEndOfLife;
 
         return $this;
     }
@@ -197,6 +226,9 @@ class ExportConfig
             self::COLUMN_DESCRIPTION      => t('field.description', [], 'EkynaUi'),
             self::COLUMN_IMAGE            => t('field.image', [], 'EkynaUi'),
             self::COLUMN_URL              => t('field.url', [], 'EkynaUi'),
+            self::COLUMN_VISIBLE          => t('field.visible', [], 'EkynaUi'),
+            self::COLUMN_QUOTE_ONLY       => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
+            self::COLUMN_END_OF_LIFE      => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
         ];
     }
 

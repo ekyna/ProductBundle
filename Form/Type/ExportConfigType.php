@@ -55,8 +55,22 @@ class ExportConfigType extends AbstractType
                 'multiple' => true,
                 'required' => false,
             ])
-            ->add('visible', Type\CheckboxType::class, [
-                'label'    => t('field.visible', [], 'EkynaUi'),
+            ->add('addInvisible', Type\CheckboxType::class, [
+                'label'    => t('export.filter.add_invisible', [], 'EkynaProduct'),
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
+            ])
+            ->add('addQuoteOnly', Type\CheckboxType::class, [
+                'label'    => t('export.filter.add_quote_only', [], 'EkynaProduct'),
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
+                ],
+            ])
+            ->add('addEndOfLife', Type\CheckboxType::class, [
+                'label'    => t('export.filter.add_end_of_life', [], 'EkynaProduct'),
                 'required' => false,
                 'attr'     => [
                     'align_with_widget' => true,
