@@ -57,8 +57,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('ekyna_commerce.helper.subject'),
             service('ekyna_commerce.helper.stock_subject_quantity'),
-            service('ekyna_commerce.report.util.order'),
-            param('ekyna_commerce.default.currency'),
+            service('ekyna_commerce.factory.margin_calculator'),
         ])
         ->tag(ReportRegistryPass::SECTION_TAG);
 

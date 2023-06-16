@@ -15,8 +15,7 @@ use Ekyna\Component\Commerce\Common\Model\Margin;
 class ProductData
 {
     public function __construct(
-        public readonly Margin $grossMargin,
-        public readonly Margin $commercialMargin,
+        public readonly Margin $margin = new Margin(),
         public Decimal         $quantity = new Decimal(0)
     ) {
     }

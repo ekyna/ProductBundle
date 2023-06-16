@@ -150,11 +150,11 @@ class ProductExporter
         }
 
         if ($column === ExportConfig::COLUMN_BUY_PRICE) {
-            return $this->costCalculator->calculateMinPurchaseCost($product)->toFixed(3);
+            return $this->costCalculator->calculateMinPurchaseCost($product)->getProduct()->toFixed(3);
         }
 
         if ($column === ExportConfig::COLUMN_BUY_PRICE_SHIP) {
-            return $this->costCalculator->calculateMinPurchaseCost($product, [], true)->toFixed(3);
+            return $this->costCalculator->calculateMinPurchaseCost($product)->getTotal()->toFixed(3);
         }
 
         if ($column === ExportConfig::COLUMN_VALID_UNTIL) {

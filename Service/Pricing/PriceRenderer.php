@@ -27,13 +27,13 @@ class PriceRenderer
     private readonly array $options;
 
     public function __construct(
-        private readonly PriceCalculator $priceCalculator,
-        private readonly PurchaseCostCalculator $purchaseCostCalculator,
+        private readonly PriceCalculator          $priceCalculator,
+        private readonly PurchaseCostCalculator   $purchaseCostCalculator,
         private readonly ContextProviderInterface $contextProvider,
-        private readonly FormatterFactory $formatterFactory,
-        private readonly TranslatorInterface $translator,
-        private readonly Environment $twig,
-        array $options
+        private readonly FormatterFactory         $formatterFactory,
+        private readonly TranslatorInterface      $translator,
+        private readonly Environment              $twig,
+        array                                     $options
     ) {
         $this->options = array_replace([
             'final_price_format'    => '<strong>{amount}</strong>&nbsp;<sup>{mode}</sup>',
@@ -192,10 +192,12 @@ class PriceRenderer
      */
     public function getPurchaseCost(
         Model\ProductInterface $product,
-        bool $withOptions = true,
-        bool $shipping = false
+        bool                   $withOptions = true,
+        bool                   $shipping = false
     ): Decimal {
-        return $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions, $shipping);
+        $cost = $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions);
+
+        return $cost->getTotal(!$shipping);
     }
 
     /**
@@ -209,8 +211,8 @@ class PriceRenderer
      */
     public function renderPricingGrid(
         Model\ProductInterface $product,
-        ContextInterface $context = null,
-        string $class = 'product-pricing-grid'
+        ContextInterface       $context = null,
+        string                 $class = 'product-pricing-grid'
     ): ?string {
         if (null === $context) {
             $context = $this->contextProvider->getContext();

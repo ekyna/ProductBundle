@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Doctrine\ORM\Events;
 use Ekyna\Bundle\ProductBundle\Attribute;
 use Ekyna\Bundle\ProductBundle\Attribute\Type\TypeInterface;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
@@ -209,11 +210,13 @@ return static function (ContainerConfigurator $container) {
     // Purchase cost calculator
     $services
         ->set('ekyna_product.calculator.purchase_cost', Pricing\PurchaseCostCalculator::class)
-        ->lazy()
         ->args([
             service('ekyna_product.calculator.price'),
-            service('ekyna_commerce.guesser.subject_purchase_cost'),
-            param('ekyna_commerce.default.currency'),
+            service('ekyna_commerce.guesser.subject_cost'),
+        ])
+        ->tag('doctrine.event_listener', [
+            'event'      => Events::onClear,
+            'connection' => 'default',
         ]);
 
     // Pricing renderer cost calculator

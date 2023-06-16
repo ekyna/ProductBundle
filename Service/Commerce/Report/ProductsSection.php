@@ -9,14 +9,14 @@ use Doctrine\Common\Collections\Collection;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\Report\Model\ProductData;
-use Ekyna\Component\Commerce\Common\Model\Margin;
+use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorFactory;
+use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorInterface;
 use Ekyna\Component\Commerce\Exception\UnexpectedTypeException;
 use Ekyna\Component\Commerce\Exception\UnexpectedValueException;
 use Ekyna\Component\Commerce\Order\Model\OrderInterface;
 use Ekyna\Component\Commerce\Order\Model\OrderItemInterface;
 use Ekyna\Component\Commerce\Report\ReportConfig;
 use Ekyna\Component\Commerce\Report\Section\SectionInterface;
-use Ekyna\Component\Commerce\Report\Util\OrderUtil;
 use Ekyna\Component\Commerce\Report\Writer\WriterInterface;
 use Ekyna\Component\Commerce\Report\Writer\XlsWriter;
 use Ekyna\Component\Commerce\Stock\Helper\StockSubjectQuantityHelper;
@@ -46,11 +46,12 @@ class ProductsSection implements SectionInterface
     private array  $years;
     private string $year;
 
+    private ?MarginCalculatorInterface $calculator = null;
+
     public function __construct(
         private readonly SubjectHelperInterface     $subjectHelper,
         private readonly StockSubjectQuantityHelper $quantityHelper,
-        private readonly OrderUtil                  $util,
-        private readonly string                     $defaultCurrency
+        private readonly MarginCalculatorFactory    $factory,
     ) {
     }
 
@@ -69,6 +70,8 @@ class ProductsSection implements SectionInterface
 
         $this->year = $resource->getAcceptedAt()->format('Y');
 
+        $this->calculator = $this->factory->create();
+
         $this->calculateOrderItems($resource->getItems());
     }
 
@@ -83,36 +86,29 @@ class ProductsSection implements SectionInterface
 
     private function calculateOrderItem(OrderItemInterface $item): void
     {
-        if ($item->isCompound()) {
+        if ($item->isCompound() && !$item->hasPrivateChildren()) {
             return;
         }
-
 
         $soldTotal = $this->quantityHelper->calculateSoldQuantity($item);
         if ($soldTotal->isZero()) {
             return;
         }
 
-        $gross = $this->util->getGrossCalculator()->calculateSaleItem($item, true);
-        $commercial = $this->util->getCommercialCalculator()->calculateSaleItem($item, true);
-
-        if ($gross->getSellingPrice()->isZero() && $commercial->getSellingPrice()->isZero()) {
-            return;
-        }
+        $margin = $this->calculator->calculateSaleItem($item);
 
         $reference = $item->getReference();
 
         $this->addSubject($item);
 
         if (!isset($this->data[$reference][$this->year])) {
-            $this->data[$reference][$this->year] = $this->createEmptyData();
+            $this->data[$reference][$this->year] = new ProductData();
         }
 
         $data = $this->data[$reference][$this->year];
 
         $data->quantity += $soldTotal;
-        $data->grossMargin->merge($gross);
-        $data->commercialMargin->merge($commercial);
+        $data->margin->merge($margin);
     }
 
     private function addSubject(OrderItemInterface $item): void
@@ -147,14 +143,6 @@ class ProductsSection implements SectionInterface
         $this->subjects[$reference]['category'] = $category->getName();
     }
 
-    private function createEmptyData(): ProductData
-    {
-        return new ProductData(
-            new Margin($this->defaultCurrency),
-            new Margin($this->defaultCurrency)
-        );
-    }
-
     public function write(WriterInterface $writer): void
     {
         if ($writer instanceof XlsWriter) {
@@ -177,7 +165,7 @@ class ProductsSection implements SectionInterface
             $total = new Decimal(0);
             /** @var ProductData $datum */
             foreach ($data as $datum) {
-                $total += $datum->grossMargin->getRevenue();
+                $total += $datum->margin->getRevenueProduct();
             }
             $data['total'] = $total;
         });
@@ -201,18 +189,20 @@ class ProductsSection implements SectionInterface
             $sheet->getCell([4, $row])->setValue($subject['category']);
 
             foreach ($this->years as $index => $year) {
-                $col = 5 + $index * 4;
+                $col = 5 + $index * 6;
 
-                $data = $years[$year] ?? $this->createEmptyData();
+                $data = $years[$year] ?? new ProductData();
 
                 // Left border
                 $sheet->getCell([$col, $row])->getStyle()->applyFromArray(XlsWriter::STYLE_BORDER_LEFT);
 
                 // Cells values
                 $sheet->getCell([$col, $row])->setValue($data->quantity->toFixed());
-                $sheet->getCell([$col + 1, $row])->setValue($data->grossMargin->getRevenue());
-                $sheet->getCell([$col + 2, $row])->setValue($data->grossMargin->getPercent());
-                $sheet->getCell([$col + 3, $row])->setValue($data->commercialMargin->getPercent());
+                $sheet->getCell([$col + 1, $row])->setValue($data->margin->getRevenueProduct());
+                $sheet->getCell([$col + 2, $row])->setValue($data->margin->getCostProduct());
+                $sheet->getCell([$col + 3, $row])->setValue($data->margin->getCostSupply());
+                $sheet->getCell([$col + 4, $row])->setValue($data->margin->getPercent(true));
+                $sheet->getCell([$col + 5, $row])->setValue($data->margin->getPercent(false));
             }
         }
     }
@@ -261,20 +251,30 @@ class ProductsSection implements SectionInterface
             $sheet->getCell([$col, 2])->getStyle()->applyFromArray(XlsWriter::STYLE_BORDER_LEFT);
             $sheet->getCell([$col, 2])->setValue('Quantity'); // TODO Trans
 
-            // Revenue
+            // Revenue product
             $sheet->getColumnDimensionByColumn($col + 1)->setWidth(20, 'mm');
             $sheet->getCell([$col + 1, 2])->getStyle()->applyFromArray($headerStyle);
-            $sheet->getCell([$col + 1, 2])->setValue('CA'); // TODO Trans
+            $sheet->getCell([$col + 1, 2])->setValue('Sales'); // TODO Trans
+
+            // Cost product
+            $sheet->getColumnDimensionByColumn($col + 1)->setWidth(20, 'mm');
+            $sheet->getCell([$col + 2, 2])->getStyle()->applyFromArray($headerStyle);
+            $sheet->getCell([$col + 2, 2])->setValue('Purchase'); // TODO Trans
+
+            // Cost supply
+            $sheet->getColumnDimensionByColumn($col + 1)->setWidth(20, 'mm');
+            $sheet->getCell([$col + 3, 2])->getStyle()->applyFromArray($headerStyle);
+            $sheet->getCell([$col + 3, 2])->setValue('Supply'); // TODO Trans
 
             // Gross margin
             $sheet->getColumnDimensionByColumn($col + 2)->setWidth(22, 'mm');
-            $sheet->getCell([$col + 2, 2])->getStyle()->applyFromArray($headerStyle);
-            $sheet->getCell([$col + 2, 2])->setValue('Marge Brut.'); // TODO Trans
+            $sheet->getCell([$col + 4, 2])->getStyle()->applyFromArray($headerStyle);
+            $sheet->getCell([$col + 4, 2])->setValue('Marge Brut.'); // TODO Trans
 
-            // Commercial margin
+            // Net margin
             $sheet->getColumnDimensionByColumn($col + 3)->setWidth(25, 'mm');
-            $sheet->getCell([$col + 3, 2])->getStyle()->applyFromArray($headerStyle);
-            $sheet->getCell([$col + 3, 2])->setValue('Marge Comm.'); // TODO Trans
+            $sheet->getCell([$col + 5, 2])->getStyle()->applyFromArray($headerStyle);
+            $sheet->getCell([$col + 5, 2])->setValue('Marge Net.'); // TODO Trans
         }
     }
 
