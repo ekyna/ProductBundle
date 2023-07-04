@@ -25,7 +25,6 @@ class UpdateOffersHandler
 
     public function __invoke(UpdateOffers $message): void
     {
-
         $product = $this->repository->find($message->getProductId());
 
         if (null === $product) {

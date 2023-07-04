@@ -13,7 +13,6 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
 use Ekyna\Component\Resource\Message\MessageQueue;
 
-use function array_merge;
 use function array_push;
 use function array_unique;
 use function in_array;

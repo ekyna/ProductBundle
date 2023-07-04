@@ -16,19 +16,6 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 final class CacheUtil
 {
     /**
-     * Adds the given key to the given cache key list.
-     *
-     * @param array  $list
-     * @param string $key
-     */
-    public static function addKeyToList(array &$list, string $key): void
-    {
-        if (!in_array($key, $list, true)) {
-            $list[] = $key;
-        }
-    }
-
-    /**
      * Builds and returns the offer(s) cache key.
      *
      * @see \Ekyna\Bundle\ProductBundle\Repository\OfferRepository

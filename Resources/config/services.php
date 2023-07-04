@@ -131,6 +131,15 @@ return static function (ContainerConfigurator $container) {
 
     // Offer resolver
     $services
+        ->set('ekyna_product.clearer.price_cache', Pricing\PriceCacheClearer::class)
+        ->args([
+            service('ekyna_commerce.repository.customer_group'),
+            service('ekyna_commerce.repository.country'),
+            service('doctrine.orm.default_result_cache')->nullOnInvalid(),
+        ]);
+
+    // Offer resolver
+    $services
         ->set('ekyna_product.resolver.offer', Pricing\OfferResolver::class)
         ->args([
             service('ekyna_product.repository.pricing'),
@@ -150,7 +159,7 @@ return static function (ContainerConfigurator $container) {
         ->tag('resource.event_listener', [
             'event'    => QueueEvents::QUEUE_CLOSE,
             'method'   => 'flush',
-            'priority' => 1,
+            'priority' => 2,
         ]);
 
     // Offer updater
@@ -178,8 +187,9 @@ return static function (ContainerConfigurator $container) {
             param('ekyna_product.class.price'),
         ])
         ->tag('resource.event_listener', [
-            'event'  => QueueEvents::QUEUE_CLOSE,
-            'method' => 'flush',
+            'event'    => QueueEvents::QUEUE_CLOSE,
+            'method'   => 'flush',
+            'priority' => 1,
         ]);
 
     // Price updater
@@ -247,7 +257,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.generator.reference', DateNumberGenerator::class)
         ->args([8, 'ym', param('kernel.debug')])
         ->call('setStorage', [
-            expr("parameter('kernel.project_dir')~'/var/data/product_reference'")
+            expr("parameter('kernel.project_dir')~'/var/data/product_reference'"),
         ]);
 
     // External reference generator

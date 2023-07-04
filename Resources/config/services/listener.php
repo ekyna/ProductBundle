@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\CommerceBundle\Event\BuildSubjectLabels;
+use Ekyna\Bundle\ProductBundle\Event\OfferEvents;
+use Ekyna\Bundle\ProductBundle\Event\PriceEvents;
 use Ekyna\Bundle\ProductBundle\Event\PricingEvents;
 use Ekyna\Bundle\ProductBundle\Event\ProductEvents;
 use Ekyna\Bundle\ProductBundle\Event\SpecialOfferEvents;
@@ -36,7 +38,6 @@ use Ekyna\Bundle\ProductBundle\EventListener\SaleButtonsEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\SaleItemEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\SpecialOfferListener;
 use Ekyna\Bundle\UserBundle\Event\DashboardEvent;
-use Symfony\Component\Console\ConsoleEvents;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -128,32 +129,43 @@ return static function (ContainerConfigurator $container) {
         ->tag('resource.event_subscriber');
 
     // Price resource event listener
+    // TODO Remove if doctrine.orm.default_result_cache is not available
     $services
         ->set('ekyna_product.listener.price', PriceListener::class)
         ->args([
-            service('ekyna_resource.orm.persistence_helper'),
-            service('ekyna_commerce.repository.customer_group'),
-            service('ekyna_commerce.repository.country'),
+            service('ekyna_product.clearer.price_cache'),
         ])
-        ->tag('resource.event_subscriber')
-        ->tag('kernel.event_listener', [
-            'event'  => ConsoleEvents::TERMINATE,
-            'method' => 'onTerminate',
+        ->tag('resource.event_listener', [
+            'event'  => PriceEvents::INSERT,
+            'method' => 'onChange',
+        ])
+        ->tag('resource.event_listener', [
+            'event'  => PriceEvents::UPDATE,
+            'method' => 'onChange',
+        ])
+        ->tag('resource.event_listener', [
+            'event'  => PriceEvents::DELETE,
+            'method' => 'onChange',
         ]);
 
     // Offer resource event listener
+    // TODO Remove if doctrine.orm.default_result_cache is not available
     $services
         ->set('ekyna_product.listener.offer', OfferListener::class)
         ->args([
-            service('ekyna_resource.orm.persistence_helper'),
-            service('ekyna_commerce.repository.customer_group'),
-            service('ekyna_commerce.repository.country'),
-            service('doctrine.orm.default_result_cache')->nullOnInvalid(),
+            service('ekyna_product.clearer.price_cache'),
         ])
-        ->tag('resource.event_subscriber')
-        ->tag('kernel.event_listener', [
-            'event'  => ConsoleEvents::TERMINATE,
-            'method' => 'onTerminate',
+        ->tag('resource.event_listener', [
+            'event'  => OfferEvents::INSERT,
+            'method' => 'onChange',
+        ])
+        ->tag('resource.event_listener', [
+            'event'  => OfferEvents::UPDATE,
+            'method' => 'onChange',
+        ])
+        ->tag('resource.event_listener', [
+            'event'  => OfferEvents::DELETE,
+            'method' => 'onChange',
         ]);
 
     // Special offer resource event listener

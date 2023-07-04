@@ -55,21 +55,14 @@ class PriceUpdater
      */
     public function updateProduct(Model\ProductInterface $product): bool
     {
-        switch ($product->getType()) {
-            case Types::TYPE_SIMPLE:
-            case Types::TYPE_VARIANT:
-            case Types::TYPE_BUNDLE:
-                return $this->updateDefault($product);
-
-            case Types::TYPE_VARIABLE:
-                return $this->updateVariable($product);
-
-            case Types::TYPE_CONFIGURABLE:
-                return $this->updateConfigurable($product);
-
-            default:
-                throw new InvalidArgumentException('Unexpected product type.');
-        }
+        return match ($product->getType()) {
+            Types::TYPE_SIMPLE,
+            Types::TYPE_VARIANT,
+            Types::TYPE_BUNDLE       => $this->updateDefault($product),
+            Types::TYPE_VARIABLE     => $this->updateVariable($product),
+            Types::TYPE_CONFIGURABLE => $this->updateConfigurable($product),
+            default                  => throw new InvalidArgumentException('Unexpected product type.'),
+        };
     }
 
     protected function updateDefault(Model\ProductInterface $product): bool
