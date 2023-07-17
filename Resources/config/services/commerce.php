@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Ekyna\Bundle\CommerceBundle\DependencyInjection\Compiler\ItemCheckerPass;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemChecker;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductFilter;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\Report\ProductsSection;
@@ -36,6 +38,16 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.commerce.provider.subject'),
             service('ekyna_product.commerce.filter.product'),
         ]);
+
+    // Sale item checker
+    $services
+        ->set('ekyna_product.commerce.checker.item', ItemChecker::class)
+        ->args([
+            service('ekyna_commerce.provider.context'),
+            service('ekyna_commerce.helper.subject'),
+            service('ekyna_product.commerce.filter.product'),
+        ])
+        ->tag(ItemCheckerPass::TAG);
 
     // Sale form builder
     $services

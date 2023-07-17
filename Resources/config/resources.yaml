@@ -457,6 +457,3 @@ resources:
                     read: '@EkynaProduct/Admin/SpecialOffer/read.html.twig'
                 admin_toggle:
                     properties: enabled
-
-
-
