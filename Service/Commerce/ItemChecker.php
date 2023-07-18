@@ -21,6 +21,7 @@ use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use function array_merge;
 use function array_unique;
 use function in_array;
+use function is_null;
 
 /**
  * Class ItemChecker
@@ -34,9 +35,9 @@ use function in_array;
 class ItemChecker implements ItemCheckerInterface
 {
     public function __construct(
-        private readonly ContextProviderInterface $contextProvider,
-        private readonly SubjectHelperInterface   $subjectHelper,
-        private readonly ProductFilterInterface   $filter,
+        protected readonly ContextProviderInterface $contextProvider,
+        protected readonly SubjectHelperInterface   $subjectHelper,
+        protected readonly ProductFilterInterface   $filter,
     ) {
     }
 
@@ -69,7 +70,9 @@ class ItemChecker implements ItemCheckerInterface
 
         $this->checkComponents($item);
 
-        $this->checkOptions($item, $exclude);
+        if (!is_null($exclude)) {
+            $this->checkOptions($item, $exclude);
+        }
     }
 
     protected function configureFilter(SaleItemInterface $item): void
@@ -84,7 +87,7 @@ class ItemChecker implements ItemCheckerInterface
             return;
         }
 
-        $slots = $product->getBundleSlots()->toArray(); // TODO Filter if product is configurable
+        $slots = $this->filter->getBundleSlots($product);
 
         if (empty($slots)) {
             foreach ($item->getChildren() as $child) {
@@ -124,9 +127,14 @@ class ItemChecker implements ItemCheckerInterface
                 }
                 // Bundle slot found
 
+                $choices = $this->filter->getSlotChoices($slot);
+                if (empty($choices)) {
+                    // Obsolete bundle choice
+                    throw new InvalidSaleItemException();
+                }
+
                 // Bundle slot choice lookup
                 $choiceId = $child->getDatum(ItemBuilder::BUNDLE_CHOICE_ID);
-                $choices = $slot->getChoices(); // TODO Filter if product is configurable
                 foreach ($choices as $choice) {
                     if ($choiceId !== $choice->getId()) {
                         continue;
@@ -142,7 +150,7 @@ class ItemChecker implements ItemCheckerInterface
                 }
             }
 
-            // Obsolete bundle choice
+            // Obsolete bundle slot/choice
             throw new InvalidSaleItemException();
         }
 
@@ -268,7 +276,7 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
-    private function checkOptions(SaleItemInterface $item, ?array $exclude): void
+    private function checkOptions(SaleItemInterface $item, array $exclude): void
     {
         $groups = $this->getOptionGroups($item, $exclude);
 
@@ -297,13 +305,19 @@ class ItemChecker implements ItemCheckerInterface
                     continue;
                 }
 
+                $options = $this->filter->getGroupOptions($group);
+                if (empty($options)) {
+                    // Obsolete option group
+                    throw new InvalidSaleItemException();
+                }
+
                 $optionId = $child->getDatum(ItemBuilder::OPTION_ID);
-                foreach ($group->getOptions() as $option) {
+                foreach ($options as $option) {
                     if ($option->getId() !== $optionId) {
                         continue;
                     }
 
-                    $this->checkOption($item, $option);
+                    $this->checkOption($child, $option);
 
                     $validatedGroups[] = $group->getId();
 
@@ -311,7 +325,7 @@ class ItemChecker implements ItemCheckerInterface
                 }
             }
 
-            // Option not found
+            // Obsolete option group/option
             throw new InvalidSaleItemException();
         }
 
@@ -337,7 +351,7 @@ class ItemChecker implements ItemCheckerInterface
                 throw new InvalidSaleItemException();
             }
 
-            $this->checkItem($item, $product);
+            $this->checkItem($item, null);
 
             return;
         }

@@ -42,7 +42,7 @@ class Option extends RM\AbstractTranslatable implements Model\OptionInterface, G
 
     public function __toString(): string
     {
-        return $this->designation ?: 'New option';
+        return $this->product?->getDesignation() ?: $this->designation ?: 'New option';
     }
 
     public function getGroup(): ?Model\OptionGroupInterface

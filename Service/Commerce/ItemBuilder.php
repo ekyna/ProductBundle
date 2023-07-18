@@ -505,7 +505,7 @@ class ItemBuilder
         $item->setNetPrice(new Decimal(0));
 
         if (null !== $product = $option->getProduct()) {
-            $this->buildFromProduct($item, $product, []); // TODO Cascade / exclude
+            $this->buildFromProduct($item, $product);
             $item->unsetDatum(self::VARIANT_ID); // Not a variant choice
         } else {
             $designation = sprintf(
@@ -572,7 +572,6 @@ class ItemBuilder
     {
         $product = $this->resolve($item);
 
-        // TODO (?) $components = $this->filter->getComponents($product);
         $components = $product->getComponents()->toArray();
         if ($product->getType() === ProductTypes::TYPE_VARIANT) {
             foreach ($product->getParent()->getComponents() as $component) {
