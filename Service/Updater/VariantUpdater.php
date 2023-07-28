@@ -182,6 +182,25 @@ class VariantUpdater
     }
 
     /**
+     * Updates whether the given variant is physical regarding its parent/variable product.
+     *
+     * @throws CommerceExceptionInterface
+     */
+    public function updatePhysical(Model\ProductInterface $variant): bool
+    {
+        $this->assertVariantWithParent($variant);
+
+        $physical = $variant->getParent()->isPhysical();
+        if ($variant->isPhysical() !== $physical) {
+            $variant->setPhysical($physical);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Updates the brand regarding its parent/variable product.
      *
      * @throws CommerceExceptionInterface

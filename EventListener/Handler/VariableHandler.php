@@ -69,6 +69,13 @@ class VariableHandler extends AbstractVariantHandler
                 }
             }
         }
+        if (isset($changeSet['physical'])) {
+            foreach ($variable->getVariants() as $variant) {
+                if ($updater->updatePhysical($variant)) {
+                    $addVariant($variant);
+                }
+            }
+        }
         if (isset($changeSet['unit'])) {
             foreach ($variable->getVariants() as $variant) {
                 if ($updater->updateUnit($variant)) {
@@ -127,6 +134,7 @@ class VariableHandler extends AbstractVariantHandler
             'estimatedDateOfArrival',
             'stockMode',
             'stockState',
+            'physical',
         ];
         if ($this->persistenceHelper->isChanged($variable, $stockProperties)) {
             $childEvents[] = ProductEvents::CHILD_STOCK_CHANGE;

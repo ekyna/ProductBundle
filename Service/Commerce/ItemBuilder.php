@@ -128,6 +128,7 @@ class ItemBuilder
         $item->setReference($product->getReference());
         $item->setNetPrice(clone $product->getNetPrice());
         $item->setWeight(clone $product->getPackageWeight());
+        $item->setPhysical($product->isPhysical());
         $item->setTaxGroup($product->getTaxGroup());
         $item->setCompound(false);
         $item->setConfigurable(false);
@@ -531,6 +532,7 @@ class ItemBuilder
             ->setDatum(self::OPTION_ID, $option->getId())
             ->setQuantity(new Decimal(1))
             ->setImmutable(true)
+            ->setPrivate(false)
             ->setConfigurable(false);
 
         // If not private and group is required and group has a single option choice
