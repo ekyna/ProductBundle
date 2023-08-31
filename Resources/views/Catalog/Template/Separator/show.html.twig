@@ -5,6 +5,6 @@
     'label': t('field.description', [], 'EkynaUi'),
     'html': true
 }) }}
-{{ show_row(page.options.image, 'media_media', {
+{{ show_row(page.options.image|default(null), 'media_media', {
     'label': t('field.image', [], 'EkynaUi'),
 }) }}

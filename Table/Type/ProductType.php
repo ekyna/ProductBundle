@@ -236,9 +236,13 @@ class ProductType extends AbstractResourceType
                     'class'    => StockSubjectStates::class,
                     'position' => 80,
                 ])
+                ->addFilter('physical', CType\Filter\BooleanType::class, [
+                    'label'    => t('field.physical', [], 'EkynaCommerce'),
+                    'position' => 90,
+                ])
                 ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
                     'label'    => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
-                    'position' => 90,
+                    'position' => 95,
                 ])
                 ->addFilter('endOfLife', CType\Filter\BooleanType::class, [
                     'label'    => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),

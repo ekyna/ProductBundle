@@ -23,7 +23,6 @@ class AttributeSetType extends AbstractResourceType
         $builder
             ->addColumn('name', BType\Column\AnchorType::class, [
                 'label'         => t('field.name', [], 'EkynaUi'),
-                'property_path' => null,
                 'sortable'      => true,
                 'position'      => 10,
             ])

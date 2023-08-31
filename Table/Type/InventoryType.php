@@ -42,7 +42,7 @@ class InventoryType extends AbstractResourceType
         $builder
             ->addColumn('actions', BType\Column\ActionsType::class, [
                 'resource' => $this->dataClass,
-                'actions' => [
+                'actions'  => [
                     DeleteAction::class,
                 ],
             ]);
