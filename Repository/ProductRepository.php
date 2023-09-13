@@ -949,12 +949,19 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->andWhere($qb->expr()->notIn('p.type', ':types'))
             ->setParameters(
                 [
-                    'types'       => [
+                    'types' => [
                         ProductTypes::TYPE_VARIABLE,
                         ProductTypes::TYPE_CONFIGURABLE,
                     ],
                 ]
             );
+
+        $categories = $config->getCategories();
+        if (!$categories->isEmpty()) {
+            $qb
+                ->andWhere($qb->expr()->isMemberOf(':categories', 'p.categories'))
+                ->setParameter('categories', $categories->toArray());
+        }
 
         $brands = $config->getBrands();
         if (!$brands->isEmpty()) {

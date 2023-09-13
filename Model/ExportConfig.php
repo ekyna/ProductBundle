@@ -55,6 +55,8 @@ class ExportConfig
     private string            $enclosure    = '"';
     /** @var Collection<int, BrandInterface> */
     private Collection $brands;
+    /** @var Collection<int, CategoryInterface> */
+    private Collection $categories;
 
     public function __construct(private readonly ContextInterface $context)
     {
@@ -70,6 +72,7 @@ class ExportConfig
             self::COLUMN_URL,
         ];
         $this->brands = new ArrayCollection();
+        $this->categories = new ArrayCollection();
         $this->validUntil = new DateTime('last day of December');
     }
 
@@ -118,6 +121,32 @@ class ExportConfig
     {
         if ($this->brands->contains($brand)) {
             $this->brands->removeElement($brand);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CategoryInterface>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(CategoryInterface $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(CategoryInterface $category): self
+    {
+        if ($this->categories->contains($category)) {
+            $this->categories->removeElement($category);
         }
 
         return $this;

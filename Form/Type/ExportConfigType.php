@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type;
 
 use Ekyna\Bundle\CommerceBundle\Form\Type\Common\ContextType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Brand\BrandChoiceType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Category\CategoryChoiceType;
 use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -50,6 +51,10 @@ class ExportConfigType extends AbstractType
                 'choice_translation_domain' => false,
                 'multiple'                  => true,
                 'expanded'                  => true,
+            ])
+            ->add('categories', CategoryChoiceType::class, [
+                'multiple' => true,
+                'required' => false,
             ])
             ->add('brands', BrandChoiceType::class, [
                 'multiple' => true,

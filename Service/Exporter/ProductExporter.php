@@ -46,19 +46,7 @@ class ProductExporter
     {
         $this->config = $config;
 
-        $brands = $this->config->getBrands()->toArray();
-
-        if (empty($brands)) {
-            $name = 'products';
-        } else {
-            $slugger = new AsciiSlugger();
-            $name = join('_', array_map(
-                fn(BrandInterface $brand) => $slugger->slug($brand->getName())->lower(),
-                $brands
-            ));
-        }
-
-        $this->file = Csv::create($name . '_export.csv');
+        $this->file = Csv::create('product_export.csv');
         $this->file->setSeparator($this->config->getSeparator());
         $this->file->setEnclosure($this->config->getEnclosure());
 
