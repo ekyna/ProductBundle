@@ -138,7 +138,6 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'allow_new' => true,
-            'required'  => true,
         ], $options);
 
         $this->form->add('brand', PR\Brand\BrandChoiceType::class, $options);
@@ -187,7 +186,6 @@ class ProductFormBuilder
             'resource'  => 'ekyna_product.category',
             'multiple'  => true,
             'allow_new' => true,
-            'required'  => true,
         ], $options);
 
         $this->form->add('categories', ResourceChoiceType::class, $options);
@@ -268,7 +266,6 @@ class ProductFormBuilder
                 MediaTypes::VIDEO,
                 MediaTypes::FILE,
             ],
-            'required'    => false,
         ], $options);
 
         $this->form->add('medias', MediaCollectionType::class, $options);
@@ -324,7 +321,6 @@ class ProductFormBuilder
             'allow_delete'    => true,
             'allow_sort'      => true,
             'add_button_text' => t('option_group.button.add', [], 'EkynaProduct'),
-            'required'        => false,
         ], $options);
 
         $this->form->add('optionGroups', CollectionType::class, $options);
@@ -340,7 +336,6 @@ class ProductFormBuilder
         $options = array_replace([
             'resource'  => PricingGroupInterface::class,
             'allow_new' => true,
-            'required'  => false,
         ], $options);
 
         $this->form->add('pricingGroup', ResourceChoiceType::class, $options);
@@ -365,7 +360,6 @@ class ProductFormBuilder
             'allow_add'       => true,
             'allow_delete'    => true,
             'add_button_text' => t('pricing.button.add', [], 'EkynaProduct'),
-            'required'        => false,
         ], $options);
 
         $this->form->add('pricings', CollectionType::class, $options);
@@ -399,7 +393,6 @@ class ProductFormBuilder
             'entry_type'   => PR\ProductReferenceType::class,
             'allow_add'    => true,
             'allow_delete' => true,
-            'required'     => false,
         ], $options);
 
         $this->form->add('references', CollectionType::class, $options);
@@ -438,7 +431,6 @@ class ProductFormBuilder
             'allow_add'       => true,
             'allow_delete'    => true,
             'add_button_text' => t('special_offer.button.add', [], 'EkynaProduct'),
-            'required'        => false,
         ], $options);
 
         $this->form->add('specialOffers', CollectionType::class, $options);
@@ -486,7 +478,6 @@ class ProductFormBuilder
         $options = array_replace([
             'property_path' => 'parent',
             'types'         => [ProductTypes::TYPE_VARIABLE],
-            'required'      => false,
             'disabled'      => true,
         ], $options);
 
@@ -528,7 +519,7 @@ class ProductFormBuilder
     }
 
     /**
-     * Adds the best-seller field.
+     * Adds the bestseller field.
      */
     public function addBestSellerField(array $options = []): ProductFormBuilder
     {

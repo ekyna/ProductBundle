@@ -10,14 +10,15 @@ use Ekyna\Bundle\ProductBundle\Model\SpecialOfferInterface;
 return [
     SpecialOfferInterface::class => [
         'special_offer_1' => [
-            '__factory'   => [
+            '__factory'      => [
                 '@ekyna_product.factory.special_offer::create' => [],
             ],
-            'designation' => 'Remise Acme Entreprise',
-            'percent'     => "<decimal('10')>",
-            'enabled'     => true,
-            'brands'      => ['@brand_acme'],
-            'groups'      => ["<resource('ekyna_commerce.customer_group', '{id: 2}')>",],
+            'designation'    => 'Remise Acme Entreprise',
+            'percent'        => "<decimal('10')>",
+            'enabled'        => true,
+            'brands'         => ['@brand_acme'],
+            'pricingGroups'  => ["<resource('ekyna_product.pricing_group', '{id: 1}')>"],
+            'customerGroups' => ["<resource('ekyna_commerce.customer_group', '{id: 2}')>"],
         ],
     ],
     CatalogInterface::class      => [

@@ -177,7 +177,6 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageDepthField();
     }
 
-
     /**
      * Builds the variable product form.
      */

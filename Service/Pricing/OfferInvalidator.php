@@ -27,7 +27,7 @@ class OfferInvalidator extends AbstractInvalidator
         parent::__construct($entityManager, $productRepository, $messageQueue, $offerClass, 'pendingOffers');
     }
 
-    protected function createMessage(array|int $productId): object
+    protected function createMessage(int $productId): object
     {
         return (new Envelope(new UpdateOffers($productId)))->with(new DelayStamp(1000));
     }

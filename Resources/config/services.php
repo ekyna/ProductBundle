@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\ORM\Events;
+use Ekyna\Bundle\CommerceBundle\Install\CommerceInstaller;
 use Ekyna\Bundle\ProductBundle\Attribute;
 use Ekyna\Bundle\ProductBundle\Attribute\Type\TypeInterface;
+use Ekyna\Bundle\ProductBundle\Install\ProductInstaller;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
@@ -410,4 +412,14 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.schema_org.brand', SchemaOrg\BrandProvider::class)
         ->tag('ekyna_cms.schema_org_provider');
+
+    // Installer
+    $services
+        ->set('ekyna_product.installer', ProductInstaller::class)
+        ->args([
+            service('ekyna_resource.repository.factory'),
+            service('ekyna_resource.factory.factory'),
+            service('ekyna_resource.manager.factory'),
+        ])
+        ->tag('ekyna_install.installer', ['priority' => 96]);
 };

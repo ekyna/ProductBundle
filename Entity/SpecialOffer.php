@@ -63,6 +63,7 @@ class SpecialOffer extends AbstractResource implements SpecialOfferInterface
 
         $this->products = new ArrayCollection();
         $this->brands = new ArrayCollection();
+        $this->pricingGroups = new ArrayCollection();
         $this->customerGroups = new ArrayCollection();
         $this->countries = new ArrayCollection();
     }

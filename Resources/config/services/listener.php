@@ -43,7 +43,8 @@ return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     // Account dashboard event listener
-    $services->set('ekyna_product.listener.account.dashboard', AccountDashboardSubscriber::class)
+    $services
+        ->set('ekyna_product.listener.account.dashboard', AccountDashboardSubscriber::class)
         /*->args([
             service('ekyna_commerce.provider.context'),
             service('ekyna_product.repository.pricing'),

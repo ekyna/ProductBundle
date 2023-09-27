@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Controller\Admin\StockView;
 
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Commerce\Common\Util\Money;
 use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
 use RuntimeException;
@@ -27,6 +28,7 @@ class ExportUnitsController
 {
     public function __construct(
         private readonly StockUnitRepositoryInterface $stockUnitRepository,
+        private readonly FormatterFactory             $formatterFactory,
         private readonly string                       $defaultCurrency
     ) {
     }
@@ -40,6 +42,8 @@ class ExportUnitsController
                 throw new RuntimeException('Failed to open output stream.');
             }
 
+            $formatter = $this->formatterFactory->create();
+
             $stockUnits = $this->stockUnitRepository->findInStock();
 
             fputcsv($handle, [
@@ -51,6 +55,8 @@ class ExportUnitsController
                 'buy price',
                 'currency',
                 'valorization',
+                'exchange rate',
+                'exchange date',
             ]);
 
             foreach ($stockUnits as $stockUnit) {
@@ -64,8 +70,10 @@ class ExportUnitsController
 
                 $currency = ($c = $stockUnit->getCurrency()) ? $c->getCode() : $this->defaultCurrency;
 
-                if ($rate = $stockUnit->getExchangeRate()) {
-                    $price = Money::round($price * $rate, $currency);
+                $exchangeRate = null;
+                $exchangeDate = $stockUnit->getExchangeDate();
+                if (null !== $exchangeRate = $stockUnit->getExchangeRate()) {
+                    $price = Money::round($price * $exchangeRate, $currency);
                 }
 
                 $value = Money::round($value * $inStock, $currency);
@@ -79,6 +87,8 @@ class ExportUnitsController
                     Money::fixed($price, $currency),
                     $currency,
                     Money::fixed($value, $currency),
+                    $exchangeRate ? $exchangeRate->toFixed(5) : '',
+                    $exchangeDate ? $formatter->date($exchangeDate) : '',
                 ];
 
                 fputcsv($handle, $data);
@@ -88,9 +98,11 @@ class ExportUnitsController
         });
 
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'inventory-units.csv'
-        ));
+        $response->headers->set('Content-Disposition',
+            $response->headers->makeDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                'inventory-units.csv'
+            ));
 
         return $response;
     }

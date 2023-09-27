@@ -13,9 +13,14 @@ use Ekyna\Bundle\ProductBundle\Model\OptionGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\OptionInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Component\Commerce\Common\Builder\AdjustmentBuilderInterface;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentDataInterface;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentInterface;
+use Ekyna\Component\Commerce\Common\Model\AdjustmentTypes;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Exception;
 
+use function array_map;
 use function array_merge;
 use function array_unique;
 
@@ -33,13 +38,11 @@ class ItemBuilder
     public const OPTION_ID        = 'option_id';
     public const COMPONENT_ID     = 'component_id';
 
-    protected ProductProvider        $provider;
-    protected ProductFilterInterface $filter;
-
-    public function __construct(ProductProvider $provider, ProductFilterInterface $filter)
-    {
-        $this->provider = $provider;
-        $this->filter = $filter;
+    public function __construct(
+        protected readonly ProductProvider            $provider,
+        protected readonly ProductFilterInterface     $filter,
+        protected readonly AdjustmentBuilderInterface $adjustmentBuilder,
+    ) {
     }
 
     /**
@@ -134,7 +137,21 @@ class ItemBuilder
         $item->setConfigurable(false);
         $item->setPrivate(!$product->isVisible());
 
+        $this->buildAdjustments($item, $product);
+
         $this->cleanUpBundleSlots($item);
+    }
+
+    protected function buildAdjustments(SaleItemInterface $item, ProductInterface $product): void
+    {
+        $adjustments = $product->getAdjustments(AdjustmentTypes::TYPE_INCLUDED)->toArray();
+
+        $adjustments = array_map(
+            static fn (AdjustmentInterface $a): AdjustmentDataInterface => $a->toAdjustmentData(),
+            $adjustments
+        );
+
+        $this->adjustmentBuilder->buildAdjustments(AdjustmentTypes::TYPE_INCLUDED, $item, $adjustments);
     }
 
     /**

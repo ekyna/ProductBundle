@@ -37,6 +37,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('ekyna_product.commerce.provider.subject'),
             service('ekyna_product.commerce.filter.product'),
+            service('ekyna_commerce.builder.adjustment'),
         ]);
 
     // Sale item checker
