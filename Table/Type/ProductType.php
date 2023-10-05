@@ -76,7 +76,7 @@ class ProductType extends AbstractResourceType
         $builder
             ->addColumn('designation', BType\Column\AnchorType::class, [
                 'label'         => t('field.designation', [], 'EkynaUi'),
-                'property_path' => 'fullDesignation',
+                'property_path' => false,
                 'sortable'      => false,
                 'position'      => 20,
             ])

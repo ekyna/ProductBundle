@@ -23,11 +23,21 @@ use Ekyna\Component\Commerce\Exception;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function is_null;
 
 /**
  * Class ItemBuilder
  * @package Ekyna\Bundle\ProductBundle\Service\Commerce
  * @author  Etienne Dauvergne <contact@ekyna.com>
+ *
+ * Options exclusion logic must be kept in sync with ItemChecker,
+ * until a new « Add to sale model » is introduced, with composition tree
+ * and options bubbling (to get a single level of public children).
+ *
+ * TODO Refactor usage of
+ *      \Ekyna\Component\Commerce\Common\Model\SaleItemInterface::isCompound
+ *      vs
+ *      \Ekyna\Component\Commerce\Stock\Model\StockSubjectInterface::isStockCompound
  */
 class ItemBuilder
 {
@@ -523,7 +533,7 @@ class ItemBuilder
         $item->setNetPrice(new Decimal(0));
 
         if (null !== $product = $option->getProduct()) {
-            $this->buildFromProduct($item, $product);
+            $this->buildFromProduct($item, $product, []);
             $item->unsetDatum(self::VARIANT_ID); // Not a variant choice
         } else {
             $designation = sprintf(

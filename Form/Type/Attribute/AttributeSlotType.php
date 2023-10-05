@@ -36,9 +36,7 @@ class AttributeSlotType extends AbstractResourceType
             ->add('naming', Type\CheckboxType::class, [
                 'label'    => t('attribute_slot.field.naming', [], 'EkynaProduct'),
                 'required' => false,
-                'attr'     => [
-                    'help_text' => t('attribute_slot.help.naming', [], 'EkynaProduct'),
-                ],
+                'help'     => t('attribute_slot.help.naming', [], 'EkynaProduct'),
             ])
             ->add('position', CollectionPositionType::class);
     }

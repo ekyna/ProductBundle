@@ -81,9 +81,8 @@ class BundleToSimpleType extends AbstractType
 
         $form->add('option_group_selection', OptionGroupChoiceType::class, [
             'optionGroups' => $optionGroups,
-            'attr'         => [
-                'help_text' => t('convert.bundle_to_simple.option_group_choice', [], 'EkynaProduct'),
-            ],
+            'help'         => t('convert.bundle_to_simple.option_group_choice', [], 'EkynaProduct'),
+            'help_html'    => true,
         ]);
     }
 

@@ -266,9 +266,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
         $this->subjectBuilder
             ->addDesignationField([
                 'required' => false,
-                'attr'     => [
-                    'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
-                ],
+                'help'     => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
             ])
             ->addCustomerGroupsField()
             ->addNetPriceField()

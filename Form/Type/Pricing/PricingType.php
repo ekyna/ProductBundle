@@ -65,9 +65,7 @@ class PricingType extends AbstractResourceType
             ->add('designation', TextType::class, [
                 'label'    => t('field.designation', [], 'EkynaUi'),
                 'required' => false,
-                'attr'     => [
-                    'help_text' => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
-                ],
+                'help'     => t('leave_blank_to_auto_generate', [], 'EkynaProduct'),
             ])
             ->add('pricingGroups', ResourceChoiceType::class, [
                 'resource' => PricingGroupInterface::class,

@@ -31,9 +31,7 @@ class UnitConfigType extends AbstractType
             ->add('suffix', Type\TextType::class, [
                 'label'    => t('attribute.config.suffix', [], 'EkynaProduct'),
                 'required' => false,
-                'attr'     => [
-                    'help_text' => t('attribute.help.suffix', [], 'EkynaProduct'),
-                ],
+                'help'     => t('attribute.help.suffix', [], 'EkynaProduct'),
             ]);
     }
 

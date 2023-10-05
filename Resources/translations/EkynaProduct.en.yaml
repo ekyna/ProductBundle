@@ -241,20 +241,20 @@ convert:
         warning: Please check all the variable <strong>AND</strong> the created variant informations.
         tag_choice: |
             Select the <strong>variable</strong> product tags.
-            Tags not selected will be trasfered to the <strong>variant</strong> created.
+            Tags not selected will be transferred to the <strong>variant</strong> created.
         option_group_choice: |
             Select the <strong>variable</strong> product options groups.
-            Options groups not selected will be trasfered to the <strong>variant</strong> created.
+            Options groups not selected will be transferred to the <strong>variant</strong> created.
         media_choice: |
             Select the <strong>variable</strong> product medias.
-            Medias not selected will be trasfered to the <strong>variant</strong> created.
+            Medias not selected will be transferred to the <strong>variant</strong> created.
     bundle_to_simple:
         confirm: Are you sure you want to convert this bundle into a simple product ? Composition will be lost.
         option_group_choice: |
             Select the <strong>sub-products</strong> options group.
     success: |
         Conversion succeeded.
-        <br><strong>Warning</strong>: this product has been marqued as &laquo; <strong>quote only</strong> &raquo;'.
+        <br><strong>Warning</strong>: this product has been marked as &laquo; <strong>quote only</strong> &raquo;'.
         <br>Please check all the information, especially the &laquo; <strong>stock</strong> &raquo; tab.
 cross_selling:
     label:
@@ -354,7 +354,7 @@ price:
         no_item: No price configured
     display:
         special_offer: Special Offer -%percent%
-        pricing: Preferencial Price -%percent%
+        pricing: Preferential Price -%percent%
         starting_from: <small>From</small>
         valid_until: Offer valid until %date%
         while_stock: Within the limit of available product stock
@@ -491,7 +491,7 @@ product:
         related_catalogs: This product is shown in the following catalogs
         brand_naming: Include brand in title and designation
         not_contractual: Non-contractual photos
-        attributes_title: Aattributes title
+        attributes_title: Attributes title
         attributes_designation: Attributes designation
         internal_manual: Product manual (media)
         external_manual: Product manual (URL)

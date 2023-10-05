@@ -67,6 +67,9 @@ class BundleHandler extends AbstractHandler
             $events[] = ProductEvents::CHILD_PRICE_CHANGE;
             $changed = true;
         }
+        if ($this->persistenceHelper->isChanged($bundle, ['brand', 'pricingGroup'])) {
+            $this->offerInvalidator->invalidateByProduct($bundle);
+        }
 
         $changed = $this->updateMinPrice($bundle) || $changed;
 

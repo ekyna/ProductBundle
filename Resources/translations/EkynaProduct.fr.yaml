@@ -252,7 +252,7 @@ convert:
         confirm: Êtes-vous sûr de vouloir convertir ce pack en produit simple ? La composition sera perdue.
         option_group_choice: |
             Sélectionnez les groupes d'options des sous-produits du pack
-            à destination du produit <strong>simpe</strong>.
+            à destination du produit <strong>simple</strong>.
     success: |
         Conversion réussie.
         <br><strong>Attention</strong> : le produit a été marqué &laquo; <strong>sur devis uniquement</strong> &raquo;.

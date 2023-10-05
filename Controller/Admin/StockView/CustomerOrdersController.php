@@ -33,6 +33,8 @@ class CustomerOrdersController extends AbstractController
 
         $product = $this->findProductById($request->attributes->getInt('productId'));
 
+        // TODO Having item not fully shipped
+
         $table = $this->tableHelper->createResourceTableView('ekyna_commerce.order', [
             'subject'       => $product,
             'state'         => [OrderStates::STATE_ACCEPTED],

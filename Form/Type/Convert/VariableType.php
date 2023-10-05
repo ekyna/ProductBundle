@@ -101,27 +101,24 @@ class VariableType extends AbstractType
         if (!empty($optionGroups = $variant->getOptionGroups()->toArray())) {
             $form->add('option_group_selection', OptionGroupChoiceType::class, [
                 'optionGroups' => $optionGroups,
-                'attr'         => [
-                    'help_text' => t('convert.simple_to_variable.option_group_choice', [], 'EkynaProduct'),
-                ],
+                'help'         => t('convert.simple_to_variable.option_group_choice', [], 'EkynaProduct'),
+                'help_html'    => true,
             ]);
         }
 
         if (!empty($medias = $variant->getMedias()->toArray())) {
             $form->add('media_selection', MediaChoiceType::class, [
-                'medias' => $medias,
-                'attr'   => [
-                    'help_text' => t('convert.simple_to_variable.media_choice', [], 'EkynaProduct'),
-                ],
+                'medias'    => $medias,
+                'help'      => t('convert.simple_to_variable.media_choice', [], 'EkynaProduct'),
+                'help_html' => true,
             ]);
         }
 
         if (!empty($tags = $variant->getTags()->toArray())) {
             $form->add('tag_selection', TagChoiceType::class, [
-                'tags' => $tags,
-                'attr' => [
-                    'help_text' => t('convert.simple_to_variable.tag_choice', [], 'EkynaProduct'),
-                ],
+                'tags'      => $tags,
+                'help'      => t('convert.simple_to_variable.tag_choice', [], 'EkynaProduct'),
+                'help_html' => true,
             ]);
         }
 
