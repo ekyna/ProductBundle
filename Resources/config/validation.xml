@@ -1002,7 +1002,6 @@
             <constraint name="Count">
                 <option name="max">0</option>
                 <option name="groups">
-                    <value>bundle</value>
                     <value>variable</value>
                     <value>configurable</value>
                 </option>
