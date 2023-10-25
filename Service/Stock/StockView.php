@@ -47,7 +47,7 @@ class StockView
     use FormatterAwareTrait;
 
     private const PENDING_DQL = "(
-  SELECT SUM(nsoi.quantity) 
+  SELECT SUM(nsoi.quantity * nsoi.packing) 
   FROM _class_ nsoi
   JOIN nsoi.product nsp
   JOIN nsoi.order nso
