@@ -31,6 +31,7 @@ class Configuration implements ConfigurationInterface
         $this->addEditorSection($root);
         $this->addPricingSection($root);
         $this->addHighlightSection($root);
+        $this->addAdjustmentSection($root);
 
         return $builder;
     }
@@ -239,6 +240,22 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('price_with_from')
                             ->defaultTrue()
                         ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addAdjustmentSection(ArrayNodeDefinition $node): void
+    {
+        $node
+            ->children()
+                ->arrayNode('adjustment')
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('label')->end()
+                        ->scalarNode('domain')->end()
+                    ->end()
                     ->end()
                 ->end()
             ->end();

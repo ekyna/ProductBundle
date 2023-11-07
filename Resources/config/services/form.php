@@ -14,6 +14,7 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 use Ekyna\Bundle\ProductBundle\Form\Type\ExportConfigType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Option;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductAdjustmentType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAttributesType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductType;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
@@ -208,6 +209,14 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.form_type.product', ProductType::class)
         ->args([
             service('ekyna_product.listener.product_form'),
+        ])
+        ->tag('form.type');
+
+    $services
+        ->set('ekyna_product.form_type.product_adjustment', ProductAdjustmentType::class)
+        ->args([
+            service('translator'),
+            abstract_arg('The adjustment designation choices.'),
         ])
         ->tag('form.type');
 

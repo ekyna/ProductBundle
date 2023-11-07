@@ -174,7 +174,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageWeightField()
             ->addPackageWidthField()
             ->addPackageHeightField()
-            ->addPackageDepthField();
+            ->addPackageDepthField()
+            ->addHsCodeField();
     }
 
     /**
@@ -229,7 +230,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageWeightField(['disabled' => true])
             ->addPackageWidthField(['disabled' => true])
             ->addPackageHeightField(['disabled' => true])
-            ->addPackageDepthField(['disabled' => true]);
+            ->addPackageDepthField(['disabled' => true])
+            ->addHsCodeField(['disabled' => true]);
     }
 
     /**
@@ -298,7 +300,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageWeightField()
             ->addPackageWidthField()
             ->addPackageHeightField()
-            ->addPackageDepthField();
+            ->addPackageDepthField()
+            ->addHsCodeField();
     }
 
     /**
@@ -356,7 +359,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageWeightField()
             ->addPackageWidthField()
             ->addPackageHeightField()
-            ->addPackageDepthField();
+            ->addPackageDepthField()
+            ->addHsCodeField();
     }
 
     /**
@@ -409,7 +413,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addPackageWeightField(['disabled' => true])
             ->addPackageWidthField(['disabled' => true])
             ->addPackageHeightField(['disabled' => true])
-            ->addPackageDepthField(['disabled' => true]);
+            ->addPackageDepthField(['disabled' => true])
+            ->addHsCodeField(['disabled' => true]);
     }
 
     protected function getProductBuilder(): ProductFormBuilder

@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function array_replace;
 use function in_array;
 
 /**
@@ -130,6 +131,11 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
             ->replaceArgument(6, array_replace([
                 'vat_display_mode' => new Parameter('ekyna_commerce.default.vat_display_mode'),
             ], $config['pricing']));
+
+        // Product adjustment form type
+        $container
+            ->getDefinition('ekyna_product.form_type.product_adjustment')
+            ->replaceArgument(1, $config['adjustment']);
     }
 
     private function configureFeatures(array $config, ContainerBuilder $container): void

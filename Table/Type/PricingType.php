@@ -60,17 +60,21 @@ class PricingType extends AbstractResourceType
         }
 
         $builder
-            ->addFilter('brands', ResourceType::class, [
-                'resource' => 'ekyna_product.brand',
-                'position' => 10,
-            ])
-            ->addFilter('groups', ResourceType::class, [
+            ->addFilter('customerGroups', ResourceType::class, [
                 'resource' => 'ekyna_commerce.customer_group',
-                'position' => 20,
+                'position' => 10,
             ])
             ->addFilter('countries', ResourceType::class, [
                 'resource' => 'ekyna_commerce.country',
+                'position' => 20,
+            ])
+            ->addFilter('pricingGroups', ResourceType::class, [
+                'resource' => 'ekyna_product.pricing_group',
                 'position' => 30,
+            ])
+            ->addFilter('brands', ResourceType::class, [
+                'resource' => 'ekyna_product.brand',
+                'position' => 40,
             ]);
     }
 
