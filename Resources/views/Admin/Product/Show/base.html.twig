@@ -1,5 +1,4 @@
 {% import '@EkynaProduct/Admin/Product/Show/_macro.html.twig' as _product %}
-{% import '@EkynaCommerce/Admin/Stock/_subject_macros.html.twig' as _subject %}
 
 {% set optionParents = product|option_parents %}
 {% set componentParents = product|component_parents %}
@@ -171,7 +170,7 @@
                     {%- endblock stock_actions -%}
                 </p>
                 <div id="stock-view">
-                    {{ _subject.show_stock_view(product, 'product') }}
+                    {{ render_subject_stock_view(product, {'prefix': 'product'}) }}
                 </div>
             {%- endblock stock_content -%}
             </div>

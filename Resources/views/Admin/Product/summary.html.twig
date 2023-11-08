@@ -52,7 +52,7 @@
                 <dt>{{ 'stock_subject.field.replenishment_time'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ replenishment }}</dd>
                 <dt>{{ 'stock_subject.field.quote_only'|trans({}, 'EkynaCommerce') }}</dt>
-                <dd>{{ quote_only }}</dd>
+                <dd>{{ quote_only|raw }}</dd>
                 <dt>{{ 'field.visible'|trans({}, 'EkynaUi') }}</dt>
                 <dd>{{ ('value.' ~ (visible ? 'yes' : 'no'))|trans({}, 'EkynaUi') }}</dd>
             </dl>
@@ -70,7 +70,7 @@
                 <dt>{{ 'field.replenishment_eda'|trans({}, 'EkynaCommerce') }}</dt>
                 <dd>{{ eda }}</dd>
                 <dt>{{ 'stock_subject.field.end_of_life'|trans({}, 'EkynaCommerce') }}</dt>
-                <dd>{{ end_of_life }}</dd>
+                <dd>{{ end_of_life|raw }}</dd>
                 <dt>{{ 'common.visibility'|trans({}, 'EkynaProduct') }}</dt>
                 <dd>{{ visibility }}</dd>
             </dl>

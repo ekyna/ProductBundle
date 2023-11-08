@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Group;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface;
 use Ekyna\Component\Commerce\Supplier\Repository\SupplierProductRepositoryInterface;
@@ -12,6 +13,8 @@ use Ekyna\Component\Resource\Bridge\Symfony\Serializer\TranslatableNormalizer;
 use Ekyna\Component\Resource\Model\TranslationInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareTrait;
+
+use function array_merge_recursive;
 
 /**
  * Class ProductNormalizer
@@ -42,7 +45,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
      */
     public function normalize($object, string $format = null, array $context = [])
     {
-        if ($this->contextHasGroup('StockView', $context)) {
+        if (self::contextHasGroup([Group::STOCK_VIEW, Group::STOCK_UNIT], $context)) {
             return $this->helper->normalizeStock($object, $format, $context);
         }
 
@@ -67,7 +70,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
             'tax_group'   => $object->getTaxGroup()->getId(),
         ], $data);
 
-        if ($this->contextHasGroup(['Default', 'Product'], $context)) {
+        if (self::contextHasGroup(['Default', 'Product'], $context)) {
             // Brand
             if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = $brand->getId();
@@ -95,7 +98,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
 
             // Option groups
             $data['option_groups'] = $this->normalizeOptionGroups($object);
-        } elseif ($this->contextHasGroup('Search', $context)) {
+        } elseif (self::contextHasGroup('Search', $context)) {
             // Brand
             if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = [
@@ -128,7 +131,7 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
             $data['option_groups'] = $this->normalizeOptionGroups($object);
             $data['quote_only'] = $object->isQuoteOnly();
             $data['end_of_life'] = $object->isEndOfLife();
-        } elseif ($this->contextHasGroup('Summary', $context)) {
+        } elseif (self::contextHasGroup('Summary', $context)) {
             $data['visibility'] = $object->getVisibility();
 
             // Brand
@@ -141,7 +144,8 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
             }
 
-            $data = array_replace($data, $this->helper->normalizeStock($object, $format, $context));
+            $stockContext = array_merge_recursive($context, ['groups' => [Group::STOCK_VIEW]]);
+            $data = array_replace($data, $this->helper->normalizeStock($object, $format, $stockContext));
 
             $data['suppliers'] = array_map(function (SupplierProductInterface $reference) {
                 return [
@@ -150,10 +154,6 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
                     'currency'  => $reference->getSupplier()->getCurrency()->getCode(),
                 ];
             }, $this->supplierProductRepository->findBySubject($object));
-        }
-
-        if ($this->contextHasGroup('Stock', $context)) {
-            $data = array_replace($this->helper->normalizeStock($object, $format, $context), $data);
         }
 
         return $data;

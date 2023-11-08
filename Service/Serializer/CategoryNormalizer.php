@@ -27,11 +27,11 @@ class CategoryNormalizer extends TranslatableNormalizer
         $data['name'] = $object->getName();
         $data['visible'] = $object->isVisible();
 
-        if ($this->contextHasGroup(['Default', 'Category'], $context)) {
+        if (self::contextHasGroup(['Default', 'Category'], $context)) {
             if (null !== $seo = $object->getSeo()) {
                 $data['seo'] = $seo->getId();
             }
-        } elseif ($this->contextHasGroup('Search', $context)) {
+        } elseif (self::contextHasGroup('Search', $context)) {
             if (null !== $seo = $object->getSeo()) {
                 $data['seo'] = $this->normalizeObject($seo, $format, $context);
             }
