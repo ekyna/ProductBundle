@@ -44,7 +44,7 @@ class ExportProductsController
                 'reference',
                 'stock',
                 'geocode',
-            ], ';', '"');
+            ]);
 
             foreach ($products as $product) {
                 $data = [

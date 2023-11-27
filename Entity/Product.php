@@ -119,6 +119,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     {
         parent::__clone();
 
+        $this->initializeTimestampable();
         $this->stockSubjectClone();
     }
 

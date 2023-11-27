@@ -229,6 +229,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.controller.admin.stock_view.export_units', StockView\ExportUnitsController::class)
         ->args([
             service('ekyna_product.repository.product_stock_unit'),
+            service('ekyna_commerce.factory.formatter'),
             param('ekyna_commerce.default.currency'),
         ])
         ->alias(StockView\ExportUnitsController::class, 'ekyna_product.controller.admin.stock_view.export_units')
