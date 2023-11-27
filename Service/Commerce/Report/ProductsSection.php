@@ -241,7 +241,7 @@ class ProductsSection implements SectionInterface
             $col = $base + ($index * 4);
 
             // Year (merged cells)
-            $sheet->mergeCells([$col, 1, $col + 3, 1]);
+            $sheet->mergeCells([$col, 1, $col + 5, 1]);
             $sheet->getCell([$col, 1])->getStyle()->applyFromArray($yearStyle);
             $sheet->getCell([$col, 1])->setValue($year);
 
