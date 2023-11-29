@@ -6,7 +6,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Exporter;
 
 use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
-use Ekyna\Bundle\ProductBundle\Model\BrandInterface;
 use Ekyna\Bundle\ProductBundle\Model\ExportConfig;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
@@ -14,11 +13,7 @@ use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PurchaseCostCalculator;
 use Ekyna\Component\Resource\Helper\File\Csv;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
-use function array_map;
-use function join;
 
 /**
  * Class ProductExporter

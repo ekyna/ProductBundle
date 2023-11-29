@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\ORM\Events;
-use Ekyna\Bundle\CommerceBundle\Install\CommerceInstaller;
 use Ekyna\Bundle\ProductBundle\Attribute;
 use Ekyna\Bundle\ProductBundle\Attribute\Type\TypeInterface;
 use Ekyna\Bundle\ProductBundle\Install\ProductInstaller;
@@ -15,6 +14,7 @@ use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Converter;
 use Ekyna\Bundle\ProductBundle\Service\Editor\Block\ProductSlidePlugin;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter;
+use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductSaleExporter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Generator;
 use Ekyna\Bundle\ProductBundle\Service\Google\TrackingHelper;
@@ -324,6 +324,17 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.calculator.purchase_cost'),
             service('ekyna_commerce.helper.subject'),
             service('translator'),
+        ]);
+
+    // Sale exporter
+    $services
+        ->set('ekyna_product.exporter.product_sale', ProductSaleExporter::class)
+        ->args([
+            service('ekyna_commerce.repository.order'),
+            service('doctrine.orm.default_entity_manager'),
+            service('ekyna_commerce.helper.subject'),
+            service('ekyna_commerce.helper.stock_subject_quantity'),
+            service('ekyna_commerce.factory.margin_calculator'),
         ]);
 
     // Catalog registry

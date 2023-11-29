@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Command\ClearPastEDACommand;
 use Ekyna\Bundle\ProductBundle\Command\InventoryApplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
+use Ekyna\Bundle\ProductBundle\Command\ProductSaleExportCommand;
 use Ekyna\Bundle\ProductBundle\Command\ResupplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockReportCommand;
@@ -71,6 +72,16 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.invalidator.offer'),
             service('ekyna_product.invalidator.price'),
             service('doctrine.orm.default_entity_manager'),
+        ])
+        ->tag('console.command');
+
+    // Product sale export command
+    $services
+        ->set('ekyna_product.command.product_sale_export', ProductSaleExportCommand::class)
+        ->args([
+            service('ekyna_product.exporter.product_sale'),
+            service('ekyna_admin.helper.mailer'),
+            service('mailer'),
         ])
         ->tag('console.command');
 
