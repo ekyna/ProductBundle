@@ -70,7 +70,7 @@ class ProductSaleExporter
             $this->logger?->debug('Month ' . $month->getStart()->format('Y-m'));
 
             $page = 0;
-            while (!empty($orders = $this->repository->findByAcceptedAt($range, $page, $size))) {
+            while (!empty($orders = $this->repository->findByAcceptedAt($month, $page, $size))) {
                 foreach ($orders as $order) {
                     $this->logger?->debug((string)$order);
 
@@ -181,10 +181,13 @@ class ProductSaleExporter
             'Group customer',
             'Customer',
             'Quantity',
-            'Sales',
+            'Revenue',
+            'Cost',
             'Net margin amount',
             'Net Margin percent',
         ]);
+
+        $gross = true;
 
         foreach ($this->sales as $reference => $years) {
             foreach ($years as $year => $months) {
@@ -203,9 +206,10 @@ class ProductSaleExporter
                                 $group,
                                 $customer,
                                 $data->quantity->toFixed(),
-                                $data->margin->getRevenueProduct(),
-                                $data->margin->getPercent(false),
-                                $data->margin->getPercent(true),
+                                $data->margin->getRevenueTotal($gross),
+                                $data->margin->getCostTotal($gross),
+                                $data->margin->getTotal($gross),
+                                $data->margin->getPercent($gross),
                             ]);
                         }
                     }
