@@ -12,6 +12,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\Report\Model\ProductData;
 use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorFactory;
 use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorInterface;
+use Ekyna\Component\Commerce\Common\Util\DateUtil;
 use Ekyna\Component\Commerce\Order\Model\OrderItemInterface;
 use Ekyna\Component\Commerce\Order\Repository\OrderRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Helper\StockSubjectQuantityHelper;
@@ -33,12 +34,13 @@ class ProductSaleExporter
 
     private MarginCalculatorInterface $calculator;
     private array                     $products;
+    private array                     $months;
     /**
-     * @var array<string, array<int, array<int, array<string, array<string, ProductData>>>>>
+     * @var array<string, array<string, array<string, array<string, array<string, ProductData>>>>>
      */
     private array  $sales;
-    private int    $year;
-    private int    $month;
+    private string $year;
+    private string $month;
     private string $group;
     private string $customer;
 
@@ -53,6 +55,8 @@ class ProductSaleExporter
 
     public function export(DateRange $range, LoggerInterface $logger = null): Csv
     {
+        $this->months = DateUtil::getMonths('fr'); // TODO User locale
+
         $this->logger = $logger;
 
         $this->loadData($range);
@@ -87,8 +91,8 @@ class ProductSaleExporter
 
     private function readOrder(OrderInterface $order): void
     {
-        $this->year = (int)$order->getAcceptedAt()->format('Y');
-        $this->month = (int)$order->getAcceptedAt()->format('m');
+        $this->year = $order->getAcceptedAt()->format('Y');
+        $this->month = $this->months[(int)$order->getAcceptedAt()->format('n')];
         $this->group = $order->getCustomerGroup()->getName();
         $this->customer = $order->getCustomer()?->getCompany()
             ?? $order->getCompany()
@@ -120,6 +124,9 @@ class ProductSaleExporter
         }
 
         $margin = $this->calculator->calculateSaleItem($item);
+        /*if ($margin->getRevenueProduct()->isZero()) {
+            return;
+        }*/
 
         $reference = $item->getReference();
 
@@ -187,8 +194,6 @@ class ProductSaleExporter
             'Net Margin percent',
         ]);
 
-        $gross = true;
-
         foreach ($this->sales as $reference => $years) {
             foreach ($years as $year => $months) {
                 foreach ($months as $month => $groups) {
@@ -206,10 +211,10 @@ class ProductSaleExporter
                                 $group,
                                 $customer,
                                 $data->quantity->toFixed(),
-                                $data->margin->getRevenueTotal($gross),
-                                $data->margin->getCostTotal($gross),
-                                $data->margin->getTotal($gross),
-                                $data->margin->getPercent($gross),
+                                $data->margin->getRevenueTotal(true)->toFixed(2),
+                                $data->margin->getCostTotal(true)->toFixed(2),
+                                $data->margin->getTotal(true)->toFixed(2),
+                                $data->margin->getPercent(true)->toFixed(2),
                             ]);
                         }
                     }
