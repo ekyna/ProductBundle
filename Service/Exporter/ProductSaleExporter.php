@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\CommerceBundle\Model\OrderInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
+use Ekyna\Bundle\ProductBundle\Model\SaleExportConfig;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\Report\Model\ProductData;
 use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorFactory;
 use Ekyna\Component\Commerce\Common\Calculator\MarginCalculatorInterface;
@@ -18,7 +19,6 @@ use Ekyna\Component\Commerce\Order\Repository\OrderRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Helper\StockSubjectQuantityHelper;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 use Ekyna\Component\Resource\Helper\File\Csv;
-use Ekyna\Component\Resource\Model\DateRange;
 use Psr\Log\LoggerInterface;
 
 use function gc_collect_cycles;
@@ -30,11 +30,12 @@ use function gc_collect_cycles;
  */
 class ProductSaleExporter
 {
-    private ?LoggerInterface $logger = null;
-
-    private MarginCalculatorInterface $calculator;
-    private array                     $products;
     private array                     $months;
+    private SaleExportConfig          $config;
+    private ?LoggerInterface          $logger = null;
+    private MarginCalculatorInterface $calculator;
+
+    private array $products;
     /**
      * @var array<string, array<string, array<string, array<string, array<string, ProductData>>>>>
      */
@@ -53,24 +54,24 @@ class ProductSaleExporter
     ) {
     }
 
-    public function export(DateRange $range, LoggerInterface $logger = null): Csv
+    public function export(SaleExportConfig $config, LoggerInterface $logger = null): Csv
     {
         $this->months = DateUtil::getMonths('fr'); // TODO User locale
-
+        $this->config = $config;
         $this->logger = $logger;
 
-        $this->loadData($range);
+        $this->loadData();
 
         return $this->buildCSV();
     }
 
-    private function loadData(DateRange $range): void
+    private function loadData(): void
     {
         $size = 30;
         $this->products = [];
         $this->sales = [];
 
-        foreach ($range->byMonths() as $month) {
+        foreach ($this->config->range->byMonths() as $month) {
             $this->logger?->debug('Month ' . $month->getStart()->format('Y-m'));
 
             $page = 0;
@@ -82,11 +83,11 @@ class ProductSaleExporter
                 }
 
                 $page++;
+
+                $this->manager->clear();
+                gc_collect_cycles();
             }
         }
-
-        $this->manager->clear();
-        gc_collect_cycles();
     }
 
     private function readOrder(OrderInterface $order): void
@@ -123,12 +124,15 @@ class ProductSaleExporter
             return;
         }
 
-        $margin = $this->calculator->calculateSaleItem($item);
-        /*if ($margin->getRevenueProduct()->isZero()) {
+        $margin = $this->calculator->calculateSaleItem($item, $this->config->single);
+        if ($margin->getRevenueProduct()->isZero()) {
             return;
-        }*/
+        }
 
         $reference = $item->getReference();
+        if (!empty($this->config->filter) && !in_array($reference, $this->config->filter, true)) {
+            return;
+        }
 
         $this->addProduct($item);
 

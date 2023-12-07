@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Command;
 
 use DateTime;
 use Ekyna\Bundle\AdminBundle\Service\Mailer\MailerHelper;
+use Ekyna\Bundle\ProductBundle\Model\SaleExportConfig;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductSaleExporter;
 use Ekyna\Component\Resource\Model\DateRange;
 use Exception;
@@ -46,16 +47,21 @@ class ProductSaleExportCommand extends Command
         $this
             ->addOption('from', null, InputOption::VALUE_REQUIRED, 'The export start month')
             ->addOption('to', null, InputOption::VALUE_REQUIRED, 'The export end month')
-            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'The email to send the export to');
+            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'The email to send the export to')
+            ->addOption('single', null, InputOption::VALUE_NONE, 'Whether to export sub-products instead of bundles')
+            ->addOption('filter', null, InputOption::VALUE_IS_ARRAY, 'The product reference to filter');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $range = $this->createDateRange($input);
+        $config = new SaleExportConfig();
+        $config->range = $this->createDateRange($input);
+        $config->single = $input->getOption('single');
+        $config->filter = $input->getOption('filter');
 
         $logger = new ConsoleLogger($output);
 
-        $csv = $this->exporter->export($range, $logger);
+        $csv = $this->exporter->export($config, $logger);
 
         if (!empty($email = $input->getOption('email'))) {
             $to = [new Address($email)];
@@ -74,8 +80,8 @@ class ProductSaleExportCommand extends Command
             file_get_contents($csv->close()),
             sprintf(
                 'sales_report_%s_%s.csv',
-                $range->getStart()->format('Y-m-d'),
-                $range->getEnd()->format('Y-m-d')
+                $config->range->getStart()->format('Y-m-d'),
+                $config->range->getEnd()->format('Y-m-d')
             ),
             'application/vnd.ms-excel'
         );

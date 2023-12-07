@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Model;
 
+use Ekyna\Component\Resource\Model\DateRange;
+
 /**
  * Class SaleExportConfig
  * @package Ekyna\Bundle\ProductBundle\Model
@@ -11,5 +13,11 @@ namespace Ekyna\Bundle\ProductBundle\Model;
  */
 class SaleExportConfig
 {
-
+    public DateRange $range;
+    public bool      $single = false;
+    /**
+     * Product references.
+     * @var array<int, string>
+     */
+    public ?array $filter;
 }
