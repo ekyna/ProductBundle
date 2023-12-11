@@ -58,6 +58,13 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('ekyna_resource.action');
 
+    $services
+        ->set('ekyna_product.action.admin.inventory.read', Inventory\ReadAction::class)
+        ->args([
+            service('ekyna_product.repository.inventory_product'),
+        ])
+        ->tag('ekyna_resource.action');
+
     // Product actions
     $services
         ->set('ekyna_product.action.admin.product.adjust_stock', Product\AdjustStockAction::class)

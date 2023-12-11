@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
+use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Repository\InventoryRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Inventory\InventoryApplier;
 use Symfony\Component\Console\Command\Command;
@@ -50,7 +51,13 @@ class InventoryApplyCommand extends Command
             return Command::SUCCESS;
         }
 
-        $this->applier->apply($inventory);
+        try {
+            $this->applier->apply($inventory);
+        } catch (LogicException $exception) {
+            $output->writeln($exception->getMessage());
+
+            return Command::FAILURE;
+        }
 
         return Command::SUCCESS;
     }

@@ -6,11 +6,11 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Ekyna\Bundle\ProductBundle\Entity\InventoryProduct;
 use Ekyna\Bundle\ProductBundle\Model\InventoryInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 
 /**
  * Class InventoryProductRepository
@@ -21,8 +21,6 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
  */
 class InventoryProductRepository extends ServiceEntityRepository
 {
-    private ?Query $findOneNotAppliedByInventoryQuery = null;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, InventoryProduct::class);
@@ -35,33 +33,72 @@ class InventoryProductRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function findOneNotAppliedByInventory(InventoryInterface $inventory): ?InventoryProduct
+    public function findByInventoryWithRealStock(InventoryInterface $inventory): array
     {
-        return $this
-            ->getFindOneNotAppliedByInventory()
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        return $qb
+            ->andWhere($ex->eq('p.inventory', ':inventory'))
+            ->andWhere($ex->isNotNull('p.realStock'))
+            ->getQuery()
+            ->setParameter('inventory', $inventory)
+            ->getResult();
+    }
+
+    public function findOneNotAppliedByInventory(InventoryInterface $inventory, bool $bundle): ?InventoryProduct
+    {
+        $qb = $this->createQueryBuilder('p');
+        $ex = $qb->expr();
+
+        if ($bundle) {
+            $types = [ProductTypes::TYPE_BUNDLE];
+            $clause = $ex->andX(
+                $ex->gt('p.realStock', 0),
+                $ex->orX(
+                    $ex->isNull('p.appliedStock'),
+                    $ex->neq(0, 'p.realStock - p.appliedStock')
+                )
+            );
+        } else {
+            $types = [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT];
+            $clause = $ex->andX(
+                $ex->neq('p.initialStock', 'p.realStock'),
+                $ex->orX(
+                    $ex->isNull('p.appliedStock'),
+                    $ex->neq(0, 'p.realStock - p.initialStock - p.appliedStock')
+                )
+            );
+        }
+
+        return $qb
+            ->join('p.product', 'p2')
+            ->andWhere($ex->eq('p.inventory', ':inventory'))
+            ->andWhere($ex->in('p2.type', ':types'))
+            ->andWhere($ex->isNotNull('p.realStock'))
+            ->andWhere($clause)
+            ->setParameter('types', $types)
+            ->setMaxResults(1)
+            ->getQuery()
             ->setParameter('inventory', $inventory)
             ->getOneOrNullResult();
     }
 
-    private function getFindOneNotAppliedByInventory(): Query
+    public function findBundlesByInventory(InventoryInterface $inventory): array
     {
-        if (null !== $this->findOneNotAppliedByInventoryQuery) {
-            return $this->findOneNotAppliedByInventoryQuery;
-        }
-
         $qb = $this->createQueryBuilder('p');
         $ex = $qb->expr();
 
-        return $this->findOneNotAppliedByInventoryQuery = $qb
+        return $qb
+            ->join('p.product', 'p2')
             ->andWhere($ex->eq('p.inventory', ':inventory'))
+            ->andWhere($ex->eq('p2.type', ':type'))
             ->andWhere($ex->isNotNull('p.realStock'))
-            ->andWhere($ex->neq('p.initialStock', 'p.realStock'))
-            ->andWhere($ex->orX(
-                $ex->isNull('p.appliedStock'),
-                $ex->neq(0, 'p.realStock - p.initialStock - p.appliedStock')
-            ))
-            ->setMaxResults(1)
-            ->getQuery();
+            ->andWhere($ex->gt('p.realStock', 0))
+            ->setParameter('type', ProductTypes::TYPE_BUNDLE)
+            ->getQuery()
+            ->setParameter('inventory', $inventory)
+            ->getResult();
     }
 
     public function findOneByInventoryAndProduct(

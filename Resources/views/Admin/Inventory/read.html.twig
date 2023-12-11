@@ -9,19 +9,54 @@
 
 {% block main_contents -%}
     <div class="tab-pane active" id="{{ resource_name }}-general">
-        <p>[TODO]</p>{# TODO #}
         <div class="table-responsive">
             <table class="table table-alt-head table-striped table-hover">
                 <thead>
                 <tr>
-                    <th></th>
+                    {# TODO translations #}
+                    <th>Reference</th>
+                    <th>Designation</th>
+                    <th>Type</th>
+                    <th>EndOfLife</th>
+                    <th>Initial</th>
+                    <th>Real</th>
+                    <th>Applied</th>
                 </tr>
                 </thead>
                 <tbody>
+                {% for line in products -%}
                 <tr>
-                    <td></td>
+                    <td>
+                        {{ line.product.reference }}
+                    </td>
+                    <td>
+                        <a href="{{ admin_resource_path(line.product) }}"
+                            {{ admin_resource_summary(line.product, true) }}>
+                            {{ line.product }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ line.product|product_type_badge }}
+                    </td>
+                    <td>
+                        {%- if line.product.endOfLife -%}
+                            <span class="label label-warning">{{ 'value.yes'|trans({}, 'EkynaUi') }}</span>
+                        {%- else -%}
+                            <span class="label label-info">{{ 'value.no'|trans({}, 'EkynaUi') }}</span>
+                        {%- endif -%}
+                    </td>
+                    <td>
+                        {{ line.initialStock|format_number }}
+                    </td>
+                    <td>
+                        {{ line.realStock is null ? '-' : (line.realStock|format_number) }}
+                    </td>
+                    <td>
+                        {{ line.appliedStock is null ? '-' : (line.appliedStock|format_number) }}
+                    </td>
                 </tr>
                 </tbody>
+                {%- endfor %}
             </table>
         </div>
     </div>

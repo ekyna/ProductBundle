@@ -221,12 +221,13 @@ resources:
             trans_domain: EkynaProduct
             actions:
                 admin_crud:
-                    create: false
-                    update: false
                     list: '@EkynaProduct/Admin/Inventory/list.html.twig'
-                    read: '@EkynaProduct/Admin/Inventory/read.html.twig'
+                    create: false
+                    read: false
+                    update: false
                     delete: '@EkynaProduct/Admin/Inventory/delete.html.twig'
                 Ekyna\Bundle\ProductBundle\Action\Admin\Inventory\CreateAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Inventory\ReadAction: ~
 
         option:
             driver: doctrine/orm

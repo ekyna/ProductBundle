@@ -25,4 +25,14 @@ class InventoryCalculator
             - $product->getInitialStock()
             - ($product->getAppliedStock() ?? new Decimal(0));
     }
+
+    public function calculateBundleQuantityToApply(InventoryProduct $product): Decimal
+    {
+        if (null === $product->getRealStock()) {
+            throw new UnexpectedValueException('Expected inventory product with defined real stock.');
+        }
+
+        return $product->getRealStock()
+            - ($product->getAppliedStock() ?? new Decimal(0));
+    }
 }

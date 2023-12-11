@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
 use Ekyna\Bundle\AdminBundle\Action\DeleteAction;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Inventory\ReadAction;
 use Ekyna\Bundle\ResourceBundle\Table\Type\AbstractResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Table\TableBuilderInterface;
@@ -33,7 +34,10 @@ class InventoryType extends AbstractResourceType
                 'label'         => t('field.name', [], 'EkynaUi'),
                 'property_path' => false,
                 'position'      => 10,
+                'action'        => ReadAction::class,
             ]);
+
+        // TODO State column
 
         if (!$this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
             return;

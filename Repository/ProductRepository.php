@@ -574,6 +574,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->andWhere($ex->neq('p.stockMode', ':mode'))
             ->andWhere($ex->not($ex->andX(
                 $ex->eq('p.endOfLife', true),
+                $ex->eq('p.inStock', 0),
                 $ex->eq('p.virtualStock', 0)
             )))
             ->addOrderBy('p.geocode', 'asc')
@@ -582,7 +583,11 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getQuery()
             ->useQueryCache(true)
             ->setParameter('mode', [CStockModes::MODE_DISABLED])
-            ->setParameter('types', [Model\ProductTypes::TYPE_SIMPLE, Model\ProductTypes::TYPE_VARIANT])
+            ->setParameter('types', [
+                Model\ProductTypes::TYPE_SIMPLE,
+                Model\ProductTypes::TYPE_VARIANT,
+                Model\ProductTypes::TYPE_BUNDLE,
+            ])
             ->getResult();
     }
 

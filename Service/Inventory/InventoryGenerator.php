@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Service\Inventory;
 
+use Decimal\Decimal;
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Entity\InventoryProduct;
 use Ekyna\Bundle\ProductBundle\Exception\LogicException;
 use Ekyna\Bundle\ProductBundle\Model\InventoryInterface;
 use Ekyna\Bundle\ProductBundle\Model\InventoryState;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
 
@@ -48,12 +50,16 @@ class InventoryGenerator
                 array_push($geocodes, ...$stockUnit->getGeocodes());
             }
 
+            $initial = ProductTypes::isBundleType($product)
+                ? new Decimal(0)
+                : clone $product->getInStock();
+
             $inventoryProduct = new InventoryProduct();
             $inventoryProduct
                 ->setInventory($inventory)
                 ->setProduct($product)
                 ->setGeocodes(array_unique($geocodes))
-                ->setInitialStock(clone $product->getInStock());
+                ->setInitialStock($initial);
 
             $this->entityManager->persist($inventoryProduct);
         }
