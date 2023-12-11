@@ -57,6 +57,11 @@
             display: none;
         }
 
+        &[data-bundle="1"] {
+            background-color: #d8e6f0;
+            display: none;
+        }
+
         &[data-end-of-life="1"] {
             display: none;
         }
@@ -140,6 +145,14 @@
     &.display-zero {
         > div {
             &[data-zero="1"] {
+                display: block !important;
+            }
+        }
+    }
+
+    &.display-bundle {
+        > div {
+            &[data-bundle="1"] {
                 display: block !important;
             }
         }

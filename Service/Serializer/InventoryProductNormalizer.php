@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 use Ekyna\Bundle\ProductBundle\Entity\InventoryProduct;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\Units;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -45,6 +46,7 @@ class InventoryProductNormalizer implements NormalizerInterface
             'reference'   => $product?->getReference(),
             'designation' => $product?->getFullDesignation(),
             'geocodes'    => $object->getGeocodes(),
+            'bundle'      => ProductTypes::isBundleType($product) ? 1 : 0,
             'initial'     => $object->getInitialStock()->toFixed($precision),
             'real'        => $object->getRealStock()?->toFixed($precision),
             'state'       => $state,

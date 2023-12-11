@@ -9,12 +9,14 @@ define(
             route_prefix = 'admin_ekyna_product_inventory_app_',
             $reloadList = $('#reload_list'),
             $displayZero = $('#display_zero'),
+            $displayBundle = $('#display_bundle'),
             $displayValid = $('#display_valid'),
             $displayEndOfLife = $('#display_end_of_life');
 
         let busy = false,
             display_zero = $displayZero.prop('checked'),
             display_valid = $displayValid.prop('checked'),
+            display_bundle = $displayBundle.prop('checked'),
             display_end_of_life = $displayEndOfLife.prop('checked');
 
 
@@ -23,6 +25,11 @@ define(
                 $list.addClass('display-zero');
             } else {
                 $list.removeClass('display-zero');
+            }
+            if (display_bundle) {
+                $list.addClass('display-bundle');
+            } else {
+                $list.removeClass('display-bundle');
             }
             if (display_valid) {
                 $list.addClass('display-valid');
