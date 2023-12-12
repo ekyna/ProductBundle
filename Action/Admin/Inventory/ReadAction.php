@@ -40,7 +40,8 @@ class ReadAction extends BaseAction
     public static function configureAction(): array
     {
         return array_replace(parent::configureAction(), [
-            'options'    => [
+            'name'    => 'product_inventory_read',
+            'options' => [
                 'template' => '@EkynaProduct/Admin/Inventory/read.html.twig',
             ],
         ]);
