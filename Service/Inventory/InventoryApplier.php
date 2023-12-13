@@ -17,6 +17,8 @@ use Ekyna\Component\Commerce\Stock\Helper\AdjustHelper;
 use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentData;
 use Ekyna\Component\Commerce\Stock\Model\StockAdjustmentReasons;
 
+use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
+
 use function gc_collect_cycles;
 use function get_class;
 use function sprintf;
@@ -30,6 +32,7 @@ class InventoryApplier
 {
     private Inventory $inventory;
     private string    $note;
+    private array     $errors;
 
     public function __construct(
         private readonly InventoryProductRepository $repository,
@@ -44,7 +47,12 @@ class InventoryApplier
         $this->inventory = $inventory;
         $this->note = $inventory->getCreatedAt()->format('Y-m-d') . ' inventory';
 
+        $this->errors = [];
         $this->checkIfReady();
+
+        if (!empty($this->errors)) {
+            throw new LogicException();
+        }
 
         $this->applyBundles();
         $this->applySimples();
@@ -55,6 +63,11 @@ class InventoryApplier
         $inventory->setState(InventoryState::CLOSED);
         $this->manager->persist($inventory);
         $this->manager->flush();
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 
     private function checkIfReady(): void
@@ -71,29 +84,37 @@ class InventoryApplier
         foreach ($bundle->getBundleSlots() as $slot) {
             $choiceProduct = $slot->getChoices()->first()->getProduct();
 
+            if (StockSubjectModes::MODE_DISABLED === $choiceProduct->getStockMode()) {
+                continue;
+            }
+
             $inventoryProduct = $this
                 ->repository
                 ->findOneByInventoryAndProduct($this->inventory, $choiceProduct);
 
             if (null === $inventoryProduct) {
-                throw new LogicException(
-                    sprintf(
-                        'Product [%s] %s (#{%s}) is missing from inventory.',
-                        $choiceProduct,
-                        $choiceProduct->getReference(),
-                        $choiceProduct->getId(),
-                    )
+                $this->errors[] = sprintf(
+                    '[%s] %s (#{%s}) is missing. Needed for bundle [%s] %s (#{%s}).',
+                    $choiceProduct->getReference(),
+                    $choiceProduct,
+                    $choiceProduct->getId(),
+                    $bundle->getReference(),
+                    $bundle,
+                    $bundle->getId(),
                 );
+
+                continue;
             }
 
             if (null === $inventoryProduct->getRealStock()) {
-                throw new LogicException(
-                    sprintf(
-                        'You must set real stock for product [%s] %s (#{%s}).',
-                        $choiceProduct,
-                        $choiceProduct->getReference(),
-                        $choiceProduct->getId(),
-                    )
+                $this->errors[] = sprintf(
+                    '[%s] %s (#{%s}) is missing. Needed for bundle [%s] %s (#{%s}).',
+                    $choiceProduct->getReference(),
+                    $choiceProduct,
+                    $choiceProduct->getId(),
+                    $bundle->getReference(),
+                    $bundle,
+                    $bundle->getId(),
                 );
             }
         }

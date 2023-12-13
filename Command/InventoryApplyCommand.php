@@ -42,10 +42,12 @@ class InventoryApplyCommand extends Command
 
         $helper = $this->getHelper('question');
 
-        $confirm = new ConfirmationQuestion(sprintf(
-            'Are you sure you want to apply and close %s inventory ?',
-            $inventory->getCreatedAt()->format('Y-m-d')
-        ));
+        $confirm = new ConfirmationQuestion(
+            sprintf(
+                'Are you sure you want to apply and close %s inventory ?',
+                $inventory->getCreatedAt()->format('Y-m-d')
+            )
+        );
 
         if (!$helper->ask($input, $output, $confirm)) {
             return Command::SUCCESS;
@@ -53,8 +55,10 @@ class InventoryApplyCommand extends Command
 
         try {
             $this->applier->apply($inventory);
-        } catch (LogicException $exception) {
-            $output->writeln($exception->getMessage());
+        } catch (LogicException) {
+            foreach ($this->applier->getErrors() as $error) {
+                $output->writeln($error);
+            }
 
             return Command::FAILURE;
         }
