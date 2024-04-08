@@ -6,6 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\CommerceBundle\Service\AbstractViewType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Common\View\LineView;
@@ -19,7 +20,7 @@ class SaleViewType extends AbstractViewType
 {
     public function buildItemView(SaleItemInterface $item, LineView $view, array $options): void
     {
-        if (!$options['private']) {
+        if (!$options['private'] && !$options['export']) {
             return;
         }
 
@@ -33,11 +34,21 @@ class SaleViewType extends AbstractViewType
             return;
         }
 
+        if ($options['export']) {
+            $view->ean13 = $subject->getReferenceByType(ProductReferenceTypes::TYPE_EAN_13);
+            $view->mpn = $subject->getReferenceByType(ProductReferenceTypes::TYPE_MANUFACTURER);
+            $view->hsCode = $subject->getHsCode();
+        }
+
+        if (!$options['private']) {
+            return;
+        }
+
         $link = [
-            'data-summary'  => json_encode([
+            'data-summary' => json_encode([
                 'route'      => 'admin_ekyna_product_product_summary',
                 'parameters' => ['productId' => $subject->getId()],
-            ])
+            ]),
         ];
         if (isset($view->vars['link'])) {
             $view->vars['link'] = array_replace($view->vars['link'], $link);
