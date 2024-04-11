@@ -799,7 +799,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
         $qb = $this->createQueryBuilder('p');
         $qb
             ->leftJoin('p.variants', 'v')
-            ->leftJoin('v.translations', 'v_t', Expr\Join::WITH, $this->getLocaleCondition('v_t'))
+            ->leftJoin('v.translations', 'v_t')
             ->select('PARTIAL p.{id}', 'v', 'v_t')
             ->andWhere($qb->expr()->eq('p.id', ':id'))
             ->getQuery()
