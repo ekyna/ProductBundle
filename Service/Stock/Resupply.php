@@ -93,14 +93,14 @@ class Resupply
             $packing = clone $reference->getPacking();
 
             $item
-                ->setQuantity($quantity->div($packing))
+                ->setQuantity($quantity)
                 ->setPacking($packing)
                 ->setProduct($reference)
                 ->setNetPrice($netPrice);
 
             $order->addItem($item);
         } else {
-            $item->setQuantity($item->getQuantity() + $quantity->div($item->getPacking()));
+            $item->setQuantity($item->getQuantity() + $quantity);
 
             if ($netPrice > $item->getNetPrice()) {
                 $item->setNetPrice($netPrice);

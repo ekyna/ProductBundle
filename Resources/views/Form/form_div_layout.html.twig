@@ -444,6 +444,7 @@
             <th>{{ 'field.designation'|trans({}, 'EkynaUi') }}</th>
             <th>{{ 'field.reference'|trans({}, 'EkynaUi') }}</th>
             <th>{{ 'field.buy_net_price'|trans({}, 'EkynaCommerce') }}</th>
+            <th>{{ 'field.packing'|trans({}, 'EkynaCommerce') }}</th>
             <th>{{ 'supplier_product.field.available'|trans({}, 'EkynaCommerce') }}</th>
             <th>{{ 'supplier_product.field.ordered'|trans({}, 'EkynaCommerce') }}</th>
             <th>{{ 'supplier_product.field.eda'|trans({}, 'EkynaCommerce') }}</th>
@@ -477,6 +478,7 @@
         </td>
         <td>{{ supplierProduct.reference }}</td>
         <td>{{ supplierProduct.netPrice|format_currency(supplierProduct.supplier.currency.code) }}</td>
+        <td>{{ supplierProduct.packing|format_number }}</td>
         <td>{{ supplierProduct.availableStock|format_number }}</td>
         <td>{{ supplierProduct.orderedStock|format_number }}</td>
         <td>
@@ -487,7 +489,7 @@
     </tr>
     <tr id="supplier_product_{{ supplierProduct.id }}_details" class="supplier-product-details" style="display:none;">
         <td>&nbsp;</td>
-        <td colspan="6">
+        <td colspan="7">
             {{- form_widget(form.supplierOrder, {'widget_col': 12}) -}}
             {{- form_errors(form.supplierOrder) -}}
         </td>
