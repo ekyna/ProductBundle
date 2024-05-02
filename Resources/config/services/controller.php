@@ -239,6 +239,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.controller.admin.stock_view.export_products', StockView\ExportProductsController::class)
         ->args([
             service('ekyna_product.repository.product'),
+            service('ekyna_product.repository.product_stock_unit'),
         ])
         ->alias(StockView\ExportProductsController::class, 'ekyna_product.controller.admin.stock_view.export_products')
         ->public();
