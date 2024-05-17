@@ -2,8 +2,6 @@ ekyna_product:
     attribute:
         config:
             suffix_is_mandatory: Veuillez saisir un suffixe.
-    attribute_slot:
-        duplicate_attribute: Cet attribut est déjà utilisé.
     bundle_choice:
         invalid_quantity_range: La quantité maximum doit être supérieure à la quantité minimum.
         rules_should_be_empty: La liste des règles doit être vide.

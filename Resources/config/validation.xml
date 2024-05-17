@@ -106,15 +106,6 @@
         <property name="attribute">
             <constraint name="NotNull"/>
         </property>
-        <!-- Unique attribute per set -->
-        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
-            <option name="fields">
-                <value>set</value>
-                <value>attribute</value>
-            </option>
-            <option name="errorPath">attribute</option>
-            <option name="message">ekyna_product.attribute_slot.duplicate_attribute</option>
-        </constraint>
     </class>
 
     <class name="Ekyna\Bundle\ProductBundle\Entity\Brand">
