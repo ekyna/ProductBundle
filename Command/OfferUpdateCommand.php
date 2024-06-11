@@ -45,12 +45,7 @@ class OfferUpdateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription(<<<TXT
-                Updates the product(s) offers.
-                
-                If symfony/messenger is not available, this command should be run periodically.
-                TXT
-            )
+            ->setDescription('Updates the product(s) offers. If symfony/messenger is not available, this command should be run periodically.')
             ->addArgument('id', InputArgument::OPTIONAL, 'The product identifier to update the offers of.')
             ->addOption('max_execution_time', 't', InputOption::VALUE_OPTIONAL, 'Max execution time in seconds', 59);
     }

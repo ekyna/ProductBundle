@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-
 use Throwable;
 
 use function date;
@@ -45,11 +44,36 @@ class ProductSaleExportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('from', null, InputOption::VALUE_REQUIRED, 'The export start month')
-            ->addOption('to', null, InputOption::VALUE_REQUIRED, 'The export end month')
-            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'The email to send the export to')
-            ->addOption('single', null, InputOption::VALUE_NONE, 'Whether to export sub-products instead of bundles')
-            ->addOption('filter', null, InputOption::VALUE_IS_ARRAY, 'The product reference to filter');
+            ->addOption(
+                'from',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The export start month'
+            )
+            ->addOption(
+                'to',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The export end month'
+            )
+            ->addOption(
+                'email',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The email to send the export to'
+            )
+            ->addOption(
+                'single',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether to export sub-products instead of bundles'
+            )
+            ->addOption(
+                'filter',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'The product reference to filter'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
