@@ -365,6 +365,7 @@ resources:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\MoveDownAction: ~
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\CreateSupplierProductAction: ~
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\ExportOrdersAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\ExportStockLogAction: ~
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\LabelAction:
                     expose: true
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Subject\RefreshStockAction: ~

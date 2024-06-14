@@ -39,7 +39,6 @@
         </div>
         <div class="actions">
             {{ macros.labels_product_button(product) }}
-            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\ExportOrdersAction') }}
             {{ macros.convert_product_button(product) }}
             {%- if product is simple_product -%}
                 {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\DuplicateAction') }}

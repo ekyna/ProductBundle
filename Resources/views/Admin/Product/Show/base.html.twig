@@ -159,6 +159,10 @@
             {%- block stock_content -%}
                 <p class="actions">
                     {%- block stock_actions -%}
+                    {% if product is child_product %}
+                        {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\ExportStockLogAction') }}
+                    {% endif %}
+                    {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\ExportOrdersAction') }}
                     {{ admin_resource_btn(product, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\Subject\\RefreshStockAction', {
                         'label': 'button.reload',
                         'trans_domain': 'EkynaUi',
