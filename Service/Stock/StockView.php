@@ -6,7 +6,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Stock;
 
 use DateTime;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Action\ReadAction;
 use Ekyna\Bundle\AdminBundle\Model\UserInterface;
@@ -16,17 +15,12 @@ use Ekyna\Bundle\ProductBundle\Entity\ProductBookmark;
 use Ekyna\Bundle\ProductBundle\Form\Type\StockView\InventoryType;
 use Ekyna\Bundle\ProductBundle\Model\InventoryContext;
 use Ekyna\Bundle\ProductBundle\Model\InventoryProfiles;
-use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Component\Commerce\Common\Util\FormatterAwareTrait;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
-use Ekyna\Component\Commerce\Stock\Model\StockUnitStates;
-use Ekyna\Component\Commerce\Supplier\Model\SupplierOrderStates;
 use Ekyna\Component\User\Service\UserProviderInterface;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,23 +40,6 @@ class StockView
 {
     use FormatterAwareTrait;
 
-    private const PENDING_DQL = "(
-  SELECT SUM(nsoi.quantity * nsoi.packing) 
-  FROM _class_ nsoi
-  JOIN nsoi.product nsp
-  JOIN nsoi.order nso
-  WHERE nsp.subjectIdentity.provider = :provider
-    AND nsp.subjectIdentity.identifier = p.id
-    AND (nso.state = '_state_new_' OR nso.state = '_state_ordered_')
-) AS pending";
-
-    private const STOCK_SUB_DQL = "(
-    SELECT SUM(_table_._field_)
-    FROM _class_ _table_
-    WHERE _table_.state <> '_state_'
-    AND _table_.product = p.id
-) AS _alias_";
-
     private const BOOKMARK_SUB_DQL = '(
     SELECT 1
     FROM _class_ bm
@@ -72,50 +49,21 @@ class StockView
 
     private const SESSION_KEY = 'inventory_context';
 
-    private EntityManagerInterface $entityManager;
-    private ResourceHelper         $resourceHelper;
-    private UrlGeneratorInterface  $urlGenerator;
-    private TranslatorInterface    $translator;
-    private FormFactoryInterface   $formFactory;
-    private RequestStack           $requestStack;
-    private UserProviderInterface  $userProvider;
-
-    private string $productClass;
-    private string $supplierProductClass;
-    private string $supplierOrderItemClass;
-    private string $stockUnitClass;
-
     private ?array            $config  = null;
     private ?InventoryContext $context = null;
     private ?FormInterface    $form    = null;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        ResourceHelper         $resourceHelper,
-        UrlGeneratorInterface  $urlGenerator,
-        TranslatorInterface    $translator,
-        FormFactory            $formFactory,
-        RequestStack           $requestStack,
-        FormatterFactory       $formatterFactory,
-        UserProviderInterface  $userProvider,
-        string                 $productClass,
-        string                 $supplierProductClass,
-        string                 $supplierOrderItemClass,
-        string                 $stockUnitClass
+        private readonly StockRepository       $stockRepository,
+        private readonly ResourceHelper        $resourceHelper,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly TranslatorInterface   $translator,
+        private readonly FormFactory           $formFactory,
+        private readonly RequestStack          $requestStack,
+        private readonly UserProviderInterface $userProvider,
+        FormatterFactory                       $formatterFactory
     ) {
-        $this->entityManager = $entityManager;
-        $this->resourceHelper = $resourceHelper;
-        $this->urlGenerator = $urlGenerator;
-        $this->translator = $translator;
-        $this->formFactory = $formFactory;
-        $this->requestStack = $requestStack;
-        $this->formatterFactory = $formatterFactory;
-        $this->userProvider = $userProvider;
-
-        $this->productClass = $productClass;
-        $this->supplierProductClass = $supplierProductClass;
-        $this->supplierOrderItemClass = $supplierOrderItemClass;
-        $this->stockUnitClass = $stockUnitClass;
+        $this->setFormatterFactory($formatterFactory);
 
         $this->loadConfig();
     }
@@ -164,7 +112,7 @@ class StockView
      *
      * @param Request $request
      * @param bool    $raw
-     * @param array $options
+     * @param array   $options
      *
      * @return array
      */
@@ -237,84 +185,8 @@ class StockView
      */
     protected function normalizeProducts(array $products): array
     {
-        $formatter = $this->getFormatter();
-
-        $route = $this->resourceHelper->getRoute('ekyna_product.product', ReadAction::class);
-
         foreach ($products as &$product) {
-            // Designation (for variant)
-            if ($product['type'] === ProductTypes::TYPE_VARIANT) {
-                if (empty($product['designation'])) {
-                    $product['designation'] = sprintf(
-                        '%s %s',
-                        $product['parent_designation'],
-                        $product['attributes_designation']
-                    );
-                }
-            }
-
-            // Url
-            $product['url'] = $this->urlGenerator->generate($route, [
-                'productId' => $product['id'],
-            ]);
-
-            // Format price
-            $product['net_price'] = $formatter->currency((float)$product['net_price']);
-
-            // Format weight
-            $product['weight'] = $formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
-
-            // Visible
-            $product['visible_label'] = $this->config['bool'][$product['visible']]['label'];
-            $product['visible_theme'] = $this->config['bool'][$product['visible']]['theme'];
-
-            // Quote only
-            $product['quote_only_label'] = $this->config['bool'][$product['quote_only']]['label'];
-            $product['quote_only_theme'] = $this->config['bool'][$product['quote_only']]['theme'];
-
-            // End of life
-            $product['end_of_life_label'] = $this->config['bool'][$product['end_of_life']]['label'];
-            $product['end_of_life_theme'] = $this->config['bool'][$product['end_of_life']]['theme'];
-
-            // Format stock
-            $product['stock_floor'] = $formatter->number((float)$product['stock_floor']);
-            $product['in_stock'] = $formatter->number((float)$product['in_stock']);
-            $product['available_stock'] = $formatter->number((float)$product['available_stock']);
-            $product['virtual_stock'] = $formatter->number((float)$product['virtual_stock']);
-
-            // Eda
-            $product['eda_theme'] = '';
-            if (null !== $eda = $product['eda']) {
-                $eda = new DateTime($eda);
-                $product['eda'] = $eda->format('d/m/Y'); // TODO localized format
-                if ($eda < (new DateTime())->setTime(0, 0)) {
-                    $product['eda_theme'] = 'danger';
-                }
-            }
-
-            // Stock themes
-            $product['sold_theme'] = '';
-            if ($product['sold'] > $product['ordered'] + $product['adjusted']) {
-                $product['sold_theme'] = 'danger';
-            }
-
-            // Stock sums
-            $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
-            $product['ordered'] = $formatter->number((float)($product['ordered'] - $product['received']));
-            $product['sold'] = $formatter->number((float)($product['sold'] - $product['shipped']));
-
-            // Stock mode badge
-            $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
-            $product['stock_mode_theme'] = $this->config['stock_modes'][$product['stock_mode']]['theme'];
-
-            // Stock state badge
-            $product['stock_state_label'] = $this->config['stock_states'][$product['stock_state']]['label'];
-            $product['stock_state_theme'] = $this->config['stock_states'][$product['stock_state']]['theme'];
-
-            // Cleanup
-            unset($product['parent_id']);
-            unset($product['parent_designation']);
-            unset($product['attributes_designation']);
+            $this->normalizeProduct($product);
 
             unset($product);
         }
@@ -322,60 +194,99 @@ class StockView
         return $products;
     }
 
+    /**
+     * Normalizes the product.
+     *
+     * @param array $product The database product data
+     *
+     * @return array The normalized product data
+     */
+    protected function normalizeProduct(array &$product): array
+    {
+        $formatter = $this->getFormatter();
+
+        // Url
+        $product['url'] = $this->urlGenerator->generate($this->config['read_route'], [
+            'productId' => $product['id'],
+        ]);
+
+        // Format price
+        $product['net_price'] = $formatter->currency((float)$product['net_price']);
+
+        // Format weight
+        $product['weight'] = $formatter->number((float)$product['weight']) . '&nbsp;Kg'; // TODO packaging format
+
+        // Visible
+        $product['visible_label'] = $this->config['bool'][$product['visible']]['label'];
+        $product['visible_theme'] = $this->config['bool'][$product['visible']]['theme'];
+
+        // Quote only
+        $product['quote_only_label'] = $this->config['bool'][$product['quote_only']]['label'];
+        $product['quote_only_theme'] = $this->config['bool'][$product['quote_only']]['theme'];
+
+        // End of life
+        $product['end_of_life_label'] = $this->config['bool'][$product['end_of_life']]['label'];
+        $product['end_of_life_theme'] = $this->config['bool'][$product['end_of_life']]['theme'];
+
+        // Stock themes
+        $product['sold_theme'] = '';
+        if ($product['sold'] > $product['ordered'] + $product['adjusted']) {
+            $product['sold_theme'] = 'danger';
+        }
+
+        // Stock mode badge
+        $product['stock_mode_label'] = $this->config['stock_modes'][$product['stock_mode']]['label'];
+        $product['stock_mode_theme'] = $this->config['stock_modes'][$product['stock_mode']]['theme'];
+
+        // Stock state badge
+        $product['stock_state_label'] = $this->config['stock_states'][$product['stock_state']]['label'];
+        $product['stock_state_theme'] = $this->config['stock_states'][$product['stock_state']]['theme'];
+
+        // Format stock
+        $product['stock_floor'] = $formatter->number((float)$product['stock_floor']);
+        $product['in_stock'] = $formatter->number((float)$product['in_stock']);
+        $product['available_stock'] = $formatter->number((float)$product['available_stock']);
+        $product['virtual_stock'] = $formatter->number((float)$product['virtual_stock']);
+
+        // Eda
+        $product['eda_theme'] = ''; // Move to StockView
+        if (null !== $eda = $product['eda']) {
+            $eda = new DateTime($eda);
+            $product['eda'] = $eda->format('d/m/Y'); // TODO localized format
+            if ($eda < (new DateTime())->setTime(0, 0)) {
+                $product['eda_theme'] = 'danger';
+            }
+        }
+
+        // Stock sums
+        $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
+        $product['ordered'] = $formatter->number((float)($product['ordered'] - $product['received']));
+        $product['sold'] = $formatter->number((float)($product['sold'] - $product['shipped']));
+
+        $this->stockRepository->normalizeProduct($product);
+
+        return $product;
+    }
+
     private function getProductsQueryBuilder(): QueryBuilder
     {
-        $pQb = $this->entityManager->createQueryBuilder();
-        $pQb
-            ->from($this->productClass, 'p')
-            ->select([
-                'p.id',
-                'p.type',
-                'b.name as brand',
-                'p.netPrice as net_price',
-                'p.weight',
-                'p.reference',
-                'p.designation',
-                'p.attributesDesignation as attributes_designation',
-                'p.geocode',
-                'p.visible',
-                'p.quoteOnly as quote_only',
-                'p.endOfLife as end_of_life',
-                'p.stockMode as stock_mode',
-                'p.stockState as stock_state',
-                'p.stockFloor as stock_floor',
-                'p.replenishmentTime as replenishment',
-                'p.inStock as in_stock',
-                'p.availableStock as available_stock',
-                'p.virtualStock as virtual_stock',
-                'p.estimatedDateOfArrival as eda',
-                'parent.designation as parent_designation',
-            ])
-            ->addSelect($this->getPendingSubQuery())
-            ->addSelect($this->buildStockSubQuery('orderedQuantity', 'ordered', 'su1'))
-            ->addSelect($this->buildStockSubQuery('receivedQuantity', 'received', 'su2'))
-            ->addSelect($this->buildStockSubQuery('adjustedQuantity', 'adjusted', 'su3'))
-            ->addSelect($this->buildStockSubQuery('soldQuantity', 'sold', 'su4'))
-            ->addSelect($this->buildStockSubQuery('shippedQuantity', 'shipped', 'su5'))
-            ->leftJoin('p.brand', 'b')
-            ->leftJoin('p.parent', 'parent')
-            ->andWhere($pQb->expr()->in('p.type', ':types'))
-            /*->andWhere($pQb->expr()->not($pQb->expr()->andX(
-                $pQb->expr()->eq('p.endOfLife', ':end_of_life'),
-                $pQb->expr()->gte('p.virtualStock', ':virtual_stock')
-            )))*/
-            ->setParameters([
-                'types'    => [ProductTypes::TYPE_SIMPLE, ProductTypes::TYPE_VARIANT],
-                'provider' => ProductProvider::getName(),
-                //'end_of_life'   => true,
-                //'virtual_stock' => 0,
-            ]);
+        $qb = $this->stockRepository->getProductsQueryBuilder();
+        $qb->addSelect([
+            'p.netPrice as net_price',
+            'p.weight',
+            'p.geocode',
+            'p.visible',
+            'p.quoteOnly as quote_only',
+            'p.stockMode as stock_mode',
+            'p.stockState as stock_state',
+        ]);
 
         if ($this->userProvider->hasUser()) {
             /** @noinspection PhpParamsInspection */
-            $pQb->addSelect($this->buildBookmarkSubQuery($this->userProvider->getUser()));
+            $qb->addSelect($this->buildBookmarkSubQuery($this->userProvider->getUser()));
         }
 
-        return $pQb;
+        return $qb;
     }
 
     /**
@@ -407,17 +318,19 @@ class StockView
         // Supplier filter
         if (0 < $supplier = $context->getSupplier()) {
             $qb
-                ->andWhere($expr->exists($this->buildSupplierSubQuery()))
+                ->andWhere($expr->exists($this->stockRepository->buildSupplierSubQuery()))
                 ->setParameter('supplier', $supplier);
         }
 
         // Designation filter
         if (!empty($designation = $context->getDesignation())) {
             $qb
-                ->andWhere($expr->orX(
-                    $expr->andX($expr->isNull('p.parent'), $expr->like('p.designation', ':designation')),
-                    $expr->andX($expr->isNotNull('p.parent'), $expr->like('parent.designation', ':designation'))
-                ))
+                ->andWhere(
+                    $expr->orX(
+                        $expr->andX($expr->isNull('p.parent'), $expr->like('p.designation', ':designation')),
+                        $expr->andX($expr->isNotNull('p.parent'), $expr->like('parent.designation', ':designation'))
+                    )
+                )
                 ->setParameter('designation', '%' . $designation . '%');
         }
 
@@ -483,10 +396,12 @@ class StockView
 
         // Profile
         if (InventoryProfiles::TREATMENT === $context->getProfile()) {
-            $qb->andHaving($expr->andX(
-                $expr->lt('shipped', $expr->sum('adjusted', 'received')),
-                $expr->lt('shipped', 'sold')
-            ));
+            $qb->andHaving(
+                $expr->andX(
+                    $expr->lt('shipped', $expr->sum('adjusted', 'received')),
+                    $expr->lt('shipped', 'sold')
+                )
+            );
         } elseif (InventoryProfiles::RESUPPLY === $context->getProfile()) {
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
@@ -496,22 +411,24 @@ class StockView
             $qb
                 ->andWhere($expr->neq('p.stockMode', ':not_mode'))
                 ->setParameter('not_mode', CStockModes::MODE_DISABLED)
-                ->andHaving($qb->expr()->orX(
+                ->andHaving(
                     $qb->expr()->orX(
-                        $qb->expr()->andX(
-                            $qb->expr()->eq('p.endOfLife', 0),
-                            $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
+                        $qb->expr()->orX(
+                            $qb->expr()->andX(
+                                $qb->expr()->eq('p.endOfLife', 0),
+                                $qb->expr()->lt('p.virtualStock', 'p.stockFloor')
+                            ),
+                            $qb->expr()->andX(
+                                $qb->expr()->eq('p.endOfLife', 1),
+                                $qb->expr()->lt('p.virtualStock', 0)
+                            )
                         ),
                         $qb->expr()->andX(
-                            $qb->expr()->eq('p.endOfLife', 1),
-                            $qb->expr()->lt('p.virtualStock', 0)
+                            $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
+                            $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
                         )
-                    ),
-                    $qb->expr()->andX(
-                        $qb->expr()->isNotNull('p.estimatedDateOfArrival'),
-                        $qb->expr()->lte('p.estimatedDateOfArrival', ':today')
                     )
-                ))
+                )
                 ->setParameter('today', (new DateTime())->setTime(0, 0), Types::DATE_MUTABLE);
         } elseif (InventoryProfiles::ORDERED === $context->getProfile()) {
             $qb
@@ -538,42 +455,6 @@ class StockView
     }
 
     /**
-     * Builds the pending stock sub query.
-     *
-     * i.e. Ordered quantity of 'new' supplier orders.
-     *
-     * @return string
-     */
-    private function getPendingSubQuery(): string
-    {
-        return strtr(static::PENDING_DQL, [
-            '_class_'         => $this->supplierOrderItemClass,
-            '_state_new_'     => SupplierOrderStates::STATE_NEW,
-            '_state_ordered_' => SupplierOrderStates::STATE_ORDERED,
-        ]);
-    }
-
-    /**
-     * Builds the stock sub query.
-     *
-     * @param string $field
-     * @param string $fieldAlias
-     * @param string $tableAlias
-     *
-     * @return string
-     */
-    private function buildStockSubQuery(string $field, string $fieldAlias, string $tableAlias): string
-    {
-        return strtr(static::STOCK_SUB_DQL, [
-            '_field_' => $field,
-            '_class_' => $this->stockUnitClass,
-            '_table_' => $tableAlias,
-            '_state_' => StockUnitStates::STATE_CLOSED,
-            '_alias_' => $fieldAlias,
-        ]);
-    }
-
-    /**
      * Builds the bookmark sub query.
      *
      * @param UserInterface $user
@@ -586,23 +467,6 @@ class StockView
             '_class_'   => ProductBookmark::class,
             '_user_id_' => $user->getId(),
         ]);
-    }
-
-    /**
-     * Builds the supplier sub query.
-     *
-     * @return string
-     */
-    private function buildSupplierSubQuery(): string
-    {
-        $sQb = $this->entityManager->createQueryBuilder();
-        $sQb
-            ->from($this->supplierProductClass, 'sp')
-            ->select('sp.subjectIdentity.identifier')
-            ->andWhere($sQb->expr()->eq('sp.subjectIdentity.identifier', 'p.id'))
-            ->andWhere($sQb->expr()->eq('sp.supplier', ':supplier'));
-
-        return $sQb->getDQL();
     }
 
     private function loadConfig(): void
@@ -624,6 +488,7 @@ class StockView
                     'theme' => 'danger',
                 ],
             ],
+            'read_route'   => $this->resourceHelper->getRoute('ekyna_product.product', ReadAction::class),
         ];
 
         foreach (BStockModes::getConfig() as $mode => $c) {

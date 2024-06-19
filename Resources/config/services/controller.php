@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\ProductBundle\Controller\Account;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\Export\StockAnalysisController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
@@ -49,6 +50,14 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_resource.search'),
         ])
         ->alias(Account\ProductSearchController::class, 'ekyna_product.controller.account.product.search')
+        ->public();
+
+    $services
+        ->set('ekyna_product.controller.admin.export.stock_analysis', StockAnalysisController::class)
+        ->args([
+            service('ekyna_product.stock.analysis_exporter'),
+        ])
+        ->alias(StockAnalysisController::class, 'ekyna_product.controller.admin.export.stock_analysis')
         ->public();
 
     $services

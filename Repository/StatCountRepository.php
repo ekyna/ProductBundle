@@ -6,9 +6,9 @@ namespace Ekyna\Bundle\ProductBundle\Repository;
 
 use DatePeriod;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
@@ -26,8 +26,8 @@ use function array_replace;
  */
 class StatCountRepository extends AbstractStatRepository
 {
-    private ?Query $findOneQuery = null;
-    private ?Query $findByProductAndPeriodQuery = null;
+    private ?Query $findOneQuery                        = null;
+    private ?Query $findByProductAndPeriodQuery         = null;
     private ?Query $findByProductAndPeriodAndGroupQuery = null;
 
     public function __construct(ManagerRegistry $registry)
@@ -57,10 +57,10 @@ class StatCountRepository extends AbstractStatRepository
      * @return array<int>
      */
     public function findByProductAndPeriodAndGroup(
-        Product $product,
-        string $source,
+        Product    $product,
+        string     $source,
         DatePeriod $period,
-        Group $group = null
+        Group      $group = null
     ): array {
         $parameters = [
             'product' => $product,
@@ -71,7 +71,7 @@ class StatCountRepository extends AbstractStatRepository
 
         if ($group) {
             $parameters['group'] = $group;
-            $query               = $this->getFindByProductAndPeriodAndGroupQuery();
+            $query = $this->getFindByProductAndPeriodAndGroupQuery();
         } else {
             $query = $this->getFindByProductAndPeriodQuery();
         }
@@ -183,6 +183,5 @@ class StatCountRepository extends AbstractStatRepository
             ->andWhere($ex->eq('s.customerGroup', ':group'))
             ->getQuery()
             ->useQueryCache(true);
-
     }
 }

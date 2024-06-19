@@ -13,6 +13,8 @@ common:
 email:
     stock_report:
         title: Rapport de stock [%mode%]
+    stock_analysis:
+        title: Analyse stock
 
 account:
     pricing:
@@ -268,6 +270,7 @@ cross_selling:
         add: Ajouter une vente croisée
 
 export:
+    stock_analysis: Analyse stock
     filter:
         add_invisible: Ajouter les produits invisible.
         add_quote_only: Ajouter les produits « Sur devis uniquement ».

@@ -1,0 +1,14 @@
+{% apply spaceless %}
+<div class="commerce-export">
+    <div class="commerce-panel">
+        <h3>{{ 'dashboard.export.title'|trans({}, 'EkynaCommerce') }}</h3>
+        <p>
+            <a href="{{ path('admin_ekyna_product_export_stock_analysis') }}"
+               class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-download"></span>
+                {{- 'export.stock_analysis'|trans({}, 'EkynaProduct') -}}
+            </a>
+        </p>
+    </div>
+</div>
+{% endapply %}

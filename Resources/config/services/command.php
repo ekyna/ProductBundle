@@ -12,6 +12,7 @@ use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\ProductSaleExportCommand;
 use Ekyna\Bundle\ProductBundle\Command\ResupplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand;
+use Ekyna\Bundle\ProductBundle\Command\StockAnalysisCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockReportCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockShowCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockUpdateCommand;
@@ -103,7 +104,19 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.command.stat_update', StatUpdateCommand::class)
         ->args([
+            service('ekyna_product.repository.product'),
             service('ekyna_product.updater.stat'),
+        ])
+        ->tag('console.command');
+
+    // Stock analysis command
+    $services
+        ->set('ekyna_product.command.stock_analysis', StockAnalysisCommand::class)
+        ->args([
+            service('ekyna_product.stock.analysis_exporter'),
+            service('ekyna_setting.manager'),
+            service('translator'),
+            service('mailer'),
         ])
         ->tag('console.command');
 

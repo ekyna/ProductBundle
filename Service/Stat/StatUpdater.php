@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Service\Stat;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Entity\StatCross;
-use Ekyna\Bundle\ProductBundle\Exception\LogicException;
-use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\StatCountRepository;
 use Ekyna\Bundle\ProductBundle\Repository\StatCrossRepository;
@@ -22,184 +24,90 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StatUpdater
 {
-    /**
-     * @var StatCountRepository
-     */
-    private $countRepository;
+    private ?OutputInterface $output = null;
+    private bool             $debug  = false;
+    private bool             $force  = false;
 
-    /**
-     * @var StatCrossRepository
-     */
-    private $crossRepository;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var CustomerGroupRepositoryInterface
-     */
-    private $groupRepository;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var bool
-     */
-    private $debug = false;
-
-    /**
-     * @var bool
-     */
-    private $force = false;
-
-    /**
-     * @var \DateTime
-     */
-    private $maxUpdateDate;
-
-    /**
-     * @var StatCalculator
-     */
-    private $calculator;
-
-    /**
-     * @var Product
-     */
-    private $product;
-
-    /**
-     * @var Stopwatch
-     */
-    private $watch;
-
-    /**
-     * @var Group[]
-     */
-    private $groups;
+    private StatCalculator   $calculator;
+    private ProductInterface $product;
+    private ?array           $groups = null;
 
 
-    /**
-     * Constructor.
-     *
-     * @param StatCountRepository              $countRepository
-     * @param StatCrossRepository              $crossRepository
-     * @param ProductRepositoryInterface       $productRepository
-     * @param CustomerGroupRepositoryInterface $groupRepository
-     * @param EntityManagerInterface           $entityManager
-     */
     public function __construct(
-        StatCountRepository $countRepository,
-        StatCrossRepository $crossRepository,
-        ProductRepositoryInterface $productRepository,
-        CustomerGroupRepositoryInterface $groupRepository,
-        EntityManagerInterface $entityManager
+        private readonly StatCountRepository              $countRepository,
+        private readonly StatCrossRepository              $crossRepository,
+        private readonly ProductRepositoryInterface       $productRepository,
+        private readonly CustomerGroupRepositoryInterface $groupRepository,
+        private readonly EntityManagerInterface           $entityManager
     ) {
-        $this->countRepository = $countRepository;
-        $this->crossRepository = $crossRepository;
-        $this->productRepository = $productRepository;
-        $this->groupRepository = $groupRepository;
-        $this->entityManager = $entityManager;
-
         $this->calculator = new StatCalculator($entityManager->getConnection());
     }
 
     /**
      * Sets the output.
-     *
-     * @param OutputInterface $output
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
 
     /**
-     * Sets the whether to debug update.
-     *
-     * @param bool $debug
+     * Sets whether to debug update.
      */
-    public function setDebug(bool $debug)
+    public function setDebug(bool $debug): void
     {
         $this->debug = $debug;
     }
 
     /**
      * Sets whether to force update.
-     *
-     * @param bool $force
      */
-    public function setForce(bool $force)
+    public function setForce(bool $force): void
     {
         $this->force = $force;
     }
 
     /**
-     * Sets the "max update" date time.
-     *
-     * @param \DateTime $date
+     * Purges the statistics data.
      */
-    public function setMaxUpdateDate(\DateTime $date)
+    public function purge(): void
     {
-        $this->maxUpdateDate = $date;
-    }
+        $connection = $this->entityManager->getConnection();
 
-    /**
-     * Purges the stats data.
-     */
-    public function purge()
-    {
-        $this
-            ->entityManager
-            ->getConnection()
-            ->query("TRUNCATE TABLE product_stat_count; TRUNCATE TABLE product_stat_cross;");
+        $connection->executeQuery('TRUNCATE TABLE product_stat_count');
+        $connection->executeQuery('TRUNCATE TABLE product_stat_cross');
     }
 
     /**
      * Updates the next product stats.
      *
+     * @param ProductInterface $product
      * @return float|int|null
      */
-    public function updateNextProduct()
+    public function update(ProductInterface $product): float|int|null
     {
-        if (!$this->force && is_null($this->maxUpdateDate)) {
-            throw new LogicException("You must set the max update date first.");
-        }
+        $this->product = $product;
 
-        if (null === $this->product = $this->findNextProduct()) {
-            return null;
-        }
+        $watch = new Stopwatch();
+        $watch->start('product');
 
-        $this->watch = new Stopwatch();
-        $this->watch->start('product');
-
-        $this->writeln("");
+        $this->writeln('');
         $this->writeln('Updating <comment>' . $this->product->getFullDesignation() . '</comment> stats');
 
-        $this->update();
+        $this->updateStats();
 
-        $this->product->setStatUpdatedAt(new \DateTime());
+        $this->product->setStatUpdatedAt(new DateTime());
 
         $this->entityManager->persist($this->product);
         $this->entityManager->flush();
 
-        $event = $this->watch->stop('product');
+        $event = $watch->stop('product');
 
         $this->writeln("Product stats updated in <comment>{$event->getDuration()}ms</comment>");
-        $this->writeln("");
-        $this->writeln("-------------------------------");
+        $this->writeln('');
+        $this->writeln('-------------------------------');
 
         $this->entityManager->clear();
-
         $this->groups = null;
 
         return $event->getDuration();
@@ -208,7 +116,7 @@ class StatUpdater
     /**
      * Updates the stats for the current product.
      */
-    private function update()
+    private function updateStats(): void
     {
         $count = 0;
         foreach (StatCount::getSources() as $source) {
@@ -219,18 +127,20 @@ class StatUpdater
                 $statDates = $this->calculator->getStatCountDates($this->product, $group, $source);
 
                 foreach ($orderDates as $date => $updated) {
-                    $this->write(sprintf(
-                        '    - %s %s ',
-                        $date,
-                        str_pad('.', 16 - mb_strlen($date), '.', STR_PAD_LEFT)
-                    ));
+                    $this->write(
+                        sprintf(
+                            '    - %s %s ',
+                            $date,
+                            str_pad('.', 16 - mb_strlen($date), '.', STR_PAD_LEFT)
+                        )
+                    );
 
                     if (!$this->force && isset($statDates[$date]) && $statDates[$date] > $updated) {
                         $this->writeln('<comment>skipped</comment>');
                         continue;
                     }
 
-                    $from = new \DateTime($date);
+                    $from = new DateTime($date);
                     $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
 
                     $this->updateCount($source, $group, $from, $to);
@@ -258,12 +168,12 @@ class StatUpdater
     }
 
     /**
-     * @param Group     $group
-     * @param \DateTime $from
-     * @param \DateTime $to
-     * @param string    $source
+     * @param Group    $group
+     * @param DateTime $from
+     * @param DateTime $to
+     * @param string   $source
      */
-    private function updateCount(string $source, Group $group, \DateTime $from, \DateTime $to)
+    private function updateCount(string $source, Group $group, DateTime $from, DateTime $to): void
     {
         // Count
         $quantity = $this
@@ -281,21 +191,23 @@ class StatUpdater
                 ->setSource($source)
                 ->setDate($date)
                 ->setCustomerGroup($group);
+        } elseif ($quantity !== $previous = $stat->getCount()) {
+            $this->writeln("<comment>$previous => $quantity</comment>");
         }
 
         $stat
             ->setCount($quantity)
-            ->setUpdatedAt(new \DateTime());
+            ->setUpdatedAt(new DateTime());
 
         $this->entityManager->persist($stat);
     }
 
     /**
-     * @param Group     $group
-     * @param \DateTime $from
-     * @param \DateTime $to
+     * @param Group    $group
+     * @param DateTime $from
+     * @param DateTime $to
      */
-    private function updateCross(Group $group, \DateTime $from, \DateTime $to)
+    private function updateCross(Group $group, DateTime $from, DateTime $to): void
     {
         $data = $this->calculator->calculateCrossByGroup($this->product, $group, $from, $to);
 
@@ -304,7 +216,7 @@ class StatUpdater
         $date = $from->format('Y-m');
 
         foreach ($data as $targetId => $quantity) {
-            /** @var Product $target */
+            /** @var ProductInterface $target */
             $target = $this->entityManager->getReference($this->productRepository->getClassName(), $targetId);
 
             if (null === $stat = $this->crossRepository->findOne($this->product, $target, $group, $date)) {
@@ -314,6 +226,8 @@ class StatUpdater
                     ->setTarget($target)
                     ->setDate($date)
                     ->setCustomerGroup($group);
+            } elseif ($quantity !== $previous = $stat->getCount()) {
+                $this->writeln("<comment>$previous => $quantity</comment>");
             }
 
             $stat->setCount($quantity);
@@ -325,9 +239,9 @@ class StatUpdater
     /**
      * Returns the groups.
      *
-     * @return Group[]
+     * @return array<Group>
      */
-    private function getGroups()
+    private function getGroups(): array
     {
         if ($this->groups) {
             return $this->groups;
@@ -339,19 +253,9 @@ class StatUpdater
     }
 
     /**
-     * Returns the next product to update.
-     *
-     * @return Product|null
-     */
-    private function findNextProduct()
-    {
-        return $this->productRepository->findNextStatUpdate($this->maxUpdateDate);
-    }
-
-    /**
      * @param string $message
      */
-    private function write(string $message)
+    private function write(string $message): void
     {
         if (!$this->debug || is_null($this->output)) {
             return;
@@ -363,7 +267,7 @@ class StatUpdater
     /**
      * @param string $message
      */
-    private function writeln(string $message)
+    private function writeln(string $message): void
     {
         if (!$this->debug || is_null($this->output)) {
             return;

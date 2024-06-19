@@ -13,6 +13,8 @@ common:
 email:
     stock_report:
         title: Stock report [%mode%]
+    stock_analysis:
+        title: Stock analysis
 
 account:
     pricing:

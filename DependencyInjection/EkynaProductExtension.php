@@ -48,6 +48,7 @@ class EkynaProductExtension extends Extension implements PrependExtensionInterfa
         $loader->load('services/repository.php');
         $loader->load('services/serializer.php');
         $loader->load('services/show.php');
+        $loader->load('services/stock.php');
         $loader->load('services/table.php');
         $loader->load('services/twig.php');
         $loader->load('services/validator.php');

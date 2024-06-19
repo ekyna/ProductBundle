@@ -9,3 +9,7 @@ admin_ekyna_product_stock_view:
 admin_ekyna_product_highlight:
     resource: admin/highlight.yaml
     prefix:   /highlight
+
+admin_ekyna_product_export:
+    resource: admin/export.yaml
+    prefix:   /export

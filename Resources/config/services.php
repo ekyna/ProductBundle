@@ -7,6 +7,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Doctrine\ORM\Events;
 use Ekyna\Bundle\ProductBundle\Attribute;
 use Ekyna\Bundle\ProductBundle\Attribute\Type\TypeInterface;
+use Ekyna\Bundle\ProductBundle\Dashboard\ExportWidget;
 use Ekyna\Bundle\ProductBundle\Install\ProductInstaller;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRegistry;
 use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
@@ -23,7 +24,6 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing;
 use Ekyna\Bundle\ProductBundle\Service\Routing\RoutingLoader;
 use Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Service\Stat;
-use Ekyna\Bundle\ProductBundle\Service\Stock;
 use Ekyna\Component\Commerce\Common\Generator\DateNumberGenerator;
 use Ekyna\Component\Resource\Event\QueueEvents;
 
@@ -82,41 +82,6 @@ return static function (ContainerConfigurator $container) {
             service('translator'),
         ])
         ->tag(TypeInterface::TYPE_TAG);
-
-    // StockView
-    $services
-        ->set('ekyna_product.stock_view', Stock\StockView::class)
-        ->args([
-            service('doctrine.orm.default_entity_manager'),
-            service('ekyna_resource.helper'),
-            service('router'),
-            service('translator'),
-            service('form.factory'),
-            service('request_stack'),
-            service('ekyna_commerce.factory.formatter'),
-            service('ekyna_admin.provider.user'),
-            param('ekyna_product.class.product'),
-            param('ekyna_commerce.class.supplier_product'),
-            param('ekyna_commerce.class.supplier_order_item'),
-            param('ekyna_product.class.product_stock_unit'),
-        ]);
-
-    // Bundle stock adjuster
-    $services
-        ->set('ekyna_product.bundle_stock_adjuster', Stock\BundleStockAdjuster::class)
-        ->args([
-            service('ekyna_commerce.helper.adjust'),
-        ]);
-
-    // Resupply
-    $services
-        ->set('ekyna_product.resupply', Stock\Resupply::class)
-        ->args([
-            service('ekyna_resource.factory.factory'),
-            service('ekyna_resource.repository.factory'),
-            service('ekyna_resource.manager.factory'),
-            service('ekyna_commerce.helper.subject'),
-        ]);
 
     // Constant helper
     $services
@@ -433,4 +398,9 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_resource.manager.factory'),
         ])
         ->tag('ekyna_install.installer', ['priority' => 96]);
+
+    // Dashboard export widget
+    $services
+        ->set('ekyna_product.dashboard.export_widget', ExportWidget::class)
+        ->tag('ekyna_admin.dashboard_widget');
 };
