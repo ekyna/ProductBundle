@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Command;
 
 use DateTime;
-use Ekyna\Bundle\AdminBundle\Service\Mailer\MailerHelper;
+use Ekyna\Bundle\AdminBundle\Service\Mailer\AddressHelper;
 use Ekyna\Bundle\ProductBundle\Model\SaleExportConfig;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductSaleExporter;
 use Ekyna\Component\Resource\Model\DateRange;
@@ -35,7 +35,7 @@ class ProductSaleExportCommand extends Command
 
     public function __construct(
         private readonly ProductSaleExporter $exporter,
-        private readonly MailerHelper        $helper,
+        private readonly AddressHelper       $helper,
         private readonly MailerInterface     $mailer
     ) {
         parent::__construct();

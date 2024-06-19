@@ -81,7 +81,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.command.product_sale_export', ProductSaleExportCommand::class)
         ->args([
             service('ekyna_product.exporter.product_sale'),
-            service('ekyna_admin.helper.mailer'),
+            service('ekyna_admin.helper.mailer.address'),
             service('mailer'),
         ])
         ->tag('console.command');

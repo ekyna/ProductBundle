@@ -104,7 +104,7 @@ class StockReportCommand extends Command
             'title'    => $title,
             'mode'     => $mode,
             'products' => $products,
-            'today'    => (new DateTime())->setTime(0, 0),
+            'today'    => (new DateTime())->setTime(23, 59, 59, 999999),
             'locale'   => $this->translator->getLocale(),
         ]);
 

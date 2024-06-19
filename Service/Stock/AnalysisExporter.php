@@ -313,6 +313,7 @@ class AnalysisExporter
         FROM item_quantity AS iq
         JOIN commerce_quote o ON iq.quote_id = o.id
         WHERE iq.parent_id IS NULL
+          AND o.project_alive = 1
           AND o.project_trust >= :trust
           AND o.project_date BETWEEN :from AND :to
         GROUP BY iq.subject_identifier, YEAR(o.project_date), MONTH(o.project_date)
