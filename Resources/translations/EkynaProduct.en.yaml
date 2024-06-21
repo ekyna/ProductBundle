@@ -495,6 +495,7 @@ product:
         not_contractual: Non-contractual photos
         attributes_title: Attributes title
         attributes_designation: Attributes designation
+        internal_note: Internal note
         internal_manual: Product manual (media)
         external_manual: Product manual (URL)
     alert:

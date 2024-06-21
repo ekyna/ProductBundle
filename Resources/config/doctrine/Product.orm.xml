@@ -47,8 +47,8 @@
 
         <field name="statUpdatedAt" column="stat_updated_at" type="datetime" nullable="true"/>
 
-        <!-- TODO internalManual, externalManual -->
         <field name="externalManual" column="external_manual" type="string" length="255" nullable="true"/>
+        <field name="internalNote" column="internal_note" type="text" nullable="true" />
 
         <field name="createdAt" type="datetime" column="created_at">
             <gedmo:timestampable on="create"/>

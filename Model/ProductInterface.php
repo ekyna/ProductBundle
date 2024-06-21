@@ -108,6 +108,10 @@ interface ProductInterface extends
 
     public function setExternalManual(?string $externalManual): ProductInterface;
 
+    public function getInternalNote(): ?string;
+
+    public function setInternalNote(?string $internalNote): ProductInterface;
+
     /**
      * Returns whether to include brand in full designation and title.
      */

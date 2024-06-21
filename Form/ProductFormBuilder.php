@@ -25,6 +25,7 @@ use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ResourceBundle\Form\Type\ConstantChoiceType;
 use Ekyna\Bundle\ResourceBundle\Form\Type\ResourceChoiceType;
 use Ekyna\Bundle\UiBundle\Form\Type\CollectionType;
+use Ekyna\Bundle\UiBundle\Form\Type\TinymceType;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -247,6 +248,22 @@ class ProductFormBuilder
         ], $options);
 
         $this->form->add('internalManual', MediaChoiceType::class, $options);
+
+        return $this;
+    }
+
+    /**
+     * Adds the internal note field.
+     */
+    public function addInternalNoteField(array $options = []): ProductFormBuilder
+    {
+        $options = array_replace([
+            'label'    => t('product.field.internal_note', [], 'EkynaProduct'),
+            'theme'    => 'simple',
+            'required' => false,
+        ], $options);
+
+        $this->form->add('internalNote', TinymceType::class, $options);
 
         return $this;
     }

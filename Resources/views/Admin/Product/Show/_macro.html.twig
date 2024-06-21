@@ -152,6 +152,14 @@
     }|merge(options)) -}}
 {%- endmacro show_medias -%}
 
+{%- macro show_internal_note(product, options = {}) -%}
+    {{- show_row(product.internalNote, 'textarea', {
+        'label': t('product.field.internal_note', [], 'EkynaProduct'),
+        'id': 'product_internal_note',
+        'html': true,
+    }|merge(options)) -}}
+{%- endmacro show_internal_note -%}
+
 
 {%- macro show_internal_manual(product, options = {}) -%}
     {{- show_row(product.internalManual, 'media_media', {

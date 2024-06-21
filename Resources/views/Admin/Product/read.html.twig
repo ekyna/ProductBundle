@@ -66,6 +66,15 @@
     {% endif %}
 {% endblock %}
 
+{% block side %}
+    {% if product.internalNote is not empty %}
+        <h3>{{ t('product.field.internal_note', [], 'EkynaProduct')|trans }}</h3>
+        <hr>
+        {{ product.internalNote|raw }}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <link href="{{ absolute_url(asset('bundles/ekynaproduct/css/admin/product.css')) }}" rel="stylesheet" type="text/css"/>

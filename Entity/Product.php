@@ -64,6 +64,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
     protected ?Media\MediaInterface $internalManual = null;
     protected ?string               $externalManual = null;
+    protected ?string               $internalNote   = null;
 
     /** @var Collection<int, Model\ProductInterface> */
     protected Collection $variants;
@@ -335,6 +336,18 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     public function setExternalManual(?string $externalManual): Model\ProductInterface
     {
         $this->externalManual = $externalManual;
+
+        return $this;
+    }
+
+    public function getInternalNote(): ?string
+    {
+        return $this->internalNote;
+    }
+
+    public function setInternalNote(?string $internalNote): Model\ProductInterface
+    {
+        $this->internalNote = $internalNote;
 
         return $this;
     }
