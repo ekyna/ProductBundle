@@ -115,15 +115,6 @@ class StockRepository
             );
         }
 
-        // Stock sums
-        $product['ordered'] = $product['ordered'] - $product['received'];
-        $product['sold'] = $product['sold'] - $product['shipped'];
-
-        // Cleanup
-        /*unset($product['parent_id']);
-        unset($product['parent_designation']);
-        unset($product['attributes_designation']);*/
-
         return $product;
     }
 

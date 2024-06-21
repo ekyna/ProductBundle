@@ -225,8 +225,8 @@ class AnalysisExporter
                 $product['designation'], // Désignation article
                 $status, // Statut
                 $product['in_stock'], // Stock
-                $product['sold'], // Qté cde client
-                $product['ordered'], // Achat DEV // TODO what about pending ?
+                $product['sold'] - $product['shipped'], // Qté cde client
+                $product['ordered'] - $product['received'], // Achat DEV // TODO what about pending ?
                 $product['virtual_stock'], // Dispo théorique
                 $this->getForecast($id, 4), // Forecast sur 4 Mois
                 $this->getForecast($id, 6), // Forecast sur 6 Mois

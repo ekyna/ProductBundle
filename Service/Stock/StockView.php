@@ -260,8 +260,8 @@ class StockView
 
         // Stock sums
         $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
-        $product['ordered'] = $formatter->number((float)($product['ordered']));
-        $product['sold'] = $formatter->number((float)($product['sold']));
+        $product['ordered'] = $formatter->number((float)($product['ordered'] - $product['received']));
+        $product['sold'] = $formatter->number((float)($product['sold'] - $product['shipped']));
 
         $this->stockRepository->normalizeProduct($product);
 
