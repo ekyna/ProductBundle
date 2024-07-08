@@ -105,6 +105,13 @@ return static function (ContainerConfigurator $container) {
         ->tag('ekyna_resource.action');
 
     $services
+        ->set('ekyna_product.action.admin.product.export_bundle', Product\ExportBundleAction::class)
+        ->args([
+            service('ekyna_product.exporter.bundle'),
+        ])
+        ->tag('ekyna_resource.action');
+
+    $services
         ->set('ekyna_product.action.admin.product.generate_reference', Product\GenerateReferenceAction::class)
         ->args([
             service('ekyna_product.generator.external_reference'),

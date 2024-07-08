@@ -14,6 +14,7 @@ use Ekyna\Bundle\ProductBundle\Service\Catalog\CatalogRenderer;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Converter;
 use Ekyna\Bundle\ProductBundle\Service\Editor\Block\ProductSlidePlugin;
+use Ekyna\Bundle\ProductBundle\Service\Exporter\BundleExporter;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductSaleExporter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
@@ -279,6 +280,17 @@ return static function (ContainerConfigurator $container) {
             param('ekyna_product.editor.slide'), // TODO abstract_arg
         ])
         ->tag('ekyna_cms.editor.block_plugin');
+
+    // Bundle exporter
+    $services
+        ->set('ekyna_product.exporter.bundle', BundleExporter::class)
+        ->args([
+            service('ekyna_resource.helper'),
+            service('ekyna_product.helper.constants'),
+            service('ekyna_commerce.helper.constants'),
+            service('ekyna_ui.renderer'),
+            service('ekyna_product.calculator.purchase_cost'),
+        ]);
 
     // Product exporter
     $services

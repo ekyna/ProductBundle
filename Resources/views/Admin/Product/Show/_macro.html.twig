@@ -528,6 +528,7 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-bundle">
             {%- if product is bundle_product -%}
+                {#  TODO Use \Ekyna\Bundle\ProductBundle\Service\Exporter\BundleExporter::buildList #}
                 <table class="table table-stripped table-condensed table-hover table-alt-head">
                     <tr>
                         <th>{{ 'product.label.singular'|trans({}, 'EkynaProduct') }}</th>
@@ -568,25 +569,19 @@
                             {{- choice_product|product_type_badge -}}
                         </td>
                         <td id="{{ slot_id ~ 'visible' }}" class="text-right">
-                            {%- if choice_product.visible -%}
-                                <span class="label label-success">{{ 'value.yes'|trans({}, 'EkynaUi') }}</span>
-                            {%- else -%}
-                                <span class="label label-danger">{{ 'value.no'|trans({}, 'EkynaUi') }}</span>
-                            {%- endif -%}
+                            {{ choice_product.visible|boolean_badge }}
                         </td>
                         <td id="{{ slot_id ~ 'hidden' }}" class="text-right">
-                            {%- if choice.hidden -%}
-                                <span class="label label-warning">{{ 'value.yes'|trans({}, 'EkynaUi') }}</span>
-                            {%- else -%}
-                                <span class="label label-default">{{ 'value.no'|trans({}, 'EkynaUi') }}</span>
-                            {%- endif -%}
+                            {{ choice.hidden|boolean_badge({
+                                'true': {'class': 'warning'},
+                                'false': {'class': 'default'},
+                            }) }}
                         </td>
                         <td id="{{ slot_id ~ 'excludeImages' }}" class="text-right">
-                            {%- if choice.excludeImages -%}
-                                <span class="label label-warning">{{ 'value.no'|trans({}, 'EkynaUi') }}</span>
-                            {%- else -%}
-                                <span class="label label-default">{{ 'value.yes'|trans({}, 'EkynaUi') }}</span>
-                            {%- endif -%}
+                            {{ choice.excludeImages|boolean_badge({
+                                'true': {'class': 'warning'},
+                                'false': {'class': 'default'},
+                            }) }}
                         </td>
                         <td id="{{ slot_id ~ 'options' }}" class="text-right">
                             {{ choice|bundle_choice_option_groups }}
@@ -664,6 +659,9 @@
                 </p>
             {%- endif -%}
             </div>
+            <p class="actions">
+                {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ExportBundleAction') }}
+            </p>
         </div>
     </div>
 {%- endmacro show_bundle_composition -%}
