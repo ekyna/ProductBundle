@@ -238,7 +238,7 @@ class ProductsSection implements SectionInterface
 
         $base = $col;
         foreach ($this->years as $index => $year) {
-            $col = $base + ($index * 4);
+            $col = $base + ($index * 6);
 
             // Year (merged cells)
             $sheet->mergeCells([$col, 1, $col + 5, 1]);
