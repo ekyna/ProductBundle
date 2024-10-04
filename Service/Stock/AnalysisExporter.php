@@ -123,23 +123,23 @@ class AnalysisExporter
             $id = $product['id'];
             $status = $product['end_of_life'] ? 'EOL' : '';
 
-            $sheet->getCell([1, $row])->setValue($product['reference']);              // Article
-            $sheet->getCell([2, $row])->setValue($product['designation']);            // Désignation article
-            $sheet->getCell([3, $row])->setValue($status);                            // Statut
-            $sheet->getCell([4, $row])->setValue($product['in_stock']);               // Stock
-            $sheet->getCell([5, $row])->setValue($product['sold']);                   // Qté cde client
+            $sheet->getCell([1, $row])->setValue($product['reference']);                      // Article
+            $sheet->getCell([2, $row])->setValue($product['designation']);                    // Désignation article
+            $sheet->getCell([3, $row])->setValue($status);                                    // Statut
+            $sheet->getCell([4, $row])->setValue($product['in_stock']);                       // Stock
+            $sheet->getCell([5, $row])->setValue($product['sold'] - $product['shipped']);     // Qté cde client
             // TODO what about pending ?
-            $sheet->getCell([6, $row])->setValue($product['ordered']);                // Achat DEV
-            $sheet->getCell([7, $row])->setValue($product['virtual_stock']);          // Dispo théorique
-            $sheet->getCell([8, $row])->setValue($this->getForecast($id, 4));         // Forecast sur 4 Mois
-            $sheet->getCell([9, $row])->setValue($this->getForecast($id, 6));         // Forecast sur 6 Mois
-            $sheet->getCell([10, $row])->setValue($product['stock_floor']);           // Seuil stock mini
-            $sheet->getCell([11, $row])->setValue($this->getHistoric($id, 0, 1));     // Dernier mois
-            $sheet->getCell([12, $row])->setValue($this->getHistoric($id, 0, 3));     // 3 derniers mois
-            $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 2));     // Entre 4 et 6 derniers mois
-            $sheet->getCell([14, $row])->setValue($this->getHistoric($id, 6, 2));     // Entre 7 et 9 derniers mois
-            $sheet->getCell([15, $row])->setValue($this->getHistoric($id, 9, 2));     // Entre 10 et 12 derniers mois
-            $sheet->getCell([16, $row])->setValue($this->getHistoric($id, 11, null)); // Avant les 12 derniers mois
+            $sheet->getCell([6, $row])->setValue($product['ordered'] - $product['received']); // Achat DEV
+            $sheet->getCell([7, $row])->setValue($product['virtual_stock']);                  // Dispo théorique
+            $sheet->getCell([8, $row])->setValue($this->getForecast($id, 4));                 // Forecast sur 4 Mois
+            $sheet->getCell([9, $row])->setValue($this->getForecast($id, 6));                 // Forecast sur 6 Mois
+            $sheet->getCell([10, $row])->setValue($product['stock_floor']);                   // Seuil stock mini
+            $sheet->getCell([11, $row])->setValue($this->getHistoric($id, 0, 1));             // Dernier mois
+            $sheet->getCell([12, $row])->setValue($this->getHistoric($id, 0, 3));             // 3 derniers mois
+            $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 2));             // Entre 4 et 6 derniers mois
+            $sheet->getCell([14, $row])->setValue($this->getHistoric($id, 6, 2));             // Entre 7 et 9 derniers mois
+            $sheet->getCell([15, $row])->setValue($this->getHistoric($id, 9, 2));             // Entre 10 et 12 derniers mois
+            $sheet->getCell([16, $row])->setValue($this->getHistoric($id, 11, null));         // Avant les 12 derniers mois
 
             if (1 === $row % 2) {
                 $sheet->getStyle([1, $row, 16, $row])->applyFromArray($altRowStyle);
