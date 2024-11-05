@@ -136,10 +136,10 @@ class AnalysisExporter
             $sheet->getCell([10, $row])->setValue($product['stock_floor']);                   // Seuil stock mini
             $sheet->getCell([11, $row])->setValue($this->getHistoric($id, 0, 1));             // Dernier mois
             $sheet->getCell([12, $row])->setValue($this->getHistoric($id, 0, 3));             // 3 derniers mois
-            $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 2));             // Entre 4 et 6 derniers mois
-            $sheet->getCell([14, $row])->setValue($this->getHistoric($id, 6, 2));             // Entre 7 et 9 derniers mois
-            $sheet->getCell([15, $row])->setValue($this->getHistoric($id, 9, 2));             // Entre 10 et 12 derniers mois
-            $sheet->getCell([16, $row])->setValue($this->getHistoric($id, 11, null));         // Avant les 12 derniers mois
+            $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 3));             // Entre 4 et 6 derniers mois
+            $sheet->getCell([14, $row])->setValue($this->getHistoric($id, 6, 3));             // Entre 7 et 9 derniers mois
+            $sheet->getCell([15, $row])->setValue($this->getHistoric($id, 9, 3));             // Entre 10 et 12 derniers mois
+            $sheet->getCell([16, $row])->setValue($this->getHistoric($id, 12, null));         // Avant les 12 derniers mois
 
             if (1 === $row % 2) {
                 $sheet->getStyle([1, $row, 16, $row])->applyFromArray($altRowStyle);
@@ -350,7 +350,7 @@ class AnalysisExporter
         $nbMonths = 12;
 
         $sql = <<<SQL
-        SELECT product_id, date, count
+        SELECT product_id, date, SUM(count) as count
         FROM product_stat_count
         WHERE source=:source
         GROUP BY product_id, date
