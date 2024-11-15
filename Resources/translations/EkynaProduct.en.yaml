@@ -348,6 +348,9 @@ option_group:
     button:
         add: Add an options groups
 
+permission:
+    change_reference: Change reference
+
 price:
     label:
         singular: Displayed price
@@ -452,13 +455,14 @@ product:
     header:
         list: Products <small>List of the products</small>
         export: Products <small>Catalog and pricing</small>
-        show: Product details <small>%name%</small>
+        show: Product details <small>%reference% - %name%</small>
         new: Create a new product
         duplicate: Duplicate the product <small>%name%</small>
         convert: Convert the product <small>%name%</small>
         edit: Edit the product <small>%name%</small>
         remove: Remove the product <small>%name%</small>
         adjust_stock: Adjust stock <small>%name%</small>
+        change_reference: Changer reference <small>%name%</small>
     button:
         list: Products list
         export: Catalog export
@@ -471,6 +475,7 @@ product:
         label: Label
         invalidate_offers: Recalculate offers and prices
         adjust_stock: Adjust stock
+        change_reference: Change reference
     type:
         simple: Simple
         variable: Variable

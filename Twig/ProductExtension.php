@@ -142,6 +142,10 @@ class ProductExtension extends AbstractExtension
                 'product_price_list',
                 [ProductReadHelper::class, 'getPriceList']
             ),
+            new TwigFilter(
+                'product_reference',
+                [ProductReadHelper::class, 'renderReference']
+            ),
         ];
     }
 

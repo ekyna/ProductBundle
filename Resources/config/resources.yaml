@@ -4,6 +4,11 @@ namespaces:
         trans_domain: EkynaProduct
         prefix: /catalog
 
+permissions:
+    Ekyna\Bundle\ProductBundle\Model\Permission::CHANGE_REFERENCE:
+        label: permission.change_reference
+        trans_domain: EkynaProduct
+
 resources:
     ekyna_product:
         attribute:
@@ -355,8 +360,9 @@ resources:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\AdjustStockAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\AttributesFormAction:
                     expose: true
-                Ekyna\Bundle\ProductBundle\Action\Admin\Product\CreateAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\ChangeReferenceAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\ConvertAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\Product\CreateAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\DuplicateAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\ExportAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\ExportBundleAction: ~

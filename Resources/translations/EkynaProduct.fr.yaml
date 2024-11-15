@@ -350,6 +350,9 @@ option_group:
     button:
         add: Ajouter un groupe d'options
 
+permission:
+    change_reference: Changer référence
+
 price:
     label:
         singular: Tarif affiché
@@ -455,13 +458,14 @@ product:
     header:
         list: Produits <small>Liste des produits</small>
         export: Produits <small>Catalogue et tarifs</small>
-        show: Détail du produit <small>%name%</small>
+        show: Détail du produit <small>%reference% - %name%</small>
         new: Créer un nouveau produit
         duplicate: Dupliquer le produit <small>%name%</small>
         convert: Convertir le produit <small>%name%</small>
         edit: Modifier le produit <small>%name%</small>
         remove: Supprimer le produit <small>%name%</small>
         adjust_stock: Ajuster le stock <small>%name%</small>
+        change_reference: Changer la référence <small>%name%</small>
     button:
         list: Liste des produits
         export: Export catalogue
@@ -474,6 +478,7 @@ product:
         label: Étiquette
         invalidate_offers: Recalculer les offres et tarifs
         adjust_stock: Ajuster le stock
+        change_reference: Changer la référence
     type:
         simple: Simple
         variable: Variable

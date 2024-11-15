@@ -83,6 +83,8 @@ class ProductRepository extends SearchRepository implements Locale\LocaleProvide
             'reference.analyzed',
             'references^3',
             'references.analyzed',
+            'references_aliases^3',
+            'references_aliases.analyzed',
             'designation^3',
             'designation.analyzed',
             'translations.' . $locale . '.title^2',

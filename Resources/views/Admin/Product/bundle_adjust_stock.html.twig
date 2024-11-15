@@ -8,6 +8,7 @@
 
 {% block title %}
     <h1>{{ 'product.header.adjust_stock'|trans({'%name%': product}, 'EkynaProduct')|raw }}</h1>
+    {{ product|product_type_badge }}
 {% endblock title %}
 
 {% block actions %}
@@ -30,8 +31,6 @@
     {#  TODO Liste (tree) sous-produits + stock #}
 
     {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
-    {{ bootstrap_set_style('horizontal') }}
-    {{ bootstrap_set_col_size('md') }}
     <div class="form-body">
     {% include '@EkynaCommerce/Admin/Stock/stock_adjustment_form.html.twig' %}
     </div>

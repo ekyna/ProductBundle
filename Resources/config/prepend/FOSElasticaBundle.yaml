@@ -15,6 +15,7 @@ fos_elastica:
                 min_price: { type: float }
                 reference: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
                 references: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                references_aliases: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
                 brand.id: { type: integer }
                 brand.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                 brand.visible: { type: boolean }

@@ -43,6 +43,10 @@ class LabelListener
             $label->reference = $subject->getReference();
             $label->barcode = $subject->getReferenceByType(ProductReferenceTypes::TYPE_EAN_13);
             $label->geocode = $subject->getGeocode();
+
+            if (!empty($aliases = $subject->getReferenceAliases())) {
+                $label['reference_aliases'] = $aliases;
+            }
         }
 
         $supplierOrder = $event->parameters['supplierOrder'] ?? null;

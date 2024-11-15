@@ -23,6 +23,7 @@ use Ekyna\Component\Commerce\Exception;
 use function array_map;
 use function array_merge;
 use function array_unique;
+use function implode;
 use function is_null;
 
 /**
@@ -123,6 +124,19 @@ class ItemBuilder
         }
 
         $this->buildComponents($item);
+
+        $this->buildDescriptions($item);
+    }
+
+    protected function buildDescriptions(SaleItemInterface $item): void
+    {
+        $product = $this->resolve($item);
+
+        if (empty($aliases = $product->getReferenceAliases())) {
+            return;
+        }
+
+        $item->setDescription('aliases', 'Renumbered: ' . implode(', ', $aliases));
     }
 
     /**

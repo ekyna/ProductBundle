@@ -17,11 +17,13 @@ use Ekyna\Bundle\ProductBundle\Repository\PriceRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
+use Ekyna\Bundle\UiBundle\Service\UiHelper;
 use Ekyna\Component\Resource\Locale\LocaleProviderInterface;
 use Ekyna\Component\Resource\Repository\RepositoryFactoryInterface;
 use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_map;
 use function array_reverse;
 use function sprintf;
 
@@ -118,6 +120,26 @@ class ProductReadHelper
         }
 
         return $messages;
+    }
+
+    public function renderReference(ProductInterface $product): string
+    {
+        $reference = UiHelper::renderClipboardCopy($product->getReference());
+
+        if (empty($aliases = $product->getReferenceAliases())) {
+            return $reference;
+        }
+
+        $aliases = array_map(
+            static fn(string $ref): string => UiHelper::renderClipboardCopy($ref),
+            $aliases
+        );
+
+        return sprintf(
+            '%s (%s)',
+            $reference,
+            implode(', ', $aliases)
+        );
     }
 
     private function generatePendingOffersMessage(ProductInterface $product): ?string

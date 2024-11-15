@@ -127,6 +127,9 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
                 return $r->getCode();
             }, $object->getReferences()->toArray());
 
+            // References
+            $data['references_aliases'] = $object->getReferenceAliases();
+
             // Option groups
             $data['option_groups'] = $this->normalizeOptionGroups($object);
             $data['quote_only'] = $object->isQuoteOnly();

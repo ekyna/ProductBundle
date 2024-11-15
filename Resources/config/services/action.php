@@ -82,6 +82,10 @@ return static function (ContainerConfigurator $container) {
         ->tag('ekyna_resource.action');
 
     $services
+        ->set('ekyna_product.action.admin.product.change_reference', Product\ChangeReferenceAction::class)
+        ->tag('ekyna_resource.action');
+
+    $services
         ->set('ekyna_product.action.admin.product.convert', Product\ConvertAction::class)
         ->args([
             service('ekyna_product.converter.product'),

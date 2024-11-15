@@ -1,0 +1,29 @@
+{% extends '@EkynaAdmin/Entity/Crud/update.html.twig' %}
+
+{% import '@EkynaProduct/Admin/Product/_macro.html.twig' as macros %}
+
+{% block page_title %}
+    {{ (context.config.transPrefix ~ '.label.singular')|trans({}, context.config.transDomain)|raw }}
+{% endblock page_title %}
+
+{% block title %}
+    <h1>{{ 'product.header.change_reference'|trans({'%name%': product}, 'EkynaProduct')|raw }}</h1>
+    {{ product|product_type_badge }}
+{% endblock title %}
+
+{% block actions %}
+    {{ admin_resource_btn(context.config.id, 'Ekyna\\Bundle\\AdminBundle\\Action\\ListAction') }}
+    {{ macros.new_product_button() }}
+{% endblock actions %}
+
+{% block main %}
+    {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+    {{ bootstrap_set_style('horizontal') }}
+    {{ bootstrap_set_col_size('md') }}
+    <div class="form-body">
+        {{ form_errors(form) }}
+        {{ form_row(form.reference) }}
+        {{ form_rest(form) }}
+    </div>
+    {{ form_end(form) }}
+{% endblock main %}

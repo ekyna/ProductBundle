@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ekyna\Bundle\ProductBundle\Validator\Constraints;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Class ProductValidator
@@ -15,40 +17,29 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class ProductValidator extends ConstraintValidator
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $repository;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ProductRepositoryInterface $repository
-     */
-    public function __construct(ProductRepositoryInterface $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private readonly ProductRepositoryInterface $repository
+    ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function validate($product, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        if (!$product instanceof Model\ProductInterface) {
-            throw new InvalidArgumentException("Expected instance of " . Model\ProductInterface::class);
+        if (!$value instanceof Model\ProductInterface) {
+            throw new UnexpectedTypeException($value, Model\ProductInterface::class);
         }
         if (!$constraint instanceof Product) {
-            throw new InvalidArgumentException("Expected instance of " . Product::class);
+            throw new UnexpectedTypeException($constraint, Product::class);
         }
 
-        $this->validateReference($product);
+        $this->validateReference($value);
 
-        if ($product->getType() === Model\ProductTypes::TYPE_VARIANT) {
-            $this->validateVariantDesignation($product);
+        if ($value->getType() === Model\ProductTypes::TYPE_VARIANT) {
+            $this->validateVariantDesignation($value);
         } else {
-            $this->validateDesignation($product);
+            $this->validateDesignation($value);
         }
 
         // TODO unique option groups by name
@@ -61,6 +52,16 @@ class ProductValidator extends ConstraintValidator
      */
     private function validateReference(Model\ProductInterface $product): void
     {
+        if (in_array($product->getReference(), $product->getReferenceAliases(), true)) {
+            $this
+                ->context
+                ->buildViolation('Can`t use a previous reference')
+                ->atPath('reference')
+                ->addViolation();
+
+            return;
+        }
+
         if (null === $duplicate = $this->repository->findDuplicateByReference($product)) {
             return;
         }

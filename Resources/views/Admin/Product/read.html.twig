@@ -14,7 +14,7 @@
 
 {% block title %}
     {{ admin_resource_pin(resource) }}
-    <h1>{{ 'product.header.show'|trans({'%name%': product}, 'EkynaProduct')|raw }}</h1>
+    <h1>{{ 'product.header.show'|trans({'%reference%': product|product_reference, '%name%': product}, 'EkynaProduct')|raw }}</h1>
 {% endblock title %}
 
 {% block actions %}
@@ -40,6 +40,9 @@
         <div class="actions">
             {{ macros.labels_product_button(product) }}
             {{ macros.convert_product_button(product) }}
+            {% if is_granted('ROLE_SUPER_ADMIN') %}
+            {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ChangeReferenceAction') }}
+            {% endif %}
             {%- if product is simple_product -%}
                 {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\DuplicateAction') }}
             {%- endif -%}
