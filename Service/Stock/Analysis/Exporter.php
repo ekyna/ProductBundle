@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Ekyna\Bundle\ProductBundle\Service\Stock;
+namespace Ekyna\Bundle\ProductBundle\Service\Stock\Analysis;
 
 use DateTime;
 use Doctrine\DBAL\Connection;
 use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
+use Ekyna\Bundle\ProductBundle\Service\Stock\StockRepository;
 use Ekyna\Component\Resource\Helper\File\Csv;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -21,11 +22,11 @@ use function sprintf;
 use function sys_get_temp_dir;
 
 /**
- * Class AnalysisExport
- * @package Ekyna\Bundle\ProductBundle\Service\Stock
+ * Class Exporter
+ * @package Ekyna\Bundle\ProductBundle\Service\Stock\Analysis
  * @author  Étienne Dauvergne <contact@ekyna.com>
  */
-class AnalysisExporter
+class Exporter
 {
     private array $products;
     private array $forecast;
@@ -59,16 +60,17 @@ class AnalysisExporter
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->getDefaultRowDimension()->setRowHeight(18);
 
+        // Column widths
         $sheet->getRowDimension(1)->setRowHeight(33.75);
         $sheet->getColumnDimension('A')->setWidth(13.14);
         $sheet->getColumnDimension('B')->setWidth(68.29);
         $sheet->getColumnDimension('C')->setWidth(6);
-        $sheet->getColumnDimension('D')->setWidth(6);
-        $sheet->getColumnDimension('E')->setWidth(12);
-        $sheet->getColumnDimension('F')->setWidth(9.57);
-        $sheet->getColumnDimension('G')->setWidth(14);
-        $sheet->getColumnDimension('H')->setWidth(11.43);
-        $sheet->getColumnDimension('I')->setWidth(9.86);
+        $sheet->getColumnDimension('D')->setWidth(9.86);
+        $sheet->getColumnDimension('E')->setWidth(6);
+        $sheet->getColumnDimension('F')->setWidth(12);
+        $sheet->getColumnDimension('G')->setWidth(9.57);
+        $sheet->getColumnDimension('H')->setWidth(14);
+        $sheet->getColumnDimension('I')->setWidth(11.43);
         $sheet->getColumnDimension('J')->setWidth(9.86);
         $sheet->getColumnDimension('K')->setWidth(11.43);
         $sheet->getColumnDimension('L')->setWidth(11.43);
@@ -77,6 +79,7 @@ class AnalysisExporter
         $sheet->getColumnDimension('O')->setWidth(14);
         $sheet->getColumnDimension('P')->setWidth(14);
 
+        // Column headers
         $sheet->getStyle('A1:P1')->applyFromArray([
             'font'      => [
                 'bold'  => true,
@@ -92,17 +95,24 @@ class AnalysisExporter
                 'color'    => ['argb' => 'FF666699'],
             ],
         ]);
+        // Editable column headers
+        $sheet->getStyle('C1:D1')->applyFromArray([
+            'fill'      => [
+                'color'    => ['argb' => 'FF669966'],
+            ],
+        ]);
 
-        $sheet->getCell([1, 1])->setValue('Article');
-        $sheet->getCell([2, 1])->setValue('Désignation article');
+        // TODO translations
+        $sheet->getCell([1, 1])->setValue('Référence');
+        $sheet->getCell([2, 1])->setValue('Désignation');
         $sheet->getCell([3, 1])->setValue('Statut');
-        $sheet->getCell([4, 1])->setValue('Stock');
-        $sheet->getCell([5, 1])->setValue('Qté cde client');
-        $sheet->getCell([6, 1])->setValue('Achat DEV');
-        $sheet->getCell([7, 1])->setValue('Dispo théorique');
-        $sheet->getCell([8, 1])->setValue('Forecast sur 4 Mois');
-        $sheet->getCell([9, 1])->setValue('Forecast sur 6 Mois');
-        $sheet->getCell([10, 1])->setValue('Seuil stock mini');
+        $sheet->getCell([4, 1])->setValue('Seuil stock mini');
+        $sheet->getCell([5, 1])->setValue('Stock');
+        $sheet->getCell([6, 1])->setValue('Qté cde client');
+        $sheet->getCell([7, 1])->setValue('Achat DEV');
+        $sheet->getCell([8, 1])->setValue('Dispo théorique');
+        $sheet->getCell([9, 1])->setValue('Forecast sur 4 Mois');
+        $sheet->getCell([10, 1])->setValue('Forecast sur 6 Mois');
         $sheet->getCell([11, 1])->setValue('Dernier mois');
         $sheet->getCell([12, 1])->setValue('3 derniers mois');
         $sheet->getCell([13, 1])->setValue('Entre 4 et 6 derniers mois');
@@ -126,14 +136,14 @@ class AnalysisExporter
             $sheet->getCell([1, $row])->setValue($product['reference']);                      // Article
             $sheet->getCell([2, $row])->setValue($product['designation']);                    // Désignation article
             $sheet->getCell([3, $row])->setValue($status);                                    // Statut
-            $sheet->getCell([4, $row])->setValue($product['in_stock']);                       // Stock
-            $sheet->getCell([5, $row])->setValue($product['sold'] - $product['shipped']);     // Qté cde client
+            $sheet->getCell([4, $row])->setValue($product['stock_floor']);                    // Seuil stock mini
+            $sheet->getCell([5, $row])->setValue($product['in_stock']);                       // Stock
+            $sheet->getCell([6, $row])->setValue($product['sold'] - $product['shipped']);     // Qté cde client
             // TODO what about pending ?
-            $sheet->getCell([6, $row])->setValue($product['ordered'] - $product['received']); // Achat DEV
-            $sheet->getCell([7, $row])->setValue($product['virtual_stock']);                  // Dispo théorique
-            $sheet->getCell([8, $row])->setValue($this->getForecast($id, 4));                 // Forecast sur 4 Mois
-            $sheet->getCell([9, $row])->setValue($this->getForecast($id, 6));                 // Forecast sur 6 Mois
-            $sheet->getCell([10, $row])->setValue($product['stock_floor']);                   // Seuil stock mini
+            $sheet->getCell([7, $row])->setValue($product['ordered'] - $product['received']); // Achat DEV
+            $sheet->getCell([8, $row])->setValue($product['virtual_stock']);                  // Dispo théorique
+            $sheet->getCell([9, $row])->setValue($this->getForecast($id, 4));                 // Forecast sur 4 Mois
+            $sheet->getCell([10, $row])->setValue($this->getForecast($id, 6));                // Forecast sur 6 Mois
             $sheet->getCell([11, $row])->setValue($this->getHistoric($id, 0, 1));             // Dernier mois
             $sheet->getCell([12, $row])->setValue($this->getHistoric($id, 0, 3));             // 3 derniers mois
             $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 3));             // Entre 4 et 6 derniers mois
@@ -145,6 +155,9 @@ class AnalysisExporter
                 $sheet->getStyle([1, $row, 16, $row])->applyFromArray($altRowStyle);
             }
         }
+
+        // References as raw text
+        $sheet->getStyle('A')->getNumberFormat()->setFormatCode('@');
 
         // Center numbers
         $sheet->getStyle([4, 2, 16, $row])->applyFromArray([
@@ -174,8 +187,11 @@ class AnalysisExporter
 
         $sheet->setAutoFilter('A1:C2');
         $sheet->getAutoFilter()->setRangeToMaxRow();
+        $sheet->freezePane('B2');
 
-        $sheet->freezePane('A2');
+        // TODO "Data" tab with weight, dimensions, hscode, ean, mpn, etc
+
+        // TODO "Price" tab with buy and sell prices, margin, etc
 
         $writer = new Xls($spreadsheet);
         $path = sprintf('%s/%s', sys_get_temp_dir(), $fileName);
@@ -198,7 +214,7 @@ class AnalysisExporter
         $file = Csv::create($fileName);
 
         $file->addRow([
-            'Article',
+            'Référence',
             'Désignation article',
             'Statut',
             'Stock',

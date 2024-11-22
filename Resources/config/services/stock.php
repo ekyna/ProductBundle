@@ -11,10 +11,19 @@ return static function (ContainerConfigurator $container) {
 
     // Analysis exporter
     $services
-        ->set('ekyna_product.stock.analysis_exporter', Stock\AnalysisExporter::class)
+        ->set('ekyna_product.stock.analysis_exporter', Stock\Analysis\Exporter::class)
         ->args([
             service('ekyna_product.stock.repository'),
             service('doctrine.dbal.default_connection'),
+        ]);
+
+    // Analysis importer
+    $services
+        ->set('ekyna_product.stock.analysis_importer', Stock\Analysis\Importer::class)
+        ->args([
+            service('doctrine.dbal.default_connection'),
+            service('doctrine.orm.default_entity_manager'),
+            param('ekyna_product.class.product'),
         ]);
 
     // Bundle stock adjuster

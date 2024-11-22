@@ -1,0 +1,18 @@
+{% extends '@EkynaAdmin/Layout/content.html.twig' %}
+
+{% block page_title %}Stock analysis import result{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Stock analysis import result</h1>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-condensed">
+            {% include '@EkynaProduct/Admin/StockAnalysis/report.html.twig' with {'report': report} only %}
+        </table>
+    </div>
+{% endblock content %}

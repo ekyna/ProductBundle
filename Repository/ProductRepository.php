@@ -635,8 +635,10 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
         $qb = $this->createQueryBuilder('p');
         $qb
-            ->andWhere($qb->expr()->eq('p.reference', ':reference'))
-            ->setParameter('reference', $reference);
+            ->orWhere($qb->expr()->eq('p.reference', ':reference'))
+            ->orWhere($qb->expr()->like('p.referenceAliases', ':alias'))
+            ->setParameter('reference', $reference)
+            ->setParameter('alias', "%$reference%");
 
         $ignore[] = $product;
         if (!empty($ids = $this->filterProductsIds($ignore))) {

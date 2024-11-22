@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\ProductBundle\Controller\Account;
-use Ekyna\Bundle\ProductBundle\Controller\Admin\Export\StockAnalysisController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ExportController;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ImportController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\StockView;
 
 return static function (ContainerConfigurator $container) {
@@ -53,11 +54,23 @@ return static function (ContainerConfigurator $container) {
         ->public();
 
     $services
-        ->set('ekyna_product.controller.admin.export.stock_analysis', StockAnalysisController::class)
+        ->set('ekyna_product.controller.admin.stock_analysis.export', ExportController::class)
         ->args([
             service('ekyna_product.stock.analysis_exporter'),
         ])
-        ->alias(StockAnalysisController::class, 'ekyna_product.controller.admin.export.stock_analysis')
+        ->alias(ExportController::class, 'ekyna_product.controller.admin.stock_analysis.export')
+        ->public();
+
+    $services
+        ->set('ekyna_product.controller.admin.stock_analysis.import', ImportController::class)
+        ->args([
+            service('ekyna_product.stock.analysis_importer'),
+            service('form.factory'),
+            service('twig'),
+            service('mailer'),
+            service('ekyna_commerce.helper.mailer.address'),
+        ])
+        ->alias(ImportController::class, 'ekyna_product.controller.admin.stock_analysis.import')
         ->public();
 
     $services

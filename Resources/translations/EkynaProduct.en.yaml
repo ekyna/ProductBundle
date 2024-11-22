@@ -448,6 +448,10 @@ stat:
     label: Statistics
     count: Sales count
     cross: Cross selling
+
+stock_analysis:
+    title: Stock analysis
+
 product:
     label:
         singular: Product

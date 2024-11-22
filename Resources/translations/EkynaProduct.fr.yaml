@@ -451,6 +451,9 @@ stat:
     count: Nombre de ventes
     cross: Cross selling
 
+stock_analysis:
+    title: Analyse stock
+
 product:
     label:
         singular: Produit

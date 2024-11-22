@@ -1,0 +1,33 @@
+<thead>
+<tr>
+    <th>Reference</th>
+    <th>Designation</th>
+    <th>Changes</th>
+</tr>
+</thead>
+<tbody>
+{% for reference, product in report -%}
+    <tr{% if not product.success %} class="danger"{% endif %}>
+        <td>
+            {% if product.id is not null %}
+                <a href="{{ url('admin_ekyna_product_product_read', {'productId': product.id}) }}">
+                    {{ reference }}
+                </a>
+            {% else %}
+                {{ reference }}
+            {% endif %}
+        </td>
+        <td>{{ product['designation'] }}</td>
+        <td>
+            {% if product['changes'] is not empty -%}
+                <dl class="dl-horizontal">
+                    {% for property, values in product['changes'] -%}
+                        <dt>{{ property }}</dt>
+                        <dd>{{ values['from'] }} → {{ values['to'] }}</dd>
+                    {%- endfor %}
+                </dl>
+            {%- endif %}
+        </td>
+    </tr>
+{%- endfor %}
+</tbody>

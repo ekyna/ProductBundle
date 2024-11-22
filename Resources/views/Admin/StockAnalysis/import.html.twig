@@ -1,0 +1,57 @@
+{% extends '@EkynaAdmin/Layout/content.html.twig' %}
+
+{% block page_title %}Stock analysis import{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Stock analysis import</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    Veillez à ce que le fichier importé comporte bien ces 4 premières colonnes.
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered table-condensed" style="width:auto;">
+                        <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Désignation</th>
+                            <th>Statut</th>
+                            <th>Seuil stock mini</th>
+                            <th>...</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>123456</td>
+                            <td>Un produit</td>
+                            <td>EOL</td>
+                            <td>100</td>
+                            <td>...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{ bootstrap_set_style('horizontal') }}
+            {{ bootstrap_set_col_size('md') }}
+            {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+            <div class="form-body">
+                {{ bootstrap_set_style('horizontal') }}
+                {{ bootstrap_set_col_size('md') }}
+                {{ bootstrap_set_sizing('md') }}
+                {{ form_errors(form) }}
+                {{ form_widget(form) }}
+                {{ form_rest(form) }}
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock content %}

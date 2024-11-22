@@ -1,4 +1,0 @@
-admin_ekyna_product_export_stock_analysis:
-    path: /stock-analysis
-    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Export\StockAnalysisController
-    methods: [GET]

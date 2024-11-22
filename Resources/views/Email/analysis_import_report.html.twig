@@ -1,0 +1,21 @@
+{% extends "email.html.twig" %}
+
+{% block stylesheets %}
+    <style>
+        table { width:100%; border-spacing:0; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+        td, th { font-size: 13px; padding: 2px 4px; border-top: 1px solid #ddd; border-left: 1px solid #ddd; }
+        td.danger { background-color: #ffddcc; }
+    </style>
+{% endblock stylesheets %}
+
+{% block width %}1200{% endblock %}
+
+{% block subject %}{{ title }}{% endblock subject %}
+
+{% block body %}
+    {% apply spaceless %}
+        <table>
+        {% include '@EkynaProduct/Admin/StockAnalysis/report.html.twig' with {'report': report} only %}
+        </table>
+    {% endapply %}
+{% endblock %}

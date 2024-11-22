@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Command;
 
-use Ekyna\Bundle\ProductBundle\Service\Stock\AnalysisExporter;
+use Ekyna\Bundle\ProductBundle\Service\Stock\Analysis\Exporter;
 use Ekyna\Bundle\SettingBundle\Manager\SettingManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +28,7 @@ class StockAnalysisCommand extends Command
     protected static $defaultName = 'ekyna:product:stock:analysis';
 
     public function __construct(
-        private readonly AnalysisExporter        $exporter,
+        private readonly Exporter                $exporter,
         private readonly SettingManagerInterface $settings,
         private readonly TranslatorInterface     $translator,
         private readonly MailerInterface         $mailer

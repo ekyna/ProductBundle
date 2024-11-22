@@ -1,0 +1,9 @@
+admin_ekyna_product_stock_analysis_export:
+    path: /export
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ExportController
+    methods: [GET]
+
+admin_ekyna_product_stock_analysis_import:
+    path: /import
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ImportController
+    methods: [GET, POST]
