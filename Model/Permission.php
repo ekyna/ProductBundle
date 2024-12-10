@@ -12,6 +12,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 final class Permission
 {
     public const CHANGE_REFERENCE = 'change_reference';
+    public const SYNC_REFERENCE   = 'sync_reference';
 
     private function __construct()
     {

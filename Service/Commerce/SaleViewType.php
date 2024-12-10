@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\CommerceBundle\Service\AbstractViewType;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
+use Ekyna\Component\Commerce\Common\View\Action;
 use Ekyna\Component\Commerce\Common\View\LineView;
 
 /**
@@ -44,6 +47,22 @@ class SaleViewType extends AbstractViewType
             return;
         }
 
+        // Sync reference action
+        if (
+            $subject->getReference() !== $item->getReference()
+            && $this->resourceHelper->isGranted(Permission::SYNC_REFERENCE, $item)
+        ) {
+            $syncReferencePath = $this->resourceUrl($item, SyncReferenceAction::class);
+            $view->addAction(new Action($syncReferencePath, 'fa fa-hashtag', [
+                'title'           => $this->trans('sale_item.button.sync_reference', [], 'EkynaProduct'),
+                'confirm'         => $this->trans('sale_item.confirm.sync_reference', [], 'EkynaProduct'),
+                'data-sale-xhr' => null,
+                //'data-sale-modal' => null,
+                'class'           => 'text-danger',
+            ]));
+        }
+
+        // Product summary
         $link = [
             'data-summary' => json_encode([
                 'route'      => 'admin_ekyna_product_product_summary',

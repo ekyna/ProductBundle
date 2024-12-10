@@ -8,6 +8,9 @@ permissions:
     Ekyna\Bundle\ProductBundle\Model\Permission::CHANGE_REFERENCE:
         label: permission.change_reference
         trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::SYNC_REFERENCE:
+        label: permission.sync_reference
+        trans_domain: EkynaProduct
 
 resources:
     ekyna_product:
@@ -466,3 +469,14 @@ resources:
                     read: '@EkynaProduct/Admin/SpecialOffer/read.html.twig'
                 admin_toggle:
                     properties: enabled
+
+    ekyna_commerce:
+        cart_item:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~
+        order_item:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~
+        quote_item:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~

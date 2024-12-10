@@ -128,15 +128,43 @@ class ItemBuilder
         $this->buildDescriptions($item);
     }
 
-    protected function buildDescriptions(SaleItemInterface $item): void
+    public function buildReferences(SaleItemInterface $item): bool
+    {
+        $product = $this->resolve($item);
+
+        $changed = false;
+
+        if ($item->getReference() !== $product->getReference()) {
+            $item->setReference($product->getReference());
+
+            $changed = true;
+        }
+
+        return $this->buildDescriptions($item) || $changed;
+    }
+
+    protected function buildDescriptions(SaleItemInterface $item): bool
     {
         $product = $this->resolve($item);
 
         if (empty($aliases = $product->getReferenceAliases())) {
-            return;
+            if ($item->hasDescription('aliases')) {
+                $item->clearDescription('aliases');
+                return true;
+            }
+
+            return false;
         }
 
-        $item->setDescription('aliases', 'Renumbered: ' . implode(', ', $aliases));
+        $description = 'Previously: ' . implode(', ', $aliases);
+
+        if ($description === $item->getDescription('aliases')) {
+            return false;
+        }
+
+        $item->setDescription('aliases', $description);
+
+        return true;
     }
 
     /**

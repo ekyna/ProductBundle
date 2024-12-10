@@ -352,6 +352,7 @@ option_group:
 
 permission:
     change_reference: Changer référence
+    sync_reference: Synchroniser référence
 
 price:
     label:
@@ -415,6 +416,12 @@ pricing_rule:
         add: Ajouter une règle
     alert:
         no_item: Aucune régle configuré
+
+sale_item:
+    button:
+        sync_reference: Synchroniser la référence
+    confirm:
+        sync_reference: Êtes-vous sûr de vouloir synchroniser la référence produit ?
 
 special_offer:
     label:
