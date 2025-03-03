@@ -160,6 +160,11 @@ class SimpleToVariableConverter extends AbstractConverter
         // Reload the variant and reapply changes
         $this->entityManager->refresh($this->source);
 
+        $this->source
+            ->setQuoteOnly(true)
+            ->setPendingOffers(true)
+            ->setPendingPrices(true);
+
         // Add variant to variable
         $this->source->setType(ProductTypes::TYPE_VARIANT);
         $this->source->setParent($this->target);

@@ -72,7 +72,8 @@ class ConvertAction extends AbstractAction implements AdminActionInterface, Rout
 
         $formTemplate = sprintf(
             '@EkynaProduct/Admin/Product/Convert/_%s_to_%s_form.html.twig',
-            $sourceType, $targetType
+            $sourceType,
+            $targetType
         );
 
         FormUtil::addErrorsFromResourceEvent($form, $event);
