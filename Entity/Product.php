@@ -1214,43 +1214,55 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
             }
         }
 
-        // TODO If product is variant, add medias from parent
+        if (0 >= $limit || !$recurse) {
+            return $collection;
+        }
 
-        if ($recurse && $limit) {
-            if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
-                /** @var Product $variant TODO */
-                foreach ($this->variants as $variant) {
-                    $variant->gatherMedias($type, false, $limit, $collection);
+        if ($this->type === Model\ProductTypes::TYPE_VARIANT && $collection->isEmpty()) {
+            $this->getParent()->gatherMedias($type, false, $limit, $collection);
+
+            return $collection;
+        }
+
+        if ($this->type === Model\ProductTypes::TYPE_VARIABLE) {
+            /** @var Product $variant TODO */
+            foreach ($this->variants as $variant) {
+                $variant->gatherMedias($type, false, $limit, $collection);
+            }
+
+            return $collection;
+        }
+
+        if (!in_array($this->type, [
+            Model\ProductTypes::TYPE_BUNDLE,
+            Model\ProductTypes::TYPE_CONFIGURABLE,
+        ], true)) {
+            return $collection;
+        }
+
+        foreach ($this->bundleSlots as $slot) {
+            $choices = $slot->getChoices();
+            foreach ($choices as $choice) {
+                if ($type === Media\MediaTypes::IMAGE && $choice->isExcludeImages()) {
+                    continue;
                 }
-            } elseif (in_array($this->type, [
-                Model\ProductTypes::TYPE_BUNDLE,
-                Model\ProductTypes::TYPE_CONFIGURABLE,
-            ], true)) {
-                foreach ($this->bundleSlots as $slot) {
-                    $choices = $slot->getChoices();
-                    foreach ($choices as $choice) {
-                        if ($type === Media\MediaTypes::IMAGE && $choice->isExcludeImages()) {
-                            continue;
-                        }
 
-                        $product = $choice->getProduct();
-                        if (0 < $product->getMedias()->count()) {
-                            foreach ($product->getMedias() as $pm) {
-                                $media = $pm->getMedia();
-                                if ($media->getType() === $type && !$collection->contains($media)) {
-                                    $collection->add($media);
-                                    $limit--;
-                                    if (0 >= $limit) {
-                                        break 3;
-                                    }
-                                    break;
-                                }
+                $product = $choice->getProduct();
+                if (0 < $product->getMedias()->count()) {
+                    foreach ($product->getMedias() as $pm) {
+                        $media = $pm->getMedia();
+                        if ($media->getType() === $type && !$collection->contains($media)) {
+                            $collection->add($media);
+                            $limit--;
+                            if (0 >= $limit) {
+                                break 3;
                             }
-                        } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
-                            foreach ($product->getVariants() as $variant) {
-                                $variant->gatherMedias($type, false, $limit, $collection);
-                            }
+                            break;
                         }
+                    }
+                } elseif ($product->getType() === Model\ProductTypes::TYPE_VARIABLE) {
+                    foreach ($product->getVariants() as $variant) {
+                        $variant->gatherMedias($type, false, $limit, $collection);
                     }
                 }
             }
