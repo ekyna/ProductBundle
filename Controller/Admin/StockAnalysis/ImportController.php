@@ -7,7 +7,11 @@ namespace Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis;
 use Ekyna\Bundle\CommerceBundle\Service\Mailer\AddressHelper;
 use Ekyna\Bundle\ProductBundle\Service\Stock\Analysis\Importer;
 use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
+use Ekyna\Bundle\UiBundle\Service\FlashHelper;
+use Exception;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -37,6 +41,7 @@ class ImportController
     public function __construct(
         private readonly Importer             $importer,
         private readonly FormFactoryInterface $formFactory,
+        private readonly FlashHelper          $flashHelper,
         private readonly Environment          $twig,
         private readonly MailerInterface      $mailer,
         private readonly AddressHelper        $addressHelper,
@@ -47,17 +52,26 @@ class ImportController
     {
         $form = $this
             ->formFactory
-            ->createBuilder()
+            ->createBuilder(FormType::class, [
+                'dry' => true,
+            ])
             ->add('file', FileType::class, [
                 'constraints' => [
                     new File([
-                        'maxSize'          => '1024k',
+                        'maxSize'          => '4096k',
                         'mimeTypes'        => [
                             'application/vnd.ms-excel',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         ],
                         'mimeTypesMessage' => 'Please upload a valid Excel document',
                     ]),
+                ],
+            ])
+            ->add('dry', CheckboxType::class, [
+                'label'    => 'Dry run',
+                'required' => false,
+                'attr'     => [
+                    'align_with_widget' => true,
                 ],
             ])
             ->getForm();
@@ -72,8 +86,13 @@ class ImportController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $file */
             $file = $form->get('file')->getData();
+            $dry = $form->get('dry')->getData();
 
-            return $this->import($file);
+            try {
+                return $this->import($file, $dry);
+            } catch (Exception $e) {
+                $this->flashHelper->addFlash($e->getMessage(), 'danger');
+            }
         }
 
         $content = $this->twig->render('@EkynaProduct/Admin/StockAnalysis/import.html.twig', [
@@ -83,7 +102,7 @@ class ImportController
         return new Response($content);
     }
 
-    private function import(UploadedFile $file): Response
+    private function import(UploadedFile $file, bool $dryRun): Response
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         // this is needed to safely include the file name as part of the URL
@@ -97,7 +116,7 @@ class ImportController
             // ... handle exception if something happens during file upload
         }
 
-        $report = $this->importer->importXls($directory . DIRECTORY_SEPARATOR . $newFilename);
+        $report = $this->importer->importXls($directory . DIRECTORY_SEPARATOR . $newFilename, $dryRun);
 
         $this->sendReport($report);
 

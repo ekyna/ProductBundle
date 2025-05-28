@@ -61,6 +61,7 @@ class StockRepository
                 'b.name as brand',
                 'p.reference',
                 'p.designation',
+                'p.netPrice as net_price',
                 'p.attributesDesignation as attributes_designation',
                 'p.endOfLife as end_of_life',
                 'p.replenishmentTime as replenishment',

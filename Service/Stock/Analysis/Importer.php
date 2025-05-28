@@ -14,6 +14,8 @@ use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
+use Throwable;
+
 use function array_combine;
 use function array_diff_assoc;
 use function array_keys;
@@ -22,6 +24,7 @@ use function array_values;
 use function gc_collect_cycles;
 use function implode;
 use function preg_match;
+use function strtr;
 
 /**
  * Class Importer
@@ -31,6 +34,7 @@ use function preg_match;
 class Importer
 {
     private array $importData;
+    private bool $dryRun;
 
     private Query $productById;
 
@@ -41,13 +45,18 @@ class Importer
     ) {
     }
 
-    public function importXls(string $filePath): array
+    public function importXls(string $filePath, bool $dryRun): array
     {
         $spreadsheet = IOFactory::load($filePath);
 
         $this->createQueries();
 
-        $this->readProducts($spreadsheet->getActiveSheet());
+        $this->importData = [];
+        $this->dryRun = $dryRun;
+
+        $this->readSheet($spreadsheet->getSheetByNameOrThrow('Stock'), [$this, 'readStockRow']);
+        //$this->readSheet($spreadsheet->$this->getSheetByNameOrThrow('Data'), [$this, 'readDataRow']);
+        $this->readSheet($spreadsheet->getSheetByNameOrThrow('Price'), [$this, 'readPriceRow']);
 
         return $this->writeProducts();
     }
@@ -63,9 +72,9 @@ class Importer
             ->setMaxResults(1);
     }
 
-    private function readProducts(Worksheet $sheet): void
+    private function readSheet(Worksheet $sheet, callable $rowReader): void
     {
-        $this->importData = [];
+        $references = [];
 
         $endRow = $sheet->getHighestDataRow();
         $rows = $sheet->getRowIterator(2, $endRow);
@@ -77,39 +86,58 @@ class Importer
 
             $rowIndex = $row->getRowIndex();
 
-            $this->readProduct($sheet, $rowIndex);
+            $reference = (string)$sheet->getCell("A$rowIndex")->getValue();
+            if (!preg_match('~^[0-9]+$~', $reference)) {
+                throw new Exception('Invalid refence: ' . $reference);
+            }
+
+            if (in_array($reference, $references, true)) {
+                throw new Exception('Duplicate product: ' . $reference);
+            }
+
+            $references[] = $reference;
+
+            $rowReader($sheet, $rowIndex, $reference);
         }
     }
 
-    private function readProduct(Worksheet $sheet, int $rowIndex): void
+    private function readStockRow(Worksheet $sheet, int $rowIndex, string $reference): void
     {
         $mapping = [
-            'reference'   => 1,
-            'end_of_life' => 3,
-            'stock_floor' => 4,
+            'end_of_life' => 'C',
+            'stock_floor' => 'D',
         ];
 
-        $reference = (string)$sheet->getCell([$mapping['reference'], $rowIndex])->getValue();
-        if (!preg_match('~^[0-9]+$~', $reference)) {
-            return;
-        }
-
-        if (isset($this->importData[$reference])) {
-            throw new Exception('Duplicate product: ' . $reference);
-        }
-
-        $endOfLife = $sheet->getCell([$mapping['end_of_life'], $rowIndex])->getValue();
+        $endOfLife = (string)$sheet->getCell($mapping['end_of_life'] . $rowIndex)->getValue();
         $endOfLife = match ($endOfLife) {
-            'EOL'   => 1,
+            'EOL' => 1,
             default => 0,
         };
+        $this->importData[$reference]['end_of_life'] = $endOfLife;
 
-        $stockFloor = (int)$sheet->getCell([$mapping['stock_floor'], $rowIndex])->getValue();
+        $raw = (string)$sheet->getCell($mapping['stock_floor'] . $rowIndex)->getValue();
+        try {
+            $stockFloor = new Decimal($raw);
+            $this->importData[$reference]['stock_floor'] = $stockFloor->toFixed();
+        } catch (Throwable) {
+            throw new Exception("[$reference] Unexpected stock floor: " . $raw);
+        }
+    }
 
-        $this->importData[$reference] = [
-            'end_of_life' => $endOfLife,
-            'stock_floor' => $stockFloor,
+    private function readPriceRow(Worksheet $sheet, int $rowIndex, string $reference): void
+    {
+        $mapping = [
+            'net_price' => 'C',
         ];
+
+        $raw = (string)$sheet->getCell($mapping['net_price'] . $rowIndex)->getValue();
+
+        try {
+            $netPrice = new Decimal(strtr($raw, [',' => '.']));
+            $this->importData[$reference]['net_price'] = $netPrice->toFixed(5);
+        } catch (Throwable) {
+            throw new Exception("[$reference] Unexpected price: " . $raw);
+        }
     }
 
     private function writeProducts(): array
@@ -130,7 +158,7 @@ class Importer
             $references = implode(',', array_keys($rows));
             $data = $this->connection->executeQuery(
                 <<<SQL
-                SELECT p.id, p.reference, p.end_of_life, p.stock_floor
+                SELECT p.id, p.reference, p.net_price, p.end_of_life, p.stock_floor
                 FROM product_product p
                 WHERE p.reference IN ($references)
                 LIMIT $size
@@ -141,6 +169,7 @@ class Importer
                 $raw[$datum['reference']] = [
                     'id'          => (int)$datum['id'],
                     'reference'   => (string)$datum['reference'],
+                    'net_price'   => (string)$datum['net_price'],
                     'end_of_life' => (int)$datum['end_of_life'],
                     'stock_floor' => (int)$datum['stock_floor'],
                 ];
@@ -167,18 +196,23 @@ class Importer
 
                 $product = $this->selectProduct($rawProduct);
 
-                if (isset($diff['end_of_life'])) {
-                    $product->setEndOfLife((bool)$row['end_of_life']);
-                }
-                if (isset($diff['stock_floor'])) {
-                    $product->setStockFloor(new Decimal($row['stock_floor']));
-                }
+                if (!$this->dryRun) {
+                    if (isset($diff['net_price'])) {
+                        $product->setNetPrice(new Decimal($row['net_price']));
+                    }
+                    if (isset($diff['end_of_life'])) {
+                        $product->setEndOfLife((bool)$row['end_of_life']);
+                    }
+                    if (isset($diff['stock_floor'])) {
+                        $product->setStockFloor(new Decimal($row['stock_floor']));
+                    }
 
-                $this->entityManager->persist($product);
-                $persist = true;
+                    $this->entityManager->persist($product);
+                    $persist = true;
+                }
 
                 $keys = array_keys($diff);
-                $changes = array_combine($keys, array_map(function (string $key, int $value) use ($rawProduct) {
+                $changes = array_combine($keys, array_map(function (string $key, mixed $value) use ($rawProduct) {
                     return [
                         'from' => $rawProduct[$key],
                         'to'   => $value,
@@ -193,11 +227,14 @@ class Importer
                 ];
             }
 
-            if ($persist) {
-                $this->entityManager->flush();
+            if (!$this->dryRun) {
+                if ($persist) {
+                    $this->entityManager->flush();
+                }
+
+                $this->entityManager->clear();
             }
 
-            $this->entityManager->clear();
             gc_collect_cycles();
         } while (true);
 

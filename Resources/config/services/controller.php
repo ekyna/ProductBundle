@@ -66,6 +66,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('ekyna_product.stock.analysis_importer'),
             service('form.factory'),
+            service('ekyna_ui.helper.flash'),
             service('twig'),
             service('mailer'),
             service('ekyna_commerce.helper.mailer.address'),

@@ -28,6 +28,58 @@ use function sys_get_temp_dir;
  */
 class Exporter
 {
+    private const COLUMN_HEADER_STYLE = [
+        'font'      => [
+            'bold'  => true,
+            'color' => ['argb' => 'FFFFFFFF'],
+        ],
+        'alignment' => [
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical'   => Alignment::VERTICAL_CENTER,
+            'wrapText'   => true,
+        ],
+        'fill'      => [
+            'fillType' => Fill::FILL_SOLID,
+            'color'    => ['argb' => 'FF666699'],
+        ],
+    ];
+
+    private const COLUMN_EDITABLE_HEADER_STYLE = [
+        'fill'      => [
+            'color'    => ['argb' => 'FF669966'],
+        ],
+    ];
+
+    private const ALT_ROW_STYLE = [
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'color'    => ['argb' => 'FFF8FBFC'],
+        ],
+    ];
+
+    private const CENTER_STYLE = [
+        'alignment' => [
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+        ],
+    ];
+    private const GREY_COLUMN_STYLE = [
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'color'    => ['argb' => 'FFD8D8D8'],
+        ],
+        'font' => [
+            'color' => ['argb' => 'FF000000'],
+        ],
+    ];
+    private const BORDERS_STYLE = [
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_THIN,
+                'color'       => ['argb' => 'FFCCCCFF'],
+            ],
+        ],
+    ];
+
     private array $products;
     private array $forecast;
     private array $historic;
@@ -57,75 +109,81 @@ class Exporter
             ],
         ]);
 
+        $this->buildStockSheet($spreadsheet);
+
+        $this->buildDataSheet($spreadsheet);
+
+        $this->buildPriceSheet($spreadsheet);
+
+        // TODO "Help" tab with VB code to highlight changed cells.
+        /*
+         * Private Sub Worksheet_Change(ByVal Target As Range)
+         *     ' Cette ligne s'exécute à chaque modification dans la feuille.
+         *     ' "Target" représente la ou les cellules qui viennent d'être modifiées.
+         *
+         *     ' On vérifie que la modification n'est pas vide
+         *     If Not IsEmpty(Target) Then
+         *         ' On applique la couleur orange à l'intérieur de la cellule modifiée
+         *         Target.Interior.Color = RGB(255, 192, 0)
+         *     End If
+         * End Sub
+         */
+
+        $writer = new Xls($spreadsheet);
+        $path = sprintf('%s/%s', sys_get_temp_dir(), $fileName);
+        $writer->save($path);
+
+        return $path;
+    }
+
+    private function buildStockSheet(Spreadsheet $spreadsheet): void
+    {
         $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCodeName('stock');
+        $sheet->setTitle('Stock');
         $sheet->getDefaultRowDimension()->setRowHeight(18);
 
         // Column widths
         $sheet->getRowDimension(1)->setRowHeight(33.75);
-        $sheet->getColumnDimension('A')->setWidth(13.14);
-        $sheet->getColumnDimension('B')->setWidth(68.29);
-        $sheet->getColumnDimension('C')->setWidth(6);
-        $sheet->getColumnDimension('D')->setWidth(9.86);
-        $sheet->getColumnDimension('E')->setWidth(6);
-        $sheet->getColumnDimension('F')->setWidth(12);
-        $sheet->getColumnDimension('G')->setWidth(9.57);
-        $sheet->getColumnDimension('H')->setWidth(14);
-        $sheet->getColumnDimension('I')->setWidth(11.43);
-        $sheet->getColumnDimension('J')->setWidth(9.86);
-        $sheet->getColumnDimension('K')->setWidth(11.43);
-        $sheet->getColumnDimension('L')->setWidth(11.43);
-        $sheet->getColumnDimension('M')->setWidth(14);
-        $sheet->getColumnDimension('N')->setWidth(14);
-        $sheet->getColumnDimension('O')->setWidth(14);
-        $sheet->getColumnDimension('P')->setWidth(14);
+        $sheet->getColumnDimension('A')->setWidth(13.14);   // Référence
+        $sheet->getColumnDimension('B')->setWidth(68.29);   // Désignation
+        $sheet->getColumnDimension('C')->setWidth(6);       // Statut
+        $sheet->getColumnDimension('D')->setWidth(9.86);    // Seuil stock mini
+        $sheet->getColumnDimension('E')->setWidth(6);       // Stock
+        $sheet->getColumnDimension('F')->setWidth(12);      // Qté cde client
+        $sheet->getColumnDimension('G')->setWidth(9.57);    // Achat DEV
+        $sheet->getColumnDimension('H')->setWidth(14);      // Dispo théorique
+        $sheet->getColumnDimension('I')->setWidth(11.43);   // Forecast sur 4 Mois
+        $sheet->getColumnDimension('J')->setWidth(9.86);    // Forecast sur 6 Mois
+        $sheet->getColumnDimension('K')->setWidth(11.43);   // Dernier mois
+        $sheet->getColumnDimension('L')->setWidth(11.43);   // 3 derniers mois
+        $sheet->getColumnDimension('M')->setWidth(14);      // Entre 4 et 6 derniers mois
+        $sheet->getColumnDimension('N')->setWidth(14);      // Entre 7 et 9 derniers mois
+        $sheet->getColumnDimension('O')->setWidth(14);      // Entre 10 et 12 derniers mois
+        $sheet->getColumnDimension('P')->setWidth(14);      // Avant les 12 derniers mois
 
         // Column headers
-        $sheet->getStyle('A1:P1')->applyFromArray([
-            'font'      => [
-                'bold'  => true,
-                'color' => ['argb' => 'FFFFFFFF'],
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical'   => Alignment::VERTICAL_CENTER,
-                'wrapText'   => true,
-            ],
-            'fill'      => [
-                'fillType' => Fill::FILL_SOLID,
-                'color'    => ['argb' => 'FF666699'],
-            ],
-        ]);
+        $sheet->getStyle('A1:P1')->applyFromArray(self::COLUMN_HEADER_STYLE);
         // Editable column headers
-        $sheet->getStyle('C1:D1')->applyFromArray([
-            'fill'      => [
-                'color'    => ['argb' => 'FF669966'],
-            ],
-        ]);
+        $sheet->getStyle('C1:D1')->applyFromArray(self::COLUMN_EDITABLE_HEADER_STYLE);
 
         // TODO translations
-        $sheet->getCell([1, 1])->setValue('Référence');
-        $sheet->getCell([2, 1])->setValue('Désignation');
-        $sheet->getCell([3, 1])->setValue('Statut');
-        $sheet->getCell([4, 1])->setValue('Seuil stock mini');
-        $sheet->getCell([5, 1])->setValue('Stock');
-        $sheet->getCell([6, 1])->setValue('Qté cde client');
-        $sheet->getCell([7, 1])->setValue('Achat DEV');
-        $sheet->getCell([8, 1])->setValue('Dispo théorique');
-        $sheet->getCell([9, 1])->setValue('Forecast sur 4 Mois');
-        $sheet->getCell([10, 1])->setValue('Forecast sur 6 Mois');
-        $sheet->getCell([11, 1])->setValue('Dernier mois');
-        $sheet->getCell([12, 1])->setValue('3 derniers mois');
-        $sheet->getCell([13, 1])->setValue('Entre 4 et 6 derniers mois');
-        $sheet->getCell([14, 1])->setValue('Entre 7 et 9 derniers mois');
-        $sheet->getCell([15, 1])->setValue('Entre 10 et 12 derniers mois');
-        $sheet->getCell([16, 1])->setValue('Avant les 12 derniers mois');
-
-        $altRowStyle = [
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'color'    => ['argb' => 'FFF8FBFC'],
-            ],
-        ];
+        $sheet->getCell('A1')->setValue('Référence');
+        $sheet->getCell('B1')->setValue('Désignation');
+        $sheet->getCell('C1')->setValue('Statut');
+        $sheet->getCell('D1')->setValue('Seuil stock mini');
+        $sheet->getCell('E1')->setValue('Stock');
+        $sheet->getCell('F1')->setValue('Qté cde client');
+        $sheet->getCell('G1')->setValue('Achat DEV');
+        $sheet->getCell('H1')->setValue('Dispo théorique');
+        $sheet->getCell('I1')->setValue('Forecast sur 4 Mois');
+        $sheet->getCell('J1')->setValue('Forecast sur 6 Mois');
+        $sheet->getCell('K1')->setValue('Dernier mois');
+        $sheet->getCell('L1')->setValue('3 derniers mois');
+        $sheet->getCell('M1')->setValue('Entre 4 et 6 derniers mois');
+        $sheet->getCell('N1')->setValue('Entre 7 et 9 derniers mois');
+        $sheet->getCell('O1')->setValue('Entre 10 et 12 derniers mois');
+        $sheet->getCell('P1')->setValue('Avant les 12 derniers mois');
 
         $row = 1;
         foreach ($this->products as $product) {
@@ -133,26 +191,26 @@ class Exporter
             $id = $product['id'];
             $status = $product['end_of_life'] ? 'EOL' : '';
 
-            $sheet->getCell([1, $row])->setValue($product['reference']);                      // Article
-            $sheet->getCell([2, $row])->setValue($product['designation']);                    // Désignation article
-            $sheet->getCell([3, $row])->setValue($status);                                    // Statut
-            $sheet->getCell([4, $row])->setValue($product['stock_floor']);                    // Seuil stock mini
-            $sheet->getCell([5, $row])->setValue($product['in_stock']);                       // Stock
-            $sheet->getCell([6, $row])->setValue($product['sold'] - $product['shipped']);     // Qté cde client
+            $sheet->getCell("A$row")->setValue($product['reference']);                      // Référence
+            $sheet->getCell("B$row")->setValue($product['designation']);                    // Désignation
+            $sheet->getCell("C$row")->setValue($status);                                    // Statut
+            $sheet->getCell("D$row")->setValue($product['stock_floor']);                    // Seuil stock mini
+            $sheet->getCell("E$row")->setValue($product['in_stock']);                       // Stock
+            $sheet->getCell("F$row")->setValue($product['sold'] - $product['shipped']);     // Qté cde client
             // TODO what about pending ?
-            $sheet->getCell([7, $row])->setValue($product['ordered'] - $product['received']); // Achat DEV
-            $sheet->getCell([8, $row])->setValue($product['virtual_stock']);                  // Dispo théorique
-            $sheet->getCell([9, $row])->setValue($this->getForecast($id, 4));                 // Forecast sur 4 Mois
-            $sheet->getCell([10, $row])->setValue($this->getForecast($id, 6));                // Forecast sur 6 Mois
-            $sheet->getCell([11, $row])->setValue($this->getHistoric($id, 0, 1));             // Dernier mois
-            $sheet->getCell([12, $row])->setValue($this->getHistoric($id, 0, 3));             // 3 derniers mois
-            $sheet->getCell([13, $row])->setValue($this->getHistoric($id, 3, 3));             // Entre 4 et 6 derniers mois
-            $sheet->getCell([14, $row])->setValue($this->getHistoric($id, 6, 3));             // Entre 7 et 9 derniers mois
-            $sheet->getCell([15, $row])->setValue($this->getHistoric($id, 9, 3));             // Entre 10 et 12 derniers mois
-            $sheet->getCell([16, $row])->setValue($this->getHistoric($id, 12, null));         // Avant les 12 derniers mois
+            $sheet->getCell("G$row")->setValue($product['ordered'] - $product['received']); // Achat DEV
+            $sheet->getCell("H$row")->setValue($product['virtual_stock']);                  // Dispo théorique
+            $sheet->getCell("I$row")->setValue($this->getForecast($id, 4));                 // Forecast sur 4 Mois
+            $sheet->getCell("J$row")->setValue($this->getForecast($id, 6));                // Forecast sur 6 Mois
+            $sheet->getCell("K$row")->setValue($this->getHistoric($id, 0, 1));             // Dernier mois
+            $sheet->getCell("L$row")->setValue($this->getHistoric($id, 0, 3));             // 3 derniers mois
+            $sheet->getCell("M$row")->setValue($this->getHistoric($id, 3, 3));             // Entre 4 et 6 derniers mois
+            $sheet->getCell("N$row")->setValue($this->getHistoric($id, 6, 3));             // Entre 7 et 9 derniers mois
+            $sheet->getCell("O$row")->setValue($this->getHistoric($id, 9, 3));             // Entre 10 et 12 derniers mois
+            $sheet->getCell("P$row")->setValue($this->getHistoric($id, 12, null));         // Avant les 12 derniers mois
 
             if (1 === $row % 2) {
-                $sheet->getStyle([1, $row, 16, $row])->applyFromArray($altRowStyle);
+                $sheet->getStyle("A$row:P$row")->applyFromArray(self::ALT_ROW_STYLE);
             }
         }
 
@@ -160,44 +218,100 @@ class Exporter
         $sheet->getStyle('A')->getNumberFormat()->setFormatCode('@');
 
         // Center numbers
-        $sheet->getStyle([4, 2, 16, $row])->applyFromArray([
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-            ],
-        ]);
+        $sheet->getStyle("D2:p$row")->applyFromArray(self::CENTER_STYLE);
         // Forecast columns
-        $sheet->getStyle([8, 1, 9, $row])->applyFromArray([
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'color'    => ['argb' => 'FFD8D8D8'],
-            ],
-            'font' => [
-                'color' => ['argb' => 'FF000000'],
-            ],
-        ]);
+        $sheet->getStyle("H1:I$row")->applyFromArray(self::GREY_COLUMN_STYLE);
         // Set all borders
-        $sheet->getStyle([1, 1, 16, $row])->applyFromArray([
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color'       => ['argb' => 'FFCCCCFF'],
-                ],
-            ],
-        ]);
+        $sheet->getStyle("A1:P$row")->applyFromArray(self::BORDERS_STYLE);
 
         $sheet->setAutoFilter('A1:C2');
         $sheet->getAutoFilter()->setRangeToMaxRow();
         $sheet->freezePane('B2');
+    }
 
-        // TODO "Data" tab with weight, dimensions, hscode, ean, mpn, etc
+    private function buildDataSheet(Spreadsheet $spreadsheet): void
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setCodeName('data');
+        $sheet->setTitle('Data');
+        $sheet->getDefaultRowDimension()->setRowHeight(18);
 
-        // TODO "Price" tab with buy and sell prices, margin, etc
+        // Column widths
+        $sheet->getRowDimension(1)->setRowHeight(33.75);
+        $sheet->getColumnDimension('A')->setWidth(13.14); // Référence
+        $sheet->getColumnDimension('B')->setWidth(68.29); // Désignation
+        $sheet->getColumnDimension('C')->setWidth(9);     // Weight
+        $sheet->getColumnDimension('D')->setWidth(9);     // PackageWeight
+        $sheet->getColumnDimension('E')->setWidth(9);     // HSCode
+        $sheet->getColumnDimension('F')->setWidth(9);     // EAN
+        $sheet->getColumnDimension('G')->setWidth(9);     // MPN
 
-        $writer = new Xls($spreadsheet);
-        $path = sprintf('%s/%s', sys_get_temp_dir(), $fileName);
-        $writer->save($path);
+        // Column headers
+        $sheet->getStyle('A1:G1')->applyFromArray(self::COLUMN_HEADER_STYLE);
 
-        return $path;
+        // TODO translations
+        $sheet->getCell('A1')->setValue('Référence');
+        $sheet->getCell('B1')->setValue('Désignation');
+        $sheet->getCell('C1')->setValue('Poids');
+        $sheet->getCell('D1')->setValue('Poids emballé');
+        $sheet->getCell('E1')->setValue('HSCode');
+        $sheet->getCell('F1')->setValue('EAN13');
+        $sheet->getCell('G1')->setValue('MPN');
+
+        // TODO Add product rows
+    }
+
+    private function buildPriceSheet(Spreadsheet $spreadsheet): void
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setCodeName('price');
+        $sheet->setTitle('Price');
+        $sheet->getDefaultRowDimension()->setRowHeight(18);
+
+        // TODO Add cost, margin, etc
+
+        // Column widths
+        $sheet->getRowDimension(1)->setRowHeight(33.75);
+        $sheet->getColumnDimension('A')->setWidth(13.14); // Référence
+        $sheet->getColumnDimension('B')->setWidth(68.29); // Désignation
+        $sheet->getColumnDimension('C')->setWidth(9);     // PV
+
+        // Column headers
+        $sheet->getStyle('A1:C1')->applyFromArray(self::COLUMN_HEADER_STYLE);
+        // Editable column headers
+        $sheet->getStyle('C1:C1')->applyFromArray(self::COLUMN_EDITABLE_HEADER_STYLE);
+
+        // TODO translations
+        $sheet->getCell('A1')->setValue('Référence');
+        $sheet->getCell('B1')->setValue('Désignation');
+        $sheet->getCell('C1')->setValue('PV HT');
+
+        $row = 1;
+        foreach ($this->products as $product) {
+            $row++;
+
+            $sheet->getCell("A$row")->setValue($product['reference']);                      // Référence
+            $sheet->getCell("B$row")->setValue($product['designation']);                    // Désignation
+            $sheet->getCell("C$row")->setValue($product['net_price']);                      // PV
+
+            if (1 === $row % 2) {
+                $sheet->getStyle("A$row:C$row")->applyFromArray(self::ALT_ROW_STYLE);
+            }
+        }
+
+        // References as raw text
+        $sheet->getStyle('A')->getNumberFormat()->setFormatCode('@');
+
+        // Center numbers
+        //$sheet->getStyle([4, 2, 16, $row])->applyFromArray(self::CENTER_STYLE);
+        // Forecast columns
+        //$sheet->getStyle([8, 1, 9, $row])->applyFromArray(self::ALT_ROW_STYLE);
+        // Set all borders
+        $sheet->getStyle("A1:C$row")->applyFromArray(self::BORDERS_STYLE);
+
+        $sheet->setAutoFilter('A1:B2');
+        $sheet->getAutoFilter()->setRangeToMaxRow();
+        $sheet->freezePane('B2');
     }
 
     public function exportCsv(string $fileName = null): string
@@ -316,12 +430,12 @@ class Exporter
         $nbMonths = 6;
 
         $sql = <<<SQL
-        WITH RECURSIVE item_quantity (id, parent_id, quote_id, total, subject_identifier) AS (
-            SELECT id, parent_id, quote_id, quantity as total, subject_identifier
+        WITH RECURSIVE item_quantity (id, parent_id, quote_id, total, subject_provider, subject_identifier) AS (
+            SELECT id, parent_id, quote_id, quantity as total, subject_provider, subject_identifier
             FROM commerce_quote_item
             WHERE subject_provider = :provider
             UNION ALL
-            SELECT i1.id, i1.parent_id, i1.quote_id, i2.total * i1.quantity, i2.subject_identifier
+            SELECT i1.id, i1.parent_id, i1.quote_id, i2.total * i1.quantity, i2.subject_provider, i2.subject_identifier
             FROM item_quantity AS i2
             JOIN commerce_quote_item AS i1 ON i2.parent_id = i1.id
         )
@@ -332,7 +446,7 @@ class Exporter
           AND o.project_alive = 1
           AND o.project_trust >= :trust
           AND o.project_date BETWEEN :from AND :to
-        GROUP BY iq.subject_identifier, YEAR(o.project_date), MONTH(o.project_date)
+        GROUP BY iq.subject_provider, iq.subject_identifier, YEAR(o.project_date), MONTH(o.project_date)
         ORDER BY iq.subject_identifier, date;
         SQL;
 
