@@ -52,6 +52,10 @@ class StockRepository
 
     public function getProductsQueryBuilder(): QueryBuilder
     {
+        /**
+         * @TODO Do not add fields twice
+         * @see \Ekyna\Bundle\ProductBundle\Service\Stock\StockView::getProductsQueryBuilder
+         */
         $pQb = $this->entityManager->createQueryBuilder();
         $pQb
             ->from($this->productClass/** @type Product */, 'p')

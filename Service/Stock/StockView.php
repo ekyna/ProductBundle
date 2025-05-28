@@ -272,7 +272,6 @@ class StockView
     {
         $qb = $this->stockRepository->getProductsQueryBuilder();
         $qb->addSelect([
-            'p.netPrice as net_price',
             'p.weight',
             'p.geocode',
             'p.visible',

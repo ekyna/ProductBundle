@@ -117,6 +117,13 @@ class Exporter
 
         // TODO "Help" tab with VB code to highlight changed cells.
         /*
+         * You can edit green columns and reimport the file to update the database.
+         *
+         * You must keep the column names and the order of the columns.
+         * You must keep the sheet names and the order of the sheets.
+         *
+         * The following VB code highlights the changed cells.
+         *
          * Private Sub Worksheet_Change(ByVal Target As Range)
          *     ' Cette ligne s'exécute à chaque modification dans la feuille.
          *     ' "Target" représente la ou les cellules qui viennent d'être modifiées.
