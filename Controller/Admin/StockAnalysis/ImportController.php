@@ -23,6 +23,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints\File;
 use Twig\Environment;
 
+use function ini_set;
 use function pathinfo;
 use function Symfony\Component\Translation\t;
 use function sys_get_temp_dir;
@@ -104,6 +105,8 @@ class ImportController
 
     private function import(UploadedFile $file, bool $dryRun): Response
     {
+        ini_set('max_execution_time', '0');
+
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         // this is needed to safely include the file name as part of the URL
         $safeFilename = (new AsciiSlugger())->slug($originalFilename);
