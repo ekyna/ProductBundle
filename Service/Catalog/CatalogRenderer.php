@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Catalog;
 
 use Behat\Transliterator\Transliterator;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy;
 use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
@@ -30,27 +32,14 @@ class CatalogRenderer
     public const FORMAT_HTML  = 'HTML';
     public const FORMAT_EMAIL = 'EMail';
 
-    protected CatalogRegistry $registry;
-    protected Environment $twig;
-    protected PdfGenerator $pdfGenerator;
-    protected SubjectHelperInterface $subjectHelper;
-    protected string $logoPath;
-    protected bool $debug;
-
     public function __construct(
-        CatalogRegistry        $registry,
-        Environment            $twig,
-        PdfGenerator           $pdfGenerator,
-        SubjectHelperInterface $subjectHelper,
-        string                 $logoPath,
-        bool                   $debug = false
+        protected readonly CatalogRegistry        $registry,
+        protected readonly Environment            $twig,
+        protected readonly PdfGenerator           $pdfGenerator,
+        protected readonly SubjectHelperInterface $subjectHelper,
+        protected readonly string                 $logoPath,
+        protected readonly bool                   $debug = false
     ) {
-        $this->registry = $registry;
-        $this->twig = $twig;
-        $this->pdfGenerator = $pdfGenerator;
-        $this->subjectHelper = $subjectHelper;
-        $this->logoPath = $logoPath;
-        $this->debug = $debug;
     }
 
     /**

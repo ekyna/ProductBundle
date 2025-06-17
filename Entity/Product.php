@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Persistence\Proxy;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model as Media;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
@@ -1191,6 +1192,19 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this->gatherMedias(Media\MediaTypes::FILE, $withChildren, $limit);
     }
 
+    private function loadParent(): void
+    {
+        if (!$this->parent instanceof Proxy) {
+            return;
+        }
+
+        if ($this->parent->__isInitialized()) {
+            return;
+        }
+
+        $this->parent->__load();
+    }
+
     private function gatherMedias(
         string          $type,
         bool            $recurse = true,
@@ -1202,6 +1216,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         // TODO "Add media to collection" closure
+
+
 
         foreach ($this->medias as $pm) {
             $media = $pm->getMedia();
@@ -1219,7 +1235,9 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         if ($this->type === Model\ProductTypes::TYPE_VARIANT && $collection->isEmpty()) {
-            $this->getParent()->gatherMedias($type, false, $limit, $collection);
+            $this->loadParent();
+
+            $this->parent->gatherMedias($type, false, $limit, $collection);
 
             return $collection;
         }
