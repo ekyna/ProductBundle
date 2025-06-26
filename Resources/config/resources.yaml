@@ -389,6 +389,26 @@ resources:
             parent: ekyna_product.product
             trans_domain: EkynaProduct
 
+        product_attachment:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\ProductAttachmentInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\ProductAttachment
+            form: Ekyna\Bundle\ProductBundle\Form\Type\ProductAttachmentType
+            parent: ekyna_product.product
+            trans_prefix: attachment
+            trans_domain: EkynaCommerce
+            behaviors:
+                uploadable:
+                    uploader: ekyna_product.uploader
+            actions:
+                admin_crud:
+                    templates: '@EkynaCommerce/Admin/Common/Attachment'
+                    list: false
+                    read: false
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Attachment\ArchiveAction: ~
+                Ekyna\Bundle\CommerceBundle\Action\Admin\Attachment\DownloadAction: ~
+
         product_attribute:
             driver: doctrine/orm
             entity:

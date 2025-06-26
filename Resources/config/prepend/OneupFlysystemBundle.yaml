@@ -1,0 +1,10 @@
+oneup_flysystem:
+    adapters:
+        local_product:
+            local:
+                location: "%kernel.data_dir%/product"
+    filesystems:
+        local_product:
+            adapter: local_product
+            alias: local_product_filesystem
+            mount: local_product

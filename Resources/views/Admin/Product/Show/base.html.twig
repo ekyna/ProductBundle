@@ -20,6 +20,14 @@
         </li>
         {%- endblock content_tab -%}
 
+        {%- block files_tab -%}
+        <li>
+            <a href="#{{ resource_name }}-files" id="toggle-product-files" data-toggle="tab">
+                {{- 'field.files'|trans({}, 'EkynaUi') -}}
+            </a>
+        </li>
+        {%- endblock files_tab -%}
+
         {%- block pricing_tab -%}
         <li>
             <a href="#{{ resource_name }}-pricing" id="toggle-product-pricing" data-toggle="tab">
@@ -100,18 +108,36 @@
                 {%- block content_content -%}
                     {{ _product.show_translations(product) }}
                     {{ _product.show_medias(product) }}
+                    {{ _product.show_not_contractual(product) }}
+                {%- endblock content_content -%}
+                </div>
+            {%- endblock content_pane -%}
+
+            {%- block files_pane -%}
+                <div class="tab-pane" id="{{ resource_name }}-files">
+                {%- block files_content -%}
+                    <h4 class="sub-header">
+                        <a href="{{ admin_resource_path('ekyna_product.product_attachment', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction') }}"
+                           class="btn btn-primary btn-xs pull-right">
+                            {{ 'attachment.button.new'|trans({}, 'EkynaCommerce') }}
+                        </a>
+                        {{ 'attachment.label.plural'|trans({}, 'EkynaCommerce') }}
+                    </h4>
+                    {% include '@EkynaProduct/Admin/Product/Show/_attachments.html.twig' with {
+                        'attachments': product.attachments
+                    } only %}
+                    <hr>
                     <div class="row">
                         <div class="col-md-4">
                             {{ _product.show_internal_manual(product, {'label_col': 6}) }}
                         </div>
                         <div class="col-md-8">
-                            {{ _product.show_not_contractual(product, {'label_col': 3}) }}
                             {{ _product.show_external_manual(product, {'label_col': 3}) }}
                         </div>
                     </div>
-                {%- endblock content_content -%}
+                {%- endblock files_content -%}
                 </div>
-            {%- endblock content_pane -%}
+            {%- endblock files_pane -%}
 
             {%- block pricing_pane -%}
                 <div class="tab-pane" id="{{ resource_name }}-pricing">

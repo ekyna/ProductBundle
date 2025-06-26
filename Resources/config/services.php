@@ -25,6 +25,8 @@ use Ekyna\Bundle\ProductBundle\Service\Pricing;
 use Ekyna\Bundle\ProductBundle\Service\Routing\RoutingLoader;
 use Ekyna\Bundle\ProductBundle\Service\SchemaOrg;
 use Ekyna\Bundle\ProductBundle\Service\Stat;
+use Ekyna\Bundle\ResourceBundle\DependencyInjection\Compiler\UploaderPass;
+use Ekyna\Bundle\ResourceBundle\Service\Uploader\Uploader;
 use Ekyna\Component\Commerce\Common\Generator\DateNumberGenerator;
 use Ekyna\Component\Resource\Event\QueueEvents;
 
@@ -52,6 +54,18 @@ return static function (ContainerConfigurator $container) {
             param('kernel.debug'),
         ])
         ->tag('routing.loader');
+
+    // Filesystem
+    $services->alias('ekyna_product.filesystem', 'oneup_flysystem.local_product_filesystem');
+
+    // Uploader
+    $services
+        ->set('ekyna_product.uploader', Uploader::class)
+        ->args([
+            service('ekyna_resource.filesystem.tmp'),
+            service('ekyna_product.filesystem'),
+        ])
+        ->tag(UploaderPass::UPLOADER_TAG);
 
     // Attributes
     $services

@@ -58,6 +58,10 @@ class ProductExtension extends AbstractExtension
                 [ConstantsHelper::class, 'renderAttributeTypeLabel']
             ),
             new TwigFilter(
+                'product_attachment_type_label',
+                [ConstantsHelper::class, 'renderAttachmentTypeLabel']
+            ),
+            new TwigFilter(
                 'product_best_seller_badge',
                 [ConstantsHelper::class, 'renderProductBestSellerBadge'],
                 ['is_safe' => ['html']]

@@ -57,6 +57,17 @@
             <gedmo:timestampable on="update"/>
         </field>
 
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Entity\ProductAttachment"
+                     field="attachments" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-persist/>
+                <cascade-remove/>
+            </cascade>
+            <order-by>
+                <order-by-field name="createdAt" direction="DESC"/>
+            </order-by>
+        </one-to-many>
+
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
                      field="variants" mapped-by="parent" orphan-removal="true" index-by="id">
             <cascade>

@@ -548,6 +548,18 @@ product:
             Cette opération peut générer un <strong>grand nombre d'ajustements</strong> de stocks sur de nombreux produits.<br>
             Veuillez <strong>vérifier votre saisie</strong> avant de soumettre ce formulaire.
 
+product_attachment:
+    type:
+        term_of_sale: Conditions de vente
+        instructions: Notice d'utilisation
+        data_sheet: Fiche technique
+        drawing_3d: Plans 3D
+        drawing_2d: Plans 2D
+    help:
+        auto_add_to_document: >
+            Les fichiers de type 'Conditions de vente' sont automatiquement ajoutés 
+            aux documents comme les bons de commande, les proformas ou les factures.
+
 product_media:
     label:
         singular: Média

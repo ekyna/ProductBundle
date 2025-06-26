@@ -545,6 +545,18 @@ product:
             This operation may generate <strong>many stock adjustments</strong> over many products.<br>
             Please <strong>review this form</strong> before submitting it.
 
+product_attachment:
+    type:
+        term_of_sale: Terms of sale
+        instructions: Instructions for use
+        data_sheet: Data sheet
+        drawing_3d: 3D drawings
+        drawing_2d: 2D drawings
+    help:
+        auto_add_to_document: >
+            'Terms of sale' files are automatically added to documents 
+            such as purchase orders, proformas or invoices.
+
 product_media:
     label:
         singular: Media

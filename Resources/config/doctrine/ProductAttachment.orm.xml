@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <entity name="Ekyna\Bundle\ProductBundle\Entity\ProductAttachment"
+            table="product_product_attachment">
+
+        <field name="locale" column="locale" type="string" length="6"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\ProductInterface"
+                     field="product" inversed-by="attachments">
+            <join-column name="product_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+
+    </entity>
+
+</doctrine-mapping>

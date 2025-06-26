@@ -116,6 +116,20 @@ class ConstantsHelper extends AbstractConstantsHelper
     }
 
     /**
+     * Renders the attachment type label.
+     *
+     * @param Model\ProductAttachmentInterface|string $typeOrAttachment
+     */
+    public function renderAttachmentTypeLabel($typeOrAttachment): string
+    {
+        if ($typeOrAttachment instanceof Model\ProductAttachmentInterface) {
+            $typeOrAttachment = $typeOrAttachment->getType();
+        }
+
+        return $this->renderLabel(Model\ProductAttachmentTypes::getLabel($typeOrAttachment));
+    }
+
+    /**
      * Renders the product best-seller label.
      *
      * @param Model\ProductInterface|string $modeOrProduct

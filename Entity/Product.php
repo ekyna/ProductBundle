@@ -8,10 +8,12 @@ use DateTimeInterface;
 use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\Proxy;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model as Media;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
+use Ekyna\Bundle\ProductBundle\Exception\UnexpectedValueException;
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
 use Ekyna\Component\Commerce\Common\Model as Common;
@@ -69,6 +71,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
     /** @var Collection<int, Model\ProductInterface> */
     protected Collection $variants;
+    /** @var Collection<int, Model\ProductAttachmentInterface> */
+    protected Collection $attachments;
     /** @var Collection<int, Model\ProductAttributeInterface> */
     protected Collection $attributes;
     /** @var Collection<int, Model\OptionGroupInterface> */
@@ -98,6 +102,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         $this->minPrice = new Decimal(0);
 
+        $this->attachments = new ArrayCollection();
         $this->attributes = new ArrayCollection();
         $this->bundleSlots = new ArrayCollection();
         $this->components = new ArrayCollection();
@@ -580,6 +585,66 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         }
 
         return $this;
+    }
+
+    public function hasAttachments(string $type = null): bool
+    {
+        if (null !== $type) {
+            foreach ($this->attachments as $attachment) {
+                if ($type === $attachment->getType()) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return 0 < $this->attachments->count();
+    }
+
+    public function hasAttachment(Model\ProductAttachmentInterface $attachment): bool
+    {
+        return $this->attachments->contains($attachment);
+    }
+
+    public function addAttachment(Model\ProductAttachmentInterface $attachment): Model\ProductInterface
+    {
+        if (!$this->hasAttachment($attachment)) {
+            $this->attachments->add($attachment);
+            $attachment->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttachment(Model\ProductAttachmentInterface $attachment): Model\ProductInterface
+    {
+        if ($this->hasAttachment($attachment)) {
+            $this->attachments->removeElement($attachment);
+            $attachment->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+    public function getPublicAttachments(string $type = null): Collection
+    {
+        $criteria =Criteria::create()->where(Criteria::expr()->eq('internal', false));
+
+        if (null !== $type) {
+            if (!Model\ProductAttachmentTypes::isValid($type)) {
+                throw new UnexpectedValueException("invalid product attachment type '$type'.");
+            }
+
+            $criteria->andWhere(Criteria::expr()->eq('type', $type));
+        }
+
+        return $this->attachments->matching($criteria);
     }
 
     public function getOptionGroups(): Collection

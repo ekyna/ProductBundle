@@ -20,6 +20,7 @@ use Ekyna\Bundle\ProductBundle\EventListener\CategoryListener;
 use Ekyna\Bundle\ProductBundle\EventListener\CheckoutEventSubscriber;
 use Ekyna\Bundle\ProductBundle\EventListener\ComponentListener;
 use Ekyna\Bundle\ProductBundle\EventListener\CustomerGroupListener;
+use Ekyna\Bundle\ProductBundle\EventListener\DocumentExtraListener;
 use Ekyna\Bundle\ProductBundle\EventListener\Handler;
 use Ekyna\Bundle\ProductBundle\EventListener\ImageUrlEventListener;
 use Ekyna\Bundle\ProductBundle\EventListener\LabelListener;
@@ -431,4 +432,14 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.highlight'),
         ])
         ->tag('kernel.event_subscriber');
+
+    // Checkout event listener
+    $services
+        ->set('ekyna_product.listener.document_extra', DocumentExtraListener::class)
+        ->args([
+            service('ekyna_commerce.helper.document_attribute'),
+            service('ekyna_commerce.helper.subject'),
+            service('ekyna_product.filesystem'),
+        ])
+        ->tag('kernel.event_listener');
 };

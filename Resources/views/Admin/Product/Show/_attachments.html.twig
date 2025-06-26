@@ -1,0 +1,20 @@
+{% extends '@EkynaCommerce/Admin/Common/Attachment/list.html.twig' %}
+
+
+{% block header_type %}
+{{ parent() }}
+<th>{{ 'field.locale'|trans({}, 'EkynaUi') }}</th>
+{% endblock %}
+
+
+{% block cell_type -%}
+    <td id="{{ attachmentId }}_type">{{ attachment.type|product_attachment_type_label }}</td>
+    <td id="{{ attachmentId }}_locale">{{ attachment.locale }}</td>
+{%- endblock %}
+
+
+{% block after_list %}
+    <div class="alert alert-info">
+        <p>{{ 'product_attachment.help.auto_add_to_document'|trans({}, 'EkynaProduct') }}</p>
+    </div>
+{% endblock %}

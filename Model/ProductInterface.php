@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Model;
 use DateTimeInterface;
 use Decimal\Decimal;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Ekyna\Bundle\CmsBundle\Model as Cms;
 use Ekyna\Bundle\MediaBundle\Model\MediaInterface;
 use Ekyna\Component\Commerce\Common\Model as Common;
@@ -233,6 +234,34 @@ interface ProductInterface extends
     public function addAttribute(ProductAttributeInterface $attribute): ProductInterface;
 
     public function removeAttribute(ProductAttributeInterface $attribute): ProductInterface;
+
+    /**
+     * Returns whether the order has attachments or not, optionally filtered by type.
+     */
+    public function hasAttachments(string $type = null): bool;
+
+    /**
+     * Returns whether the order has the attachment or not.
+     */
+    public function hasAttachment(ProductAttachmentInterface $attachment): bool;
+
+    public function addAttachment(ProductAttachmentInterface $attachment): ProductInterface;
+
+    public function removeAttachment(ProductAttachmentInterface $attachment): ProductInterface;
+
+    /**
+     * Returns the attachments.
+     *
+     * @return Collection<int, ProductAttachmentInterface>
+     */
+    public function getAttachments(): Collection;
+
+    /**
+     * Returns the public attachments, optionally filtered by type.
+     *
+     * @return Collection<int, ProductAttachmentInterface>
+     */
+    public function getPublicAttachments(string $type = null): Collection;
 
     /**
      * @return Collection<int, OptionGroupInterface>
