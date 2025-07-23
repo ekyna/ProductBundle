@@ -21,6 +21,7 @@ use Ekyna\Component\Commerce\Report\Writer\WriterInterface;
 use Ekyna\Component\Commerce\Report\Writer\XlsWriter;
 use Ekyna\Component\Commerce\Stock\Helper\StockSubjectQuantityHelper;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
+use Ekyna\Component\Resource\Helper\File\Xls;
 use Ekyna\Component\Resource\Model\ResourceInterface;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -194,7 +195,7 @@ class ProductsSection implements SectionInterface
                 $data = $years[$year] ?? new ProductData();
 
                 // Left border
-                $sheet->getCell([$col, $row])->getStyle()->applyFromArray(XlsWriter::STYLE_BORDER_LEFT);
+                $sheet->getCell([$col, $row])->getStyle()->applyFromArray(Xls::STYLE_BORDER_LEFT);
 
                 // Cells values
                 $sheet->getCell([$col, $row])->setValue($data->quantity->toFixed());
@@ -209,7 +210,7 @@ class ProductsSection implements SectionInterface
 
     private function writeXlsHeaders(Worksheet $sheet): void
     {
-        $headerStyle = XlsWriter::STYLE_BOLD + XlsWriter::STYLE_BACKGROUND;
+        $headerStyle = Xls::STYLE_BOLD + Xls::STYLE_BACKGROUND;
 
         $columns = [
             'Reference'   => 20,
@@ -224,17 +225,17 @@ class ProductsSection implements SectionInterface
 
             $sheet->mergeCells([$col, 1, $col, 2]);
             $sheet->getCell([$col, 1])->getStyle()->applyFromArray($headerStyle);
-            $sheet->getCell([$col, 2])->getStyle()->applyFromArray($headerStyle + XlsWriter::STYLE_BORDER_BOTTOM);
+            $sheet->getCell([$col, 2])->getStyle()->applyFromArray($headerStyle + Xls::STYLE_BORDER_BOTTOM);
             $sheet->getCell([$col, 1])->setValue($label);
 
             $col++;
         }
 
         $yearStyle =
-            XlsWriter::STYLE_BOLD
-            + XlsWriter::STYLE_CENTER
-            + XlsWriter::STYLE_BACKGROUND
-            + XlsWriter::STYLE_BORDER_LEFT;
+            Xls::STYLE_BOLD
+            + Xls::STYLE_CENTER
+            + Xls::STYLE_BACKGROUND
+            + Xls::STYLE_BORDER_LEFT;
 
         $base = $col;
         foreach ($this->years as $index => $year) {
@@ -248,7 +249,7 @@ class ProductsSection implements SectionInterface
             // Quantity
             $sheet->getColumnDimensionByColumn($col)->setWidth(18, 'mm');
             $sheet->getCell([$col, 2])->getStyle()->applyFromArray($headerStyle);
-            $sheet->getCell([$col, 2])->getStyle()->applyFromArray(XlsWriter::STYLE_BORDER_LEFT);
+            $sheet->getCell([$col, 2])->getStyle()->applyFromArray(Xls::STYLE_BORDER_LEFT);
             $sheet->getCell([$col, 2])->setValue('Quantity'); // TODO Trans
 
             // Revenue product

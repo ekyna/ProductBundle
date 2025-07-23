@@ -327,12 +327,12 @@ class Exporter
 
         if (empty($fileName)) {
             $fileName = sprintf(
-                'stock_analysis_%s.csv',
+                'stock_analysis_%s',
                 (new DateTime())->format('Y-m-d')
             );
         }
 
-        $file = Csv::create($fileName);
+        $file = new Csv($fileName);
 
         $file->addRow([
             'Référence',

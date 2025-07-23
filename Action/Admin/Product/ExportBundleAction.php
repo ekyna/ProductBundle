@@ -38,7 +38,7 @@ class ExportBundleAction extends AbstractAction implements AdminActionInterface
             throw new UnexpectedValueException('Expected bundle product type.');
         }
 
-        $file = $this->bundleExporter->export($product);
+        $file = $this->bundleExporter->export($product, $this->request->query->getBoolean('recursive'));
 
         return $file->download();
     }

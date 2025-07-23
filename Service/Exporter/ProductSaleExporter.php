@@ -18,7 +18,7 @@ use Ekyna\Component\Commerce\Order\Model\OrderItemInterface;
 use Ekyna\Component\Commerce\Order\Repository\OrderRepositoryInterface;
 use Ekyna\Component\Commerce\Stock\Helper\StockSubjectQuantityHelper;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
-use Ekyna\Component\Resource\Helper\File\Csv;
+use Ekyna\Component\Resource\Helper\File\Xls;
 use Psr\Log\LoggerInterface;
 
 use function gc_collect_cycles;
@@ -54,7 +54,7 @@ class ProductSaleExporter
     ) {
     }
 
-    public function export(SaleExportConfig $config, LoggerInterface $logger = null): Csv
+    public function export(SaleExportConfig $config, LoggerInterface $logger = null): Xls
     {
         $this->months = DateUtil::getMonths('fr'); // TODO User locale
         $this->config = $config;
@@ -62,7 +62,7 @@ class ProductSaleExporter
 
         $this->loadData();
 
-        return $this->buildCSV();
+        return $this->buildFile();
     }
 
     private function loadData(): void
@@ -178,11 +178,11 @@ class ProductSaleExporter
         $this->products[$reference]['category'] = $category->getName();
     }
 
-    private function buildCSV(): Csv
+    private function buildFile(): Xls
     {
-        $csv = Csv::create('product-sales.csv');
+        $file = new Xls('product-sales');
 
-        $csv->addRow([
+        $file->addRow([
             'Reference',
             'Designation',
             'Brand',
@@ -205,7 +205,7 @@ class ProductSaleExporter
                         foreach ($customers as $customer => $data) {
                             $product = $this->products[$reference];
 
-                            $csv->addRow([
+                            $file->addRow([
                                 $reference,
                                 $product['designation'],
                                 $product['brand'],
@@ -226,6 +226,6 @@ class ProductSaleExporter
             }
         }
 
-        return $csv;
+        return $file;
     }
 }

@@ -528,7 +528,7 @@
         <div class="col-md-10">
             <div class="show-widget show-widget-sm show-product-bundle">
             {%- if product is bundle_product -%}
-                {#  TODO Use \Ekyna\Bundle\ProductBundle\Service\Exporter\BundleExporter::buildList #}
+                {#  TODO Use \Ekyna\Bundle\ProductBundle\Service\Exporter\BundleExporter::buildComponents #}
                 <table class="table table-stripped table-condensed table-hover table-alt-head">
                     <tr>
                         <th>{{ 'product.label.singular'|trans({}, 'EkynaProduct') }}</th>
@@ -660,7 +660,7 @@
             {%- endif -%}
             </div>
             <p class="actions">
-                {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ExportBundleAction') }}
+                {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ExportBundleAction', {'parameters': {'recursive': 1}}) }}
             </p>
         </div>
     </div>

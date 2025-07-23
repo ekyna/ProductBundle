@@ -8,15 +8,10 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Ekyna\Component\Commerce\Common\Util\Money;
 use Ekyna\Component\Commerce\Stock\Repository\StockUnitRepositoryInterface;
-use RuntimeException;
+use Ekyna\Component\Resource\Helper\File\Xls;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
-use function fclose;
-use function fopen;
-use function fputcsv;
 use function implode;
 
 /**
@@ -35,75 +30,60 @@ class ExportUnitsController
 
     public function __invoke(Request $request): Response
     {
-        $response = new StreamedResponse();
+        $formatter = $this->formatterFactory->create();
 
-        $response->setCallback(function () {
-            if (false === $handle = fopen('php://output', 'w+')) {
-                throw new RuntimeException('Failed to open output stream.');
+        $stockUnits = $this->stockUnitRepository->findInStock();
+
+        $file = new Xls('stock-units');
+
+        $file->setHeaders([
+            'id',
+            'designation',
+            'reference',
+            'stock',
+            'geocode',
+            'buy price',
+            'currency',
+            'valorization',
+            'exchange rate',
+            'exchange date',
+        ]);
+
+        foreach ($stockUnits as $stockUnit) {
+            $inStock = $stockUnit->getReceivedQuantity()
+                + $stockUnit->getAdjustedQuantity()
+                - $stockUnit->getShippedQuantity();
+
+            /** @var ProductInterface $product */
+            $product = $stockUnit->getSubject();
+            $value = $price = $stockUnit->getNetPrice();
+
+            $currency = ($c = $stockUnit->getCurrency()) ? $c->getCode() : $this->defaultCurrency;
+
+            $exchangeRate = null;
+            $exchangeDate = $stockUnit->getExchangeDate();
+            if (null !== $exchangeRate = $stockUnit->getExchangeRate()) {
+                $price = Money::round($price * $exchangeRate, $currency);
             }
 
-            $formatter = $this->formatterFactory->create();
+            $value = Money::round($value * $inStock, $currency);
 
-            $stockUnits = $this->stockUnitRepository->findInStock();
+            $data = [
+                $product->getId(),
+                (string)$product,
+                $product->getReference(),
+                $inStock,
+                implode(', ', $stockUnit->getGeocodes()),
+                Money::fixed($price, $currency),
+                $currency,
+                Money::fixed($value, $currency),
+                $exchangeRate ? $exchangeRate->toFixed(5) : '',
+                $exchangeDate ? $formatter->date($exchangeDate) : '',
+            ];
 
-            fputcsv($handle, [
-                'id',
-                'designation',
-                'reference',
-                'stock',
-                'geocode',
-                'buy price',
-                'currency',
-                'valorization',
-                'exchange rate',
-                'exchange date',
-            ]);
+            $file->addRow($data);
+        }
 
-            foreach ($stockUnits as $stockUnit) {
-                $inStock = $stockUnit->getReceivedQuantity()
-                    + $stockUnit->getAdjustedQuantity()
-                    - $stockUnit->getShippedQuantity();
-
-                /** @var ProductInterface $product */
-                $product = $stockUnit->getSubject();
-                $value = $price = $stockUnit->getNetPrice();
-
-                $currency = ($c = $stockUnit->getCurrency()) ? $c->getCode() : $this->defaultCurrency;
-
-                $exchangeRate = null;
-                $exchangeDate = $stockUnit->getExchangeDate();
-                if (null !== $exchangeRate = $stockUnit->getExchangeRate()) {
-                    $price = Money::round($price * $exchangeRate, $currency);
-                }
-
-                $value = Money::round($value * $inStock, $currency);
-
-                $data = [
-                    $product->getId(),
-                    (string)$product,
-                    $product->getReference(),
-                    $inStock,
-                    implode(', ', $stockUnit->getGeocodes()),
-                    Money::fixed($price, $currency),
-                    $currency,
-                    Money::fixed($value, $currency),
-                    $exchangeRate ? $exchangeRate->toFixed(5) : '',
-                    $exchangeDate ? $formatter->date($exchangeDate) : '',
-                ];
-
-                fputcsv($handle, $data);
-            }
-
-            fclose($handle);
-        });
-
-        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition',
-            $response->headers->makeDisposition(
-                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                'inventory-units.csv'
-            ));
-
-        return $response;
+        return $file->download();
     }
 }

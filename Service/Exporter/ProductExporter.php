@@ -12,7 +12,9 @@ use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceCalculator;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PurchaseCostCalculator;
+use Ekyna\Component\Resource\Helper\File\AbstractFile;
 use Ekyna\Component\Resource\Helper\File\Csv;
+use Ekyna\Component\Resource\Helper\File\Xls;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProductExporter
 {
     protected ExportConfig $config;
-    protected Csv          $file;
+    protected AbstractFile $file;
 
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
@@ -37,13 +39,18 @@ class ProductExporter
     /**
      * Exports products.
      */
-    public function export(ExportConfig $config): Csv
+    public function export(ExportConfig $config): AbstractFile
     {
         $this->config = $config;
 
-        $this->file = Csv::create('product_export.csv');
-        $this->file->setSeparator($this->config->getSeparator());
-        $this->file->setEnclosure($this->config->getEnclosure());
+        if ($config->getFormat() === 'csv') {
+            $this->file = new Csv('product_export', [
+                'separator' => $this->config->getSeparator(),
+                'enclosure' => $this->config->getEnclosure()
+            ]);
+        } else {
+            $this->file = new Xls('product_export');
+        }
 
         $this->buildHeaders();
         $this->buildRows();
@@ -64,7 +71,7 @@ class ProductExporter
             $headers[] = $definitions[$column]->trans($this->translator);
         }
 
-        $this->file->addRow($headers);
+        $this->file->setHeaders($headers);
     }
 
     /**

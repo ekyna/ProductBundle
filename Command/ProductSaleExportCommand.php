@@ -103,7 +103,7 @@ class ProductSaleExportCommand extends Command
         $message->attach(
             file_get_contents($csv->close()),
             sprintf(
-                'sales_report_%s_%s.csv',
+                'sales_report_%s_%s.xls',
                 $config->range->getStart()->format('Y-m-d'),
                 $config->range->getEnd()->format('Y-m-d')
             ),

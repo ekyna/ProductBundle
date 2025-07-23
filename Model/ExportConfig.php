@@ -21,6 +21,7 @@ use function Symfony\Component\Translation\t;
  */
 class ExportConfig
 {
+    public const FORMAT_XLS = 'xls';
     public const FORMAT_CSV = 'csv';
 
     public const COLUMN_DESIGNATION      = 'designation';
@@ -45,7 +46,7 @@ class ExportConfig
     public const COLUMN_QUOTE_ONLY       = 'quote_only';
     public const COLUMN_END_OF_LIFE      = 'end_of_life';
 
-    private string            $format       = self::FORMAT_CSV;
+    private string            $format       = self::FORMAT_XLS;
     private array             $columns;
     private bool              $addInvisible = false;
     private bool              $addQuoteOnly = false;
@@ -279,7 +280,8 @@ class ExportConfig
     public static function getFormatLabels(): array
     {
         return [
-            self::FORMAT_CSV => 'CSV',
+            self::FORMAT_XLS => 'Excel',
+            self::FORMAT_CSV => 'Csv',
         ];
     }
 
@@ -291,6 +293,7 @@ class ExportConfig
     public static function getFormatChoices(): array
     {
         return [
+            self::FORMAT_XLS,
             self::FORMAT_CSV,
         ];
     }
