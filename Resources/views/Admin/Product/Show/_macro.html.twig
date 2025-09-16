@@ -189,7 +189,8 @@
 
 
 {%- macro show_min_price(product, options = {}) -%}
-    {{- show_row(product.minPrice|format_currency(commerce_default_currency), 'text', {
+    {% set price = '<strong>' ~ product.minPrice|format_currency(commerce_default_currency) ~ '</strong>&nbsp;<em>(' ~ product|product_margin.getPercent(false) ~'%)</em>' %}
+    {{- show_row(price, 'text', {
         'label': t('product.field.min_price', [], 'EkynaProduct'),
         'id': 'product_minPrice',
     }|merge(options)) -}}

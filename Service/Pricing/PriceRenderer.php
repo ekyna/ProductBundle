@@ -11,6 +11,7 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Model\OfferInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextInterface;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
+use Ekyna\Component\Commerce\Common\Model\Margin;
 use Ekyna\Component\Commerce\Common\Util\FormatterFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -198,6 +199,26 @@ class PriceRenderer
         $cost = $this->purchaseCostCalculator->calculateMinPurchaseCost($product, $withOptions);
 
         return $cost->getTotal(!$shipping);
+    }
+
+    /**
+     * Returns the product margin.
+     *
+     * @param Model\ProductInterface $product
+     *
+     * @return Margin
+     */
+    public function getProductMargin(Model\ProductInterface $product): Margin
+    {
+        $cost = $this
+            ->purchaseCostCalculator
+            ->calculateMinPurchaseCost($product, true);
+
+        $margin = new Margin();
+        $margin->addRevenueProduct($product->getMinPrice());
+        $margin->addCost($cost);
+
+        return $margin;
     }
 
     /**

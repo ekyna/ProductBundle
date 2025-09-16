@@ -97,6 +97,10 @@ class ProductExtension extends AbstractExtension
                 [PriceRenderer::class, 'getPurchaseCost']
             ),
             new TwigFilter(
+                'product_margin',
+                [PriceRenderer::class, 'getProductMargin']
+            ),
+            new TwigFilter(
                 'product_attribute',
                 [AttributeRenderer::class, 'renderProductAttribute'],
                 ['is_safe' => ['html']]
