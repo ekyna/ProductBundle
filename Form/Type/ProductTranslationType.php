@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use function Symfony\Component\Translation\t;
 
@@ -20,6 +21,11 @@ use function Symfony\Component\Translation\t;
  */
 class ProductTranslationType extends AbstractType
 {
+    public function __construct(
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $titleOptions = [
@@ -39,6 +45,16 @@ class ProductTranslationType extends AbstractType
             ->add('description', TinymceType::class, [
                 'label'    => t('field.description', [], 'EkynaUi'),
                 'theme'    => 'simple',
+                'required' => false,
+            ]);
+
+        if (!$this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
+            return;
+        }
+
+        $builder
+            ->add('slug', TextType::class, [
+                'label'    => t('field.url', [], 'EkynaUi'),
                 'required' => false,
             ]);
     }

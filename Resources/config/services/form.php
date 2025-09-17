@@ -16,6 +16,7 @@ use Ekyna\Bundle\ProductBundle\Form\Type\ExportConfigType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Option;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAdjustmentType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductAttributesType;
+use Ekyna\Bundle\ProductBundle\Form\Type\ProductTranslationType;
 use Ekyna\Bundle\ProductBundle\Form\Type\ProductType;
 use Ekyna\Bundle\ProductBundle\Form\Type\SaleItem;
 use Ekyna\Bundle\ProductBundle\Form\Type\StockView;
@@ -209,6 +210,13 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.form_type.product', ProductType::class)
         ->args([
             service('ekyna_product.listener.product_form'),
+        ])
+        ->tag('form.type');
+
+    $services
+        ->set('ekyna_product.form_type.product_translation', ProductTranslationType::class)
+        ->args([
+            service('security.authorization_checker'),
         ])
         ->tag('form.type');
 

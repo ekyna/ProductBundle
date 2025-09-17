@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\Table\Type;
 
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Ekyna\Bundle\AdminBundle\Action;
 use Ekyna\Bundle\AdminBundle\Table\Type\Filter\ConstantChoiceType;
@@ -15,19 +16,22 @@ use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectModeType;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\ProductBundle\Table\Column\ProductTypeType;
-use Ekyna\Bundle\ProductBundle\Table\Filter\ProductReferenceType;
+use Ekyna\Bundle\ProductBundle\Table as PType;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
 use Ekyna\Bundle\ResourceBundle\Table\Filter\ResourceType;
 use Ekyna\Bundle\ResourceBundle\Table\Type\AbstractResourceType;
 use Ekyna\Bundle\TableBundle\Extension\Type as BType;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Source\EntitySource;
 use Ekyna\Component\Table\Bridge\Doctrine\ORM\Type as DType;
+use Ekyna\Component\Table\Context\ActiveFilter;
+use Ekyna\Component\Table\Context\Context;
+use Ekyna\Component\Table\Context\Profile\Profile;
 use Ekyna\Component\Table\Exception\UnexpectedTypeException;
 use Ekyna\Component\Table\Extension\Core\Type as CType;
 use Ekyna\Component\Table\Source\RowInterface;
 use Ekyna\Component\Table\TableBuilderInterface;
 use Ekyna\Component\Table\Util\ColumnSort;
+use Ekyna\Component\Table\Util\FilterOperator;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -63,7 +67,7 @@ class ProductType extends AbstractResourceType
                 ->setConfigurable(true)
                 ->setProfileable(true)
                 ->addDefaultSort('id', ColumnSort::DESC)
-                ->addColumn('type', ProductTypeType::class, [
+                ->addColumn('type', PType\Column\ProductTypeType::class, [
                     'label'    => t('field.type', [], 'EkynaUi'),
                     'position' => 10,
                 ]);
@@ -99,11 +103,23 @@ class ProductType extends AbstractResourceType
                 'precision' => 3,
                 'append'    => 'Kg',
                 'position'  => 60,
-                //'visible'   => false,
+                'visible'   => false,
+            ])
+            ->addColumn('hscode', CType\Column\TextType::class, [
+                'label'          => t('stock_subject.field.hs_code', [], 'EkynaCommerce'),
+                'clipboard_copy' => true,
+                'position'       => 61,
+                'visible'        => false,
+            ])
+            ->addColumn('ean13', PType\Column\ProductReferenceType::class, [
+                'label'          => t('product_reference.type.ean13', [], 'EkynaProduct'),
+                'clipboard_copy' => true,
+                'position'       => 62,
+                'visible'        => false,
             ])
             ->addColumn('stockMode', StockSubjectModeType::class, [
                 'position' => 70,
-                //'visible'  => false,
+                'visible'  => false,
             ])
             ->addColumn('stockState', StockSubjectStateType::class, [
                 'position' => 80,
@@ -198,81 +214,145 @@ class ProductType extends AbstractResourceType
             'buttons'  => $buttons,
         ]);
 
-        if (!$variantMode) {
-            $builder
-                ->addFilter('type', ConstantChoiceType::class, [
-                    'label'    => t('field.type', [], 'EkynaUi'),
-                    'class'    => ProductTypes::class,
-                    'filter'   => [ProductTypes::TYPE_VARIANT],
-                    'position' => 10,
-                ])
-                ->addFilter('designation', CType\Filter\TextType::class, [
-                    'label'    => t('field.designation', [], 'EkynaUi'),
-                    'position' => 20,
-                ])
-                ->addFilter('visible', CType\Filter\BooleanType::class, [
-                    'label'    => t('field.visible', [], 'EkynaUi'),
-                    'position' => 30,
-                ])
-                ->addFilter('reference', ProductReferenceType::class, [
-                    'label'    => t('field.reference', [], 'EkynaUi'),
-                    'position' => 40,
-                ])
-                ->addFilter('netPrice', CType\Filter\NumberType::class, [
-                    'label'    => t('field.net_price', [], 'EkynaCommerce'),
-                    'position' => 50,
-                ])
-                ->addFilter('weight', CType\Filter\NumberType::class, [
-                    'label'    => t('field.weight', [], 'EkynaUi'),
-                    'position' => 60,
-                ])
-                ->addFilter('stockMode', ConstantChoiceType::class, [
-                    'label'    => t('stock_subject.field.mode', [], 'EkynaCommerce'),
-                    'class'    => StockSubjectModes::class,
-                    'position' => 70,
-                ])
-                ->addFilter('stockState', ConstantChoiceType::class, [
-                    'label'    => t('stock_subject.field.state', [], 'EkynaCommerce'),
-                    'class'    => StockSubjectStates::class,
-                    'position' => 80,
-                ])
-                ->addFilter('physical', CType\Filter\BooleanType::class, [
-                    'label'    => t('field.physical', [], 'EkynaCommerce'),
-                    'position' => 90,
-                ])
-                ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
-                    'label'    => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
-                    'position' => 95,
-                ])
-                ->addFilter('endOfLife', CType\Filter\BooleanType::class, [
-                    'label'    => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
-                    'position' => 100,
-                ])
-                ->addFilter('categories', ResourceType::class, [
-                    'resource' => 'ekyna_product.category',
-                    'position' => 200,
-                ])
-                ->addFilter('brand', ResourceType::class, [
-                    'resource' => 'ekyna_product.brand',
-                    'position' => 210,
-                ])
-                ->addFilter('pricingGroup', ResourceType::class, [
-                    'resource' => 'ekyna_product.pricing_group',
-                    'position' => 220,
-                ])
-                ->addFilter('attributeSet', ResourceType::class, [
-                    'resource' => 'ekyna_product.attribute_set',
-                    'position' => 230,
-                ])
-                ->addFilter('taxGroup', ResourceType::class, [
-                    'resource' => 'ekyna_commerce.tax_group',
-                    'position' => 240,
-                ])
-                ->addFilter('tags', ResourceType::class, [
-                    'resource' => 'ekyna_cms.tag',
-                    'position' => 998,
-                ]);
+        if ($variantMode) {
+            return;
         }
+
+        $builder
+            ->addFilter('type', ConstantChoiceType::class, [
+                'label'    => t('field.type', [], 'EkynaUi'),
+                'class'    => ProductTypes::class,
+                'filter'   => [ProductTypes::TYPE_VARIANT],
+                'position' => 10,
+            ])
+            ->addFilter('designation', CType\Filter\TextType::class, [
+                'label'    => t('field.designation', [], 'EkynaUi'),
+                'position' => 20,
+            ])
+            ->addFilter('visible', CType\Filter\BooleanType::class, [
+                'label'    => t('field.visible', [], 'EkynaUi'),
+                'position' => 30,
+            ])
+            ->addFilter('reference', PType\Filter\ProductReferenceType::class, [
+                'label'    => t('field.reference', [], 'EkynaUi'),
+                'position' => 40,
+            ])
+            ->addFilter('netPrice', CType\Filter\NumberType::class, [
+                'label'    => t('field.net_price', [], 'EkynaCommerce'),
+                'position' => 50,
+            ])
+            ->addFilter('weight', CType\Filter\NumberType::class, [
+                'label'    => t('field.weight', [], 'EkynaUi'),
+                'position' => 60,
+            ])
+            ->addFilter('stockMode', ConstantChoiceType::class, [
+                'label'    => t('stock_subject.field.mode', [], 'EkynaCommerce'),
+                'class'    => StockSubjectModes::class,
+                'position' => 70,
+            ])
+            ->addFilter('stockState', ConstantChoiceType::class, [
+                'label'    => t('stock_subject.field.state', [], 'EkynaCommerce'),
+                'class'    => StockSubjectStates::class,
+                'position' => 80,
+            ])
+            ->addFilter('physical', CType\Filter\BooleanType::class, [
+                'label'    => t('field.physical', [], 'EkynaCommerce'),
+                'position' => 90,
+            ])
+            ->addFilter('quoteOnly', CType\Filter\BooleanType::class, [
+                'label'    => t('stock_subject.field.quote_only', [], 'EkynaCommerce'),
+                'position' => 95,
+            ])
+            ->addFilter('endOfLife', CType\Filter\BooleanType::class, [
+                'label'    => t('stock_subject.field.end_of_life', [], 'EkynaCommerce'),
+                'position' => 100,
+            ])
+            ->addFilter('categories', ResourceType::class, [
+                'resource' => 'ekyna_product.category',
+                'position' => 200,
+            ])
+            ->addFilter('brand', ResourceType::class, [
+                'resource' => 'ekyna_product.brand',
+                'position' => 210,
+            ])
+            ->addFilter('pricingGroup', ResourceType::class, [
+                'resource' => 'ekyna_product.pricing_group',
+                'position' => 220,
+            ])
+            ->addFilter('attributeSet', ResourceType::class, [
+                'resource' => 'ekyna_product.attribute_set',
+                'position' => 230,
+            ])
+            ->addFilter('taxGroup', ResourceType::class, [
+                'resource' => 'ekyna_commerce.tax_group',
+                'position' => 240,
+            ])
+            ->addFilter('tags', ResourceType::class, [
+                'resource' => 'ekyna_cms.tag',
+                'position' => 998,
+            ]);
+
+
+        $this->addProfiles($builder);
+    }
+
+    private function addProfiles(TableBuilderInterface $builder): void
+    {
+        // Default
+        $context = new Context();
+        $context->setVisibleColumns(
+            [
+                'type',
+                'designation',
+                'visible',
+                'reference',
+                'net_price',
+                'categories',
+                'brand',
+                'tags',
+                'actions',
+            ]
+        );
+
+        /*$filter = (new ActiveFilter('paidTotal_0', 'paidTotal'));
+        $filter->setOperator(FilterOperator::EQUAL);
+        $filter->setValue(0);
+        $context->addActiveFilter($filter);
+
+        $filter = (new ActiveFilter('dueDate_1', 'dueDate'));
+        $filter->setOperator(FilterOperator::LOWER_THAN_OR_EQUAL);
+        $filter->setValue(new DateTime());
+        $context->addActiveFilter($filter);*/
+
+        $builder->addProfile(Profile::create('default', 'Par défaut', $context));
+
+        // Stock
+        $context = new Context();
+        $context->setVisibleColumns(
+            [
+                'type',
+                'designation',
+                'reference',
+                'stockMode',
+                'stockState',
+                'weight',
+                'hsCode',
+                'ean13',
+                'actions',
+            ]
+        );
+
+        /*$filter = (new ActiveFilter('paidTotal_0', 'paidTotal'));
+        $filter->setOperator(FilterOperator::EQUAL);
+        $filter->setValue(0);
+        $context->addActiveFilter($filter);
+
+        $filter = (new ActiveFilter('dueDate_1', 'dueDate'));
+        $filter->setOperator(FilterOperator::LOWER_THAN_OR_EQUAL);
+        $filter->setValue(new DateTime());
+        $context->addActiveFilter($filter);*/
+
+        $builder->addProfile(Profile::create('stock', 'Stock', $context));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -296,7 +376,7 @@ class ProductType extends AbstractResourceType
 
                 $value->setQueryBuilderInitializer(function (QueryBuilder $qb, string $alias): void {
                     $qb
-                        ->andWhere($alias.'.type != :type')
+                        ->andWhere($alias . '.type != :type')
                         ->setParameter('type', ProductTypes::TYPE_VARIANT);
                 });
 
