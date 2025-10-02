@@ -379,6 +379,14 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('twig.runtime');
 
+    // Stat helper
+    $services
+        ->set('ekyna_product.helper.stat', Stat\StatHelper::class)
+        ->args([
+            service('ekyna_product.repository.stat_count'),
+        ])
+        ->tag('twig.runtime');
+
     // Highlight
     $services
         ->set('ekyna_product.highlight', Highlight::class)

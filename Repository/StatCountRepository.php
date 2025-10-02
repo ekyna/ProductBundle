@@ -35,6 +35,25 @@ class StatCountRepository extends AbstractStatRepository
         parent::__construct($registry, StatCount::class);
     }
 
+    public function findAnnualStatsByProduct(Product $product, string $source = StatCount::SOURCE_ORDER): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        $result = $qb
+            ->select(['YEAR(CONCAT(c.date, \'-01\')) as year', 'SUM(c.count) as count'])
+            ->andWhere('c.product = :product')
+            ->andWhere('c.source = :source')
+            ->addGroupBy('year')
+            ->getQuery()
+            ->setParameters([
+                'product' => $product,
+                'source'  => $source,
+            ])
+            ->getScalarResult();
+
+        return $result;
+    }
+
     /**
      * Finds one stat count.
      */

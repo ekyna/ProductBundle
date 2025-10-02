@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Twig;
 
 use Ekyna\Bundle\ProductBundle\Service\Stat\ChartRenderer;
+use Ekyna\Bundle\ProductBundle\Service\Stat\StatHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -27,6 +28,10 @@ class StatExtension extends AbstractExtension
                 'product_stat_cross_chart',
                 [ChartRenderer::class, 'renderProductCrossChart'],
                 ['is_safe' => ['html']]
+            ),
+            new TwigFunction(
+                'product_annual_sales_stats',
+                [StatHelper::class, 'getAnnualSalesStatCount']
             ),
         ];
     }
