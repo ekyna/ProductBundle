@@ -407,7 +407,7 @@ resources:
                     list: false
                     read: false
                 Ekyna\Bundle\CommerceBundle\Action\Admin\Attachment\ArchiveAction: ~
-                Ekyna\Bundle\CommerceBundle\Action\Admin\Attachment\DownloadAction: ~
+                Ekyna\Bundle\ProductBundle\Action\Admin\DownloadAction: ~
 
         product_attribute:
             driver: doctrine/orm

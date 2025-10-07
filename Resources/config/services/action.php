@@ -6,6 +6,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\ProductBundle\Action\Admin\Attribute;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Catalog;
+use Ekyna\Bundle\ProductBundle\Action\Admin\DownloadAction;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Inventory;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction;
@@ -48,6 +49,14 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.action.admin.catalog.render_from_sale', Catalog\RenderFromSaleAction::class)
         ->parent('ekyna_product.action.admin.catalog.abstract_render')
+        ->tag('ekyna_resource.action');
+
+    // Download actions
+    $services
+        ->set('ekyna_product.action.download', DownloadAction::class)
+        ->args([
+            service('ekyna_product.filesystem'),
+        ])
         ->tag('ekyna_resource.action');
 
     // Inventory actions
