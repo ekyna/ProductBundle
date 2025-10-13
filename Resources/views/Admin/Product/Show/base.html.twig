@@ -124,7 +124,8 @@
                         {{ 'attachment.label.plural'|trans({}, 'EkynaCommerce') }}
                     </h4>
                     {% include '@EkynaProduct/Admin/Product/Show/_attachments.html.twig' with {
-                        'attachments': product.attachments
+                        'attachments': product.attachments,
+                        'download_action': 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\DownloadAction'
                     } only %}
                     <hr>
                     <div class="row">
