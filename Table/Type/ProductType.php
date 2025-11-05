@@ -15,6 +15,8 @@ use Ekyna\Bundle\CommerceBundle\Model\StockSubjectStates;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectModeType;
 use Ekyna\Bundle\CommerceBundle\Table\Column\StockSubjectStateType;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Table as PType;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
@@ -46,15 +48,10 @@ use function Symfony\Component\Translation\t;
  */
 class ProductType extends AbstractResourceType
 {
-    protected ResourceHelper        $resourceHelper;
-    protected UrlGeneratorInterface $urlGenerator;
-
     public function __construct(
-        ResourceHelper        $resourceHelper,
-        UrlGeneratorInterface $urlGenerator
+        protected readonly ResourceHelper        $resourceHelper,
+        protected readonly UrlGeneratorInterface $urlGenerator
     ) {
-        $this->resourceHelper = $resourceHelper;
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function buildTable(TableBuilderInterface $builder, array $options): void
@@ -87,6 +84,7 @@ class ProductType extends AbstractResourceType
             ->addColumn('visible', CType\Column\BooleanType::class, [
                 'label'    => t('field.visible', [], 'EkynaUi'),
                 'property' => 'visible',
+                'disabled' => !$this->resourceHelper->isGranted(Permission::VISIBILITY, ProductInterface::class),
                 'position' => 30,
             ])
             ->addColumn('reference', CType\Column\TextType::class, [

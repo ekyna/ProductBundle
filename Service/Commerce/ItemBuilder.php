@@ -183,6 +183,7 @@ class ItemBuilder
         $item->setReference($product->getReference());
         $item->setNetPrice(clone $product->getNetPrice());
         $item->setWeight(clone $product->getPackageWeight());
+        $item->setUnit($product->getUnit());
         $item->setPhysical($product->isPhysical());
         $item->setTaxGroup($product->getTaxGroup());
         $item->setCompound(false);
@@ -599,7 +600,7 @@ class ItemBuilder
         $item
             ->setDatum(self::OPTION_GROUP_ID, $option->getGroup()->getId())
             ->setDatum(self::OPTION_ID, $option->getId())
-            ->setQuantity(new Decimal(1))
+            ->setQuantity(new Decimal(1)) // TODO Manage quantity
             ->setImmutable(true)
             ->setPrivate(false)
             ->setConfigurable(false);

@@ -8,6 +8,7 @@ use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
 use Ekyna\Bundle\ProductBundle\Exception\ProductExceptionInterface;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
 use Ekyna\Bundle\ProductBundle\Service\Generator\ExternalReferenceGenerator;
@@ -16,7 +17,6 @@ use Ekyna\Bundle\ResourceBundle\Action\HelperTrait;
 use Ekyna\Bundle\ResourceBundle\Action\ManagerTrait;
 use Ekyna\Bundle\ResourceBundle\Action\RoutingActionInterface;
 use Ekyna\Bundle\UiBundle\Action\FlashTrait;
-use Ekyna\Component\Resource\Action\Permission;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
@@ -72,7 +72,7 @@ class GenerateReferenceAction extends AbstractAction implements AdminActionInter
     {
         return [
             'name'       => 'product_product_generate_reference',
-            'permission' => Permission::UPDATE,
+            'permission' => Permission::GENERATE_EXTERNAL_REFERENCE,
             'route'      => [
                 'name'    => 'admin_%s_generate_reference',
                 'path'    => '/generate-reference/{type}',

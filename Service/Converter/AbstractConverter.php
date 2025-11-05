@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Ekyna\Bundle\AdminBundle\Action\ReadAction;
 use Ekyna\Bundle\ProductBundle\Event\ConvertEvent;
 use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
 use Ekyna\Bundle\ProductBundle\Factory\ProductFactoryInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\OfferInvalidator;
+use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
+use Ekyna\Bundle\UiBundle\Form\Type\FormActionsType;
 use Ekyna\Component\Resource\Dispatcher\ResourceEventDispatcherInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Manager\ResourceManagerInterface;
+use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,6 +29,7 @@ use function array_map;
 use function implode;
 use function iterator_to_array;
 use function sprintf;
+use function Symfony\Component\Translation\t;
 
 /**
  * Class AbstractConverter
@@ -45,6 +50,7 @@ abstract class AbstractConverter implements ConverterInterface
         protected readonly EntityManagerInterface           $entityManager,
         protected readonly FormFactoryInterface             $formFactory,
         protected readonly RequestStack                     $requestStack,
+        protected readonly ResourceHelper                   $resourceHelper,
         protected readonly ValidatorInterface               $validator,
         protected readonly ResourceEventDispatcherInterface $eventDispatcher,
         protected readonly OfferInvalidator                 $offerInvalidator
@@ -85,7 +91,7 @@ abstract class AbstractConverter implements ConverterInterface
 
             $this->dispatch(ConvertEvent::FORM_DATA);
 
-            $this->form = $this->buildForm();
+            $this->form = $this->createForm();
 
             $this->form->handleRequest($this->requestStack->getMainRequest());
 
@@ -108,7 +114,7 @@ abstract class AbstractConverter implements ConverterInterface
 
                 $this->event->setSuccess(true);
             }
-        } catch (ConvertException) {
+        } catch (ConvertException $e) {
             $this->onError();
         }
 
@@ -121,6 +127,39 @@ abstract class AbstractConverter implements ConverterInterface
      * Initializes the conversion.
      */
     abstract protected function init(): ProductInterface;
+
+    private function createForm(): FormInterface
+    {
+        $form = $this->buildForm();
+
+        $form->add('actions', FormActionsType::class, [
+            'buttons' => [
+                'save' => [
+                    'type'    => Type\SubmitType::class,
+                    'options' => [
+                        'button_class' => 'primary',
+                        'label'        => t('button.save', [], 'EkynaUi'),
+                        'attr'         => ['icon' => 'ok'],
+                    ],
+                ],
+                'cancel' => [
+                    'type'    => Type\ButtonType::class,
+                    'options' => [
+                        'label'        => t('button.cancel', [], 'EkynaUi'),
+                        'button_class' => 'default',
+                        'as_link'      => true,
+                        'attr'         => [
+                            'class' => 'form-cancel-btn',
+                            'icon'  => 'remove',
+                            'href'  => $this->resourceHelper->generateResourcePath($this->source, ReadAction::class),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        return $form;
+    }
 
     /**
      * Builds the target form.

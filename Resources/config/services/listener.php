@@ -375,6 +375,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('ekyna_product.repository.product'),
             service('ekyna_product.repository.catalog'),
+            service('ekyna_commerce.repository.bill_of_materials'),
             service('ekyna_resource.queue.message'),
             service('ekyna_resource.helper'),
             service('translator'),

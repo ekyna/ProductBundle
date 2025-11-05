@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function Symfony\Component\Translation\t;
+
 /**
  * Class ProductAttributeType
  * @package Ekyna\Bundle\ProductBundle\Form\Type
@@ -71,6 +73,7 @@ class ProductAttributesType extends AbstractType
     {
         $resolver
             ->setDefaults([
+                'label'         => t('attribute.label.plural', [], 'EkynaProduct'),
                 'attribute_set' => null,
                 'required'      => function (Options $options) {
                     /** @var Model\AttributeSetInterface $set */

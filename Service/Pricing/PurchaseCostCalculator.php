@@ -130,7 +130,7 @@ class PurchaseCostCalculator
                 continue;
             }
 
-            $cost->add($this->calculateMinPurchaseCost($optionProduct, true));
+            $cost = $cost->add($this->calculateMinPurchaseCost($optionProduct, true));
         }
 
         return $this->optionsCache[$key] = $cost;
@@ -150,9 +150,9 @@ class PurchaseCostCalculator
         foreach ($product->getComponents() as $component) {
             $cost = $this->costGuesser->guess($component->getChild());
 
-            $cost->multiply($component->getQuantity()); // TODO Use packaging format
+            $cost = $cost->multiply($component->getQuantity()); // TODO Use packaging format
 
-            $total->add($cost);
+            $total = $total->add($cost);
         }
 
         return $total;
@@ -172,11 +172,9 @@ class PurchaseCostCalculator
 
         $cost = $this->costGuesser->guess($product) ?: new Cost();
 
-        $cost->add($this->calculateMinOptionsPurchaseCost($product, $exclude));
+        $cost = $cost->add($this->calculateMinOptionsPurchaseCost($product, $exclude));
 
-        $cost->add($this->calculateComponentsPurchaseCost($product));
-
-        return $cost;
+        return $cost->add($this->calculateComponentsPurchaseCost($product));
     }
 
     /**
@@ -211,11 +209,9 @@ class PurchaseCostCalculator
             return $cost;
         }
 
-        $cost->add($this->calculateProductPurchaseCost($lowestVariant, $exclude));
+        $cost = $cost->add($this->calculateProductPurchaseCost($lowestVariant, $exclude));
 
-        $cost->add($this->calculateComponentsPurchaseCost($variable));
-
-        return $cost;
+        return $cost->add($this->calculateComponentsPurchaseCost($variable));
     }
 
     /**
@@ -235,14 +231,12 @@ class PurchaseCostCalculator
             /** @var BundleChoiceInterface $choice */
             $choice = $slot->getChoices()->first();
 
-            $this->addBundleChoiceCost($total, $choice, $exclude);
+            $total = $total->add($this->calculateBundleChoiceCost($choice, $exclude));
         }
 
-        $total->add($this->calculateMinOptionsPurchaseCost($bundle, $exclude));
+        $total = $total->add($this->calculateMinOptionsPurchaseCost($bundle, $exclude));
 
-        $total->add($this->calculateComponentsPurchaseCost($bundle));
-
-        return $total;
+        return $total->add($this->calculateComponentsPurchaseCost($bundle));
     }
 
     /**
@@ -306,23 +300,20 @@ class PurchaseCostCalculator
                 continue;
             }
 
-            $this->addBundleChoiceCost($total, $lowestChoice, $exclude);
+            $total = $total->add($this->calculateBundleChoiceCost($lowestChoice, $exclude));
         }
 
-        $total->add($this->calculateMinOptionsPurchaseCost($configurable, $exclude));
+        $total = $total->add($this->calculateMinOptionsPurchaseCost($configurable, $exclude));
 
-        $total->add($this->calculateComponentsPurchaseCost($configurable));
-
-        return $total;
+        return $total->add($this->calculateComponentsPurchaseCost($configurable));
     }
 
     /**
-     * @param Cost                  $total
      * @param BundleChoiceInterface $choice
      * @param bool|array            $exclude
-     * @return void
+     * @return Cost
      */
-    private function addBundleChoiceCost(Cost $total, BundleChoiceInterface $choice, bool|array $exclude): void
+    private function calculateBundleChoiceCost(BundleChoiceInterface $choice, bool|array $exclude): Cost
     {
         if (true !== $exclude) {
             $exclude = array_unique(array_merge(
@@ -333,8 +324,6 @@ class PurchaseCostCalculator
 
         $cost = $this->calculateMinPurchaseCost($choice->getProduct(), $exclude);
 
-        $cost->multiply($choice->getMinQuantity()); // TODO Use packaging format
-
-        $total->add($cost);
+        return $cost->multiply($choice->getMinQuantity()); // TODO Use packaging format
     }
 }

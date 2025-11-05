@@ -232,8 +232,11 @@
             {%- block suppliers_pane -%}
             <div class="tab-pane" id="{{ resource_name }}-suppliers">
                 {% block suppliers_content -%}
+                <h4 class="sub-header">
+                    {{ 'supplier_product.label.plural'|trans({}, 'EkynaCommerce') }}
+                </h4>
                 {% set form = (product|subject_create_supplier_product_form).createView() %}
-                <div style="text-align: right">
+                <div style="text-align:right; margin-bottom:20px;">
                     {{ bootstrap_set_sizing('sm') }}
                     {{ form_start(form, { 'style': 'inline' }) }}
                     {{ form_row(form.supplier) }}
@@ -241,8 +244,13 @@
                     {{ form_end(form) }}
                     {{ bootstrap_set_sizing('md') }}
                 </div>
-                <hr>
                 {{ ekyna_table_render(admin_resource_table('ekyna_commerce.supplier_product', {
+                    'subject': product
+                })) }}
+                <h4 class="sub-header" style="margin-top:50px;">
+                    {{ 'bill_of_materials.label.plural'|trans({}, 'EkynaCommerce') }}
+                </h4>
+                {{ ekyna_table_render(admin_resource_table('ekyna_commerce.bill_of_materials', {
                     'subject': product
                 })) }}
                 {%- endblock suppliers_content %}

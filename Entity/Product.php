@@ -473,7 +473,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         return $this->brand;
     }
 
-    public function setBrand(Model\BrandInterface $brand): Model\ProductInterface
+    public function setBrand(?Model\BrandInterface $brand): Model\ProductInterface
     {
         $this->brand = $brand;
 

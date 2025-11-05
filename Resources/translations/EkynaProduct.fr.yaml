@@ -353,6 +353,9 @@ option_group:
 permission:
     change_reference: Changer référence
     sync_reference: Synchroniser référence
+    generate_external_reference: Générer référence externe
+    change_type: Changer le type
+    visibility: Visibilité
 
 price:
     label:
@@ -536,7 +539,10 @@ product:
             associations entre ce produit et les autres.
         catalog_prevents_deletion: >
             Ce produit est lié au catalogue <a href="{url}">{title}</a> et ne peut être supprimé.
-            Modifiez le catalogue afin de pouvoir supprimer ce produit.
+            Modifiez ou supprimez ce catalogue afin de pouvoir supprimer ce produit.
+        bom_prevents_deletion: >
+            Ce produit est lié à la nomenclature <a href="{url}">{title}</a> et ne peut être supprimé.
+            Modifiez ou supprimez cette nomenclature afin de pouvoir supprimer ce produit.
         delete_warning: >
             Attention, cette opération n'est pas réversible.<br>
             Toutes les <strong>données de stock</strong> seront <strong>définitivement perdues</strong>.<br>

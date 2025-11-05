@@ -6,6 +6,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Ekyna\Bundle\ProductBundle\Command\BundleFixReleasedAtCommand;
 use Ekyna\Bundle\ProductBundle\Command\ClearPastEDACommand;
+use Ekyna\Bundle\ProductBundle\Command\ConvertBundleIntoBOMCommand;
 use Ekyna\Bundle\ProductBundle\Command\InventoryApplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferInvalidateCommand;
 use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
@@ -41,6 +42,22 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.repository.product'),
             service('ekyna_commerce.updater.stock_subject'),
             service('ekyna_product.manager.product'),
+        ])
+        ->tag('console.command');
+
+    // Convert Bundle into BOM command
+    $services
+        ->set('ekyna_product.command.convert_bundle_into_bom', ConvertBundleIntoBOMCommand::class)
+        ->args([
+            service('ekyna_resource.repository.factory'),
+            service('ekyna_resource.manager.factory'),
+            service('ekyna_resource.factory.factory'),
+            service('ekyna_commerce.helper.subject'),
+            service('ekyna_commerce.updater.stock_subject'),
+            service('ekyna_resource.copier'),
+            service('ekyna_product.invalidator.offer'),
+            service('validator'),
+            service('ekyna_resource.helper'),
         ])
         ->tag('console.command');
 

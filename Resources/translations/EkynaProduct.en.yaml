@@ -351,6 +351,9 @@ option_group:
 permission:
     change_reference: Change reference
     sync_reference: Synchronize reference
+    generate_external_reference: Generate external reference
+    change_type: Change type
+    visibility: Visibility
 
 price:
     label:
@@ -533,7 +536,10 @@ product:
             product and others.
         catalog_prevents_deletion: >
             This product is shown in the catalog <a href="{url}">{title}</a> and
-            therefore cannot be deleted. Edit this catalog before you van delete this product.
+            therefore cannot be deleted. Edit this catalog before you can delete this product.
+        bom_prevents_deletion: >
+            This product is used in the bill of materials <a href="{url}">{title}</a> and
+            therefore cannot be deleted. Edit or delete this bill of materials before you can delete this product.
         delete_warning: >
             Warning, this operation cannot be reverted.<br>
             All <strong>stock data</strong> will be <strong>definitively lost</strong>.<br>

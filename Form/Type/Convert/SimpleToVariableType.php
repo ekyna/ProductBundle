@@ -8,10 +8,8 @@ use Ekyna\Bundle\ProductBundle\Form\Type\Attribute\AttributeSetChoiceType;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
-use Ekyna\Bundle\UiBundle\Form\Type\FormActionsType;
 use Ekyna\Component\Resource\Repository\ResourceRepositoryInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -26,13 +24,12 @@ use function Symfony\Component\Translation\t;
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class VariableType extends AbstractType
+class SimpleToVariableType extends AbstractType
 {
-    private ResourceRepositoryInterface $attributeSetRepository;
+    public function __construct(
+        private readonly ResourceRepositoryInterface $attributeSetRepository
+    ) {
 
-    public function __construct(ResourceRepositoryInterface $attributeSetRepository)
-    {
-        $this->attributeSetRepository = $attributeSetRepository;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -42,18 +39,6 @@ class VariableType extends AbstractType
                 'allow_new' => true,
                 'attr'      => [
                     'class' => 'product-attribute-set',
-                ],
-            ])
-            ->add('actions', FormActionsType::class, [
-                'buttons' => [
-                    'save' => [
-                        'type'    => Type\SubmitType::class,
-                        'options' => [
-                            'button_class' => 'primary',
-                            'label'        => t('button.save', [], 'EkynaUi'),
-                            'attr'         => ['icon' => 'ok'],
-                        ],
-                    ],
                 ],
             ]);
 

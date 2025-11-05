@@ -6,7 +6,6 @@ namespace Ekyna\Bundle\ProductBundle\Form\Type\Convert;
 
 use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
-use Ekyna\Bundle\UiBundle\Form\Type\FormActionsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -35,18 +34,6 @@ class BundleToSimpleType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new Constraints\IsTrue(),
-                ],
-            ])
-            ->add('actions', FormActionsType::class, [
-                'buttons' => [
-                    'save' => [
-                        'type'    => Type\SubmitType::class,
-                        'options' => [
-                            'button_class' => 'primary',
-                            'label'        => t('button.save', [], 'EkynaUi'),
-                            'attr'         => ['icon' => 'ok'],
-                        ],
-                    ],
                 ],
             ]);
 

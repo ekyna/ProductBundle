@@ -95,6 +95,7 @@ class ProductTranslation extends AbstractTranslation implements ProductTranslati
     public function clear(): ProductTranslationInterface
     {
         $this->title = null;
+        $this->subTitle = null;
         $this->attributesTitle = null;
         $this->description = null;
         $this->slug = null;

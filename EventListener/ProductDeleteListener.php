@@ -11,6 +11,9 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\CatalogRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Repository\ProductRepositoryInterface;
 use Ekyna\Bundle\ResourceBundle\Helper\ResourceHelper;
+use Ekyna\Component\Commerce\Manufacture\Model\BillOfMaterialsInterface;
+use Ekyna\Component\Commerce\Manufacture\Repository\BillOfMaterialsRepositoryInterface;
+use Ekyna\Component\Commerce\Subject\Entity\SubjectIdentity;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Ekyna\Component\Resource\Event\ResourceMessage;
 use Ekyna\Component\Resource\Message\MessageQueueInterface;
@@ -24,11 +27,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProductDeleteListener
 {
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly CatalogRepositoryInterface $catalogRepository,
-        private readonly MessageQueueInterface      $messageQueue,
-        private readonly ResourceHelper             $resourceHelper,
-        private readonly TranslatorInterface        $translator,
+        private readonly ProductRepositoryInterface         $productRepository,
+        private readonly CatalogRepositoryInterface         $catalogRepository,
+        private readonly BillOfMaterialsRepositoryInterface $bomRepository,
+        private readonly MessageQueueInterface              $messageQueue,
+        private readonly ResourceHelper                     $resourceHelper,
+        private readonly TranslatorInterface                $translator,
     ) {
     }
 
@@ -64,7 +68,7 @@ class ProductDeleteListener
         $catalogs = $this->catalogRepository->findByProduct($product, 1);
         if (!empty($catalogs)) {
             $catalog = $catalogs[0];
-            $message = ResourceMessage::create('product.message.relation_prevents_deletion', ResourceMessage::TYPE_ERROR)
+            $message = ResourceMessage::create('product.message.catalog_prevents_deletion', ResourceMessage::TYPE_ERROR)
                 ->setParameters([
                     '{url}'   => $this->resourceHelper->generateResourcePath($catalog, ReadAction::class),
                     '{title}' => $catalog->getTitle(),
@@ -72,6 +76,36 @@ class ProductDeleteListener
                 ->setDomain('EkynaProduct');
 
             $event->addMessage($message);
+        }
+
+        $this->checkBillOfMaterials($event);
+    }
+
+    private function checkBillOfMaterials(ResourceEventInterface $event): void
+    {
+        $product = $this->getProductFromEvent($event);
+
+        $identity = SubjectIdentity::fromSubject($product);
+
+        $buildMessage = fn(BillOfMaterialsInterface $bom): ResourceMessage
+            => ResourceMessage::create(
+                'product.message.bom_prevents_deletion',
+                ResourceMessage::TYPE_ERROR
+            )
+            ->setParameters([
+                '{url}'   => $this->resourceHelper->generateResourcePath($bom, ReadAction::class),
+                '{title}' => (string)$bom,
+            ])
+            ->setDomain('EkynaProduct');
+
+        $boms = $this->bomRepository->findBySubject($identity);
+        if (!empty($boms)) {
+            $event->addMessage($buildMessage($boms[0]));
+        }
+
+        $boms = $this->bomRepository->findByComponentWithSubject($identity);
+        if (!empty($boms)) {
+            $event->addMessage($buildMessage($boms[0]));
         }
     }
 

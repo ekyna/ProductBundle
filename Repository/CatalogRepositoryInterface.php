@@ -28,5 +28,5 @@ interface CatalogRepositoryInterface extends ResourceRepositoryInterface
     /**
      * @return iterable<CatalogInterface>
      */
-    public function findByProduct(ProductInterface $product): iterable;
+    public function findByProduct(ProductInterface $product, int $limit = null): iterable;
 }

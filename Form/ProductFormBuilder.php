@@ -14,10 +14,10 @@ use Ekyna\Bundle\MediaBundle\Model\MediaTypes;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMention;
 use Ekyna\Bundle\ProductBundle\Entity\ProductMentionTranslation;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
-use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
 use Ekyna\Bundle\ProductBundle\Form\Type as PR;
 use Ekyna\Bundle\ProductBundle\Model\AttributeSetInterface;
 use Ekyna\Bundle\ProductBundle\Model\HighlightModes;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Ekyna\Bundle\ProductBundle\Model\PricingGroupInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -29,6 +29,7 @@ use Ekyna\Bundle\UiBundle\Form\Type\TinymceType;
 use Symfony\Component\Form\Extension\Core\Type as SF;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use function array_replace;
 use function in_array;
@@ -41,40 +42,26 @@ use function Symfony\Component\Translation\t;
  */
 class ProductFormBuilder
 {
-    private Features $features;
-    private string   $mediaClass;
+    private ?ProductInterface                       $product = null;
+    private FormInterface|FormBuilderInterface|null $form = null;
 
-    private ?ProductInterface $product = null;
-    /** @var FormInterface|FormBuilderInterface */
-    private $form = null;
+    public function __construct(
+        protected readonly Features                      $features,
+        protected readonly AuthorizationCheckerInterface $authorizationChecker,
+        protected readonly string                        $mediaClass
+    ) {
 
-    public function __construct(Features $features, string $mediaClass)
-    {
-        $this->features = $features;
-        $this->mediaClass = $mediaClass;
     }
 
-    /**
-     * Initializes the builder.
-     *
-     * @param FormInterface|FormBuilderInterface $form
-     */
-    public function initialize(ProductInterface $product, $form): ProductFormBuilder
+    public function initialize(ProductInterface $product, FormInterface|FormBuilderInterface $form): ProductFormBuilder
     {
-        if (!($form instanceof FormInterface || $form instanceof FormBuilderInterface)) {
-            throw new UnexpectedTypeException($form, [FormInterface::class, FormBuilderInterface::class]);
-        }
-
         $this->product = $product;
         $this->form = $form;
 
         return $this;
     }
 
-    /**
-     * @return FormInterface|FormBuilderInterface
-     */
-    protected function getForm()
+    protected function getForm(): FormInterface|FormBuilderInterface
     {
         return $this->form;
     }
@@ -123,7 +110,6 @@ class ProductFormBuilder
         ProductTypes::assertChildType($this->product);
 
         $options = array_replace([
-            'label'         => t('attribute.label.plural', [], 'EkynaProduct'),
             'attribute_set' => $attributeSet,
         ], $options);
 
@@ -493,12 +479,13 @@ class ProductFormBuilder
         ProductTypes::assertVariant($this->product);
 
         $options = array_replace([
+            'label'         => t('product.field.parent', [], 'EkynaProduct'),
             'property_path' => 'parent',
             'types'         => [ProductTypes::TYPE_VARIABLE],
             'disabled'      => true,
         ], $options);
 
-        $this->form->add('variable', PR\ProductChoiceType::class, $options);
+        $this->form->add('variable', PR\ProductSearchType::class, $options);
 
         return $this;
     }
@@ -510,6 +497,7 @@ class ProductFormBuilder
     {
         $options = array_replace([
             'label'    => t('field.visible', [], 'EkynaUi'),
+            'disabled' => !$this->authorizationChecker->isGranted(Permission::VISIBILITY, ProductInterface::class),
             'required' => false,
             'attr'     => [
                 'align_with_widget' => true,

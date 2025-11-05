@@ -1,4 +1,5 @@
 {%- macro new_product_button() -%}
+{% if admin_resource_access('ekyna_product.product', 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\CreateAction') %}
 <div class="btn-group btn-group-sm">
     <a href="{{ admin_resource_path('ekyna_product.product', 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\CreateAction', {
         'type': product_create_types()|first
@@ -23,6 +24,7 @@
     {%- endfor %}
     </ul>
 </div>
+{% endif %}
 {%- endmacro new_product_button -%}
 
 
@@ -32,6 +34,7 @@
 
 
 {%- macro convert_product_button(product) -%}
+    {% if admin_resource_access(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ConvertAction') %}
     {%- set types = product_convert_types(product.type) -%}
     {%- if types is not empty -%}
     <div class="btn-group btn-group-sm">
@@ -53,6 +56,7 @@
         {%- endfor -%}
         </ul>
     </div>
+    {%- endif -%}
     {%- endif -%}
 {%- endmacro convert_product_button -%}
 

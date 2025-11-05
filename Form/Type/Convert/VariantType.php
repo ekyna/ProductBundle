@@ -12,8 +12,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use function Symfony\Component\Translation\t;
-
 /**
  * Class VariantType
  * @package Ekyna\Bundle\ProductBundle\Form\Type\Convert
@@ -24,7 +22,6 @@ class VariantType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('attributes', ProductAttributesType::class, [
-            'label'         => t('attribute_choice.label.plural', [], 'EkynaProduct'),
             'attribute_set' => $options['attribute_set'],
         ]);
     }

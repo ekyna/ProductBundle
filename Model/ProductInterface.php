@@ -199,7 +199,7 @@ interface ProductInterface extends
 
     public function getBrand(): ?BrandInterface;
 
-    public function setBrand(BrandInterface $brand): ProductInterface;
+    public function setBrand(?BrandInterface $brand): ProductInterface;
 
     public function getPricingGroup(): ?PricingGroupInterface;
 

@@ -66,10 +66,14 @@ class CreateAction extends BaseAction implements RoutingActionInterface
     protected function getFormOptions(): array
     {
         return array_replace(parent::getFormOptions(), [
-            'action' => $this->generateResourcePath('ekyna_product.product', self::class, array_replace(
-                $this->request->query->all(),
-                ['type' => $this->request->attributes->get('type')]
-            )),
+            'action' => $this->generateResourcePath(
+                'ekyna_product.product',
+                self::class,
+                array_replace(
+                    $this->request->query->all(),
+                    ['type' => $this->request->attributes->get('type')]
+                )
+            ),
         ]);
     }
 

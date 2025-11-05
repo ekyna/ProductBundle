@@ -12,6 +12,9 @@ use Ekyna\Component\Commerce\Stock\Updater\StockSubjectUpdaterInterface;
 use Ekyna\Component\Resource\Copier\CopierInterface;
 use Symfony\Component\Form\FormInterface;
 
+use function array_map;
+use function intval;
+
 /**
  * Class BundleToSimpleConverter
  * @package Ekyna\Bundle\ProductBundle\Service\Converter
@@ -73,7 +76,7 @@ class BundleToSimpleConverter extends AbstractConverter
                 /** @var BundleChoiceInterface $choice */
                 $choice = $slot->getChoices()->first();
                 $child = $choice->getProduct();
-                $excluded = $choice->getExcludedOptionGroups();
+                $excluded = array_map(fn($id) => intval($id), $choice->getExcludedOptionGroups());
 
                 foreach ($child->getOptionGroups() as $group) {
                     if (in_array($group->getId(), $excluded, true)) {

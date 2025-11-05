@@ -10,7 +10,8 @@ use Ekyna\Bundle\ProductBundle\Form\ProductFormBuilder;
 use Ekyna\Bundle\ProductBundle\Form\Type\Attribute;
 use Ekyna\Bundle\ProductBundle\Form\Type\Bundle;
 use Ekyna\Bundle\ProductBundle\Form\Type\Catalog;
-use Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Convert\SimpleToVariableType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Convert\SimpleToVariantType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Editor;
 use Ekyna\Bundle\ProductBundle\Form\Type\ExportConfigType;
 use Ekyna\Bundle\ProductBundle\Form\Type\Option;
@@ -28,6 +29,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.builder.product_form', ProductFormBuilder::class)
         ->args([
             service('ekyna_product.features'),
+            service('security.authorization_checker'),
             param('ekyna_product.class.product_media'),
         ]);
 
@@ -256,9 +258,16 @@ return static function (ContainerConfigurator $container) {
         ->tag('form.type');
 
     $services
-        ->set('ekyna_product.form_type.convert_variable', VariableType::class)
+        ->set('ekyna_product.form_type.convert_simple_to_variable', SimpleToVariableType::class)
         ->args([
             service('ekyna_product.repository.attribute_set'),
+        ])
+        ->tag('form.type');
+
+    $services
+        ->set('ekyna_product.form_type.convert_simple_to_variant', SimpleToVariantType::class)
+        ->args([
+            service('ekyna_product.repository.product'),
         ])
         ->tag('form.type');
 };

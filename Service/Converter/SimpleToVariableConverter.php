@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Converter;
 
 use Ekyna\Bundle\ProductBundle\Exception\ConvertException;
-use Ekyna\Bundle\ProductBundle\Form\Type\Convert\VariableType;
+use Ekyna\Bundle\ProductBundle\Form\Type\Convert\SimpleToVariableType;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
@@ -65,7 +65,7 @@ class SimpleToVariableConverter extends AbstractConverter
 
     protected function buildForm(): FormInterface
     {
-        return $this->formFactory->create(VariableType::class, $this->target);
+        return $this->formFactory->create(SimpleToVariableType::class, $this->target);
     }
 
     protected function onPreConvert(): void

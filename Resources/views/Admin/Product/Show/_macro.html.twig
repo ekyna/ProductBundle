@@ -1020,14 +1020,14 @@
                     {{- product.netPrice|format_currency(commerce_default_currency) -}}
                 </td>
                 {% if buttons -%}
-                <th id="{{ relationId ~ 'product_delete' }}">
+                <td id="{{ relationId ~ 'product_delete' }}">
                     {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {
                         'label': '', 'size': 'xs'
                     }) }}&nbsp;
                     {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {
                         'label': '', 'size': 'xs'
                     }) }}
-                </th>
+                </td>
                 {%- endif %}
             </tr>
         {%- endfor -%}
@@ -1058,14 +1058,14 @@
                     {%- endif %}
                 </td>
                 {% if buttons -%}
-                <th id="{{ catalogId ~ 'update' }}">
+                <td id="{{ catalogId ~ 'update' }}">
                     {{ admin_resource_btn(catalog, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {
                         'label': '', 'size': 'xs'
                     }) }}&nbsp;
                     {{ admin_resource_btn(catalog, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {
                         'label': '', 'size': 'xs'
                     }) }}
-                </th>
+                </td>
                 {%- endif %}
             </tr>
         {%- endfor -%}

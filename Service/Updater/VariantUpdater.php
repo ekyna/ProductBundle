@@ -80,11 +80,12 @@ class VariantUpdater
             $title = trim(implode(' ', $titles));
             // TODO truncate if length is greater than 255 ?
 
-            // If title is not blank or locale is the default one or a translation exists for this locale.
+            // If title is not blank and locale is the default one or a translation exists for this locale.
             if (
-                !empty($title)
-                || $locale === $this->localeProvider->getFallbackLocale()
-                || $variant->hasTranslationForLocale($locale)
+                !empty($title) && (
+                    $locale === $this->localeProvider->getFallbackLocale()
+                    || $variant->hasTranslationForLocale($locale)
+                )
             ) {
                 // Create variant translation
                 $vChanged = false;

@@ -70,7 +70,7 @@ class ProductFilter implements ProductFilterInterface
             // Not available if a required option group has no available choices
             foreach ($product->getOptionGroups() as $optionGroup) {
                 // SKip excluded option group
-                if (in_array($optionGroup->getId(), $exclude)) {
+                if (in_array($optionGroup->getId(), $exclude)) { // ! Comparing integers with strings !
                     continue;
                 }
 
@@ -164,7 +164,7 @@ class ProductFilter implements ProductFilterInterface
 
         $groups = [];
         foreach ($product->getOptionGroups() as $group) {
-            if (in_array($group->getId(), $exclude)) {
+            if (in_array($group->getId(), $exclude)) { // ! Comparing integers with strings !
                 continue;
             }
 

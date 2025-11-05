@@ -23,7 +23,7 @@ enum InventoryState: string implements LabelInterface, ColorInterface
 
     public function label(): TranslatableInterface
     {
-        return t('device.status.' . $this->value, [], 'App');
+        return t('inventory.status.' . $this->value, [], 'EkynaProduct');
     }
 
     public function color(): string

@@ -7,6 +7,7 @@ use Ekyna\Bundle\ProductBundle\Event\ProductStockUnitEvents;
 use Ekyna\Bundle\ProductBundle\Model\ProductStockUnitInterface;
 use Ekyna\Component\Commerce\Exception\InvalidArgumentException;
 use Ekyna\Component\Commerce\Stock\EventListener\AbstractStockUnitListener;
+use Ekyna\Component\Commerce\Stock\Model\StockUnitInterface;
 use Ekyna\Component\Resource\Event\ResourceEventInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -17,32 +18,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ProductStockUnitListener extends AbstractStockUnitListener implements EventSubscriberInterface
 {
-    /**
-     * @inheritDoc
-     */
-    protected function getStockUnitFromEvent(ResourceEventInterface $event)
+    protected function getStockUnitFromEvent(ResourceEventInterface $event): StockUnitInterface
     {
         $stockUnit = $event->getResource();
 
         if (!$stockUnit instanceof ProductStockUnitInterface) {
-            throw new InvalidArgumentException("Expected instance of ProductStockUnitInterface.");
+            throw new InvalidArgumentException('Expected instance of ProductStockUnitInterface.');
         }
 
         return $stockUnit;
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function getSubjectStockUnitChangeEventName()
+    protected function getSubjectStockUnitChangeEventName(): string
     {
         return ProductEvents::STOCK_UNIT_CHANGE;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ProductStockUnitEvents::INSERT => ['onInsert', 0],

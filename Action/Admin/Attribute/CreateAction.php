@@ -61,9 +61,9 @@ class CreateAction extends BaseAction implements RoutingActionInterface
             ]),
         );
 
-        return [
+        return array_replace(parent::getFormOptions(), [
             'action' => $action,
-        ];
+        ]);
     }
 
     public static function configureAction(): array

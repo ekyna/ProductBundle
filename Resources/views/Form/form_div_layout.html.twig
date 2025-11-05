@@ -546,7 +546,7 @@
     {%- if supplierOrder is not same as(null) -%}
     <tr id="supplier_order_{{ supplierOrder.id }}_details" class="supplier-order-details" style="display:none;">
         <td>&nbsp;</td>
-        <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Show/items.html.twig' %}</td>
+        <td colspan="5">{% include '@EkynaCommerce/Admin/SupplierOrder/Read/items.html.twig' %}</td>
     </tr>
     {%- endif -%}
 {%- endblock ekyna_product_inventory_resupply_order_widget -%}

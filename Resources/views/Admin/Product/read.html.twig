@@ -40,9 +40,7 @@
         <div class="actions">
             {{ macros.labels_product_button(product) }}
             {{ macros.convert_product_button(product) }}
-            {% if is_granted('ROLE_SUPER_ADMIN') %}
             {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ChangeReferenceAction') }}
-            {% endif %}
             {%- if product is simple_product -%}
                 {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\DuplicateAction') }}
             {%- endif -%}

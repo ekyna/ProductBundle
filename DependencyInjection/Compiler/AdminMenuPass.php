@@ -84,14 +84,14 @@ class AdminMenuPass implements CompilerPassInterface
                 'resource' => 'ekyna_product.product',
                 'position' => 90,
             ])
-            ->addEntry([
+            /*->addEntry([
                 'name'     => 'highlight',
                 'route'    => 'admin_ekyna_product_highlight_index',
                 'label'    => 'highlight.title',
                 'domain'   => 'EkynaProduct',
                 'resource' => 'ekyna_product.product',
                 'position' => 91,
-            ]);
+            ])*/;
 
         if (!$container->getParameter('ekyna_product.catalog_enabled')) {
             return;

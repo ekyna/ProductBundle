@@ -49,6 +49,8 @@ class HighlightController
 
     public function index(): Response
     {
+        return new Response('', Response::HTTP_NOT_FOUND);
+
         $this->menuBuilder->breadcrumbAppend([
             'name'         => 'ekyna_product_highlight',
             'label'        => 'highlight.title',
@@ -79,6 +81,8 @@ class HighlightController
 
     public function update(Request $request): Response
     {
+        return new Response('', Response::HTTP_NOT_FOUND);
+
         $productId = $request->attributes->getInt('productId');
         $property = $request->request->get('property');
         $value = $request->request->get('value');

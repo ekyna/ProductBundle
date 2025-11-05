@@ -7,6 +7,7 @@ namespace Ekyna\Bundle\ProductBundle\Action\Admin\Product;
 use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
 use Ekyna\Bundle\AdminBundle\Action\Util\BreadcrumbTrait;
 use Ekyna\Bundle\ProductBundle\Exception\UnexpectedTypeException;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter;
 use Ekyna\Bundle\ResourceBundle\Action\AbstractAction;
@@ -15,7 +16,6 @@ use Ekyna\Bundle\ResourceBundle\Action\RoutingActionInterface;
 use Ekyna\Bundle\ResourceBundle\Action\TemplatingTrait;
 use Ekyna\Bundle\UiBundle\Action\FlashTrait;
 use Ekyna\Bundle\UiBundle\Form\Util\FormUtil;
-use Ekyna\Component\Resource\Action\Permission;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
@@ -93,7 +93,7 @@ class ConvertAction extends AbstractAction implements AdminActionInterface, Rout
     {
         return [
             'name'       => 'product_product_convert',
-            'permission' => Permission::UPDATE,
+            'permission' => Permission::CHANGE_TYPE,
             'route'      => [
                 'name'     => 'admin_%s_convert',
                 'path'     => '/convert/{type}',

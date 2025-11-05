@@ -11,6 +11,15 @@ permissions:
     Ekyna\Bundle\ProductBundle\Model\Permission::SYNC_REFERENCE:
         label: permission.sync_reference
         trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::GENERATE_EXTERNAL_REFERENCE:
+        label: permission.generate_external_reference
+        trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::CHANGE_TYPE:
+        label: permission.change_type
+        trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::VISIBILITY:
+        label: permission.visibility
+        trans_domain: EkynaProduct
 
 resources:
     ekyna_product:
@@ -347,6 +356,8 @@ resources:
                 interface: Ekyna\Bundle\ProductBundle\Model\ProductTranslationInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\ProductTranslation
                 fields: [ title, subTitle, attributesTitle, description, slug ]
+            permissions:
+                - Ekyna\Bundle\ProductBundle\Model\Permission::VISIBILITY
             actions:
                 api_crud:
                     search:
@@ -359,6 +370,7 @@ resources:
                         expose: true
                 admin_toggle:
                     properties: visible
+                    # TODO permission: Permission::VISIBILITY
                 admin_tinymce: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\AdjustStockAction: ~
                 Ekyna\Bundle\ProductBundle\Action\Admin\Product\AttributesFormAction:

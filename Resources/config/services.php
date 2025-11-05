@@ -265,6 +265,7 @@ return static function (ContainerConfigurator $container) {
             service('doctrine.orm.default_entity_manager'),
             service('form.factory'),
             service('request_stack'),
+            service('ekyna_resource.helper'),
             service('validator'),
             service('ekyna_resource.event_dispatcher'),
             service('ekyna_product.invalidator.offer'),
@@ -274,6 +275,17 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.converter.product.simple_to_variable', Converter\SimpleToVariableConverter::class)
         ->parent('ekyna_product.converter.product.abstract')
+        ->tag(Converter\ConverterInterface::DI_TAG);
+
+    // Simple to variant product converter
+    $services
+        ->set('ekyna_product.converter.product.simple_to_variant', Converter\SimpleToVariantConverter::class)
+        ->parent('ekyna_product.converter.product.abstract')
+        ->call('setVariantUpdater', [
+            service('ekyna_resource.orm.persistence_helper'),
+            service('ekyna_resource.provider.locale'),
+            service('ekyna_product.registry.attribute_type'),
+        ])
         ->tag(Converter\ConverterInterface::DI_TAG);
 
     // Bundle to simple product converter
