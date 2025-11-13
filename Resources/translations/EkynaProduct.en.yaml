@@ -354,6 +354,8 @@ permission:
     generate_external_reference: Generate external reference
     change_type: Change type
     visibility: Visibility
+    stock_view: Vue stock
+    dashboard_export: Export (dashboard)
 
 price:
     label:

@@ -20,6 +20,12 @@ permissions:
     Ekyna\Bundle\ProductBundle\Model\Permission::VISIBILITY:
         label: permission.visibility
         trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::STOCK_VIEW:
+        label: permission.stock_view
+        trans_domain: EkynaProduct
+    Ekyna\Bundle\ProductBundle\Model\Permission::DASHBOARD_EXPORT:
+        label: permission.dashboard_export
+        trans_domain: EkynaProduct
 
 resources:
     ekyna_product:
@@ -358,6 +364,8 @@ resources:
                 fields: [ title, subTitle, attributesTitle, description, slug ]
             permissions:
                 - Ekyna\Bundle\ProductBundle\Model\Permission::VISIBILITY
+                - Ekyna\Bundle\ProductBundle\Model\Permission::STOCK_VIEW
+                - Ekyna\Bundle\ProductBundle\Model\Permission::DASHBOARD_EXPORT
             actions:
                 api_crud:
                     search:

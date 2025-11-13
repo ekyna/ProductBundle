@@ -16,6 +16,8 @@ final class Permission
     public const GENERATE_EXTERNAL_REFERENCE = 'generate_external_reference';
     public const CHANGE_TYPE                 = 'change_type';
     public const VISIBILITY                  = 'visibility';
+    public const STOCK_VIEW                  = 'stock_view';
+    public const DASHBOARD_EXPORT            = 'dashboard_export';
 
     private function __construct()
     {

@@ -448,5 +448,8 @@ return static function (ContainerConfigurator $container) {
     // Dashboard export widget
     $services
         ->set('ekyna_product.dashboard.export_widget', ExportWidget::class)
+        ->args([
+            service('security.authorization_checker'),
+        ])
         ->tag('ekyna_admin.dashboard_widget');
 };

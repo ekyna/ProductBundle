@@ -6,7 +6,10 @@ namespace Ekyna\Bundle\ProductBundle\Dashboard;
 
 use Ekyna\Bundle\AdminBundle\Dashboard\Widget\Type\AbstractWidgetType;
 use Ekyna\Bundle\AdminBundle\Dashboard\Widget\WidgetInterface;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
+use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment;
 
 /**
@@ -18,6 +21,12 @@ class ExportWidget extends AbstractWidgetType
 {
     public const NAME = 'product_export';
 
+    public function __construct(
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+    ) {
+
+    }
+
     public static function getName(): string
     {
         return self::NAME;
@@ -25,6 +34,10 @@ class ExportWidget extends AbstractWidgetType
 
     public function render(WidgetInterface $widget, Environment $twig): string
     {
+        if (!$this->authorizationChecker->isGranted(Permission::DASHBOARD_EXPORT, ProductInterface::class)) {
+            return '';
+        }
+
         return $twig->render('@EkynaProduct/Admin/Dashboard/widget_export.html.twig');
     }
 

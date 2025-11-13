@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\DependencyInjection\Compiler;
 
 use Ekyna\Bundle\AdminBundle\Service\Menu\PoolHelper;
+use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -77,12 +78,13 @@ class AdminMenuPass implements CompilerPassInterface
                 'position' => 73,
             ])
             ->addEntry([
-                'name'     => 'stock_view',
-                'route'    => 'admin_ekyna_product_stock_view_index',
-                'label'    => 'stock_view.title',
-                'domain'   => 'EkynaProduct',
-                'resource' => 'ekyna_product.product',
-                'position' => 90,
+                'name'       => 'stock_view',
+                'route'      => 'admin_ekyna_product_stock_view_index',
+                'label'      => 'stock_view.title',
+                'domain'     => 'EkynaProduct',
+                'resource'   => 'ekyna_product.product',
+                'permission' => Permission::STOCK_VIEW,
+                'position'   => 90,
             ])
             /*->addEntry([
                 'name'     => 'highlight',

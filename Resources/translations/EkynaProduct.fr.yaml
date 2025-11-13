@@ -356,6 +356,8 @@ permission:
     generate_external_reference: Générer référence externe
     change_type: Changer le type
     visibility: Visibilité
+    stock_view: Stock view
+    dashboard_export: Export (dashboard)
 
 price:
     label:
