@@ -21,6 +21,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectModes as CStockModes;
 use Ekyna\Component\Commerce\Stock\Model\StockSubjectStates;
+use Ekyna\Component\Resource\Doctrine\DoctrineUtil;
 use Ekyna\Component\Resource\Doctrine\ORM\Hydrator\IdHydrator;
 use Ekyna\Component\Resource\Doctrine\ORM\Repository\TranslatableRepository;
 
@@ -749,7 +750,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
     public function loadMedias(Model\ProductInterface $product): void
     {
-        if ($this->isInitializedCollection($product->getMedias())) {
+        if (DoctrineUtil::isInitializedCollection($product->getMedias())) {
             return;
         }
 
@@ -770,7 +771,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
 
     public function loadOptions(Model\ProductInterface $product): void
     {
-        if ($this->isInitializedCollection($product->getOptionGroups())) {
+        if (DoctrineUtil::isInitializedCollection($product->getOptionGroups())) {
             return;
         }
 
@@ -794,7 +795,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
     {
         Model\ProductTypes::assertVariable($variable);
 
-        if ($this->isInitializedCollection($variable->getVariants())) {
+        if (DoctrineUtil::isInitializedCollection($variable->getVariants())) {
             return;
         }
 
@@ -816,7 +817,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
     {
         Model\ProductTypes::assertBundle($bundle);
 
-        if ($this->isInitializedCollection($bundle->getBundleSlots())) {
+        if (DoctrineUtil::isInitializedCollection($bundle->getBundleSlots())) {
             return;
         }
 
@@ -847,7 +848,7 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
     {
         Model\ProductTypes::assertConfigurable($configurable);
 
-        if ($this->isInitializedCollection($configurable->getBundleSlots())) {
+        if (DoctrineUtil::isInitializedCollection($configurable->getBundleSlots())) {
             return;
         }
 
@@ -1270,18 +1271,6 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
         }
 
         return $this->findNextQuery[$direction] = $qb->getQuery();
-    }
-
-    /**
-     * Returns whether the collection has been initialized or not.
-     *
-     * @TODO Move in a AbstractResource or ResourceUtil class ? (search 'isInitialized' usages ...)
-     */
-    protected function isInitializedCollection(?Collection $collection): bool
-    {
-        return (null !== $collection)
-            && method_exists($collection, 'isInitialized')
-            && $collection->{'isInitialized'}();
     }
 
     protected function getAlias(): string

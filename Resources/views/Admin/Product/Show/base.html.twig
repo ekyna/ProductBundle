@@ -3,6 +3,7 @@
 {% set optionParents = product|option_parents %}
 {% set componentParents = product|component_parents %}
 {% set bundleParents = product|bundle_parents %}
+{% set BOMs_components = product|subject_bill_of_materials_component %}
 
 <div class="show show-with-tabs">
     <ul class="nav nav-tabs" data-tab-key="{{ resource_name }}">
@@ -53,7 +54,10 @@
         {%- endblock stock_tab -%}
 
         {%- block relations_tab -%}
-        {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
+        {%- if optionParents is not empty
+            or componentParents is not empty
+            or bundleParents is not empty
+            or BOMs_components is not empty -%}
         <li>
             <a href="#{{ resource_name }}-relations" id="toggle-product-relations" data-toggle="tab">
                 {{ 'product.field.relations'|trans({}, 'EkynaProduct') }}
@@ -219,10 +223,15 @@
                     <p class="h4">{{ 'product.field.component_parents'|trans({}, 'EkynaProduct') }}</p>
                     {{ _product.show_relations(componentParents) }}
                 {%- endif %}
+                {% if BOMs_components is not empty -%}
+                    <p class="h4">{{ 'product.field.component_parents'|trans({}, 'EkynaProduct') }}</p>
+                    {{ _product.show_relations(BOMs_components|subject_references_subjects) }}
+                {%- endif %}
                 {% if optionParents is not empty -%}
                     <p class="h4">{{ 'product.field.option_parents'|trans({}, 'EkynaProduct') }}</p>
                     {{ _product.show_relations(optionParents) }}
                 {%- endif %}
+                {# TODO BOMs #}
             {%- endblock relations_content -%}
             </div>
             {%- endif -%}
