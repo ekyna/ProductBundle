@@ -86,3 +86,13 @@
         </ul>
     </div>
 {%- endmacro labels_product_button -%}
+
+
+{%- macro produce_product_button(product) -%}
+{% set bom = product|subject_validated_bill_of_material %}
+{% if bom is not null %}
+    {{- admin_resource_btn(bom, 'Ekyna\\Bundle\\CommerceBundle\\Action\\Admin\\BillOfMaterials\\CreatePOAction', {
+        'label': t('button.manufacture', [], 'EkynaCommerce'),
+    }) -}}
+{% endif %}
+{%- endmacro produce_product_button -%}

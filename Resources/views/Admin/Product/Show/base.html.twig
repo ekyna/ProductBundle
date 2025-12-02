@@ -212,7 +212,10 @@
             {%- endblock stock_pane -%}
 
             {%- block relations_pane -%}
-            {%- if optionParents is not empty or componentParents is not empty or bundleParents is not empty -%}
+            {%- if optionParents is not empty
+                or componentParents is not empty
+                or bundleParents is not empty
+                or BOMs_components is not empty -%}
             <div class="tab-pane" id="{{ resource_name }}-relations">
             {%- block relations_content -%}
                 {% if bundleParents is not empty -%}

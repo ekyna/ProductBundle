@@ -38,6 +38,7 @@
             {{ product|cms_tags({'text': false}) -}}
         </div>
         <div class="actions">
+            {{ macros.produce_product_button(product) }}
             {{ macros.labels_product_button(product) }}
             {{ macros.convert_product_button(product) }}
             {{ admin_resource_btn(product, 'Ekyna\\Bundle\\ProductBundle\\Action\\Admin\\Product\\ChangeReferenceAction') }}
