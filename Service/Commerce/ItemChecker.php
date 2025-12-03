@@ -16,6 +16,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
+use Ekyna\Component\Commerce\Exception\SubjectException;
 use Ekyna\Component\Commerce\Subject\SubjectHelperInterface;
 
 use function array_merge;
@@ -48,6 +49,10 @@ class ItemChecker implements ItemCheckerInterface
         $this->filter->setContext($context);
     }
 
+    /**
+     * @throws InvalidSaleItemException
+     * @throws SubjectException
+     */
     public function check(SaleItemInterface $item): void
     {
         $this->checkItem($item, []);
@@ -55,6 +60,7 @@ class ItemChecker implements ItemCheckerInterface
 
     /**
      * @throws InvalidSaleItemException
+     * @throws SubjectException
      */
     private function checkItem(SaleItemInterface $item, ?array $exclude): void
     {
@@ -79,11 +85,18 @@ class ItemChecker implements ItemCheckerInterface
     {
     }
 
+    /**
+     * @throws InvalidSaleItemException|SubjectException
+     */
     private function checkBundleSlots(SaleItemInterface $item, ?array $exclude): void
     {
         $product = $this->resolve($item);
 
         if (!ProductTypes::isBundledType($product)) {
+            if ($item->isCompound()) {
+                throw new InvalidSaleItemException();
+            }
+
             return;
         }
 
@@ -169,6 +182,10 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
+    /**
+     * @throws InvalidSaleItemException
+     * @throws SubjectException
+     */
     private function checkBundleChoice(SaleItemInterface $item, BundleChoiceInterface $choice, ?array $exclude): void
     {
         // Check whether sale item's product matches slot choice's one
@@ -195,6 +212,9 @@ class ItemChecker implements ItemCheckerInterface
         $this->checkItem($item, $exclude);
     }
 
+    /**
+     * @throws InvalidSaleItemException|SubjectException
+     */
     private function checkComponents(SaleItemInterface $item): void
     {
         $product = $this->resolve($item);
@@ -263,6 +283,9 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
+    /**
+     * @throws InvalidSaleItemException|SubjectException
+     */
     private function checkComponent(SaleItemInterface $item, Component $component): void
     {
         if ($component->getChild() !== $this->resolve($item)) {
@@ -276,6 +299,9 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
+    /**
+     * @throws InvalidSaleItemException|SubjectException
+     */
     private function checkOptions(SaleItemInterface $item, array $exclude): void
     {
         $groups = $this->getOptionGroups($item, $exclude);
@@ -344,6 +370,10 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
+    /**
+     * @throws InvalidSaleItemException
+     * @throws SubjectException
+     */
     private function checkOption(SaleItemInterface $item, OptionInterface $option): void
     {
         if (null !== $product = $option->getProduct()) {
@@ -361,6 +391,9 @@ class ItemChecker implements ItemCheckerInterface
         }
     }
 
+    /**
+     * @throws SubjectException
+     */
     private function resolve(SaleItemInterface $item): ProductInterface
     {
         $product = $this->subjectHelper->resolve($item);
@@ -379,6 +412,7 @@ class ItemChecker implements ItemCheckerInterface
      * @param array             $exclude = The option group ids to exclude
      *
      * @return OptionGroupInterface[]
+     * @throws SubjectException
      */
     private function getOptionGroups(SaleItemInterface $item, array $exclude = []): array
     {
