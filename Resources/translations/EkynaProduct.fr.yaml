@@ -319,6 +319,8 @@ stock_view:
     modal:
         orders: Commandes clients
         resupply: Réassort
+        manufacture: Fabriquer
+        production_orders: Liste des ordres de fabrication
     profile:
         none: Aucun
         treatment: Traitement

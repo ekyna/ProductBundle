@@ -317,6 +317,8 @@ stock_view:
     modal:
         orders: Customer orders
         resupply: Resupply
+        manufacture: Manufacture
+        production_orders: Production orders list
     profile:
         none: None
         treatment: Treatment

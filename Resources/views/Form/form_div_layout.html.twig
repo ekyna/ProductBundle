@@ -412,6 +412,23 @@
 {%- endblock ekyna_product_special_offer_widget -%}
 
 
+{%- block ekyna_product_inventory_manufacture_widget -%}
+    {{- render_subjects_stock([product]) -}}
+    <hr>
+    <h3 style="margin-bottom:10px">{{ 'stock_view.modal.production_orders'|trans([], 'EkynaProduct') }}</h3>
+    {{- render_subject_production_orders(product) -}}
+    <hr>
+    <h3 style="margin-bottom:10px">{{ 'production_order.header.new'|trans([], 'EkynaCommerce') }}</h3>
+    {{- bootstrap_set_style('horizontal') -}}
+    {{- bootstrap_set_col_size('md') -}}
+    {{- form_errors(form) -}}
+    {{- form_row(form.bom) -}}
+    {{- form_row(form.warehouse) -}}
+    {{- form_row(form.quantity) -}}
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_inventory_manufacture_widget -%}
+
+
 {%- block ekyna_product_inventory_resupply_widget -%}
     {{- render_subjects_stock([product]) -}}
     <hr>

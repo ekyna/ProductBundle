@@ -354,6 +354,13 @@ define(
         return requestModal(e, 'admin_ekyna_product_stock_view_resupply', true);
     });
 
+    /**
+     * Line's manufacture buttons click handler
+     */
+    $body.on('click', 'a.manufacture', function (e) {
+        return requestModal(e, 'admin_ekyna_product_stock_view_manufacture', true);
+    });
+
     $('button[name="batch_submit"]').on('click', function(e) {
         let ids = [];
         $('#inventory').serializeArray().forEach(function(obj) {

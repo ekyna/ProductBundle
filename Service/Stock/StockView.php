@@ -259,7 +259,8 @@ class StockView
         }
 
         // Stock sums
-        $product['pending'] = 0 < $product['pending'] ? $formatter->number((float)$product['pending']) : '';
+        $pending = $product['pending_supply'] + $product['pending_production'];
+        $product['pending'] = 0 < $pending ? $formatter->number((float)$pending) : '';
         $product['ordered'] = $formatter->number((float)($product['ordered'] - $product['received']));
         $product['sold'] = $formatter->number((float)($product['sold'] - $product['shipped']));
 

@@ -193,6 +193,21 @@ return static function (ContainerConfigurator $container) {
         ->public();
 
     $services
+        ->set('ekyna_product.controller.admin.stock_view.manufacture', StockView\ManufactureController::class)
+        ->parent('ekyna_product.controller.admin.stock_view.abstract')
+        ->call('setStockView', [service('ekyna_product.stock_view')])
+        ->args([
+            service('ekyna_commerce.repository.bill_of_materials'),
+            service('ekyna_commerce.factory.production_order'),
+            service('ekyna_commerce.manager.production_order'),
+            service('form.factory'),
+            service('router'),
+            service('translator'),
+        ])
+        ->alias(StockView\ManufactureController::class, 'ekyna_product.controller.admin.stock_view.manufacture')
+        ->public();
+
+    $services
         ->set('ekyna_product.controller.admin.stock_view.batch_edit', StockView\BatchEditController::class)
         ->parent('ekyna_product.controller.admin.stock_view.abstract')
         ->call('setStockView', [service('ekyna_product.stock_view')])

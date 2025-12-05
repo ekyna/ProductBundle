@@ -53,6 +53,8 @@ return static function (ContainerConfigurator $container) {
             param('ekyna_product.class.product_stock_unit'),
             param('ekyna_commerce.class.supplier_order_item'),
             param('ekyna_commerce.class.supplier_product'),
+            param('ekyna_commerce.class.production_order'),
+            param('ekyna_commerce.class.bill_of_materials'),
         ]);
 
     // StockView

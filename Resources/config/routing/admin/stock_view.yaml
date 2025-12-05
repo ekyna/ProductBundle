@@ -10,6 +10,13 @@ admin_ekyna_product_stock_view_products:
     options:
         expose: true
 
+admin_ekyna_product_stock_view_manufacture:
+    path: /{productId}/manufacture
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ManufactureController
+    methods: [GET, POST]
+    options:
+        expose: true
+
 admin_ekyna_product_stock_view_quick_edit:
     path: /{productId}/quick-edit
     controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\QuickEditController

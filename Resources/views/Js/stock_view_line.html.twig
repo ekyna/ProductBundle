@@ -39,8 +39,15 @@
         <a href="javascript: void(0)" class="btn btn-xs btn-default treatment" title="Customer orders">
             <i class="fa fa-user"></i>
         </a>
+        {% if has_supplier_product %}
         <a href="javascript: void(0)" class="btn btn-xs btn-default resupply" title="Supplier orders">
             <i class="fa fa-truck"></i>
         </a>
+        {% endif %}
+        {% if has_bom %}
+        <a href="javascript: void(0)" class="btn btn-xs btn-default manufacture" title="Production orders">
+            <i class="fa fa-wrench"></i>
+        </a>
+        {% endif %}
     </td>
 </tr>
