@@ -23,13 +23,18 @@ define(
         };
 
         SaleBrowseProducts.prototype.thumbAddButtonClickHandler = function (event) {
-            const productId = event.target.attributes['data-id'].value;
+            this.busy = true;
 
-            const url = new URL(this.element.attributes['data-add-item-path'].value);
-            url.searchParams.set('provider', 'product');
-            url.searchParams.set('identifier', productId);
+            const productId = parseInt(event.target.attributes['data-id'].value);
 
-            EkynaModal.getInstance().load({url: url.href});
+            EkynaModal.getInstance().load({
+                url: this.element.attributes['data-add-item-path'].value,
+                method: 'POST',
+                data: {
+                    provider: 'product',
+                    identifier: productId,
+                }
+            });
         };
 
         SaleBrowseProducts.prototype.displayProducts = function (data) {

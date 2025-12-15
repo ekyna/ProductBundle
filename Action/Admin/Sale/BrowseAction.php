@@ -6,7 +6,7 @@ namespace Ekyna\Bundle\ProductBundle\Action\Admin\Sale;
 
 use Ekyna\Bundle\AdminBundle\Action\AdminActionInterface;
 use Ekyna\Bundle\AdminBundle\Action\Util\ModalTrait;
-use Ekyna\Bundle\CommerceBundle\Action\Admin\Sale\Item\AddAction;
+use Ekyna\Bundle\CommerceBundle\Action\Admin\Sale\Item\AddSubjectAction;
 use Ekyna\Bundle\ProductBundle\Repository\CategoryRepositoryInterface;
 use Ekyna\Bundle\ResourceBundle\Action\AbstractAction;
 use Ekyna\Bundle\ResourceBundle\Action\TemplatingTrait;
@@ -44,7 +44,7 @@ class BrowseAction extends AbstractAction implements AdminActionInterface
         $categories = $this->categoryRepository->findForSaleBrowse();
 
         $config = $this->resourceHelper->getResourceConfig($sale);
-        $addUrl = $this->resourceHelper->generateResourcePath($config->getId() . '_item', AddAction::class, [
+        $addUrl = $this->resourceHelper->generateResourcePath($config->getId() . '_item', AddSubjectAction::class, [
             $config->getName() . 'Id' => $sale->getId(),
         ], true);
 
