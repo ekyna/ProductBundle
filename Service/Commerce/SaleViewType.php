@@ -31,9 +31,11 @@ class SaleViewType extends AbstractViewType
             return;
         }
 
+        $config = $this->resourceHelper->getResourceConfig($sale);
+
         // Browse button
-        $addItemPath = $this->resourceUrl('ekyna_commerce.order', BrowseAction::class, [
-            'orderId' => $sale->getId(),
+        $addItemPath = $this->resourceUrl($config->getId(), BrowseAction::class, [
+            $config->getName() . 'Id' => $sale->getId(),
         ]);
         $view->addButton(new Button(
             $addItemPath,
