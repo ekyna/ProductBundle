@@ -33,3 +33,11 @@ liip_imagine:
             post_processors:
                 jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
                 pngquant: { quality: '%ekyna_media.image.quality.png%' }
+        sale_add_thumb:
+            cache: local_media
+            data_loader: local_media
+            filters:
+                thumbnail: { size: [ 300, 225 ], mode: outbound }
+            post_processors:
+                jpegoptim: { strip_all: true, max: '%ekyna_media.image.quality.jpeg%', progressive: true }
+                pngquant: { quality: '%ekyna_media.image.quality.png%' }

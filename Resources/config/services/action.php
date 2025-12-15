@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Action\Admin\Catalog;
 use Ekyna\Bundle\ProductBundle\Action\Admin\DownloadAction;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Inventory;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Product;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\BrowseAction;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction;
 
 return static function (ContainerConfigurator $container) {
@@ -145,6 +146,15 @@ return static function (ContainerConfigurator $container) {
 
     $services
         ->set('ekyna_product.action.admin.product.move_down', Product\MoveDownAction::class)
+        ->tag('ekyna_resource.action');
+
+    // Sale actions
+    $services
+        ->set('ekyna_product.action.admin.sale.browse', BrowseAction::class)
+        ->args([
+            service('ekyna_product.repository.category'),
+            service('ekyna_resource.helper'),
+        ])
         ->tag('ekyna_resource.action');
 
     // Sale item actions

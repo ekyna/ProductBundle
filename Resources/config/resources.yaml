@@ -511,12 +511,21 @@ resources:
                     properties: enabled
 
     ekyna_commerce:
+        cart:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\BrowseAction: ~
         cart_item:
             actions:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~
+        order:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\BrowseAction: ~
         order_item:
             actions:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~
+        quote:
+            actions:
+                Ekyna\Bundle\ProductBundle\Action\Admin\Sale\BrowseAction: ~
         quote_item:
             actions:
                 Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction: ~

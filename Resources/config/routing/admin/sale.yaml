@@ -1,0 +1,8 @@
+admin_ekyna_product_sale_product_list:
+    path: /product/list/{categoryId}
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\Sale\ListProductController
+    methods: [GET]
+    requirements:
+        categoryId: \d+
+    options:
+        expose: true

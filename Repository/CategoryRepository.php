@@ -59,6 +59,11 @@ class CategoryRepository extends TranslatableRepository implements CategoryRepos
             ->getResult();
     }
 
+    public function findForSaleBrowse(): array
+    {
+        return $this->findForMenu();
+    }
+
     protected function getAlias(): string
     {
         return 'c';

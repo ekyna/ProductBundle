@@ -1,0 +1,16 @@
+<h1>{{ category.title }}</h1>
+<div class="thumb-list">
+{% for product in products %}
+    <div class="thumb">
+        <p>
+            <span data-clipboard-copy="{{ product.reference }}">{{ product.reference }}</span><br>
+            <strong>{{ product.brand }}</strong>
+            {{ product.designation }}
+        </p>
+        <img alt="Product picture" src="{{ product.image }}">
+        <a href="javascript:void(0)" data-id="{{ product.id }}">
+            Ajouter
+        </a>
+    </div>
+{% endfor %}
+</div>

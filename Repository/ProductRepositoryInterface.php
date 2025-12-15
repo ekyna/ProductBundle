@@ -76,6 +76,11 @@ interface ProductRepositoryInterface extends TranslatableRepositoryInterface, Su
     public function findByCategory(CategoryInterface $category, bool $recursive = false): array;
 
     /**
+     * @return array<ProductInterface>
+     */
+    public function findForSaleBrowse(CategoryInterface $category, bool $recursive = false): array;
+
+    /**
      * Finds the parents products of the given bundled product.
      *
      * @param bool $requiredSlots Whether to return only bundles having this product as a REQUIRED slot choice.

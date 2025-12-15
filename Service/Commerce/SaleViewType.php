@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Commerce;
 
 use Ekyna\Bundle\CommerceBundle\Service\AbstractViewType;
+use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\BrowseAction;
 use Ekyna\Bundle\ProductBundle\Action\Admin\Sale\Item\SyncReferenceAction;
 use Ekyna\Bundle\ProductBundle\Model\Permission;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductReferenceTypes;
+use Ekyna\Component\Commerce\Common\Model;
 use Ekyna\Component\Commerce\Common\Model\SaleInterface;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
 use Ekyna\Component\Commerce\Common\View\Action;
+use Ekyna\Component\Commerce\Common\View\Button;
 use Ekyna\Component\Commerce\Common\View\LineView;
+use Ekyna\Component\Commerce\Common\View\SaleView;
 
 /**
  * Class SaleViewType
@@ -21,6 +25,29 @@ use Ekyna\Component\Commerce\Common\View\LineView;
  */
 class SaleViewType extends AbstractViewType
 {
+    public function buildSaleView(Model\SaleInterface $sale, SaleView $view, array $options): void
+    {
+        if (!$options['editable'] || !$options['private']) {
+            return;
+        }
+
+        // Browse button
+        $addItemPath = $this->resourceUrl('ekyna_commerce.order', BrowseAction::class, [
+            'orderId' => $sale->getId(),
+        ]);
+        $view->addButton(new Button(
+            $addItemPath,
+            $this->trans('sale.button.browse', [], 'EkynaProduct'),
+            'fa fa-cube',
+            [
+                'id'              => 'order_browse',
+                'title'           => $this->trans('sale.button.browse', [], 'EkynaProduct'),
+                'class'           => 'btn btn-sm btn-primary',
+                'data-sale-modal' => null,
+            ]
+        ));
+    }
+
     public function buildItemView(SaleItemInterface $item, LineView $view, array $options): void
     {
         if (!$options['private'] && !$options['export']) {

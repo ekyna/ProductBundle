@@ -15,6 +15,7 @@ module.exports = function (grunt, options) {
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/inventory_line.html.twig',
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_item_option_group.html.twig',
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_item_offers.html.twig',
+                    'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/sale_product_list.html.twig',
                     'src/Ekyna/Bundle/ProductBundle/Resources/views/Js/stock_view_line.html.twig'
                 ]
             }

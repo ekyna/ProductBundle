@@ -31,10 +31,21 @@ class CategoryNormalizer extends TranslatableNormalizer
             if (null !== $seo = $object->getSeo()) {
                 $data['seo'] = $seo->getId();
             }
-        } elseif (self::contextHasGroup('Search', $context)) {
+            return $data;
+        }
+
+        if (self::contextHasGroup('Sale', $context)) {
+            $data['title'] = $object->getTitle();
+
+            return $data;
+        }
+
+        if (self::contextHasGroup('Search', $context)) {
             if (null !== $seo = $object->getSeo()) {
                 $data['seo'] = $this->normalizeObject($seo, $format, $context);
             }
+
+            return $data;
         }
 
         return $data;

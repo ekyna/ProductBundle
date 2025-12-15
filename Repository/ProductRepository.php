@@ -362,6 +362,11 @@ class ProductRepository extends TranslatableRepository implements ProductReposit
             ->getResult();
     }
 
+    public function findForSaleBrowse(Model\CategoryInterface $category, bool $recursive = false): array
+    {
+        return $this->findByCategory($category, $recursive);
+    }
+
     public function findParentsByBundled(
         Model\ProductInterface $bundled,
         bool                   $requiredSlots = false,

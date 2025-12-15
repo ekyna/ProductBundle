@@ -23,4 +23,9 @@ interface CategoryRepositoryInterface extends TranslatableRepositoryInterface
      * @return array<CategoryInterface>
      */
     public function findForMenu(): array;
+
+    /**
+     * @return array<CategoryInterface>
+     */
+    public function findForSaleBrowse(): array;
 }

@@ -98,7 +98,27 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
 
             // Option groups
             $data['option_groups'] = $this->normalizeOptionGroups($object);
-        } elseif (self::contextHasGroup('Search', $context)) {
+
+            return $data;
+        }
+
+        if (self::contextHasGroup('Sale', $context)) {
+            $data['reference'] = $object->getReference();
+
+            // Brand
+            if (null !== $brand = $object->getBrand()) {
+                $data['brand'] = $brand->getTitle();
+            }
+
+            // Image
+            if ($image = $object->getImage()) {
+                $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'sale_add_thumb');
+            }
+
+            return $data;
+        }
+
+        if (self::contextHasGroup('Search', $context)) {
             // Brand
             if (null !== $brand = $object->getBrand()) {
                 $data['brand'] = [
@@ -134,7 +154,11 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
             $data['option_groups'] = $this->normalizeOptionGroups($object);
             $data['quote_only'] = $object->isQuoteOnly();
             $data['end_of_life'] = $object->isEndOfLife();
-        } elseif (self::contextHasGroup('Summary', $context)) {
+
+            return $data;
+        }
+
+        if (self::contextHasGroup('Summary', $context)) {
             $data['visibility'] = $object->getVisibility();
 
             // Brand

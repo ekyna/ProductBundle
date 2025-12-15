@@ -422,6 +422,10 @@ pricing_rule:
     alert:
         no_item: No rule configured
 
+sale:
+    button:
+        browse: Browse products
+
 sale_item:
     button:
         sync_reference: Synchronize reference

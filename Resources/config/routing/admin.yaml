@@ -13,3 +13,7 @@ admin_ekyna_product_highlight:
 admin_ekyna_product_stock_analysis:
     resource: admin/stock_analysis.yaml
     prefix:   /stock-analysis
+
+admin_ekyna_product_sale:
+    resource: admin/sale.yaml
+    prefix:   /sale

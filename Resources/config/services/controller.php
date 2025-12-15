@@ -8,6 +8,7 @@ use Ekyna\Bundle\ProductBundle\Controller\Account;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\HighlightController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\InventoryApp;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\ProductBookmarkController;
+use Ekyna\Bundle\ProductBundle\Controller\Admin\Sale\ListProductController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ExportController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\StockAnalysis\ImportController;
 use Ekyna\Bundle\ProductBundle\Controller\Admin\StockView;
@@ -51,6 +52,17 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_resource.search'),
         ])
         ->alias(Account\ProductSearchController::class, 'ekyna_product.controller.account.product.search')
+        ->public();
+
+    $services
+        ->set('ekyna_product.controller.admin.sale.list_product', ListProductController::class)
+        ->args([
+            service('ekyna_product.repository.category'),
+            service('ekyna_product.repository.product'),
+            service('serializer'),
+            service('serializer'),
+        ])
+        ->alias(ListProductController::class, 'ekyna_product.controller.admin.sale.list_product')
         ->public();
 
     $services
