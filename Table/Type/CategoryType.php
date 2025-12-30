@@ -22,13 +22,11 @@ use function Symfony\Component\Translation\t;
  */
 class CategoryType extends AbstractResourceType
 {
-    private ResourceHelper        $resourceHelper;
-    private UrlGeneratorInterface $urlGenerator;
+    public function __construct(
+        protected readonly ResourceHelper        $resourceHelper,
+        protected readonly UrlGeneratorInterface $urlGenerator
+    ) {
 
-    public function __construct(ResourceHelper $resourceHelper, UrlGeneratorInterface $urlGenerator)
-    {
-        $this->resourceHelper = $resourceHelper;
-        $this->urlGenerator = $urlGenerator;
     }
 
     public function buildTable(TableBuilderInterface $builder, array $options): void

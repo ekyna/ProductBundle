@@ -22,7 +22,7 @@ use function Symfony\Component\Translation\t;
 class InventoryType extends AbstractResourceType
 {
     public function __construct(
-        private readonly AuthorizationCheckerInterface $authorizationChecker
+        protected readonly AuthorizationCheckerInterface $authorizationChecker
     ) {
     }
 
