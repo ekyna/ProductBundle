@@ -75,14 +75,14 @@
                 {% for category in categories %}
                 <li>
                     <a href="javascript:void(0)" data-id="{{ category.id }}">
-                        {{ category.title }}
+                        {{ category.name }}
                     </a>
                     {% if not category.children.empty %}
                     <ul>
                         {% for child in category.children %}
                         <li>
                             <a href="javascript:void(0)" data-id="{{ child.id }}">
-                                {{ child.title }}
+                                {{ child.name }}
                             </a>
                         </li>
                         {% endfor %}

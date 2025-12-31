@@ -14,7 +14,9 @@
 
 
 {% block after_list %}
+    {% if admin_resource_access('ekyna_product.product_attachment', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction') -%}
     <div class="alert alert-info">
         <p>{{ 'product_attachment.help.auto_add_to_document'|trans({}, 'EkynaProduct') }}</p>
     </div>
+    {%- endif %}
 {% endblock %}

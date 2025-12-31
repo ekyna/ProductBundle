@@ -121,10 +121,12 @@
                 <div class="tab-pane" id="{{ resource_name }}-files">
                 {%- block files_content -%}
                     <h4 class="sub-header">
+                        {% if admin_resource_access('ekyna_product.product_attachment', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction') -%}
                         <a href="{{ admin_resource_path('ekyna_product.product_attachment', 'Ekyna\\Bundle\\AdminBundle\\Action\\CreateAction') }}"
                            class="btn btn-primary btn-xs pull-right">
                             {{ 'attachment.button.new'|trans({}, 'EkynaCommerce') }}
                         </a>
+                        {% endif %}
                         {{ 'attachment.label.plural'|trans({}, 'EkynaCommerce') }}
                     </h4>
                     {% include '@EkynaProduct/Admin/Product/Show/_attachments.html.twig' with {
