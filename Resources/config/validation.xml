@@ -393,6 +393,7 @@
         <!-- Unique name -->
         <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
             <option name="fields">
+                <value>parent</value>
                 <value>name</value>
             </option>
         </constraint>
