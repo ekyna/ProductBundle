@@ -204,7 +204,7 @@ return static function (ContainerConfigurator $container) {
         ->set('ekyna_product.calculator.purchase_cost', Pricing\PurchaseCostCalculator::class)
         ->args([
             service('ekyna_product.calculator.price'),
-            service('ekyna_commerce.guesser.subject_cost'),
+            service('ekyna_commerce.calculator.subject_cost'),
         ])
         ->tag('doctrine.event_listener', [
             'event'      => Events::onClear,

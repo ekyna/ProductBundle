@@ -33,13 +33,11 @@
         font-size: 32px;
     }
     #sale-browse-products > div > main > .thumb-list {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: auto auto auto;
         gap: 20px;
     }
     #sale-browse-products > div > main > .thumb-list > .thumb {
-        flex: 1 30%;
         display: flex;
         flex-direction: column;
         box-shadow: 0 3px 7px 0 rgba(0, 0, 0, 0.2);

@@ -8,7 +8,7 @@ use Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface as Product;
 use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Component\Commerce\Common\Model\Cost;
-use Ekyna\Component\Commerce\Subject\Guesser\SubjectCostGuesserInterface;
+use Ekyna\Component\Commerce\Subject\Calculator\SubjectCostCalculatorInterface;
 
 use function array_key_exists;
 use function array_merge;
@@ -30,8 +30,8 @@ class PurchaseCostCalculator
     private array $optionsCache = [];
 
     public function __construct(
-        protected readonly PriceCalculator             $priceCalculator,
-        protected readonly SubjectCostGuesserInterface $costGuesser,
+        protected readonly PriceCalculator                $priceCalculator,
+        protected readonly SubjectCostCalculatorInterface $costCalculator,
     ) {
     }
 
@@ -148,7 +148,7 @@ class PurchaseCostCalculator
         $total = new Cost();
 
         foreach ($product->getComponents() as $component) {
-            $cost = $this->costGuesser->guess($component->getChild());
+            $cost = $this->costCalculator->calculate($component->getChild());
 
             $cost = $cost->multiply($component->getQuantity()); // TODO Use packaging format
 
@@ -170,7 +170,7 @@ class PurchaseCostCalculator
     {
         ProductTypes::assertChildType($product);
 
-        $cost = $this->costGuesser->guess($product) ?: new Cost();
+        $cost = $this->costCalculator->calculate($product) ?: new Cost();
 
         $cost = $cost->add($this->calculateMinOptionsPurchaseCost($product, $exclude));
 
