@@ -194,7 +194,7 @@ class StockRepository
     private function getSupplierProductSubQuery(): string
     {
         return strtr(static::SUPPLIER_PRODUCT_DQL, [
-            '_class_' => $this->supplierOrderItemClass,
+            '_class_' => $this->supplierProductClass,
         ]);
     }
 
