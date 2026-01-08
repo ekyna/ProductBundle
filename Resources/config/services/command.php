@@ -13,6 +13,7 @@ use Ekyna\Bundle\ProductBundle\Command\OfferUpdateCommand;
 use Ekyna\Bundle\ProductBundle\Command\ProductSaleExportCommand;
 use Ekyna\Bundle\ProductBundle\Command\ResupplyCommand;
 use Ekyna\Bundle\ProductBundle\Command\StatUpdateCommand;
+use Ekyna\Bundle\ProductBundle\Command\StatUpdateAsyncCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockAnalysisCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockReportCommand;
 use Ekyna\Bundle\ProductBundle\Command\StockShowCommand;
@@ -123,6 +124,15 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('ekyna_product.repository.product'),
             service('ekyna_product.updater.stat'),
+        ])
+        ->tag('console.command');
+
+    // Stat update async command
+    $services
+        ->set('ekyna_product.command.stat_update_async', StatUpdateAsyncCommand::class)
+        ->args([
+            service('ekyna_product.repository.product'),
+            service('messenger.bus.default'),
         ])
         ->tag('console.command');
 

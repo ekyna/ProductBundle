@@ -7,6 +7,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Ekyna\Bundle\ProductBundle\MessageHandler\ProductDeletionHandler;
 use Ekyna\Bundle\ProductBundle\MessageHandler\UpdateOffersHandler;
 use Ekyna\Bundle\ProductBundle\MessageHandler\UpdatePricesHandler;
+use Ekyna\Bundle\ProductBundle\MessageHandler\UpdateProductStatHandler;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -36,6 +37,15 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_product.repository.product'),
             service('ekyna_product.updater.price'),
             service('doctrine.orm.default_entity_manager'),
+        ])
+        ->tag('messenger.message_handler');
+
+    // UpdateProductStat message handler
+    $services
+        ->set('ekyna_product.message_handler.update_product_stat', UpdateProductStatHandler::class)
+        ->args([
+            service('ekyna_product.repository.product'),
+            service('ekyna_product.updater.stat'),
         ])
         ->tag('messenger.message_handler');
 };
