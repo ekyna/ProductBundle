@@ -14,6 +14,14 @@
                 {{- 'button.import'|trans({}, 'EkynaUi') -}}
             </a>
         </p>
+        <h3>{{ 'export.stock_valuation'|trans({}, 'EkynaProduct') }}</h3>
+        <p>
+            <a href="{{ path('admin_ekyna_product_stock_view_valuation_export') }}"
+               class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-download"></span>
+                {{- 'button.export'|trans({}, 'EkynaUi') -}}
+            </a>
+        </p>
     </div>
 </div>
 {% endapply %}

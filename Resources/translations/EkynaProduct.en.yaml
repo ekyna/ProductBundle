@@ -269,6 +269,7 @@ cross_selling:
         add: Add cross selling
 
 export:
+    stock_valuation: Stock valuation
     filter:
         add_invisible: Add invisible products.
         add_quote_only: Add « Quote only » products.

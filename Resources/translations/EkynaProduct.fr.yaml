@@ -270,7 +270,7 @@ cross_selling:
         add: Ajouter une vente croisée
 
 export:
-    stock_analysis: Analyse stock
+    stock_valuation: Valorisation du stock
     filter:
         add_invisible: Ajouter les produits invisible.
         add_quote_only: Ajouter les produits « Sur devis uniquement ».

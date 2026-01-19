@@ -66,3 +66,8 @@ admin_ekyna_product_stock_view_export_units:
     path: /export-units
     controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ExportUnitsController
     methods: [GET]
+
+admin_ekyna_product_stock_view_valuation_export:
+    path: /valuation-export
+    controller: Ekyna\Bundle\ProductBundle\Controller\Admin\StockView\ValuationExportController
+    methods: [GET, POST]

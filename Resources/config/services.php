@@ -17,6 +17,7 @@ use Ekyna\Bundle\ProductBundle\Service\Editor\Block\ProductSlidePlugin;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\BundleExporter;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductExporter;
 use Ekyna\Bundle\ProductBundle\Service\Exporter\ProductSaleExporter;
+use Ekyna\Bundle\ProductBundle\Service\Exporter\StockExporter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
 use Ekyna\Bundle\ProductBundle\Service\Generator;
 use Ekyna\Bundle\ProductBundle\Service\Google\TrackingHelper;
@@ -338,6 +339,14 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_commerce.helper.subject'),
             service('ekyna_commerce.helper.stock_subject_quantity'),
             service('ekyna_commerce.factory.margin_calculator'),
+        ]);
+
+    // Stock exporter
+    $services
+        ->set('ekyna_product.exporter.stock', StockExporter::class)
+        ->args([
+            service('ekyna_product.repository.product_stock_unit'),
+            param('ekyna_commerce.default.currency'),
         ]);
 
     // Catalog registry

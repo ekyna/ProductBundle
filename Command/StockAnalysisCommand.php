@@ -51,7 +51,7 @@ class StockAnalysisCommand extends Command
             return Command::FAILURE;
         }
 
-        $subject = $this->translator->trans('export.stock_analysis', [], 'EkynaProduct');
+        $subject = $this->translator->trans('stock_analysis.title', [], 'EkynaProduct');
 
         $fromEmail = $this->settings->getParameter('notification.from_email');
         $fromName = $this->settings->getParameter('notification.from_name');
