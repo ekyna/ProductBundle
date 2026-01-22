@@ -104,11 +104,10 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
 
         if (self::contextHasGroup('Sale', $context)) {
             $data['reference'] = $object->getReference();
+            $data['brand_naming'] = $object->isBrandNaming();
 
             // Brand
-            if (null !== $brand = $object->getBrand()) {
-                $data['brand'] = $brand->getTitle();
-            }
+            $data['brand'] = $object->getBrand()?->getTitle() ?? '';
 
             // Image
             if ($image = $object->getImage()) {

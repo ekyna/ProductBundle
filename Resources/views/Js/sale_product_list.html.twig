@@ -4,10 +4,10 @@
     <div class="thumb">
         <p>
             <span data-clipboard-copy="{{ product.reference }}">{{ product.reference }}</span><br>
-            <strong>{{ product.brand }}</strong>
+            {% if product.brand_naming and product.brand is not empty %}<strong>{{ product.brand }}</strong>{% endif %}
             {{ product.designation }}
         </p>
-        <img alt="Product picture" src="{{ product.image }}">
+        <img alt="Product picture" src="{{ product.image ?? default_image }}">
         <a href="javascript:void(0)" data-id="{{ product.id }}">
             Ajouter
         </a>

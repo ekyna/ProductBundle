@@ -38,6 +38,7 @@ define(
         };
 
         SaleBrowseProducts.prototype.displayProducts = function (data) {
+            data.default_image = this.element.attributes['data-default-image'].value;
             this.list.innerHTML = Templates['@EkynaProduct/Js/sale_product_list.html.twig'].render(data);
 
             this.list.querySelectorAll('a').forEach((a) => {

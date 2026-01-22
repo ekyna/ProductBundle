@@ -34,7 +34,7 @@
     }
     #sale-browse-products > div > main > .thumb-list {
         display: grid;
-        grid-template-columns: auto auto auto;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 20px;
     }
     #sale-browse-products > div > main > .thumb-list > .thumb {
@@ -66,7 +66,9 @@
         border-radius: 7px 0 0 0;
     }
 </style>
-<div id="sale-browse-products" data-add-item-path="{{ add_item_path }}">
+<div id="sale-browse-products"
+     data-add-item-path="{{ add_item_path }}"
+     data-default-image="{{ product_default_image() }}">
     <div>
         <nav>
             <ul>
