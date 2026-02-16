@@ -14,7 +14,9 @@ use Ekyna\Component\Resource\Model\TranslationInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManagerAwareTrait;
 
+use function array_map;
 use function array_merge_recursive;
+use function array_replace;
 
 /**
  * Class ProductNormalizer
@@ -57,6 +59,57 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
             foreach ($object->getVariants() as $variant) {
                 $reference[] = $variant->getReference();
             }
+        }
+
+        if (self::contextHasGroup('Search', $context)) {
+            $data = array_replace([
+                'designation' => $object->getFullDesignation(),
+                'type'        => $object->getType(),
+                'reference'   => $reference,
+                'netPrice'   => $object->getNetPrice()->toFixed(5),
+                'minPrice'   => $object->getMinPrice()->toFixed(5),
+                'stockState' => $object->getStockState(),
+                'visible'     => $object->isVisible(),
+                'taxGroup'   => $object->getTaxGroup()->getId(),
+            ], $data);
+
+            // Brand
+            if (null !== $brand = $object->getBrand()) {
+                $data['brand'] = [
+                    'id'      => $brand->getId(),
+                    'name'    => $brand->getName(),
+                    'visible' => $brand->isVisible(),
+                ];
+            }
+
+            // Seo
+            /*if (null !== $seo = $product->getSeo()) {
+                $data['seo'] = $this->normalizeObject($seo, $format, $context);
+            }*/
+
+            // Categories
+            $data['categories'] = array_map(function (Model\CategoryInterface $c) {
+                return [
+                    'id'      => $c->getId(),
+                    'name'    => $c->getName(),
+                    'visible' => $c->isVisible(),
+                ];
+            }, $object->getCategories()->toArray());
+
+            // References
+            $data['references'] = array_map(function (Model\ProductReferenceInterface $r) {
+                return $r->getCode();
+            }, $object->getReferences()->toArray());
+
+            // References
+            $data['referencesAliases'] = $object->getReferenceAliases();
+
+            // Option groups
+            $data['optionGroups'] = $this->normalizeOptionGroups($object);
+            $data['quoteOnly'] = $object->isQuoteOnly();
+            $data['endOfLife'] = $object->isEndOfLife();
+
+            return $data;
         }
 
         $data = array_replace([
@@ -113,46 +166,6 @@ class ProductNormalizer extends TranslatableNormalizer implements CacheManagerAw
             if ($image = $object->getImage()) {
                 $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'sale_add_thumb');
             }
-
-            return $data;
-        }
-
-        if (self::contextHasGroup('Search', $context)) {
-            // Brand
-            if (null !== $brand = $object->getBrand()) {
-                $data['brand'] = [
-                    'id'      => $brand->getId(),
-                    'name'    => $brand->getName(),
-                    'visible' => $brand->isVisible(),
-                ];
-            }
-
-            // Seo
-            /*if (null !== $seo = $product->getSeo()) {
-                $data['seo'] = $this->normalizeObject($seo, $format, $context);
-            }*/
-
-            // Categories
-            $data['categories'] = array_map(function (Model\CategoryInterface $c) {
-                return [
-                    'id'      => $c->getId(),
-                    'name'    => $c->getName(),
-                    'visible' => $c->isVisible(),
-                ];
-            }, $object->getCategories()->toArray());
-
-            // References
-            $data['references'] = array_map(function (Model\ProductReferenceInterface $r) {
-                return $r->getCode();
-            }, $object->getReferences()->toArray());
-
-            // References
-            $data['references_aliases'] = $object->getReferenceAliases();
-
-            // Option groups
-            $data['option_groups'] = $this->normalizeOptionGroups($object);
-            $data['quote_only'] = $object->isQuoteOnly();
-            $data['end_of_life'] = $object->isEndOfLife();
 
             return $data;
         }

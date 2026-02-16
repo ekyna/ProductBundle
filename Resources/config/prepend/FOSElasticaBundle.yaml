@@ -7,23 +7,23 @@ fos_elastica:
             properties:
                 designation: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                 type: { type: keyword }
-                stock_state: { type: keyword }
+                stockState: { type: keyword }
                 visible: { type: boolean }
-                quote_only: { type: boolean }
-                end_of_life: { type: boolean }
-                net_price: { type: float }
-                min_price: { type: float }
+                quoteOnly: { type: boolean }
+                endOfLife: { type: boolean }
+                netPrice: { type: float }
+                minPrice: { type: float }
                 reference: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
                 references: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
-                references_aliases: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
+                referencesAliases: { type: text, fields: { analyzed: { type: text, analyzer: ngram, search_analyzer: search } } }
                 brand.id: { type: integer }
                 brand.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                 brand.visible: { type: boolean }
                 categories.name: { type: text, fields: { analyzed: { type: text, analyzer: edge, search_analyzer: search } } }
                 categories.visible: { type: boolean }
-                option_groups.id: { type: integer }
-                option_groups.name: { type: text }
-                option_groups.required: { type: boolean }
+                optionGroups.id: { type: integer }
+                optionGroups.name: { type: text }
+                optionGroups.required: { type: boolean }
             persistence:
                 driver: orm
                 model: '%ekyna_product.class.product%'
