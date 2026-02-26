@@ -19,7 +19,7 @@ use function implode;
  *
  * @TODO    Use ProductProvider::NAME instead of 'product' in queries
  */
-class StatCalculator
+class SaleStatCalculator
 {
     public function __construct(
         private readonly Connection $connection

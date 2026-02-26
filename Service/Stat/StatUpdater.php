@@ -28,9 +28,10 @@ class StatUpdater
     private bool             $debug  = false;
     private bool             $force  = false;
 
-    private StatCalculator   $calculator;
-    private ProductInterface $product;
-    private ?array           $groups = null;
+    private SaleStatCalculator        $saleCalculator;
+    private ManufactureStatCalculator $manufactureCalculator;
+    private ProductInterface          $product;
+    private ?array                    $groups = null;
 
 
     public function __construct(
@@ -40,7 +41,8 @@ class StatUpdater
         private readonly CustomerGroupRepositoryInterface $groupRepository,
         private readonly EntityManagerInterface           $entityManager
     ) {
-        $this->calculator = new StatCalculator($entityManager->getConnection());
+        $this->saleCalculator = new SaleStatCalculator($entityManager->getConnection());
+        $this->manufactureCalculator = new ManufactureStatCalculator($entityManager->getConnection());
     }
 
     /**
@@ -78,6 +80,11 @@ class StatUpdater
         $connection->executeQuery('TRUNCATE TABLE product_stat_cross');
     }
 
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->entityManager;
+    }
+
     /**
      * Updates the next product stats.
      *
@@ -94,7 +101,8 @@ class StatUpdater
         $this->writeln('');
         $this->writeln('Updating <comment>' . $this->product->getFullDesignation() . '</comment> stats');
 
-        $this->updateStats();
+        $this->updateSaleStats();
+        $this->updateManufactureStats();
 
         $this->product->setStatUpdatedAt(new DateTime());
 
@@ -116,15 +124,15 @@ class StatUpdater
     /**
      * Updates the stats for the current product.
      */
-    private function updateStats(): void
+    private function updateSaleStats(): void
     {
         $count = 0;
         foreach (StatCount::getSources() as $source) {
             foreach ($this->getGroups() as $group) {
                 $this->writeln(" - [$source] Group <comment>{$group->getName()}</comment>");
 
-                $orderDates = $this->calculator->getSourceDates($this->product, $group, $source);
-                $statDates = $this->calculator->getStatCountDates($this->product, $group, $source);
+                $orderDates = $this->saleCalculator->getSourceDates($this->product, $group, $source);
+                $statDates = $this->saleCalculator->getStatCountDates($this->product, $group, $source);
 
                 foreach ($orderDates as $date => $updated) {
                     $this->write(
@@ -143,7 +151,12 @@ class StatUpdater
                     $from = new DateTime($date);
                     $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
 
-                    $this->updateCount($source, $group, $from, $to);
+                    // Count
+                    $quantity = $this
+                        ->saleCalculator
+                        ->calculateCountByGroup($this->product, $source, $group, $from, $to);
+
+                    $this->updateCount($quantity, $source, $group, $from, $to);
                     if ($source === StatCount::SOURCE_ORDER) {
                         $this->updateCross($group, $from, $to);
                     }
@@ -168,18 +181,61 @@ class StatUpdater
     }
 
     /**
-     * @param Group    $group
+     * Updates the stats for the current product.
+     */
+    private function updateManufactureStats(): void
+    {
+        $count = 0;
+        $this->writeln(" - [manufacture]");
+
+        $orderDates = $this->manufactureCalculator->getSourceDates($this->product);
+        $statDates = $this->manufactureCalculator->getStatCountDates($this->product);
+
+        foreach ($orderDates as $date => $updated) {
+            $this->write(
+                sprintf(
+                    '    - %s %s ',
+                    $date,
+                    str_pad('.', 16 - mb_strlen($date), '.', STR_PAD_LEFT)
+                )
+            );
+
+            if (!$this->force && isset($statDates[$date]) && $statDates[$date] > $updated) {
+                $this->writeln('<comment>skipped</comment>');
+                continue;
+            }
+
+            $from = new DateTime($date);
+            $to = (clone $from)->modify('last day of this month')->setTime(23, 59, 59, 999999);
+
+            // Count
+            $quantity = $this
+                ->manufactureCalculator
+                ->calculateCount($this->product, $from, $to);
+
+            $this->updateCount($quantity, StatCount::SOURCE_MANUFACTURE, null, $from, $to);
+
+            $this->writeln('<info>updated</info>');
+
+            $count++;
+            if ($count % 10 === 0) {
+                $this->entityManager->flush();
+            }
+        }
+
+        if ($count % 10 === 0) {
+            $this->entityManager->flush();
+        }
+    }
+
+    /**
+     * @param Group|null $group
      * @param DateTime $from
      * @param DateTime $to
      * @param string   $source
      */
-    private function updateCount(string $source, Group $group, DateTime $from, DateTime $to): void
+    private function updateCount(int $quantity, string $source, ?Group $group, DateTime $from, DateTime $to): void
     {
-        // Count
-        $quantity = $this
-            ->calculator
-            ->calculateCountByGroup($this->product, $source, $group, $from, $to);
-
         // TODO Remove existing StatCount that do no longer match result
 
         $date = $from->format('Y-m');
@@ -209,7 +265,7 @@ class StatUpdater
      */
     private function updateCross(Group $group, DateTime $from, DateTime $to): void
     {
-        $data = $this->calculator->calculateCrossByGroup($this->product, $group, $from, $to);
+        $data = $this->saleCalculator->calculateCrossByGroup($this->product, $group, $from, $to);
 
         // TODO Remove existing StatCross that do no longer match result
 

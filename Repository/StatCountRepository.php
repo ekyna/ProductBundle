@@ -57,7 +57,7 @@ class StatCountRepository extends AbstractStatRepository
     /**
      * Finds one stat count.
      */
-    public function findOne(Product $product, string $source, Group $group, string $date): ?StatCount
+    public function findOne(Product $product, string $source, ?Group $group, string $date): ?StatCount
     {
         return $this
             ->getFindOneQuery()

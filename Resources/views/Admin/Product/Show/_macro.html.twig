@@ -1100,20 +1100,26 @@
 
 {%- macro show_stat_charts(product) -%}
     <div class="panel-group" id="stat_collapse" role="tablist" aria-multiselectable="true">
-        {% set stats = product_annual_sales_stats(product) %}
+        {% set stats = product_annual_stats(product) %}
         {% if stats is not empty %}
         <div class="panel panel-default">
             <table class="table">
                 <tr>
                     <th>Year</th>
-                    {% for stat in stats %}
-                    <th>{{ stat.year }}</th>
+                    {% for year, stat in stats %}
+                    <th>{{ year }}</th>
                     {% endfor %}
                 </tr>
                 <tr>
                     <td>Sales</td>
                     {% for stat in stats %}
-                    <td>{{ stat.count }}</td>
+                    <td>{{ stat.orders ?? '' }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Productions</td>
+                    {% for stat in stats %}
+                    <td>{{ stat.productions ?? '' }}</td>
                     {% endfor %}
                 </tr>
             </table>

@@ -21,7 +21,7 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="source" column="source" type="string" length="6" nullable="false"/>
+        <field name="source" column="source" type="string" length="11" nullable="false"/>
         <field name="date" column="date" type="string" length="7" nullable="false"/>
         <field name="count" column="count" type="integer" nullable="false"/>
         <field name="updatedAt" column="updated_at" type="datetime" nullable="false"/>
@@ -33,7 +33,7 @@
 
         <many-to-one target-entity="Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface"
                      field="customerGroup">
-            <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+            <join-column name="group_id" referenced-column-name="id" on-delete="CASCADE" nullable="true"/>
         </many-to-one>
 
     </entity>

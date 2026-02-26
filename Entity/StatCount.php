@@ -2,6 +2,7 @@
 
 namespace Ekyna\Bundle\ProductBundle\Entity;
 
+use DateTime;
 use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
@@ -14,43 +15,17 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
 class StatCount
 {
     /* Warning : StatCalculator uses these constant values to build queries */
-    public const SOURCE_ORDER = 'order';
-    public const SOURCE_QUOTE = 'quote';
+    public const SOURCE_ORDER       = 'order';
+    public const SOURCE_QUOTE       = 'quote';
+    public const SOURCE_MANUFACTURE = 'manufacture';
 
-    /**
-     * @var int
-     */
-    private $id = 0;
-
-    /**
-     * @var string
-     */
-    private $source;
-
-    /***
-     * @var string
-     */
-    private $date;
-
-    /**
-     * @var ProductInterface
-     */
-    private $product;
-
-    /**
-     * @var int
-     */
-    private $count = 0;
-
-    /**
-     * @var CustomerGroupInterface
-     */
-    private $customerGroup;
-
-    /**
-     * @var \DateTime
-     */
-    private $updatedAt;
+    private int                     $id            = 0;
+    private string                  $source;
+    private string                  $date;
+    private ProductInterface        $product;
+    private int                     $count         = 0;
+    private ?CustomerGroupInterface $customerGroup = null;
+    private ?DateTime               $updatedAt     = null;
 
 
     /**
@@ -68,7 +43,7 @@ class StatCount
      *
      * @param string $source
      */
-    public static function isValidSource(string $source)
+    public static function isValidSource(string $source): void
     {
         if (!in_array($source, self::getSources(), true)) {
             throw new InvalidArgumentException("Invalid stat source.");
@@ -186,7 +161,7 @@ class StatCount
      *
      * @return CustomerGroupInterface|null
      */
-    public function getCustomerGroup(): CustomerGroupInterface
+    public function getCustomerGroup(): ?CustomerGroupInterface
     {
         return $this->customerGroup;
     }
@@ -194,11 +169,11 @@ class StatCount
     /**
      * Sets the customer group.
      *
-     * @param CustomerGroupInterface $group
+     * @param CustomerGroupInterface|null $group
      *
      * @return StatCount
      */
-    public function setCustomerGroup(CustomerGroupInterface $group): StatCount
+    public function setCustomerGroup(?CustomerGroupInterface $group): StatCount
     {
         $this->customerGroup = $group;
 
@@ -208,9 +183,9 @@ class StatCount
     /**
      * Returns the updatedAt.
      *
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
@@ -218,11 +193,11 @@ class StatCount
     /**
      * Sets the "updated at" date time.
      *
-     * @param \DateTime $updatedAt
+     * @param DateTime $updatedAt
      *
      * @return StatCount
      */
-    public function setUpdatedAt(\DateTime $updatedAt): StatCount
+    public function setUpdatedAt(DateTime $updatedAt): StatCount
     {
         $this->updatedAt = $updatedAt;
 

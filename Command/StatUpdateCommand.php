@@ -65,6 +65,8 @@ class StatUpdateCommand extends Command
         $this->updater->setDebug($this->debug = !$input->getOption('no-debug'));
         $this->updater->setForce((bool)$input->getOption('force'));
 
+        $this->updater->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
         if (0 < $id = (int)$input->getArgument('id')) {
             if (null === $product = $this->repository->find($id)) {
                 $output->writeln("Product #$id not found.");

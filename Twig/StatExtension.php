@@ -30,8 +30,8 @@ class StatExtension extends AbstractExtension
                 ['is_safe' => ['html']]
             ),
             new TwigFunction(
-                'product_annual_sales_stats',
-                [StatHelper::class, 'getAnnualSalesStatCount']
+                'product_annual_stats',
+                [StatHelper::class, 'getAnnualStatCount']
             ),
         ];
     }
