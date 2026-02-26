@@ -69,6 +69,29 @@
 {% endblock %}
 
 {% block side %}
+    {% set margin = product|product_margin %}
+    <h3>{{ t('sale.field.margin', [], 'EkynaCommerce')|trans }}</h3>
+    <table class="table table-condensed">
+        <tr>
+            <th>PU HT</th>
+            <td>{{ margin.getRevenueTotal(false)|format_currency(commerce_default_currency) }}</td>
+        </tr>
+        <tr>
+            <th>Total cost</th>
+            <td>
+                {% if margin.average %}~{% endif %}
+                {{ margin.getCostTotal(false)|format_currency(commerce_default_currency) }}
+            </td>
+        </tr>
+        <tr>
+            <th>Margin</th>
+            <td>
+                {% if margin.average %}~{% endif %}
+                {{ margin.getTotal(false)|format_currency(commerce_default_currency) }}
+                - <em>{{ margin.getPercent(false) }}%</em>
+            </td>
+        </tr>
+    </table>
     {% if product.internalNote is not empty %}
         <h3>{{ t('product.field.internal_note', [], 'EkynaProduct')|trans }}</h3>
         <hr>
