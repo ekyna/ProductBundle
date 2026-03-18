@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Catalog;
 
 use Behat\Transliterator\Transliterator;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\Proxy;
 use Ekyna\Bundle\CommerceBundle\Service\Subject\SubjectHelperInterface;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogPage;
 use Ekyna\Bundle\ProductBundle\Entity\CatalogSlot;
@@ -14,7 +12,7 @@ use Ekyna\Bundle\ProductBundle\Exception\InvalidArgumentException;
 use Ekyna\Bundle\ProductBundle\Model\CatalogInterface;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Resource\Exception\PdfException;
-use Ekyna\Component\Resource\Helper\PdfGenerator;
+use Ekyna\Component\Resource\Helper\PdfGeneratorInterface;
 use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +33,7 @@ class CatalogRenderer
     public function __construct(
         protected readonly CatalogRegistry        $registry,
         protected readonly Environment            $twig,
-        protected readonly PdfGenerator           $pdfGenerator,
+        protected readonly PdfGeneratorInterface  $pdfGenerator,
         protected readonly SubjectHelperInterface $subjectHelper,
         protected readonly string                 $logoPath,
         protected readonly bool                   $debug = false
@@ -107,10 +105,10 @@ class CatalogRenderer
 
         if ($catalog->getFormat() === static::FORMAT_PDF) {
             $options = [
-                'marginTop'     => 0,
-                'marginBottom'  => 0,
-                'marginLeft'    => 0,
-                'marginRight'   => 0,
+                'marginTop'     => '0',
+                'marginBottom'  => '0',
+                'marginLeft'    => '0',
+                'marginRight'   => '0',
             ];
 
             return $this->pdfGenerator->generateFromHtml($content, $options);
