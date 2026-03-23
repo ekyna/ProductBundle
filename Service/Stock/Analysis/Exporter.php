@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Entity\Product;
 use Ekyna\Bundle\ProductBundle\Entity\StatCount;
 use Ekyna\Bundle\ProductBundle\Service\Stock\StockRepository;
 use Ekyna\Component\Resource\Helper\File\Csv;
+use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -83,6 +84,8 @@ class Exporter
     private array $products;
     private array $forecast;
     private array $historic;
+    private array $supply;
+    private array $shipment;
 
     public function __construct(
         private readonly StockRepository $stockRepository,
@@ -90,6 +93,9 @@ class Exporter
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public function exportXls(string $fileName = null): string
     {
         if (empty($fileName)) {
@@ -114,6 +120,8 @@ class Exporter
         $this->buildDataSheet($spreadsheet);
 
         $this->buildPriceSheet($spreadsheet);
+
+        $spreadsheet->setActiveSheetIndex(0);
 
         // TODO "Help" tab with VB code to highlight changed cells.
         /*
@@ -143,6 +151,9 @@ class Exporter
         return $path;
     }
 
+    /**
+     * @throws Exception
+     */
     private function buildStockSheet(Spreadsheet $spreadsheet): void
     {
         $sheet = $spreadsheet->getActiveSheet();
@@ -168,9 +179,14 @@ class Exporter
         $sheet->getColumnDimension('N')->setWidth(14);      // Entre 7 et 9 derniers mois
         $sheet->getColumnDimension('O')->setWidth(14);      // Entre 10 et 12 derniers mois
         $sheet->getColumnDimension('P')->setWidth(14);      // Avant les 12 derniers mois
+        $sheet->getColumnDimension('Q')->setWidth(24);      // Fournisseur dernier achat
+        $sheet->getColumnDimension('R')->setWidth(8);       // Prix dernier achat
+        $sheet->getColumnDimension('S')->setWidth(8);       // Devise dernier achat
+        $sheet->getColumnDimension('T')->setWidth(22);      // Date dernier achat
+        $sheet->getColumnDimension('U')->setWidth(22);      // Date dernière livraison client
 
         // Column headers
-        $sheet->getStyle('A1:P1')->applyFromArray(self::COLUMN_HEADER_STYLE);
+        $sheet->getStyle('A1:U1')->applyFromArray(self::COLUMN_HEADER_STYLE);
         // Editable column headers
         $sheet->getStyle('C1:D1')->applyFromArray(self::COLUMN_EDITABLE_HEADER_STYLE);
 
@@ -191,6 +207,11 @@ class Exporter
         $sheet->getCell('N1')->setValue('Entre 7 et 9 derniers mois');
         $sheet->getCell('O1')->setValue('Entre 10 et 12 derniers mois');
         $sheet->getCell('P1')->setValue('Avant les 12 derniers mois');
+        $sheet->getCell('Q1')->setValue('Fournisseur dernier achat');
+        $sheet->getCell('R1')->setValue('Prix dernier achat');
+        $sheet->getCell('S1')->setValue('Devise dernier achat');
+        $sheet->getCell('T1')->setValue('Date dernier achat');
+        $sheet->getCell('U1')->setValue('Date dernière livraison client');
 
         $row = 1;
         foreach ($this->products as $product) {
@@ -216,8 +237,21 @@ class Exporter
             $sheet->getCell("O$row")->setValue($this->getHistoric($id, 9, 3));             // Entre 10 et 12 derniers mois
             $sheet->getCell("P$row")->setValue($this->getHistoric($id, 12, null));         // Avant les 12 derniers mois
 
+            if (isset($this->supply[$id])) {
+                $supply = $this->supply[$id];
+
+                $sheet->getCell("Q$row")->setValue($supply['supplier']); // Fournisseur dernier achat
+                $sheet->getCell("R$row")->setValue($supply['price']);    // Prix dernier achat
+                $sheet->getCell("S$row")->setValue($supply['currency']); // Devise dernier achat
+                $sheet->getCell("T$row")->setValue($supply['date']);     // Date dernier achat
+            }
+
+            if (isset($this->shipment[$id])) {
+                $sheet->getCell("U$row")->setValue($this->shipment[$id]); // Date dernière livraison client
+            }
+
             if (1 === $row % 2) {
-                $sheet->getStyle("A$row:P$row")->applyFromArray(self::ALT_ROW_STYLE);
+                $sheet->getStyle("A$row:U$row")->applyFromArray(self::ALT_ROW_STYLE);
             }
         }
 
@@ -229,13 +263,16 @@ class Exporter
         // Forecast columns
         $sheet->getStyle("H1:I$row")->applyFromArray(self::GREY_COLUMN_STYLE);
         // Set all borders
-        $sheet->getStyle("A1:P$row")->applyFromArray(self::BORDERS_STYLE);
+        $sheet->getStyle("A1:U$row")->applyFromArray(self::BORDERS_STYLE);
 
         $sheet->setAutoFilter('A1:C2');
         $sheet->getAutoFilter()->setRangeToMaxRow();
         $sheet->freezePane('B2');
     }
 
+    /**
+     * @throws Exception
+     */
     private function buildDataSheet(Spreadsheet $spreadsheet): void
     {
         $sheet = $spreadsheet->createSheet();
@@ -268,6 +305,9 @@ class Exporter
         // TODO Add product rows
     }
 
+    /**
+     * @throws Exception
+     */
     private function buildPriceSheet(Spreadsheet $spreadsheet): void
     {
         $sheet = $spreadsheet->createSheet();
@@ -402,6 +442,10 @@ class Exporter
         return array_sum($interval);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function loadProducts(): void
     {
         $qb = $this->stockRepository->getProductsQueryBuilder();
@@ -429,13 +473,21 @@ class Exporter
 
         $this->loadForecast();
         $this->loadStats();
+        $this->loadSupplierOrders();
+        $this->loadShipments();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Exception
+     */
     private function loadForecast(): void
     {
         $trust = 5;
         $nbMonths = 6;
 
+        /** @noinspection SqlDialectInspection */
         $sql = <<<SQL
         WITH RECURSIVE item_quantity (id, parent_id, quote_id, total, subject_provider, subject_identifier) AS (
             SELECT id, parent_id, quote_id, quantity as total, subject_provider, subject_identifier
@@ -482,10 +534,15 @@ class Exporter
         }
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     private function loadStats(): void
     {
         $nbMonths = 12;
 
+        /** @noinspection SqlDialectInspection */
         $sql = <<<SQL
         SELECT product_id, date, SUM(count) as count
         FROM product_stat_count
@@ -510,6 +567,74 @@ class Exporter
             }
 
             $this->historic[$id][$row['date']] = (int)$row['count'];
+        }
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function loadSupplierOrders(): void
+    {
+        /** @noinspection SqlDialectInspection */
+        $sql = <<<SQL
+        SELECT soi2.subject_identifier as product_id,
+               s.name as supplier,
+               soi2.net_price as price,
+               c.code as currency,
+               sd2.created_at as date
+        FROM (
+             SELECT soi1.subject_identifier as product_id, MAX(sd1.created_at) as delivery_date
+             FROM commerce_supplier_delivery sd1
+             JOIN commerce_supplier_delivery_item sdi1 ON sdi1.supplier_delivery_id = sd1.id
+             JOIN commerce_supplier_order_item soi1 ON soi1.id = sdi1.supplier_order_item_id
+             WHERE soi1.subject_provider = 'product'
+               AND soi1.subject_identifier IS NOT NULL
+             GROUP BY soi1.subject_identifier
+        ) as last_deliveries
+        JOIN commerce_supplier_order_item soi2 ON soi2.subject_identifier = last_deliveries.product_id
+        JOIN commerce_supplier_order so2 ON so2.id = soi2.supplier_order_id
+        JOIN commerce_supplier_delivery sd2 ON sd2.supplier_order_id = so2.id AND sd2.created_at = last_deliveries.delivery_date
+        JOIN commerce_supplier s ON s.id = so2.supplier_id
+        JOIN commerce_currency c ON c.id = so2.currency_id
+        GROUP BY soi2.subject_identifier
+        SQL;
+
+        $statement = $this->connection->prepare($sql);
+
+        $data = $statement->executeQuery();
+
+        $this->supply = [];
+
+        while (false !== $row = $data->fetchAssociative()) {
+            $this->supply[(int)$row['product_id']] = $row;
+        }
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function loadShipments(): void
+    {
+        /** @noinspection SqlDialectInspection */
+        $sql = <<<SQL
+        SELECT oi1.subject_identifier as product_id, MAX(s1.shipped_at) as shipment_date
+        FROM commerce_order_shipment s1
+        JOIN commerce_order_shipment_item si1 ON si1.shipment_id = s1.id
+        JOIN commerce_order_item oi1 ON oi1.id = si1.order_item_id
+        WHERE oi1.subject_provider = 'product'
+        GROUP BY oi1.subject_identifier;
+        SQL;
+
+        $statement = $this->connection->prepare($sql);
+
+        $data = $statement->executeQuery();
+
+        $this->shipment = [];
+
+        while (false !== $row = $data->fetchAssociative()) {
+            $this->shipment[(int)$row['product_id']] = $row['shipment_date'];
         }
     }
 
