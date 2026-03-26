@@ -449,17 +449,8 @@ class Exporter
     private function loadProducts(): void
     {
         $qb = $this->stockRepository->getProductsQueryBuilder();
-        $ex = $qb->expr();
 
         $this->products = $qb
-            ->andWhere(
-                $ex->not(
-                    $ex->andX(
-                        $ex->eq('p.endOfLife', 1),
-                        $ex->eq('p.virtualStock', 0),
-                    )
-                )
-            )
             ->addOrderBy('p.reference')
             ->getQuery()
             ->getScalarResult();
