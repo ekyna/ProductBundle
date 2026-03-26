@@ -456,8 +456,7 @@ class Exporter
                 $ex->not(
                     $ex->andX(
                         $ex->eq('p.endOfLife', 1),
-                        $ex->eq('p.inStock', 0),
-                        $ex->lt('p.virtualStock', 0)
+                        $ex->eq('p.virtualStock', 0),
                     )
                 )
             )
