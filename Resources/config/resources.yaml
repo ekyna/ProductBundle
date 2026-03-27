@@ -126,6 +126,7 @@ resources:
             entity:
                 interface: Ekyna\Bundle\ProductBundle\Model\BundleChoiceInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BundleChoice
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\BundleChoiceNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceType
             parent: ekyna_product.bundle_slot
             trans_domain: EkynaProduct
@@ -135,6 +136,7 @@ resources:
             entity:
                 interface: Ekyna\Bundle\ProductBundle\Model\BundleChoiceRuleInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BundleChoiceRule
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\BundleChoiceRuleNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleChoiceRuleType
             parent: ekyna_product.bundle_choice
             trans_domain: EkynaProduct
@@ -145,6 +147,7 @@ resources:
             entity:
                 interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BundleSlot
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\BundleSlotNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotType
             parent: ekyna_product.product
             trans_domain: EkynaProduct
@@ -158,6 +161,7 @@ resources:
             entity:
                 interface: Ekyna\Bundle\ProductBundle\Model\BundleSlotRuleInterface
                 class: Ekyna\Bundle\ProductBundle\Entity\BundleSlotRule
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\BundleSlotRuleNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Bundle\BundleSlotRuleType
             parent: ekyna_product.bundle_slot
             trans_domain: EkynaProduct
@@ -259,6 +263,7 @@ resources:
                 class: Ekyna\Bundle\ProductBundle\Entity\Option
             repository:
                 class: Ekyna\Bundle\ProductBundle\Repository\OptionRepository
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\OptionNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Option\OptionType
             parent: ekyna_product.option_group
             trans_domain: EkynaProduct
@@ -274,6 +279,7 @@ resources:
                 class: Ekyna\Bundle\ProductBundle\Entity\OptionGroup
             repository:
                 class: Ekyna\Bundle\ProductBundle\Repository\OptionGroupRepository
+            normalizer: Ekyna\Bundle\ProductBundle\Service\Serializer\OptionGroupNormalizer
             form: Ekyna\Bundle\ProductBundle\Form\Type\Option\OptionGroupType
             parent: ekyna_product.product
             trans_domain: EkynaProduct

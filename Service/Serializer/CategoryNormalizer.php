@@ -6,7 +6,6 @@ namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Component\Resource\Bridge\Symfony\Serializer\TranslatableNormalizer;
-use Exception;
 
 /**
  * Class CategoryNormalizer
@@ -34,6 +33,12 @@ class CategoryNormalizer extends TranslatableNormalizer
             return $data;
         }
 
+        if (self::contextHasGroup('Api', $context)) {
+            $data['title'] = $object->getTitle();
+
+            return $data;
+        }
+
         if (self::contextHasGroup('Sale', $context)) {
             $data['title'] = $object->getTitle();
 
@@ -49,31 +54,5 @@ class CategoryNormalizer extends TranslatableNormalizer
         }
 
         return $data;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
-    {
-        //$object = parent::denormalize($data, $class, $format, $context);
-
-        throw new Exception('Not yet implemented');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function supportsNormalization($data, string $format = null): bool
-    {
-        return $data instanceof Model\CategoryInterface;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function supportsDenormalization($data, string $type, string $format = null): bool
-    {
-        return class_exists($type) && is_subclass_of($type, Model\CategoryInterface::class);
     }
 }

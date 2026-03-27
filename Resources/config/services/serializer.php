@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $container) {
     // Product normalizer
     $services
         ->set('ekyna_product.normalizer.product', ProductNormalizer::class)
+        ->call('setResourceHelper', [service('ekyna_resource.helper')])
         ->call('setCacheManager', [service('liip_imagine.cache.manager')])
         ->call('setSubjectNormalizerHelper', [service('ekyna_commerce.helper.subject_normalizer')])
         ->call('setSupplierProductRepository', [service('ekyna_commerce.repository.supplier_product')]);
