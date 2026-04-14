@@ -31,7 +31,7 @@ class ProductNormalizer extends TranslatableNormalizer implements ResourceHelper
     use ResourceHelperAwareTrait;
     use CacheManagerAwareTrait;
 
-    protected SubjectNormalizerHelper $subjectHelper;
+    protected SubjectNormalizerHelper            $subjectHelper;
     protected SupplierProductRepositoryInterface $supplierProductRepository;
 
     public function setSubjectNormalizerHelper(SubjectNormalizerHelper $helper): void
@@ -255,12 +255,12 @@ class ProductNormalizer extends TranslatableNormalizer implements ResourceHelper
             'references'    => $this->normalizeCollection($object->getReferences(), $format, $context),
             'option_groups' => $this->normalizeCollection($object->getOptionGroups(), $format, $context),
             'bundle_slots'  => $this->normalizeCollection($object->getBundleSlots(), $format, $context),
-            'image'         => null,
+            'images'        => [],
         ]);
 
         // Image
-        if ($image = $object->getImage()) {
-            $data['image'] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_thumb');
+        foreach ($object->getImages() as $image) {
+            $data['images'][] = $this->cacheManager->getBrowserPath($image->getPath(), 'media_front');
         }
 
         $data['_links'] = [
