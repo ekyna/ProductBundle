@@ -44,7 +44,10 @@ class RenderFromSaleAction extends AbstractRenderAction implements RoutingAction
             )
             ->setDisplayPrices(false)
             ->setFormat(CatalogRenderer::FORMAT_PDF)
-            ->setSaleItems($loader->loadItems());
+            ->setSaleItems($loader->loadItems())
+            // TODO Set with CatalogFactory
+            ->setTheme('default')
+            ->setTemplate('default.half');
 
         $form = $this->createRenderForm($catalog, $sale);
 
