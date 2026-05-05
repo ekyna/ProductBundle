@@ -37,7 +37,7 @@ class SaleViewType extends AbstractViewType
         $addItemPath = $this->resourceUrl($config->getId(), BrowseAction::class, [
             $config->getName() . 'Id' => $sale->getId(),
         ]);
-        $view->addButton(new Button(
+        $view->addButton('browse', new Button(
             $addItemPath,
             $this->trans('sale.button.browse', [], 'EkynaProduct'),
             'fa fa-cube',
@@ -82,7 +82,7 @@ class SaleViewType extends AbstractViewType
             && $this->resourceHelper->isGranted(Permission::SYNC_REFERENCE, $item)
         ) {
             $syncReferencePath = $this->resourceUrl($item, SyncReferenceAction::class);
-            $view->addAction(new Action($syncReferencePath, 'fa fa-hashtag', [
+            $view->addAction('sync_reference', new Action($syncReferencePath, 'fa fa-hashtag', [
                 'title'           => $this->trans('sale_item.button.sync_reference', [], 'EkynaProduct'),
                 'confirm'         => $this->trans('sale_item.confirm.sync_reference', [], 'EkynaProduct'),
                 'data-sale-xhr' => null,
