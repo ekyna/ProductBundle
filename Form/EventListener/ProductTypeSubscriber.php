@@ -145,6 +145,7 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addSpecialOffersField()
             ->addPricingGroupField()
             ->addPricingsField()
+            ->addPriceGridsField()
             ->addSeoField();
 
         $this->subjectBuilder
@@ -266,7 +267,8 @@ class ProductTypeSubscriber implements EventSubscriberInterface
             ->addOptionGroupsField()
             ->addSpecialOffersField()
             ->addPricingGroupField()
-            ->addPricingsField();
+            ->addPricingsField()
+            ->addPriceGridsField();
 
         $this->subjectBuilder
             ->addDesignationField([

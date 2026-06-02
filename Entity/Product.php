@@ -85,6 +85,8 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
     protected Collection $crossSellings;
     /** @var Collection<int, Model\SpecialOfferInterface> */
     protected Collection $specialOffers;
+    /** @var Collection<int, Model\PriceGridInterface> */
+    protected Collection $priceGrids;
     /** @var Collection<int, Model\PricingInterface> */
     protected Collection $pricings;
     /** @var Collection<int, Model\CategoryInterface> */
@@ -108,6 +110,7 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
         $this->components = new ArrayCollection();
         $this->crossSellings = new ArrayCollection();
         $this->specialOffers = new ArrayCollection();
+        $this->priceGrids = new ArrayCollection();
         $this->pricings = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->medias = new ArrayCollection();
@@ -962,6 +965,49 @@ class Product extends RM\AbstractTranslatable implements Model\ProductInterface
 
         foreach ($offers as $offer) {
             $this->addSpecialOffer($offer);
+        }
+
+        return $this;
+    }
+
+    public function getPriceGrids(): Collection
+    {
+        return $this->priceGrids;
+    }
+
+    public function hasPriceGrid(Model\PriceGridInterface $priceGrid): bool
+    {
+        return $this->priceGrids->contains($priceGrid);
+    }
+
+    public function addPriceGrid(Model\PriceGridInterface $priceGrid): Model\ProductInterface
+    {
+        if (!$this->hasPriceGrid($priceGrid)) {
+            $this->priceGrids->add($priceGrid);
+            $priceGrid->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removePriceGrid(Model\PriceGridInterface $priceGrid): Model\ProductInterface
+    {
+        if ($this->hasPriceGrid($priceGrid)) {
+            $this->priceGrids->removeElement($priceGrid);
+            $priceGrid->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    public function setPriceGrids(Collection $priceGrids): Model\ProductInterface
+    {
+        foreach ($this->priceGrids as $priceGrid) {
+            $this->removePriceGrid($priceGrid);
+        }
+
+        foreach ($priceGrids as $priceGrid) {
+            $this->addPriceGrid($priceGrid);
         }
 
         return $this;

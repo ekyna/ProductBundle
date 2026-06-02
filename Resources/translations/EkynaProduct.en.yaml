@@ -373,6 +373,25 @@ price:
         valid_until: Offer valid until %date%
         while_stock: Within the limit of available product stock
 
+price_grid:
+    label:
+        singular: Price grid
+        plural: Price grids
+    header:
+        list: Price grids <small>List of grids</small>
+        show: Price grid details <small>%name%</small>
+        new: Create a new price grid
+        edit: Edit the price grid <small>%name%</small>
+        remove: Remove the price grid <small>%name%</small>
+    button:
+        list: Price grids list
+        show: Price grid details
+        new: New price grid
+        edit: Edit the price grid
+        remove: Remove the price grid
+    alert:
+        no_item: No price grid configured
+
 pricing:
     label:
         singular: Pricing

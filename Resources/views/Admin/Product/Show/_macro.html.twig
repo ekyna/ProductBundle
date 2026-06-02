@@ -520,6 +520,66 @@
 {%- endmacro show_pricings -%}
 
 
+{%- macro show_price_grids(product, options = {}) -%}
+    <div class="row show-row">
+        <div class="col-md-2 show-label">
+            {{- 'price_grid.label.plural'|trans({}, 'EkynaProduct') -}}
+        </div>
+        <div class="col-md-10">
+            {% set cost = product|product_purchase_cost(false) %}
+            {%- if product.priceGrids is not empty -%}
+            <div class="show-widget show-widget-sm">
+                <table class="table table-stripped table-condensed table-alt-head">
+                    <tr>
+                        <th>{{ 'customer_group.label.singular'|trans({}, 'EkynaCommerce') }}</th>
+                        <th>{{ 'price_grid.label.singular'|trans({}, 'EkynaProduct') }}</th>
+                    </tr>
+                    {%- for priceGrid in product.priceGrids -%}
+                    {%- set priceGridId = 'product_priceGrid_' ~ loop.index0 ~ '_' -%}
+                    <tr>
+                        <td id="{{ priceGridId ~ 'group' }}">
+                            {{- priceGrid.group.name -}}
+                        </td>
+                        <td id="{{ priceGridId ~ 'rules' }}">
+                            <table class="table table-condensed table-alt-head">
+                                <tr>
+                                    <th class="text-right">{{ 'common.min_quantity'|trans({}, 'EkynaProduct') }}</th>
+                                    {%- for rule in priceGrid.rules -%}
+                                        <td class="text-right">{{ rule.quantity|format_number }}</td>
+                                    {%- endfor -%}
+                                </tr>
+                                <tr>
+                                    <th class="text-right">{{ 'field.price'|trans({}, 'EkynaUi') }}</th>
+                                    {%- for rule in priceGrid.rules -%}
+                                        <td class="text-right">{{ rule.price|format_currency(commerce_default_currency) }}</td>
+                                    {%- endfor -%}
+                                </tr>
+                                <tr>
+                                    <th class="text-right">{{ 'field.margin'|trans({}, 'EkynaCommerce') }}</th>
+                                    {%- for rule in priceGrid.rules -%}
+                                        {% set margin = commerce_margin({revenue:{product: rule.price}, cost: {product: cost}}) %}
+                                        <td class="text-right">
+                                            {{ margin.total(true)|format_currency(commerce_default_currency) }}<br>
+                                            {{ margin.percent(true).div(100)|format_number(style='percent') }}
+                                        </td>
+                                    {%- endfor -%}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {%- endfor -%}
+                </table>
+            </div>
+            {%- else -%}
+            <div class="show-widget show-widget-inline">
+                <em>{{ 'value.none'|trans({}, 'EkynaUi') }}</em>
+            </div>
+            {%- endif -%}
+        </div>
+    </div>
+{%- endmacro show_price_grids -%}
+
+
 {%- macro show_bundle_composition(product, options = {}) -%}
     <div class="row show-row">
         <div class="col-md-2 show-label">

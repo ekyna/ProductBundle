@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping
+        xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                            http://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
+
+    <mapped-superclass
+            name="Ekyna\Bundle\ProductBundle\Entity\PriceGridRule"
+            table="product_price_grid_rule">
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="quantity" column="quantity" type="integer" nullable="false"/>
+        <field name="price" column="price" type="php_decimal" precision="10" scale="5" nullable="false"/>
+
+        <many-to-one target-entity="Ekyna\Bundle\ProductBundle\Model\PriceGridInterface" field="grid" inversed-by="rules">
+            <join-column name="grid_id" referenced-column-name="id" on-delete="CASCADE" nullable="true" />
+        </many-to-one>
+
+    </mapped-superclass>
+
+</doctrine-mapping>

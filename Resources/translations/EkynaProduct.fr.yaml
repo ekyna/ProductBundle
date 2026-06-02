@@ -374,6 +374,25 @@ price:
         valid_until: Offre valable jusqu'au %date%
         while_stock: Dans la limite des stocks disponibles
 
+price_grid:
+    label:
+        singular: Grille de prix
+        plural: Grilles de prix
+    header:
+        list: Grilles de prix <small>Liste des grilles de prix</small>
+        show: Détail de la grille de prix <small>%name%</small>
+        new: Créer une nouvelle grille de prix
+        edit: Modifier la grille de prix <small>%name%</small>
+        remove: Supprimer la grille de prix <small>%name%</small>
+    button:
+        list: Liste des grilles de prix
+        show: Détail de la grille de prix
+        new: Nouvelle grille de prix
+        edit: Modifier la grille de prix
+        remove: Supprimer la grille de prix
+    alert:
+        no_item: Aucune grille de prix configuré
+
 pricing:
     label:
         singular: Tarification

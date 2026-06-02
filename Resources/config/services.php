@@ -200,6 +200,18 @@ return static function (ContainerConfigurator $container) {
             param('ekyna_commerce.default.currency'),
         ]);
 
+    // Price grid guesser
+    $services
+        ->set('ekyna_product.guesser.price_grid', Pricing\PriceGridGuesser::class)
+        ->lazy()
+        ->args([
+            service('ekyna_product.repository.price_grid_rule'),
+        ])
+        ->tag('doctrine.event_listener', [
+            'event'      => Events::onClear,
+            'connection' => 'default',
+        ]);
+
     // Purchase cost calculator
     $services
         ->set('ekyna_product.calculator.purchase_cost', Pricing\PurchaseCostCalculator::class)

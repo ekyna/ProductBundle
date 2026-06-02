@@ -373,6 +373,24 @@ interface ProductInterface extends
     public function setSpecialOffers(Collection $offers): ProductInterface;
 
     /**
+     * @return Collection<int, PriceGridInterface>
+     */
+    public function getPriceGrids(): Collection;
+
+    public function hasPriceGrid(PriceGridInterface $priceGrid): bool;
+
+    public function addPriceGrid(PriceGridInterface $priceGrid): ProductInterface;
+
+    public function removePriceGrid(PriceGridInterface $priceGrid): ProductInterface;
+
+    /**
+     * @param Collection<int, PriceGridInterface> $priceGrids
+     *
+     * @internal
+     */
+    public function setPriceGrids(Collection $priceGrids): ProductInterface;
+
+    /**
      * @return Collection<int, PricingInterface>
      */
     public function getPricings(): Collection;

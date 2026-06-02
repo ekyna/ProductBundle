@@ -361,6 +361,33 @@
 {%- endblock ekyna_product_pricing_rule_widget -%}
 
 
+{%- block ekyna_product_price_grid_widget -%}
+    <div class="ekyna-collection-item">
+        {{- bootstrap_backup_form_settings() -}}
+        {{- bootstrap_set_sizing('sm') -}}
+        {{- form_errors(form) -}}
+        {{- form_row(form.group, {'label_col': 2, 'widget_col': 10}) -}}
+        {{- form_row(form.rules, {'label_col': 2, 'widget_col': 10}) -}}
+        {{- form_rest(form) -}}
+        {{- bootstrap_restore_form_settings() -}}
+    </div>
+{%- endblock ekyna_product_price_grid_widget -%}
+
+
+{%- block ekyna_product_price_grid_rule_widget -%}
+    {{- form_errors(form) -}}
+    <div class="row">
+        <div class="col-md-6">
+            {{- form_row(form.quantity, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) -}}
+        </div>
+        <div class="col-md-6">
+            {{- form_row(form.price, {'label_col': 4, 'widget_col': 8, 'sizing': 'sm'}) -}}
+        </div>
+    </div>
+    {{- form_rest(form) -}}
+{%- endblock ekyna_product_price_grid_rule_widget -%}
+
+
 {%- block ekyna_product_reference_widget -%}
     {{- form_errors(form) -}}
     <div class="row">

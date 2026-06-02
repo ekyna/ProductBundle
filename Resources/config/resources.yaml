@@ -308,6 +308,25 @@ resources:
                 class: Ekyna\Bundle\ProductBundle\Repository\PriceRepository
             trans_domain: EkynaProduct
 
+        price_grid:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PriceGridInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\PriceGrid
+            form: Ekyna\Bundle\ProductBundle\Form\Type\PriceGrid\PriceGridType
+            trans_domain: EkynaProduct
+
+        price_grid_rule:
+            driver: doctrine/orm
+            entity:
+                interface: Ekyna\Bundle\ProductBundle\Model\PriceGridRuleInterface
+                class: Ekyna\Bundle\ProductBundle\Entity\PriceGridRule
+            repository:
+                interface: Ekyna\Bundle\ProductBundle\Repository\PriceGridRuleRepositoryInterface
+                class: Ekyna\Bundle\ProductBundle\Repository\PriceGridRuleRepository
+            form: Ekyna\Bundle\ProductBundle\Form\Type\PriceGrid\PriceGridRuleType
+            trans_domain: EkynaProduct
+
         pricing_group:
             driver: doctrine/orm
             entity:

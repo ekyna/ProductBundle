@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceGridGuesser;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
@@ -27,24 +28,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SaleItemEventSubscriber implements EventSubscriberInterface
 {
-    protected ContextProviderInterface $contextProvider;
-    protected ItemBuilder $itemBuilder;
-    protected FormBuilder $formBuilder;
-    protected OfferRepositoryInterface $offerRepository;
-    protected TranslatorInterface $translator;
-
     public function __construct(
-        ContextProviderInterface $contextProvider,
-        ItemBuilder $itemBuilder,
-        FormBuilder $formBuilder,
-        OfferRepositoryInterface $offerRepository,
-        TranslatorInterface $translator
+        protected readonly ContextProviderInterface $contextProvider,
+        protected readonly ItemBuilder $itemBuilder,
+        protected readonly FormBuilder $formBuilder,
+        protected readonly PriceGridGuesser $priceGridGuesser,
+        protected readonly OfferRepositoryInterface $offerRepository,
+        protected readonly TranslatorInterface $translator
     ) {
-        $this->contextProvider = $contextProvider;
-        $this->itemBuilder = $itemBuilder;
-        $this->formBuilder = $formBuilder;
-        $this->offerRepository = $offerRepository;
-        $this->translator = $translator;
     }
 
     /**
@@ -93,19 +84,35 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // TODO Move AdjustmentData build in a dedicated service.
 
-        $offer = null;
         $item = $event->getItem();
+
+        if (null === $product = $this->getProductFromItem($item)) {
+            return;
+        }
 
         $context = $this->contextProvider->getContext($item->getRootSale());
 
-        // Loop through parents and keep the best offer
-        do {
-            if (null === $product = $this->getProductFromItem($item)) {
-                continue;
-            }
+        // PRICE GRID SYSTEM
 
+        $price = $this
+            ->priceGridGuesser
+            ->guess($product, $context->getCustomerGroup(), $item->getTotalQuantity());
+
+        if (null !== $price) {
+            $item->setNetPrice($price);
+
+            return;
+        }
+
+        // PRICING SYSTEM
+
+        // TODO Move AdjustmentData build in a dedicated service.
+
+        $offer = null;
+
+        // Loop through parents and keep the best offer
+        while ($product) {
             $o = $this
                 ->offerRepository
                 ->findOneByProductAndContextAndQuantity($product, $context, $item->getTotalQuantity());
@@ -118,7 +125,13 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             if ($item->hasDatum(ItemBuilder::OPTION_GROUP_ID) || $item->hasDatum(ItemBuilder::OPTION_ID)) {
                 break;
             }
-        } while ($item = $item->getParent());
+
+            if (null === $item = $item->getParent()) {
+                break;
+            }
+
+            $product = $this->getProductFromItem($item);
+        }
 
         if (is_null($offer)) {
             return;

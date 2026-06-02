@@ -230,10 +230,10 @@ class PriceRenderer
      *
      * @return string|null
      */
-    public function renderPricingGrid(
+    public function renderPricingGrid( // TODO rename to renderPricings()
         Model\ProductInterface $product,
         ContextInterface       $context = null,
-        string                 $class = 'product-pricing-grid'
+        string                 $class = 'product-pricings'
     ): ?string {
         if (null === $context) {
             $context = $this->contextProvider->getContext();
@@ -261,7 +261,7 @@ class PriceRenderer
 
         $config['offers'] = array_reverse($offers);
 
-        return $this->twig->render('@EkynaProduct/Pricing/grid.html.twig', [
+        return $this->twig->render('@EkynaProduct/Price/pricings.html.twig', [
             'pricing' => $config,
             'class'   => $class,
         ]);

@@ -171,6 +171,13 @@
             </cascade>
         </one-to-many>
 
+        <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PriceGridInterface"
+                     field="priceGrids" mapped-by="product" orphan-removal="true" index-by="id">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+        </one-to-many>
+
         <one-to-many target-entity="Ekyna\Bundle\ProductBundle\Model\PricingInterface"
                      field="pricings" mapped-by="product" orphan-removal="true" index-by="id">
             <cascade>

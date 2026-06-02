@@ -114,6 +114,9 @@
             {% if form.pricings is defined %}
                 {{ form_row(form.pricings) }}
             {% endif %}
+            {% if form.priceGrids is defined %}
+                {{ form_row(form.priceGrids) }}
+            {% endif %}
         </div>
         {% endblock offers_pane %}
         {% endif %}

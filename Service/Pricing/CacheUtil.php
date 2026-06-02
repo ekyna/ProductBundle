@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
-
 namespace Ekyna\Bundle\ProductBundle\Service\Pricing;
 
 use Decimal\Decimal;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
 use Ekyna\Component\Commerce\Common\Model\CountryInterface;
 use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
+
+use function sprintf;
 
 /**
  * Class CacheUtil
@@ -15,6 +16,24 @@ use Ekyna\Component\Commerce\Customer\Model\CustomerGroupInterface;
  */
 final class CacheUtil
 {
+    /**
+     * Builds and returns the offer(s) cache key.
+     *
+     * @see \Ekyna\Bundle\ProductBundle\Repository\OfferRepository
+     */
+    public static function buildGridRuleKey(
+        ProductInterface $product,
+        CustomerGroupInterface $group,
+        Decimal $quantity
+    ): string {
+        return sprintf(
+            'product_grid_rule_%d_%d_%d',
+            $product->getId(),
+            $group->getId(),
+            $quantity->ceil()->toInt()
+        );
+    }
+
     /**
      * Builds and returns the offer(s) cache key.
      *

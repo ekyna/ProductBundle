@@ -248,6 +248,7 @@ return static function (ContainerConfigurator $container) {
             service('ekyna_commerce.provider.context'),
             service('ekyna_product.commerce.builder.item'),
             service('ekyna_product.commerce.builder.form'),
+            service('ekyna_product.guesser.price_grid'),
             service('ekyna_product.repository.offer'),
             service('translator'),
         ])

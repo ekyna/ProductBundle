@@ -347,6 +347,30 @@ class ProductFormBuilder
     }
 
     /**
+     * Adds the price grids field.
+     */
+    public function addPriceGridsField(array $options = []): ProductFormBuilder
+    {
+        if (in_array($this->product->getType(), [ProductTypes::TYPE_VARIABLE, ProductTypes::TYPE_CONFIGURABLE])) {
+            throw new InvalidArgumentException('Unexpected product type.');
+        }
+
+        $options = array_replace([
+            'label'           => t('price_grid.label.plural', [], 'EkynaProduct'),
+            'entry_type'      => PR\PriceGrid\PriceGridType::class,
+            'entry_options'   => [],
+            'prototype_name'  => '__price_grid__',
+            'allow_add'       => true,
+            'allow_delete'    => true,
+            'add_button_text' => t('pricing.button.add', [], 'EkynaProduct'),
+        ], $options);
+
+        $this->form->add('priceGrids', CollectionType::class, $options);
+
+        return $this;
+    }
+
+    /**
      * Adds the pricings field.
      */
     public function addPricingsField(array $options = []): ProductFormBuilder
