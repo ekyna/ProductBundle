@@ -78,21 +78,21 @@
     <table class="table table-condensed">
         <tr>
             <th>PU HT</th>
-            <td>{{ margin.getRevenueTotal(false)|format_currency(commerce_default_currency) }}</td>
+            <td>{{ margin.revenueTotal(false)|format_currency(commerce_default_currency) }}</td>
         </tr>
         <tr>
             <th>Total cost</th>
             <td>
                 {% if margin.average %}~{% endif %}
-                {{ margin.getCostTotal(false)|format_currency(commerce_default_currency) }}
+                {{ margin.costTotal(false)|format_currency(commerce_default_currency) }}
             </td>
         </tr>
         <tr>
             <th>Margin</th>
             <td>
                 {% if margin.average %}~{% endif %}
-                {{ margin.getTotal(false)|format_currency(commerce_default_currency) }}
-                - <em>{{ margin.getPercent(false) }}%</em>
+                {{ margin.total(false)|format_currency(commerce_default_currency) }}
+                - <em>{{ margin.percent(false).div(100)|format_number(style='percent') }}%</em>
             </td>
         </tr>
     </table>

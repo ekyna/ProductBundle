@@ -526,7 +526,7 @@
             {{- 'price_grid.label.plural'|trans({}, 'EkynaProduct') -}}
         </div>
         <div class="col-md-10">
-            {% set cost = product|product_purchase_cost(false) %}
+            {% set margin = product|product_margin %}
             {%- if product.priceGrids is not empty -%}
             <div class="show-widget show-widget-sm">
                 <table class="table table-stripped table-condensed table-alt-head">
@@ -557,10 +557,10 @@
                                 <tr>
                                     <th class="text-right">{{ 'field.margin'|trans({}, 'EkynaCommerce') }}</th>
                                     {%- for rule in priceGrid.rules -%}
-                                        {% set margin = commerce_margin({revenue:{product: rule.price}, cost: {product: cost}}) %}
+                                        {% set margin = margin.duplicate({revenue:{product: rule.price}}) %}
                                         <td class="text-right">
-                                            {{ margin.total(true)|format_currency(commerce_default_currency) }}<br>
-                                            {{ margin.percent(true).div(100)|format_number(style='percent') }}
+                                            {{ margin.total(false)|format_currency(commerce_default_currency) }}<br>
+                                            {{ margin.percent(false).div(100)|format_number(style='percent') }}
                                         </td>
                                     {%- endfor -%}
                                 </tr>
