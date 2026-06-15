@@ -34,10 +34,13 @@
 {% block main %}
     <div class="main-header">
         <div class="infos">
+            {% block main_infos %}
             {{- product|product_type_badge }}
             {{ product|cms_tags({'text': false}) -}}
+            {% endblock main_infos %}
         </div>
         <div class="actions">
+            {% block main_actions %}
             {{ macros.produce_product_button(product) }}
             {{ macros.labels_product_button(product) }}
             {{ macros.convert_product_button(product) }}
@@ -49,6 +52,7 @@
             {{ admin_resource_btn(product, 'editor') }}
             {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\UpdateAction', {'short': true}) }}
             {{ admin_resource_btn(product, 'Ekyna\\Bundle\\AdminBundle\\Action\\DeleteAction', {'short': true}) }}
+            {% endblock main_actions %}
         </div>
     </div>
     {% if product is simple_product %}
