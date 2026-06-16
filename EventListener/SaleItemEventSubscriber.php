@@ -12,6 +12,7 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceGridGuesser;
 use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
+use Ekyna\Component\Commerce\Common\Event\SaleItemDiscountEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
@@ -78,12 +79,11 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
     /**
      * Sale item discount event handler.
      */
-    public function onSaleItemDiscount(SaleItemEvent $event): void
+    public function onSaleItemDiscount(SaleItemDiscountEvent $event): void
     {
         if (null === $this->getProductFromEvent($event)) {
             return;
         }
-
 
         $item = $event->getItem();
 
@@ -94,18 +94,22 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         $context = $this->contextProvider->getContext($item->getRootSale());
 
         // PRICE GRID SYSTEM
+        if ($event->usePriceGrid) {
+            $price = $this
+                ->priceGridGuesser
+                ->guess($product, $context->getCustomerGroup(), $item->getTotalQuantity());
 
-        $price = $this
-            ->priceGridGuesser
-            ->guess($product, $context->getCustomerGroup(), $item->getTotalQuantity());
+            if (null !== $price) {
+                $item->setNetPrice($price);
 
-        if (null !== $price) {
-            $item->setNetPrice($price);
-
-            return;
+                return;
+            }
         }
 
         // PRICING SYSTEM
+        if (!$event->usePricing) {
+            return;
+        }
 
         // TODO Move AdjustmentData build in a dedicated service.
 
@@ -215,7 +219,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         return [
             SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],
             SaleItemEvents::BUILD         => ['onSaleItemBuild'],
-            SaleItemEvents::DISCOUNT      => ['onSaleItemDiscount'],
+            SaleItemDiscountEvent::class  => ['onSaleItemDiscount'],
             SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
             SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];
