@@ -15,6 +15,7 @@ use Ekyna\Component\Commerce\Common\Context\ContextProviderInterface;
 use Ekyna\Component\Commerce\Common\Event\SaleItemDiscountEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvent;
 use Ekyna\Component\Commerce\Common\Event\SaleItemEvents;
+use Ekyna\Component\Commerce\Common\Event\SaleItemNetPriceEvent;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentData;
 use Ekyna\Component\Commerce\Common\Model\AdjustmentModes;
 use Ekyna\Component\Commerce\Common\Model\SaleItemInterface;
@@ -76,6 +77,35 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         $item->setPrivate(false); // Root items can't be private.
     }
 
+    public function onSaleItemNetPrice(SaleItemNetPriceEvent $event): void
+    {
+        if (null === $this->getProductFromEvent($event)) {
+            return;
+        }
+
+        $item = $event->getItem();
+
+        if (null === $product = $this->getProductFromItem($item)) {
+            return;
+        }
+
+        $event->setNetPrice($product->getNetPrice());
+
+        $context = $this->contextProvider->getContext($item->getRootSale());
+
+        // PRICE GRID SYSTEM
+        $price = $this
+            ->priceGridGuesser
+            ->guess($product, $context->getCustomerGroup(), $item->getTotalQuantity());
+
+        if (null === $price) {
+            return;
+        }
+
+        $event->setNetPrice($price);
+        $event->stopPropagation();
+    }
+
     /**
      * Sale item discount event handler.
      */
@@ -92,24 +122,6 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         }
 
         $context = $this->contextProvider->getContext($item->getRootSale());
-
-        // PRICE GRID SYSTEM
-        if ($event->usePriceGrid) {
-            $price = $this
-                ->priceGridGuesser
-                ->guess($product, $context->getCustomerGroup(), $item->getTotalQuantity());
-
-            if (null !== $price) {
-                $item->setNetPrice($price);
-
-                return;
-            }
-        }
-
-        // PRICING SYSTEM
-        if (!$event->usePricing) {
-            return;
-        }
 
         // TODO Move AdjustmentData build in a dedicated service.
 
@@ -157,6 +169,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             $offer['percent'],
             $source
         ));
+        $event->stopPropagation();
     }
 
     /**
@@ -207,7 +220,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
                 if ($subject instanceof ProductInterface) {
                     return $subject;
                 }
-            } catch (SubjectException $e) {
+            } catch (SubjectException) {
             }
         }
 
@@ -220,6 +233,7 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
             SaleItemEvents::INITIALIZE    => ['onSaleItemInitialize'],
             SaleItemEvents::BUILD         => ['onSaleItemBuild'],
             SaleItemDiscountEvent::class  => ['onSaleItemDiscount'],
+            SaleItemNetPriceEvent::class  => ['onSaleItemNetPrice'],
             SaleItemFormEvent::BUILD_FORM => ['onSaleItemBuildForm'],
             SaleItemFormEvent::BUILD_VIEW => ['onSaleItemBuildFormView'],
         ];
