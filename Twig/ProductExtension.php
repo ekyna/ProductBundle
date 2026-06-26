@@ -9,6 +9,7 @@ use Ekyna\Bundle\ProductBundle\Model;
 use Ekyna\Bundle\ProductBundle\Service\ConstantsHelper;
 use Ekyna\Bundle\ProductBundle\Service\Converter\ProductConverter;
 use Ekyna\Bundle\ProductBundle\Service\Features;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceGridHelper;
 use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -191,6 +192,10 @@ class ProductExtension extends AbstractExtension
             new TwigFunction(
                 'get_product_by_reference',
                 [ProductHelper::class, 'findOneProductByReference']
+            ),
+            new TwigFunction(
+                'get_product_price_grids',
+                [PriceGridHelper::class, 'getPriceGrids']
             ),
         ];
     }

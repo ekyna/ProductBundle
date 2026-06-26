@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ekyna\Bundle\ProductBundle\Service\Serializer;
 
 use Ekyna\Bundle\ProductBundle\Model;
+use Ekyna\Bundle\ProductBundle\Service\Pricing\PriceGridHelper;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Group;
 use Ekyna\Component\Commerce\Bridge\Symfony\Serializer\Helper\SubjectNormalizerHelper;
 use Ekyna\Component\Commerce\Supplier\Model\SupplierProductInterface;
@@ -25,8 +26,10 @@ use function array_replace;
  * @package Ekyna\Bundle\ProductBundle\Service\Serializer
  * @author  Etienne Dauvergne <contact@ekyna.com>
  */
-class ProductNormalizer extends TranslatableNormalizer implements ResourceHelperAwareInterface,
-                                                                  CacheManagerAwareInterface
+class ProductNormalizer
+    extends TranslatableNormalizer
+    implements ResourceHelperAwareInterface,
+               CacheManagerAwareInterface
 {
     use ResourceHelperAwareTrait;
     use CacheManagerAwareTrait;
@@ -230,6 +233,8 @@ class ProductNormalizer extends TranslatableNormalizer implements ResourceHelper
                 'currency'  => $reference->getSupplier()->getCurrency()->getCode(),
             ];
         }, $this->supplierProductRepository->findBySubject($object));
+
+        $data['price_grids'] = PriceGridHelper::getPriceGrids($object);
 
         return $data;
     }

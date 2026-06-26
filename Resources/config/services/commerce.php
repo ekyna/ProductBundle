@@ -10,6 +10,7 @@ use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemChecker;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductFilter;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ProductProvider;
+use Ekyna\Bundle\ProductBundle\Service\Commerce\QuoteViewType;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\Report\ProductsSection;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\SaleViewType;
 use Ekyna\Component\Commerce\Bridge\Symfony\DependencyInjection\RegisterViewTypePass;
@@ -78,5 +79,14 @@ return static function (ContainerConfigurator $container) {
     $services
         ->set('ekyna_product.commerce.view_type.sale', SaleViewType::class)
         ->parent('ekyna_commerce.view_type.abstract')
+        ->tag(RegisterViewTypePass::VIEW_TYPE_TAG);
+
+    // Quote view type
+    $services
+        ->set('ekyna_product.commerce.view_type.quote', QuoteViewType::class)
+        ->parent('ekyna_commerce.view_type.abstract')
+        ->args([
+            service('ekyna_product.guesser.price_grid'),
+        ])
         ->tag(RegisterViewTypePass::VIEW_TYPE_TAG);
 };
