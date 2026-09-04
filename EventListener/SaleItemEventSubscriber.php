@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Ekyna\Bundle\ProductBundle\EventListener;
 
+use Decimal\Decimal;
 use Ekyna\Bundle\CommerceBundle\Event\SaleItemFormEvent;
 use Ekyna\Bundle\ProductBundle\Exception\RuntimeException;
 use Ekyna\Bundle\ProductBundle\Model\ProductInterface;
+use Ekyna\Bundle\ProductBundle\Model\ProductTypes;
 use Ekyna\Bundle\ProductBundle\Repository\OfferRepositoryInterface;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\FormBuilder;
 use Ekyna\Bundle\ProductBundle\Service\Commerce\ItemBuilder;
@@ -86,6 +88,13 @@ class SaleItemEventSubscriber implements EventSubscriberInterface
         $item = $event->getItem();
 
         if (null === $product = $this->getProductFromItem($item)) {
+            return;
+        }
+
+        if (ProductTypes::isBundledType($product)) {
+            $event->setNetPrice(new Decimal(0));
+            $event->stopPropagation();
+
             return;
         }
 
